@@ -1,0 +1,49 @@
+<dom-module id="fc-johntest">
+  <template>
+    <paper-material>
+      <firebase-document id="johnloc" location="https://focusedstaging1.firebaseio.com/johntest" data="{{johntest}}"></firebase-document>
+      <iron-localstorage id="johnls" value="[[something]]" name="fb-john-test" on-iron-local-storage-load="newPush"></iron-localstorage>
+      <paper-input value="{{username}}" label="username"></paper-input>
+      <paper-input value="{{firstname}}" label="firstname"></paper-input>
+      <paper-input value="{{lastname}}" label="lastname"></paper-input>
+      <paper-button on-tap="pushToFirebase">Old</paper-button>
+      <paper-button on-tap="newPush">New</paper-button>
+    </paper-material>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'fc-johntest',
+    properties: {
+      alljohntest: {
+        type: Object,
+        value: {},
+        notify: true
+      },
+      johntest: {
+        type: Object,
+        value: {},
+        notify: true
+      }
+    },
+    ready: function(){
+      console.log('fc-johntest is ready');
+    },
+    pushToFirebase: function(){
+      var obj = {
+        'firstname': this.firstname,
+        'lastname': this.lastname,
+        'time': Date().toString()
+      };
+      this.alljohntest[this.username] = obj;
+      this.johntest = this.alljohntest;
+      this.something = {'puke':'ass'};
+    },
+    newPush: function(){
+      console.log('read from local storage');
+      console.log(this.$.johnls.value);
+      this.$.johnloc.data = this.$.johnls.value;
+    }
+  });
+</script>
+</dom-module>
