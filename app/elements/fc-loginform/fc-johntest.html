@@ -1,8 +1,10 @@
 <dom-module id="fc-johntest">
   <template>
     <paper-material>
-      <firebase-document id="johnloc" location="https://focusedstaging1.firebaseio.com/johntest" data="{{johntest}}"></firebase-document>
+      <firebase-document id="johnloc" location="https://focusedstaging1.firebaseio.com/johntest" data="{{online_data}}"></firebase-document>
       <iron-localstorage id="johnls" value="[[something]]" name="fb-john-test" on-iron-local-storage-load="newPush"></iron-localstorage>
+      <iron-signals on-iron-signal-connection-state-changed="changeConnected"></iron-signals>
+
       <paper-input value="{{username}}" label="username"></paper-input>
       <paper-input value="{{firstname}}" label="firstname"></paper-input>
       <paper-input value="{{lastname}}" label="lastname"></paper-input>
@@ -20,14 +22,18 @@
         value: {},
         notify: true
       },
-      johntest: {
+      online_data: {
         type: Object,
         value: {},
         notify: true
+      },
+      connected: {
+        type: Boolean,
+        observer: ''
       }
     },
     ready: function(){
-      console.log('fc-johntest is ready');
+      //console.log('fc-johntest is ready');
     },
     pushToFirebase: function(){
       var obj = {
@@ -36,13 +42,17 @@
         'time': Date().toString()
       };
       this.alljohntest[this.username] = obj;
-      this.johntest = this.alljohntest;
+      this.online_data = this.alljohntest;
       this.something = {'puke':'ass'};
     },
     newPush: function(){
-      console.log('read from local storage');
-      console.log(this.$.johnls.value);
-      this.$.johnloc.data = this.$.johnls.value;
+      /*console.log('read from local storage');
+      console.log(this.$.johnls.value);*/
+      this.online_data = this.something;
+    },
+    changeConnected: function(e, detail){
+      this.connected = detail;
+      //console.log('Connected: ' + this.connected)
     }
   });
 </script>
