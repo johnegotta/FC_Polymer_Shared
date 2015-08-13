@@ -1,0 +1,101 @@
+<dom-module id="fc-callMemo">
+  <style>
+    div.text {
+      border: 1px solid #002c80;
+      background-color: white;
+      padding: 5px;
+      margin: 6px 1px 2px 5px;
+      border-radius: 23px;
+    }
+ 
+    .log-entry {
+   	border: 8px ridge #aecdfe;
+    	margin: 3px;
+    	background-color: #aecdfe;
+      	border-radius: 23px;
+      	width: 99%;
+      	min-width: 640px;
+    }
+    
+    	
+    paper-button.better-platinum {
+    	background: #E5E4E2;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 5px 5px 2.5px #888888;
+	font-weight: 800;
+	color: #002c80;
+	font-size: 13px;
+}
+   paper-material.callcard {
+   	margin: 10px 10px 10px 10px;
+   	background: #f6f6f6;
+   	padding: 8px;
+   	border-radius: 20px;
+   	}
+</style>
+<template>
+<div class="vertical layout scroller">
+	<div class="horizontal layout wrap">
+  		<div class="vertical layout message log-entry">	
+    			<div class="horizontal layout  wrap" min-width= "330px" on-dblclick="toggleDetail">	   		
+    				<div class="text" ><b> Time: </b> <span>{{callinfo.timestamp}}</span></div> 
+      			<div class="text"> <b> Caller4: </b> <span>{{callinfo.firstname}}</span> <span>{{callinfo.lastname}}</span></div>
+      			<div class="text"> <b> Phone: </b> <span>{{callinfo.phone}}</span></div>
+      			<div class="text"> <b> Email: </b> <span>{{callinfo.email}}</span></div>
+    				<div class="text"> <b> Student: </b> <span><span>{{callinfo.timeorder}}</span> <span>{{callinfo.lastname}}</span></span></div>
+    			</div>
+    			<div>
+      			<div class="text"><b> <span>{{callinfo.firstname}}</span> <span>{{callinfo.lastname}}</span><span>’s Message: </span></b> <span>{{callinfo.message}}</span>
+				</div>
+   			</div>
+   			
+		</div>
+	</div>
+	<div>
+   		<paper-button class="better-platinum" on-tap="toggleDetail">View</paper-button>
+  	</div>
+</div>
+<div class="verticle layout">
+	<iron-collapse id="collapsedDetail">
+		<content>
+
+
+<!--
+	<paper-material class="callcard" elevation="2">
+	  	<p>I am a Student Card for <span>{{callinfo.firstname}}</span> <span>{{callinfo.lastname}}</span></p>
+	  	<p>{{callinfo.message}}</p>
+	  	
+	  	Double Clicking the above call entry bar will open/close this profile card.
+	  	<div>
+	  	<paper-button class="better-platinum" on-tap="doIt">Select</paper-button>
+	  	</div>
+	</paper-material>-->
+
+
+
+		</content>
+	</iron-collapse>
+</div>
+
+</template>
+ <script>
+    Polymer({
+      is: 'fc-callMemo',
+     properties: {   
+        callinfo: {
+            type: Object,
+            notify: true
+          	}
+      },
+     
+      doIt: function(){
+        this.fire('writeToInputs',this.callinfo);
+      },
+      toggleDetail: function(){
+    	this.$.collapsedDetail.toggle();
+    	//this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? "icons:remove":"icons:add";
+      }
+    });
+  </script>
+</dom-module>
