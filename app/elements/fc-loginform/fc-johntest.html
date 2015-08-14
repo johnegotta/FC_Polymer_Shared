@@ -2,14 +2,14 @@
   <template>
     <paper-material>
       <firebase-document id="johnloc" location="https://focusedstaging1.firebaseio.com/johntest" data="{{online_data}}"></firebase-document>
-      <iron-localstorage id="johnls" value="[[something]]" name="fb-john-test" on-iron-local-storage-load="newPush"></iron-localstorage>
+      <iron-localstorage id="johnls" value="{{offline_data}}" on-iron-localstorage-load="loaded" name="fb-john-test"></iron-localstorage>
       <iron-signals on-iron-signal-connection-state-changed="changeConnected"></iron-signals>
 
       <paper-input value="{{username}}" label="username"></paper-input>
       <paper-input value="{{firstname}}" label="firstname"></paper-input>
       <paper-input value="{{lastname}}" label="lastname"></paper-input>
-      <paper-button on-tap="pushToFirebase">Old</paper-button>
-      <paper-button on-tap="newPush">New</paper-button>
+      <paper-button on-tap="storeData">Add</paper-button>
+      <paper-button on-tap="pushFromLocal">New</paper-button>
     </paper-material>
   </template>
 </dom-module>
@@ -17,7 +17,7 @@
   Polymer({
     is: 'fc-johntest',
     properties: {
-      alljohntest: {
+      all_new_data: {
         type: Object,
         value: {},
         notify: true
@@ -27,32 +27,52 @@
         value: {},
         notify: true
       },
+      offline_data: {
+        type: Object,
+        value: {},
+        notify: true
+      },
       connected: {
         type: Boolean,
-        observer: ''
+        observer: 'pushFromLocal'
       }
     },
-    ready: function(){
-      //console.log('fc-johntest is ready');
-    },
-    pushToFirebase: function(){
-      var obj = {
+    storeData: function(){
+      var children = {
         'firstname': this.firstname,
         'lastname': this.lastname,
         'time': Date().toString()
-      };
-      this.alljohntest[this.username] = obj;
-      this.online_data = this.alljohntest;
-      this.something = {'puke':'ass'};
+      }
+      switch(this.connected){
+        case true:
+         /*the way this obj is created and split from the children object doesn't have to be like this
+         but I don't feel like chnaging it back right now. was just testing other variations before I got it working*/
+          var obj = {};
+          obj[this.username] = children;
+          this.online_data = obj;
+          break;
+        case false:
+          /*Not sure why I have to erase the whole thing and reset it, but have tried many
+          other ways of doing this, and this was the only thing that worked*/
+          this.all_new_data[this.username] = children;
+          this.offline_data = {};
+          this.offline_data = this.all_new_data;
+          break;
+      }
     },
-    newPush: function(){
-      /*console.log('read from local storage');
-      console.log(this.$.johnls.value);*/
-      this.online_data = this.something;
+    pushFromLocal: function(){
+      if(this.connected){
+        this.online_data = this.offline_data;
+        console.log('adding stuff from local storage');
+      }
+    },
+    loaded: function(e){
+      console.log(this.offline_data);
+      //this.offline_data = this.$.johnls.value;
     },
     changeConnected: function(e, detail){
       this.connected = detail;
-      //console.log('Connected: ' + this.connected)
+      console.log('Connected: ' + this.connected)
     }
   });
 </script>
