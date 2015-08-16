@@ -1,0 +1,108 @@
+<dom-module id="fc-callCenterInterface">
+<style>
+paper-button.better-red {
+	background: #ff0000;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #fff;
+	position: absolute;
+	right: 20px;
+	top: 20px;
+}
+ 
+.leftPanel {
+	
+	height:100%;
+
+	}
+
+.rightPanel {
+	height: 900px;
+	
+}
+
+paper-textarea.textAreaLimit {
+     width: 300px;
+     height: 330px;
+     font-size: 11.5px;
+}
+div.barrier {
+     width: 20px;
+     height: 100%;
+}
+</style>
+<template>
+<div class="vertical layout">
+    <div class="horizontal layout container wrap">
+          <div class="leftPanel layout flex-1 wrap">
+     		<fc-card header-title="Call Memo Entry">
+                    <fc-inputs></fc-inputs>
+               </fc-card>
+  		
+               <fc-card header-title="Call Message" elevation="3">
+                   <paper-textarea class="textAreaLimit" value="{{SOMETHING}}" label="This input expands!" maxlength="450"></paper-textarea>
+               </fc-card>
+               <fc-card header-title="Student Info">
+                    <span>{{person.firstname}}</span>&nbsp<span>{{person.lastname}}</span>
+                    <br><br>
+                    <span>{{person.email}}</span>
+                    <br><br>
+                    <span>{{person.phone}}</span>
+               </fc-card>
+
+          </div>
+          <div class="barrier"></div>
+  		<div class="rightPanel layout flex-3 wrap" height="99vh">
+               <fc-callMemoList>
+               <paper-button class="better-red right" on-tap="clearCall">Clear Call</paper-button></fc-callMemoList>
+  		</div><!--right-->
+  	</div><!--horizontal layout container-->
+  </div>
+  <fc-person></fc-person>
+</template>
+  <script>
+    Polymer({
+          is: "fc-callCenterInterface",
+
+          properties: {
+               person: {
+                    type: Object,
+                    notify: true,
+               }
+          },
+      	ready: function() {
+      	      //this.addEventListener('writeToInputs', this.fillInputsFromCall);
+      	      this.addEventListener('inputChanged', this.tester);
+                this.person = {firstname: "Unspecified"};
+    	    },
+    	    fillInputsFromCall: function(e){
+          /*
+    	      this.$.callinputs.callerFirstName = e.detail.firstname;
+    	      this.$.callinputs.callerLastName = e.detail.lastname;
+    	      this.$.callinputs.callerEmail = e.detail.email;
+    	      this.$.callinputs.callerPhone = e.detail.phone;
+           */
+          this.person = new FcPerson(e.detail.firstname, e.detail.lastname, e.detail.email, e.detail.phone);
+          //this.person = {firstname: e.detail.firstname, lastname: e.detail.lastname};
+           console.log(this.person.lastname);
+           //alert("received writeToInputs event");
+    	      //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
+    	    },
+    	    tester: function(e){
+    	      console.log(e.detail);
+    	      this.$.callmemos.inputinfo = e.detail;
+    	   
+    	    },
+    	    clearCall: function(){
+	      this.$.callinputs.callerFirstName = '';
+    	      this.$.callinputs.callerLastName = '';
+    	      this.$.callinputs.callerEmail = '';
+    	      this.$.callinputs.callerPhone = '';
+    	      this.$.callinputs.callerMessage = '';
+	      }
+    	    
+    });
+  </script>
+</dom-module>

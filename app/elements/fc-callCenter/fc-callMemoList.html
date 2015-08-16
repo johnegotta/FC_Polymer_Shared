@@ -1,0 +1,97 @@
+<dom-module id="fc-callMemoList">
+<style>
+paper-input.searchbar{
+	border-radius: 42px;
+	background: #ff;
+	width: 400px;
+	margin-left: 12px;
+	color: #00CCFF;
+}
+
+div.searchresults {
+	max-height: 1050px;
+	overflow-y: scroll;
+	margin-top: 20px;
+	border: 2px solid red;
+	width: 62vw;
+	}
+	
+
+div.fixedsearch {
+	margin-bottom: 4px; 
+
+
+	}
+</style>
+<template>
+<firebase-collection data="{{callReads}}" id="FBCallReads" limit-to="40" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
+<firebase-collection data="{{people}}" id="FocusedPeople" order-by-child="lastname" location="https://focusedstaging1.firebaseio.com/persons">
+                </firebase-collection>  
+	<div class="verticle layout">
+         	<div class="fixedsearch">   
+               		<paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
+               		</paper-input>
+               		<content></content>
+      		</div>
+      		<div class="searchresults">
+      			<!--<paper-material class="limit" elevation="2">-->
+      			<!--
+                    		<template is="dom-repeat" items="{{callReads}}"  filter="{{_callFilter(inputinfo)}}"><fc-callMemo callinfo="{{item}}"></fc-callMemo>  
+                    		</template>
+                 -->
+                 <template is="dom-repeat" items="{{people}}"  filter="{{_personFilter(inputinfo)}}"><fc-callMemo callinfo="{{item}}"><fc-tabbedCardHolder></fc-tabbedCardHolder></fc-callMemo>  
+                    		</template>
+                    	<!--</paper-material>-->
+               </div>
+	</div>
+</template>
+<script>
+HTMLImports.whenReady(function() {
+	Polymer({
+	  is: "fc-callMemoList",
+	  properties: {
+	    	inputinfo: {
+	    	  type: Object,
+	    	  value: {
+	    	   	firstname: '',
+	    	   	lastname: '',
+	    	   	email: '',
+	    	   	phone: '',
+	    	   	timestamp:'',
+	    	   	timeorder:'',
+	    	   	message: ''
+	    	  },
+	    	  notify: true
+	    	}
+	    },
+	    
+	    ready: function(){
+      	      this.addEventListener('personSelected', this._selectPerson);
+	    },
+
+	    _selectPerson: function(e){
+	    	//alert("received personSelected event");
+	    	console.log(e.detail);
+	    	this._personFilter(e.detail)
+	    },
+	    
+	    _callFilter: function(inpobj){
+	      return function(item){
+	        if(item.firstname.indexOf(inpobj.firstname)> -1 && item.email.indexOf(inpobj.email)>-1 && item.lastname.indexOf(inpobj.lastname)>-1) return true;
+	      }
+	    },
+
+	    _personFilter: function(inpobj){
+	      return (item.firstname.indexOf(inpobj.firstname)> -1 && item.lastname.indexOf(inpobj.lastname) > -1 && item.email.indexOf(inpobj.email) > -1 && item.phone.indexOf(inpobj.phone) > -1);
+	      /*
+	      return function(item){
+	      	console.log(item);
+	      	alert("person filter");
+	        if(item.firstname.indexOf(inpobj.firstname)> -1 && item.email.indexOf(inpobj.email)>-1 && item.lastname.indexOf(inpobj.lastname)>-1 && item.phone.indexOf(inpobj.phone)>-1) return true;
+	        */
+	      }  
+	    } 
+	});
+});
+</script>
+</dom-module>
