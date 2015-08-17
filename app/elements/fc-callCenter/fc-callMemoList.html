@@ -1,0 +1,88 @@
+<dom-module id="fc-callMemoList">
+<style>
+paper-input.searchbar{
+	border-radius: 42px;
+	background: #ff;
+	width: 400px;
+	margin-left: 12px;
+	color: #00CCFF;
+}
+
+div.searchresults {
+	max-height: 1050px;
+	overflow: scroll;
+	margin-top: 20px;
+	border: 2px solid red;
+	width: 62vw;
+	}
+	
+
+div.fixedsearch {
+	margin-bottom: 4px; 
+
+
+	}
+</style>
+<template>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="100" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
+</firebase-collection>
+	<div class="verticle layout">
+         	<div class="fixedsearch">   
+               		<paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
+               		</paper-input>
+      		</div>
+      		<div class="searchresults">
+            		<template is="dom-repeat" items="{{calls}}" filter="{{_callFilter(inputinfo)}}">
+                 		<fc-callMemo callinfo="{{item}}">
+                 			<fc-tabbedCardHolder callinfo="{{item}}"></fc-tabbedCardHolder>
+                 		</fc-callMemo> 
+                  	</template>
+                    	
+               </div>
+	</div>
+</template>
+<script>
+	Polymer({
+	  is: "fc-callMemoList",
+	  properties: {
+	    	inputinfo: {
+	    	  type: Object,
+	    	  value: {
+	    	   	firstname: '',
+	    	   	lastname: '',
+	    	   	email: '',
+	    	   	phone: '',
+	    	   	timestamp:'',
+	    	   	timeorder:'',
+	    	   	message: ''
+	    	  },
+	    	  notify: true
+	    	}
+	    },
+
+		showCalls: function(){
+	    		console.log("found # calls = " + this.$.FBCallReads.data.length);
+	    	},
+
+	  
+	    _selectPerson: function(e){
+	    	alert("received personSelected event");
+	    	console.log(e.detail);
+	    	//this.$.callEntry.person.uid = e.detail.__firebaseKey__;
+	    	alert(e.detail.__firebaseKey__);
+	    	//this._personFilter()(e.detail)
+	    },
+	    
+	    _callFilter: function(inpobj){
+	      return function(item){
+	      	console.log("_callFilter");
+	      	console.log(item);
+	        if(item.firstname.indexOf(inpobj.firstname)> -1 || item.email.indexOf(inpobj.email)>-1 || item.lastname.indexOf(inpobj.lastname)>-1) return true;
+	      };
+
+	    }
+	        
+	         
+	});		
+</script>
+</dom-module>

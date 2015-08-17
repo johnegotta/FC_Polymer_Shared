@@ -1,0 +1,98 @@
+<dom-module id="fc-inputs">
+<style is="custom-style">
+
+paper-button.better-green {
+	background: green;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #fff;
+	margin-top: 10px;
+	margin-left: 20px;
+	font-size: 11.5px;
+	text-align: left;
+	text-indent: 0px;
+	bottom: 8px;
+	}
+
+paper-input.focused {
+	margin: 4px;
+	max-width: 135px;
+	}
+
+paper-textarea.message {
+ 	padding: 0px 8px 0px  8px;
+ 	text-indent: 0px;
+ 	margin-top: 0px;
+ 	width: 300px;
+ 	}
+
+}
+</style>
+<template>
+	<div class="horizontal layout wrap">
+	  	<paper-input id="uid" maxlength="40" hidden></paper-input>
+	  	<paper-input class="focused" id="inp0" value="{{person.firstname}}" label="First Name" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp1" value="{{person.lastname}}" label="Last Name" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp2" value="{{person.phone}}" label="Phone" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp3" value="{{person.email}}" label="Email" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp4" value="{{person.student}}" label="Related Student" maxlength="40"></paper-input>
+	 </div>
+     <iron-signals on-iron-signal-personSelected="_selectPerson"></iron-signals>
+
+</template>
+<script> 
+Polymer({
+	is: "fc-inputs",
+	properties:{
+	    person: {
+	    	type: Object,
+	    	value: {},
+	    	notify: true,
+	    	//reflectToAttributes: true,
+	    	observer: "displayPerson"
+	    	},
+	    teststring: {
+	    	type: String,
+	    	notify: true,
+	    	value: "test123"
+	    } 
+	    		
+	},
+
+	displayPerson: function(){
+		console.log("displayPerson in fc-inputs");
+		console.log(this.person);
+	},
+
+	ready: function(){
+		//signals
+	    //this.addEventListener('iron-signal-personSelected', this._selectPerson);
+	},
+
+	_selectPerson: function(e){
+		alert("fc-inputs _selectPerson received event");
+		this.person = e.detail;
+		console.log(this.person);
+	},
+
+	addPerson: function(){
+		var time=Date().toString().slice(0,21);
+		var order=-event.timeStamp;
+		var person = {	   
+		   	'firstname': this.firstname,
+	        'lastname': this.lastname,
+	        'email': this.email, 
+	        'phone': this.phone,
+	        'relatedstudent': this.relatedstudent,
+	        'message': this.message,
+	        'timestamp': time,
+	        'timeorder': order,
+	        'personType': this.personType 
+	   };
+	}
+
+});
+</script>
+</dom-module>
