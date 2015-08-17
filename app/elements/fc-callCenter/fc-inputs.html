@@ -1,6 +1,8 @@
 <dom-module id="fc-inputs">
 <style is="custom-style">
-
+:host{ 
+	display: flex-box;
+}
 paper-button.better-green {
 	background: green;
 	raised: true;
@@ -15,9 +17,24 @@ paper-button.better-green {
 	text-indent: 0px;
 	bottom: 8px;
 	}
+paper-button.gold {
+	background: #edc013;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #002c80;
+	margin-top: 10px;
+	margin-left: 50px;
+	font-size: 13px;
+	text-align: left;
+	text-indent: 0px;
+	bottom: 8px;
+}
 
 paper-input.focused {
 	margin: 4px;
+	padding: 4px;
 	max-width: 135px;
 	}
 
@@ -25,22 +42,32 @@ paper-textarea.message {
  	padding: 0px 8px 0px  8px;
  	text-indent: 0px;
  	margin-top: 0px;
- 	width: 300px;
+ 	max-width: calculated(98%-24px);
  	}
 
-}
+ paper-checkbox: {
+ 	padding: 12px;
+ 	margin: 4px;
+ 	width: 40px;
+ }
+
 </style>
 <template>
-	<div class="horizontal layout wrap">
+<firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>		
+<div class="vertical layout">
+	<div class="horizontal layout wrap center-center">
 	  	<paper-input id="uid" maxlength="40" hidden></paper-input>
 	  	<paper-input class="focused" id="inp0" value="{{person.firstname}}" label="First Name" maxlength="40"></paper-input>
 	  	<paper-input class="focused" id="inp1" value="{{person.lastname}}" label="Last Name" maxlength="40"></paper-input>
 	  	<paper-input class="focused" id="inp2" value="{{person.phone}}" label="Phone" maxlength="40"></paper-input>
 	  	<paper-input class="focused" id="inp3" value="{{person.email}}" label="Email" maxlength="40"></paper-input>
 	  	<paper-input class="focused" id="inp4" value="{{person.student}}" label="Related Student" maxlength="40"></paper-input>
-	 </div>
+	  	<paper-input class="focused" id="inp5" value="{{person.yourcoach}}" label="Focused Coach" maxlength="40"></paper-input>
+	</div>
+</div>	
      <iron-signals on-iron-signal-personSelected="_selectPerson"></iron-signals>
-
+<paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
 </template>
 <script> 
 Polymer({
@@ -48,27 +75,29 @@ Polymer({
 	properties:{
 	    person: {
 	    	type: Object,
-	    	value: {},
-	    	notify: true,
-	    	//reflectToAttributes: true,
-	    	observer: "displayPerson"
+	    	value: {
+	    			firstname: '',
+	        		lastname: '',
+	        		email:"", 
+	        		phone: '',
+	        		relatedstudent: '',
+	        		message: '',
+	        		timestamp: '',
+	        		timeorder: '',
+	        		personType: '' 
 	    	},
-	    teststring: {
-	    	type: String,
 	    	notify: true,
-	    	value: "test123"
-	    } 
-	    		
+	    	reflectToAttributes: true,
+	    	observer: "displayPerson"
+	    	}	
 	},
+	observers: [
+	      'inputmonitor(this.person)'
+	    ],
 
 	displayPerson: function(){
 		console.log("displayPerson in fc-inputs");
 		console.log(this.person);
-	},
-
-	ready: function(){
-		//signals
-	    //this.addEventListener('iron-signal-personSelected', this._selectPerson);
 	},
 
 	_selectPerson: function(e){
@@ -77,20 +106,25 @@ Polymer({
 		console.log(this.person);
 	},
 
-	addPerson: function(){
-		var time=Date().toString().slice(0,21);
+	addCall: function(){
+		var time=Date().toString().slice(4,21);
 		var order=-event.timeStamp;
 		var person = {	   
-		   	'firstname': this.firstname,
-	        'lastname': this.lastname,
-	        'email': this.email, 
-	        'phone': this.phone,
-	        'relatedstudent': this.relatedstudent,
-	        'message': this.message,
+		   	'firstname': this.person.firstname,
+	        'lastname': this.person.lastname,
+	        'email': this.person.email, 
+	        'phone': this.person.phone,
+	        'relatedstudent': this.person.relatedstudent,
+	        'message': this.person.message,
 	        'timestamp': time,
 	        'timeorder': order,
-	        'personType': this.personType 
+	        'personType': this.person.personType //new call, current student. returning, previous caller no close
 	   };
+		 this.person=person;
+	     this.$.FBcalls._setRemoteDocumentChild(order, this.person);
+	     console.log(this.person);
+	     this.person={};
+	     return this.person;
 	}
 
 });
