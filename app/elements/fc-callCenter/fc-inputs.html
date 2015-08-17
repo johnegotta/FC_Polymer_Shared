@@ -32,12 +32,15 @@ paper-textarea.message {
 </style>
 <template>
 	<div class="horizontal layout wrap">
-	  	<paper-input class="focused" id="inp0" value="{{firstname}}" label="First Name" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp1" value="{{lastname}}" label="Last Name" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp2" value="{{phone}}" label="Phone" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp3" value="{{email}}" label="Email" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp4" value="{{relatedstudent}}" label="Related Student" maxlength="40"></paper-input>
+	  	<paper-input id="uid" maxlength="40" hidden></paper-input>
+	  	<paper-input class="focused" id="inp0" value="{{person.firstname}}" label="First Name" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp1" value="{{person.lastname}}" label="Last Name" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp2" value="{{person.phone}}" label="Phone" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp3" value="{{person.email}}" label="Email" maxlength="40"></paper-input>
+	  	<paper-input class="focused" id="inp4" value="{{person.student}}" label="Related Student" maxlength="40"></paper-input>
 	 </div>
+     <iron-signals on-iron-signal-personSelected="_selectPerson"></iron-signals>
+
 </template>
 <script> 
 Polymer({
@@ -46,10 +49,33 @@ Polymer({
 	    person: {
 	    	type: Object,
 	    	value: {},
-	    	notify: true
-	    	} 
+	    	notify: true,
+	    	//reflectToAttributes: true,
+	    	observer: "displayPerson"
+	    	},
+	    teststring: {
+	    	type: String,
+	    	notify: true,
+	    	value: "test123"
+	    } 
 	    		
-	   	},
+	},
+
+	displayPerson: function(){
+		console.log("displayPerson in fc-inputs");
+		console.log(this.person);
+	},
+
+	ready: function(){
+		//signals
+	    //this.addEventListener('iron-signal-personSelected', this._selectPerson);
+	},
+
+	_selectPerson: function(e){
+		alert("fc-inputs _selectPerson received event");
+		this.person = e.detail;
+		console.log(this.person);
+	},
 
 	addPerson: function(){
 		var time=Date().toString().slice(0,21);

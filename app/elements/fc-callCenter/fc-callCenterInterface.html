@@ -34,11 +34,13 @@ div.barrier {
 }
 </style>
 <template>
+     <iron-signals on-iron-signal-person-selected="_selectPerson"></iron-signals>
+
 <div class="vertical layout">
     <div class="horizontal layout container wrap">
           <div class="leftPanel layout flex-1 wrap">
      		<fc-card header-title="Call Memo Entry">
-                    <fc-inputs></fc-inputs>
+                    <fc-inputs id="callEntryInputs"></fc-inputs>
                </fc-card>
   		
                <fc-card header-title="Call Message" elevation="3">
@@ -55,8 +57,11 @@ div.barrier {
           </div>
           <div class="barrier"></div>
   		<div class="rightPanel layout flex-3 wrap" height="99vh">
-               <fc-callMemoList>
-               <paper-button class="better-red right" on-tap="clearCall">Clear Call</paper-button></fc-callMemoList>
+               <fc-callMemoList value="{{person}}">
+               </fc-callMemoList>
+               <br>
+               <fc-personList value="{{person}}">
+               </fc-personList>
   		</div><!--right-->
   	</div><!--horizontal layout container-->
   </div>
@@ -69,39 +74,22 @@ div.barrier {
           properties: {
                person: {
                     type: Object,
-                    notify: true,
+                    notify: true
+                    //reflectToAttributes: true
                }
           },
       	ready: function() {
       	      //this.addEventListener('writeToInputs', this.fillInputsFromCall);
       	      this.addEventListener('inputChanged', this.tester);
+                this.addEventListener("personSelected", this._selectPerson);
                 this.person = {firstname: "Unspecified"};
     	    },
-    	    fillInputsFromCall: function(e){
-          /*
-    	      this.$.callinputs.callerFirstName = e.detail.firstname;
-    	      this.$.callinputs.callerLastName = e.detail.lastname;
-    	      this.$.callinputs.callerEmail = e.detail.email;
-    	      this.$.callinputs.callerPhone = e.detail.phone;
-           */
-          this.person = new FcPerson(e.detail.firstname, e.detail.lastname, e.detail.email, e.detail.phone);
-          //this.person = {firstname: e.detail.firstname, lastname: e.detail.lastname};
-           console.log(this.person.lastname);
-           //alert("received writeToInputs event");
-    	      //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
-    	    },
-    	    tester: function(e){
-    	      console.log(e.detail);
-    	      this.$.callmemos.inputinfo = e.detail;
-    	   
-    	    },
-    	    clearCall: function(){
-	      this.$.callinputs.callerFirstName = '';
-    	      this.$.callinputs.callerLastName = '';
-    	      this.$.callinputs.callerEmail = '';
-    	      this.$.callinputs.callerPhone = '';
-    	      this.$.callinputs.callerMessage = '';
-	      }
+
+          _selectPerson: function(e){
+               //alert("received personSelected");
+               this.$.callEntryInputs.person = e.detail;
+               console.log(this.$.callEntryInputs.person);
+          }
     	    
     });
   </script>

@@ -1,0 +1,81 @@
+<dom-module id="fc-personMemo">
+  <style>
+    div.text {
+      border: 1px solid #002c80;
+      background-color: white;
+      padding: 5px;
+      margin: 6px 1px 2px 5px;
+      border-radius: 23px;
+    }
+    .log-entry {
+   	border: 8px ridge #aecdfe;
+    	margin: 3px;
+    	background-color: #aecdfe;
+      	border-radius: 23px;
+      	width: 99%;
+      	min-width: 640px;
+    }
+    
+    	
+  paper-button.better-platinum {
+    background: #E5E4E2;
+	   raised: true;
+	   border-radius: 11px;
+	   box-shadow: 5px 5px 2.5px #888888;
+	   font-weight: 800;
+	   color: #002c80;
+	   font-size: 13px;
+}
+   paper-material.callcard {
+   	margin: 10px 10px 10px 10px;
+   	background: #f6f6f6;
+   	padding: 8px;
+   	border-radius: 20px;
+   	}
+  </style>
+  
+  <template>
+
+<div class="vertical layout">
+	<div class="horizontal layout wrap">
+  <paper-button class="better-platinum" elevation="0" on-tap="doIt">Select</paper-button>
+  		<div class="vertical layout message log-entry">	
+    			<div class="horizontal layout  wrap" min-width= "320px" on-click="toggleDetail">   		
+      				<div class="text"> <b> Client: </b> <span>{{callinfo.firstname}}</span> <span>{{callinfo.lastname}}</span></div>
+      				<div class="text"> <b> Phone: </b> <span>{{callinfo.phone}}</span></div>
+      				<div class="text"> <b> Email: </b> <span>{{callinfo.email}}</span></div>
+    			</div>
+   			</div>
+   			
+		</div>
+	</div>
+     <div class="verticle layout">
+          <iron-collapse id="collapsedDetail" name="collapsedDetail">
+               <paper-material>
+	               <fc-tabbedCardHolder>
+                    </fc-tabbedCardHolder> 
+               </paper-material>
+          </iron-collapse>
+     </div>
+</div>
+  </template>
+  <script>
+    Polymer({
+      is: 'fc-personMemo',
+     properties: {   
+        callinfo: {
+            type: Object,
+            notify: true
+          	}
+      },
+     
+      doIt: function(){
+          this.fire('personSelected', this.callinfo);
+      },
+      toggleDetail: function(){
+        console.log(this.$.collapsedDetail);
+     	  this.$.collapsedDetail.toggle();
+      }
+    });
+  </script>
+</dom-module>
