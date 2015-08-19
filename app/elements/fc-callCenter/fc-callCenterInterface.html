@@ -30,14 +30,13 @@ paper-material.controller{
      margin-bottom: 60px;
 }
 
-paper-textare.input{
-     min-width:320px; 
-     max-width: 98%;
-     expand: max;
+paper-textarea.input{
+     width: 300px;
+     height: 300px;
+     padding-left: 12px;    
 }
 </style>
 <template>
-     <iron-signals on-iron-signal-person-selected="_selectPerson"></iron-signals>
 <paper-material class="controller layout wrap container">
  <h4> Student Type</h4>
      <div class="horizontal layout wrap">
@@ -59,13 +58,12 @@ paper-textare.input{
 
 <div class="vertical layout wrap">
      <div class="horizontal layout container wrap">
-          <div class="leftPanel layout flex-1 wrap">
+          <div class="leftPanel layout wrap">
      		<fc-card header-title="Call Memo Entry">
-                    <fc-inputs id="callEntryInputs"></fc-inputs>
+                    <fc-inputs value={{person}} focusedmessage = [[callMessage]] id="callEntryInputs"></fc-inputs>
                </fc-card>
-  		
                <fc-card header-title="Call Message" elevation="3">
-                   <paper-textarea  class="input" value='This Input Expands!' label="This input expands!" maxlength="450"></paper-textarea>
+                   <paper-textarea  class="input" value='{{callMessage}}' label="This input expands!" maxlength="500"></paper-textarea>
                </fc-card>
                <fc-card header-title="Student Info">
                     <span>{{person.firstname}}</span>&nbsp<span>{{person.lastname}}</span>
@@ -76,16 +74,15 @@ paper-textare.input{
                </fc-card>
 
           </div>
-  		<div class="rightPanel layout flex-3 wrap" height="99vh">
-               <fc-callMemoList value="{{person}}">
+  		<div class="rightPanel layout wrap" height="99vh">
+               <fc-callMemoList id="callList" name="callList" value="{{inputinfo}}">
                </fc-callMemoList>
                <br>
-               <fc-personList value="{{person}}">
-               </fc-personList>
+              <!-- <fc-personList value="{{person}}">
+               </fc-personList>-->
   		</div><!--right-->
   	</div><!--horizontal layout container-->
   </div>
-  <fc-person></fc-person>
 </template>
   <script>
     Polymer({
@@ -94,19 +91,36 @@ paper-textare.input{
           properties: {
                person: {
                     type: Object,
-                    notify: true
-                    //reflectToAttributes: true
+                    notify: true,
+                    reflectToAttributes: true
+               }, 
+               inputinfo:{
+                  type:Object,
+                  value: {}, 
+                  notify: true, 
+                  reflectToAttributes: true
                }
           },
+
+
       	ready: function() {
       	      //this.addEventListener('writeToInputs', this.fillInputsFromCall);
-      	      this.addEventListener('inputChanged', this.tester);
+      	      this.addEventListener('inputChanged', this._updateCallList);
                 this.addEventListener("personSelected", this._selectPerson);
-                this.person = {firstname: "Unspecified"};
     	    },
 
+          _updateCallList: function(e){
+            console.log("received inputChanged event");
+            console.log(e.detail);
+            this.$.callList.searchValues = e.detail;
+            
+            console.log(this.$.callList.searchValues.firstname + " " + e.detail.firstname +" are hitting call list update. So did ");
+            console.log(e.detail)
+            //fire callList.inputinfo;
+            //up to here awesome
+          },
+
           _selectPerson: function(e){
-               //alert("received personSelected");
                this.$.callEntryInputs.person = e.detail;
                console.log(this.$.callEntryInputs.person);
           }

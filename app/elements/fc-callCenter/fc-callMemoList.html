@@ -3,16 +3,16 @@
 paper-input.searchbar{
 	border-radius: 42px;
 	background: #ff;
-	width: 400px;
+	width: 200px;
 	margin-left: 12px;
 	color: #00CCFF;
 }
 
 div.searchresults {
-	max-height: 1050px;
+	max-height: 900px;
 	overflow: scroll;
 	margin-top: 20px;
-	width: 62vw;
+	width: 900px;
 	}
 	
 
@@ -23,7 +23,7 @@ div.fixedsearch {
 	}
 </style>
 <template>
-<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="100" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
 </firebase-collection>
 	<div class="verticle layout">
          	<div class="fixedsearch">   
@@ -31,53 +31,96 @@ div.fixedsearch {
                		</paper-input>
       		</div>
       		<div class="searchresults">
-            		<template is="dom-repeat" items="{{calls}}" filter="{{_callFilter(inputinfo)}}">
+            		<template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
                  		<fc-callMemo callinfo="{{item}}">
                  			<fc-tabbedCardHolder callinfo="{{item}}"></fc-tabbedCardHolder>
                  		</fc-callMemo> 
                   	</template>
-                    	
-               </div>
+ 		               
 	</div>
 </template>
 <script>
 	Polymer({
 	  is: "fc-callMemoList",
 	  properties: {
-	    	inputinfo: {
+	    	searchValues: {
 	    	  type: Object,
 	    	  value: {
-	    	   	firstname: '',
-	    	   	lastname: '',
-	    	   	email: '',
-	    	   	phone: '',
-	    	   	timestamp:'',
-	    	   	timeorder:'',
-	    	   	message: ''
+	    	  		firstname: "",
+	    	  		lastname:"",
+	    	  		email:"", 
+					phone:"",
+	        		relatedstudent: "",
+	        		message: "",
+	        		coach:""
 	    	  },
-	    	  notify: true
+	    	  notify: true, 
+	    	  reflectToAttributes: true
 	    	}
-	    },
-
-		showCalls: function(){
-	    		console.log("found # calls = " + this.$.FBCallReads.data.length);
-	    	},
-
-	  
-	    _selectPerson: function(e){
-	    	alert("received personSelected event");
-	    	console.log(e.detail);
-	    	//this.$.callEntry.person.uid = e.detail.__firebaseKey__;
-	    	alert(e.detail.__firebaseKey__);
-	    	//this._personFilter()(e.detail)
-	    },
-	    
+	    },   
 	    _callFilter: function(inpobj){
+	      
 	      return function(item){
-	      	console.log("_callFilter");
+	      	if(!inpobj) {
+	      		console.log("_callFilter inpobj is null");
+	      		return true;
+	      	}
+	      	//start out with true result & falsify if any non blank match fails
+	      	var result = true;
+	      	console.log(inpobj);
 	      	console.log(item);
-	        if(item.firstname.indexOf(inpobj.firstname)> -1 || item.email.indexOf(inpobj.email)>-1 || item.lastname.indexOf(inpobj.lastname)>-1) return true;
+	      	if(inpobj.firstname && inpobj.firstname != "")
+	      	{
+	      		//user entered a value in first name search
+	      		if(item.firstname)	      		
+	      		{
+		      		result &= (item.firstname.indexOf(inpobj.firstname) > -1);
+		      	}
+		      	else return false; // first name searched but none in record
+	      	}	    	    
+
+	      	if(inpobj.lastname && inpobj.lastname != "")
+	      	{
+	      		//user entered a value in last name search
+	      		if(item.lastname)	      		
+	      		{
+		      		result &= (item.lastname.indexOf(inpobj.lastname) > -1);
+		      	}
+		      	else return false; // last name searched but none in record
+	      	}
+	      	if(inpobj.email && inpobj.email != "")
+	      	{
+	      		//user entered a value in email search
+	      		if(item.email)	      		
+	      		{
+		      		result &= (item.email.indexOf(inpobj.email) > -1);
+		      	}
+		      	else return false; //user entered email search but none in record
+	      	}
+	      	if(inpobj.phone && inpobj.phone != "")
+	      	{
+	      		//user entered value in phone search
+	      		if(item.phone)	      		
+	      		{
+		      		result &= (item.phone.indexOf(inpobj.phone) > -1);
+		      	}
+		      	else return false; //user entered phone search but none in record
+	      	}
+	      	console.log("callFilter returning " + result);
+	      	return result;
+	        //if(item.firstname.indexOf(inpobj.firstname)> -1 && item.lastname.indexOf(inpobj.lastname)>-1) return tru
+/*
+	        if ((inpobj.firstname!==null && inpobj.firstname != "" && item.firstname !== null && item.firstname !="" && item.firstname.indexOf(inpobj.firstname) > -1) || 
+	        	(inpobj.lastname!==null && inpobj.lastname != "" && item.lastname !== null && item.lastname !="" && item.lastname.indexOf(inpobj.lastname) > -1) ||
+	        	(inpobj.email!==null && inpobj.email != "" && item.email !== null && item.email != "" && item.email.indexOf(inpobj.email) > -1)) {
+	      		console.log("_callFilter returning true");
+			
+	        	return true;
+	        }
+*/
+
 	      };
+	      
 
 	    }
 	        
