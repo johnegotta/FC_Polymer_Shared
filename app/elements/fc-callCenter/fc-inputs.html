@@ -109,7 +109,11 @@ Polymer({
 
 	addCall: function(){  
 		if(this.person.firstname /*&& this.person.uid */!= ''){
-		var time=Date().toString().slice(4,21);
+		var rawtime= new Date();
+		var callbackTime = new Date();
+		callbackTime.setDate(rawtime.getDate() + 2);
+		alert(callbackTime);
+		var time = rawtime.toString().slice(4,21);
 		var order=-event.timeStamp;
 		if(this.person.firstname == null || this.person.lastname == null){
 			alert("First and last name are required before adding call.");
@@ -127,15 +131,17 @@ Polymer({
 	        'relatedstudent': this.person.relatedstudent ? this.person.relatedstudent : "",
 	        'message': this.focusedmessage ? this.focusedmessage : "",
 	        'timestamp': time,
+	        'callbacktime': callbackTime.toString().slice(4,21),
 	        'timeorder': order,
 	        'coach': this.person.coach ? this.person.coach : "" //new call, current student. returning, previous caller no close
 	    };
 		console.log("person is this object for " + person.firstname);
 		this.person=person;
-		alert("this is when this person called" + this.person.timestamp + " " + this.person.message + "is defined.")
+		//alert("this is when this person called" + this.person.timestamp + " " + this.person.message + "is defined.")
 	    this.$.FBcalls._setRemoteDocumentChild(order, person);
-	   	console.log("person is this MADMAN-Object" + person);
-	    alert(this.person.lastname);
+	   	console.log("addCall(): person is ");
+	   	console.log(person);
+	   // alert(this.person.lastname);
 	    return person;
 	    this.person={};
 	    this.focusedmessage = "";
