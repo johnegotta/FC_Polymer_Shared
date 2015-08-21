@@ -1,6 +1,6 @@
 <dom-module id="fc-inputs">
 <style is="custom-style">
-:host{
+:host{ 
 	display: flex-box;
 }
 paper-button.better-green {
@@ -54,7 +54,7 @@ paper-textarea.message {
 </style>
 <template>
 <firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
-</firebase-document>
+</firebase-document>		
 <div class="vertical layout">
 	<div class="horizontal layout wrap center-center">
 	  	<paper-input id="uid" maxlength="40" hidden></paper-input>
@@ -65,70 +65,39 @@ paper-textarea.message {
 	  	<paper-input class="focused" id="inp4" value="{{person.relatedstudent}}" readonly label="Related Student" maxlength="40"></paper-input>
 	  	<paper-input class="focused" id="inp5" value="{{person.coach}}" label="Focused Coach" maxlength="40"></paper-input>
 	</div>
-</div>
-
-<paper-button class="gold" on-tap="addCall">Add Call</paper-button>
+</div>	
+     
+<paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
 </template>
-<script>
+<script> 
 Polymer({
 	is: "fc-inputs",
 	properties:{
 	    person: {
 	    	type: Object,
-	    	value:{
-	    		firstname: "",
-	    		lastname: "",
-	    		email: "",
-	    		phone: ""
-	    	},
+	    	value:{},
 	    	notify: true,
 	    	reflectToAttributes: true
 	    	},
 	    focusedmessage: {
 	    	type: String,
 	    	notify: true,
-	    	value: "test123"
 	    	reflectToAttributes: true
-	    }
+	    }	
 	},
-
-	/*
-	ready: function(){
-		this.person = {};
-	},
-	*/
-
 	observers: [
-	      'inputmonitor(person.firstname, person.lastname, person.email, person.phone)'
+	      'inputmonitor(person.*)'
 	    ],
 
-	inputmonitor: function(first, last, email, phone){
-		var tempObject = {"firstname": first, "lastname": last, "email": email, "phone": phone};
-		this.fire("inputChanged", tempObject);
+	inputmonitor: function(){
+		this.fire("inputChanged", this.person);
 		console.log(this.person.firstname + " " + " " + "just fired inputChanged event." + " for " + this.person.firstname);
 	},
 
-	addCall: function(){
+	addCall: function(){  
 		if(this.person.firstname /*&& this.person.uid */!= ''){
-		var rawtime= new Date();
-		var callbackTime = new Date();
-		callbackTime.setDate(rawtime.getDate() + 2);
-		alert(callbackTime);
-		var time = rawtime.toString().slice(4,21);
+		var time=Date().toString().slice(4,21);
 		var order=-event.timeStamp;
-    var person = {
-        'firstname': this.person.firstname,
-          'lastname': this.person.lastname,
-          'email': this.person.email ? this.person.email : "",
-          'phone': this.person.phone ? this.person.phone : "",
-          'relatedstudent': this.person.relatedstudent ? this.person.relatedstudent : "",
-          'message': this.focusedmessage ? this.focusedmessage : "",
-          'timestamp': time,
-          'callbacktime': callbackTime.toString().slice(4,21),
-          'timeorder': order,
-          'personType': this.personType
-          'coach': this.person.coach ? this.person.coach : "" //new call, current student. returning, previous caller no close
-      };
 		if(this.person.firstname == null || this.person.lastname == null){
 			alert("First and last name are required before adding call.");
 			return;
@@ -137,18 +106,27 @@ Polymer({
 			alert("Must supply either phone number or email before adding call.");
 			return;
 		}
-
+		var person = {	   
+		   	'firstname': this.person.firstname,
+	        'lastname': this.person.lastname,
+	        'email': this.person.email ? this.person.email : "", 
+	        'phone': this.person.phone ? this.person.phone : "",
+	        'relatedstudent': this.person.relatedstudent ? this.person.relatedstudent : "",
+	        'message': this.focusedmessage ? this.focusedmessage : "",
+	        'timestamp': time,
+	        'timeorder': order,
+	        'coach': this.person.coach ? this.person.coach : "" //new call, current student. returning, previous caller no close
+	    };
 		console.log("person is this object for " + person.firstname);
 		this.person=person;
-		//alert("this is when this person called" + this.person.timestamp + " " + this.person.message + "is defined.")
+		alert("this is when this person called" + this.person.timestamp + " " + this.person.message + "is defined.")
 	    this.$.FBcalls._setRemoteDocumentChild(order, person);
-	   	console.log("addCall(): person is ");
-	   	console.log(person);
-	   // alert(this.person.lastname);
+	   	console.log("person is this MADMAN-Object" + person);
+	    alert(this.person.lastname);
 	    return person;
 	    this.person={};
 	    this.focusedmessage = "";
-
+	    
 	 }
 	}
 

@@ -1,0 +1,185 @@
+<dom-module id="fc-listView">
+<style is="custom-style">
+
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+    iron-icon {
+      color: var(--google-grey-500);
+    }
+
+  </style>
+<template>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+      
+
+    <paper-toolbar class="medium-tall"> 
+            <paper-icon-button id="button" icon="arrow-back">
+            </paper-icon-button>
+    </paper-toolbar>
+    
+    <div class="main">
+        
+    <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
+          <span searchValues="{{item}}">
+                <paper-item>
+                      <paper-item-body two-line>
+                            <div>
+                                <span>[[item.firstname]]</span> <span>[[item.lastname]]</span> called on 
+                                <span>[[item.timestamp]]</span> regarding her daughter, June <span>[[item.lastname]]</span>: a seventh grader at NAME OF SCHOOL
+                            </div>
+                            <div secondary>[[item.message]]</div>
+                      </paper-item-body>
+                  <iron-icon icon="info"></iron-icon>
+                </paper-item>
+          </span>
+      </template>
+    </div>
+</template>
+<script>
+  Polymer({
+
+    is: 'fc-listView',
+
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+
+    listeners: {
+      'click': '_onClick'
+    },
+
+    properties: {
+
+      data: {
+        type: Array,
+        value: function() {
+          return [];
+            }
+        },
+      
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      },
+
+      searchValues: {
+         type: Object,
+          value: {
+          firstname: "",
+          lastname:"",
+          email:"", 
+          phone:"",
+          relatedstudent: "",
+          message: "",
+          coach:""
+          },
+          notify: true, 
+          reflectToAttributes: true
+        }
+    },
+  
+      _callFilter: function(searchfields){
+        
+        return function(item){
+          if(!searchfields) {
+            return true;
+          }
+          //start out with true result & falsify if any non blank match fails
+          var result = true;
+          console.log(searchfields);
+          console.log(item);
+          if(searchfields.firstname && searchfields.firstname != "")
+          {
+            //user entered a value in first name search
+            if(item.firstname)            
+            {
+              result &= (item.firstname.indexOf(searchfields.firstname) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
+
+          if(searchfields.lastname && searchfields.lastname != "")
+          {
+            //user entered a value in last name search
+            if(item.lastname)           
+            {
+              result &= (item.lastname.indexOf(searchfields.lastname) > -1);
+            }
+            else return false; // last name searched but none in record
+          }
+          if(searchfields.email && searchfields.email != "")
+          {
+            //user entered a value in email search
+            if(item.email)            
+            {
+              result &= (item.email.indexOf(searchfields.email) > -1);
+            }
+            else return false; //user entered email search but none in record
+          }
+          if(searchfields.message && searchfields.message != "")
+          {
+            //user entered a value in first name search
+            if(item.message)            
+            {
+              result &= (item.message.indexOf(searchfields.message) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
+          if(searchfields.phone && searchfields.phone != "")
+          {
+            //user entered value in phone search
+            if(item.phone)            
+            {
+              result &= (item.phone.indexOf(searchfields.phone) > -1);
+            }
+            else return false; //user entered phone search but none in record
+          }
+          console.log("callFilter returning " + result);
+          return result;
+        }
+      },
+
+
+    _onClick: function(event) {
+      var target = event.target;
+      while (target !== this && !target._templateInstance) {
+        target = target.parentNode;
+      }
+
+      // configure the page animation
+      this.sharedElements = {
+        'hero': target,
+      };
+
+      this.fire('item-click', {
+        item: target,
+      });
+    }
+
+  });
+
+</script>
+</dom-module>
