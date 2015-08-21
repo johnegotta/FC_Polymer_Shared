@@ -1,5 +1,5 @@
 <dom-module id="fc-listView">
-<style>
+<style is="custom-style">
 
     :host {
       @apply(--layout-vertical);
@@ -11,36 +11,38 @@
     }
 
     iron-icon {
-      color: var(--google-blue-500);
+      color: var(--google-grey-500);
     }
 
   </style>
-      <template>
-        <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+<template>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+      
+
+    <paper-toolbar class="medium-tall"> 
+            <paper-icon-button id="button" icon="arrow-back">
+            </paper-icon-button>
+    </paper-toolbar>
     
-
-
-<paper-toolbar class="medium-tall"> 
-    <div class="vertical layout">
-            <div class="fixedsearch">   
-                  <paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
-                  </paper-input>
-            </div>
-        <paper-icon-button id="button" icon="arrow-back"></paper-icon-button>
-</paper-toolbar>
-<div class="searchresults">
-      <div class="main">
-                <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
-                   <paper-item>
-                      <fc-callMemo searchValues="{{item}}">
-                      </fc-callMemo>
-                    </paper-item>
-                </template>
-        </div>
-</div>
+    <div class="main">
+        
+    <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
+          <span searchValues="{{item}}">
+                <paper-item>
+                      <paper-item-body two-line>
+                            <div>
+                                <span>[[item.firstname]]</span> <span>[[item.lastname]]</span> called on 
+                                <span>[[item.timestamp]]</span> regarding her daughter, June <span>[[item.lastname]]</span>: a seventh grader at NAME OF SCHOOL
+                            </div>
+                            <div secondary>[[item.message]]</div>
+                      </paper-item-body>
+                  <iron-icon icon="info"></iron-icon>
+                </paper-item>
+          </span>
+      </template>
+    </div>
 </template>
 <script>
-
   Polymer({
 
     is: 'fc-listView',
@@ -59,8 +61,29 @@
         type: Array,
         value: function() {
           return [];
+            }
         },
+      
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
 
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      },
 
       searchValues: {
          type: Object,
@@ -72,13 +95,12 @@
           relatedstudent: "",
           message: "",
           coach:""
-
-
           },
           notify: true, 
           reflectToAttributes: true
         }
-      },   
+    },
+  
       _callFilter: function(searchfields){
         
         return function(item){
@@ -137,30 +159,9 @@
           }
           console.log("callFilter returning " + result);
           return result;
+        }
       },
 
-      animationConfig: {
-        type: Object,
-        value: function() {
-          return {
-            'entry': [{
-              name: 'fade-in-animation',
-              node: this.$.button
-            }],
-
-            'exit': [{
-              name: 'fade-out-animation',
-              node: this.$.button
-            }, {
-              name: 'hero-animation',
-              id: 'hero',
-              fromPage: this
-            }]
-          };
-        }
-      }
-
-    },
 
     _onClick: function(event) {
       var target = event.target;
