@@ -1,6 +1,28 @@
 <dom-module id="fc-inputs">
 <style is="custom-style">
+ :host {
+      @apply(--layout-vertical);
+    }
 
+    .main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+    iron-icon {
+      color: var(--google-light-blue-50);
+    }
+
+     paper-icon-button {
+        margin-left: 20px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+      }
+      paper-icon-button.blue {
+        color: var(--paper-light-blue-50);
+      }
 paper-button.better-green {
 	background: green;
 	raised: true;
@@ -15,9 +37,26 @@ paper-button.better-green {
 	text-indent: 0px;
 	bottom: 8px;
 	}
+paper-button.gold {
+	background: #edc013;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #002c80;
+	margin-top: 15px;
+	margin-left: 50px;
+	font-size: 13px;
+	text-align: left;
+	text-indent: 0px;
+	bottom: 8px;
+	width: 65px;
+	height: 45px;
+}
 
 paper-input.focused {
 	margin: 4px;
+	padding: 4px;
 	max-width: 135px;
 	}
 
@@ -25,96 +64,192 @@ paper-textarea.message {
  	padding: 0px 8px 0px  8px;
  	text-indent: 0px;
  	margin-top: 0px;
-<<<<<<< HEAD
- 	/*width: 300px;*/
-=======
- 	width: 300px;
->>>>>>> 5fcfdfd12613e7de4dc6ad8052f815bb4d6c6512
+ 	max-width: calculated(98%-24px);
  	}
 
+fc-paperInput {
+	display: inline;
+	width: 100px;
+	padding: 0px 6px 0px 6px;
+	margin-bottom: 14px;
+
 }
+.linear {
+	display: inline;
+}
+
 </style>
 <template>
-	<div class="horizontal layout wrap">
-	  	<paper-input id="uid" maxlength="40" hidden></paper-input>
-	  	<paper-input class="focused" id="inp0" value="{{person.firstname}}" label="First Name" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp1" value="{{person.lastname}}" label="Last Name" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp2" value="{{person.phone}}" label="Phone" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp3" value="{{person.email}}" label="Email" maxlength="40"></paper-input>
-	  	<paper-input class="focused" id="inp4" value="{{person.student}}" label="Related Student" maxlength="40"></paper-input>
-	 </div>
-     <iron-signals on-iron-signal-personSelected="_selectPerson"></iron-signals>
-
+<paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
+<firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>		
+	<div class="vertical layout wrap">
+		<!--	<paper-item>
+            		<paper-item-body four-line>-->
+                    	<div class="horizontal layout wrap linear">
+                                <fc-paperInput class="stubby" name="firstname" value="{{inquirer.firstname}}"></fc-paperInput>  <fc-paperInput class="stubby" name="lastname" value="{{inquirer.lastname}}"></fc-paperInput><span> called on </span> <fc-paperInput name="timestamp" value="{{inquirer.timestamp}}"></fc-paperInput> <span>, regarding </span> <fc-paperInput name="hisHerDaughterSon"></fc-paperInput><span>, </span><fc-paperInput name="studentfirstname"></fc-paperInput> <fc-paperInput name="studentlastname"></fc-paperInput>, 
+						</div>
+						<div secondary class="horizontal layout wrap linear">
+                             	who is in <fc-paperInput name="firstThroughTwelfth"></fc-paperInput> grade at <fc-paperInput name="schoolname"></fc-paperInput> in <fc-paperInput name="townname"></fc-paperInput>. The <span>{{lastname}}</span> family would like information about Focused's
+                        </div> 
+                        <div secondary class="horizontal layout wrap">
+                             	 <fc-paperInput name="nameofprogram"></fc-paperInput>, begining on <fc-paperInput name="startdate"></fc-paperInput>, led by <fc-paperInput name="coach"></fc-paperInput>, and priced at <fc-paperInput name="price"></fc-paperInput>. The <span>{{lastname}}</span> is aware of the pricing. 
+                        </div>
+                        <div secondary class="horizontal layout wrap">
+                        		Pricing <fc-paperInput name="isOrIsNot"></fc-paperInput> an issue. A second call is scheduled for <fc-paperInput name="dateOfCallTwo"></fc-paperInput>. We <fc-paperInput name="haveOrHaveNot"></fc-paperInput> secured credit card information for the <span>{{lastname}}</span><span> family: </span>
+						</div>
+						<div secondary class="horizontal layout wrap">
+                        		we <fc-paperInput name="haveOrHaveNot"></fc-paperInput> placed credit card information into the automated payment system<fc-paperInput name="{{toBeRunOnDate}}"></fc-paperInput>. <!--last entry blank on no info-->
+                        </div>
+                  <!--	</paper-item-body>-->
+             	<iron-icon icon="info"></iron-icon>
+        	<!--</paper-item>-->
+		</div>	 
+<div class="layout vertical">
+<content>
+</content>
+</div>
 </template>
-<<<<<<< HEAD
-<script>
-=======
 <script> 
->>>>>>> 5fcfdfd12613e7de4dc6ad8052f815bb4d6c6512
 Polymer({
 	is: "fc-inputs",
 	properties:{
-	    person: {
+	    inquirer: {
 	    	type: Object,
-	    	value: {},
+	    	value:{
+	    		firstname: "",
+	    		lastname: "",
+	    		email:"", 
+          		phone:"",
+          		studentfirstname: "",
+          		studentlastname:'',
+          		message: "",
+          		coach:"",
+          		timestamp: '',
+          		grade: '',
+          		school: '',
+          		interest: '',
+          		dateOfCallTwo: Date,
+          		dateorder: '',
+          		ccInfo: Number
+          		},
 	    	notify: true,
-	    	//reflectToAttributes: true,
-	    	observer: "displayPerson"
-	    	},
-	    teststring: {
-	    	type: String,
-	    	notify: true,
-	    	value: "test123"
-<<<<<<< HEAD
-	    }
+	    	reflectToAttributes: true
+	    }	
+    },
+  
+      _callFilter: function(inquirer){
+        
+        return function(item){
+          if(!inquirer) {
+            return true;
+          }
+          //start out with true result & falsify if any non blank match fails
+          var result = true;
+          console.log(inquirer);
+          console.log(item);
+          if(inquirer.firstname && inquirer.firstname != "")
+          {
+            //user entered a value in first name search
+            if(item.firstname)            
+            {
+              result &= (item.firstname.indexOf(inquirer.firstname) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
 
-=======
-	    } 
-	    		
->>>>>>> 5fcfdfd12613e7de4dc6ad8052f815bb4d6c6512
+          if(inquirer.lastname && inquirer.lastname != "")
+          {
+            //user entered a value in last name search
+            if(item.lastname)           
+            {
+              result &= (item.lastname.indexOf(inquirer.lastname) > -1);
+            }
+            else return false; // last name searched but none in record
+          }
+          if(inquirer.email && inquirer.email != "")
+          {
+            //user entered a value in email search
+            if(item.email)            
+            {
+              result &= (item.email.indexOf(inquirer.email) > -1);
+            }
+            else return false; //user entered email search but none in record
+          }
+          if(inquirer.message && inquirer.message != "")
+          {
+            //user entered a value in first name search
+            if(item.message)            
+            {
+              result &= (item.message.indexOf(inquirer.message) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
+          if(inquirer.phone && inquirer.phone != "")
+          {
+            //user entered value in phone search
+            if(item.phone)            
+            {
+              result &= (item.phone.indexOf(inquirer.phone) > -1);
+            }
+            else return false; //user entered phone search but none in record
+          }
+          console.log("callFilter returning " + result);
+          return result;
+        }
+      },
+	
+
+	observers: [
+	      'inputmonitor(firstname, lastname, email, phone)'
+	    ],
+
+	inputmonitor: function(first, last, email, phone){
+		var tempObject = {"firstname": first, "lastname": last, "email": email, "phone": phone};
+		this.fire("inputChanged", tempObject);
+		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + this.inquirer.firstname);
 	},
 
-	displayPerson: function(){
-		console.log("displayPerson in fc-inputs");
-		console.log(this.person);
-	},
-
-	ready: function(){
-		//signals
-	    //this.addEventListener('iron-signal-personSelected', this._selectPerson);
-	},
-
-	_selectPerson: function(e){
-		alert("fc-inputs _selectPerson received event");
-		this.person = e.detail;
-		console.log(this.person);
-	},
-
-	addPerson: function(){
-		var time=Date().toString().slice(0,21);
+	addCall: function(){  
+		if(this.inquirer.firstname /*&& this.inquirer.uid */!= ''){
+		var rawtime= new Date();
+		var callbackTime = new Date();
+		callbackTime.setDate(rawtime.getDate() + 2);
+		alert(callbackTime);
+		var time = rawtime.toString().slice(4,21);
 		var order=-event.timeStamp;
-<<<<<<< HEAD
-		var person = {
-		   	'firstname': this.firstname,
-	        'lastname': this.lastname,
-	        'email': this.email,
-=======
-		var person = {	   
-		   	'firstname': this.firstname,
-	        'lastname': this.lastname,
-	        'email': this.email, 
->>>>>>> 5fcfdfd12613e7de4dc6ad8052f815bb4d6c6512
-	        'phone': this.phone,
-	        'relatedstudent': this.relatedstudent,
-	        'message': this.message,
+		if(this.inquirer.firstname == null || this.inquirer.lastname == null){
+			alert("First and last name are required before adding call.");
+			return;
+		}
+		if(this.inquirer.email == null && this.inquirer.phone == null){
+			alert("Must supply either phone number or email before adding call.");
+			return;
+		}
+		var inquirer = {	   
+		   	'firstname': this.inquirer.firstname,
+	        'lastname': this.inquirer.lastname,
+	        'email': this.inquirer.email ? this.inquirer.email : "", 
+	        'phone': this.inquirer.phone ? this.inquirer.phone : "",
+	        'relatedstudent': this.inquirer.relatedstudent ? this.inquirer.relatedstudent : "",
+	        'message': this.focusedmessage ? this.focusedmessage : "",
 	        'timestamp': time,
+	        'callbacktime': callbackTime.toString().slice(4,21),
 	        'timeorder': order,
-<<<<<<< HEAD
-	        'personType': this.personType
-=======
-	        'personType': this.personType 
->>>>>>> 5fcfdfd12613e7de4dc6ad8052f815bb4d6c6512
-	   };
+	        'coach': this.inquirer.coach ? this.inquirer.coach : "" //new call, current student. returning, previous caller no close
+	    };
+		console.log("inquirer is this object for " + inquirer.firstname);
+		this.inquirer=inquirer;
+		//alert("this is when this inquirer called" + this.inquirer.timestamp + " " + this.inquirer.message + "is defined.")
+	    this.$.FBcalls._setRemoteDocumentChild(order, inquirer);
+	   	console.log("addCall(): inquirer is ");
+	   	console.log(inquirer);
+	   // alert(this.inquirer.lastname);
+	    return inquirer;
+	    this.inquirer={};
+	    this.focusedmessage = "";
+	    
+	 }
 	}
 
 });
