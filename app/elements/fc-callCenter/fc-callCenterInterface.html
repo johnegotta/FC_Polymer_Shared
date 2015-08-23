@@ -42,8 +42,8 @@ div.contained{
 }
 </style>
 <template>
-<paper-material class="controller layout wrap container">
- <h4> Student Type</h4>
+  <paper-material class="controller horizontal layout wrap container">
+                   <h4> Student Type</h4>
      <div class="horizontal layout wrap">
           <span class="checkbox">
                <paper-checkbox> New </paper-checkbox>
@@ -57,39 +57,51 @@ div.contained{
           <span class="checkbox">
                <paper-checkbox> Returning </paper-checkbox>
           </span>
+          <span class="checkbox">
+      <fc-inputs inquirer="{{item}}">
+          
+      </fc-inputs>
+      </span>
      </div>
-</paper-material>
+</paper-material>     
 
+
+      
 
 <div class="vertical layout wrap">
      <div class="horizontal layout container wrap">
           <div class="leftPanel layout wrap">
-     		<fc-card header-title="Call Memo Entry">
-              <fc-inputs value={{person}} focusedmessage = [[callMessage]] id="callEntryInputs"></fc-inputs>
+     		<!--<fc-card header-title="Call Memo Entry">
+                <fc-inputs value={{inquirer}} focusedmessage = [[callMessage]] id="callEntryInputs">
+                </fc-inputs>
         </fc-card>
         <fc-card header-title="Call Message" elevation="3">
               <paper-textarea  class="input" value='{{callMessage}}' label="This input expands!" maxlength="500">
               </paper-textarea>
-               </fc-card>
-         <fc-card header-title="Student Info">
-              <span>{{person.firstname}}</span>&nbsp<span>{{person.lastname}}</span>
+        </fc-card>-->
+         <!--<fc-card header-title="Student Info">
+              <span>{{inquirer.firstname}}</span>&nbsp<span>{{inquirer.lastname}}</span>
                 <br><br>
-                <span>{{person.email}}</span>
+                <span>{{inquirer.email}}</span>
                 <br><br>
-                <span>{{person.phone}}</span>
-               </fc-card>
-
+                <span>{{inquirer.phone}}</span>
+               </fc-card>-->
           </div>
   		<div class="rightPanel layout wrap" height="99vh">
-               <fc-callMemoList id="callList" name="callList" value="{{inputinfo}}">
+               <div container class="contained">
+                    
+                                 
+              <fc-listDemo class="fit" search-values="{{inputinfo}}" ></fc-listDemo>
+                </div>
+               <!--<fc-callMemoList id="callList" name="callList" value="{{inputinfo}}">
                </fc-callMemoList>
-               <br>
-              <!-- <fc-personList value="{{person}}">
-               </fc-personList>-->
+               <br>-->
+              <!-- <fc-inquirerList value="{{inquirer}}">
+               </fc-inquirerList>-->
   		</div><!--right-->
-      <div container class="contained">
+    <!--  <div container class="contained">
    <fc-listDemo class="fit"></fc-listDemo>
-  	</div></div><!--horizontal layout container-->
+  	</div>--></div><!--horizontal layout container-->
   </div>
 </template>
   <script>
@@ -97,7 +109,7 @@ div.contained{
           is: "fc-callCenterInterface",
 
           properties: {
-               person: {
+               inquirer: {
                     type: Object,
                     notify: true,
                     reflectToAttributes: true
@@ -114,7 +126,7 @@ div.contained{
       	ready: function() {
       	      //this.addEventListener('writeToInputs', this.fillInputsFromCall);
       	      this.addEventListener('inputChanged', this._updateCallList);
-                this.addEventListener("personSelected", this._selectPerson);
+                this.addEventListener("inquirerSelected", this._selectInquirer);
     	    },
 
           _updateCallList: function(e){
@@ -128,9 +140,9 @@ div.contained{
             //up to here awesome
           },
 
-          _selectPerson: function(e){
-               this.$.callEntryInputs.person = e.detail;
-               console.log(this.$.callEntryInputs.person);
+          _selectInquirer: function(e){
+               this.$.callEntryInputs.inquirer = e.detail;
+               console.log(this.$.callEntryInputs.inquirer);
           }
     	    
     });
