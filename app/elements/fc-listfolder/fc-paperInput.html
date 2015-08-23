@@ -28,7 +28,7 @@ paper-input	{
 	width: 80px;
 	display: inline;
 	padding: 0 4px 0 4px;
-	margin: 0px 4px 14px 4px;
+	margin: 0px 14px;
 }
 
 .add-on-content.is-invalid ::content * {
@@ -39,11 +39,11 @@ paper-input	{
 
   <template>
 
-   <paper-input class="fatInput" always-float-label="true" auto-validate$="{{autoValidate}}" autocomplete="true" autofocus="true" maxlength="16" required$="{{required}}" name$="{{name}}" autocapitalize$="{{true}}" autocorrect$="{{true}}" error-message$="{{This is a Required Field!}}" value="{{value}}" label="{{label}}" placeholder="name" list$="{{list}}"></paper-input>
+   <paper-input always-float-label="true" autocomplete="true" autofocus="true" required$="{{required}}" name$="{{name}}" autocapitalize$="{{autocapitalize}}" autocorrect$="{{autocorrect}}" error-message$="{{This is a Required Field!}}" value="{{value}}" label$="{{label}}" placeholder$="{{placeholder}}" list$="{{list}}"></paper-input>
 
 </template>
 <script>
- Polymer({
+ FcPaperInput=Polymer({
     is: 'fc-paperInput',
     behaviors: [
       Polymer.IronFormElementBehavior,
@@ -61,26 +61,26 @@ paper-input	{
 		autocapitalize:true, 
 		autocorrect: true, 
 		errorMessage: "This is a Required Field!", 
-		name: 'firstname',
-		label: 'Inquirer First Name', 
-		placeholder: 'First Name', 
+		name: '',
+		label: '', 
+		placeholder: '', 
 		list:[],
 		readOnly: false,
 		notify: true,
 		reflectToAttributes: true
 	},
 
-	ready: function(name, placeholder, label){
+	attached: function(name, placeholder, label){
 		//initializing the opening values: 
 		if (name==null){
 			name='firstname'; 
 		}
-		
+		console.log(name);
 		if (name=='firstname'){
 			placeholder='First Name';
 			label='Inquirer First Name';
 		}
-		
+		console.log( placeholder + " " + label);
 		if (name=='lastname'){
 			placeholder='Last Name';
 			label='Inquirer Last Name';
@@ -177,7 +177,7 @@ paper-input	{
 			label='pickle';
 		}
 
-		return [name, label, placeholder]; 
+		return label;
 	},
 
 	toggleInput: function(readOnly) {

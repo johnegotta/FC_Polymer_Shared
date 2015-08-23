@@ -50,7 +50,7 @@ paper-button.gold {
 	text-align: left;
 	text-indent: 0px;
 	bottom: 8px;
-	width: 65px;
+	width: 80px;
 	height: 45px;
 }
 
@@ -80,31 +80,26 @@ fc-paperInput {
 
 </style>
 <template>
-<paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
 <firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
 </firebase-document>		
 <div class="vertical layout">
+<paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
 	<div class="vertical layout wrap">
-		<!--	<paper-item>
-            		<paper-item-body four-line>-->
+		<paper-item>
+            		<paper-item-body four-line>
                     	<div class="horizontal layout wrap linear">
-                                <fc-paperInput class="stubby" name="firstname" value="{{inquirer.firstname}}"></fc-paperInput>  <fc-paperInput class="stubby" name="lastname" value="{{inquirer.lastname}}"></fc-paperInput><span> called on </span> <fc-paperInput name="timestamp" value="{{inquirer.timestamp}}"></fc-paperInput> <span>, regarding </span> <fc-paperInput name="hisHerDaughterSon"></fc-paperInput><span>, </span><fc-paperInput name="studentfirstname"></fc-paperInput> <fc-paperInput name="studentlastname"></fc-paperInput>, 
-						</div>
-						<div secondary class="horizontal layout wrap linear">
-                             	who is in <fc-paperInput name="firstThroughTwelfth"></fc-paperInput> grade at <fc-paperInput name="schoolname"></fc-paperInput> in <fc-paperInput name="townname"></fc-paperInput>. The <span>{{lastname}}</span> family would like information about Focused's
-                        </div> 
-                        <div secondary class="horizontal layout wrap">
-                             	 <fc-paperInput name="nameofprogram"></fc-paperInput>, begining on <fc-paperInput name="startdate"></fc-paperInput>, led by <fc-paperInput name="coach"></fc-paperInput>, and priced at <fc-paperInput name="price"></fc-paperInput>. The <span>{{lastname}}</span> is aware of the pricing. 
+                                <fc-paperInput name="firstname" label$="{{label}}" placeholder$="{{placeholder}}" value="{{inquirer.firstname}}"></fc-paperInput>  &nbsp<fc-paperInput name="lastname" value="{{inquirer.lastname}}"></fc-paperInput><span> called on </span> &nbsp<fc-paperInput name="timestamp" value="{{timestamp}}"></fc-paperInput> <span>, regarding </span> <fc-paperInput name="hisHerDaughterSon" value="{{inquirer.hisHerDaughterSon}}"></fc-paperInput><span>, </span><fc-paperInput name="studentfirstname" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput name="studentlastname" value="{{inquirer.studentlastname}}"></fc-paperInput>,  who is in <fc-paperInput name="firstThroughTwelfth" value="{{inquirer.grade}}"></fc-paperInput> grade at <fc-paperInput name="schoolname" value="{{inquirer.school}}"></fc-paperInput> in <fc-paperInput name="townname" value="{{inquirer.schooltown}}"></fc-paperInput>.
+                      </div>
+                      <div  secondary class="horizontal layout wrap"> 
+                                The &nbsp <span>{{inquirer.lastname}}</span> &nbsp family can be contacted at &nbsp <fc-paperInput name="phone" value="{{inquirer.phone}}"></fc-paperInput> &nbsp or &nbsp <fc-paperInput name="email" value="{{inquirer.email}}"></fc-paperInput>, &nbsp regarding their interest in Focused`s <fc-paperInput name="nameofprogram" value="{{inquirer.interest}}"></fc-paperInput>&nbsp on &nbsp<fc-paperInput name="startdate" value="{{inquirer.intereststartdate}}"></fc-paperInput>,&nbsp taught by &nbsp <fc-paperInput name="coach" value="{{inquirer.coach}}"></fc-paperInput><span>, &nbsp and priced &nbsp </span><fc-paperInput name="price" value="{{inquirer.interestprice}}"></fc-paperInput>. 
+                      </div>
+                      <div secondary class="horizontal layout wrap">
+
+                            The &nbsp <span>{{inquirer.lastname}}</span> &nbsp family is aware of the pricing. Pricing is <fc-paperInput name="Not"></fc-paperInput> &nbsp an issue. A second call is scheduled for &nbsp <span>{{inquirer.callbacktime}}</span>. &nbsp Payment information has &nbsp <fc-paperInput name="Not"></fc-paperInput> been secured, and/but will &nbsp <fc-paperInput name="Not"></fc-paperInput> &nbsp be run on or before &nbsp <span>{{inquirer.callbacktime}}</span>. <!--last entry blank on no info-->
                         </div>
-                        <div secondary class="horizontal layout wrap">
-                        		Pricing <fc-paperInput name="isOrIsNot"></fc-paperInput> an issue. A second call is scheduled for <fc-paperInput name="dateOfCallTwo"></fc-paperInput>. We <fc-paperInput name="haveOrHaveNot"></fc-paperInput> secured credit card information for the <span>{{lastname}}</span><span> family: </span>
-						</div>
-						<div secondary class="horizontal layout wrap">
-                        		we <fc-paperInput name="haveOrHaveNot"></fc-paperInput> placed credit card information into the automated payment system<fc-paperInput name="{{toBeRunOnDate}}"></fc-paperInput>. <!--last entry blank on no info-->
-                        </div>
-                  <!--	</paper-item-body>-->
+                </paper-item-body>
              	<iron-icon icon="info"></iron-icon>
-        	<!--</paper-item>-->
+        </paper-item>
 		</div>	
 </div>  
 <div class="layout vertical">
@@ -122,21 +117,24 @@ Polymer({
 	    		firstname: "",
 	    		lastname: "",
 	    		email:"", 
-          		phone:"",
-          		studentfirstname: "",
-          		studentlastname:'',
-          		message: "",
-          		coach:"",
-          		timestamp: '',
-          		grade: '',
-          		school: '',
-          		interest: '',
-          		dateOfCallTwo: Date,
-          		dateorder: '',
-          		ccInfo: Number
+          phone:"",
+          studentfirstname: "",
+          studentlastname:'',
+          relatedstudent:'',
+          message: "",
+          coach:"",
+          timestamp: '',
+          grade: '',
+          school: '',
+          schooltown: '',
+          interest: '',
+          interestprice: '',
+          intereststartdate: '',
+          callbacktime: '',
+          dateorder: '',
+          ccInfo: Number
           		},
-	    	notify: true,
-	    	reflectToAttributes: true
+	    	notify: true
 	    }	
     },
   
@@ -203,7 +201,7 @@ Polymer({
 	
 
 	observers: [
-	      'inputmonitor(firstname, lastname, email, phone)'
+	      'inputmonitor(firstname, lastname, email, phone, studentfirstname, studentlastname)'
 	    ],
 
 	inputmonitor: function(first, last, email, phone){
@@ -229,16 +227,24 @@ Polymer({
 			return;
 		}
 		var inquirer = {	   
-		   	'firstname': this.inquirer.firstname,
+		   	  'firstname': this.inquirer.firstname,
 	        'lastname': this.inquirer.lastname,
 	        'email': this.inquirer.email ? this.inquirer.email : "", 
 	        'phone': this.inquirer.phone ? this.inquirer.phone : "",
-	        'relatedstudent': this.inquirer.relatedstudent ? this.inquirer.relatedstudent : "",
-	        'message': this.focusedmessage ? this.focusedmessage : "",
+          'studentfirst': this.inquirer.studentfirstname ? this.inquirer.studentfirstname: "",
+          "studentlast": this.inquirer.studentlastname ? this.inquirer.studentlastname: "",
+	        'relatedstudent': this.inquirer.studentfirstname + " " + this.inquirer.studentlastname,
+	        'message': this.inquirer.studentfirstname ? this.inquirer.message : "",
 	        'timestamp': time,
 	        'callbacktime': callbackTime.toString().slice(4,21),
 	        'timeorder': order,
-	        'coach': this.inquirer.coach ? this.inquirer.coach : "" //new call, current student. returning, previous caller no close
+	        'coach': this.inquirer.coach,
+          'school': this.inquirer.school,
+          'schooltown': this.inquirer.schooltown,
+          'interest': this.inquirer.interest,
+          'interestprice': this.inquirer.interestprice,
+          'intereststartdate': this.inquirer.intereststartdate
+           //new call, current student. returning, previous caller no close
 	    };
 		console.log("inquirer is this object for " + inquirer.firstname);
 		this.inquirer=inquirer;
@@ -247,10 +253,6 @@ Polymer({
 	   	console.log("addCall(): inquirer is ");
 	   	console.log(inquirer);
 	   // alert(this.inquirer.lastname);
-	    return inquirer;
-	    this.inquirer={};
-	    this.focusedmessage = "";
-	    
 	 }
 	}
 
