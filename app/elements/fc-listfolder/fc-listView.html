@@ -35,8 +35,7 @@
     
     <div class="main">
         
-    <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(inquirer)}}'>
-          <span searchValues="{{item}}"></span>
+    <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(inquiry)}}'>
                 <paper-item>
                       <paper-item-body three-line>
                             <div>
@@ -73,6 +72,41 @@
           return [];
             }
         },
+      inquiry: {
+        type: Object, 
+        value: {
+          firstname: '',
+          lastname: '',
+          email: '', 
+          phone: '',
+          notify: true,
+        },
+        notify: true,
+      },
+
+      pastinquirer:{
+         type: Object,
+         value: {
+               firstname: '', 
+               lastname: '', 
+               email: '', 
+               phone:'', 
+               studentfirstname: '', 
+               studentlastname: '', 
+               relatedstudent: '', 
+               message: '', 
+               coach:'', 
+               grade: '', 
+               school:'', 
+               schooltown:'', 
+               interest:'', 
+               interestprice: '',
+               intereststartdate: '', 
+               role: '',
+               notify: true, 
+               },
+          notify: true
+          }, 
       
       animationConfig: {
         type: Object,
@@ -100,9 +134,8 @@
       var target = event.target;
       if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
-        console.log(target);
         target = null;
-          console.log(target);
+         
      } 
       else {
         target=target.parentNode;
@@ -112,15 +145,21 @@
       this.sharedElements = {
         'hero': target,
       };
-        console.log(target);
 
       this.fire('item-click', {
         item: target,
       });
-        console.log(target);
+  
     }
 
-  }
+  },
+   _callFilter: function(inquiry){
+        return function(item){
+          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.message.indexOf(inquiry.message)>-1 && item.lastname.indexOf(inquiry.lastname)>-1) return true;
+        } 
+        
+     }
+    
 });
 
 </script>

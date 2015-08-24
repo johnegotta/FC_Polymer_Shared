@@ -26,7 +26,7 @@ div.contained{
 </style>
 <template>
   
-      <fc-inputs inquirer="{{item}}">
+      <fc-inputs id="fcInputs" inquirer="{{item}}">
           
       </fc-inputs>
      
@@ -66,10 +66,10 @@ div.contained{
           </div>
           <div class="rightPanel layout wrap" height="99vh">
                <div container class="contained">            
-                    <fc-listDemo class="fit" search-values="{{inputinfo}}" ></fc-listDemo>
+                    <fc-listDemo class="fit" id="fcListDemo"></fc-listDemo>
                </div>
   		</div><!--right-->
-          <fc-card header-title="Your Notes">
+          <fc-card header-title="Untended Calls">
                 
                     </fc-card>
     </div><!--horizontal layout container-->
@@ -78,44 +78,24 @@ div.contained{
   <script>
     Polymer({
           is: "fc-callCenterInterface",
-
-          properties: {
-               inquirer: {
-                    type: Object,
-                    notify: true,
-                    reflectToAttributes: true
-               }, 
-               inputinfo:{
-                  type:Object,
-                  value: {}, 
-                  notify: true, 
-                  reflectToAttributes: true
-               }
-          },
-
-
-      	ready: function() {
-      	      //this.addEventListener('writeToInputs', this.fillInputsFromCall);
-      	      this.addEventListener('inputChanged', this._updateCallList);
-                this.addEventListener("inquirerSelected", this._selectInquirer);
-    	    },
-
-          _updateCallList: function(e){
-            console.log("received inputChanged event");
-            console.log(e.detail);
-            this.$.callList.searchValues = e.detail;
-            
-            console.log(this.$.callList.searchValues.firstname + " " + e.detail.firstname +" are hitting call list update. So did ");
-            console.log(e.detail)
-            //fire callList.inputinfo;
-            //up to here awesome
-          },
-
-          _selectInquirer: function(e){
-               this.$.callEntryInputs.inquirer = e.detail;
-               console.log(this.$.callEntryInputs.inquirer);
+          ready: function() {
+               this.addEventListener('writeToInputs', this.fillInputsFromCall);
+                this.addEventListener('searchInquiries', this.inquirerObserver);
+         },
+         
+         fillInputsFromCall: function(e){
+           this.$.callinputs.callerFirstName = e.detail.firstname;
+           this.$.callinputs.callerLastName = e.detail.lastname;
+           this.$.callinputs.callerEmail = e.detail.email;
+           this.$.callinputs.callerPhone = e.detail.phone;
+           //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
+         },
+         inquirerObserver: function(e){
+          this.$.fcListDemo.inquirer = e.detail;
+           return this.$.fcListDemo.inquirer;
           }
-    	    
+
+   
     });
   </script>
 </dom-module>

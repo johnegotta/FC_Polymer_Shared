@@ -90,7 +90,7 @@ h4 {
 }
 
 paper-material.controller{
-     padding: 8px;
+     padding: 8px 8px 26px 8px;
      background: #fffff;
      color: #002c90;
      margin: 12px;
@@ -120,13 +120,14 @@ div.checkbox {
                 </paper-item-body>
              	<iron-icon icon="info"></iron-icon>
         </paper-item>
- <paper-textarea label="Message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="250" max-rows="5" class="textareaannoyed"></paper-textarea>
+ <paper-textarea label="Message" placeholder="Message 200 Characters: 60 More than Twitter." value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed"></paper-textarea>
 </div>
      </div>
 </paper-material>    
 <div class="layout vertical">
 <div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div> 
 <content>
+
 </content>
 </div>
 </template>
@@ -137,101 +138,50 @@ Polymer({
 	    inquirer: {
 	    	type: Object,
 	    	value:{
-	    		firstname: "",
-	    		lastname: "",
-	    		email:"", 
-          phone:"",
-          studentfirstname:"",
-          studentlastname:'',
-          relatedstudent:'',
-          message:"",
-          coach:"",
-          timestamp:'',
-          grade:'',
-          school:'',
-          schooltown:'',
-          interest:'',
-          interestprice:'',
-          intereststartdate:'',
-          callbacktime: '',
-          dateorder: '',
+          firstname: '', 
+          lastname: '', 
+          email: '', 
+          phone:'', 
+          studentfirstname: '', 
+          studentlastname: '', 
+          relatedstudent: '', 
+          message: '', 
+          coach:'', 
+          timestamp: '', 
+          grade: '', 
+          school:'', 
+          schooltown:'', 
+          interest:'', 
+          interestprice: '',
+          intereststartdate: '', 
+          callbacktime: '', 
+          dateorder: Number, 
           ccInfo: Number,
-          role:''
-          		},
-	    	notify: true
-	    }	
+          role: '' 
+            },
+        notify: true 
+      }	
     },
-  
-      _callFilter: function(inquirer){
-        
-        return function(item){
-          if(!inquirer) {
-            return true;
-          }
-          //start out with true result & falsify if any non blank match fails
-          var result = true;
-          console.log(inquirer);
-          console.log(item);
-          if(inquirer.firstname && inquirer.firstname != "")
-          {
-            //user entered a value in first name search
-            if(item.firstname)            
-            {
-              result &= (item.firstname.indexOf(inquirer.firstname) > -1);
-            }
-            else return false; // first name searched but none in record
-          }           
+  observers: [
+        'inquirerObserver(inquirer.firstname,inquirer.lastname, inquirer.email,inquirer.phone,inquirer.studentfirstname,inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
+      ],
 
-          if(inquirer.lastname && inquirer.lastname != "")
-          {
-            //user entered a value in last name search
-            if(item.lastname)           
-            {
-              result &= (item.lastname.indexOf(inquirer.lastname) > -1);
-            }
-            else return false; // last name searched but none in record
-          }
-          if(inquirer.email && inquirer.email != "")
-          {
-            //user entered a value in email search
-            if(item.email)            
-            {
-              result &= (item.email.indexOf(inquirer.email) > -1);
-            }
-            else return false; //user entered email search but none in record
-          }
-          if(inquirer.message && inquirer.message != "")
-          {
-            //user entered a value in first name search
-            if(item.message)            
-            {
-              result &= (item.message.indexOf(inquirer.message) > -1);
-            }
-            else return false; // first name searched but none in record
-          }           
-          if(inquirer.phone && inquirer.phone != "")
-          {
-            //user entered value in phone search
-            if(item.phone)            
-            {
-              result &= (item.phone.indexOf(inquirer.phone) > -1);
-            }
-            else return false; //user entered phone search but none in record
-          }
-          console.log("callFilter returning " + result);
-          return result;
-        }
-      },
-	
-
-	observers: [
-	      'inputmonitor(firstname, lastname, email, phone, studentfirstname, studentlastname)'
-	    ],
-
-	inputmonitor: function(first, last, email, phone){
-		var tempObject = {"firstname": first, "lastname": last, "email": email, "phone": phone};
-		this.fire("inputChanged", tempObject);
-		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + this.inquirer.firstname);
+     
+	inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
+		var shadowInquirer = {
+      "firstname": first, 
+      "lastname": last, 
+      "email": email, 
+      "phone": phone,
+      "studentfirstname":studentfirstname, 
+      "studentlastname": studentlastname, 
+      "role": role, 
+      "interest": interest, 
+      "timestamp": timestamp,
+      "message": message
+    };
+		this.fire("searchInquiries", shadowInquirer);
+		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + shadowInquirer.firstname);
 	},
 
 	addCall: function(){  
@@ -240,7 +190,7 @@ Polymer({
 		var callbackTime = new Date();
 		callbackTime.setDate(rawtime.getDate() + 2);
 		alert(callbackTime);
-		var time = rawtime.toString().slice(21);
+		var time = rawtime.toString().slice(0, 21);
 		var order=-event.timeStamp;
 		if(this.inquirer.firstname == null || this.inquirer.lastname == null){
 			alert("First and last name are required before adding call.");
@@ -255,12 +205,12 @@ Polymer({
 	        'lastname': this.inquirer.lastname,
 	        'email': this.inquirer.email ? this.inquirer.email : "", 
 	        'phone': this.inquirer.phone ? this.inquirer.phone : "",
-          'studentfirst': this.inquirer.studentfirstname ? this.inquirer.studentfirstname: "",
-          "studentlast": this.inquirer.studentlastname ? this.inquirer.studentlastname: "",
+          'studentfirstname': this.inquirer.studentfirstname ? this.inquirer.studentfirstname: "",
+          "studentlastname": this.inquirer.studentlastname ? this.inquirer.studentlastname: "",
 	        'relatedstudent': this.inquirer.studentfirstname + " " + this.inquirer.studentlastname,
 	        'message': this.inquirer.studentfirstname ? this.inquirer.message : "",
 	        'timestamp': time,
-	        'callbacktime': callbackTime.toString().slice(21),
+	        'callbacktime': callbackTime.toString().slice(0, 21),
 	        'timeorder': order,
           'grade': this.inquirer.grade,
 	        'coach': this.inquirer.coach,
@@ -273,12 +223,12 @@ Polymer({
            //new call, current student. returning, previous caller no close
 	    };
 		console.log("inquirer is this object for " + inquirer.firstname);
-		this.inquirer=inquirer;
-		//alert("this is when this inquirer called" + this.inquirer.timestamp + " " + this.inquirer.message + "is defined.")
+		  this.inquirer=inquirer;
 	    this.$.FBcalls._setRemoteDocumentChild(order, inquirer);
 	   	console.log("addCall(): inquirer is ");
 	   	console.log(inquirer);
-	   // alert(this.inquirer.lastname);
+	     this.inquirer={};
+       return this.inquirer;
 	 }
 	}
 
