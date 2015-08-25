@@ -1,5 +1,5 @@
 <dom-module id="jason-listDemo">
-  <style>
+  <style is="custom-style">
 
     :host {
       display: block;
@@ -39,9 +39,9 @@ div.contained{
 </style>
 <template id="fc-one">
   
-      <fc-inputs id="fcInputs" inquirer="{{item}}">
-           <fc-clockObj class="clock"></fc-clockObj>
-      </fc-inputs>
+      <jason-inputs id="jasonInputs" inquirer="{{message}}">
+          <fc-clockObj class="clock"></fc-clockObj>
+      </jason-inputs>
      
 <div class="vertical layout wrap">
      <div class="horizontal layout container wrap">
@@ -50,24 +50,24 @@ div.contained{
                     <paper-item class="wrap">
                       <paper-item-body wrap four-line>
                             <div secondary>
-                               <b> <span>[[item.firstname]]</span> <span>[[item.lastname]]</span> </b> called on 
-                               <b> <span>[[item.timestamp]]</span> </b> 
-                               <br>regarding, <b><span>[[item.studentfirstname]]</span> <span>[[item.studentlastname]]</span></b>: a <span>[[item.grade]]</span> grader at 
+                               <b> <span>[[message.firstname]]</span> <span>[[message.lastname]]</span> </b> called on 
+                               <b> <span>[[message.timestamp]]</span> </b> 
+                               <br>regarding, <b><span>[[message.studentfirstname]]</span> <span>[[message.studentlastname]]</span></b>: a <span>[[message.grade]]</span> grader at 
                               </div> 
-                              <div secondary><span>[[item.school]]</span> in <span>[[item.schooltown]]</span>.
+                              <div secondary><span>[[message.school]]</span> in <span>[[message.schooltown]]</span>.
                               </div>
-                              <div secondary> <span>[[item.firstname]]</span> can be reached at <b><u><span>[[item.phone]]</span></b></u> or <br><u><b><span>[[item.email]]</span></b></u>. 
-                              <br><span>[[item.firstname]]</span> is <span>[[item.studentfirstname]]</span>`s <span>[[item.role]]</span>. 
+                              <div secondary> <span>[[message.firstname]]</span> can be reached at <b><u><span>[[message.phone]]</span></b></u> or <br><u><b><span>[[message.email]]</span></b></u>. 
+                              <br><span>[[message.firstname]]</span> is <span>[[message.studentfirstname]]</span>`s <span>[[message.role]]</span>. 
                               <br>
-                              We will contact the <span>[[item.lastname]]</span>`s by <b><u><span>[[item.callbacktime]]</span></u></b>.
+                              We will contact the <span>[[message.lastname]]</span>`s by <b><u><span>[[message.callbacktime]]</span></u></b>.
                               </div>
                               <div secondary>
-                              <span>[[item.firstname]]</span> is interested in <span>[[item.interest]]</span>
-                              <br> with <span>[[item.coach]]</span>, starting on <span>[[item.intereststartdate]]</span> 
+                              <span>[[message.firstname]]</span> is interested in <span>[[message.interest]]</span>
+                              <br> with <span>[[message.coach]]</span>, starting on <span>[[message.intereststartdate]]</span> 
                               <br>
-                              and priced at <span>[[item.interestprice]]</span>.
+                              and priced at <span>[[message.interestprice]]</span>.
                               </div>
-                              <div secondary width="330px"><b>Additional Message: </b><span>[[item.message]]</span></div>
+                              <div secondary width="330px"><b>Additional Message: </b><span>[[message.message]]</span></div>
                       </paper-item-body>
                 </paper-item>
               </fc-card>
@@ -76,8 +76,8 @@ div.contained{
                <div container class="contained">            
 <template id="fc-idTwo">
      <neon-animated-pages id="pages" selected="0">
-      <fc-listView data="[[fileData]]" id="fcListView" pastinquirer='{{this.$.fcListView.pastinquirer}}'  inquiry="{{inquirer}}" on-item-click="_onItemClick"></fc-listView>
-      <fc-fullView on-close="_onClose"></fc-fullView> 
+      <jason-listView data="[[fileData]]" id="jasonListView" inquiry="{{message}}" on-item-click="_onItemClick"></jason-listView>
+      <jason-fullView on-close="_onClose"></jason-fullView> 
      </neon-animated-pages>
 </template>
                </div>
@@ -173,17 +173,16 @@ div.contained{
       console.log(this.$.pages.selected.pastinquirer);
     },
      ready: function() {
-               this.addEventListener('writeToInputs', this.fillInputsFromCall);
+              // this.addEventListener('writeToInputs', this.fillInputsFromCall);
                 this.addEventListener('searchInquiries', this.inquirerObserver);
-      },
-      fillInputsFromCall: function(this.$.fcListView.pastinquirer){
-           this.$.fcInputs.inquirer = this.$.fcListView.pastinquirer.detail;
+      }
+      //fillInputsFromCall: function(){
+        //   fcInputs.inquirer = this.$.fcListView.pastinquirer.detail;
            //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
-         },
-    inquirerObserver: function(e){
-          this.$.fcInputs.inquirer = e.detail;
-           return this.$.fcInputs.inquirer;
-          }
+        // },
+    //inquirerObserver: function(e){
+           //return this.$.fcInputs.inquirer;
+          //}
 
 });
 </script>
