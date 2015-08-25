@@ -32,60 +32,60 @@ div.contained{
     margin: 12px;
     padding: 12px;
 }
-.clock{
-     padding: 35px 4px 20px 24px;
-
+div.containedmore{
+    height: 80px;
+    width: 310px;
+    position: relative;
+    padding: 12px;
 }
+
 </style>
 <template id="fc-one">
   
       <jason-inputs id="jasonInputs" inquirer="{{message}}">
-          <fc-clockObj class="clock"></fc-clockObj>
+          
       </jason-inputs>
      
 <div class="vertical layout wrap">
      <div class="horizontal layout container wrap">
           <div class="leftPanel horizontal layout wrap">
-                    <fc-card class="container flex wrap" header-title="Call Memo Entry">
+                    <fc-card class="container better flex wrap" header-title="Messages">
                     <paper-item class="wrap">
                       <paper-item-body wrap four-line>
-                            <div secondary>
+                            <div secondary class="wrap">
                                <b> <span>[[message.firstname]]</span> <span>[[message.lastname]]</span> </b> called on 
                                <b> <span>[[message.timestamp]]</span> </b> 
                                <br>regarding, <b><span>[[message.studentfirstname]]</span> <span>[[message.studentlastname]]</span></b>: a <span>[[message.grade]]</span> grader at 
                               </div> 
-                              <div secondary><span>[[message.school]]</span> in <span>[[message.schooltown]]</span>.
+                              <div class="wrap" secondary><span>[[message.school]]</span> in <span>[[message.schooltown]]</span>.
                               </div>
-                              <div secondary> <span>[[message.firstname]]</span> can be reached at <b><u><span>[[message.phone]]</span></b></u> or <br><u><b><span>[[message.email]]</span></b></u>. 
+                              <div class="wrap" secondary> <span>[[message.firstname]]</span> can be reached at <b><u><span>[[message.phone]]</span></b></u> or <br><u><b><span>[[message.email]]</span></b></u>. 
                               <br><span>[[message.firstname]]</span> is <span>[[message.studentfirstname]]</span>`s <span>[[message.role]]</span>. 
                               <br>
                               We will contact the <span>[[message.lastname]]</span>`s by <b><u><span>[[message.callbacktime]]</span></u></b>.
                               </div>
-                              <div secondary>
+                              <div class="wrap" secondary>
                               <span>[[message.firstname]]</span> is interested in <span>[[message.interest]]</span>
                               <br> with <span>[[message.coach]]</span>, starting on <span>[[message.intereststartdate]]</span> 
                               <br>
                               and priced at <span>[[message.interestprice]]</span>.
                               </div>
-                              <div secondary width="330px"><b>Additional Message: </b><span>[[message.message]]</span></div>
+                              <div  secondary class="containedmore wrap"><b>Additional Message: </b><span>[[message.message]]</span></div>
                       </paper-item-body>
                 </paper-item>
               </fc-card>
           </div>
           <div class="rightPanel layout wrap" height="99vh">
                <div container class="contained">            
-<template id="fc-idTwo">
+
      <neon-animated-pages id="pages" selected="0">
-      <jason-listView data="[[fileData]]" id="jasonListView" inquiry="{{message}}" on-item-click="_onItemClick"></jason-listView>
+      <jason-listView data="[[fileData]]" id="jasonListView" on-item-click="_onItemClick"></jason-listView>
       <jason-fullView on-close="_onClose"></jason-fullView> 
      </neon-animated-pages>
-</template>
+
                </div>
       </div><!--right-->
-          <fc-card header-title="UnAttended Calls">
-               new
-                
-                    </fc-card>
+          
     </div> <!--horizontal layout container-->
 </div>
 </template>
@@ -165,24 +165,26 @@ div.contained{
 
     _onItemClick: function() {
       this.$.pages.selected = 1;
-      this.fire('pastinquirerSelected', this.$.fcListView.pastinquirer);
+      this.fire('pastCallerSelected', this.$.jasonListView.caller);
+      console.log(this.$.jasonListView.caller);
     },
 
     _onClose: function() {
       this.$.pages.selected = 0;
-      console.log(this.$.pages.selected.pastinquirer);
+      console.log(this.$.pages.selected.caller);
     },
-     ready: function() {
+    ready: function() {
               // this.addEventListener('writeToInputs', this.fillInputsFromCall);
-                this.addEventListener('searchInquiries', this.inquirerObserver);
-      }
+           this.addEventListener('searchInquiries', this.inquirerObserver);
+    },
       //fillInputsFromCall: function(){
         //   fcInputs.inquirer = this.$.fcListView.pastinquirer.detail;
            //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
         // },
-    //inquirerObserver: function(e){
-           //return this.$.fcInputs.inquirer;
-          //}
+   inquirerObserver: function(e){
+          this.$.jasonListView.inquiry = e.detail;
+         
+          }
 
 });
 </script>
