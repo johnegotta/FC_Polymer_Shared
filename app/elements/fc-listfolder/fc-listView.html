@@ -29,22 +29,22 @@
       </content>
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
-<fc-clockObj></fc-clockObj>
+
     <paper-toolbar  id="fcpapertoolbar" class="medium">
              </paper-toolbar>
     
     <div class="main">
         
-    <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(inquiry)}}'>
+    <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
                 <paper-item>
                       <paper-item-body three-line>
                             <div>
-                               <b> <span>[[item.firstname]]</span> <span>[[item.lastname]]</span> </b> called on 
-                               <b> <span>[[item.timestamp]]</span> </b> regarding, <b><span>[[item.relatedstudent]]</span></b>: a <span>[[item.grade]]</span> grader at <span>[[item.school]]</span> in <span>[[item.schooltown]]</span>. <span>[[item.firstname]]</span> is interested in <span>[[item.interest]]</span> with <span>[[item.coach]]</span>, priced at <span>[[item.interestprice]</span>
+                               <b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called on 
+                               <b> <span>[[pastinquirer.timestamp]]</span> </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span>. <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
                             </div>
-                            <div secondary> <span>[[item.firstname]]</span> can be reached at <b><u><span>[[item.phone]]</span></b></u> or <u><b><span>[[item.email]]</span></b></u>. <span>[[item.firstname]]</span> will be called back on or before <b><u><span>[[item.callbacktime]]</span></u></b>.
+                            <div secondary> <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></b></u> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
                             </div>
-                            <div secondary><b>Additional Message:</b><span>[[item.message]]</span></div>
+                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span></div>
                       </paper-item-body>
                   <iron-icon icon="info"></iron-icon>
                 </paper-item>
@@ -132,6 +132,7 @@
 
     _onClick: function(event) {
       var target = event.target;
+      console.log(event.details);
       if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
         target = null;
@@ -139,8 +140,8 @@
      } 
       else {
         target=target.parentNode;
- 
-
+        this.pastinquirer=target.details
+        
       // configure the page animation
       this.sharedElements = {
         'hero': target,
@@ -149,6 +150,8 @@
       this.fire('item-click', {
         item: target,
       });
+
+
   
     }
 
