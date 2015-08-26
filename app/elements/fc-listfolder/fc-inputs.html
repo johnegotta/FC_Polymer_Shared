@@ -1,0 +1,259 @@
+<dom-module id="fc-inputs">
+<style is="custom-style">
+ :host {
+      @apply(--layout-vertical);
+    }
+
+.main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+iron-icon {
+      color: var(--google-light-blue-500);
+    }
+
+paper-icon-button {
+        margin-left: 20px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+      }
+
+paper-button.gold {
+  background: #edc013;
+  raised: true;
+  border-radius: 11px;
+  box-shadow: 10px 10px 5px #888888;
+  font-weight: 800;
+  color: #002c80;
+  margin-top: 10px;
+  margin-left: 50px;
+  font-size: 13px;
+  text-align: left;
+  text-indent: 0px;
+  bottom: 8px;
+}
+
+fc-paperInput {
+	display: inline;
+	max-width: 130px;
+	padding: 0px 6px 0px 6px;
+  font-size: 12px;
+
+}
+.adjust {
+	display: inline;
+  margin-top:28px;
+}
+span.green {
+  color: green;
+}
+
+h4 {
+     margin-right: 4px;
+}
+
+paper-material.controller{
+     padding: 8px 8px 26px 8px;
+     background: #fffff;
+     color: #002c90;
+     margin: 12px;
+}
+paper-button.red {
+     background: red;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #ffffff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+}
+
+paper-button.green {
+     background: green;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #fff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+     }
+
+</style>
+<template>
+<firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>
+<iron-form id="fcInputsForm" name="fcInputsForm">
+<paper-material class="controller horizontal layout wrap container">
+     <h4>Call Intake:</h4>
+     <div class="horizontal layout checkbox wrap">
+	    <paper-item>
+               <paper-item-body four-line>
+                    <div class="vertical layout wrap">
+                    	<div class="horizontal layout wrap linear">
+                                <fc-paperInput id="fcInp1" name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}" on-blur="showLogText"></fc-paperInput>  &nbsp<fc-paperInput id="fcInp2" name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}"></fc-paperInput><span class="adjust">  &nbsp</span><fc-paperInput id="fcInp3" name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput id="fcInp4" name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}"></fc-paperInput>&nbsp <fc-paperInput id="fcInp5" name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput><span class="adjust"> &nbsp </span><fc-paperInput id="fcInp6" name="schoolname" label="Current School Name" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput><span class="adjust"> in </span><fc-paperInput id="fcInp7" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}"></fc-paperInput>
+                         </div>
+                         <div  class="horizontal layout wrap"> 
+                                <fc-paperInput id="fcInp8" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}"></fc-paperInput>  &nbsp <fc-paperInput id="fcInp9" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}"></fc-paperInput> &nbsp<fc-paperInput id="fcInp10" name="inquirerrole" placeholder="Caller Role" label="Parent, Student, Other" value="{{inquirer.role}}"> </fc-paperInput><fc-paperInput id="fcInp11" name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name"></fc-paperInput>&nbsp<fc-paperInput id="fcInp12" name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date"></fc-paperInput> &nbsp <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp13" name="coach" value="{{inquirer.coach}}"></fc-paperInput> &nbsp<span class="green adjust">$</span><fc-paperInput id="fcInp14" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput> 
+                         </div>
+                    </div>
+                </paper-item-body>
+             	<iron-icon icon="info"></iron-icon>
+        </paper-item>
+ <paper-input label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed"></paper-input>
+</div>
+<fc-clockObj class="clok"></fc-clockObj>
+     </div>
+     <content>
+
+</content>
+</paper-material> 
+ </iron-form>  
+<div class="layout horizontal">
+<div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div> 
+<div><paper-button class="green" on-tap="addCall">Add Call and Register</paper-button></div> 
+<div><paper-button class="red" on-tap="clearInputs">Clear Call</paper-button></div> 
+
+
+</div>
+</template>
+<script> 
+Polymer({
+	is: "fc-inputs",
+	properties:{
+	    inquirer: {
+	    	type: Object,
+	    	value:{
+          firstname: '', 
+          lastname: '', 
+          email: '', 
+          phone:'', 
+          studentfirstname: '', 
+          studentlastname: '', 
+          relatedstudent: '', 
+          message: '',
+          coach:'', 
+          timestamp: '', 
+          grade: '', 
+          school:'', 
+          schooltown:'', 
+          interest:'', 
+          interestprice: '',
+          intereststartdate: '', 
+          callbacktime: '', 
+          dateorder: '', 
+          ccInfo: '',
+          role: '' 
+        },
+        notify: true,
+        reflectToAttributes: true 
+      }	
+    },
+  observers: [
+        'inquirerObserver(inquirer.firstname,inquirer.lastname, inquirer.email,inquirer.phone,inquirer.studentfirstname,inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
+      ],
+  clearInputs: function(){
+      this.fire("searchInquiries", {});
+  },
+  showLogText: function(event){
+    //this.$[argField].hidden = false;
+    //alert("poo");
+    console.log(event.target.name);
+    console.log(this.$$.filler1);
+  },
+
+	inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
+		var shadowInquirer = {
+          "firstname": first, 
+          "lastname": last, 
+          "email": email, 
+          "phone": phone,
+          "studentfirstname":studentfirstname, 
+          "studentlastname": studentlastname, 
+          "role": role, 
+          "interest": interest, 
+          "timestamp": timestamp,
+          "message": message
+    };
+	this.fire("searchInquiries", shadowInquirer);
+		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + shadowInquirer.firstname);
+	},
+
+	addCall: function(){  
+		var rawtime= new Date();
+		var callbackTime = new Date();
+		callbackTime.setDate(rawtime.getDate() + 2);
+    callbackTime = callbackTime.toString().slice(0, 21);
+		var time = rawtime.toString().slice(0, 21);
+		var order=-event.timeStamp;
+          this.inquirer.timestamp = time;
+          this.inquirer.timeorder = order;
+          this.inquirer.callbacktime = callbackTime;
+		
+     if(this.inquirer.firstname == '' || this.inquirer.lastname == ''){
+			alert("First and last name are required before adding call.");
+			return;
+		}
+	   if(this.inquirer.email == '' && this.inquirer.phone == ''){
+			alert("Must supply either phone number or email before adding call.");
+			return;
+		}
+
+          this.inquirer.relatedstudent = this.inquirer.studentfirstname + " " + this.inquirer.studentlastname + "_1";
+          this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
+
+	     
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+      
+     },
+
+  clearInputs: function(){
+          fcInp1.value = "";
+          fcInp2.value = "";
+          fcInp3.value = "";
+          fcInp4.value = "";
+          fcInp5.value = "";
+          fcInp6.value = "";
+          fcInp7.value = "";
+          fcInp8.value = "";
+          fcInp9.value = "";
+          fcInp10.value = "";
+          fcInp11.value = "";
+          fcInp12.value = "";
+          fcInp13.value = "";
+          fcInp14.value = "";
+          fcInp15.value = "";
+          fcInp16.value = "";
+          return;
+
+	}
+
+});
+</script>
+</dom-module>
