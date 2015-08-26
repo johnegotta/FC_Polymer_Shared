@@ -168,7 +168,9 @@ Polymer({
   observers: [
         'inquirerObserver(inquirer.firstname,inquirer.lastname, inquirer.email,inquirer.phone,inquirer.studentfirstname,inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
       ],
-
+  clearInputs: function(){
+      this.fire("searchInquiries", {});
+  },
   showLogText: function(event){
     //this.$[argField].hidden = false;
     //alert("poo");
@@ -198,7 +200,9 @@ Polymer({
 		var rawtime= new Date();
 		var callbackTime = new Date();
 		callbackTime.setDate(rawtime.getDate() + 2);
-		alert(callbackTime);
+    callbackTime = callbackTime.toString().slice(0, 21);
+
+
 		var time = rawtime.toString().slice(0, 21);
 		var order=-event.timeStamp;
 		
@@ -234,11 +238,14 @@ Polymer({
 	    };*/
 		console.log("inquirer is this object for " + this.inquirer.firstname);
          // this.inquirer=inquirer;
+         this.inquirer.timestamp = time;
+         this.inquirer.timeorder = order;
+         this.inquirer.callbacktime = callbackTime;
           this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
 	   	console.log("addCall(): inquirer is " );
 	   	//console.log(inquirer);
 	     
-     /* this.inquirer.firstname = "";
+       this.inquirer.firstname = "";
        this.inquirer.lastname = "";
        this.inquirer.email = "";
        this.inquirer.phone = "";
@@ -253,10 +260,10 @@ Polymer({
        this.inquirer.school = "";
        this.inquirer.message = "";
        this.inquirer.role = "";
-       this.inquirer.interest ="";*/
-        
+       this.inquirer.interest ="";
         //inquirer={};
-        this.inquirer = {};
+ //       this.inquirer = {};
+     //es", this.inquirer);
 /*
        var keys = Object.keys(this.inquirer);
        for(k in keys)
