@@ -1,0 +1,247 @@
+<dom-module id="jason-inputs">
+<style is="custom-style">
+ :host {
+      @apply(--layout-vertical);
+    }
+
+.main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+iron-icon {
+      color: var(--google-light-blue-50);
+    }
+
+paper-icon-button {
+        margin-left: 20px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+      }
+paper-icon-button.blue {
+        color: var(--paper-light-blue-50);
+      }
+
+paper-button.better-green {
+     background: green;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #fff;
+	margin-top: 10px;
+	margin-left: 20px;
+	font-size: 11.5px;
+	text-align: left;
+	text-indent: 0px;
+	bottom: 8px;
+	}
+paper-button.gold {
+	background: #edc013;
+	raised: true;
+	border-radius: 11px;
+	box-shadow: 10px 10px 5px #888888;
+	font-weight: 800;
+	color: #002c80;
+	margin-top: 15px;
+	margin-left: 50px;
+	font-size: 13px;
+	text-align: left;
+	text-indent: 0px;
+	bottom: 8px;
+	width: 80px;
+	height: 35px;
+}
+
+paper-input.focused {
+	margin: 4px;
+	padding: 4px;
+	max-width: 135px;
+	}
+
+
+
+fc-paperInput {
+	display: inline;
+	max-width: 135px;
+	padding: 4px;
+  font-size: 11px;
+  margin: 4px;
+}
+.adjust {
+	display: inline;
+  margin-top: 40px;
+}
+span.green {
+  color: green;
+}
+
+h4 {
+     margin: 0px 4px;
+}
+
+paper-material.controller{
+     padding: 6px;
+     background: #fffff;
+     color: #002c90;
+     margin: 8px;
+}
+div.checkbox {
+     margin: 0px 6px 6px 6px;
+     padding: 4px;
+}
+paper-textarea.tanda{
+  width: 320px;
+  padding: 8px;
+  text-indent: 0px;
+  margin: 4px;
+  margin-bottom: 8px;
+  display: inline-block;
+  overflow: hidden;
+}
+</style>
+<template>
+<firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>	
+<form id="fcCallInputsForm"> 	
+<paper-material class="controller horizontal layout wrap container">
+     <h4>Call Intake:</h4>
+     <div class="horizontal layout checkbox wrap">
+	    <paper-item>
+               <paper-item-body four-line>
+                    	<div class="horizontal layout wrap linear">
+                      
+                                <fc-paperInput form="fccallinputsform" name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}"></fc-paperInput>  &nbsp<fc-paperInput form="fccallinputsform" name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}"></fc-paperInput><span class="adjust">  &nbsp</span><fc-paperInput form="fccallinputsform" name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput form="fccallinputsform" name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}"></fc-paperInput>&nbsp <fc-paperInput form="fccallinputsform" name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput><span class="adjust"> &nbsp </span><fc-paperInput form="fccallinputsform" name="schoolname" label="Current School Name" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput><span class="adjust"> in </span><fc-paperInput form="fccallinputsform" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}"></fc-paperInput>  
+                         </div>   
+                         <div  class="horizontal layout wrap"> 
+                                <fc-paperInput form="fccallinputsform" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}"></fc-paperInput>  &nbsp <fc-paperInput form="fccallinputsform" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}"></fc-paperInput> &nbsp<fc-paperInput form="fccallinputsform" name="inquirerrole" placeholder="Caller Role" label="Parent, Student, Other" value="{{inquirer.role}}"> </fc-paperInput><fc-paperInput form="fccallinputsform" name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name"></fc-paperInput>&nbsp<fc-paperInput form="fccallinputsform" name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date"></fc-paperInput> &nbsp <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" form="fccallinputsform" name="coach" value="{{inquirer.coach}}"></fc-paperInput> &nbsp<span class="green adjust">$</span><fc-paperInput form="fccallinputsform" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput> 
+                          </div>
+                    </div>
+                </paper-item-body>
+        </paper-item>
+                  <div class="horizontal layout container">
+                                    <fc-paperInput class="tanda" label="Message" value="{{inquirer.message}}" form="fccallinputsform" name="message" always-float-label="true" placeholder= "Additional Information" maxlength="200" rows="5"></paper-textarea>
+                        </div> 
+
+
+                        <iron-icon icon="info"></iron-icon>
+     </div>
+ </form>    
+<fc-clockObj class="clock"></fc-clockObj>
+
+</paper-material>    
+<div class="layout vertical">
+<div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div> 
+
+</div>
+</template>
+<script> 
+Polymer({
+	is: "jason-inputs",
+	properties:{
+	    inquirer: {
+	    	type: Object,
+	    	value:{
+          firstname: '', 
+          lastname: '', 
+          email: '', 
+          phone:'', 
+          studentfirstname: '', 
+          studentlastname: '', 
+          relatedstudent: '', 
+          message:'', 
+          coach:'', 
+          timestamp: '', 
+          grade: '', 
+          school:'', 
+          schooltown:'', 
+          interest:'', 
+          interestprice: '',
+          intereststartdate: '', 
+          callbacktime: '', 
+          dateorder: Number, 
+          ccInfo: Number,
+          role: '' 
+            },
+        notify: true,
+        reflectToAttributes: true 
+      }	
+    },
+  observers: [
+        'inquirerObserver(inquirer.firstname,inquirer.lastname, inquirer.email,inquirer.phone,inquirer.studentfirstname,inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
+      ],
+
+     
+	inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
+		var shadowInquirer = {
+          "firstname": first, 
+          "lastname": last, 
+          "email": email, 
+          "phone": phone,
+          "studentfirstname":studentfirstname, 
+          "studentlastname": studentlastname, 
+          "role": role, 
+          "interest": interest, 
+          "timestamp": timestamp,
+          "message": message,
+    };
+	this.fire("searchInquiries", shadowInquirer);
+		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + shadowInquirer.studentfirstname);
+	},
+
+	addCall: function(){  
+		if(this.inquirer.firstname /*&& this.inquirer.uid */!= ''){
+		var rawtime= new Date();
+		var callbackTime = new Date();
+		callbackTime.setDate(rawtime.getDate() + 2);
+		alert(callbackTime);
+		var time = rawtime.toString().slice(0, 21);
+		var order=-event.timeStamp;
+		
+     if(this.inquirer.firstname == null || this.inquirer.lastname == null){
+			alert("First and last name are required before adding call.");
+			return;
+		}
+	if(this.inquirer.email == null && this.inquirer.phone == null){
+			alert("Must supply either phone number or email before adding call.");
+			return;
+		}
+	var inquirer = {	   
+          'firstname': this.inquirer.firstname,
+          'lastname': this.inquirer.lastname,
+          'email': this.inquirer.email ? this.inquirer.email : "", 
+          'phone': this.inquirer.phone ? this.inquirer.phone : "",
+          'studentfirstname': this.inquirer.studentfirstname ? this.inquirer.studentfirstname: "",
+          "studentlastname": this.inquirer.studentlastname ? this.inquirer.studentlastname: "",
+          'relatedstudent': this.inquirer.studentfirstname + " " + this.inquirer.studentlastname,
+          'message': this.inquirer.message ? this.inquirer.message : "",
+          'timestamp': time,
+          'callbacktime': callbackTime.toString().slice(0, 21),
+          'timeorder': order,
+          'grade': this.inquirer.grade ? this.inquirer.grade : "", 
+          'coach': this.inquirer.coach ? this.inquirer.coach : "",
+          'school': this.inquirer.school ? this.inquirer.school: "",
+          'schooltown': this.inquirer.schooltown ? this.inquirer.schooltown:'',
+          'interest': this.inquirer.interest ? this.inquirer.interest:'',
+          'interestprice': this.inquirer.interestprice ? this.inquirer.interestprice: '',
+          'intereststartdate': this.inquirer.intereststartdate ? this.inquirer.intereststartdate: '',
+          'role': this.inquirer.role ? this.inquirer.role: '',
+           //new call, current student. returning, previous caller no close
+	    };
+		console.log("inquirer is this object for " + inquirer.firstname);
+          this.inquirer=inquirer;
+          this.$.FBcalls._setRemoteDocumentChild(order, inquirer);
+	   	console.log("addCall(): inquirer is ");
+	   	console.log(inquirer);
+	     
+       this.$.querrySelector("#fcCallInputsForm").reset();
+       this.inquirer={};
+          return this.inquirer;
+	 }
+	}
+
+});
+</script>
+</dom-module>
