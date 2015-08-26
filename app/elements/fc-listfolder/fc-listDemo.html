@@ -14,7 +14,7 @@
   <template>
      <neon-animated-pages id="pages" selected="0">
       <fc-listView data="[[fileData]]" id="fcListView" pastinquirer='{{this.$.fcListView.pastinquirer}}'  inquiry="{{inquirer}}" on-item-click="_onItemClick"></fc-listView>
-      <fc-fullView on-close="_onClose"></fc-fullView> 
+      <fc-fullView id="fullio" on-close="_onClose"></fc-fullView> 
      </neon-animated-pages>
 </template>
 <script>
@@ -26,7 +26,9 @@
         value: function() {
           return [
             {fileName: 'IMG_4130.jpg', modifiedDate: 'May 12 2015'},
-            {fileName: 'IMG_4131.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4131.jpg', modifiedDate: 'May 12 2015'}
+            ];
+            /*
             {fileName: 'IMG_4132.jpg', modifiedDate: 'May 12 2015'},
             {fileName: 'IMG_4133.jpg', modifiedDate: 'May 12 2015'},
             {fileName: 'IMG_4134.jpg', modifiedDate: 'May 12 2015'},
@@ -65,7 +67,7 @@
             {fileName: 'IMG_4167.jpg', modifiedDate: 'May 12 2015'},
             {fileName: 'IMG_4168.jpg', modifiedDate: 'May 12 2015'},
             {fileName: 'IMG_4169.jpg', modifiedDate: 'May 12 2015'}
-          ]
+          ]*/
         }
       },
       inquirer: {
@@ -91,9 +93,12 @@
       
     },
 
-    _onItemClick: function() {
+    _onItemClick: function(e) {
       this.$.pages.selected = 1;
-      this.fire('pastinquirerSelected', this.$.fcListView.pastinquirer);
+      console.log("received on-item-click event from");
+      console.log(e.detail);
+      this.$.fullio.selectedCall = e.detail.caller;
+      //this.fire('pastinquirerSelected', this.$.fcListView.pastinquirer);
     },
 
     _onClose: function() {

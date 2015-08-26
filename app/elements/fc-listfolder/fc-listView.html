@@ -36,7 +36,7 @@
     <div class="main">
         
     <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
-                <paper-item>
+                <paper-item on-click="_scott">
                       <paper-item-body three-line>
                             <div>
                                <b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called on 
@@ -61,7 +61,7 @@
     ],
 
     listeners: {
-      'click': '_onClick'
+      //'click': '_onClick'
     },
 
     properties: {
@@ -130,9 +130,19 @@
       }
     },
 
+    _scott: function(e){
+      console.log(e.model.pastinquirer);
+      this.pastinquirer = e.model.pastinquirer;
+      // configure the page animation
+      this.sharedElements = {
+        'hero': e.target,
+      };
+      this.fire('item-click', {caller: this.pastinquirer});
+    },
+
     _onClick: function(event) {
       var target = event.target;
-      console.log(event.details);
+      console.log(event.model);
       if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
         target = null;
@@ -141,6 +151,7 @@
       else {
         target=target.parentNode;
         this.pastinquirer=target.details
+        console.log(this.pastinquirer);
         
       // configure the page animation
       this.sharedElements = {
@@ -158,7 +169,7 @@
   },
    _callFilter: function(inquiry){
         return function(item){
-          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.message.indexOf(inquiry.message)>-1 && item.lastname.indexOf(inquiry.lastname)>-1) return true;
+          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1) return true;
         } 
         
      }, 

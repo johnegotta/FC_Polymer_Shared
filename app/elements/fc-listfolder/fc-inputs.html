@@ -112,7 +112,7 @@ div.checkbox {
                <paper-item-body four-line>
                     <div class="vertical layout wrap">
                     	<div class="horizontal layout wrap linear">
-                                <fc-paperInput name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}"></fc-paperInput>  &nbsp<fc-paperInput name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}"></fc-paperInput><span class="adjust">  &nbsp</span><fc-paperInput name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}"></fc-paperInput>&nbsp <fc-paperInput name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput><span class="adjust"> &nbsp </span><fc-paperInput name="schoolname" label="Current School Name" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput><span class="adjust"> in </span><fc-paperInput name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}"></fc-paperInput>.
+                                <fc-paperInput name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}" on-blur="showLogText"></fc-paperInput>  &nbsp<fc-paperInput name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}"></fc-paperInput><span class="adjust">  &nbsp</span><fc-paperInput name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}"></fc-paperInput>&nbsp <fc-paperInput name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput><span class="adjust"> &nbsp </span><fc-paperInput name="schoolname" label="Current School Name" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput><span class="adjust"> in </span><fc-paperInput name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}"></fc-paperInput>
                          </div>
                          <div  class="horizontal layout wrap"> 
                                 <fc-paperInput name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}"></fc-paperInput>  &nbsp <fc-paperInput name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}"></fc-paperInput> &nbsp<fc-paperInput name="inquirerrole" placeholder="Caller Role" label="Parent, Student, Other" value="{{inquirer.role}}"> </fc-paperInput><fc-paperInput name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name"></fc-paperInput>&nbsp<fc-paperInput name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date"></fc-paperInput> &nbsp <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" name="coach" value="{{inquirer.coach}}"></fc-paperInput> &nbsp<span class="green adjust">$</span><fc-paperInput name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput> 
@@ -121,7 +121,7 @@ div.checkbox {
                 </paper-item-body>
              	<iron-icon icon="info"></iron-icon>
         </paper-item>
- <paper-textarea label="Message" placeholder="Message 200 Characters: 60 More than Twitter." value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed"></paper-textarea>
+ <paper-input label="Message" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed"></paper-input>
 </div>
      </div>
      <content>
@@ -147,7 +147,7 @@ Polymer({
           studentfirstname: '', 
           studentlastname: '', 
           relatedstudent: '', 
-          message: '', 
+          message: '',
           coach:'', 
           timestamp: '', 
           grade: '', 
@@ -157,18 +157,25 @@ Polymer({
           interestprice: '',
           intereststartdate: '', 
           callbacktime: '', 
-          dateorder: Number, 
-          ccInfo: Number,
+          dateorder: '', 
+          ccInfo: '',
           role: '' 
-            },
-        notify: true 
+        },
+        notify: true,
+        reflectToAttributes: true 
       }	
     },
   observers: [
         'inquirerObserver(inquirer.firstname,inquirer.lastname, inquirer.email,inquirer.phone,inquirer.studentfirstname,inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
       ],
 
-     
+  showLogText: function(event){
+    //this.$[argField].hidden = false;
+    //alert("poo");
+    console.log(event.target.name)
+    console.log(this.$$.filler1);
+  },
+
 	inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
 		var shadowInquirer = {
           "firstname": first, 
@@ -203,15 +210,15 @@ Polymer({
 			alert("Must supply either phone number or email before adding call.");
 			return;
 		}
-	var inquirer = {	   
+	/*var inquirer = {	   
           'firstname': this.inquirer.firstname,
           'lastname': this.inquirer.lastname,
           'email': this.inquirer.email ? this.inquirer.email : "", 
           'phone': this.inquirer.phone ? this.inquirer.phone : "",
           'studentfirstname': this.inquirer.studentfirstname ? this.inquirer.studentfirstname: "",
           "studentlastname": this.inquirer.studentlastname ? this.inquirer.studentlastname: "",
-          'relatedstudent': this.inquirer.studentfirstname + " " + this.inquirer.studentlastname,
-          'message': this.inquirer.studentfirstname ? this.inquirer.message : "",
+          'relatedstudent': this.inquirer.studentfirstname + this.inquirer.studentlastname + "1",
+          'message': this.inquirer.message ? this.inquirer.message : "",
           'timestamp': time,
           'callbacktime': callbackTime.toString().slice(0, 21),
           'timeorder': order,
@@ -224,14 +231,41 @@ Polymer({
           'intereststartdate': this.inquirer.intereststartdate,
           'role': this.inquirer.role
            //new call, current student. returning, previous caller no close
-	    };
-		console.log("inquirer is this object for " + inquirer.firstname);
-          this.inquirer=inquirer;
-          this.$.FBcalls._setRemoteDocumentChild(order, inquirer);
-	   	console.log("addCall(): inquirer is ");
-	   	console.log(inquirer);
-	     this.inquirer={};
-          return this.inquirer;
+	    };*/
+		console.log("inquirer is this object for " + this.inquirer.firstname);
+         // this.inquirer=inquirer;
+          this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
+	   	console.log("addCall(): inquirer is " );
+	   	//console.log(inquirer);
+	     
+     /* this.inquirer.firstname = "";
+       this.inquirer.lastname = "";
+       this.inquirer.email = "";
+       this.inquirer.phone = "";
+       this.inquirer.studentfirstname = "";
+       this.inquirer.studentlastname = "";
+       this.inquirer.relatedstudent = "";
+       this.inquirer.timestamp = "";
+       this.inquirer.callbacktime = "";
+       this.inquirer.timeorder = "";
+       this.inquirer.grade = "";
+       this.inquirer.coach = "";
+       this.inquirer.school = "";
+       this.inquirer.message = "";
+       this.inquirer.role = "";
+       this.inquirer.interest ="";*/
+        
+        //inquirer={};
+        this.inquirer = {};
+/*
+       var keys = Object.keys(this.inquirer);
+       for(k in keys)
+       {
+        this[k] = "";
+       }
+       */
+   console.log(this.inquirer);
+   //console.log(inquirer);
 	 }
 	}
 
