@@ -79,7 +79,7 @@ div.containedmore{
                <div container class="contained">            
 
      <neon-animated-pages id="pages" selected="0">
-      <jason-listView data="[[fileData]]" id="jasonListView" on-item-click="_onItemClick"></jason-listView>
+      <jason-listView inquiry="{{this.$.memo}}" id="jasonListView" on-item-click="_onItemClick"></jason-listView>
       <jason-fullView on-close="_onClose"></jason-fullView> 
      </neon-animated-pages>
 
@@ -92,23 +92,7 @@ div.containedmore{
 <script>
   Polymer({
     is: 'jason-listDemo',
-    properties: {
-      fileData: {
-        type: Array,
-        value: function() {
-          return [
-            {fileName: 'IMG_4169.jpg', modifiedDate: 'May 12 2015'}
-          ]
-        }
-     /* },
-      inquirer: {
-        type: Object, 
-        value: {
-        },
-        notify: true*/
-      }
-
-      
+    properties: { 
     },
 
     _onItemClick: function() {
@@ -119,20 +103,20 @@ div.containedmore{
 
     _onClose: function() {
       this.$.pages.selected = 0;
-      console.log(this.$.pages.selected.caller);
+      console.log(this.$.pages.selected.inquiry);
     },
-    ready: function() {
-              // this.addEventListener('writeToInputs', this.fillInputsFromCall);
+  ready: function() {
+            //this.addEventListener('writeToInputs', this.fillInputsFromCall);
            this.addEventListener('searchInquiries', this.inquirerObserver);
     },
       //fillInputsFromCall: function(){
         //   fcInputs.inquirer = this.$.fcListView.pastinquirer.detail;
            //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
         // },
-   inquirerObserver: function(e){
-          this.$.jasonListView.inquiry = e.detail;
+    inquirerObserver: function(e){
+         this.$.jasonListView.inquiry = e.detail;
          
-          }
+     }
 
 });
 </script>
