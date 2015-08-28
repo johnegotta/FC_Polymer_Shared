@@ -38,6 +38,7 @@
 
       .commands {
         float: right;
+        padding: 0px 10px;
       }
 
       .commands iron-icon:not([icon="check-circle"]) {
@@ -47,6 +48,11 @@
 
       .commands iron-icon:hover {
         opacity: 1;
+      }
+
+      .fileSelects {
+        float: right;
+        padding: 0px 10px;
       }
 
       [hidden] {
@@ -74,18 +80,37 @@
       <div id="UploadBorder">
         <div id="dropArea" hidden$="{{_hiddenDropText}}">{{dropText}}</div>
         <template is="dom-repeat" items="{{files}}">
-          <div class="file">
-            <div class="name">
-              <span>{{item.name}}</span>
-              <div class="commands">
-                <iron-icon icon="autorenew" title="Retry Upload" on-click="_retryUpload" hidden$="{{!item.error}}"></iron-icon>
-                <iron-icon icon="cancel" title="Remove" on-click="_cancelUpload" hidden$="{{item.complete}}"></iron-icon>
-                <iron-icon icon="check-circle" title="Success" hidden$="{{!item.complete}}"></iron-icon>
+          <div class="file horizontal layout">
+            <div>
+              <div class="name">
+                <span>{{item.name}}</span>
+                <div class="commands">
+                  <iron-icon icon="autorenew" title="Retry Upload" on-click="_retryUpload" hidden$="{{!item.error}}"></iron-icon>
+                  <iron-icon icon="cancel" title="Remove" on-click="_cancelUpload" hidden$="{{item.complete}}"></iron-icon>
+                  <iron-icon icon="check-circle" title="Success" hidden$="{{!item.complete}}"></iron-icon>
+                </div>
+              </div>
+              <div class="error" hidden$="{{!item.error}}">Error uploading file...</div>
+              <div hidden$={{progressHidden}}>
+                <paper-progress value$="{{item.progress}}" error$="{{item.error}}"></paper-progress>
               </div>
             </div>
-            <div class="error" hidden$="{{!item.error}}">Error uploading file...</div>
-            <div hidden$={{progressHidden}}>
-              <paper-progress value$="{{item.progress}}" error$="{{item.error}}"></paper-progress>
+            <div>
+              <div class="fileSelects">
+                <paper-dropdown-menu label="Results or Score Table" on-selected-item-changed="_setFileType">
+                  <paper-menu class="dropdown-content">
+                    <paper-item>Test Result</paper-item>
+                    <paper-item>Score Table</paper-item>
+                  </paper-menu>
+                </paper-dropdown-menu>
+                <paper-dropdown-menu id="testSelector" label="For Which Test" on-selected-item-changed="_setTestName">
+                  <paper-menu class="dropdown-content">
+                    <paper-item>Test 1</paper-item>
+                    <paper-item>Test 2</paper-item>
+                    <paper-item>Test B12A</paper-item>
+                  </paper-menu>
+                </paper-dropdown-menu>
+              </div>
             </div>
           </div>
         </template>
@@ -148,7 +173,7 @@
       */
       dropText: {
         type: String,
-        value: "Drop Files Here"
+        value: "Drop CSV Files Here"
       },
 
       /**
@@ -257,7 +282,8 @@
           file.error = false;
           file.complete = false;
           this.push("files", file);
-          this.uploadFile(file);
+          this._showDropText();
+          //this.uploadFile(file);
         }
       }
     },
@@ -285,7 +311,7 @@
         file.error = false;
         file.complete = false;
         this.push("files", file);
-        this.uploadFile(file);
+        //this.uploadFile(file);
       }
     },
 
@@ -331,7 +357,24 @@
     _showDropText: function() {
       this.set("_hiddenDropText", !(!this.files.length && this.droppable));
     },
-
+    /**
+     * Tell uploader if the CSV contains test results or score conversion chart
+    */
+    _setFileType: function(e){
+      e.model.__data__.item.filetype = e.target.selectedItem.innerText;
+      if(e.model.__data__.item.filetype && e.model.__data__.item.testname){
+        this.uploadFile(e.model.__data__.item);
+      }
+    },
+    /**
+     * Tell uploader what test this goes with
+    */
+    _setTestName: function(e){
+      e.model.__data__.item.testname = e.target.selectedItem.innerText;
+      if(e.model.__data__.item.filetype && e.model.__data__.item.testname){
+        this.uploadFile(e.model.__data__.item);
+      }
+    },
     /**
      * Uploads a file
      *
@@ -343,7 +386,6 @@
       } else {
         self = this;
         var prefix = "files." + self.files.indexOf(file);
-        self._showDropText();
         console.log('Uploading ' + file.name);
         //var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
           //if (regex.test(file.name.toLowerCase())) {
@@ -351,9 +393,11 @@
               var reader = new FileReader();
               reader.onload = function (e) {
                 var table = document.createElement("table");
-                var rows = e.target.result.split("\n");
+                var lastname = '';
+                var rows = e.target.result.split(/[\r|\n]+/);
                 var numRows = rows.length;
-                  for (var i = 0; i < numRows; i++) {
+                var headers = rows[0].split(",");
+                  for (var i = 1; i < numRows; i++) {
                       var row = table.insertRow(-1);
                       var cells = rows[i].split(",");
                       for (var j = 0; j < cells.length; j++) {
@@ -364,9 +408,11 @@
                   }
                   self.set(prefix + ".complete", true);
                   self.set(prefix + ".progress", 100);
+                  //alert(self.get(prefix + ".filetype"));
                   var dvCSV = document.getElementById("dvCSV");
                   dvCSV.innerHTML = "";
                   dvCSV.appendChild(table);
+                  self.cancel(file);
               }
               reader.readAsText(file);
             }
