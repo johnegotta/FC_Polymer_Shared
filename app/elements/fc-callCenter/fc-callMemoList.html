@@ -14,19 +14,21 @@ div.searchresults {
 	margin-top: 20px;
 	width: 900px;
 	}
-	
 
 div.fixedsearch {
-	margin-bottom: 4px; 
-
-
+	margin-bottom: 4px;
+	overflow: scroll;
+	margin-top: 20px;
+	border: 2px solid red;
+	width: 62vw;
 	}
 </style>
 <template>
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
 </firebase-collection>
-	<div class="verticle layout">
-         	<div class="fixedsearch">   
+
+	<div class="vertical layout">
+         	<div class="fixedsearch">
                		<paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
                		</paper-input>
       		</div>
@@ -34,9 +36,10 @@ div.fixedsearch {
             		<template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
                  		<fc-callMemo callinfo="{{item}}">
                  			<fc-tabbedCardHolder callinfo="{{item}}"></fc-tabbedCardHolder>
-                 		</fc-callMemo> 
+                 		</fc-callMemo>
                   	</template>
- 		               
+
+               </div>
 	</div>
 </template>
 <script>
@@ -48,40 +51,38 @@ div.fixedsearch {
 	    	  value: {
 	    	  		firstname: "",
 	    	  		lastname:"",
-	    	  		email:"", 
+	    	  		email:"",
 					phone:"",
 	        		relatedstudent: "",
 	        		message: "",
 	        		coach:""
 	    	  },
-	    	  notify: true, 
+	    	  notify: true,
 	    	  reflectToAttributes: true
 	    	}
-	    },   
+	    },
+
 	    _callFilter: function(searchfields){
-	      
 	      return function(item){
 	      	if(!searchfields) {
 	      		return true;
 	      	}
 	      	//start out with true result & falsify if any non blank match fails
 	      	var result = true;
-	      	console.log(searchfields);
-	      	console.log(item);
 	      	if(searchfields.firstname && searchfields.firstname != "")
 	      	{
 	      		//user entered a value in first name search
-	      		if(item.firstname)	      		
+	      		if(item.firstname)
 	      		{
 		      		result &= (item.firstname.indexOf(searchfields.firstname) > -1);
 		      	}
 		      	else return false; // first name searched but none in record
-	      	}	    	    
+	      	}
 
 	      	if(searchfields.lastname && searchfields.lastname != "")
 	      	{
 	      		//user entered a value in last name search
-	      		if(item.lastname)	      		
+	      		if(item.lastname)
 	      		{
 		      		result &= (item.lastname.indexOf(searchfields.lastname) > -1);
 		      	}
@@ -90,7 +91,7 @@ div.fixedsearch {
 	      	if(searchfields.email && searchfields.email != "")
 	      	{
 	      		//user entered a value in email search
-	      		if(item.email)	      		
+	      		if(item.email)
 	      		{
 		      		result &= (item.email.indexOf(searchfields.email) > -1);
 		      	}
@@ -99,31 +100,24 @@ div.fixedsearch {
 	      	if(searchfields.message && searchfields.message != "")
 	      	{
 	      		//user entered a value in first name search
-	      		if(item.message)	      		
+	      		if(item.message)
 	      		{
 		      		result &= (item.message.indexOf(searchfields.message) > -1);
 		      	}
 		      	else return false; // first name searched but none in record
-	      	}	    	    
+	      	}
 	      	if(searchfields.phone && searchfields.phone != "")
 	      	{
 	      		//user entered value in phone search
-	      		if(item.phone)	      		
+	      		if(item.phone)
 	      		{
 		      		result &= (item.phone.indexOf(searchfields.phone) > -1);
 		      	}
 		      	else return false; //user entered phone search but none in record
 	      	}
-	      	console.log("callFilter returning " + result);
 	      	return result;
-
-
 	      };
-	      
-
 	    }
-	        
-	         
-	});		
+	});
 </script>
 </dom-module>
