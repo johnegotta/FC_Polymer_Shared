@@ -27,11 +27,56 @@ div.contained{
      padding: 35px 4px 20px 24px;
 
 }
+paper-button.red {
+     background: red;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #ffffff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+}
+
+paper-button.green {
+     background: green;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #fff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+     }
+
+paper-button.gold {
+  background: #edc013;
+  raised: true;
+  border-radius: 11px;
+  box-shadow: 10px 10px 5px #888888;
+  font-weight: 800;
+  color: #002c80;
+  margin-top: 10px;
+  margin-left: 50px;
+  font-size: 13px;
+  text-align: left;
+  text-indent: 0px;
+  bottom: 8px;
+}
 </style>
 <template>
   
       <fc-inputs id="fcInputs" inquirer="{{inq}}">
-          
+          <firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>
       </fc-inputs>
 
 <div class="vertical layout wrap">
@@ -72,8 +117,9 @@ div.contained{
 
 
                     </fc-listDemo>
-                 <content>   <paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
-<paper-button class="green" on-tap="addCall">Add Call and Register</paper-button>
+                 <content>  </content>
+ <paper-button class="gold" on-tap="addCall">Add Call</paper-button> 
+<paper-button class="green" on-tap="addCall">Add & Register</paper-button>
 <paper-button class="red" on-tap="clearInputs">Clear Call</paper-button></content>
                </div>
   		</div><!--right-->
@@ -89,26 +135,24 @@ div.contained{
     Polymer({
           is: "fc-callCenterInterface",
           properties:{
-            dude: {
-                firstname: "Gwen",
-                lastname: "Stefani"
-              
-            }
           },
 
-          ready: function() {
-               this.addEventListener('writeToInputs', this.fillInputsFromCall);
-                this.addEventListener('searchInquiries', this.$.fcInputs.Observer);
+     ready: function() {
+              // this.addEventListener('writeToInputs', this.fillInputsFromCall);
+                this.addEventListener('inquirerObserver', this.$.fcInputs.Observer);
           },
          
-         fillInputsFromCall: function(e){
+     fillInputsFromCall: function(e){
            this.$.fcInputs.inquirer = e.detail;
          },
-         inquirerObserver: function(e){
-         this.$.fcListDemo.inquirer = e.detail;
+
+     inquirerObserver: function(e){
+                    this.$.fcListDemo.inquirer = e.detail;
+                    console.log(e.detail);
           },
 
-       /* addCall: function(){  
+
+     addCall: function(){  
           var rawtime= new Date();
           var callbackTime = new Date();
           callbackTime.setDate(rawtime.getDate() + 2);
@@ -130,47 +174,44 @@ div.contained{
           }
 
           this.$.fcInputs.relatedstudent = this.$.fcInputs.studentfirstname + " " + this.$.fcInputs.studentlastname + " ";
-          this.$.fcInputs.FBcalls._setRemoteDocumentChild(order, this.$.fcInputs.);
+          this.$.FBcalls._setRemoteDocumentChild(order, this.$.inquirer);
 
        
-          fcInp1.value = this.$.fcInputs.firstname = "";
-          fcInp2.value = this.$.fcInputs.lastname = "";
-          fcInp3.value = this.$.fcInputs.email = "";
-          fcInp4.value = this.$.fcInputs.phone = "";
-          fcInp5.value = this.$.fcInputs.studentfirstname = "";
-          fcInp6.value = this.$.fcInputs.studentlastname = "";
-          fcInp7.value = this.$.fcInputs.relatedstudent = "";
-          fcInp8.value = this.$.fcInputs.timestamp = "";
-          fcInp9.value = this.$.fcInputs.callbacktime = "";
-          fcInp10.value = this.$.fcInputs.timeorder = "";
-          fcInp11.value = this.$.fcInputs.grade = "";
-          fcInp12.value = this.$.fcInputs.coach = "";
-          fcInp13.value = this.$.fcInputs.school = "";
-          fcInp14.value = this.$.fcInputs.message = "";
-          fcInp15.value = this.$.fcInputs.role = "";
+          this.$.fcInputs.fcInp1.value = this.$.fcInputs.firstname = "";
+          this.$.fcInputs.fcInp2.value = this.$.fcInputs.lastname = "";
+          this.$.fcInputs.fcInp3.value = this.$.fcInputs.email = "";
+          this.$.fcInputs.fcInp4.value = this.$.fcInputs.phone = "";
+          this.$.fcInputs.fcInp5.value = this.$.fcInputs.studentfirstname = "";
+          this.$.fcInputs.fcInp6.value = this.$.fcInputs.studentlastname = "";
+          this.$.fcInputs.fcInp7.value = this.$.fcInputs.relatedstudent = "";
+          this.$.fcInputs.fcInp8.value = this.$.fcInputs.timestamp = "";
+          this.$.fcInputs.fcInp9.value = this.$.fcInputs.callbacktime = "";
+          this.$.fcInputs.fcInp10.value = this.$.fcInputs.timeorder = "";
+          this.$.fcInputs.fcInp11.value = this.$.fcInputs.grade = "";
+          this.$.fcInputs.fcInp12.value = this.$.fcInputs.coach = "";
+          this.$.fcInputs.fcInp13.value = this.$.fcInputs.school = "";
+          this.$.fcInputs.fcInp14.value = this.$.fcInputs.message = "";
+          this.$.fcInputs.fcInp15.value = this.$.fcInputs.role = "";
       
-     },*/
+     },
 
- /* clearInputs: function(){
-          fcInp1.value = "";
-          fcInp2.value = "";
-          fcInp3.value = "";
-          fcInp4.value = "";
-          fcInp5.value = "";
-          fcInp6.value = "";
-          fcInp7.value = "";
-          fcInp8.value = "";
-          fcInp9.value = "";
-          fcInp10.value = "";
-          fcInp11.value = "";
-          fcInp12.value = "";
-          fcInp13.value = "";
-          fcInp14.value = "";
-          fcInp15.value = "";
-          fcInp16.value = "";
-          return;
-
-  }*/
+ clearInputs: function(){
+          this.$.fcInputs.fcInp1.value = "";
+          this.$.fcInputs.fcInp2.value = "";
+          this.$.fcInputs.fcInp3.value = "";
+          this.$.fcInputs.fcInp4.value = "";
+          this.$.fcInputs.fcInp5.value = "";
+          this.$.fcInputs.fcInp6.value = "";
+          this.$.fcInputs.fcInp7.value = "";
+          this.$.fcInputs.fcInp8.value = "";
+          this.$.fcInputs.fcInp9.value = "";
+          this.$.fcInputs.fcInp10.value = "";
+          this.$.fcInputs.fcInp11.value = "";
+          this.$.fcInputs.fcInp12.value = "";
+          this.$.fcInputs.fcInp13.value = "";
+          this.$.fcInputs.fcInp14.value = "";
+          this.$.fcInputs.fcInp15.value = "";
+  }
 
    
     });

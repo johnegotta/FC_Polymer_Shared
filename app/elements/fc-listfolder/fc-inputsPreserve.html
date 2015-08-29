@@ -21,6 +21,20 @@ paper-icon-button {
         text-align: center;
       }
 
+paper-button.gold {
+  background: #edc013;
+  raised: true;
+  border-radius: 11px;
+  box-shadow: 10px 10px 5px #888888;
+  font-weight: 800;
+  color: #002c80;
+  margin-top: 10px;
+  margin-left: 50px;
+  font-size: 13px;
+  text-align: left;
+  text-indent: 0px;
+  bottom: 8px;
+}
 
 fc-paperInput {
 	display: inline;
@@ -47,9 +61,40 @@ paper-material.controller{
      color: #002c90;
      margin: 12px;
 }
+paper-button.red {
+     background: red;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #ffffff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+}
+
+paper-button.green {
+     background: green;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 10px 10px 5px #888888;
+     font-weight: 800;
+     color: #fff;
+     margin-top: 10px;
+     margin-left: 50px;
+     font-size: 13px;
+     text-align: left;
+     text-indent: 0px;
+     bottom: 8px;
+     }
 
 </style>
 <template>
+<firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+</firebase-document>
 <iron-form id="fcInputsForm" name="fcInputsForm">
 <paper-material class="controller horizontal layout wrap container">
      <h4>Call Intake:</h4>
@@ -68,13 +113,21 @@ paper-material.controller{
              	<iron-icon icon="info"></iron-icon>
         </paper-item>
  <paper-input label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed"></paper-input>
-</div></div>
+</div>
+
+     </div>
      <content>
 
 </content>
 </paper-material> 
  </iron-form>  
+<div class="layout horizontal">
+<div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div> 
+<div><paper-button class="green" on-tap="addCall">Add Call and Register</paper-button></div> 
+<div><paper-button class="red" on-tap="clearInputs">Clear Call</paper-button></div> 
 
+
+</div>
 </template>
 <script> 
 Polymer({
@@ -127,6 +180,69 @@ Polymer({
     };
 	this.fire("searchInquiries", shadowInquirer);
 		console.log(this.inquirer.firstname + " " + " " + "just fired inputChanged event." + " for " + shadowInquirer.firstname);
+	},
+
+	addCall: function(){  
+		var rawtime= new Date();
+		var callbackTime = new Date();
+		callbackTime.setDate(rawtime.getDate() + 2);
+    callbackTime = callbackTime.toString().slice(0, 21);
+		var time = rawtime.toString().slice(0, 21);
+		var order=-event.timeStamp;
+          this.inquirer.timestamp = time;
+          this.inquirer.timeorder = order;
+          this.inquirer.callbacktime = callbackTime;
+		
+     if(this.inquirer.firstname == '' || this.inquirer.lastname == ''){
+			alert("First and last name are required before adding call.");
+			return;
+		}
+	   if(this.inquirer.email == '' && this.inquirer.phone == ''){
+			alert("Must supply either phone number or email before adding call.");
+			return;
+		}
+
+          this.inquirer.relatedstudent = this.inquirer.studentfirstname + " " + this.inquirer.studentlastname + " ";
+          this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
+
+	     
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+      
+     },
+
+  clearInputs: function(){
+          fcInp1.value = "";
+          fcInp2.value = "";
+          fcInp3.value = "";
+          fcInp4.value = "";
+          fcInp5.value = "";
+          fcInp6.value = "";
+          fcInp7.value = "";
+          fcInp8.value = "";
+          fcInp9.value = "";
+          fcInp10.value = "";
+          fcInp11.value = "";
+          fcInp12.value = "";
+          fcInp13.value = "";
+          fcInp14.value = "";
+          fcInp15.value = "";
+          fcInp16.value = "";
+          return;
+
 	}
 
 });
