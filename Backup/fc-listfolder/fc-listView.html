@@ -10,7 +10,7 @@
     }
 
     iron-icon {
-      color: var(--google-light-blue-500);
+      color: var(--google-light-blue-50);
     }
 
      paper-icon-button {
@@ -25,7 +25,9 @@
       }
   </style>
 <template>
-<firebase-collection data="{{calls}}" as="{{pastinquirer}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="focusedstaging1.firebaseio.com/calls"></firebase-collection>
+      <content>
+      </content>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
 
     <paper-toolbar  id="fcpapertoolbar" class="medium">
@@ -33,16 +35,16 @@
     
     <div class="main">
         
-    <template is="dom-repeat" items="{{calls}}" as="{{pastinquirer}}" filter='{{_callFilter(caller)}}'>
-                <paper-item on-click="_scott">
-                      <paper-item-body three-line>
+    <template is="dom-repeat" items="{{calls}}" as="{{caller}}" filter='{{_callFilter(caller)}}'>
+                <paper-item >
+                      <paper-item-body three-line on-click="_scott">
                             <div>
-                               <b> <span>[[this.pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called on 
-                               <b> <span>[[pastinquirer.timestamp]]</span> </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span>. <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
+                               <b> <span>[[this.$.caller.firstname]]</span> <span>[[caller.lastname]]</span> </b> called on 
+                               <b> <span>[[caller.timestamp]]</span> </b> regarding, <b><span>[[caller.relatedstudent]]</span></b>: a <span>[[caller.grade]]</span> grader at <span>[[caller.school]]</span> in <span>[[caller.schooltown]]</span>. <span>[[caller.firstname]]</span> is interested in <span>[[caller.interest]]</span> with <span>[[caller.coach]]</span>, priced at <span>[[caller.interestprice]</span>
                             </div>
-                            <div secondary> <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
+                            <div secondary> <span>[[caller.firstname]]</span> can be reached at <b><u><span>[[caller.phone]]</span></b></u> or <u><b><span>[[caller.email]]</span></b></u>. <span>[[caller.firstname]]</span> will be called back on or before <b><u><span>[[caller.callbacktime]]</span></u></b>.
                             </div>
-                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span></div>
+                            <div secondary><b>Additional Message:</b><span>[[caller.message]]</span></div>
                       </paper-item-body>
                   <iron-icon icon="info"></iron-icon>
                 </paper-item>
@@ -75,10 +77,10 @@
             interestprice: '',
             intereststartdate: '', 
             role: '',
-            notify: true 
-               },
-            notify: true
-            },
+            notify: true,
+            reflectToAttributes: true 
+               }
+            }, 
 
       caller: {
          type: Object,
@@ -91,9 +93,9 @@
                studentlastname: '', 
                relatedstudent: '', 
                coach:'', 
-               notify: true
-               },
-         notify: true
+               notify: true,
+               reflectToAttributes: true 
+               }
              },
          
       animationConfig: {
@@ -119,23 +121,23 @@
     },
 
    _scott: function(e){
-      console.log(e.model.pastinquirer);
-      this.pastinquirer = e.model.pastinquirer;
-      this.fire('item-click', {pastinquirer: this.pastinquirer});
+      console.log(e.model.caller);
+      this.caller = e.model.caller;
+      this.fire('item-click', {caller: this.caller});
     },
 
     _onClick: function(event) {
       var target = event.target;
       console.log(event.model);
-      if (target == this.$.fcpapertoolbar /*|| target==this.$.fcpapertoolbar.child*/)
+      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
         target = null;
          
      } 
       else {
         target=target.parentNode;
-        this.pastinquirer=target.details
-        console.log(this.pastinquirer);
+        this.caller=target.details
+        console.log(this.caller);
         
       // configure the page animation
       this.sharedElements = {
@@ -149,12 +151,12 @@
 
     }
   },
-   _callFilter: function(caller){
-         return function(item){
+  _callFilter: function(caller){
+        return function(item){
           if(item.firstname.indexOf(caller.firstname)> -1 && item.phone.indexOf(caller.phone)>-1 && item.lastname.indexOf(caller.lastname)>-1) return true;
- } 
+                    } 
         
-         }
+            }
 
     
 });
