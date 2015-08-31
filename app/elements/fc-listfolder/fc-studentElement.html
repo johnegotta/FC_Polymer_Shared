@@ -1,4 +1,4 @@
-<dom-module id='fc-studentContacts'>
+<dom-module id='fc-studentGenerator'>
 <style is='custom-style'>
     :host {
       display: block;
@@ -9,7 +9,7 @@
     }
   </style>
   <template>
-  <firebase-document id="FCIDContacts" location="focusedstudents.firebaseio.com/StreelandAnna00001" data="{{StreelandAnna00001}}">
+  <firebase-document id="FCIDContacts" as="fcid" location="focusedstudents.firebaseio.com/" data="{{contactinfo.fcid}}">
 </firebase-document>  
     <content></content>
     <paper-material class="blue" elevation="3">
@@ -22,7 +22,8 @@
     properties: {
      contactinfo:{
           type: Object,
-          value:{
+          value:{ function(){
+            return{
                firstname: 'Anna', 
                lastname: 'Streeland', 
                email: 'jzirkel@gmail.com, gzirkel@gmail.com',
@@ -42,6 +43,7 @@
                associatedStudents: {referal2: 'Zirkel M. Zirkel', referal1: 'James Brown'}, 
                siblings: {brother: 'Henry Streeland, jr.'}, 
                referredStudentToFocused: 'none'
+            }
           }, 
           notify: true,
           reflectToAttributes: true
@@ -222,11 +224,11 @@
             collegeSavings: "$120,000",
             fourYearROI: "280% annually, 6,000% in four years, non-depreciated.",
             totalValuationTodayDollars: "A child working to maximum potential for 8 to 20 weeks will see a return on investment of higher value than even the cost of school for the entirety of their lives in the average New Jersey Public School, and will pay 1/100th for the educational value offered.",
-            costOfLocalHighSchoolPerYear: "Selected High School $48,000,000 annually for 1900 students. $24,000 a year a child for public school, and $87,000,000 for the district 4,800 students.or $18,321 per student, per year, k-12. Minimal Total State Cost by 11th Grade: $201,000 of which $149,000 was born by the average property owner in the selected district. Additionally, because these numbers exclude federal education contributions in district, which increase costs by a de minimus 25%, annual expenditures for each student in selected district should exceed $22,500 a year and could be as high as $38,000 annually. These numbers should leave no room for Focused. Yet, we are tasked with not only doing the job schools failed to do for 11 years (k-10), but we are also tasked with doing it in less than 6 months and a cost of less than 1/100th the public education cost a year. When ROI is included based on our averaage results, our net cost represents a negative infinity compared to the cost of public school. At the very least, we are a bargain. (See, public NJ documents for clarification.)LINK.I coulnt resist. We will remove it. But God, it's awful how much we work, and how much there is to fix.  These kids this time are so messed up educationally.)",
+            costOfLocalHighSchoolPerYear: "Selected High School $48,000,000 annually for 1900 students. $24,000 a year a child for public school, and $87,000,000 for the district 4,800 students.or $18,321 per student, per year, k-12. Minimal Total State Cost by 11th Grade: $201,000 of which $149,000 was born by the average property owner in the selected district. Additionally, because these numbers exclude federal education contributions in district, which increase costs by a de minimus 25%, annual expenditures for each student in selected district should exceed $22,500 a year and could be as high as $38,000 annually. These numbers should leave no room for Focused. Yet, we are tasked with not only doing the job schools failed to do for 11 years (k-10), we are tasked with doing it in less than 6 months and a cost of less than 1/100th the public education cost. When ROI is included based on our averaage results, our net cost represents a negative infinite compared to the cost of public school. At the very least, we are a bargain. (See, public NJ documents for clarification.)LINK.I coulnt resist. We will remove it. But God, it's awful how much we work, and how much there is to fix.  These kids this time are so messed up educationally.)",
                performanceVsDeltaFcTestDateCourse: "Top 1%",
                performanceDeltaVsFcTestDateCourses:"Top 3%",
                performanceDeltaVsFcYear: "Top 5.7%",
-               performanceDeltaFcAllTime:"Top 7.8%",
+               performanceDeltaFcAllTime:"Top 4.8%",
             performanceAbsoluteVsYear: "Top 38.23%",
             expenditureVsAverage: "Bottom 39.513%",
             deltaExpenditureFromMedian: '-$341',
@@ -263,16 +265,21 @@
 
  },
 
+    created: function(){
+
+
+
+      },
+
     attached: function(){
       var holder="StreelandAnna00001";
       console.log('this is the value of inquiries at ready--set to StreelandAnna0001' + ' ' + this.courseOne.preTestReadingMissed);
-     //this.$.FCIDContacts._setRemoteDocumentChild(holder, this.courseOne);
+     this.$.FCIDContacts._setRemoteDocumentChild(holder, this.contactinfo);
      //var coursepurchaseinfo="coursepurchaseinfo";
      //this.$.FCIDContacts._setRemoteDocumentChild(, this.coursepurchaseinfo);
 
      this.$.FCIDContacts._updateRemoteDocument;
    
-
     }
       // `ready` is called after all elements have been configured, but
       // propagates bottom-up. This element's children are ready, but parents
@@ -323,6 +330,67 @@
      * @return {string} The full greeting.
      */
 
+    /**
+     * Attempt to destroy this element's enemies with a beam of light!
+     *
+     * Or, at least, dispatch an event in the vain hope that someone else will
+     * do the zapping.
+     */
+    
+  });
+</script>
+</dom-module>
+      
+           
+    // Element Lifecycle
+    created: function(){
+
+
+
+
+
+
+    },
+    ready: function() {
+       this.$.StreenlandAnna00001._setRemoteDocumentChild(this.$.student.fcid, this.$.student);
+      // `ready` is called after all elements have been configured, but
+      // propagates bottom-up. This element's children are ready, but parents
+      // are not.
+      //
+      // This is the point where you should make modifications to the DOM (when
+      // necessary), or kick off any processes the element wants to perform.
+    },
+    attached: function() {
+      // `attached` fires once the element and its parents have been inserted
+      // into a document.
+      //
+      // This is a good place to perform any work related to your element's
+      // visual state or active behavior (measuring sizes, beginning animations,
+      // loading resources, etc).
+    },
+    detached: function() {
+      // The analog to `attached`, `detached` fires when the element has been
+      // removed from a document.
+      //
+      // Use this to clean up anything you did in `attached`.
+    },
+    // Element Behavior
+    /**
+     * The `seed-element-lasers` event is fired whenever `fireLasers` is called.
+     *
+     * @event seed-element-lasers
+     * @detail {{sound: String}}
+     */
+    /**
+     * Sometimes it's just nice to say hi.
+     *
+     * @param {string} greeting A positive greeting.
+     * @return {string} The full greeting.
+     */
+    sayHello: function(greeting) {
+      var response = greeting || 'Hello World!';
+      return 'seed-element says, ' + response;
+    }
     /**
      * Attempt to destroy this element's enemies with a beam of light!
      *

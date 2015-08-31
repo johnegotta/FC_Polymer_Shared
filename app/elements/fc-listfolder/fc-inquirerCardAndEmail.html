@@ -1,0 +1,194 @@
+<dom-module id="fc-inquirerCardAndEmail">
+<style is="custom-style">
+
+paper-textarea.textareaannoyed{
+     width: 320px;
+     height: 160px;
+     min-width: 300px;
+     min-height: 120px;
+     display: block;
+}
+
+fc-card{
+     padding: 4px;    
+}
+div.contained{
+    height: 650px;
+    position: relative;
+    border: 12px ridge #aecdfe;
+    margin: 12px;
+    padding: 12px;
+    display: flex;
+    min-width: 850px;
+}
+.tight{
+     width:400px;
+     display: flex;
+     flex-wrap: wrap;
+     }
+</style>
+<template>
+                <fc-card class="container flex wrap" header-title="Inquiry Memorandum" header-subtitle='{{inq.timestamp}}'>
+                    <paper-item class="wrap">
+                      		<paper-item-body class="wrap two-line tight">
+                            	<div class="layout flex wrap container tight">
+                                  <br>
+                               		<b><span>{{inq.firstname}}</span>&nbsp<span>{{inq.lastname}}</span></b>&nbsp<span name="fccalledon" id="fccalledon" hidden="true"> called on:</span>&nbsp<span id="fctimestamp" hidden="true"><b><u><span id="truetimestamp"></span></u></b>,</span>&nbsp<span name="fcregarding" hidden="true" id="fcregarding">regarding,</span>&nbsp<b><span>[[inq.studentfirstname]]</span>&nbsp<span>[[inq.studentlastname]]</span></b><span hidden="true" id="asinglea">: a</span>&nbsp<span>[[inq.grade]]</span>&nbsp<span hidden="true" id="graderat" id="graderat">grader at</span>&nbsp<span>[[inq.school]]</span>&nbsp<span hidden="true" id="inat">in</span>&nbsp<span>{{inq.schooltown}}</span><span id="period" hidden="true">.</span>
+                              	</div> 
+                                <br>
+                              	<div class="secondary layout flex wrap container tight">
+                              	     <span id="headerlast" hidden="true"><b><u>Contacts</u></b>:</span>&nbsp<span hidden="true" id="canbereachedat"><span>[[inq.firstname]]</span>&nbsp<span>can be reached at</span></span>&nbsp
+                                        <!--end canbereachedat--> 
+
+                                        <b><span>[[inq.phone]]</span></b><span id='extraperiod' hidden="true">.</span>&nbsp<span hidden="true" id="orword"> or </span> &nbsp<span id='periodoneplus' hidden='true'><u><span>[[inq.email]]</span></u>.</span>
+                                        <!--end orword-->
+                                        <span id='roleid' hidden='true'>&nbsp</span>
+                                        <!--end roleid-->
+                                        <span id='fcwewill' hidden='true'><span>[[inq.firstname]]</span>&nbspconfirmed</span>&nbsp<span id="contactthe" hidden='true'>a follow-up call</span>&nbsp<span id="fcbyebye" hidden='true'>on or before</span>&nbsp<u><span hidden='true' id="fccallbacktime"></span></u><span id='periodtwo' hidden='true'>.</span>
+                                   </div>
+                              			<br>
+                              	<div class="secondary layout flex wrap container tight">
+                                        <span id="contactinterest" hidden='true'><b><u>Contact Interest</u></b>:</span>&nbsp<span id="isinterestedin" hidden="true"><span>[[inq.firstname]]</span>&nbsp<span>is interested in</span>&nbsp</span><span>[[inq.interest]]</span>&nbsp<span id="startingon" hidden="true">starting on</span>&nbsp<span>[[inq.intereststartdate]]</span>&nbsp<span id="andpricedat">and priced at $</span><span>[[inq.interestprice]]</span><span id='periodthree' hidden='true'>.</span> <span id="withcoach" hidden="true">Coach <span>[[inq.coach]]</span> was requested.</span>
+                              	</div><br>
+                              	<div class="secondary layout flex wrap container tight"><span id="additionalmessagetitle" hidden="true"><paper-textarea label="Message" name="message" value="[[inq.message]]" always-float-label="true" placeholder= "Additional Information" readonly="true" maxlength="400" rows="4" class="textareaannoyed">
+                                   </paper-textarea>
+                              	</div><br>
+                                   <span id="inquirerrole" hidden="true"><b><u>Inquirer Role</u></b>: <span>[[inq.role]]</span></span>
+                    		</paper-item-body>
+                	</paper-item>
+            	</fc-card>   	
+            	
+</template>
+<script>
+Polymer({
+	is:"fc-inquirerCardAndEmail",
+	properties: {
+          inq:{
+               type: Object,
+               value: {
+                    firstname: '', 
+                    lastname: '', 
+                    email: '', 
+                    phone:'', 
+                    studentfirstname: '', 
+                    studentlastname: ' ', 
+                    relatedstudent: '', 
+                    message: '',
+                    coach:'', 
+                    timestamp: '', 
+                    grade: '', 
+                    school:'', 
+                    schooltown:'', 
+                    interest:'', 
+                    interestprice: '',
+                    intereststartdate: '', 
+                    callbacktime: '', 
+                    dateorder: '', 
+                    ccInfo: '',
+                    role: '', 
+                    notify: true,
+                    reflectToAttributes: true
+               },
+               notify: true
+                
+          }
+			
+	},
+     
+     observers: [
+    'callMemoContentChanged(inq.firstname, inq.lastname)',
+    'callMemoContentChangedTwo(inq.studentfirstname, inq.grade, inq.school, inq.schooltown, inq.phone, inq.email, inq.role, inq.firstname, inq.interest, inq.coach, inq.intereststartdate, inq.interestprice, inq.message)'
+    ],
+
+     callMemoContentChanged: function(first, last){
+          if(first!='' && last!=''){
+            this.$.fccalledon.hidden=this.$.fctimestamp.hidden=this.$.fcregarding.hidden=false;
+            var timenow=Date().toString().slice(0, 21);
+            this.$.truetimestamp.innerHTML=timenow;
+            var rawtime= new Date();
+            var callbackTime = new Date();
+            callbackTime.setDate(rawtime.getDate() + 2);
+            callbackTime = callbackTime.toString().slice(0, 21);
+            this.$.fccallbacktime.innerHTML=callbackTime;
+            console.log("inq was observed AND CALLBACKTIME AND tIMESTAMP WERE SET AS WAS CALL TIME the callback time is" + callbackTime + ' ' + timenow );
+          }
+          if(first==''){
+            this.$.fccalledon.hidden=this.$.fctimestamp.hidden=this.$.fcregarding.hidden=true;
+            //console.log("inq was observed and hid called regarding and timestamp because inq===empty object");
+
+          }
+
+     },
+
+    callMemoContentChangedTwo: function(stufirst, gradelev, school, schoolcity, phone, email, role, first, interest, coach, startdate, price, admessage){
+
+          if(stufirst!=''){
+                 this.$.asinglea.hidden=false;
+                //console.log("stufirst was observed and revealed a single `a` and a colon");
+               }
+
+          if(gradelev!=''){
+                 this.$.graderat.hidden=false;
+                 //console.log("gradelev was observed and revealed a single grader at and a colon");
+               }
+
+          if(school!=''){
+                 this.$.inat.hidden=false;
+                 //console.log("inat revealed by school");
+               }
+
+          if(schoolcity!=''){
+               this.$.period.hidden=false;
+               }
+
+          if(phone!='' || email!=''){
+               this.$.canbereachedat.hidden=false;
+               this.$.headerlast.hidden=false;
+               }
+
+          if(phone=="" && email!=''){
+               this.$.periodoneplus.hidden=false;
+               }
+
+          if(phone!='' && email!=''){
+               this.$.orword.hidden=this.$.periodoneplus.hidden=false;
+               }
+
+          if(phone!='' && role!='' && email==''){
+               this.$.extraperiod.hidden=false;
+               }
+
+          if(role!=''){
+               this.$.roleid.hidden=false;
+               this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.inquirerrole.hidden=false;
+               }
+
+          if(interest!=''){
+               this.$.contactinterest.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(coach!=''){
+               this.$.withcoach.hidden=this.$.startingon.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(startdate!=''){
+               this.$.andpricedat.hidden=this.$.startingon.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(price!=''){
+               this.$.periodthree.hidden=false;
+               }
+          
+          if(admessage!=''){
+               this.$.additionalmessagetitle.hidden=false;
+               }
+          if(first=='' && phone=='' && email==''){
+               this.$.additionalmessagetitle.hidden=this.$.inquirerrole.hidden=this.$.contactinterest.hidden=this.$.periodthree.hidden=this.$.andpricedat.hidden=this.$.withcoach.hidden=this.$.startingon.hidden=this.$.isinterestedin.hidden=this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.roleid.hidden=this.$.orword.hidden=this.$.canbereachedat.hidden=this.$.period.hidden=this.$.inat.hidden=this.$.graderat.hidden=this.$.asinglea.hidden=this.$.headerlast.hidden=this.$.extraperiod.hidden=this.$.periodoneplus.hidden=true; 
+               }
+           }
+});
+</script>
+</dom-module>
