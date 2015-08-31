@@ -91,24 +91,13 @@ Polymer({
                },
                notify: true
                 
-          },
-          shown:{
-               type: Object, 
-               value:{
-                    calledon: '',
-                    regarding:'',
-                    notify: true
-               },
-               notify: true
           }
 			
-
 	},
      
      observers: [
     'callMemoContentChanged(inq.firstname, inq.lastname)',
-    'callMemoContentChangedTwo(inq.studentfirstname, inq.grade, inq.school, inq.schooltown, inq.phone, inq.email, inq.role, inq.firstname, inq.interest, inq.coach, inq.intereststartdate, inq.interestprice, inq.message)',
-    'callMemoContentChangesShown(shown.calledon, shown.regard)'
+    'callMemoContentChangedTwo(inq.studentfirstname, inq.grade, inq.school, inq.schooltown, inq.phone, inq.email, inq.role, inq.firstname, inq.interest, inq.coach, inq.intereststartdate, inq.interestprice, inq.message)'
     ],
 
      callMemoContentChanged: function(first, last){
@@ -121,94 +110,85 @@ Polymer({
             callbackTime.setDate(rawtime.getDate() + 2);
             callbackTime = callbackTime.toString().slice(0, 21);
             this.$.fccallbacktime.innerHTML=callbackTime;
-            console.log("inq was observed and revealed calledon regarding because studentfirstname did not equal  caller lastname. the callback time is" + callbackTime);
+            console.log("inq was observed AND CALLBACKTIME AND tIMESTAMP WERE SET AS WAS CALL TIME the callback time is" + callbackTime + ' ' + timenow );
           }
-          else if(first==''){
+          if(first==''){
             this.$.fccalledon.hidden=this.$.fctimestamp.hidden=this.$.fcregarding.hidden=true;
-            console.log("inq was observed and hid called regarding and timestamp because inq===empty object");
+            //console.log("inq was observed and hid called regarding and timestamp because inq===empty object");
 
-          }
-          else{
-            console.log("i still hit the inq observer and did not find that anything was defined so first name must equal undefined; firstname is :" + first);
           }
 
      },
 
-    callMemoContentChangedTwo: function(stufirst, gradelev, school, schoolcity, phone, email, role, first, interest, coach, startdate, price, admessage)
-          {
-      if(stufirst!=''){
-            this.$.asinglea.hidden=false;
-            console.log("stufirst was observed and revealed a single `a` and a colon");
-          }
-      if(gradelev!=''){
-            this.$.graderat.hidden=false;
-            console.log("gradelev was observed and revealed a single grader at and a colon");
-          }
-      if(school!=''){
-            this.$.inat.hidden=false;
-            console.log("inat revealed by school");
-          }
-      if(schoolcity!=''){
-        this.$.period.hidden=false;
-        }
-      if(phone!='' || email!=''){
-        this.$.canbereachedat.hidden=false;
-        this.$.headerlast.hidden=false;
-        }
-       if(phone=="" && email!=''){
-          this.$.periodoneplus.hidden=false;
-     }
-      if(phone!='' && email!=''){
-        this.$.orword.hidden=this.$.periodoneplus.hidden=false;
-        }
-        if(phone!='' && role!='' && email==''){
-          this.$.extraperiod.hidden=false;
-          }
-      if(role!=''){
-        this.$.roleid.hidden=false;
-        this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.inquirerrole.hidden=false;
-        }
-      if(interest!=''){
-          this.$.contactinterest.hidden=false;
-          this.$.isinterestedin.hidden=false;
-        }
-      if(coach!=''){
-          this.$.withcoach.hidden=this.$.startingon.hidden=false;
-          this.$.isinterestedin.hidden=false;
-      }
-      if(startdate!=''){
-          this.$.andpricedat.hidden=this.$.startingon.hidden=false;
-          this.$.isinterestedin.hidden=false;
-      }
-      if(price!=''){
-          this.$.periodthree.hidden=false;
-      }
-      if(admessage!=''){
-        this.$.additionalmessagetitle.hidden=false;
-      }
-      if(first=='' && phone=='' && email==''){
-          this.$.additionalmessagetitle.hidden=this.$.inquirerrole.hidden=this.$.contactinterest.hidden=this.$.periodthree.hidden=this.$.andpricedat.hidden=this.$.withcoach.hidden=this.$.startingon.hidden=this.$.isinterestedin.hidden=this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.roleid.hidden=this.$.orword.hidden=this.$.canbereachedat.hidden=this.$.period.hidden=this.$.inat.hidden=this.$.graderat.hidden=this.$.asinglea.hidden=this.$.headerlast.hidden=this.$.extraperiod.hidden=this.$.periodoneplus.hidden=true; 
+    callMemoContentChangedTwo: function(stufirst, gradelev, school, schoolcity, phone, email, role, first, interest, coach, startdate, price, admessage){
 
-          }
-      },
+          if(stufirst!=''){
+                 this.$.asinglea.hidden=false;
+                //console.log("stufirst was observed and revealed a single `a` and a colon");
+               }
 
-     callMemoContentChangesShown: function(calledon, regarding){
-      if(calledon!==""){
-               this.$.fccalledon.hidden=this.$.fctimestamp.hidden=this.$.fcregarding.hidden=false;
-               console.log("shown was observed");
-          }
-        else{ console.log("I did not find that calledon was defined so called on must be undefined; calledon equals: " + calledon);
-          }
-     },
+          if(gradelev!=''){
+                 this.$.graderat.hidden=false;
+                 //console.log("gradelev was observed and revealed a single grader at and a colon");
+               }
 
-     called: function(){
-          console.log("ice calledon equals " + this.shown.calledon);
-          console.log(this.inq.timestamp);
-         
+          if(school!=''){
+                 this.$.inat.hidden=false;
+                 //console.log("inat revealed by school");
+               }
 
-     }
-     
-     
+          if(schoolcity!=''){
+               this.$.period.hidden=false;
+               }
+
+          if(phone!='' || email!=''){
+               this.$.canbereachedat.hidden=false;
+               this.$.headerlast.hidden=false;
+               }
+
+          if(phone=="" && email!=''){
+               this.$.periodoneplus.hidden=false;
+               }
+
+          if(phone!='' && email!=''){
+               this.$.orword.hidden=this.$.periodoneplus.hidden=false;
+               }
+
+          if(phone!='' && role!='' && email==''){
+               this.$.extraperiod.hidden=false;
+               }
+
+          if(role!=''){
+               this.$.roleid.hidden=false;
+               this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.inquirerrole.hidden=false;
+               }
+
+          if(interest!=''){
+               this.$.contactinterest.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(coach!=''){
+               this.$.withcoach.hidden=this.$.startingon.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(startdate!=''){
+               this.$.andpricedat.hidden=this.$.startingon.hidden=false;
+               this.$.isinterestedin.hidden=false;
+               }
+
+          if(price!=''){
+               this.$.periodthree.hidden=false;
+               }
+          
+          if(admessage!=''){
+               this.$.additionalmessagetitle.hidden=false;
+               }
+          if(first=='' && phone=='' && email==''){
+               this.$.additionalmessagetitle.hidden=this.$.inquirerrole.hidden=this.$.contactinterest.hidden=this.$.periodthree.hidden=this.$.andpricedat.hidden=this.$.withcoach.hidden=this.$.startingon.hidden=this.$.isinterestedin.hidden=this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.roleid.hidden=this.$.orword.hidden=this.$.canbereachedat.hidden=this.$.period.hidden=this.$.inat.hidden=this.$.graderat.hidden=this.$.asinglea.hidden=this.$.headerlast.hidden=this.$.extraperiod.hidden=this.$.periodoneplus.hidden=true; 
+               }
+           }
 });
 </script>
 </dom-module>

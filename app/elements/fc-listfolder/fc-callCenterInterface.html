@@ -1,7 +1,7 @@
 <dom-module id="fc-callCenterInterface">
 <style is="custom-style">
 
-..leftPanel {
+.leftPanel {
      
      height:100%;
 
@@ -47,17 +47,17 @@ paper-button.red {
 </style>
 <template>
   
-      <fc-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}" show="{{showToShownTransfer}}">
+      <fc-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}">
       </fc-inputs>
      <div class="vertical layout wrap">
           <div class="horizontal layout container wrap">
                <div class="leftPanel horizontal layout wrap">
-               <fc-inquirerCardAndEmail id="fcICE" inq="{{inquirerToInqTransfer}}" shown='{{showToShownTransfer}}'>
+               <fc-inquirerCardAndEmail id="fcICE" inq="{{inquirerToInqTransfer}}">
                </fc-inquirerCardAndEmail>
           </div>
           <div class="centerPanel layout vertical wrap" height="99vh">
                <div container class="contained">            
-                    <fc-listDemo inquirer="{{showToShownTransfer}}" class="fit" id="fcListDemo">  
+                    <fc-listDemo inquirerdouble="{{inquirerToInqTransfer}}" class="fit" id="fcListDemo">  
                     </fc-listDemo>
                     </div>
                </div><!--right-->
@@ -95,17 +95,7 @@ paper-button.red {
                     role: '',
                     reflectToAttributes: true 
                },
-               notify: true   
-          },
-          showToShownTransfer:{
-               type: Object,
-               value: { 
-                    calledon:'',
-                    regarding:'',
-                    notify: true          
-               },
-               notify: true, 
-               reflectToAttributes: true     
+               notify: true      
           } 
      },
 
@@ -120,20 +110,11 @@ paper-button.red {
          },
 
           inquirerObserver: function(e){
-                   this.$.fcListDemo.inquirer = e.detail;
-                   console.log("here I am observing the value of show in the second function" + this.$.fcICE.shown.calledon);
+                   this.$.fcListDemo.inquirerdouble = e.detail;
                    console.log(e.detail);
          },
          doIt: function(){
                this.fire('fillInputsFromCall');  
-               console.log(this.$.fcInputs.inquirer);
-               console.log(this.$.fcInputs.show.regarding);
-               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.inq).toString());
-               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.shown).toString());
-               this.$.fcICE.inq=this.$.fcInputs.inquirer;
-               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.inq).toString());
-               this.mixin('this.$.fcICE.shown', this.$.fcInputs.show);
-               this.mixin('this.$.fcICE.inq', this.$.fcInputs.inquirer);
           } 
 });
   </script>
