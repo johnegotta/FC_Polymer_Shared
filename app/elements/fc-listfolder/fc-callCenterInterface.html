@@ -1,6 +1,6 @@
 <dom-module id="fc-callCenterInterface">
 <style is="custom-style">
-
+    
 .leftPanel {
      
      height:100%;
@@ -20,10 +20,13 @@ div.contained{
     position: relative;
     border: 12px ridge #aecdfe;
     margin: 12px;
-    padding: 12px;
-    display: flex;
+    display: block;
     min-width: 850px;
-}
+    }
+    neon-animated-pages {
+      height: 100%;
+    }
+
 .clock{
      padding: 35px 4px 20px 24px;
      width: 140px;
@@ -57,13 +60,19 @@ paper-button.red {
           </div>
           <div class="centerPanel layout vertical wrap" height="99vh">
                <div container class="contained">            
-                    <fc-listDemo inquirerdouble="{{inquirerToInqTransfer}}" class="fit" id="fcListDemo">  
-                    </fc-listDemo>
+            
+
+     <neon-animated-pages id="pages" selected="0">
+          <fc-listView id="fcListView" on-item-click="_onItemClick">
+          </fc-listView>
+
+          <fc-fullView id="fullio" on-close="_onClose">
+          </fc-fullView> 
+     </neon-animated-pages>
                     </div>
                </div><!--right-->
     <paper-button class="red" on-tap="doIt">Do It</paper-button>
      </div><!--horizontal layout container-->
-
      </div>
 </template>
   <script>
@@ -99,22 +108,34 @@ paper-button.red {
           } 
      },
 
-          ready: function() {
-               //this.addEventListener('writeToInputs', this.fillInputsFromCall);
-               this.addEventListener('inquirerObserver', this.$.fcInputs.inquirerObserver);
-          },
-         
-          fillInputsFromCall: function(e){
-          this.$.fcInputs.inquirer = e.detail;
-          console.log("here I am observing the value of show in the second function" + this.shown.calledon);
+
+         _onItemClick: function(e) {
+           this.$.pages.selected = 1;
+           console.log("received on-item-click event from");
+           console.log(e.detail);
+           this.$.fullio.selectedCall = e.detail.caller;
          },
 
-          inquirerObserver: function(e){
-                   this.$.fcListDemo.inquirerdouble = e.detail;
-                   console.log(e.detail);
-         },
-         doIt: function(){
+           _onClose: function() {
+           this.$.pages.selected = 0;
+           console.log(this.$.fcListView.pastinquirer);
+              },
+
+           doIt: function(){
                this.fire('fillInputsFromCall');  
+          },
+
+          ready: function() {
+               this.addEventListener('writeToInputs', this.fillInputsFromCall);
+                this.addEventListener('searchInquiries', this.inquirerObserver);
+          },
+         
+         fillInputsFromCall: function(e){
+           this.$.fcInputs.inquirer = e.detail;
+         },
+
+         inquirerObserver: function(e){
+         this.$.fcListView.inquiry = e.detail;
           } 
 });
   </script>

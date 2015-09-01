@@ -46,9 +46,9 @@
     <paper-toolbar class="medium">
       <paper-icon-button class="red" id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
     </paper-toolbar>
-
     <div id="main" class="main">
         <div class="middle">
+        <!--
           <span>{{selectedCall.firstname}}</span><br><br>
           <span>{{selectedCall.lastname}}</span><br><br>
           <span>{{selectedCall.email}}</span><br><br>
@@ -58,8 +58,12 @@
           <span>{{selectedCall.coach}}</span><br><br>
           <span>{{selectedCall.grade}}</span><br><br>
           <span>{{selectedCall.message}}</span><br><br>
+          -->
           <span>{{selectedCall.relatedstudent}}</span><br><br>
-          <firebase-document data="{{focusedstudents}}" as="{{selectedCall}}" id="focusedstudents" limit-to="1"  location="https://focusedstudents.firebaseio.com/focusedstudents"></firebase-document>
+          <firebase-collection data="{{focusedstudents}}" id="focusedStudents" location="https://focusedstudents.firebaseio.com/"></firebase-document>
+       
+            <span id="studemail"><span>
+          </template>
         </div>
       </div>
     </div>
@@ -78,7 +82,12 @@
       
       selectedCall: {
         type: Object,
-        value:{'STREELANDANNA00001': ''}
+      },
+
+//        value:{'STREELANDANNA00001': ''}
+
+      student: {
+        type: Object
       },
 
       sharedElements: {
@@ -118,6 +127,34 @@
       }
 
     },
+
+    observers: [
+           'callSelected(selectedCall.relatedstudent)'
+
+    ],
+      
+        
+    callSelected: function(relatedstud){
+        console.log(relatedstud);
+        //var stree=this.$.focusedStudents._computeQuery('https://focusedstudents.firebaseio.com/');
+        var student = this.$.focusedStudents.getByKey(relatedstud);
+         console.log(student);
+
+        this.$.studemail.innerHTML=JSON.stringify(student.contactinfo.email);
+  
+      
+        /*
+        var fb = new Firebase("https://focusedstudents.firebaseio.com/");
+        var stree = fb.child(relatedstud);
+        stree.once("value", function(snapshot){
+          document.querySelector("#anna").innerHTML = snapshot.val().contactinfo.email;
+          console.log(snapshot.val());
+          
+        });
+*/
+    },
+
+
 
     _onClearButtonClick: function() {
       this.fire('close');
