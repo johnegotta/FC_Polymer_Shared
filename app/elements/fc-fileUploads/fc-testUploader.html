@@ -381,46 +381,63 @@
      * @param {object} a file, an element of the files array
     */
     uploadFile: function(file) {
-      if (!file) {
+      var regex = /.+(.csv)/;
+      if (!file || !regex.test(file.name.toLowerCase())) {
+        alert('Check that the file you want to add exists and that it is a CSV file.')
         return;
       } else {
-        self = this;
-        var prefix = "files." + self.files.indexOf(file);
-        console.log('Uploading ' + file.name);
-        //var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
-          //if (regex.test(file.name.toLowerCase())) {
-            if (typeof (FileReader) != "undefined") {
-              var reader = new FileReader();
-              reader.onload = function (e) {
-                var table = document.createElement("table");
-                var lastname = '';
-                var rows = e.target.result.split(/[\r|\n]+/);
-                var numRows = rows.length;
-                var headers = rows[0].split(",");
-                  for (var i = 1; i < numRows; i++) {
-                      var row = table.insertRow(-1);
-                      var cells = rows[i].split(",");
-                      for (var j = 0; j < cells.length; j++) {
-                          var cell = row.insertCell(-1);
-                          cell.innerHTML = cells[j];
-                      }
-                      self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
-                  }
-                  self.set(prefix + ".complete", true);
-                  self.set(prefix + ".progress", 100);
-                  //alert(self.get(prefix + ".filetype"));
-                  var dvCSV = document.getElementById("dvCSV");
-                  dvCSV.innerHTML = "";
-                  dvCSV.appendChild(table);
-                  self.cancel(file);
-              }
-              reader.readAsText(file);
-            }
-            else {
-              alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
-              self.set(prefix + ".error", true);
-            }
+        switch(file.filetype){
+          case 'Test Result':
+            this.uploadTestResult(file);
+            break;
+          case 'Score Table':
+            this.uploadScoreTable(file);
+            break;
+        }
       }
+    },
+
+    uploadTestResult: function(file){
+      self = this;
+      var prefix = "files." + self.files.indexOf(file);
+      console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
+          if (typeof (FileReader) != "undefined") {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              //var table = document.createElement("table");
+              var essay_index = 0;
+              var student_id_index = 0;
+              var last_name_index = 0;
+              var first_name_index = 0;
+
+              var rows = e.target.result.split(/[\r|\n]+/);
+              var numRows = rows.length;
+              var headers = rows[0].split(",");
+
+
+                for (var i = 1; i < numRows; i++) {
+                    //var row = table.insertRow(-1);
+                    var cells = rows[i].split(",");
+                    for (var j = 0; j < cells.length; j++) {
+                        //var cell = row.insertCell(-1);
+                        //cell.innerHTML = cells[j];
+                    }
+                    self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
+                }
+                self.set(prefix + ".complete", true);
+                self.set(prefix + ".progress", 100);
+                //alert(self.get(prefix + ".filetype"));
+                /*var dvCSV = document.getElementById("dvCSV");
+                dvCSV.innerHTML = "";
+                dvCSV.appendChild(table);*/
+                self.cancel(file);
+            }
+            reader.readAsText(file);
+          }
+          else {
+            alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
+            self.set(prefix + ".error", true);
+          }
     }
   });
 
