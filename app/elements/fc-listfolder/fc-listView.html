@@ -72,6 +72,8 @@
         value: {
           firstname: '',
           lastname: '',
+          studentfirstname: '',
+          studentlastname: '',
           email: '', 
           phone: '',
           notify: true,
@@ -151,10 +153,6 @@
           this.$.fcInputs.fcInp12.value = this.pastinquirer.coach = "";
           this.$.fcInputs.fcInp13.value = this.pastinquirer.school = "";
           this.$.fcInputs.fcInp14.value = this.pastinquirer.message = "";*/
-          
-
-
-
     },
 
     _onClick: function(event) {
@@ -182,11 +180,40 @@
 
   },
    _callFilter: function(inquiry){
+      console.log(inquiry);
         return function(item){
-          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1) return true;
-        } 
-        
-     }, 
+
+          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1 && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+          /*
+          var result = true;
+          if(inquiry.studentfirstname)
+          {
+            //if the caller specified a student, pay attention to that foremost, even if other search criteria miss
+            result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
+          }
+          else //no student specified, so use caller criteria
+          {
+            if(inquiry.lastname)
+            {
+              result &= (item.lastname? (item.lastname.indexOf(inquiry.lastname) > -1): false);
+            }
+            if(inquiry.firstname)
+            {
+              result &= (item.firstname? (item.firstname.indexOf(inquiry.firstname) > -1): false);
+            }
+            if(inquiry.email)
+            {
+              result &= (item.email? (item.email.indexOf(inquiry.email) > -1): false);
+            }
+            if(inquiry.phone)
+            {
+              result &= (item.phone? (item.phone.indexOf(inquiry.phone) > -1): false);
+            }
+        }
+        return result;
+        */
+      }  
+    }, 
 
      
 });

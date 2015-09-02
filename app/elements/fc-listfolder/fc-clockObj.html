@@ -16,7 +16,7 @@ paper-material{
 </style>
 <template>
 <paper-material class="clok" elevation="3">
-<p id="clockObj">
+<p id={{clockid}}>
 	
 
 	
@@ -24,30 +24,37 @@ paper-material{
 </paper-material>
 </template>
 <script>
-FcClockObj=Polymer({
+FcClockObj = Polymer({
 	is: "fc-clockObj",
-	properties: {},
+	properties: {
+		clockid: ""
+	},
 	behaviors:[],
 
 
-factoryImpl: function(){
-
+factoryImpl: function(argId){
+	this.id = argId;
+	this.clockid = this.id + "C";
+	console.log("factoryImpl called for " + this.id);
 },
 
 created: function(){
-
-
 }, 
 
 ready: function(){
-
+	
+	if(this.id){this.clockid=this.id+"C";}
 }, 
 
-attached: function(){setInterval(function(){var clock=new Date();
-	document.querySelector("#clockObj").innerHTML=clock.toLocaleTimeString();}
-	, 1000);
+attached: function(){
+	console.log("clock id =" + this.clockid);
+	setInterval(this.updateClock, 1000, this.clockid);
+},
 
-	},
+updateClock: function(argId){
+	var newtime = new Date();
+	document.querySelector("#" + argId).innerHTML = newtime.toLocaleTimeString();
+},
 
 detatched: function(){
 

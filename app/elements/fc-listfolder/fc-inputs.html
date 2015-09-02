@@ -125,12 +125,12 @@ paper-material.controller {
                               </div>
                               </paper-item-body>  
                          <iron-icon icon="info"></iron-icon>
-                         <div class="horizontal layout">
+                         <div id="messagezone" class="horizontal layout">
                               <div class="vertical layout">
                                    <paper-textarea label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" class="textareaannoyed" maxlength="400" rows="4">
                                    </paper-textarea>
                               </div>
-                              <fc-clockObj class="clock"> </fc-clockObj>
+                              <!-- <fc-clockObj id="inputclock1" class="clock"> </fc-clockObj> -->
                          </div>
                     </paper-item>
                </iron-form>
@@ -176,11 +176,19 @@ Polymer({
                },
                notify: true 
 
-    }
+          },
+          clock: {
+               type: Object
+          }
 },
      observers: [
-        'inquirerObserver(inquirer.firstname, inquirer.lastname, inquirer.email, inquirer.phone, inquirer.studentfirstname, inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, this.inquirer.message)'
+        'inquirerObserver(inquirer.firstname, inquirer.lastname, inquirer.email, inquirer.phone, inquirer.studentfirstname, inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
       ],
+
+     attached: function(){
+          var c = new FcClockObj("inputclock");
+          this.$.messagezone.appendChild(c);
+     },
 
      inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
 		var shadowInquirer = {
