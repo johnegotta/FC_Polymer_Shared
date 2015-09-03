@@ -28,6 +28,10 @@
         #e0e0e0 8px,
         #e0e0e0 16px
       );
+      span.linear{
+          width:110px;
+          overflow: hidden;
+        }
 
     .paper-material {
       padding: 4px 4px 4px 4px;
@@ -51,6 +55,7 @@
     <firebase-collection data="{{focusedstudents}}" id="focusedStudents" location="https://focusedstudents.firebaseio.com/"></firebase-collection>
     <firebase-collection data="{{contacts}}" id="contactInfo" location="https://focusedstudents.firebaseio.com/contactinfo"></firebase-collection>
     <firebase-collection data="{{ROIData}}" id="roi" location="https://focusedstudents.firebaseio.com/ROIData"></firebase-collection>
+    <firebase-collection data="{{coursepurchaseinfo}}" id="fcPurchaseInfo" location="https://focusedstudents.firebaseio.com/StreelandAnna00001/coursepurchaseinfo"></firebase-collection>
     <firebase-collection data="{{previousAcademics}}" id="previousAcademics" location="https://focusedstudents.firebaseio.com/previousAcademics"></firebase-collection>
 
     <paper-toolbar class="medium">
@@ -62,7 +67,7 @@
           <paper-material class="container vertical layout flex-2 wrap leftpanel left">
             <!-- <span>{{selectedCall.relatedstudent}}</span><br><br> -->
             <paper-material class="vertical layout">
-            <img id="studphoto" width="230" src={{contactinfo.photoURL}} style="padding:4px;">
+            <img id="studphoto" width="120" height="150" src={{contactinfo.photoURL}} style="padding:4px;">
             <div class="container horizontal">
               <span id="studfirst">[[contactinfo.firstname]]</span>
               <span id="studlast">[[contactinfo.lastname]]</span>
@@ -73,22 +78,37 @@
             </paper-material>
             <paper-material class="vertical layout">
               <div class="horizontal layout">
-                School: <span id="studschool">[[previousacademics.school]]</span>
+                <span>School:</span>&nbsp <span id="studschool" class="linear">[[previousacademics.school]]</span>
               </div>
               <div class="horizontal layout">
                 Grade: <span>[[previousacademics.grade]]</span>
               </div>
             </paper-material>
           </paper-material> <!--end left panel -->
-          <paper-material class="container vertical layout flex-5 wrap centerdisplay display">
+          <paper-material class="container vertical layout flex-7 wrap centerdisplay display">
             <paper-tabs id="studenttabs" selected="{{selected}}">
+              <paper-tab>Account Information</paper-tab>
               <paper-tab>Return On Investment</paper-tab>
               <paper-tab>Academics</paper-tab>
-              <paper-tab>Previous Inquiries</paper-tab>
+                 <paper-tab>Previous Inquiries</paper-tab>
+              
             </paper-tabs>
 
             <iron-pages selected="{{selected}}">
               <div id="studentdetail1">
+                <div class="horizontal layout">
+                  Course Selected: <span id="couseSelected1">[[coursepurchaseinfo.courseSelected1.coursedates]]</span>
+                </div>
+                <div class="horizontal layout">
+                  Course Dates: <span id="datesOfCourse1">[[coursepurchaseinfo.datesOfCourse1.class1]]</span>
+                </div>
+                <div class="horizontal layout">
+                  Focused Coach: <span id="fccoachSTUDENTID">[[coursepurchaseinfo.courseSelected1.coach]]</span>
+                </div>
+                <div> Total Cost: <span id="course1cost">[[coursepurchaseinfo.totalcost]]</span>
+                </div>
+              </div>
+                <div id="studentdetail2">
                 <div class="horizontal layout">
                   Courses Taken: <span id="studcoursestaken">[[roi.coursesTaken]]</span>
                 </div>
@@ -99,8 +119,8 @@
                   Value At Completion 70%: $<span id="studVAC70">[[roi.FcValueAtCompletion70Percent]]</span>
                 </div>
               </div>
-              <div id="studentdetail2">
-                <div class="horizontal layout">
+              <div id="studentdetail3">
+                                  <div class="horizontal layout">
                   Class Rank: <span>[[previousacademics.classRank]]</span>
                 </div>
                 <div class="horizontal layout">
@@ -113,7 +133,7 @@
                   Highest Science Course: <span>[[previousacademics.highestScienceCourse]]</span>
                 </div>
               </div>
-              <div id="studentdetail3">
+              <div id="studentdetail5">
                   <template is="dom-repeat" items={{studentcalls}} filter={{_filterStudentCalls(selectedCall)}}>
                     <div class="vertical layout">
                       <div class="horizontal layout" style="border:1px gray solid">
@@ -181,6 +201,21 @@
           school: ""
         },
         notify: true
+      },
+
+      coursepurchaseinfo:{
+        type: Object, 
+        value: {
+          courseSelected1:{
+              coach:''
+            },
+          datesOfCourse1:{
+            },
+          datesOfCourse1PracticeTests: {
+            }
+        },
+        notify: true,
+        reflectToAttributes: true
       },
 
       /*
@@ -264,9 +299,25 @@
         highestMathCourse: ""
       };
     },
+
+    resetCPI: function()
+    {
+      this.coursepurchaseinfo = {
+        //fill this in Jason
+      };
+    },
     
     callSelected: function(relatedstud){
         console.log(relatedstud);
+        var someCPI = this.$.focusedStudents.getByKey(relatedstud).coursepurchaseinfo;
+        if(someCPI)
+        {
+           this.coursepurchaseinfo = someCPI;
+        }
+        else
+        {
+          this.resetCPI();
+        }
 
         var someROI = this.$.roi.getByKey(relatedstud);
         if(someROI)
@@ -304,6 +355,7 @@
         console.log(this.roi);
         console.log(this.contactinfo);
         console.log(this.previousacademics);
+        console.log(this.coursepurchaseinfo);
 
     },
 
