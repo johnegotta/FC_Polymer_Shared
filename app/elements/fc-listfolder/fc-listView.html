@@ -13,9 +13,19 @@
       color: var(--google-blue-500);
     }
 
-    fcborder{
-      border: 4px ridge #aecdfe;
+    .fcborder{
+      border: 2px ridge #aecdfe;
+      width: 770px;
+      padding:4px;
+      height: 88px;
+      margin-left: 6px;
+      margin-top: 2px;
 
+    }
+
+    paper-item-body {
+
+      padding-top: 4px;
     }
 
      paper-icon-button {
@@ -29,6 +39,19 @@
       paper-icon-button.blue {
         color: var(--paper-blue-500);
       }
+
+      .scrollercalendar{
+        overflow: hidden;
+        display: block;
+      }
+      .bottomedge: {
+        margin-bottom: 8px;
+      }
+
+      .blocker: {
+
+      }
+      
   </style>
 <template>
       <content>
@@ -36,20 +59,26 @@
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
 
-    <paper-toolbar  id="fcpapertoolbar" class="medium">
+    <paper-toolbar  id="fcpapertoolbar" class="small bottomedged">
              </paper-toolbar>
     
     <div class="main">
-        
+        <div class="horizontal layout wrapper container blocker">
+        <paper-material elevation="3" class="scrollercalendar fixed">
+    <fc-scrollCalendar class="vertical layout container"></fc-scrollCalendar>
+        </paper-material>
+     <div class="vertical layout wrapper container block">
     <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
-                <paper-item class="fcborder">
+
+    
+                <paper-item class="fcborder layout container">
                  
-                      <paper-item-body three-line>
+                      <paper-item-body four-line>
                             <div>
                                <b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called on 
                                <b> <span>[[pastinquirer.timestamp]]</span> </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span>. <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
                             </div>
-                            <div secondary> <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></b></u> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
+                            <div secondary> <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
                             </div>
                             <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span><paper-icon-button class="blue" on-tap="writeToInputs">Select</paper-icon-button></div>
                       </paper-item-body>
@@ -57,6 +86,8 @@
             
                 </paper-item>
       </template>
+      </div>
+      </div>
     </div>
 </template>
 <script>
