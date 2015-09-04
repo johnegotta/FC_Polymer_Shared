@@ -399,6 +399,7 @@
     },
 
     uploadTestResult: function(file){
+      var start_time = performance.now();
       self = this;
       var prefix = "files." + self.files.indexOf(file);
       console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
@@ -410,34 +411,71 @@
               var student_id_index = 0;
               var last_name_index = 0;
               var first_name_index = 0;
+              var indices_to_skip = [];
 
               var rows = e.target.result.split(/[\r|\n]+/);
               var numRows = rows.length;
               var headers = rows[0].split(',');
-              console.log(headers);
-              student_id_index = headers.indexOf('"id"');
-              last_name_index = headers.indexOf('"Last Name"');
+              var numColumns = headers.length;
+
+              //figure out which columns to skip over
+              for (var i = numColumns - 1; i >= 0; i--){
+                var headername = headers[i];
+                var underscore_index = headername.indexOf('_');
+                var period_index = headername.indexOf('.');
+                if( period_index > -1 ){
+                  if(headername.indexOf('mfr') < 0){
+                    var section_number = headername[0];
+                    var section_type = headername[1];
+                    var num_section_questions = headername.substring(2,period_index);
+                    var question_number = (underscore_index > -1) ?  headername.substring(period_index +1 ,underscore_index): headername.substring(period_index+1);
+                    //console.log("Section Number: " + section_number + " Section Type: " + section_type + " Num Questions: " + num_section_questions + " Question Num: " + question_number);
+                    if(parseInt(question_number) > parseInt(num_section_questions)){
+                      indices_to_skip.push(i);
+                    }
+                  }
+                } else {
+                  //console.log(headername);
+
+                }
+              }
+
+              student_id_index = headers.indexOf('id');
+              last_name_index = headers.indexOf('Last Name');
               first_name_index = headers.indexOf('First Name');
               essay_index = headers.indexOf('essay_score');
+              indices_to_skip.push(student_id_index,last_name_index,first_name_index,essay_index);
+              //console.log(indices_to_skip);
+              /*
               console.log('id: ' + student_id_index.toString());
               console.log('Last Name: ' + last_name_index.toString());
               console.log('First Name: ' + first_name_index.toString());
               console.log('essay: ' + essay_index.toString());
-
-
+              */
+              var question_results = {};
+              var test_results = {};
 
                 for (var i = 1; i < numRows; i++) {
                     //var row = table.insertRow(-1);
+                    var good_cols = [];
                     var cells = rows[i].split(",");
+                    var student_id = cells[student_id_index];
+                    var last_name = cells[last_name_index];
+                    var first_name = cells[first_name_index];
+                    var essay = cells[essay_index];
                     for (var j = 0; j < cells.length; j++) {
                         //var cell = row.insertCell(-1);
                         //cell.innerHTML = cells[j];
+                        if(indices_to_skip.indexOf(j) < 0 && headers[j].indexOf('_') >= 0) {
+                          good_cols.push(cells[j]);
+                        }
                     }
+                    console.log(good_cols);
                     self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
+
                 }
                 self.set(prefix + ".complete", true);
                 self.set(prefix + ".progress", 100);
-                //alert(self.get(prefix + ".filetype"));
                 /*var dvCSV = document.getElementById("dvCSV");
                 dvCSV.innerHTML = "";
                 dvCSV.appendChild(table);*/
@@ -449,6 +487,10 @@
             alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
             self.set(prefix + ".error", true);
           }
+
+          var endtime = performance.now();
+          var full_time = endtime - start_time;
+          console.log("Full Time: " + full_time.toString());
     }
   });
 
