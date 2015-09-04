@@ -1,7 +1,7 @@
 <dom-module id="fc-callCenterInterface">
 <style is="custom-style">
-    
-.leftPanel {
+
+..leftPanel {
      
      height:100%;
 
@@ -20,13 +20,10 @@ div.contained{
     position: relative;
     border: 12px ridge #aecdfe;
     margin: 12px;
-    display: block;
+    padding: 12px;
+    display: flex;
     min-width: 850px;
-    }
-    neon-animated-pages {
-      height: 100%;
-    }
-
+}
 .clock{
      padding: 35px 4px 20px 24px;
      width: 140px;
@@ -49,28 +46,24 @@ paper-button.red {
 }
 </style>
 <template>
-      <fc-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}">
+  
+      <fc-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}" show="{{showToShownTransfer}}">
       </fc-inputs>
      <div class="vertical layout wrap">
           <div class="horizontal layout container wrap">
                <div class="leftPanel horizontal layout wrap">
-               <fc-inquirerCardAndEmail id="fcICE" inq="{{inquirerToInqTransfer}}">
+               <fc-inquirerCardAndEmail id="fcICE" inq="{{inquirerToInqTransfer}}" shown='{{showToShownTransfer}}'>
                </fc-inquirerCardAndEmail>
           </div>
           <div class="centerPanel layout vertical wrap" height="99vh">
                <div container class="contained">            
-            
-
-     <neon-animated-pages id="pages" selected="0">
-          <fc-listView id="fcListView" on-item-click="_onItemClick">
-          </fc-listView>
-
-          <fc-fullView id="fullio" on-close="_onClose">
-          </fc-fullView> 
-     </neon-animated-pages>
+                    <fc-listDemo inquirer="{{showToShownTransfer}}" class="fit" id="fcListDemo">  
+                    </fc-listDemo>
                     </div>
                </div><!--right-->
+    <paper-button class="red" on-tap="doIt">Do It</paper-button>
      </div><!--horizontal layout container-->
+
      </div>
 </template>
   <script>
@@ -102,43 +95,46 @@ paper-button.red {
                     role: '',
                     reflectToAttributes: true 
                },
-               notify: true      
+               notify: true   
+          },
+          showToShownTransfer:{
+               type: Object,
+               value: { 
+                    calledon:'',
+                    regarding:'',
+                    notify: true          
+               },
+               notify: true, 
+               reflectToAttributes: true     
           } 
      },
 
-
-         _onItemClick: function(e) {
-           this.$.pages.selected = 1;
-           console.log("received on-item-click event from");
-           console.log(e.detail);
-           this.$.fullio.selectedCall = e.detail.caller;
+          ready: function() {
+               //this.addEventListener('writeToInputs', this.fillInputsFromCall);
+               this.addEventListener('inquirerObserver', this.$.fcInputs.inquirerObserver);
+          },
+         
+          fillInputsFromCall: function(e){
+          this.$.fcInputs.inquirer = e.detail;
+          console.log("here I am observing the value of show in the second function" + this.shown.calledon);
          },
 
-        _onClose: function() {
-           this.$.pages.selected = 0;
-           console.log(this.$.fcListView.pastinquirer);
-        },
-
-        doIt: function(){
-            this.fire('fillInputsFromCall');  
-            console.log(this.$$.icyclock.id);
-            console.log(this.$$.inputclock.id);
-        },
-
-        ready: function() {
-            this.addEventListener('writeToInputs', this.fillInputsFromCall);
-            this.addEventListener('searchInquiries', this.inquirerObserver);
-        },
-         
-        fillInputsFromCall: function(e){
-           this.$.fcInputs.inquirer = e.detail;
-        },
-
-        inquirerObserver: function(e){
-          this.$.fcListView.inquiry = e.detail;
-          this.$.pages.selected = 0;
-          console.log("inquirerObserver " + JSON.stringify(this.$.fcListView.inquiry));
-        } 
+          inquirerObserver: function(e){
+                   this.$.fcListDemo.inquirer = e.detail;
+                   console.log("here I am observing the value of show in the second function" + this.$.fcICE.shown.calledon);
+                   console.log(e.detail);
+         },
+         doIt: function(){
+               this.fire('fillInputsFromCall');  
+               console.log(this.$.fcInputs.inquirer);
+               console.log(this.$.fcInputs.show.regarding);
+               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.inq).toString());
+               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.shown).toString());
+               this.$.fcICE.inq=this.$.fcInputs.inquirer;
+               console.log("ice is equal to " + JSON.stringify(this.$.fcICE.inq).toString());
+               this.mixin('this.$.fcICE.shown', this.$.fcInputs.show);
+               this.mixin('this.$.fcICE.inq', this.$.fcInputs.inquirer);
+          } 
 });
   </script>
 </dom-module>

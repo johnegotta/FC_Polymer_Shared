@@ -1,0 +1,186 @@
+<dom-module id="fc-displayInterface">
+<style is="custom-style">
+:host{
+
+}
+div.primary{ 
+	height: 1800px;
+	padding: 8px;
+	margin: 6px;
+	border: 4px ridge #aecdfe;
+}
+div.leftpanel{
+	background: aqua;
+
+
+}
+paper-material.centerdisplay{
+	background: #dadada;}
+
+
+}
+paper-material.rightside{
+	background: #aecdfe;
+}
+</style>
+<template>
+<firebase-document id="focusedstudents" location="https://focusedstudents.firebaseio.com/" data="{{online_data}}"></firebase-document>
+      <iron-localstorage id="focusedstudent" value="{{offline_data}}" on-iron-localstorage-load="loaded" name="localstudent"></iron-localstorage>
+      <iron-signals on-iron-signal-connection-state-changed="changeConnected"></iron-signals>
+
+<div class="container primary horizontal layout flex wrap">
+		<div class="container vertical layout flex-1 wrap leftpanel">
+			<paper-material elevation='4' class="container horizontal flex wrap left"><!--rows in left panel PICTURE BASIC CONTACT INFO Basic SCORE INFO-->
+				<fc-studentContacts id="focostudcontactinfo"></fc-studentContacts>
+
+
+			</paper-material><!--divs inside for more rows-->
+		</div><!-- Left Panel Ends-->
+		<paper-material elevation="4" class="container centerdisplay flex-3 wrap display">
+<!--<polymer-tinymce id="editor"
+        tinytoolbar="insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image" 
+        tinyplugins='["advlist autolink lists link image charmap print preview anchor","searchreplace visualblocks code fullscreen","insertdatetime media table contextmenu paste"]'
+></polymer-tinymce>-->
+
+
+
+
+		</paper-material><!-- This Panel will require more thought later-->
+		<paper-material elevation="5" class="container flex-2 wrap display rightside"> 
+		</paper-material>
+</div>
+</template>
+<script>
+FcDisplayInterface=Polymer({
+	is: 'fc-displayInterface',
+	properties: {
+	      all_new_data: {
+	        type: Object,
+	        value: {},
+	        notify: true
+	      },
+	      online_data: {
+	        type: Object,
+	        value: {},
+	        notify: true
+	      },
+	      offline_data: {
+	        type: Object,
+	        value: {},
+	        notify: true
+	      },
+	      connected: {
+	        type: Boolean,
+	        observer: 'pushFromLocal'
+	      },
+	      relatedstudent: {
+	      	type: String, 
+	      	value:'',
+	      	notify: true,
+	      	fcid: 'SmithAdam00001', 
+	      	observer: 'onChange(fcidatload, currentfcid)'
+	      },
+	      relatedstudentsAvailable: {
+	      	type: Array, 
+	      	value: function (fcidselected){
+	      	//step through and select;
+	    			return [
+					   {fcid: 'IMG_4130.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4131.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4132.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4133.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4134.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4135.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4136.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4137.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4138.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4139.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4140.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4141.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4142.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4143.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4144.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4145.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4146.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4147.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4148.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4149.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4150.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4151.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4152.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4153.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4154.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4155.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4156.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4157.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4158.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4159.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4160.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4161.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4162.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4163.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4164.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4165.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4166.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4167.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4168.jpg', modifiedDate: 'May 12 2015'},
+				            {fcid: 'IMG_4169.jpg', modifiedDate: 'May 12 2015'}
+				          ]
+    			},							
+	      	notify: true, 
+	      	observe: 'onSelect(oldfcid, currentfcid)'
+	      }
+	    },
+
+	    	onChange: function(fcidatload, currentfcid){
+
+	    		if(fcidatload!==currentfcid){
+		//var StudentView= new FcStudentContacts(this.$.focostudcontactinfo.contactinfo.fcid);
+       			console.log(this.fcid);	
+
+
+
+
+	    		}
+
+
+	    	},
+
+		storeData: function(){			
+			      switch(this.connected){
+			        case true:
+			         /*the way this obj is created and split from the children object doesn't have to be like this
+			         but I don't feel like chnaging it back right now. was just testing other variations before I got it working*/
+			          var fcid = this.$.focostudcontactinfo.contactinfo.fcid;
+       				var fcidselected=this.$.focusedstudents.getByKey(fcid);
+			        	this.online_data = fcidselected;
+			          	console.log(fcidselected + ' this is the id selected and should have a massive object in tow');
+			          	return fcidselected;
+			          	break;
+			        case false:
+			          /*Not sure why I have to erase the whole thing and reset it, but have tried many
+			          other ways of doing this, and this was the only thing that worked*/
+			          this.all_new_data[this.fcid] = this.relatedstudent;
+			          this.offline_data = {};
+			          this.offline_data = this.all_new_data;
+			          break;
+			      }
+			    },
+		    pushFromLocal: function(){
+		      if(this.connected){
+		        this.online_data = this.offline_data;
+		        console.log('adding stuff from local storage');
+		      }
+		    },
+		    loaded: function(e){
+		      console.log(this.offline_data);
+		      //this.offline_data = this.$.johnls.value;
+		    },
+		    changeConnected: function(e, detail){
+		      this.connected = detail;
+		      console.log('Connected: ' + this.connected)
+		    }
+});
+</script>
+</dom-module>
+

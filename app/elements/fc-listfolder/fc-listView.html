@@ -1,76 +1,34 @@
 <dom-module id="fc-listView">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<style>
+<style is="custom-style">
 
-=======
-<style is="custom-style">
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
-<style is="custom-style">
->>>>>>> origin/master
     :host {
       @apply(--layout-vertical);
     }
 
     .main {
-      @apply(--layout-flex);
+      @apply(--layout-block);
       @apply(--layout-scroll);
     }
 
     iron-icon {
-<<<<<<< HEAD
-<<<<<<< HEAD
       color: var(--google-blue-500);
     }
 
-  </style>
-      <template>
-        <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
-    
-
-
-<paper-toolbar class="medium-tall"> 
-    <div class="vertical layout">
-            <div class="fixedsearch">   
-                  <paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
-                  </paper-input>
-            </div>
-        <paper-icon-button id="button" icon="arrow-back"></paper-icon-button>
-</paper-toolbar>
-<div class="searchresults">
-      <div class="main">
-                <template is="dom-repeat" items="{{calls}}" filter='{{_callFilter(searchValues)}}'>
-                   <paper-item>
-                      <fc-callMemo searchValues="{{item}}">
-                      </fc-callMemo>
-                    </paper-item>
-                </template>
-        </div>
-</div>
-</template>
-<script>
-
-=======
-=======
->>>>>>> origin/master
-      color: var(--google-light-blue-50);
-    }
-
-     paper-icon-button {
-        margin-left: 20px;
+      paper-icon-button {
+        margin-left: 8px;
         display: block;
         width: 24px;
         height:24px;
         text-align: center;
+        color: #002c90;
       }
       paper-icon-button.blue {
-        color: var(--paper-light-blue-50);
+        color: var(--paper-blue-500);
       }
-  </style>
+
+</style>
 <template>
-      <content>
-      </content>
+     
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
 
@@ -80,7 +38,8 @@
     <div class="main">
         
     <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
-                <paper-item on-click="_scott">
+                <paper-item class="fcborder">
+                 
                       <paper-item-body three-line>
                             <div>
                                <b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called on 
@@ -88,18 +47,17 @@
                             </div>
                             <div secondary> <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></b></u> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
                             </div>
-                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span></div>
+                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span><paper-icon-button class="blue" on-tap="writeToInputs">Select</paper-icon-button></div>
                       </paper-item-body>
-                  <iron-icon icon="info"></iron-icon>
+                  <iron-icon icon="info" on-click="_scott"></iron-icon>
+             <content>
+      </content>
                 </paper-item>
       </template>
     </div>
 </template>
 <script>
-<<<<<<< HEAD
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
->>>>>>> origin/master
+
   Polymer({
 
     is: 'fc-listView',
@@ -109,115 +67,17 @@
     ],
 
     listeners: {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      'click': '_onClick'
-=======
-      //'click': '_onClick'
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
-      //'click': '_onClick'
->>>>>>> origin/master
+    //'click': '_onClick'
     },
 
     properties: {
-
-      data: {
-        type: Array,
-        value: function() {
-          return [];
-<<<<<<< HEAD
-<<<<<<< HEAD
-        },
-
-
-      searchValues: {
-         type: Object,
-          value: {
-          firstname: "",
-          lastname:"",
-          email:"", 
-          phone:"",
-          relatedstudent: "",
-          message: "",
-          coach:""
-
-
-          },
-          notify: true, 
-          reflectToAttributes: true
-        }
-      },   
-      _callFilter: function(searchfields){
-        
-        return function(item){
-          if(!searchfields) {
-            return true;
-          }
-          //start out with true result & falsify if any non blank match fails
-          var result = true;
-          console.log(searchfields);
-          console.log(item);
-          if(searchfields.firstname && searchfields.firstname != "")
-          {
-            //user entered a value in first name search
-            if(item.firstname)            
-            {
-              result &= (item.firstname.indexOf(searchfields.firstname) > -1);
-            }
-            else return false; // first name searched but none in record
-          }           
-
-          if(searchfields.lastname && searchfields.lastname != "")
-          {
-            //user entered a value in last name search
-            if(item.lastname)           
-            {
-              result &= (item.lastname.indexOf(searchfields.lastname) > -1);
-            }
-            else return false; // last name searched but none in record
-          }
-          if(searchfields.email && searchfields.email != "")
-          {
-            //user entered a value in email search
-            if(item.email)            
-            {
-              result &= (item.email.indexOf(searchfields.email) > -1);
-            }
-            else return false; //user entered email search but none in record
-          }
-          if(searchfields.message && searchfields.message != "")
-          {
-            //user entered a value in first name search
-            if(item.message)            
-            {
-              result &= (item.message.indexOf(searchfields.message) > -1);
-            }
-            else return false; // first name searched but none in record
-          }           
-          if(searchfields.phone && searchfields.phone != "")
-          {
-            //user entered value in phone search
-            if(item.phone)            
-            {
-              result &= (item.phone.indexOf(searchfields.phone) > -1);
-            }
-            else return false; //user entered phone search but none in record
-          }
-          console.log("callFilter returning " + result);
-          return result;
-      },
-
-=======
-=======
->>>>>>> origin/master
-            }
-        },
       inquiry: {
         type: Object, 
         value: {
           firstname: '',
           lastname: '',
+          studentfirstname: '',
+          studentlastname: '',
           email: '', 
           phone: '',
           notify: true,
@@ -249,10 +109,6 @@
           notify: true
           }, 
       
-<<<<<<< HEAD
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
->>>>>>> origin/master
       animationConfig: {
         type: Object,
         value: function() {
@@ -273,12 +129,6 @@
           };
         }
       }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-=======
->>>>>>> origin/master
     },
 
     _scott: function(e){
@@ -289,73 +139,15 @@
         'hero': e.target,
       };
       this.fire('item-click', {caller: this.pastinquirer});
-<<<<<<< HEAD
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
->>>>>>> origin/master
     },
 
-    _onClick: function(event) {
-      var target = event.target;
-<<<<<<< HEAD
-<<<<<<< HEAD
-      while (target !== this && !target._templateInstance) {
-        target = target.parentNode;
-      }
-
-=======
-=======
->>>>>>> origin/master
-      console.log(event.model);
-      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
-      {
-        target = null;
-         
-     } 
-      else {
-        target=target.parentNode;
-        this.pastinquirer=target.details
-        console.log(this.pastinquirer);
-        
-<<<<<<< HEAD
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
->>>>>>> origin/master
-      // configure the page animation
-      this.sharedElements = {
-        'hero': target,
-      };
-
-      this.fire('item-click', {
-        item: target,
-      });
-<<<<<<< HEAD
-<<<<<<< HEAD
-    }
-
-  });
-=======
-=======
->>>>>>> origin/master
-
-
-  
-    }
-
-  },
    _callFilter: function(inquiry){
+      console.log(inquiry);
         return function(item){
-          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1) return true;
-        } 
-        
-     }, 
 
-     
+          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1 && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+        }
+    }      
 });
-<<<<<<< HEAD
->>>>>>> bc6d38914f4eefe8787c1bb8703b7c30265f7ab4
-=======
->>>>>>> origin/master
-
 </script>
 </dom-module>

@@ -39,7 +39,7 @@ paper-input	{
 
   <template>
 
-   <paper-input always-float-label="true" auto-validate$="{{autoValidate}}" autocomplete="true" autofocus="true" maxlength="12" required$="{{required}}" name$="{{name}}" autocapitalize$="{{true}}" autocorrect$="{{true}}" error-message$="{{This is a Required Field!}}" value="{{value}}" label="{{label}}" placeholder="name" list$="{{list}}"></paper-input>
+   <paper-input always-float-label="true" autocomplete="true" autofocus="true" required$="{{required}}" name$="{{name}}" autocapitalize$="{{autocapitalize}}" autocorrect$="{{autocorrect}}" error-message$="{{This is a Required Field!}}" value="{{value}}" label$="{{label}}" placeholder$="{{placeholder}}" list$="{{list}}"></paper-input>
 
 </template>
 <script>
@@ -61,28 +61,33 @@ paper-input	{
 		autocapitalize:true, 
 		autocorrect: true, 
 		errorMessage: "This is a Required Field!", 
-		name: 'firstname',
-		label: 'Inquirer First Name', 
-		placeholder: 'First Name', 
+		name: '',
+		label: '', 
+		placeholder: '', 
 		list:[],
 		readOnly: false,
-		notify: true,
-		reflectToAttributes: true
-	},
+		_parentForm: {
+        		type: Object,
+      			value: "fcInputsForm",
+      			name: "fcInputsForm",
+      			id: "fcInputsForm",
+      			notify: true
+      	},
+      	notify: true,
+      	reflectToAttributes: true
+    },
 
-	attached: function(name, placeholder, label){
-		//initializing the opening values: 
-		if (name==null){
-			name='firstname'; 
-		}
-	},
+    attached: function(){
+      // Note: the iron-form that this element belongs to will set this
+      // element's _parentForm property when handling this event.
+      this.fire('iron-form-element-register');
 
+	},
 
 /*	attached: function(name, placeholder, label){
 		//initializing the opening values: 
 	if (name==undefined){
 		name='firstname';
-
 		
 		if (name=='firstname'){
 			placeholder='First Name';
@@ -185,13 +190,6 @@ paper-input	{
 			label='Processing Date, If One Exists';
 		}
 		//automated with CC processor
-		else {
-			name='pickle';
-			placeholder='pickle';
-			label='pickle';
-		}
-
-		return [name, label, placeholder]; 
 	}
 		console.log(name + " " + label + '' + placeholder);
 		console.log(name);
