@@ -9,9 +9,9 @@
 	margin-top: 8px;
 	padding: 4px 8px 10px 4px;
 	text-indent: 0px;
-	min-width: 323.7px;
-	min-height: 80px;
-	display: flex-box;
+	width: 323.7px;
+	height: 80px;
+	display: block;
 }  
 
 h3.title{
@@ -26,54 +26,86 @@ h3.title{
 
 </style>
 <template id="fc-cardTemplate">
-	<paper-material class="card" elevation$="{{elevation}}">
+	<paper-material class="card" elevation="5">
 		<h3 class="title">{{headerTitle}}</h3>
 			<div class="vertical layout">
-			<div class="horizontal layout wrap">	
-	 			<content> 
+    <div id="placeholder" class="container"></div>
 
-	 			</content>
-	 			
-	  		</div>
-	  	</div>
-	</paper-material>
+    <div id="container">
+      <content select="div"></content>
+    </div>
+</div>
+</paper-material>
 </template>
+
+
 <script>
-Polymer ({
-	is : "fc-card",
-		properties: {
-			data: {	
-					type: Object, 
-					reflectToAttributes: true,
-					notify: true
-					},
-					
-			background: '#fefefe',
+(function() {
+  Polymer({
+    is: 'fc-card',
+
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+
+    properties: {
+      background: '#1e1e1e',
+	  reflectToAttributes: true,
+	  notify: true,
+	  headerTitle: {
+			type: String,
 			reflectToAttributes: true,
-			notify: true,
-			headerTitle: {
-							type: String,
-							reflectToAttributes: true,
-							notify: true
+			notify: true
 						},
-			elevation: {
-							type: Number,
-							value:"3",
-							reflectToAttributes: true,
-							notify: true
-						},
-			value: 	{
-							type: Object,
-							notify: true, 
-							reflectToAttributes: true
-			},
-			headerSubtitle: {
-							type: String,
-							reflectToAttributes: true,
-							notify: true
-						}
-	} 			
-		
-});
-</script>	
+      animationConfig: {
+        value: function() {
+          return {
+            'entry': [{
+              name: 'ripple-animation',
+              id: 'ripple',
+              toPage: this
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 850
+              }
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.container,
+              timing: {
+                delay: 1050
+              }
+            }],
+
+            'exit': [{
+              name: 'opaque-animation',
+              node: this.$.placeholder
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 2000
+              }
+            }, {
+              name: 'reverse-ripple-animation',
+              id: 'reverse-ripple',
+              fromPage: this
+            }]
+          };
+        }
+      },
+
+      sharedElements: {
+        value: function() {
+          return {
+            'ripple': this.$.placeholder,
+            'reverse-ripple': this.$.placeholder
+          };
+        }
+      }
+    }
+  });
+})();
+</script>
 </dom-module>

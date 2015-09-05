@@ -7,23 +7,84 @@ paper-textarea.textareaannoyed{
      min-width: 300px;
      display: block;
 }
-.none{
-  display: none;
-}
+
+
+
+neon-animated-pages {
+        height: 750px;
+      }
+
+      .large {
+        width: 420px;
+      }
+
+
 fc-card{
      padding: 4px;    
 }
 
 .tight{
-     width:400px;
-     display: flex;
-     flex-wrap: wrap;
+     width: 420px;
+     height: 960px;
      }
+
+.button {
+        text-align: center;
+        width: 120px;
+        height: 32px;
+        line-height: 32px;
+        border-radius: 2px;
+        font-size: 0.9em;
+        background-color: #fff;
+        color: #646464;
+      }
+
+      .button.blue {
+        background-color: #4285f4;
+        color: #fff;
+      }
+
+      .button.raised {
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+      }
+
+      .button.back {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+      }
+
+    </style>
+
 </style>
 <template>
-                <fc-card  class="container flex wrap" header-title="Inquiry Memorandum">
-                    <paper-item id="icycard" class="wrap">
-                      		<paper-item-body class="none">
+<neon-animated-pages id="pages" selected="0">
+     <fc-cards-list class="vertical layout fit"  id="list">
+
+               <fc-card on-tap="inquiryMemorandum" class="container flex wrap" header-title="Inquiry Memorandum">
+               </fc-card>
+
+               <fc-card  on-tap="scheduleCourses" class="container flex wrap" header-title="Scheduled Courses" >   
+               </fc-card>
+
+               <fc-card  on-tap="checkEmailInquiries" class="container flex wrap" header-title="Email Inquiries">  
+               </fc-card>
+
+               <fc-card  on-tap="focusedMaterials" class="container flex wrap" header-title="Focused Materials">    
+               </fc-card>   
+               
+               
+               <fc-card  on-tap="notesAndErrata" class="container flex wrap" header-title="Billing" >    
+               </fc-card>
+               
+               <fc-card  on-tap="callScripts" class="container flex wrap" header-title="Call Scripts">    
+               </fc-card>
+     
+     </fc-cards-list>
+
+                <fc-card class="container flex wrap" header-title="Inquiry Memorandum">
+                    <paper-item id="icycardTwo">
+                      		<paper-item-body class="wrap">
                             	<div class="layout flex wrap container tight">
                                   <br>
                                		<b><span>{{inq.firstname}}</span>&nbsp<span>{{inq.lastname}}</span></b>&nbsp<span name="fccalledon" id="fccalledon" hidden="true"> called on:</span>&nbsp<span id="fctimestamp" hidden="true"><b><u><span id="truetimestamp"></span></u></b>,</span>&nbsp<span name="fcregarding" hidden="true" id="fcregarding">regarding,</span>&nbsp<b><span>[[inq.studentfirstname]]</span>&nbsp<span>[[inq.studentlastname]]</span></b><span hidden="true" id="asinglea">: a</span>&nbsp<span>[[inq.grade]]</span>&nbsp<span hidden="true" id="graderat" id="graderat">grader at</span>&nbsp<span>[[inq.school]]</span>&nbsp<span hidden="true" id="inat">in</span>&nbsp<span>{{inq.schooltown}}</span><span id="period" hidden="true">.</span>
@@ -43,24 +104,15 @@ fc-card{
                               	<div class="secondary layout flex wrap container tight">
                                         <span id="contactinterest" hidden='true'><b><u>Contact Interest</u></b>:</span>&nbsp<span id="isinterestedin" hidden="true"><span>[[inq.firstname]]</span>&nbsp<span>is interested in</span>&nbsp</span><span>[[inq.interest]]</span>&nbsp<span id="startingon" hidden="true">starting on</span>&nbsp<span>[[inq.intereststartdate]]</span>&nbsp<span id="andpricedat">and priced at $</span><span>[[inq.interestprice]]</span><span id='periodthree' hidden='true'>.</span> <span id="withcoach" hidden="true">Coach <span>[[inq.coach]]</span> was requested.</span>
                               	</div><br>
-                              	<div class="secondary layout flex wrap container tight"><span id="additionalmessagetitle" hidden="true"><paper-textarea label="Message" name="message" value="[[inq.message]]" always-float-label="true" placeholder= "Additional Information" readonly="true" maxlength="400" rows="4" class="textareaannoyed">
+                              	<div class="secondary layout flex wrap container tight"><span id="additionalmessagetitle" hidden="true"><paper-textarea label="Message" name="message" value="[[inq.message]]" always-float-label="true" placeholder= "Additional Information" readonly="true" maxlength="400" rows="4" class="textareaannoyed"> </span>
                                    </paper-textarea>
                               	</div><br>
                                    <span id="inquirerrole" hidden="true"><b><u>Inquirer Role</u></b>: <span>[[inq.role]]</span></span>
                     		</paper-item-body>
                 	</paper-item>
-            	</fc-card> 
-               <fc-card  class="container flex wrap" header-title="Scheduled Courses" >  	
-            	</fc-card>
-              <fc-card  class="container flex wrap" header-title="Email Inquiries">   
-              </fc-card>
-              <fc-card  class="container flex wrap" header-title="Focused Materials">    
-              </fc-card>
-              <fc-card  class="container flex wrap" header-title="Notes & Errata" >    
-              </fc-card>
-              <fc-card  class="container flex wrap" header-title="Call Scripts">    
-              </fc-card>
-            
+                    </fc-card><!--end of memo card-->
+            	
+     </neon-animated-pages>       
 </template>
 <script>
 Polymer({
@@ -97,7 +149,8 @@ Polymer({
           },
           clock: {
             type: Object
-          }
+          }, 
+          display: ''
 			
 	},
      
@@ -130,6 +183,8 @@ Polymer({
     callMemoContentChangedTwo: function(stufirst, gradelev, school, schoolcity, phone, email, role, first, interest, coach, startdate, price, admessage){
 
           if(stufirst!=''){
+                // this.customStyle['--paper-textarea-display'] = 'flex-box';
+                //this.updateStyles();
                  this.$.asinglea.hidden=false;
                 //console.log("stufirst was observed and revealed a single `a` and a colon");
                }
@@ -151,6 +206,8 @@ Polymer({
           if(phone!='' || email!=''){
                this.$.canbereachedat.hidden=false;
                this.$.headerlast.hidden=false;
+               this.updateStyles();
+                 this.$.asinglea.hidden=false;
                }
 
           if(phone=="" && email!=''){
@@ -195,7 +252,96 @@ Polymer({
           if(first=='' && phone=='' && email==''){
                this.$.additionalmessagetitle.hidden=this.$.inquirerrole.hidden=this.$.contactinterest.hidden=this.$.periodthree.hidden=this.$.andpricedat.hidden=this.$.withcoach.hidden=this.$.startingon.hidden=this.$.isinterestedin.hidden=this.$.fcwewill.hidden=this.$.contactthe.hidden=this.$.fcbyebye.hidden=this.$.fccallbacktime.hidden=this.$.periodtwo.hidden=this.$.roleid.hidden=this.$.orword.hidden=this.$.canbereachedat.hidden=this.$.period.hidden=this.$.inat.hidden=this.$.graderat.hidden=this.$.asinglea.hidden=this.$.headerlast.hidden=this.$.extraperiod.hidden=this.$.periodoneplus.hidden=true; 
                }
-           }
+                //this.customStyle['--paper-item-display'] = 'none';
+                //this.updateStyles();
+           },
+
+      inquiryMemorandum: function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 1;
+      },
+
+      scheduleCourses: function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 2;
+      },
+
+      checkEmailInquiries: function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 3;
+      },
+
+     
+      focusedMaterials: function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 4;
+      },
+     
+     notesAndErrata: function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 5;
+      },
+
+     callScripts:function(event) {
+        this.$.list.sharedElements = {
+          'ripple': event.target,
+          'reverse-ripple': event.target
+        };
+        this.$.pages.selected = 6;
+      },
+     
+     onBackClick: function(event) {
+        this.$.pages.selected = 0;
+      }
+
 });
 </script>
 </dom-module>
+
+               
+
+ 
+
+              <!--/*  <fc-card class="container flex wrap" header-title="Inquiry Memorandum">
+                    <paper-item id="icycard" class="displayes">
+                          <paper-item-body class="wrap">
+                              <div class="layout flex wrap container tight">
+                                  <br>
+                                  <b><span>{{inq.firstname}}</span>&nbsp<span>{{inq.lastname}}</span></b>&nbsp<span name="fccalledon" id="fccalledon" hidden="true"> called on:</span>&nbsp<span id="fctimestamp" hidden="true"><b><u><span id="truetimestamp"></span></u></b>,</span>&nbsp<span name="fcregarding" hidden="true" id="fcregarding">regarding,</span>&nbsp<b><span>[[inq.studentfirstname]]</span>&nbsp<span>[[inq.studentlastname]]</span></b><span hidden="true" id="asinglea">: a</span>&nbsp<span>[[inq.grade]]</span>&nbsp<span hidden="true" id="graderat" id="graderat">grader at</span>&nbsp<span>[[inq.school]]</span>&nbsp<span hidden="true" id="inat">in</span>&nbsp<span>{{inq.schooltown}}</span><span id="period" hidden="true">.</span>
+                                </div> 
+                                <br>
+                                <div class="secondary layout flex wrap container tight">
+                                     <span id="headerlast" hidden="true"><b><u>Contacts</u></b>:</span>&nbsp<span hidden="true" id="canbereachedat"><span>[[inq.firstname]]</span>&nbsp<span>can be reached at</span></span>&nbsp
+                                        <!--
+
+                                        <b><span>[[inq.phone]]</span></b><span id='extraperiod' hidden="true">.</span>&nbsp<span hidden="true" id="orword"> or </span> &nbsp<span id='periodoneplus' hidden='true'><u><span>[[inq.email]]</span></u>.</span>
+                                     
+                                        <span id='roleid' hidden='true'>&nbsp</span>
+                                   
+                                        <span id='fcwewill' hidden='true'><span>[[inq.firstname]]</span>&nbspconfirmed</span>&nbsp<span id="contactthe" hidden='true'>a follow-up call</span>&nbsp<span id="fcbyebye" hidden='true'>on or before</span>&nbsp<u><span hidden='true' id="fccallbacktime"></span></u><span id='periodtwo' hidden='true'>.</span>
+                                   </div>
+                                    <br>
+                                <div class="secondary layout flex wrap container tight">
+                                        <span id="contactinterest" hidden='true'><b><u>Contact Interest</u></b>:</span>&nbsp<span id="isinterestedin" hidden="true"><span>[[inq.firstname]]</span>&nbsp<span>is interested in</span>&nbsp</span><span>[[inq.interest]]</span>&nbsp<span id="startingon" hidden="true">starting on</span>&nbsp<span>[[inq.intereststartdate]]</span>&nbsp<span id="andpricedat">and priced at $</span><span>[[inq.interestprice]]</span><span id='periodthree' hidden='true'>.</span> <span id="withcoach" hidden="true">Coach <span>[[inq.coach]]</span> was requested.</span>
+                                </div><br>
+                                <div class="secondary layout flex wrap container tight"><span id="additionalmessagetitle" hidden="true"><paper-textarea label="Message" name="message" value="[[inq.message]]" always-float-label="true" placeholder= "Additional Information" readonly="true" maxlength="400" rows="4" class="textareaannoyed"> 
+                                   </paper-textarea>
+                                </div><br>
+                                   <span id="inquirerrole" hidden="true"><b><u>Inquirer Role</u></b>: <span>[[inq.role]]</span></span>
+                        </paper-item-body>
+                  </paper-item>*\-->
