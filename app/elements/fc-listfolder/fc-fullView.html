@@ -13,9 +13,19 @@
       @apply(--);
     }
 
+
   .main::-webkit-scrollbar {
     display: none;
 }
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+    }
+
+
+
       span.linear{
           width:110px;
           overflow: hidden;
@@ -24,6 +34,7 @@
     .paper-material {
       padding: 4px 4px 4px 4px;
     }
+
     paper-icon-button {
         margin-left: 30px;
         display: block;
@@ -34,11 +45,14 @@
         color: var(--paper-blue-500);
       }
 
-
-    }
-
   </style>
   <template>
+
+
+    <paper-toolbar class="medium-tall">
+      <paper-icon-button id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
+
+
     <firebase-collection data="{{studentcalls}}" id="studentCalls" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
     <firebase-collection data="{{focusedstudents}}" id="focusedStudents" location="https://focusedstudents.firebaseio.com/"></firebase-collection>
     <firebase-collection data="{{contacts}}" id="contactInfo" location="https://focusedstudents.firebaseio.com/contactinfo"></firebase-collection>
@@ -46,11 +60,13 @@
     <firebase-collection data="{{coursepurchaseinfo}}" id="fcPurchaseInfo" location="https://focusedstudents.firebaseio.com/StreelandAnna00001/coursepurchaseinfo"></firebase-collection>
     <firebase-collection data="{{previousAcademics}}" id="previousAcademics" location="https://focusedstudents.firebaseio.com/previousAcademics"></firebase-collection>
 
-    <paper-toolbar class="medium">
-      <paper-icon-button class="red" id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
+
     </paper-toolbar>
     <div id="main" class="main">
-<!--        <div class="middle"> -->
+      <div class="image-container">
+        <div class="image">
+
+    <div class="middle">
         <div class="container horizontal layout">
           <paper-material class="container vertical layout flex-2 wrap leftpanel left">
             <!-- <span>{{selectedCall.relatedstudent}}</span><br><br> -->
@@ -145,20 +161,16 @@
   </template>
 <script>
   Polymer({
-
     is: 'fc-fullView',
-
     behaviors: [
       Polymer.NeonAnimatableBehavior
     ],
 
     properties: {
-      
       selectedCall: {
         type: Object,
       },
 
-//        value:{'STREELANDANNA00001': ''}
       roi: {
         type: Object,
         value: {
@@ -205,14 +217,7 @@
         notify: true,
         reflectToAttributes: true
       },
-
-      /*
-      student: {
-        type: Object,
-        notify: true
-      },
-      */
-
+      
       sharedElements: {
         type: Object,
         value: function() {
@@ -396,15 +401,6 @@
 
     },
 
-        /*
-        var fb = new Firebase("https://focusedstudents.firebaseio.com/");
-        var stree = fb.child(relatedstud);
-        stree.once("value", function(snapshot){
-          document.querySelector("#anna").innerHTML = snapshot.val().contactinfo.email;
-          console.log(snapshot.val());
-          
-        });
-        */
 
     resetStudentDisplay: function(){
       this.$.studphoto.src = "http://www.dazzaduz.com/wp-content/uploads/2015/07/cats-clip-art-free-12.jpg";
@@ -422,10 +418,8 @@
     _filterStudentCalls: function(selectedCall){
       return function(item){
         return (item.relatedstudent == selectedCall.relatedstudent);
-    };
+        };
   }
-
-  });
-
+});
 </script>
 </dom-module>
