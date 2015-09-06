@@ -10,8 +10,8 @@
 	padding: 4px 8px 10px 4px;
 	text-indent: 0px;
 	min-width: 323.7px;
-	/*min-height: 80px;*/
-	display: flex-box;
+	min-height: 80px;
+	display: flex;
 }  
 
 h3.title{
@@ -30,3 +30,85 @@ h3.title{
 		<h3 class="title">{{headerTitle}}</h3>
 			<div class="vertical layout">
 			<div class="horizontal layout wrap">
+
+				<div class="vertical layout">
+    <div id="placeholder" class="container"></div>
+
+    <div id="container">
+      <content select="fc-card"></content>
+    </div>
+</div>
+</paper-material>
+</template>
+
+
+<script>
+(function() {
+  Polymer({
+    is: 'fc-chip',
+
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+
+    properties: {
+      background: '#1e1e1e',
+	  reflectToAttributes: true,
+	  notify: true,
+	  headerTitle: {
+			type: String,
+			reflectToAttributes: true,
+			notify: true
+						},
+      animationConfig: {
+        value: function() {
+          return {
+            'entry': [{
+              name: 'ripple-animation',
+              id: 'ripple',
+              toPage: this
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 850
+              }
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.container,
+              timing: {
+                delay: 1050
+              }
+            }],
+
+            'exit': [{
+              name: 'opaque-animation',
+              node: this.$.placeholder
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 2000
+              }
+            }, {
+              name: 'reverse-ripple-animation',
+              id: 'reverse-ripple',
+              fromPage: this
+            }]
+          };
+        }
+      },
+
+      sharedElements: {
+        value: function() {
+          return {
+            'ripple': this.$.placeholder,
+            'reverse-ripple': this.$.placeholder
+          };
+        }
+      }
+    }
+  });
+})();
+</script>
+</dom-module>
