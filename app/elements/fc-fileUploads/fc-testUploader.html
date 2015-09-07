@@ -442,54 +442,69 @@
                     question_and_score_indices.push(question_index_pair_info);
                   }
                 }
-                /*
-                  if(header_name.indexOf('mfr') < 0){
-                    var section_number = header_name[0];
-                    var section_type = header_name[1];
-                    var num_section_questions = header_name.substring(2,period_index);
-                    var question_number = (underscore_index > -1) ? header_name.substring(period_index +1 ,underscore_index) : header_name.substring(period_index+1);
-                    //console.log("Section Number: " + section_number + " Section Type: " + section_type + " Num Questions: " + num_section_questions + " Question Num: " + question_number);
-                    if(parseInt(question_number) > parseInt(num_section_questions)){
-                      indices_to_skip.push(i);
-                    }
-                  }
-                } else {
-                  //console.log(header_name);
-
-                }*/
               }
               console.log(question_and_score_indices);
+              var qasi_size = question_and_score_indices.length;
               student_id_index = headers.indexOf('id');
               last_name_index = headers.indexOf('Last Name');
               first_name_index = headers.indexOf('First Name');
               essay_index = headers.indexOf('essay_score');
               indices_to_skip.push(student_id_index,last_name_index,first_name_index,essay_index);
-              //console.log(indices_to_skip);
-              /*
-              console.log('id: ' + student_id_index.toString());
-              console.log('Last Name: ' + last_name_index.toString());
-              console.log('First Name: ' + first_name_index.toString());
-              console.log('essay: ' + essay_index.toString());
-              */
+
               var question_results = {};
               var test_results = {};
 
               for (var i = 1; i < numRows; i++) {
-                  //var row = table.insertRow(-1);
-                  var good_cols = [];
-                  var cells = rows[i].split(",");
+                //var row = table.insertRow(-1);
+                var cells = rows[i].split(",");
+                if(cells[essay_index] != "0" && cells[essay_index] != ""){
                   var student_id = cells[student_id_index];
                   var last_name = cells[last_name_index];
                   var first_name = cells[first_name_index];
                   var essay = cells[essay_index];
-                  for (var j = 0; j < cells.length; j++) {
+                  var math_raw = 0;
+                  var math_num_right = 0;
+                  var math_num_wrong = 0;
+                  var math_num_skipped = 0;
+                  var reading_raw = 0;
+                  var reading_num_right = 0;
+                  var reading_num_wrong = 0;
+                  var reading_num_skipped = 0;
+                  var writing_raw = 0;
+                  var writing_num_right = 0;
+                  var writing_num_wrong = 0;
+                  var writing_num_skipped = 0;
+
+                  for (var j = 0; j < qasi_size; j++) {
                       //var cell = row.insertCell(-1);
                       //cell.innerHTML = cells[j];
-                      if(indices_to_skip.indexOf(j) < 0 && headers[j].indexOf('_') >= 0) {
-                        good_cols.push(cells[j]);
+                      switch(question_and_score_indices[j]['section_type']){
+                        case 'c':
+                          reading_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          break;
+                        case 'w':
+                          writing_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          break;
+                        case 'm':
+                          math_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          break;
+                        case 'mfr':
+                          math_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          break;
                       }
                   }
-                  //console.log(good_cols);
+                  var test_obj = {
+                    'stul': last_name,
+                    'stuf': first_name,
+                    'rr': reading_raw,
+                    'mr': math_raw,
+                    'wr': writing_raw
+                  };
+                  console.log(test_obj);
+                }
+                else {
+                  continue;
+                }
                   self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
 
               }
