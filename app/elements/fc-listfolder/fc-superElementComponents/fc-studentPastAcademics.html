@@ -20,9 +20,11 @@ font-family: times;
 }
 </style>
 <template>
-<firebase-collection></firebase-collection>
-<div>  <paper-material elevation="5" class='pastacademics'><span>[[pastacademics.fcid]</span> &nbsp Past Academics: <br>
-PSAT scores 11th Grade: &nbsp <span>[[pastacademics.PSATMSNQ]]</span> &nbsp Math Level: <span>[[pastacademics.highestMathCourse]]</span>&nbsp Science Level: <span>[[pastacademics.highestScienceCourse]]</span>&nbsp Class Rank: <span>[[pastacademics.classRank]]</span>&nbsp Grade: <span>[[pastacademics.grade]]</span>   &nbsp PSAT 10: <span>[[pastacademics.PSAT10]]</span>  PSAT 8/9: <span>[[pastacademics.PSAT89]]</span></paper-material></div>
+<firebase-document id="Focusedstudents" location="https://focusedstudents.firebaseio.com/pastAcademics"></firebase-document>
+<div> 
+<button on-click="testPSAT">test psat</button>
+ <paper-material elevation="5" class='pastacademics'><span>[[pastacademics.fcid]</span> &nbsp Past Academics: <br>
+PSAT scores 11th Grade: &nbsp <span>{{PSATMSNQprint}}</span> &nbsp Math Level: <span>[[pastacademics.highestMathCourse]]</span>&nbsp Science Level: <span>[[pastacademics.highestScienceCourse]]</span>&nbsp Class Rank: <span>[[pastacademics.classRank]]</span>&nbsp Grade: <span>[[pastacademics.grade]]</span>   &nbsp PSAT 10: <span>[[pastacademics.PSAT10]]</span>  PSAT 8/9: <span>[[pastacademics.PSAT89]]</span></paper-material></div>
 </template>
 <script>
 FcStudentPastAcademics=Polymer({
@@ -54,7 +56,9 @@ FcStudentPastAcademics=Polymer({
 	    }
 	},
 
-	created: function(fcid){
+		
+	created: function(){
+
 
 
 		},
@@ -63,12 +67,14 @@ FcStudentPastAcademics=Polymer({
 
 		},
 
-	attached: function(fcid){
-      	var holder=fcid;
-      	console.log('this is the value of inquiries at ready--set to StreelandAnna00001' + ' ' + this.pastacademics.PSATMSNQ);
-     	//this.$.FCIDContacts._setRemoteDocumentChild(holder, this.ROIdata);
+	attached: function(){
+      	
+     	var key = this.pastacademics.fcid;
+    	var value = this.pastacademics;
+    	this.$.Focusedstudents._setRemoteDocumentChild(key, value);
+                console.log(this.pastacademics.fcid + '' + JSON.stringify(this.pastacademics));
 
-                         // this.$.FCIDContacts._updateRemoteDocument;
+                       
     		},
 	detached: function(fcid){
 
