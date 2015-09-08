@@ -73,7 +73,7 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
-    <firebase-document id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results_fb}}"></firebase-document>
+    <firebase-collection id="trloc" location="https://focusedstaging1.firebaseio.com/test_results"></firebase-collection>
     <div>
       <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
         <content></content>
@@ -478,29 +478,86 @@
                   for (var j = 0; j < qasi_size; j++) {
                       //var cell = row.insertCell(-1);
                       //cell.innerHTML = cells[j];
+                      var question_score = parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                      var question_response = cells[question_and_score_indices[j]['response_index']];
                       switch(question_and_score_indices[j]['section_type']){
                         case 'c':
-                          reading_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          reading_raw += question_score;
+                          switch(question_score){
+                            case 1:
+                              reading_num_right++;
+                              break;
+                            case 0:
+                              reading_num_skipped++;
+                              break;
+                            case -0.25:
+                              reading_num_wrong++;
+                              break;
+                          }
                           break;
                         case 'w':
-                          writing_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          writing_raw += question_score;
+                          switch(question_score){
+                            case 1:
+                              writing_num_right++;
+                              break;
+                            case 0:
+                              writing_num_skipped++;
+                              break;
+                            case -0.25:
+                              writing_num_wrong++;
+                              break;
+                          }
                           break;
                         case 'm':
-                          math_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          math_raw += question_score;
+                          switch(question_score){
+                            case 1:
+                              math_num_right++;
+                              break;
+                            case 0:
+                              math_num_skipped++;
+                              break;
+                            case -0.25:
+                              math_num_wrong++;
+                              break;
+                          }
                           break;
                         case 'mfr':
-                          math_raw += parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                          math_raw += question_score;
+                          switch(question_score){
+                            case 1:
+                              math_num_right++;
+                              break;
+                            case 0:
+                              if(question_response == ""){
+                                math_num_skipped++;
+                              } else {
+                                math_num_wrong++;
+                              }
+                              break;
+                          }
                           break;
                       }
                   }
                   var test_obj = {
                     'stul': last_name,
                     'stuf': first_name,
-                    'rr': reading_raw,
-                    'mr': math_raw,
-                    'wr': writing_raw
+                    'craw': reading_raw,
+                    'cr': reading_num_right,
+                    'cw': reading_num_wrong,
+                    'cs': reading_num_skipped,
+                    'mraw': math_raw,
+                    'mr': math_num_right,
+                    'mw': math_num_wrong,
+                    'ms': math_num_skipped,
+                    'wraw': writing_raw,
+                    'wr': writing_num_right,
+                    'ww': writing_num_wrong,
+                    'ws': writing_num_skipped
                   };
                   console.log(test_obj);
+                  self.$.trloc.add(test_obj);
                 }
                 else {
                   continue;
