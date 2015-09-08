@@ -1,0 +1,137 @@
+<dom-module id="jason-listDemo">
+  <style is="custom-style">
+
+    :host {
+      display: block;
+    }
+
+    neon-animated-pages {
+      height: 100%;
+    }
+
+
+.leftPanel {
+  
+  height:100%;
+
+  }
+
+.rightPanel {
+  height: 900px;
+}
+
+
+fc-card{
+     padding: 4px;    
+}
+div.contained{
+    height: 600px;
+    width: 850px;
+    position: relative;
+    border: 12px ridge #aecdfe;
+    margin: 12px;
+    padding: 12px;
+}
+div.containedmore{
+    height: 80px;
+    width: 310px;
+    position: relative;
+    padding: 12px;
+}
+paper-button.platinum {
+  background: #edc013;
+  raised: true;
+  border-radius: 11px;
+  box-shadow: 10px 10px 5px #888888;
+  font-weight: 800;
+  color: #002c80;
+  margin-top: 10px;
+  margin-left: 50px;
+  font-size: 13px;
+  text-align: left;
+  text-indent: 0px;
+  bottom: 8px;
+}
+
+</style>
+<template id="fc-one">
+  
+      <jason-inputs id="jasonInputs" inquirer="{{memo}}">
+          <div><paper-button class="platinum" on-tap="fillInputsFromCall">Fill In Calll</paper-button></div> 
+      </jason-inputs>
+     
+<div class="vertical layout wrap">
+     <div class="horizontal layout container wrap">
+          <div class="leftPanel horizontal layout wrap">
+                    <fc-card class="container better flex wrap" header-title="Messages">
+                    <paper-item class="wrap">
+                      <paper-item-body wrap four-line>
+                            <div secondary class="wrap">
+                               <b> <span>[[memo.firstname]]</span> <span>[[memo.lastname]]</span> </b> called on 
+                               <b> <span>[[memo.timestamp]]</span> </b> 
+                               <br>regarding, <b><span>[[memo.studentfirstname]]</span> <span>[[memo.studentlastname]]</span></b>: a <span>[[memo.grade]]</span> grader at 
+                              </div> 
+                              <div class="wrap" secondary><span>[[memo.school]]</span> in <span>[[memo.schooltown]]</span>.
+                              </div>
+                              <div class="wrap" secondary> <span>[[memo.firstname]]</span> can be reached at <b><u><span>[[memo.phone]]</span></b></u> or <br><u><b><span>[[memo.email]]</span></b></u>. 
+                              <br><span>[[memo.firstname]]</span> is <span>[[memo.studentfirstname]]</span>`s <span>[[memo.role]]</span>. 
+                              <br>
+                              We will contact the <span>[[memo.lastname]]</span>`s by <b><u><span>[[memo.callbacktime]]</span></u></b>.
+                              </div>
+                              <div class="wrap" secondary>
+                              <span>[[memo.firstname]]</span> is interested in <span>[[memo.interest]]</span>
+                              <br> with <span>[[memo.coach]]</span>, starting on <span>[[memo.intereststartdate]]</span> 
+                              <br>
+                              and priced at $<span>[[memo.interestprice]]</span>.
+                              </div>
+                              <div  secondary class="containedmore wrap"><b>Additional Information: </b><span>[[memo.message]]</span></div>
+                      </paper-item-body>
+                </paper-item>
+              </fc-card>
+          </div>
+          <div class="rightPanel layout wrap" height="99vh">
+               <div container class="contained">            
+
+     <neon-animated-pages id="pages" selected="0">
+      <jason-listView inquiry="{{this.$.memo}}" id="jasonListView" on-item-click="_onItemClick"></jason-listView>
+      <jason-fullView on-close="_onClose"></jason-fullView> 
+     </neon-animated-pages>
+
+               </div>
+      </div><!--right-->
+          
+    </div> <!--horizontal layout container-->
+</div>
+</template>
+<script>
+  Polymer({
+    is: 'jason-listDemo',
+    properties: { 
+    },
+
+    _onItemClick: function() {
+      this.$.pages.selected = 1;
+      this.fire('pastCallerSelected', this.$.jasonListView.caller);
+      console.log(this.$.jasonListView.caller);
+    },
+
+    _onClose: function() {
+      this.$.pages.selected = 0;
+      console.log(this.$.pages.selected.inquiry);
+    },
+  ready: function() {
+            //this.addEventListener('writeToInputs', this.fillInputsFromCall);
+           this.addEventListener('searchInquiries', this.inquirerObserver);
+    },
+      fillInputsFromCall: function(){
+         fcInputs.inquirer = this.$.fcListView.caller.detail;
+           //this.$.fire('functionThatLinks/hits firebase', e.detail[s])
+         },
+    inquirerObserver: function(e){
+         this.$.jasonListView.inquiry = e.detail;
+         
+     }
+
+});
+</script>
+</dom-module>
