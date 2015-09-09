@@ -13,20 +13,37 @@
       color: var(--google-blue-500);
     }
 
+    paper-item:hover:after{
+      white-space: wrap;
+      cursor: pointer;
+      overflow: normal;
+      display: flex;
+      flex: wrap;
+      max-height: 100%;
+    }
+
   .fcborder{
       border: 4px ridge #aecdfe;
-      width: 760px;
-      height: 88px;
+      min-width: 640px;
+      max-width: 750px;
+      max-height: 88px;
+      margin: 2px;
+      background: #fffffc;
+      border-radius: 6px;
     
 
     }
-  
+  div.scrollercalendar::-webkit-scrollbar {
+    display: none;
+}
 div.scrollerTwo::-webkit-scrollbar {
     display: none;
 }
 
     paper-item-body {
       padding: 8px;
+      display: flex;
+      flex: wrap;
     }
 
      paper-icon-button {
@@ -42,7 +59,7 @@ div.scrollerTwo::-webkit-scrollbar {
       }
       .scrollerTwo{
         overflow-y: scroll;
-        height: 705px;
+        height: 635px;
         padding-top: 10px;
       }
 
@@ -50,56 +67,52 @@ div.scrollerTwo::-webkit-scrollbar {
         overflow: none;
         scroll: none;
         display: block;
-        height: 715px;
+        height: 480px;
+        margin-right:72px;
+        margin-left:-18px;
+        margin-top: 8px;
       }
      iron-icon {
       color: var(--google-blue-500);
     }
- 
-
-div.box{
-    width: 945px;
-    height: 45px;
-    background: beige;
-    border: 2px ridge #002c90;
-}
+    paper-item {
+      display: flex;
+      flex: wrapper;
+      color: #002c90;
+    }
 
  cards.paper-material{
   padding: 40px;
   margin: 12px;
+  
 }   
-.righty {
-  margin-left: 880px;
-}  
-.topdown{margin-top: 48px;}
+ 
+.topdown{margin-top: 84px;}
   </style>
-}
 <template>
       <content>
       </content>
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
 
-    <paper-material id="fcpapertoolbar" elevation="4" class="topdown" background="beige"><div class="box center center"><paper-icon-button icon="menu" class="righty"></paper-icon-button></div>
-    </paper-material>
     
-    <div class="main">
+    
+    <div class="main topdown">
         <div class="horizontal layout wrapper container">
-        <paper-material elevation="3" class="scrollercalendar vertical fixed">
-    <fc-scrollCalendar class="vertical layout container"></fc-scrollCalendar>
-        </paper-material>
+        
+    <fc-scrollCalendar class="vertical layout container scrollercalendar"></fc-scrollCalendar>
      <div class="vertical layout wrapper container block scrollerTwo">
     <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
 
-      <paper-material elevation='3' class="layout horizontal">
+      <paper-material elevation='4' class="layout horizontal">
                 <paper-item class="fcborder layout container">
                
-                      <paper-item-body more four-line>
+                      <paper-item-body more three-line>
                             <div>
-                               On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span>. <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
+                               On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
                             </div>
                             <div secondary> 
-                              <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u>. <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
+                              <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u> to discuss <b><span>[[pastinquirer.interest]]</span></b> <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
                             </div>
                             <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
                           </div>
@@ -246,12 +259,12 @@ div.box{
       console.log(inquiry);
         return function(item){
 
-          if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1 && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
           /*
           var result = true;
           if(inquiry.studentfirstname)
           {
-            //if the caller specified a student, pay attention to that foremost, even if other search criteria miss
+            //if the caller specified a student, pay attention to that, even if other search criteria miss
             result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
           }
           else //no student specified, so use caller criteria
