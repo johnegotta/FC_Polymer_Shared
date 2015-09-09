@@ -444,7 +444,7 @@
                   }
                 }
               }
-              console.log(question_and_score_indices);
+              //console.log(question_and_score_indices);
               var qasi_size = question_and_score_indices.length;
               student_id_index = headers.indexOf('id');
               last_name_index = headers.indexOf('Last Name');
@@ -462,7 +462,7 @@
                   var student_id = cells[student_id_index];
                   var last_name = cells[last_name_index];
                   var first_name = cells[first_name_index];
-                  var essay = cells[essay_index];
+                  var essay_score = cells[essay_index];
                   var math_raw = 0;
                   var math_num_right = 0;
                   var math_num_wrong = 0;
@@ -542,22 +542,25 @@
                       }
                   }
                   var test_obj = {
-                    'stul': last_name,
-                    'stuf': first_name,
-                    'craw': reading_raw,
-                    'cr': reading_num_right,
-                    'cw': reading_num_wrong,
-                    'cs': reading_num_skipped,
-                    'mraw': math_raw,
-                    'mr': math_num_right,
-                    'mw': math_num_wrong,
-                    'ms': math_num_skipped,
-                    'wraw': writing_raw,
-                    'wr': writing_num_right,
-                    'ww': writing_num_wrong,
-                    'ws': writing_num_skipped
+                    'test': file.testname,
+                    'last_name': last_name,
+                    'first_name': first_name,
+                    'reading_raw': reading_raw,
+                    'reading_correct': reading_num_right,
+                    'reading_wrong': reading_num_wrong,
+                    'reading_skipped': reading_num_skipped,
+                    'math_raw': math_raw,
+                    'math_correct': math_num_right,
+                    'math_wrong': math_num_wrong,
+                    'math_skipped': math_num_skipped,
+                    'writing_raw': writing_raw,
+                    'essay_score' : essay_score,
+                    'writing_correct': writing_num_right,
+                    'writing_wrong': writing_num_wrong,
+                    'writing_skipped': writing_num_skipped
                   };
-                  console.log(test_obj);
+                  //console.log(test_obj);
+                  test_obj = self.convertScores(test_obj);
                   self.$.trloc.add(test_obj);
                 }
                 else {
@@ -568,9 +571,6 @@
               }
               self.set(prefix + ".complete", true);
               self.set(prefix + ".progress", 100);
-              /*var dvCSV = document.getElementById("dvCSV");
-              dvCSV.innerHTML = "";
-              dvCSV.appendChild(table);*/
               self.cancel(file);
             }
             reader.readAsText(file);
@@ -583,6 +583,27 @@
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
+    },
+
+    convertScores: function(student_test_object){
+
+      var conversion_chart = {};
+
+      if (typeof self.score_charts[student_test_object['test']] != 'undefined'){
+        conversion_chart = self.score_charts[student_test_object['test']];
+      } else {
+        conversion_chart = self.score_charts['Default'];
+      }
+      //console.log(conversion_chart);
+      var reading_raw_rounded = Math.round(student_test_object['reading_raw']);
+      var math_raw_rounded = Math.round(student_test_object['math_raw']);
+      var writing_raw_rounded = Math.round(student_test_object['writing_raw']);
+
+      student_test_object['reading_score'] = reading_raw_rounded < -3 ? conversion_chart['reading']["-3"] : conversion_chart['reading'][reading_raw_rounded.toString()];
+      student_test_object['math_score'] = math_raw_rounded < -3 ? conversion_chart['math']["-3"] : conversion_chart['math'][math_raw_rounded.toString()];
+      student_test_object['writing_score'] = writing_raw_rounded < -3 ? conversion_chart['writing']["-3"][student_test_object['essay_score']] : conversion_chart['writing'][writing_raw_rounded.toString()][student_test_object['essay_score']];
+      //console.log(student_test_object);
+      return student_test_object;
     },
 
     uploadScoreTable: function(file){
