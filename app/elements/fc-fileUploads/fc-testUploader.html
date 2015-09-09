@@ -74,6 +74,7 @@
       }
     </style>
     <firebase-collection id="trloc" location="https://focusedstaging1.firebaseio.com/test_results"></firebase-collection>
+    <firebase-document id="score_chart_loc" location="https://focusedstaging1.firebaseio.com/score_conversion_charts" data="{{score_charts}}"></firebase-document>
     <div>
       <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
         <content></content>
@@ -562,7 +563,7 @@
                 else {
                   continue;
                 }
-                  self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
+                self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
 
               }
               self.set(prefix + ".complete", true);
@@ -579,6 +580,86 @@
             self.set(prefix + ".error", true);
           }
 
+          var endtime = performance.now();
+          var full_time = endtime - start_time;
+          console.log("Full Time: " + full_time.toString());
+    },
+
+    uploadScoreTable: function(file){
+      var start_time = performance.now();
+      self = this;
+      var prefix = "files." + self.files.indexOf(file);
+      console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
+          if (typeof (FileReader) != "undefined") {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              var rows = e.target.result.split(/[\r|\n]+/);
+              var numRows = rows.length;
+              var headers = rows[0].split(',');
+              var num_headers = headers.length;
+
+              var temp_score_obj_of_arrays = {};
+              for (var i = 0; i < num_headers; i++){
+                temp_score_obj_of_arrays[headers[i]] = [];
+              }
+
+              for (var i = 1; i < numRows; i++) {
+                var cells = rows[i].split(",");
+                var num_columns = cells.length;
+
+                for (var j = 0; j < num_columns; j++) {
+                  if (cells[j] != ''){
+                    temp_score_obj_of_arrays[headers[j]].push(cells[j]);
+                  }
+                }
+              }
+              console.log(temp_score_obj_of_arrays);
+              var num_reading_raws = temp_score_obj_of_arrays['reading_raw'].length;
+              var num_math_raws = temp_score_obj_of_arrays['math_raw'].length;
+              var num_writing_raws = temp_score_obj_of_arrays['writing_raw'].length;
+              var score_chart = {};
+              score_chart[file.testname] = {
+                  'reading': {},
+                  'math': {},
+                  'writing': {}
+              };
+              for (var i = 0; i < num_reading_raws; i++) {
+                score_chart[file.testname].reading[temp_score_obj_of_arrays['reading_raw'][i]] = temp_score_obj_of_arrays['reading_converted'][i];
+              }
+              for (var i = 0; i < num_math_raws; i++) {
+                score_chart[file.testname].math[temp_score_obj_of_arrays['math_raw'][i]] = temp_score_obj_of_arrays['math_converted'][i];
+              }
+              for (var i = 0; i < num_writing_raws; i++) {
+                score_chart[file.testname].writing[temp_score_obj_of_arrays['writing_raw'][i]] = {};
+                for (var j = 1; j <= 12; j++) {
+                  score_chart[file.testname].writing[temp_score_obj_of_arrays['writing_raw'][i]][j.toString()] = temp_score_obj_of_arrays[j.toString()][i];
+                }
+              }
+              /*for (var i = 0; i < num_reading_raws; i++) {
+                score_chart.reading[temp_score_obj_of_arrays['reading_raw'][i]] = temp_score_obj_of_arrays['reading_converted'][i];
+              }*/
+
+              console.log(score_chart);
+              /*for (var set in temp_score_obj_of_arrays){
+                if(set.indexOf('_raw') >= 0){
+                  var section_type = set.substring(0,set.indexOf('_raw'));
+                  switch (section_type){
+                    case 'reading':
+
+                  }
+                }
+              }*/
+              self.score_charts = score_chart;
+              self.set(prefix + ".complete", true);
+              self.set(prefix + ".progress", 100);
+              self.cancel(file);
+            }
+            reader.readAsText(file);
+          }
+          else {
+            alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
+            self.set(prefix + ".error", true);
+          }
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
