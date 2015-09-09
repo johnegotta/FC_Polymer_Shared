@@ -1,0 +1,192 @@
+<dom-module id="fc-registrationUploader">
+<style>
+    :host {
+      @apply(--display-block);
+    }
+      .enabled {
+        border: 1px dashed #555;
+      }
+      paper-button {
+        margin-bottom: 20px;
+        min-width: 200px;
+        min-height: 80px;
+        background: red;
+      }
+      .file {
+        padding: 10px 0px;
+      }
+      .commands {
+        float: right;
+        padding: 0px 10px;
+      }
+      .fileSelects {
+        float: right;
+        padding: 0px 10px;
+      }
+</style>
+
+<template>
+    <firebase-document id="regloc" location="https://focusedstudents.firebaseio.com/registrations"></firebase-document>
+    <firebase-collection id="courseloc" location="https://focusedstudents.firebaseio.com/courses"></firebase-collection>
+    <firebase-collection id="studentloc" location="https://focusedstudents.firebaseio.com/contactinfo"></firebase-collection>
+
+    <div>
+      <paper-button id="coursefilebutton" icon="file-upload" class="blue" on-click="_fileClick">
+        <content></content><span style="color:white">Upload Registrations From CSV</span>
+      </paper-button>
+    </div>
+    <input type="file" id="courseFileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv">
+
+</template>
+
+<script>
+  Polymer({
+    is: 'fc-registrationUploader',
+    
+    properties: {
+     /**
+       * `target` is the target url to upload the files to.
+       * Additionally by adding "<name>" in your url, it will be replaced by
+       * the file name.
+       */
+     target: {
+        type: String,
+        value: ""
+     },
+          
+      /**
+       * `multi` indicates whether or not to allow multiple files to be uploaded.
+      */
+     multi: {
+        type: Boolean,
+        value: true
+      },
+
+      // `files` is the list of files to be uploaded
+      files: {
+        type: Array,
+        value: []
+      },
+
+      // `method` is the http method to be used during upload
+      method: {
+        type: String,
+        value: "PUT"
+      },
+            
+      /**
+       * `headers` is a key value map of header names and values
+      */
+      headers: {
+        type: Object,
+        value: {},
+      },
+      notify: true
+    },
+    /**
+     * Clears the list of files
+    */
+    clear: function() {
+      this.set("files", []);
+    },
+
+     attached: function() {
+        console.log(this.$.studentloc.data);
+     },
+    
+    /**
+     * Clicks the invisible file input
+    */
+    _fileClick: function() {
+      var elem = this.$.courseFileInput;
+      if (elem && document.createEvent) { // sanity check
+        var evt = document.createEvent("MouseEvents");
+        evt.initEvent("click", true, false);
+        elem.dispatchEvent(evt);
+      }
+    },
+    /**
+     * Called whenever the list of selected files changes
+    */
+    _fileChange: function(e) {
+      var length = e.target.files.length;
+      for (var i = 0; i < length; i++) {
+        var file = e.target.files[i];
+        file.progress = 0;
+        file.error = false;
+        file.complete = false;
+        this.push("files", file);
+        this.uploadFile(file);
+      }
+    },
+ 
+    /**
+     * Uploads a file
+     *
+     * @param {object} a file, an element of the files array
+    */
+    uploadFile: function(file) {
+      var regex = /.+(.csv)/;
+      if (!file || !regex.test(file.name.toLowerCase())) {
+        alert('Check that the file you want to add exists and that it is a CSV file.')
+        return;
+      } else {
+          this.uploadRegistrations(file);
+      }
+    },
+
+    uploadRegistrations: function(file){
+      console.log('Uploading ' + file.name);
+      if(typeof (FileReader) != "undefined")
+      {
+            var reader = new FileReader();
+            var self = this;
+            reader.onload = function (e) {
+                var rows = e.target.result.split("****");
+                var numRows = rows.length;
+                var headers = rows[0].split(',');
+                var numColumns = headers.length;
+                var i = 0;
+                for(i = 0; i < numRows; i++)
+                {
+                    var cells = rows[i].split('COMMA');
+                    console.log("row #" + i);
+                    console.log(cells);
+                    
+                    //self.$.studentloc.orderByChild = "id";
+                    //self.$.studentloc._queryChanged();
+                    //var anna = self.$.studentloc.getByKey("StreelandAnna00001");
+                    //console.log(anna);
+                    self.$.studentloc.orderByChild = "id";
+                    self.$.studentloc.equalTo = cells[1];
+                    self.$.courseloc.orderByChild = "id";
+                    self.$.courseloc.equalTo = cells[2];
+                    var studId = self.$.studentloc.data[0].fcid;
+                    var cid = self.$.courseloc.data[0].fcid;
+                    console.log("studId is " + studId);
+                    var regInfo = {
+                         id: cells[0],
+                         studentId: studId,
+                         courseId: cid,
+                         registerDate: cells[3],
+                         payment1date: cells[6],
+                         payment2date: cells[7],
+                         payment1amount: cells[8],
+                         payment2amount: cells[9],
+                         payment1txid: cells[10],
+                         payment2txid: ""
+                    };
+                    console.log("reginfo is " + JSON.stringify(regInfo));
+                   self.$.regloc._setRemoteDocumentChild(studId, regInfo);
+               }
+            };
+            reader.readAsText(file);
+      }
+      else
+      {
+        console.log("cannot load FileReader");
+      }
+    }
+  });
+</script>
+</dom-module>

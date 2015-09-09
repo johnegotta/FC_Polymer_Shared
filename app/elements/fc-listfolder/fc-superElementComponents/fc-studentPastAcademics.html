@@ -1,0 +1,96 @@
+<dom-module id='fc-studentPastAcademics'>
+<style is='custom-style'>
+
+ :host {
+      @apply(--layout-vertical);
+      @apply(--display-block);
+       @apply(--layout-scroll);
+      @apply(--shadow-elevation-8dp);
+      @apply(--height-750px);
+    }
+
+.pastacademics {
+width: 320px;
+height: 760px;
+color: #002c90;
+background: #aecdfe;
+font-weight: 800;
+font-size: 18px;
+font-family: times; 
+}
+</style>
+<template>
+<firebase-document id="Focusedstudents" location="https://focusedstudents.firebaseio.com/pastacademics"></firebase-document>
+<div> 
+<button on-click="testPSAT">test psat</button>
+ <paper-material elevation="5" class='pastacademics'><span>[[pastacademics.fcid]</span> &nbsp Past Academics: <br>
+PSAT scores 11th Grade: &nbsp <span>{{PSATMSNQprint}}</span> &nbsp Math Level: <span>[[pastacademics.highestMathCourse]]</span>&nbsp Science Level: <span>[[pastacademics.highestScienceCourse]]</span>&nbsp Class Rank: <span>[[pastacademics.classRank]]</span>&nbsp Grade: <span>[[pastacademics.grade]]</span>   &nbsp PSAT 10: <span>[[pastacademics.PSAT10]]</span>  PSAT 8/9: <span>[[pastacademics.PSAT89]]</span></paper-material></div>
+</template>
+<script>
+FcStudentPastAcademics=Polymer({
+	is: 'fc-studentPastAcademics',
+	properties: {
+ 		pastacademics:{
+          	type: Object, 
+          	value: {
+	               fcid: "StreelandAnna00001",
+	               grade: '11', 
+	               school:'Manasquan High School', 
+	               schooltown:'Manasquan', 
+	               classRank: '3',
+	               highestMathCourse:'Calculus',
+	               highestScienceCourse:'Physics',
+	               PSATMSNQ:'math: "450", reading: "480", nationalMathPerc: "43%", nationalReadingPerc: "48%"  , nationalWritingPerc: "41%", nationalSciCrossSectPerc: "43%", nationalSocHisCrossSectPerc: "50%"',
+	               PSAT10: 'math: "450", reading: "480", nationalMathPerc: "43%", nationalReadingPerc: "48%"  , nationalWritingPerc: "51%", nationalSciCrossSectPerc: "43%" , nationalSocHisCrossSectPerc: "51%"',
+	               PSAT89:'math: "450", reading: "480", nationalMathPerc: "43%", nationalReadingPerc: "48%"  , nationalWritingPerc: "58%", nationalSciCrossSectPerc: "65%", nationalSocHisCrossSectPerc: "55%"',
+	            PSATaggragateNationalPercentage: '48%',
+	               SATnationalMathPerc:'None',
+	               SATnationalReadingPerc:'None', 
+	               SATnationalWritingPerc:'None',
+	               SATnationalSciCrossSectPerc:'None',
+	               SATnationalSocHisCrossSectPerc:'None',
+	               SAToverallPerc: 'None'
+            },
+            notify: true, 
+            reflectToAttributes: true
+	    }
+	},
+
+		
+	created: function(){
+
+
+
+		},
+
+	ready: function(fcid){
+
+		},
+
+	attached: function(){
+      	
+     	var key = this.pastacademics.fcid;
+    	var value = this.pastacademics;
+    	this.$.Focusedstudents._setRemoteDocumentChild(key, value);
+                //console.log(this.pastacademics.fcid + '' + JSON.stringify(this.pastacademics));
+
+                       
+    		},
+	detached: function(fcid){
+
+		},
+
+	destroyed: function(fcid){
+
+		},
+
+	factoryImpl: function(fcid){
+		console.log("this is the computed function " + this.pastacademics.PSATMSNQprint);
+
+		}
+
+});
+</script>
+</dom-module>
+
+

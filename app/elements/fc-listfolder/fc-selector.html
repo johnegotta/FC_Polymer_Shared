@@ -1,0 +1,66 @@
+<dom-module id="fc-selector">
+<template>
+<style is="custom-style">
+
+select
+{
+	min-width:124px;
+}
+</style>
+<template>
+<firebase-collection id="fbc" items="instructors" location="https://focusedstudents.firebaseio.com/instructors/"></firebase-collection>
+	
+	<select is="fc-selector"></select>
+	
+<script>
+
+Polymer({
+	is: "fc-selector",
+	extends: select,
+	properties: {
+		path: String,
+		id: String,
+		notify: true,
+		reflectToAttributes: true
+	},
+
+/*factoryImpl: function(option1, option2, option3, option4, option5){
+	this.id = argId;
+	this.$.fbc.location = argPath;
+	console.log("factoryImpl called for " + this.id + ' ' + argPath);
+
+
+created: function(){
+	
+},*/
+
+
+ready: function(){
+}, 
+
+attached: function(){
+	var fbcstuff = this.$.fbc.data;
+	console.log(fbcstuff);
+	var numItems = fbcstuff.length;
+	console.log(fbcstuff.length);
+	for(i=0; i<numItems; i++)
+	{
+		var opt = document.createElement("option");
+		opt.value = fbcstuff[i].name;
+		opt.innerHTML = fbcstuff[i].name;
+		this.$.fbcselect.appendChild(opt);
+	}
+},
+
+detatched: function(){
+
+}, 
+
+destroyed: function(){
+
+
+} 	
+});
+</script>
+</template>
+</dom-module>

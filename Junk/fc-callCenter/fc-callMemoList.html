@@ -9,6 +9,16 @@ paper-input.searchbar{
 }
 
 div.searchresults {
+	max-height: 1050px;
+	overflow-x: scroll;
+  overflow-y: scroll;
+	margin-top: 20px;
+	border: 2px solid red;
+	}
+
+
+div.fixedsearch {
+	margin-bottom: 4px;
 	max-height: 900px;
 	overflow: scroll;
 	margin-top: 20px;
@@ -22,11 +32,11 @@ div.fixedsearch {
 	border: 2px solid red;
 	width: 62vw;
 	}
+}
 </style>
 <template>
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls">
 </firebase-collection>
-
 	<div class="vertical layout">
          	<div class="fixedsearch">
                		<paper-input label="Search Call Logs" class="searchbar" required value="Select Place holder">
@@ -38,8 +48,7 @@ div.fixedsearch {
                  			<fc-tabbedCardHolder callinfo="{{item}}"></fc-tabbedCardHolder>
                  		</fc-callMemo>
                   	</template>
-
-               </div>
+          </div>
 	</div>
 </template>
 <script>
@@ -60,6 +69,18 @@ div.fixedsearch {
 	    	  notify: true,
 	    	  reflectToAttributes: true
 	    	}
+	    },
+
+		showCalls: function(){
+	    		console.log("found # calls = " + this.$.FBCallReads.data.length);
+	    	},
+
+	    _selectPerson: function(e){
+	    	alert("received personSelected event");
+	    	console.log(e.detail);
+	    	//this.$.callEntry.person.uid = e.detail.__firebaseKey__;
+	    	alert(e.detail.__firebaseKey__);
+	    	//this._personFilter()(e.detail)
 	    },
 
 	    _callFilter: function(searchfields){
