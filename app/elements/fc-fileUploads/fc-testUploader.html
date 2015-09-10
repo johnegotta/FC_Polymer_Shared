@@ -28,6 +28,24 @@
         text-align: center;
       }
 
+      #conflictBox {
+        margin-left: 20px;
+        margin-bottom: 10px;
+        height: 600px;
+        overflow-y: none;
+        display: inline-block;
+        color: #555;
+        border: 1px solid #111;
+      }
+
+      #conflictBox paper-item{
+
+      }
+
+      #conflictBox p span{
+        font-weight: bold;
+      }
+
       paper-button {
         margin-bottom: 20px;
       }
@@ -73,49 +91,77 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
-    <firebase-collection id="trloc" location="https://focusedstaging1.firebaseio.com/test_results"></firebase-collection>
+    <firebase-collection id="trloc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}"></firebase-collection>
+    <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
     <firebase-document id="score_chart_loc" location="https://focusedstaging1.firebaseio.com/score_conversion_charts" data="{{score_charts}}"></firebase-document>
-    <div>
-      <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
-        <content></content>
-      </paper-button>
-      <div id="UploadBorder">
-        <div id="dropArea" hidden$="{{_hiddenDropText}}">{{dropText}}</div>
-        <template is="dom-repeat" items="{{files}}">
-          <div class="file horizontal layout">
-            <div>
-              <div class="name">
-                <span>{{item.name}}</span>
-                <div class="commands">
-                  <iron-icon icon="autorenew" title="Retry Upload" on-click="_retryUpload" hidden$="{{!item.error}}"></iron-icon>
-                  <iron-icon icon="cancel" title="Remove" on-click="_cancelUpload" hidden$="{{item.complete}}"></iron-icon>
-                  <iron-icon icon="check-circle" title="Success" hidden$="{{!item.complete}}"></iron-icon>
+    <div class="horizontal layout">
+      <div class="flex">
+        <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
+          <content></content>
+        </paper-button>
+        <div id="UploadBorder">
+          <div id="dropArea" hidden$="{{_hiddenDropText}}">{{dropText}}</div>
+          <template is="dom-repeat" items="{{files}}">
+            <div class="file horizontal layout">
+              <div>
+                <div class="name">
+                  <span>{{item.name}}</span>
+                  <div class="commands">
+                    <iron-icon icon="autorenew" title="Retry Upload" on-click="_retryUpload" hidden$="{{!item.error}}"></iron-icon>
+                    <iron-icon icon="cancel" title="Remove" on-click="_cancelUpload" hidden$="{{item.complete}}"></iron-icon>
+                    <iron-icon icon="check-circle" title="Success" hidden$="{{!item.complete}}"></iron-icon>
+                  </div>
+                </div>
+                <div class="error" hidden$="{{!item.error}}">Error uploading file...</div>
+                <div hidden$={{progressHidden}}>
+                  <paper-progress value$="{{item.progress}}" error$="{{item.error}}"></paper-progress>
                 </div>
               </div>
-              <div class="error" hidden$="{{!item.error}}">Error uploading file...</div>
-              <div hidden$={{progressHidden}}>
-                <paper-progress value$="{{item.progress}}" error$="{{item.error}}"></paper-progress>
+              <div>
+                <div class="fileSelects">
+                  <paper-dropdown-menu label="Results or Score Table" on-selected-item-changed="_setFileType">
+                    <paper-menu class="dropdown-content">
+                      <paper-item>Test Result</paper-item>
+                      <paper-item>Score Table</paper-item>
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <paper-dropdown-menu id="testSelector" label="For Which Test" on-selected-item-changed="_setTestName">
+                    <paper-menu class="dropdown-content">
+                      <paper-item>Test 1</paper-item>
+                      <paper-item>Test 2</paper-item>
+                      <paper-item>Test B12A</paper-item>
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                </div>
               </div>
             </div>
-            <div>
-              <div class="fileSelects">
-                <paper-dropdown-menu label="Results or Score Table" on-selected-item-changed="_setFileType">
-                  <paper-menu class="dropdown-content">
-                    <paper-item>Test Result</paper-item>
-                    <paper-item>Score Table</paper-item>
-                  </paper-menu>
-                </paper-dropdown-menu>
-                <paper-dropdown-menu id="testSelector" label="For Which Test" on-selected-item-changed="_setTestName">
-                  <paper-menu class="dropdown-content">
-                    <paper-item>Test 1</paper-item>
-                    <paper-item>Test 2</paper-item>
-                    <paper-item>Test B12A</paper-item>
-                  </paper-menu>
-                </paper-dropdown-menu>
+          </template>
+        </div>
+      </div>
+      <div id= "conflictBox" class="flex">
+        <paper-header-panel>
+          <paper-toolbar>
+            <span class="flex">Test Result Conflicts<span>
+            <paper-button on-tap="toggleConflictChecks">Check/Uncheck All</paper-button>
+          </paper-toolbar>
+          <template is="dom-if" if="{{score_conflicts.length == 0}}">
+            Hey
+          </template>
+          <template is="dom-repeat" items="{{score_conflicts}}">
+            <paper-item>
+              <div class="horizontal layout center">
+                <div>
+                <paper-checkbox checked="{{allConflictsChecked}}"></paper-checkbox>
+                </div>
+                <div>
+                  <p>
+                    Attempted to add a <span>{{item.new_result.test}}</span> score for <span>{{item.new_result.first_name}}</span> <span>{{item.new_result.last_name}}</span> on <span>{{item.new_result.date_uploaded}}</span>, but <span>{{item.old_result.first_name}}</span> <span>{{item.old_result.last_name}}</span> already has a result for <span>{{item.old_result.test}}</span> from <span>{{item.old_result.date_uploaded}}</span>.
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        </template>
+            </paper-item>
+          </template>
+        </paper-header-panel>
       </div>
     </div>
     <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv">
@@ -232,6 +278,11 @@
       headers: {
         type: Object,
         value: {},
+      },
+
+      allConflictsChecked: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -541,10 +592,12 @@
                           break;
                       }
                   }
+                  var date_uploaded = new Date().toString();
                   var test_obj = {
                     'test': file.testname,
                     'last_name': last_name,
                     'first_name': first_name,
+                    'student_id': student_id,
                     'reading_raw': reading_raw,
                     'reading_correct': reading_num_right,
                     'reading_wrong': reading_num_wrong,
@@ -557,11 +610,24 @@
                     'essay_score' : essay_score,
                     'writing_correct': writing_num_right,
                     'writing_wrong': writing_num_wrong,
-                    'writing_skipped': writing_num_skipped
+                    'writing_skipped': writing_num_skipped,
+                    'date_uploaded': date_uploaded
                   };
                   //console.log(test_obj);
                   test_obj = self.convertScores(test_obj);
-                  self.$.trloc.add(test_obj);
+                  if (self.test_results.some( function(e) {
+                    if(e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test){
+                      var conflict = {};
+                      conflict['old_result'] = e;
+                      conflict['new_result'] = test_obj;
+                      self.$.score_conflicts_loc.add(conflict);
+                    }
+                    return e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test;
+                  })) {
+                    continue;
+                  } else {
+                    self.$.trloc.add(test_obj);
+                  }
                 }
                 else {
                   continue;
@@ -599,9 +665,10 @@
       var math_raw_rounded = Math.round(student_test_object['math_raw']);
       var writing_raw_rounded = Math.round(student_test_object['writing_raw']);
 
-      student_test_object['reading_score'] = reading_raw_rounded < -3 ? conversion_chart['reading']["-3"] : conversion_chart['reading'][reading_raw_rounded.toString()];
-      student_test_object['math_score'] = math_raw_rounded < -3 ? conversion_chart['math']["-3"] : conversion_chart['math'][math_raw_rounded.toString()];
-      student_test_object['writing_score'] = writing_raw_rounded < -3 ? conversion_chart['writing']["-3"][student_test_object['essay_score']] : conversion_chart['writing'][writing_raw_rounded.toString()][student_test_object['essay_score']];
+      student_test_object['reading_score'] = reading_raw_rounded < -3 ? parseInt(conversion_chart['reading']["-3"]) : parseInt(conversion_chart['reading'][reading_raw_rounded.toString()]);
+      student_test_object['math_score'] = math_raw_rounded < -3 ? parseInt(conversion_chart['math']["-3"]) : parseInt(conversion_chart['math'][math_raw_rounded.toString()]);
+      student_test_object['writing_score'] = writing_raw_rounded < -3 ? parseInt(conversion_chart['writing']["-3"][student_test_object['essay_score']]) : parseInt(conversion_chart['writing'][writing_raw_rounded.toString()][student_test_object['essay_score']]);
+      student_test_object['total_score'] = student_test_object['reading_score'] + student_test_object['math_score'] + student_test_object['writing_score'];
       //console.log(student_test_object);
       return student_test_object;
     },
@@ -684,6 +751,11 @@
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
+    },
+
+    toggleConflictChecks: function(){
+      this.allConflictsChecked = !this.allConflictsChecked;
+      //console.log();
     }
   });
 
