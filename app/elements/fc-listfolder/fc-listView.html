@@ -1,5 +1,6 @@
 <dom-module id="fc-listView">
 <style is="custom-style">
+
     :host {
       @apply(--layout-vertical);
     }
@@ -29,6 +30,7 @@
     }
 
      paper-icon-button {
+
         margin-left: 8px;
         display: block;
         width: 24px;
@@ -39,6 +41,7 @@
       paper-icon-button.blue {
         color: var(--paper-blue-500);
       }
+
 
       .scrollercalendar{
         overflow: hidden;
@@ -53,9 +56,9 @@
       }
       
   </style>
+
 <template>
-      <content>
-      </content>
+     
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
       
 
@@ -83,7 +86,8 @@
                             <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span><paper-icon-button class="blue" on-tap="writeToInputs">Select</paper-icon-button></div>
                       </paper-item-body>
                   <iron-icon icon="info" on-click="_scott"></iron-icon>
-            
+             <content>
+      </content>
                 </paper-item>
       </template>
       </div>
@@ -91,6 +95,7 @@
     </div>
 </template>
 <script>
+
   Polymer({
 
     is: 'fc-listView',
@@ -100,11 +105,10 @@
     ],
 
     listeners: {
-      //'click': '_onClick'
+    //'click': '_onClick'
     },
 
     properties: {
-      
       inquiry: {
         type: Object, 
         value: {
@@ -175,86 +179,13 @@
       this.fire('item-click', {caller: this.pastinquirer});
     },
 
-    writeToInputs: function(){
-    /*   this.fire(
-         this.$.fcInputs.fcInp1.value = this.pastinquirer.firstname = "";
-          this.$.fcInputs.fcInp2.value = this.pastinquirer.lastname = "";
-          this.$.fcInputs.fcInp3.value = this.pastinquirer.email = "";
-          this.$.fcInputs.fcInp4.value = this.pastinquirer.phone = "";
-          this.$.fcInputs.fcInp5.value = this.pastinquirer.studentfirstname = "";
-          this.$.fcInputs.fcInp6.value = this.pastinquirer.studentlastname = "";
-          this.$.fcInputs.fcInp7.value = this.pastinquirer.relatedstudent = "";
-          //this.$.fcInputs.fcInp8.value = this.pastinquirer.timestamp = "";
-          //this.$.fcInputs.fcInp9.value = this.pastinquirer.callbacktime = "";
-          //this.$.fcInputs.fcInp10.value = this.pastinquirer.timeorder = "";
-          this.$.fcInputs.this.$.fcInputs.fcInp11.value = this.pastinquirer.grade = "";
-          this.$.fcInputs.fcInp12.value = this.pastinquirer.coach = "";
-          this.$.fcInputs.fcInp13.value = this.pastinquirer.school = "";
-          this.$.fcInputs.fcInp14.value = this.pastinquirer.message = "";*/
-    },
-
-    _onClick: function(event) {
-      var target = event.target;
-      console.log(event.model);
-      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
-      {
-        target = null;
-         
-     } 
-      else {
-        target=target.parentNode;
-        this.pastinquirer=target.details
-        console.log(this.pastinquirer);
-        
-        // configure the page animation
-        this.sharedElements = {
-          'hero': target,
-        };
-
-        this.fire('item-click', {
-          item: target,
-        });
-      }
-
-  },
    _callFilter: function(inquiry){
       console.log(inquiry);
         return function(item){
 
           if(item.firstname.indexOf(inquiry.firstname)> -1 && item.phone.indexOf(inquiry.phone)>-1 && item.lastname.indexOf(inquiry.lastname)>-1 && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
-          /*
-          var result = true;
-          if(inquiry.studentfirstname)
-          {
-            //if the caller specified a student, pay attention to that foremost, even if other search criteria miss
-            result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
-          }
-          else //no student specified, so use caller criteria
-          {
-            if(inquiry.lastname)
-            {
-              result &= (item.lastname? (item.lastname.indexOf(inquiry.lastname) > -1): false);
-            }
-            if(inquiry.firstname)
-            {
-              result &= (item.firstname? (item.firstname.indexOf(inquiry.firstname) > -1): false);
-            }
-            if(inquiry.email)
-            {
-              result &= (item.email? (item.email.indexOf(inquiry.email) > -1): false);
-            }
-            if(inquiry.phone)
-            {
-              result &= (item.phone? (item.phone.indexOf(inquiry.phone) > -1): false);
-            }
         }
-        return result;
-        */
-      }  
-    }, 
-
-     
+    }      
 });
-
 </script>
 </dom-module>
