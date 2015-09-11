@@ -1,0 +1,86 @@
+<dom-module id="fc-select">
+<style is="custom-style">
+
+array-select
+{	
+	height: 126px;
+	width:124px;
+	border: 9px ridge #aecdfe;
+}
+iron-selector {
+        padding: 8px;
+}
+
+.iron-selected {
+        background-color: var(--google-blue-500);
+        color: white;
+}
+</style>
+<template>
+  <firebase-document id="mess" location="https://focusedstudents.firebaseio.com/registrations"></firebase-document>
+<firebase-collection id="fbcarrayselector" data={{instructors}} location="https://focusedstudents.firebaseio.com/instructors"></firebase-collection>
+<div style="min-height:400px;">
+	<iron-selector  multi>
+    <template is="dom-repeat" id="instructorsList" items={{instructors}}>
+      <div name$={{item.name}}>
+        <div>First name: <span>{{item.name}}</span></div>
+        <div>Last name: <span>{{item.last}}</span></div>
+      </div>
+    </template> 
+     </iron-selector>
+<!--        <button on-click="toggleSelection">Select</button> -->
+
+	<!-- <array-selector id="fbselector" items="{{instructors}}" selected="{{selected}}"></array-selector> -->
+	<template is="dom-repeat" items="{{selected}}">
+        <div>First name: <span>{{item.name}}</span></div>
+        <div>Last name: <span>{{item.last}}</span></div>
+    </template>
+    </div>
+</template>
+<script>
+Polymer({
+	is: "fc-select",
+	properties: {
+		path: String,
+		id: String,
+		name: String,
+		last: String,
+		notify: true
+	},
+
+factoryImpl: function (){
+
+},
+
+created: function(){
+
+
+}, 
+
+ready: function(){
+
+}, 
+
+attached: function(){
+	//console.log("here is the value of the instructors array " + this.$.fbcarrayselector.items[1]);
+	
+},
+
+detatched: function(){
+
+}, 
+
+destroyed: function(){
+
+
+}, 
+toggleSelection: function(e) {
+        var item = this.$.instructorsList.itemForElement(e.target);
+        //var selectedInstructor = this.$.instructorsList.data[0];
+        console.log(item);
+        this.$.fbselector.select(item);
+      }
+
+});
+</script>
+</dom-module>
