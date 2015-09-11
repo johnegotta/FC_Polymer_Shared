@@ -21,17 +21,51 @@ div {
 
     <array-selector id="selector" items="{{courses}}" selected="{{selected}}" multi toggle></array-selector>
 
-    <div> Selected Courses: </div>
+    <div> Selected Course: </div>
     <template is="dom-repeat" items="{{selected}}">
-        <div>Course Schedule: <span>{{item.schedules}}</span></div>
-        <div>Coach: <span>{{item.coaches}}</span></div>
-        <div>Price: <span>{{item.courseprices}}</span></div>
-        <div>Remaining Seats: <span>{{item.seatsremaining}}</span</div>
-        <div>Performance Average: <span>{{item.thirtysevenpercent}}</span>
-        <div>Performance Top 20 Percent: <span>{{item.eightypercent}}</span>
-        <div>Performance Top 10 Percent: <span>{{item.ninetypercent}}</span>
-        <div>Performance Top 5  Percent: <span>{{item.ninetyfivepercent}}</span>
-        <div>Performance Top 1 Percent: <span>{{item.ninetyninepercent}}</span>
+     <ARTICLE>
+          <section>
+               <div>Course Type: <span>{{item.coursetype}}</span></div>
+               <div>Course Title: <span>{{item.coursetitle}}</span></div>
+               <div>Course Schedule: <span>{{item.courseschedule}}</span></div>
+               <div>Course Testing Schedule:&nbsp<span>{{item.coursetestschedule}}</span></div>
+               <div>Coach: <span>{{item.coaches}}</span></div>
+               <div>Price: <span>{{item.courseprice}}</span></div>
+               <div>Remaining Seats: <span>{{item.seatsremaining}}</span></div>
+          </section>
+           <section>
+           <h5 on-tap="openCourseDescription">Course Description</h5>
+               <div class="verticle layout">
+                    <iron-collapse id="courseDescription">
+                         <paper-material class="callcard" elevation="2">
+                              <p>Course Description: <span>{{item.coursedescription}}</span></p>
+                    
+           
+                              <p>Double Clicking the above  open/close this profile card.</p>
+                              <paper-button class="better-platinum" on-tap="doIt">Select
+                              </paper-button>
+                         </paper-material>
+                    </iron-collapse>
+               </div>
+          </section>
+          <section>
+               <h5 on-tap="openCoursePerormanceData">Course Description</h5>
+               <div class="verticle layout">
+                    <iron-collapse id="coursePerformanceData">
+                         <paper-material class="callcard" elevation="2">
+                              <div>Performance Average: <span>{{item.thirtysevenpercent}}</span>
+                              <div>Performance Top 20 Percent: <span>{{item.eightypercent}}</span>
+                              <div>Performance Top 10 Percent: <span>{{item.ninetypercent}}</span>
+                              <div>Performance Top 5  Percent: <span>{{item.ninetyfivepercent}}</span>
+                              <div>Performance Top 1 Percent: <span>{{item.ninetyninepercent}}</span>
+                              <paper-button class="better-platinum" on-tap="doIt">Select
+                              </paper-button>
+                         </paper-material>
+                    </iron-collapse>
+               </div>
+          </section>
+     </Article>
+
     </template>
 
   </template>
@@ -39,17 +73,39 @@ div {
   <script>
     Polymer({
       is: 'fc-courseSelector',
+          course
+      
+
+
+
+
+
       ready: function() {
-        this.employees = [
-            {first: 'Bob', last: 'Smith'},
-            {first: 'Sally', last: 'Johnson'},
-            ...
+        this.course = [
+          
         ];
       },
       toggleSelection: function(e) {
         var item = this.$.employeeList.itemForElement(e.target);
         this.$.selector.select(item);
+      },
+
+       doIt: function(){
+        this.fire('writeToInputs',this.callinfo);
+      },
+      openCourseDescription: function(){
+     this.$.courseDescription.toggle();
+     //this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? "icons:remove":"icons:add";
+      },
+
+      openCoursePerormanceData: function(){
+     this.$.coursePerformanceData.toggle();
+     //this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? "icons:remove":"icons:add";
       }
+    });
+  </script>
+    });
+  </script>
     });
   </script>
 
