@@ -1,4 +1,4 @@
-<dom-module id="fc-select">
+<dom-module id="fc-chainSelect">
 <style is="custom-style">
 
 array-select
@@ -25,9 +25,9 @@ iron-selector {
 	</firebase-collection>
 	
 	<div style="min-height:400px;">
-		<iron-selector  selectedValues="{{selValsAsProps}}"multi>
-			<template is="dom-repeat" id="instructorsList" items={{instructors}}>
-				<div name$={{item.name}}>
+		<iron-selector activateEvent="writeToProps" selectedValues="{{selectedVals}}" multi>
+			<template is="dom-repeat" id="instructorsList" items="{{instructors}}">
+				<div name$='{{item.name}}'>
 					<div>First name: <span>{{item.name}}</span></div>
 					<div>Last name: <span>{{item.last}}</span></div>
 				</div>
@@ -37,9 +37,9 @@ iron-selector {
 			<div>
 				<div class="vertical-section">
 					<paper-dropdown-menu label="Instructor(s)" alwaysfloatlabel="true" placeholder="Instructor(s)">
-						<iron-list class="list vertical layout dropdown-content select">
-							<iron-select selected='[[0]]'>
-								<template is="dom-repeat" items="{{selValsAsProps}}">
+						<iron-list class="list vertical layout dropdown-content selected">
+							<iron-select selected='[0]'>
+								<template is="dom-repeat" items="{{selectedVals}}">
 									<paper-item>First name: <span>{{item.name}}</span> Last name: <span>{{item.last}}</span>
 									</paper-item>
 								</template>
@@ -53,18 +53,17 @@ iron-selector {
 </template>
 <script>
 Polymer({
-	is: "fc-select",
+	is: "fc-chainSelect",
 	properties: {
 		path: String,
 		id: String,
 		name: String,
 		last: String,
-		selValsAsProps: {
-				type: Array, 
+		selectedVals: {
+				type: Array,
 				value: [],
 				notify: true
-			},
-		notify: true
+		}
 	},
 
 factoryImpl: function (){
