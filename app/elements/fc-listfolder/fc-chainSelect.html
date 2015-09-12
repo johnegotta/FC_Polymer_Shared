@@ -21,35 +21,18 @@ iron-selector {
   	<firebase-document id="mess" location="https://focusedstudents.firebaseio.com/registrations">
   	</firebase-document>
 	
-	<firebase-collection id="fbcarrayselector" data={{instructors}} location="https://focusedstudents.firebaseio.com/instructors">
+	<firebase-collection id="fbcarrayselector" data='{{instructors}}' as="{{instructor}}" location="https://focusedstudents.firebaseio.com/instructors">
 	</firebase-collection>
 	
-	<div style="min-height:400px;">
-		<iron-selector activateEvent="writeToProps" selectedValues="{{selectedVals}}" multi>
-			<template is="dom-repeat" id="instructorsList" items="{{instructors}}">
-				<div name$='{{item.name}}'>
-					<div>First name: <span>{{item.name}}</span></div>
-					<div>Last name: <span>{{item.last}}</span></div>
-				</div>
-			</template> 
-		</iron-selector>
-	  	<div class="horizontal-section-container">
-			<div>
-				<div class="vertical-section">
-					<paper-dropdown-menu label="Instructor(s)" alwaysfloatlabel="true" placeholder="Instructor(s)">
-						<iron-list class="list vertical layout dropdown-content selected">
-							<iron-select selected='[0]'>
-								<template is="dom-repeat" items="{{selectedVals}}">
-									<paper-item>First name: <span>{{item.name}}</span> Last name: <span>{{item.last}}</span>
-									</paper-item>
-								</template>
-							</iron-select>
-						</iron-list>
-					</paper-dropdown-menu>
-				</div>
-			</div>
-		</div>
-	</div>
+<div style="min-height:400px;">
+	<paper-dropdown-menu label="Instructor(s)" alwaysfloatlabel="true">
+		<paper-menu activateEvent="writeToProps" selected="{{instructor}}">
+			<template is="dom-repeat" id="instructorsList" items="{{instructors}}" as="{{instructor}}">
+					<paper-item name$='{{instructor.name}}'>Full Name: <span>{{instructor.name}}</span> <span>{{instructor.last}}</span></paper-item>
+				</template> 
+			</paper-menu>
+		</paper-dropdown-menu>	
+</div>
 </template>
 <script>
 Polymer({
@@ -57,13 +40,12 @@ Polymer({
 	properties: {
 		path: String,
 		id: String,
-		name: String,
-		last: String,
-		selectedVals: {
-				type: Array,
-				value: [],
-				notify: true
-		}
+		instructor: {
+			value: [{name:''}, {last: ''}],
+			observer: '_changed',
+			notify: true
+		},
+		notify: true
 	},
 
 factoryImpl: function (){
@@ -96,8 +78,16 @@ toggleSelection: function(e) {
 		var item = this.$.instructorsList.itemForElement(e.target);
 		//var selectedInstructor = this.$.instructorsList.data[0];
 		console.log(item);
-		this.$.fbselector.select(item);
-	  }
+		this.$.fbselector.select(instructor);
+	  },
+_changed: function(oldValue, newValue){
+	console.log(this.instructor.value);
+
+
+	},
+	writeToProps: function(){
+		console.log('shit just was selected');
+	}
 
 });
 </script>
