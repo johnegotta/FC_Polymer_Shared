@@ -18,17 +18,15 @@ iron-selector {
 </style>
 <template>
   	
-  	<firebase-document id="mess" location="https://focusedstudents.firebaseio.com/registrations">
-  	</firebase-document>
 	
-	<firebase-collection id="fbcarrayselector" data='{{instructors}}' as="{{instructor}}" location="https://focusedstudents.firebaseio.com/instructors">
+	<firebase-collection id="fbcarrayselector" data='{{instructors}}' location="https://focusedstudents.firebaseio.com/instructors">
 	</firebase-collection>
 	
 <div style="min-height:400px;">
 	<paper-dropdown-menu label="Instructor(s)" alwaysfloatlabel="true">
-		<paper-menu activateEvent="writeToProps" selected="{{instructor}}">
-			<template is="dom-repeat" id="instructorsList" items="{{instructors}}" as="{{instructor}}">
-					<paper-item name$='{{instructor.name}}'>Full Name: <span>{{instructor.name}}</span> <span>{{instructor.last}}</span></paper-item>
+		<paper-menu class="dropdown-content">
+			<template is="dom-repeat" id="instructorsList" items="{{instructors}}">
+					<paper-item>Full Name:  <span>{{item.name}}</span>  <span>{{item.last}}</span></paper-item>
 				</template> 
 			</paper-menu>
 		</paper-dropdown-menu>	
@@ -40,11 +38,6 @@ Polymer({
 	properties: {
 		path: String,
 		id: String,
-		instructor: {
-			value: [{name:''}, {last: ''}],
-			observer: '_changed',
-			notify: true
-		},
 		notify: true
 	},
 

@@ -23,7 +23,7 @@ paper-icon-button {
 paper-material.alignmemtfc {
   width: 353px;
   overflow-x: scroll;
-  max-height: 472px;
+  max-height: 225px;
   padding: 8px;
   margin: 12px 8px 4px 18px;
   border: 8px ridge #aecdfe;
@@ -158,7 +158,7 @@ margin-left: 16px;
                                         </div>
                                          <span>   &nbsp </span>
                                         <div class="horizontal layout wrap linear">
-                                            <span>  &nbsp </span>  <fc-selector id="fcInp5" name="firstThroughTwelfth" placeholder="Grade Level" label="Current Grade" alwaysfloatlabel="true" value="{{inquirer.grade}}"></fc-selector>
+                                            <span>  &nbsp </span>  <fc-selector id="fcInp5" name="grade" placeholder="Grade Level" label="Current Grade" alwaysfloatlabel="true" grade="{{inquirer.grade}}"></fc-selector>
                                              <span>&nbsp &nbsp &nbsp &nbsp</span>
 
                                              <fc-paperInput id="fcInp6" name="schoolname" label="Current School" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput>
@@ -168,16 +168,16 @@ margin-left: 16px;
                                             <span>  &nbsp </span>  <fc-paperInput id="fcInp7" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}">
                                              </fc-paperInput>
                                                  <span>&nbsp &nbsp &nbsp &nbsp</span>
-                                             <fc-paperInput id="fcInp10" name="inquirerrole" placeholder="Caller Role" label="Parent/Student" value="{{inquirer.role}}"> 
-                                             </fc-paperInput>
+                                             <fc-parentSelector id="fcInp8" role="{{inquirer.role}}"> 
+                                             </fc-parentSelector>
                                                   &nbsp 
                                         </div>
                                          <span>   &nbsp </span><br><br>
                                         <div class="horizontal layout wrap linear">
-                                             <span>  &nbsp </span> <fc-paperInput id="fcInp8" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}">
+                                             <span>  &nbsp </span> <fc-paperInput id="fcInp9" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}">
                                              </fc-paperInput>  
                                                 <span>&nbsp &nbsp &nbsp &nbsp</span>
-                                             <fc-paperInput id="fcInp9" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}">
+                                             <fc-paperInput id="fcInp10" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}">
                                              </fc-paperInput> 
                                                <span>   &nbsp </span>
                                         </div>
@@ -192,9 +192,9 @@ margin-left: 16px;
                                         </div>
                                          <span>   &nbsp </span>
                                         <div class="horizontal layout wrap linear">
-                                            <span>  &nbsp </span>  <fc-paperInput id="fcInp14" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput>
+                                            <span>  &nbsp </span>  <fc-paperInput id="fcInp13" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput>
                                                 <span>&nbsp &nbsp &nbsp &nbsp</span>
-                                             <!-- <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp13" name="coach" value="{{inquirer.coach}}">
+                                             <!-- <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp14" name="coach" value="{{inquirer.coach}}">
                                              </fc-paperInput> -->
                                                 <div id="coachlist">
                                                   
@@ -206,7 +206,7 @@ margin-left: 16px;
                                
                                 
                                    <div class="horizontal layout">
-                                        <paper-textarea label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" class="textareaannoyed" maxlength="360" rows="1">
+                                        <paper-textarea label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" class="textareaannoyed" maxlength="320" rows="1">
                                         </paper-textarea>
                                    </div>
                               </div>
@@ -326,28 +326,32 @@ margin-left: 16px;
           return;
      }
 
-
      this.inquirer.relatedstudent = this.inquirer.studentfirstname + " " + this.inquirer.studentlastname + " ";
      this.async(this.reminder, 3000, this.inquirer.relatedstudent);
 
           this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
 
-       
+          this.inquirer.timeorder = "";
+          this.inquirer.relatedstudent = "";
+          this.inquirer.timestamp = "";
+          this.inquirer.callbacktime = "";
+          
           fcInp1.value = this.inquirer.firstname = "";
           fcInp2.value = this.inquirer.lastname = "";
-          fcInp3.value = this.inquirer.email = "";
-          fcInp4.value = this.inquirer.phone = "";
-          fcInp5.value = this.inquirer.studentfirstname = "";
-          fcInp6.value = this.inquirer.studentlastname = "";
-          fcInp7.value = this.inquirer.relatedstudent = "";
-          fcInp8.value = this.inquirer.timestamp = "";
-          fcInp9.value = this.inquirer.callbacktime = "";
-          fcInp10.value = this.inquirer.timeorder = "";
-          fcInp11.value = this.inquirer.grade = "";
-          fcInp12.value = this.inquirer.coach = "";
-          fcInp13.value = this.inquirer.school = "";
-          fcInp14.value = this.inquirer.message = "";
-          fcInp15.value = this.inquirer.role = "";
+          fcInp3.value = this.inquirer.studentfirstname = "";
+          fcInp4.value = this.inquirer.studentlastname = "";
+          fcInp5.value = this.inquirer.grade = "";//clear the preselect on selector
+          fcInp6.value = this.inquirer.school = "";
+          fcInp7.value = this.inquirer.schooltown = "";
+          this.inquirer.role = "";    fcInp8.index = 0;
+          fcInp9.value = this.inquirer.phone = "";
+          fcInp10.value = this.inquirer.email = "";
+          fcInp11.value = this.inquirer.interest = "";
+          fcInp12.value = this.inquirer.intereststartdate = "";
+          fcInp13.value = this.inquirer.interestprice = "";
+          fcInp14.value = this.inquirer.coach = "";
+          fcInp15.value = this.inquirer.message = "";
+
       
      },
 
