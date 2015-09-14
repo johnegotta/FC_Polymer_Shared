@@ -1,5 +1,4 @@
 <dom-module id='fc-selectorX'>
-<template>
 <style is='custom-style'>
 :host {
       @apply(--layout-vertical);
@@ -10,82 +9,44 @@
 --paper-dropdown-menu-noScrollbar::-webkit-scrollbar {
   display: none;
 }
-
 </style>
-	<div class='horizontal-section-container'>
-        <div class='vertical-section' style='display: flex; min-height:24px; width: 149px;'>
-        	<paper-dropdown-menu class='noScrollbar' label='Grade Level' placeholder='Grade Level' alwaysfloatlabel='true'>
-	            <paper-menu class='dropdown-content' style='display: flex; min-height:80px; min-width: 137px;'>
-	            <template is='dom-repeat' items='selectTitles' item as=>
-					<paper-item on-tap='focusedThree'>{{selectTitle.0}}</paper-item>
-				</template>
-				</paper-menu>
-			</paper-dropdown-menu>
-		</div>
-	</div>
+<template>
+<firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection>
+	
+	<div style="display: block; min-height:40px; min-width: 330px;">
+     	
+     	<paper-dropdown-menu always-float-label="true" placeholder={{placeholder}} label={{label}}>
+     			<paper-menu class="dropdown-content">
+     				
+     				<template is="dom-repeat" items="{{fbdata}}">
+        					<paper-item  value={{item.value}}>{{item.value}}</paper-item>
+    				</template> 
+     			</paper-menu>
+     	</paper-dropdown-menu>
+    </div>
 </template>
 <script>
-
-Polymer({
-	is: 'fc-selectorX',
+FcSelectorX = Polymer({
+	is: "fc-selectorX",
 	properties: {
-		path: String,
+		path: "https://focused0ne.firebaseio.com/",
+		label: String,
+		placeholder: String,
 		id: String,
-		selectNum: Number,
-		selectTitle: {
-			type: Array, 
-			value: [return 
-
-			
-
-
-
-
-
-			],
-			notify: true,
-			reflectToAttributes: true
-		}
-
-
-
-
-
-
-
-ready: function() {
-        this.menuItems = [
-            { name: 'Pizza', ordered: 0 },
-            { name: 'Pasta', ordered: 0 },
-            { name: 'Toast', ordered: 0 }
-        ];
-      },
-      order: function(e) {
-        var model = e.model;
-        model.set('item.ordered', model.item.ordered+1);
-      }
-    });
-
-
-
-			]			
-
-
-
-
-
-
-		]
+		fbid: String,
 		notify: true,
-		},
+		reflectToAttributes: true
+	},
 
-
-
-destroyed: function(){
-
-
-} 	
+factoryImpl: function (argId, argPath, argLabel, argPlaceholder){
+	console.log("fc-select factoryImpl argPath = " + argPath);
+	this.fbid = "fb" + argId;
+	this.id = argId;
+	this.path = argPath;
+	this.label = argLabel? argLabel:argId;
+	this.placeholder=argPlaceholder? argPlaceholder:argId;
+}
+	
 });
 </script>
-
 </dom-module>
