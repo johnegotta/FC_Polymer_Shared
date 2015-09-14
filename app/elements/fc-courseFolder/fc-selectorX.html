@@ -3,6 +3,7 @@
 :host {
       @apply(--layout-vertical);
       @apply(--text-align-center);
+      @apply(--width-95vw)
     }
 
 
@@ -18,8 +19,18 @@
      	<paper-dropdown-menu always-float-label="true" placeholder={{placeholder}} label={{label}}>
      			<paper-menu class="dropdown-content">
      				
-     				<template is="dom-repeat" items="{{fbdata}}">
+     				<template is="dom-repeat" items="{{fbdata}}" filter={{_filterFunc(itempassed)}} observe='{{itempaths}}'>
         					<paper-item  value={{item.value}}>{{item.value}}</paper-item>
+        					<content name="dropzone">								
+
+
+
+
+
+
+
+
+        					</content>
     				</template> 
      			</paper-menu>
      	</paper-dropdown-menu>
@@ -34,17 +45,29 @@ FcSelectorX = Polymer({
 		placeholder: String,
 		id: String,
 		fbid: String,
+		itemPassed: Object,
+		itemPathsToObserve: Array, 
 		notify: true,
 		reflectToAttributes: true
 	},
 
-factoryImpl: function (argId, argPath, argLabel, argPlaceholder){
+factoryImpl: function (argId, argPath, argLabel, argPlaceholder, argItemPathsToObserve, argItemPassed){
+	/*takenote, this is a bold move to try and use binding to observe, but i have rocked it with everything else for the last two days... WTF... I say*/
 	console.log("fc-select factoryImpl argPath = " + argPath);
 	this.fbid = "fb" + argId;
 	this.id = argId;
 	this.path = argPath;
 	this.label = argLabel? argLabel:argId;
 	this.placeholder=argPlaceholder;
+},
+
+_filterFunc: function (itempassed){
+      console.log(itempassed);
+        /*return function(item){
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;*/
+
+
+
 }
 	
 });
