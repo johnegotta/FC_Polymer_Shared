@@ -1,0 +1,52 @@
+<dom-module id='fc-selectorX'>
+<style is='custom-style'>
+:host {
+      @apply(--layout-vertical);
+      @apply(--text-align-center);
+    }
+
+
+--paper-dropdown-menu-noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>
+<template>
+<firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection>
+	
+	<div style="display: block; min-height:40px; min-width: 330px;">
+     	
+     	<paper-dropdown-menu always-float-label="true" placeholder={{placeholder}} label={{label}}>
+     			<paper-menu class="dropdown-content">
+     				
+     				<template is="dom-repeat" items="{{fbdata}}">
+        					<paper-item  value={{item.value}}>{{item.value}}</paper-item>
+    				</template> 
+     			</paper-menu>
+     	</paper-dropdown-menu>
+    </div>
+</template>
+<script>
+FcSelectorX = Polymer({
+	is: "fc-selectorX",
+	properties: {
+		path: "https://focused0ne.firebaseio.com/",
+		label: String,
+		placeholder: String,
+		id: String,
+		fbid: String,
+		notify: true,
+		reflectToAttributes: true
+	},
+
+factoryImpl: function (argId, argPath, argLabel, argPlaceholder){
+	console.log("fc-select factoryImpl argPath = " + argPath);
+	this.fbid = "fb" + argId;
+	this.id = argId;
+	this.path = argPath;
+	this.label = argLabel? argLabel:argId;
+	this.placeholder=argPlaceholder;
+}
+	
+});
+</script>
+</dom-module>
