@@ -27,9 +27,9 @@ neon-animated-pages {
     }
 </style>
 <template>
-	<div class="container fit contained">            
-        <neon-animated-pages id="pages" selected="0">
-            <fc-courseListView id="fc-courseListView" on-item-click="_onItemClick">
+	<div class="container fit contained" id="pastrami">            
+        <neon-animated-pages id="cpages" selected="0">
+            <fc-courseListView id="fcCourseListView" on-item-click="_onItemClick">
             </fc-courseListView>
             <fc-courseFullView id="fullioCourse" on-close="_onClose">
             </fc-courseFullView> 
@@ -41,18 +41,45 @@ Polymer({
 	is: 'fc-courseCenterHolder',
 	properties:{},
 
+  attached: function(){
+    var instructorSelect = new FcSelect('instructorTest', 'https://focusedstudents.firebaseio.com/instructors', 'Select Coach', 'name', 'Scott');
+    var studentSelect = new FcSelect('studentTest', 'https://focusedstudents.firebaseio.com/contactinfo', 'Select Student');
+    var courseSelect = new FcSelect('courseTest', 'https://focusedstudents.firebaseio.com/courses', 'Select Course');
 
-  _onItemClick: function(e) {
-           this.$.pages.selected = 1;
+    var elem = this.$.pastrami;
+    Polymer.dom(elem).appendChild(instructorSelect);
+    Polymer.dom.flush();
+    elem.appendChild(studentSelect);
+    elem.appendChild(courseSelect);
+
+    this.addEventListener('fcValueSelected', this.handleValueChange);
+
+},
+
+  handleValueChange: function(e){
+    console.log("handleValueChange received " + e.detail.value);
+      if(e.detail.id == "instructorTest")
+      {
+        console.log(e.detail.value);
+        document.querySelector("#courseTest").searchField = "fcid";
+        document.querySelector("#studentTest").searchValue= "StreelandAnna00001";
+        //this.$.instructorSelect.searchField = "fcid";
+        //this.$.instructorSelect.searchValue = "FrazzanoJason00001";
+      }
+  },
+
+        _onItemClick: function(e) {
+           this.$.cpages.selected = 1;
            console.log("received on-item-click event from");
            console.log(e.detail);
-           this.$.fullio.selectedCall = e.detail.caller;
+           this.$.fullioCourse.selectedCall = e.detail.caller;
          },
 
         _onClose: function() {
            this.$.pages.selected = 0;
-           console.log(this.$.fcListView.pastinquirer);
+           console.log(this.$.fcCourseListView.pastinquirer);
         },
+
 });
 </script>
 </dom-module>

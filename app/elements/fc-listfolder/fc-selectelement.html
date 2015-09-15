@@ -21,7 +21,8 @@ paper-item {
 }
 </style>
 <template>
-<firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection>
+<!-- <firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection> -->
+<firebase-collection id="mydb" data="{{fbdata}}" location="{{path}}"></firebase-collection>
 	
 	<div style="display: flex; min-height:40px; width: 145px;">
      	
@@ -29,7 +30,7 @@ paper-item {
      			<paper-menu class="dropdown-content">
      				
      				<template is="dom-repeat" items="{{fbdata}}">
-        					<paper-item  value={{item.fcid}} on-tap="logSelect">{{item.fcid}}</paper-item>
+        					<paper-item  value={{item.fcid}} on-tap="doClick">{{item.fcid}}</paper-item>
     				</template> 
      			</paper-menu>
      	</paper-dropdown-menu>
@@ -43,16 +44,37 @@ FcSelect = Polymer({
 		label: String,
 		id: String,
 		fbid: String,
+		searchField: String,
+		searchValue: String,
 		notify: true,
 		reflectToAttributes: true
 	},
 
-factoryImpl: function (argId, argPath, argLabel){
+factoryImpl: function (argId, argPath, argLabel, argSearchField, argSearchValue){
 	console.log("fc-select factoryImpl argPath = " + argPath);
 	this.fbid = "fb" + argId;
 	this.id = argId;
 	this.path = argPath;
 	this.label = argLabel? argLabel:argId;
+	this.searchField = argSearchField? argSearchField:null;
+	this.searchValue = argSearchValue? argSearchValue:null;
+	console.log("fc-select factoryImpl argSearchField = " + argSearchField);
+	if(argSearchField)
+	{
+		console.log(this.$.mydb);
+		this.$.mydb.orderByChild = argSearchField;
+		if(argSearchValue)
+		{
+			this.$.mydb.equalTo = argSearchValue;
+		}
+	}
+
+},
+
+
+doClick: function(e){
+	console.log(e.target.value);
+	this.fire("fcValueSelected", {id: this.id, value: e.target.value});
 },
 
 
