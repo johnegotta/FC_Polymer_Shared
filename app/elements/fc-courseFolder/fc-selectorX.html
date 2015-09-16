@@ -16,13 +16,12 @@
 	
 	<div style="display: block; min-height:40px; min-width: 330px;">
      	
-     	<paper-dropdown-menu always-float-label="true" placeholder={{placeholder}} label={{label}}>
-     			<paper-menu class="dropdown-content">
-     				
+     	<paper-dropdown-menu always-float-label="true" selected={{selectedOne}} placeholder={{placeholder}} label={{label}}>
+     			<paper-menu class="dropdown-content" selected={{selectedOne}}>
      				<template is="dom-repeat" items="{{fbdata}}" filter={{_filterFunc(itempassed)}} observe='{{itempaths}}'>
-        					<paper-item  value={{item.value}}>{{item.value}}</paper-item>
-        					<paper-item value={{item.value}}>{{item.fctype}}</paper-item>
-        					<content name="dropzone">								
+        					<!-- <paper-item  value={{item.value}}>{{item.value}}</paper-item> -->
+        					<paper-item value={{item.value}} on-tap="doClick">{{item.fcid}}</paper-item>
+        					<script id="writeScript" name="dropzone"></script>								
 
 
 
@@ -47,7 +46,9 @@ FcSelectorX = Polymer({
 		id: String,
 		fbid: String,
 		itemPassed: Object,
-		itemPathsToObserve: Array, 
+		itemPathsToObserve: Array,
+		selected:String,  
+		writeId: String,
 		notify: true,
 		reflectToAttributes: true
 	},
@@ -60,16 +61,32 @@ factoryImpl: function (argId, argPath, argLabel, argPlaceholder, argItemPathsToO
 	this.path = argPath;
 	this.label = argLabel? argLabel:argId;
 	this.placeholder=argPlaceholder;
+	this.writeId=argPlaceholder;
+	
+},
+
+doClick: function(e)
+{
+	this.fire("fcSelectorChanged", {name: this.id, value:e.target.value});
 },
 
 _filterFunc: function (itempassed){
       console.log(itempassed);
+      return function(itempassed){
+      	return true;
+      };
         /*return function(item){
           if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;*/
 
+}
+attached: function: 
+{
+		alert(hangerTwo);
+		this.$.writeScript.innerHTML=document.write("<paper-item value={{item.value}} on-tap="doClick">{{item.type}}</paper-item>");
 
 
 }
+
 	
 });
 </script>

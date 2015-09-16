@@ -11,26 +11,45 @@ iron-selector {
         padding: 8px;
 }
 paper-item {
-	min-width: 155px;
+	max-width: 100%;
+	position:relative;
 	color: black;
+}
+paper-menu {
+	max-width: 100%;
+}
+paper-dropdown-menu {
+	min-width:100px;
+}
+paper-menu-button {
+	max-width:100%;
+}
+
+paper-material {
+	max-width:100%;
+}
+
+.dropdown-content {
+	min-width:100px;
 }
 
 .iron-selected {
         background-color: #3F51B5;
         color: white;
 }
+
 </style>
+
 <template>
-<!-- <firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection> -->
-<firebase-collection id="mydb" data="{{fbdata}}" location="{{path}}"></firebase-collection>
-	
-	<div style="display: flex; min-height:40px; width: 145px;">
-     	
-     	<paper-dropdown-menu label={{label}}>
-     			<paper-menu class="dropdown-content">
-     				
-     				<template is="dom-repeat" items="{{fbdata}}">
-        					<paper-item  value={{item.fcid}} on-tap="doClick">{{item.fcid}}</paper-item>
+<firebase-collection id="mydb" data="{{fbdata}}" location="{{path}}" order-by-child={{searchField}} equal-to={{searchValue}}></firebase-collection>
+	<div style="display: flex; min-height:40px; min-width:100px;">
+     	<div style="min-width:350px"></div>
+
+     	<paper-dropdown-menu id="pdm" style="min-width:100px;" label={{label}}>
+     			<paper-menu class="dropdown-content">     				
+     				<paper-item>--none--</paper-item>
+					<template is="dom-repeat" items="{{fbdata}}">
+        					<paper-item  value={{item.fcid}} on-tap="doClick">{{item.fcid}}</paper-item> 
     				</template> 
      			</paper-menu>
      	</paper-dropdown-menu>
@@ -46,6 +65,7 @@ FcSelect = Polymer({
 		fbid: String,
 		searchField: String,
 		searchValue: String,
+		fbdata: {},
 		notify: true,
 		reflectToAttributes: true
 	},
@@ -71,6 +91,11 @@ factoryImpl: function (argId, argPath, argLabel, argSearchField, argSearchValue)
 
 },
 
+close: function(){
+	console.log(this.$.pdm.selectedItem);
+	this.$.pdm.contentElement.selected = 0;
+	console.log(this.$.pdm.selectedItem);
+},
 
 doClick: function(e){
 	console.log(e.target.value);
