@@ -4,8 +4,12 @@
       @apply(--layout-vertical);
       @apply(--text-align-center);
       @apply(--width-95vw)
-    }
 
+    }
+.iron-selected {
+  background-color: #3F51B5;
+        color: white;
+}
 
 --paper-dropdown-menu-noScrollbar::-webkit-scrollbar {
   display: none;
@@ -13,25 +17,21 @@
 </style>
 <template>
 <firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection>
-	
 	<div style="display: block; min-height:40px; min-width: 330px;">
-     	
      	<paper-dropdown-menu always-float-label="true" selected={{selectedOne}} placeholder={{placeholder}} label={{label}}>
      			<paper-menu class="dropdown-content" selected={{selectedOne}}>
-     				<template is="dom-repeat" items="{{fbdata}}" filter={{_filterFunc(itempassed)}} observe='{{itempaths}}'>
-        					<!-- <paper-item  value={{item.value}}>{{item.value}}</paper-item> -->
-        					<paper-item value={{item.value}} on-tap="doClick">{{item.fcid}}</paper-item>
-        					<script id="writeScript" name="dropzone"></script>								
+     					<paper-item>--No Preference--</paper-item>
+     					<template is="dom-repeat" items="{{fbdata}}" filter='{{_filterFunc(fcFilter)}}' observe='{{itempaths}}'>
+
+     					<paper-item style="min-width:200px; background-selected: blue;" value={{item.value}}>{{item.fcid}}</paper-item>
+     						<content id="dropzone">
+     					
 
 
 
 
-
-
-
-
-        					</content>
-    				</template> 
+     						</content>	
+    					</template> 
      			</paper-menu>
      	</paper-dropdown-menu>
     </div>
@@ -43,48 +43,44 @@ FcSelectorX = Polymer({
 		path: "https://focused0ne.firebaseio.com/",
 		label: String,
 		placeholder: String,
-		id: String,
+		id: "dropzone2",
 		fbid: String,
-		itemPassed: Object,
-		itemPathsToObserve: Array,
+		fcFilter: String,
+		toObserve: Array,
 		selected:String,  
-		writeId: String,
+		inputOne: "item.last",
 		notify: true,
 		reflectToAttributes: true
 	},
 
-factoryImpl: function (argId, argPath, argLabel, argPlaceholder, argItemPathsToObserve, argItemPassed){
-	/*takenote, this is a bold move to try and use binding to observe, but i have rocked it with everything else for the last two days... WTF... I say*/
+factoryImpl: function (argId, argPath, argLabel, argPlaceholder, argFilter, argToObserve, argItem){
+
 	console.log("fc-selectorX factoryImpl argPath = " + argPath);
 	this.fbid = "fb" + argId;
 	this.id = argId;
 	this.path = argPath;
 	this.label = argLabel? argLabel:argId;
-	this.placeholder=argPlaceholder;
-	this.writeId=argPlaceholder;
+	this.placeholder = argPlaceholder;
+	this.fcFilter = argFilter;
+	this.toObserve = argToObserve;
+	this.inputOne = argItem;
 	
 },
 
-doClick: function(e)
-{
-	this.fire("fcSelectorChanged", {name: this.id, value:e.target.value});
+attached: function() {
+	
 },
+	
 
-_filterFunc: function (itempassed){
-      console.log(itempassed);
-      return function(itempassed){
+_filterFunc: function (stuff){
+      console.log(stuff);
+      
+        /*
+	return function(stuff){
       	return true;
-      };
-        /*return function(item){
+      												};
+        return function(item){
           if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;*/
-
-}
-attached: function: 
-{
-		alert(hangerTwo);
-		this.$.writeScript.innerHTML=document.write("<paper-item value={{item.value}} on-tap="doClick">{{item.type}}</paper-item>");
-
-
 }
 
 	
