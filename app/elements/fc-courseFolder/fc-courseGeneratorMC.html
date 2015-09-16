@@ -219,55 +219,67 @@ handleValueChange: function(e){
     console.log(e.detail);
     if(e.detail.id == "courseTypeSel")
     {
-      this.course.type = e.detail.value;
-      console.log("selected " + e.detail.value);
+      if(e.detail.id == "--No Preference--")
+      {
+        this.course.type = "";
+      }
+      else
+      {
+        this.course.type = e.detail.value;
+      }
+      //console.log("selected " + e.detail.value);
       var dateSel = document.querySelector("#testDateSel");
       dateSel.close();
       if(e.detail.value.indexOf("SAT") > -1)
       {
-        console.log(dateSel.fbdata);
         dateSel.searchField = "type";
         if(e.detail.value.indexOf("2400") > -1)
         {
           dateSel.searchValue = "2400";
-          console.log(dateSel.fbdata);
         }
         else if(e.detail.value.indexOf("1600") > -1)
         {
           dateSel.searchValue = "1600";
-          console.log(dateSel.fbdata);
         }
-        console.log(dateSel);
         dateSel.style.display = "inline";
       }
       else
       {
         dateSel.style.display = "none";
       }
-      
     }
     else if(e.detail.id == "testDateSel")
     {
-      this.course.testDate = e.detail.value;
+      this.course.testDate = (e.detail.value == "--No Preference--")? "": e.detail.value;
     }
     else if(e.detail.id == "courseTimeSel")
     {
-      this.course.hours = e.detail.value;
+      this.course.hours = (e.detail.value == "--No Preference--")? "": e.detail.value;
     }
     else if(e.detail.id == "courseDaysSel")
     {
-      this.course.days = e.detail.value;
+      this.course.days = (e.detail.value == "--No Preference--")? "": e.detail.value;
     }
     else if(e.detail.id == "instructorSel")
     {
-      this.course.instructor = e.detail.value;
+      this.course.instructor = (e.detail.value == "--No Preference--")? "": e.detail.value;
     }
 },
 
 	addCourse: function (){
+    if(this.course.type == "" || this.course.days == "" || this.course.hours == "" || this.course.instructor == "" || this.course.startDate == "")
+    {
+      alert("All fields must be selected before adding a new FC course!");
+      return false;
+    }
     this.course.fcid = this.course.type;
     if(this.course.type.indexOf("SAT") > -1)
     {
+      if(this.course.testDate == "")
+      {
+        alert("A test date must be selected for SAT courses");
+        return false;
+      }
       this.course.fcid = this.course.fcid + "_" + this.course.testDate;
     }
     this.course.fcid = this.course.fcid + "_" + this.course.instructor + "_" + this.course.days + "_" + this.course.hours;
