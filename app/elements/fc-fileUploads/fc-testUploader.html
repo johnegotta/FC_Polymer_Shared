@@ -1,7 +1,7 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!--<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">-->
 
 <dom-module id="fc-testUploader">
   <template>
@@ -22,24 +22,32 @@
         max-height: 300px;
         overflow-y: auto;
         display: inline-block;
+        font-size: 12px;
       }
 
       #dropArea {
         text-align: center;
       }
 
-      #conflictBox {
+      #conflictBox, #addedResultsBox {
         margin-left: 20px;
         margin-bottom: 10px;
         height: 600px;
-        overflow-y: none;
-        display: inline-block;
+        overflow-y: scroll;
+        display: block;
         color: #555;
         border: 1px solid #111;
       }
 
-      #conflictBox paper-item{
+      #conflictBox paper-item {
+        border: 1px solid #111;
+        font-size: 10px;
+        height: 24px;
+      }
 
+      #addedResultsBox paper-item {
+        font-size: 10px;
+        height: 16px;
       }
 
       #conflictBox p span{
@@ -47,7 +55,27 @@
       }
 
       paper-button {
-        margin-bottom: 20px;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      paper-button iron-icon {
+        height: 10px;
+      }
+
+      paper-button.white {
+        color: black;
+        background-color: white;
+      }
+
+      paper-button.green {
+        color: white;
+        background-color: green;
+      }
+
+      paper-button.red {
+        color: white;
+        background-color: red;
       }
 
       .file {
@@ -91,11 +119,14 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
-    <firebase-collection id="trloc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}"></firebase-collection>
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}"></firebase-collection>
+    <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
+    <firebase-collection id="test_names_loc" location="https://focusedstaging1.firebaseio.com/2400_SAT_tests" data="{{2400_SAT_tests}}"></firebase-collection>
     <firebase-document id="score_chart_loc" location="https://focusedstaging1.firebaseio.com/score_conversion_charts" data="{{score_charts}}"></firebase-document>
+
     <div class="horizontal layout">
-      <div class="flex">
+      <div class="flex-3">
         <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
           <content></content>
         </paper-button>
@@ -125,11 +156,11 @@
                       <paper-item>Score Table</paper-item>
                     </paper-menu>
                   </paper-dropdown-menu>
-                  <paper-dropdown-menu id="testSelector" label="For Which Test" on-selected-item-changed="_setTestName">
+                  <paper-dropdown-menu label="Test Name" on-selected-item-changed="_setTestName">
                     <paper-menu class="dropdown-content">
-                      <paper-item>Test 1</paper-item>
-                      <paper-item>Test 2</paper-item>
-                      <paper-item>Test B12A</paper-item>
+                      <template is="dom-repeat" items="{{2400_SAT_tests}}">
+                        <paper-item>{{item.testname}}</paper-item>
+                      </template>
                     </paper-menu>
                   </paper-dropdown-menu>
                 </div>
@@ -138,22 +169,41 @@
           </template>
         </div>
       </div>
-      <div id= "conflictBox" class="flex">
+
+      <div id= "addedResultsBox" class="flex-1">
         <paper-header-panel>
           <paper-toolbar>
-            <span class="flex">Test Result Conflicts<span>
-            <paper-button on-tap="toggleConflictChecks">Check/Uncheck All</paper-button>
+            <span class="flex"><h5>Added Results For:</h5></span>
           </paper-toolbar>
-          <template is="dom-if" if="{{score_conflicts.length == 0}}">
-            Hey
+          <template is="dom-repeat" items="{{newly_added_results}}">
+            <paper-item>
+              <p>
+                <span>{{item.first_name}}</span> <span>{{item.last_name}}</span> <span>{{item.test}}</span>
+              </p>
+            </paper-item>
           </template>
-          <template is="dom-repeat" items="{{score_conflicts}}">
+        </paper-header-panel>
+      </div>
+
+      <div id= "conflictBox" class="flex-4">
+        <paper-header-panel>
+          <paper-toolbar>
+            <span><h2>Test Result Conflicts</h2></span>
+            <paper-button raised class="white" on-tap="toggleConflictChecks">
+              <iron-icon icon="check"></iron-icon><span class="flex"></span><span>{{_checkButtonText}}</span>
+            </paper-button>
+            <span class="flex"></span>
+            <paper-button raised class="green" on-tap="addAllCheckedConflictsAsNewResult">Add As New Result</paper-button>
+            <paper-button raised class="red" on-tap="overwriteAllCheckedConflicts">Overwrite Existing Result</paper-button>
+            <paper-button raised class="red" on-tap="deletaAllCheckedConflicts">Delete</paper-button>
+          </paper-toolbar>
+          <template is="dom-repeat" id="list_of_conflicts" items="{{score_conflicts}}">
             <paper-item>
               <div class="horizontal layout center">
                 <div>
-                <paper-checkbox checked="{{allConflictsChecked}}"></paper-checkbox>
+                  <paper-checkbox on-iron-change="addConflictToConflictSelector"></paper-checkbox>
                 </div>
-                <div>
+                <div on-tap="_checkConflict">
                   <p>
                     Attempted to add a <span>{{item.new_result.test}}</span> score for <span>{{item.new_result.first_name}}</span> <span>{{item.new_result.last_name}}</span> on <span>{{item.new_result.date_uploaded}}</span>, but <span>{{item.old_result.first_name}}</span> <span>{{item.old_result.last_name}}</span> already has a result for <span>{{item.old_result.test}}</span> from <span>{{item.old_result.date_uploaded}}</span>.
                   </p>
@@ -161,32 +211,20 @@
               </div>
             </paper-item>
           </template>
+          <array-selector id="conflict_selector" items="{{score_conflicts}}" selected="{{selected_conflicts}}" multi></array-selector>
         </paper-header-panel>
       </div>
     </div>
-    <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv">
-    <!--<paper-toast id="toastSuccess" text="File uploaded successfully!"></paper-toast>
-    <paper-toast id="toastFail" text="Error uploading file!"></paper-toast>-->
+
+    <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv"/>
+    <paper-toast id="uploadSuccessToast" text="File uploaded successfully!"></paper-toast>
+    <paper-toast id="uploadFailToast" text="Error uploading file!"></paper-toast>
   </template>
-
-</dom-module>
-
 <script>
 
   Polymer({
 
     is: 'fc-testUploader',
-
-     /**
-      * Fired when a response is received status code 200.
-      *
-      * @event success
-    */
-     /**
-      * Fired when a response is received other status code.
-      *
-      * @event error
-    */
 
     properties: {
 
@@ -283,6 +321,17 @@
       allConflictsChecked: {
         type: Boolean,
         value: false
+      },
+
+      _checkButtonText: {
+        type: String,
+        value: 'Check All'
+      },
+
+      addedResults: {
+        type: Array,
+        value: [],
+        notify: true
       }
     },
 
@@ -406,9 +455,10 @@
 
     /**
      * Whether or not to display the drop text
+     (!this.files.length && this.droppable)
     */
     _showDropText: function() {
-      this.set("_hiddenDropText", !(!this.files.length && this.droppable));
+      this.set("_hiddenDropText", !this._hiddenDropText);
     },
     /**
      * Tell uploader if the CSV contains test results or score conversion chart
@@ -436,7 +486,8 @@
     uploadFile: function(file) {
       var regex = /.+(.csv)/;
       if (!file || !regex.test(file.name.toLowerCase())) {
-        alert('Check that the file you want to add exists and that it is a CSV file.')
+        alert('Check that the file you want to add exists and that it is a CSV file.');
+        self.$.uploadFailToast.toggle();
         return;
       } else {
         switch(file.filetype){
@@ -458,7 +509,7 @@
           if (typeof (FileReader) != "undefined") {
             var reader = new FileReader();
             reader.onload = function (e) {
-              //var table = document.createElement("table");
+
               var essay_index = 0;
               var student_id_index = 0;
               var last_name_index = 0;
@@ -495,7 +546,7 @@
                   }
                 }
               }
-              //console.log(question_and_score_indices);
+
               var qasi_size = question_and_score_indices.length;
               student_id_index = headers.indexOf('id');
               last_name_index = headers.indexOf('Last Name');
@@ -507,7 +558,7 @@
               var test_results = {};
 
               for (var i = 1; i < numRows; i++) {
-                //var row = table.insertRow(-1);
+
                 var cells = rows[i].split(",");
                 if(cells[essay_index] != "0" && cells[essay_index] != ""){
                   var student_id = cells[student_id_index];
@@ -528,8 +579,7 @@
                   var writing_num_skipped = 0;
 
                   for (var j = 0; j < qasi_size; j++) {
-                      //var cell = row.insertCell(-1);
-                      //cell.innerHTML = cells[j];
+
                       var question_score = parseFloat(cells[question_and_score_indices[j]['score_index']]);
                       var question_response = cells[question_and_score_indices[j]['response_index']];
                       switch(question_and_score_indices[j]['section_type']){
@@ -613,7 +663,7 @@
                     'writing_skipped': writing_num_skipped,
                     'date_uploaded': date_uploaded
                   };
-                  //console.log(test_obj);
+
                   test_obj = self.convertScores(test_obj);
                   if (self.test_results.some( function(e) {
                     if(e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test){
@@ -626,7 +676,9 @@
                   })) {
                     continue;
                   } else {
-                    self.$.trloc.add(test_obj);
+                    self.$.test_results_loc.add(test_obj);
+                    self.$.newly_added_results_loc.add(test_obj);
+
                   }
                 }
                 else {
@@ -643,12 +695,14 @@
           }
           else {
             alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
+            self.$.uploadFailToast.toggle();
             self.set(prefix + ".error", true);
           }
 
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
+          self.$.uploadSuccessToast.toggle();
     },
 
     convertScores: function(student_test_object){
@@ -660,7 +714,7 @@
       } else {
         conversion_chart = self.score_charts['Default'];
       }
-      //console.log(conversion_chart);
+
       var reading_raw_rounded = Math.round(student_test_object['reading_raw']);
       var math_raw_rounded = Math.round(student_test_object['math_raw']);
       var writing_raw_rounded = Math.round(student_test_object['writing_raw']);
@@ -669,7 +723,7 @@
       student_test_object['math_score'] = math_raw_rounded < -3 ? parseInt(conversion_chart['math']["-3"]) : parseInt(conversion_chart['math'][math_raw_rounded.toString()]);
       student_test_object['writing_score'] = writing_raw_rounded < -3 ? parseInt(conversion_chart['writing']["-3"][student_test_object['essay_score']]) : parseInt(conversion_chart['writing'][writing_raw_rounded.toString()][student_test_object['essay_score']]);
       student_test_object['total_score'] = student_test_object['reading_score'] + student_test_object['math_score'] + student_test_object['writing_score'];
-      //console.log(student_test_object);
+
       return student_test_object;
     },
 
@@ -701,7 +755,7 @@
                   }
                 }
               }
-              console.log(temp_score_obj_of_arrays);
+
               var num_reading_raws = temp_score_obj_of_arrays['reading_raw'].length;
               var num_math_raws = temp_score_obj_of_arrays['math_raw'].length;
               var num_writing_raws = temp_score_obj_of_arrays['writing_raw'].length;
@@ -723,20 +777,7 @@
                   score_chart[file.testname].writing[temp_score_obj_of_arrays['writing_raw'][i]][j.toString()] = temp_score_obj_of_arrays[j.toString()][i];
                 }
               }
-              /*for (var i = 0; i < num_reading_raws; i++) {
-                score_chart.reading[temp_score_obj_of_arrays['reading_raw'][i]] = temp_score_obj_of_arrays['reading_converted'][i];
-              }*/
 
-              console.log(score_chart);
-              /*for (var set in temp_score_obj_of_arrays){
-                if(set.indexOf('_raw') >= 0){
-                  var section_type = set.substring(0,set.indexOf('_raw'));
-                  switch (section_type){
-                    case 'reading':
-
-                  }
-                }
-              }*/
               self.score_charts = score_chart;
               self.set(prefix + ".complete", true);
               self.set(prefix + ".progress", 100);
@@ -747,16 +788,93 @@
           else {
             alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
             self.set(prefix + ".error", true);
+            self.$.uploadFailToast.toggle();
           }
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
+          self.$.uploadSuccessToast.toggle();
     },
 
     toggleConflictChecks: function(){
       this.allConflictsChecked = !this.allConflictsChecked;
-      //console.log();
+      this._checkButtonText = this.allConflictsChecked == true ? "Uncheck All" : "Check All";
+      var conflict_list = Polymer.dom(this.$.conflictBox).querySelectorAll('paper-item');
+      for(var i = 0; i < conflict_list.length; i++){
+        var checkbox = conflict_list[i].querySelector('paper-checkbox');
+        checkbox.checked = this.allConflictsChecked;
+        if(checkbox.checked == true){
+          this.$.conflict_selector.select(this.$.list_of_conflicts.items[i]);
+        } else {
+          this.$.conflict_selector.deselect(this.$.list_of_conflicts.items[i]);
+        }
+      }
+    },
+
+    _checkConflict: function(e){
+      var conflict_list = Polymer.dom(this.$.conflictBox).querySelectorAll('paper-item');
+      var conflict = conflict_list[e.model.__data__.index];
+      var checkbox = conflict.querySelector('paper-checkbox');
+      checkbox.toggleAttribute('checked');
+    },
+
+    addConflictToConflictSelector: function(e){
+      if(e.target.__data__.checked == true){
+        this.$.conflict_selector.select(e.model.__data__.item);
+      } else {
+        this.$.conflict_selector.deselect(e.model.__data__.item);
+      }
+    },
+
+    deletaAllCheckedConflicts: function(){
+      var num_selected_conflicts = this.selected_conflicts.length;
+      for (var i = num_selected_conflicts - 1; i >= 0; i--){
+        this.deleteSingleConflict(this.selected_conflicts[i]);
+      }
+    },
+
+    deleteSingleConflict: function(obj_to_delete){
+      this.$.score_conflicts_loc.removeByKey(obj_to_delete.__firebaseKey__);
+      this.$.conflict_selector.deselect(obj_to_delete);
+    },
+
+    addAllCheckedConflictsAsNewResult: function(){
+      var num_selected_conflicts = this.selected_conflicts.length;
+      for (var i = num_selected_conflicts - 1; i >= 0; i--){
+        this.$.test_results_loc.add(this.selected_conflicts[i].new_result);
+        this.$.newly_added_results_loc.add(this.selected_conflicts[i].new_result);
+        this.deleteSingleConflict(this.selected_conflicts[i]);
+      }
+    },
+
+    overwriteAllCheckedConflicts: function(){
+      var num_selected_conflicts = this.selected_conflicts.length;
+      for (var i = num_selected_conflicts - 1; i >= 0; i--){
+        this.$.test_results_loc.removeByKey(this.selected_conflicts[i].old_result.__firebaseKey__);
+        this.$.test_results_loc.add(this.selected_conflicts[i].new_result);
+        this.$.newly_added_results_loc.add(this.selected_conflicts[i].new_result);
+        this.deleteSingleConflict(this.selected_conflicts[i]);
+      }
+    },
+
+    removeNewlyAddedResult: function(e){
+      this.async(function(){
+        if(e.detail.previousChildName == null){
+          this.$.newly_added_results_loc.removeByKey(e.detail.childSnapshot.key());
+        }
+      },3000);
+    },
+
+    removeNewlyAddedResultsIntervals: function(){
+      this.async(function(){
+        if(this.newly_added_results.length > 0) {
+          this.$.newly_added_results_loc.removeByKey(this.newly_added_results[0].__firebaseKey__);
+        }
+      },500);
     }
   });
 
 </script>
+</dom-module>
+
+
