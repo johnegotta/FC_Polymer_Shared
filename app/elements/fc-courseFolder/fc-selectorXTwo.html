@@ -1,0 +1,77 @@
+<dom-module id='fc-selectorXTwo'>
+<style is='custom-style'>
+:host {
+      @apply(--layout-vertical);
+      @apply(--text-align-left);
+      @apply(--width-100vw)
+    }
+
+</style>
+<template id="fc-selectorXTwoTemplate">
+<firebase-collection id$="{{fbid}}" data="{{fbdata}}" location="{{path}}"></firebase-collection>
+	
+	<select style="display: block; min-height:40px; min-width: 140px; max-width: 320px;" always-float-label="true" placeholder={{placeholder}} label={{label}} observer-value={{observe}} selectedval="{{passedselected}}" dd-items={{ddItems}} path={{path}}>
+
+
+
+     				<template is="dom-repeat" items="{{fbdata}}" filter={{_filterFunc(filterValue)}} observe='{{observerValue}}'>
+        					<option value={{item.value}}>{{item.value}}</option>
+        					<option value={{ddItems}}>{{ddItems}}</option>
+        					<option id="dropzone" name="dropzone">								
+
+        					</option>
+    				</template> 
+</select>
+</template>
+<script>
+FcSelectorXTwo = Polymer({
+	is: "fc-selectorXTwo",
+  	extends: 'select',
+	properties: {
+		pathadded:String,
+		path: "",
+		label: String,
+		placeholder: String,
+		id: String,
+		fbid: String,
+		observerValue: String,
+		selectedval: String,
+		filterValue: String,
+		selected: String,
+		ddItems: String,  
+		notify: true,
+		reflectToAttributes: true
+	},
+
+factoryImpl: function (bugId, bugPath, bugLabel, bugPlaceholder, bugItemPathsToObserve, bugddItems, bugFilter){
+	
+	console.log("fc-selectorXTwo factoryImpl bugPath = " + bugPath);
+	this.fbid = "fb" + bugId;
+	this.id = bugId;
+	this.path = bugPath;
+	this.label = bugLabel? bugLabel:bugId;
+	this.placeholder = bugPlaceholder;
+	this.ddItems=bugddItems;
+	//this.$.dropzone.innerHTML.write("{{item.}}")="NO FREAKING WAY IT COULD BE THIS EASY";
+},
+
+attached: function() {
+	console.log(this.ddItems.value);
+
+	
+
+},
+
+_filterFunc: function (filterValue){
+      console.log(filterValue);
+      var checkVal = filterValue.toLowerCase();
+      //checkVal = checkVal.replace(/\s/g, '');
+      var selectedVal= this.selectedval.toLowerCase();
+        return function(item){
+          if( (selectedVal.value? (selectedVal.indexOf(checkVal.value)> -1):false) ) return true;
+      }
+}
+	
+});
+</script>
+</dom-module>

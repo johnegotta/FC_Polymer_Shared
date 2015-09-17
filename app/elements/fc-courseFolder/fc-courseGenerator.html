@@ -22,7 +22,7 @@ paper-icon-button {
         text-align: center;
       }
 paper-material.alignmemtfc {
-  width: 353px;
+  width: 640px;
   overflow-x: scroll;
   max-height: 225px;
   padding: 8px;
@@ -132,75 +132,51 @@ margin-left: 16px;
     <div>
     	<paper-button class="green" on-tap="addCourse"> Add Course </paper-button>
     </div>                
- 	<div>
+ 	<!-- <div>
 		<paper-button class="better-platinum" on-tap="addCourseCategory">Add Category</paper-button>
-	</div>
+	</div> -->
 </div>      
 
 <div id="total" class="vertical layout flex wrap container">  
   	<paper-material elevation="5" id="total" class="horizontal layout flex wrap container alignmemtfc">  
 		<div class="horizontal layout flex wrap">
-				<iron-form id="fcInputsForm" name="fcInputsForm">  
+				<div style="min-width:250px">fffff</div>
+        <iron-form id="fcInputsForm" name="fcInputsForm">  
       				<div class="horizontal layout flex wrap">
            				<div class="horizontal layout wrap linear">
         <span>
-                    <fc-selectorX-holder path='https://focused0ne.firebaseio.com/courses/courseType' selectorlabel="Course Type" holderid='courseTypeSelectorHolder'           selectorid="courseTypeSelectorid00001" placeholder="Course Type" filter="__somefilterthing(arg1, arg2)" id$="{{courseTypeSelectorXHolderId}}"></fc-selectorX-holder>  
-		</span>
+                    <!--                     <fc-selectorX-holder path='https://focused0ne.firebaseio.com/courses/courseType' selected={{selectedOne}} selectorlabel="Course Type" placeholder="Course Type"  id="fc-courseTypeSelector" observe={{observe}}></fc-selectorX-holder> -->
 
+                    <fc-selectorX-holder path='https://focused0ne.firebaseio.com/courses/courseType'selectorlabel="Course Type" placeholder="Course Type" selected={{selectedOne}} id="fcCourseTypeSelector" observe={{observe}}></fc-selectorX-holder>
+		</span>
+                <fc-selectorX-holder path='https://focused0ne.firebaseio.com/instructors/' dd-items='item.fcType' filter-value="{{selectedOne}}" selectorlabel="Title" observer-val={{observe}} placeholder="Title"  id="fcInstructorSelector"></fc-selectorX-holder>  
        
                  
                 <div class="horizontal layout wrap linear">
                     <span>  &nbsp </span>  <fc-gradeSelector tabindex="-1"
-                    id="fcInp5" grade="{{inquirer.grade}}"></fc-gradeSelector>
+                    id="fcInp5" grade="{{inquiry.grade}}"></fc-gradeSelector>
                      <span>&nbsp &nbsp &nbsp &nbsp</span>
 
-                     <fc-paperInput id="fcInp6" name="schoolname" label="Current School" tabindex="-1" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput>
-             </div>
-                     
-                <div class="horizontal layout wrap linear">
-                    <span>  &nbsp </span>  <fc-paperInput id="fcInp7" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}">
-                     </fc-paperInput>
-                         <span>&nbsp &nbsp &nbsp &nbsp</span>
-                     <fc-parentSelector id="fcInp8" tabindex="-1" role="{{inquirer.role}}"> 
-                     </fc-parentSelector>
-                          &nbsp 
-                </div>
-                 <span>   &nbsp </span><br><br>
-                <div class="horizontal layout wrap linear">
-                     <span>  &nbsp </span> <fc-paperInput id="fcInp9" tabindex="-1" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}">
-                     </fc-paperInput>  
-                        <span>&nbsp &nbsp &nbsp &nbsp</span>
-                     <fc-paperInput id="fcInp10" name="email" label="Inquirer Email" placeholder="Email" tabindex="-1" value="{{inquirer.email}}">
-                     </fc-paperInput> 
-                       <span>   &nbsp </span>
-                </div>
-                 <span>   &nbsp </span>
+                    
                  <div class="horizontal layout wrap linear">
-                    <span>  &nbsp </span>  <fc-paperInput id="fcInp11" name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name">
-                     </fc-paperInput>
-                      <span>&nbsp &nbsp &nbsp &nbsp</span>
-                     <fc-paperInput id="fcInp12" name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date">
+                   
+                      
+
+
+                     <fc-paperInput id="fcInp12" name="startdate" value="{{inquiry.intereststartdate}}" label="Program Start Date" placeholder="Start Date">
                      </fc-paperInput>
                        
                 </div>
                  <span>   &nbsp </span>
                 <div class="horizontal layout wrap linear">
-                    <span>  &nbsp </span>  <fc-paperInput id="fcInp13" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput>
+                    <span>  &nbsp </span>  <fc-paperInput id="fcInp13" name="price" label="Program Price" placeholder="Price" value="{{inquiry.interestprice}}"></fc-paperInput>
                         <span>&nbsp &nbsp &nbsp &nbsp</span>
-                     <!-- <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp14" name="coach" value="{{inquirer.coach}}">
-                     </fc-paperInput> -->
+                     <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp14" name="coach" value="{{inquirer.coach}}">
+                     </fc-paperInput>
                         <div id="coachlist">
                           
                         </div>
 
-                      <span>  &nbsp </span>
-                </div>
-                 <span>  &nbsp </span>
-       
-        
-           <div class="horizontal layout">
-                <paper-textarea label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" class="textareaannoyed" maxlength="320" rows="1">
-                </paper-textarea>
            </div>
       </div>
 
@@ -217,8 +193,9 @@ margin-left: 16px;
 Polymer({
 	is: "fc-courseGenerator",
 	properties: {
-		courseTypeSelectorXHolderId: "courseTypeSelector00001",
-	coursetype:{
+    observe: String,
+		selectedOne: String,
+		courseType:{
 			type: Array,
 			value: [
 					"2400 Focused SAT",
@@ -233,10 +210,33 @@ Polymer({
 			notify: true, 
 			reflectToAttributes: true
 		},
-course:{ 
+    instructorNames: {
+      type: Array,
+      value: [
+        "Jason Frazzano",
+        "Stacy Collerette",
+        "Scott McKinley"
+      ]
+    },
+  	inquiry:{
+      type: Object,
+		  value:{
+			coach:'', 
+	        grade: '', 
+	      	school: '', 
+	       	schooltown: '', 
+	       	interest: '', 
+	       	interestprice: '',
+	       	intereststartdate: ''
+       	},
+       	notify: true,
+       	reflectToAttributes: true
+       },
+	course:{ 
 		type: Object, 
 		value: {
 			fctype: "2400 Focused SAT",
+			grade: "sophomore, junior, senior",
 			title: "January 23, 2016",
            	schedule: "Mondays & Wednesdays",
            	testschedule: "Saturdays",
@@ -254,7 +254,7 @@ course:{
             tenpercent: "430 points",
             fivepercent: "550 points",
             onepercent: "710 points",
-            fcid: "2400SATDec2015TTH6to9SaCoach00002",
+            fcid: "2400SATJan2016MW6to9SaCoach00002",
             startdate: "December 7, 2015",
             coursedates: "class1: Monday December 7, 2015, class2: Wednesday December 9, 2015, class3: Monday December 14, 2015, class4: Wednesday December 16, 2015, class5: Monday December 21, 2015, class6: Wednesday December 23, 2015, class7: Monday December 28, 2015, class8: Wednesday December 30, 2015, class9: Monday January 4, 2016, class10: Wednesday January 6, 2016, class11: Monday January 11, 2016, class12: Wednesday January 13, 2016, class13: Monday January 18, 2016, class14: Wednesday January 20, 2016",
             testdates: "pretest0: Saturday December 5, 2015, test1: Saturday December 12, 2015, test2: Saturday December 19, 2015, test3: Saturday December 26, 2015, test4: Saturday January 2, 2016, test5: Saturday January 9, 2016, test6: Saturday January 16, 2016, test7: Friday January 22, 2016", 
@@ -267,6 +267,17 @@ course:{
     }
 },
 
+/*
+attached: function(){
+    this.addEventListener('fcSelectorChanged', this.handleValueChange);
+},
+
+handleValueChange: function(e){
+  console.log("received fcSelectorChanged event with " + e.detail.value);
+  this.$.fcCourseTypeSelector.
+},
+*/
+
 	addCourse: function (){
  		var key = this.course.fcid;
     	var value = this.course;
@@ -278,13 +289,14 @@ course:{
     	var key2 = "courseType"
     	var value2 = this.coursetype;
     	this.$.focusedOne._setRemoteDocumentChild(key2, value2);
-    	alert(this.coursetype);
+    	//alert(this.coursetype);
     }
+
 
  		
 });
   </script>
-<dom-module>
+</dom-module>
 
 <!--/*_onItemClick: function(e) {
            this.$.pages.selected = 1;

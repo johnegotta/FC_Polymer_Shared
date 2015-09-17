@@ -3,6 +3,7 @@
 :host {
       @apply(--layout-vertical);
       @apply(--text-align-center);
+      @apply(--width-95vw)
     }
 
 
@@ -15,11 +16,21 @@
 	
 	<div style="display: block; min-height:40px; min-width: 330px;">
      	
-     	<paper-dropdown-menu always-float-label="true" placeholder={{placeholder}} label={{label}}>
-     			<paper-menu class="dropdown-content">
-     				
-     				<template is="dom-repeat" items="{{fbdata}}">
-        					<paper-item  value={{item.value}}>{{item.value}}</paper-item>
+     	<paper-dropdown-menu always-float-label="true" selected={{selectedOne}} placeholder={{placeholder}} label={{label}}>
+     			<paper-menu class="dropdown-content" selected={{selectedOne}}>
+     				<template is="dom-repeat" items="{{fbdata}}" filter={{_filterFunc(itempassed)}} observe='{{itempaths}}'>
+        					<!-- <paper-item  value={{item.value}}>{{item.value}}</paper-item> -->
+        					<paper-item value={{item.value}} on-tap="doClick">{{item.fcid}}</paper-item>
+        					<script id="writeScript" name="dropzone"></script>								
+
+
+
+
+
+
+
+
+        					</content>
     				</template> 
      			</paper-menu>
      	</paper-dropdown-menu>
@@ -34,18 +45,48 @@ FcSelectorX = Polymer({
 		placeholder: String,
 		id: String,
 		fbid: String,
+		itemPassed: Object,
+		itemPathsToObserve: Array,
+		selected:String,  
+		writeId: String,
 		notify: true,
 		reflectToAttributes: true
 	},
 
-factoryImpl: function (argId, argPath, argLabel, argPlaceholder){
-	console.log("fc-select factoryImpl argPath = " + argPath);
+factoryImpl: function (argId, argPath, argLabel, argPlaceholder, argItemPathsToObserve, argItemPassed){
+	/*takenote, this is a bold move to try and use binding to observe, but i have rocked it with everything else for the last two days... WTF... I say*/
+	console.log("fc-selectorX factoryImpl argPath = " + argPath);
 	this.fbid = "fb" + argId;
 	this.id = argId;
 	this.path = argPath;
 	this.label = argLabel? argLabel:argId;
 	this.placeholder=argPlaceholder;
+	this.writeId=argPlaceholder;
+	
+},
+
+doClick: function(e)
+{
+	this.fire("fcSelectorChanged", {name: this.id, value:e.target.value});
+},
+
+_filterFunc: function (itempassed){
+      console.log(itempassed);
+      return function(itempassed){
+      	return true;
+      };
+        /*return function(item){
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;*/
+
 }
+attached: function: 
+{
+		alert(hangerTwo);
+		this.$.writeScript.innerHTML=document.write("<paper-item value={{item.value}} on-tap="doClick">{{item.type}}</paper-item>");
+
+
+}
+
 	
 });
 </script>
