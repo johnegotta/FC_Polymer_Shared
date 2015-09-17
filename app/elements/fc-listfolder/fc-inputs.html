@@ -1,14 +1,26 @@
 <dom-module id='fc-inputs'>
 <style is='custom-style'>
  :host {
+      @apply(--layout-container-fit);
+      @apply(--layout-container);
       @apply(--layout-vertical);
     }
 
-/*.main {
+.main {
       @apply(--layout-flex);
-      @apply(--layout-scroll);
-    }
-*/
+      @apply(--layout-vertical-container);
+      padding: 4px;
+      }
+
+      neon-animated-pages {
+        height: calc(100%);
+        width: calc(100%);
+      }
+
+      .large {
+        width: 100%
+      }
+
 iron-icon {
       color: var(--google-light-blue-500);
     }
@@ -21,17 +33,16 @@ paper-icon-button {
         text-align: center;
       }
 paper-material.alignmemtfc {
-  width: 353px;
+  width: calc(100%-16px);
   overflow-x: scroll;
   max-height: 880px;
   padding: 8px;
-  margin: 6px;
-  position: relative;
+  margin: 4px;
   display: block;
 }
 .containedmore {
-      display: block;
-      position: relative;
+      height: calc(100%-12px);
+      width: calc(100%-12px);
 
 
 }
@@ -75,7 +86,7 @@ paper-button.green {
      raised: true;
      border-radius: 11px;
      box-shadow: 6px 5px 2px #888888;
-     font-weight: 700;
+     font-weight: 800;
      color: #fff;
      margin: 6px;
      font-size: 11px;
@@ -86,9 +97,9 @@ paper-button.green {
      }
 fc-paperInput {
 	display: inline;
-	max-width: 142px;
+	max-width: 149.232px;
 	padding: 6px;
-     font-size: 13px;
+     font-size: 14px;
 }
 
 paper-button.better-platinum {
@@ -114,21 +125,16 @@ paper-textarea.textareaannoyed{
      margin-top: 6px;
      }
 
-
-.alignmentfc{
-margin-left: 12px;
-
-
 }
 </style>
 <template>
      <firebase-document id='FBcalls' location='focusedstaging1.firebaseio.com/calls' data='{{calls}}'>
      </firebase-document>
+     <div class="main">
  <neon-animated-pages id='pages' selected='0'>
-  <div class="containedmore">    
-<div class="containedmore">   
-  <fc-cards-list id="list">
-<div class="fit containedmore">
+  <fc-cards-list class="container vertical layout flex wrap" id="list">
+  <div class="fit.chip fit layout vertical center-center">
+
             <fc-chip on-tap='inquiryinput' class='container flex wrap' id="inqInputsChip" header-title='Call Entry'>
                </fc-chip>
 
@@ -152,11 +158,10 @@ margin-left: 12px;
                </fc-chip>
 </div>
 </fc-cards-list>
-</div>
-</div>
-    <fc-card class='wrap tight container' id="inquiryInputs" header-title='Memorandum and Email'>
+
+    <fc-card class='wrap tight container' id="inquiryInputs" header-title='Call Memo & Email'>
     
-          <div class='fit horizontal layout flex wrap'>
+          <div class='fit.chip fit horizontal layout flex wrap' style="height:calc(98%-65px); width: calc(100%-8px); margin-top: 48px;" >
                
                               <div class='horizontal layout flex wrap'>
                               
@@ -211,94 +216,147 @@ margin-left: 12px;
         
          </div>
          </fc-card> 
-    <fc-card on-tap='toggleCourseScheduler' class='container flex wrap' header-title='Scheduled Courses'>
-        <div id='total' class='fit vertical layout flex wrap container'>  
-            <div class='horizontal layout wrap linear'>
-            <fc-paperInput id='fcInp11' name='nameofprogram' value='{{inquirer.interest}}' label='Focused Program' placeholder='Program Name'>
+
+
+    <fc-card on-tap='courseScheduler' class='container flex wrap' header-title='Scheduled Courses'>
+        <div class='fit.chip fit vertical layout flex wrap container'>  
+  
+<div class='horizontal layout wrap linear'>
+
+<fc-paperInput id='fcInp11' name='nameofprogram' value='{{inquirer.interest}}' label='Focused Program' placeholder='Program Name'>
+      </fc-paperInput>
+
+
+  <fc-paperInput id='fcInp12' name='startdate' value='{{inquirer.intereststartdate}}' label='Program Start Date' placeholder='Start Date'>
+  </fc-paperInput>
+
+                                   
+      <div class='horizontal layout wrap linear'>
+              <span>  &nbsp </span>  <fc-paperInput id='fcInp11' name='nameofprogram' value='{{inquirer.interest}}' label='Focused Program' placeholder='Program Name'>
+               </fc-paperInput>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+               <fc-paperInput id='fcInp12' name='startdate' value='{{inquirer.intereststartdate}}' label='Program Start Date' placeholder='Start Date'>
+               </fc-paperInput>
+      </div>
+
+
+
+<div class='horizontal layout wrap linear'>
+      <fc-paperInput id='fcInp13' name='price' label='Program Price' placeholder='Price' value='{{inquirer.interestprice}}'>
+      </fc-paperInput>
+
+
+
+<fc-paperInput label='Prefered Coach' placeholder='Coach`s Name' id='fcInp14' name='coach' value='{{inquirer.coach}}'>
+</fc-paperInput>
+
+
+
+<select style="padding: 8px; margin: 3px; margin-left: 20%; alignment: center; line-height: 18px; color: #002c90; font-weight: 700;">
+    <option style="padding: 4px; margin: 3px; background: goldenrod;"> Select Your Focused Coach</option>
+    <option style="padding: 4px; margin: 3px;"> Master Coach Stacy Collerette</option>
+    <option style="padding: 4px; margin: 3px; line-height: 18px; color: #002c90;"> Master Coach Jason Frazzano</option>
+    <option style="padding: 4px; margin: 3px;"> Master Coach Scott McKinley</option>
+    <option style="padding: 4px; margin: 3px;"> 2400 Coach John Gotta</option>
+    <option style="padding: 4px; margin: 3px;"> 2400 Coach Joe Zirkel</option>
+</select>
+
+
+<select style="padding: 8px; margin: 3px; margin-left: 20%; alignment: center; line-height: 18px; color: #002c90; font-weight: 700;">
+    <option style="padding: 4px; margin: 3px; background: goldenrod;">Choose Your Own Price Point</option>
+    <option style="padding: 4px; margin: 3px;"> Online Focus </option>
+    <option style="padding: 4px; margin: 3px; line-height: 18px; font-weight: 700; color: #002c90;"> Focused Material Sets</option>
+    <option style="padding: 4px; margin: 3px; line-height: 18px; font-weight: 700; color: #002c90;"> Focused 2400 Coaches</option>
+    <option style="padding: 4px; margin: 3px;"> A Focused Master Coaches</option>
+    <option style="padding: 4px; margin: 3px;"> Focused Founders</option>
+    <option style="padding: 4px; margin: 3px;">Private Focus</option>
+    <option> Young Scholars</option>
+</select>
+
+
+<div>
+      <paper-button class='better-platinum' on-tap='onBackClick'>
+                  Back
+      </paper-button> 
+</div> 
+
+                  <fc-paperInput id='fcInp2' name='lastname' label='Inquirer Last Name' placeholder='Last Name' value='{{inquirer.lastname}}'>
                   </fc-paperInput>
-                    <fc-paperInput id='fcInp12' name='startdate' value='{{inquirer.intereststartdate}}' label='Program Start Date' placeholder='Start Date'>
-                    </fc-paperInput>
-
-                                         <span>   &nbsp </span>
-                                         <div class='horizontal layout wrap linear'>
-                                            <span>  &nbsp </span>  <fc-paperInput id='fcInp11' name='nameofprogram' value='{{inquirer.interest}}' label='Focused Program' placeholder='Program Name'>
-                                             </fc-paperInput>
-                                              <span>&nbsp &nbsp &nbsp &nbsp</span>
-                                             <fc-paperInput id='fcInp12' name='startdate' value='{{inquirer.intereststartdate}}' label='Program Start Date' placeholder='Start Date'>
-                                             </fc-paperInput>
-
-                                               
-                                        </div>
-                                         <span>   &nbsp </span>
-                                        <div class='horizontal layout wrap linear'>
-                                            <span>  &nbsp </span>  <fc-paperInput id='fcInp13' name='price' label='Program Price' placeholder='Price' value='{{inquirer.interestprice}}'></fc-paperInput>
-                                                <span>&nbsp &nbsp &nbsp &nbsp</span>
-                                             <fc-paperInput label='Prefered Coach' placeholder='Coach`s Name' id='fcInp14' name='coach' value='{{inquirer.coach}}'>
-                                             </fc-paperInput>
-                                        <select style="padding: 8px; margin: 3px; margin-left: 20%; alignment: center; line-height: 18px; color: #002c90; font-weight: 700;">
-                                              <option style="padding: 4px; margin: 3px; background: goldenrod;"> Select Your Focused Coach</option>
-                                              <option style="padding: 4px; margin: 3px;"> Master Coach Stacy Collerette</option>
-                                              <option style="padding: 4px; margin: 3px; line-height: 18px; color: #002c90;"> Master Coach Jason Frazzano</option>
-                                              <option style="padding: 4px; margin: 3px;"> Master Coach Scott McKinley</option>
-                                              <option style="padding: 4px; margin: 3px;"> 2400 Coach John Gotta</option>
-                                              <option style="padding: 4px; margin: 3px;"> 2400 Coach Joe Zirkel</option>
-                                        </select>
-
-                                        <select style="padding: 8px; margin: 3px; margin-left: 20%; alignment: center; line-height: 18px; color: #002c90; font-weight: 700;">
-                                              <option style="padding: 4px; margin: 3px; background: goldenrod;">Choose Your Own Price Point</option>
-                                              <option style="padding: 4px; margin: 3px;"> Online Focus </option>
-                                              <option style="padding: 4px; margin: 3px; line-height: 18px; font-weight: 700; color: #002c90;"> Focused Material Sets</option>
-                                              <option style="padding: 4px; margin: 3px; line-height: 18px; font-weight: 700; color: #002c90;"> Focused 2400 Coaches</option>
-                                              <option style="padding: 4px; margin: 3px;"> A Focused Master Coaches</option>
-                                              <option style="padding: 4px; margin: 3px;"> Focused Founders</option>
-                                              <option style="padding: 4px; margin: 3px;">Private Focus</option>
-                                              <option> Young Scholars</option>
-                                        </select>
-
-
-                                         <span>  <div><paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> </div> </span>
-
-                                                     <fc-paperInput id='fcInp2' name='lastname' label='Inquirer Last Name' placeholder='Last Name' value='{{inquirer.lastname}}'></fc-paperInput>
        </div>
-                                        <div><paper-button class='green' on-tap='addCall'> Register </paper-button></div>
-                                        <div><paper-button class='gold' on-tap='addCall'>Add Call</paper-button> </div>
-                                         <span>  <div><paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> </div> </span>
-                                        <div><paper-button class='red' on-tap='clearInputs'> Clear </paper-button></div>
-                                   </div> 
-                                  
-
-                <div id='total' class='vertical layout flex wrap container'>  
-
-                               
-          <div class='horizontal layout flex wrap'> 
-                              <div class='horizontal layout flex wrap'>
-                              
+      <div>
+            <paper-button class='green' on-tap='addCall'> 
+                  Register 
+            </paper-button>
+      </div>
+      <div>
+            <paper-button class='gold' on-tap='addCall'>
+                  Add Call
+            </paper-button> 
+      </div>
+            <div>
+                  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> 
+            </div>
+<div>
+      <paper-button class='red' on-tap='clearInputs'> 
+            Clear 
+      </paper-button>
+</div>
+ <!--outlier </div>-->
+<div id='total' class='vertical layout flex wrap container'>  
                           
+</div>
+</fc-card>
 
-                               </div>
-  </fc-card>
-  <fc-card name="cardthree">
-                                
-                                   <div class='horizontal fit layout'>
-                                        <paper-textarea label='Message' id='fcInp15' name='message' value='{{inquirer.message}}' always-float-label='true' placeholder= 'Additional Information' class='textareaannoyed' maxlength='320' rows='1'>
-                                        </paper-textarea>
-                                   </div>
-              
-                   
-               
-          
-     </fc-card>
-     <fc-card>
-     <div class='fit'>4<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> </span></div></fc-card>
+<fc-card name="cardthree">
+      <div class="fit.chip fit">                     
+            <div class='horizontal layout'>                      
+                  <paper-textarea label='Message' id='fcInp15' name='message' value='{{inquirer.message}}' always-float-label='true' placeholder= 'Additional Information' class='textareaannoyed' maxlength='320' rows='1'>
+                  </paper-textarea>
+            </div>
+      </div>              
+</fc-card>
+
+
+<fc-card>
+      <div class='fit.chip fit'>
+            4  
+            <paper-button class='better-platinum' on-tap='onBackClick'>
+                        Back
+            </paper-button> 
+      </div>
+</fc-card>  
                     
 
 
-      <fc-card><div class='fit'>5<span> <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
+<fc-card>
+      <div class='fit.chip fit'> 
+                  5
+            <paper-button class='better-platinum' on-tap='onBackClick'>
+                  Back
+            </paper-button>  
+      </div>
+</fc-card>
       
 
-      <fc-card><div class='fit'>6<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
-                   <fc-card><div class='fit'>7<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> </span></div></fc-card>
+<fc-card>
+      <div class='fit.chip fit'>
+            6 
+            <paper-button class='better-platinum' on-tap='onBackClick'>
+                        Back
+            </paper-button>  
+      </div>
+</fc-card>
+
+<fc-card>
+      <div class='fit.chip fit'>
+                  7  
+                  <paper-button class='better-platinum' on-tap='onBackClick'>
+                              Back
+                  </paper-button> 
+      </div>
+</fc-card>
  </neon-animated-pages>
+ </div>
 </template>
 <script> 
 
@@ -437,8 +495,6 @@ margin-left: 12px;
      },
 
   clearInputs: function(){
-    var instList = this.$.instructors.data;
-        console.log(this.$.instructors.data);
           fcInp1.value = this.inquirer.firstname = '';
           fcInp2.value = this.inquirer.lastname = '';
           fcInp3.value = this.inquirer.email = '';
