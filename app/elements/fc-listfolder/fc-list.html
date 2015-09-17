@@ -84,17 +84,29 @@ div.scrollerTwo::-webkit-scrollbar {
 <template>
       <content>
       </content>
-<firebase-collection data="{{fbdata}}" id="myfb" limit-to="1009" location={{path}}></firebase-collection>  
-    <div class="main topdown">
+<firebase-collection data="{{fbdata}}" id="myfb" location={{path}}></firebase-collection>  
+    <div class="main topdown"> 
+       <h3><span>{{dataType}}</span> List</h3>
+
         <div class="horizontal layout wrapper container">
         
-    
      <div class="vertical layout wrapper container block scrollerTwo">
-    <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
+    
+    <template is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
 
       <paper-material elevation='4' class="layout horizontal">
                 <paper-item class="fcborder layout container">
                       <paper-item-body more three-line>
+                            <template is="dom-if" if={{isInquiry}}>
+                              <fc-inquiry data={{item}}></fc-inquiry>
+                            </template>
+                            <template is="dom-if" if={{isCourse}}>
+                              <fc-course data={{item}}></fc-course>
+                            </template>
+                            <template is="dom-if" if={{isStudent}}>
+                              <fc-student data={{item}}></fc-student>
+                            </template>
+                            <!--
                             <div>
                                On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
                             </div>
@@ -103,11 +115,10 @@ div.scrollerTwo::-webkit-scrollbar {
                             </div>
                             <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
                           </div>
-                  
-            </paper-item-body>
-             <iron-icon icon="info" class="horizontal" on-click="_scott"></iron-icon>
+                  -->
+                      </paper-item-body>
+                   <iron-icon icon="info" class="horizontal" on-click="_switchToFull"></iron-icon>
                </paper-item>
-              
             </paper-material>
              
       </template>
@@ -118,7 +129,7 @@ div.scrollerTwo::-webkit-scrollbar {
 <script>
   Polymer({
 
-    is: 'fc-listView',
+    is: 'fc-list',
 
     behaviors: [
       Polymer.NeonAnimatableBehavior
@@ -131,6 +142,18 @@ div.scrollerTwo::-webkit-scrollbar {
     properties: {      
       path: String,
       dataType: String,
+      isInquiry: {
+        type: Boolean,
+        computed: "computeIsInquiry(dataType)"
+      },
+      isStudent: {
+        type: Boolean,
+        computed: "computeIsStudent(dataType)"
+      },
+      isCourse: {
+        type: Boolean,
+        computed: "computeIsCourse(dataType)"
+      },
       animationConfig: {
         type: Object,
         value: function() {
@@ -152,44 +175,43 @@ div.scrollerTwo::-webkit-scrollbar {
         }
       }
     },
+    
+    attached: function(){
+      console.log("fc-list attached says dataType = " + this.dataType);
+      console.log("fc-list attached says isCourse = " + this.isCourse);
+    },
 
+    computeIsInquiry: function(argType)
+    {
+      return (argType == "inquiry");
+    },
 
+    computeIsStudent: function(argType)
+    {
+      return (argType == "student");
+    },
 
-    _scott: function(e){
-      console.log(e.model.pastinquirer);
-      this.pastinquirer = e.model.pastinquirer;
+    computeIsCourse: function(argType)
+    {
+      return (argType == "course");
+    },
+
+    _switchToFull: function(e){
+      console.log(e.model.item);
+      //this.pastinquirer = e.model.pastinquirer;
       // configure the page animation
       this.sharedElements = {
         'hero': e.target,
       };
-      this.fire('item-click', {caller: this.pastinquirer});
+      this.fire('item-click', {clicked: e.model.item});
     },
 
-    writeToInputs: function(){
-    /*   this.fire(
-         this.$.fcInputs.fcInp1.value = this.pastinquirer.firstname = "";
-          this.$.fcInputs.fcInp2.value = this.pastinquirer.lastname = "";
-          this.$.fcInputs.fcInp3.value = this.pastinquirer.email = "";
-          this.$.fcInputs.fcInp4.value = this.pastinquirer.phone = "";
-          this.$.fcInputs.fcInp5.value = this.pastinquirer.studentfirstname = "";
-          this.$.fcInputs.fcInp6.value = this.pastinquirer.studentlastname = "";
-          this.$.fcInputs.fcInp7.value = this.pastinquirer.relatedstudent = "";
-          //this.$.fcInputs.fcInp8.value = this.pastinquirer.timestamp = "";
-          //this.$.fcInputs.fcInp9.value = this.pastinquirer.callbacktime = "";
-          //this.$.fcInputs.fcInp10.value = this.pastinquirer.timeorder = "";
-          this.$.fcInputs.this.$.fcInputs.fcInp11.value = this.pastinquirer.grade = "";
-          this.$.fcInputs.fcInp12.value = this.pastinquirer.coach = "";
-          this.$.fcInputs.fcInp13.value = this.pastinquirer.school = "";
-          this.$.fcInputs.fcInp14.value = this.pastinquirer.message = "";*/
-    },
-
-    _onClick: function(event) {
+    _oldOnClick: function(event) {
       var target = event.target;
       console.log(event.model);
       if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
         target = null;
-         
      } 
       else {
         target=target.parentNode;

@@ -1,12 +1,27 @@
 <dom-module id='fc-inquirerCardAndEmail'>
 <style is='custom-style'>
 :host {
+      @apply(--layout-container-fit);
+      @apply(--layout-container);
       @apply(--layout-vertical);
-      @apply(--layout-flex);
-      
     }
+
+.main {
+      @apply(--layout-flex);
+      @apply(--layout-vertical-container);
+      padding: 4px;
+      }
+
+      neon-animated-pages {
+        height: calc(100%-4px);
+        width: calc(100%-4px);
+      }
+
+      .large {
+        width: 100%
+      }
 paper-textarea.textareaannoyed{
-     max-width: 400px;
+     max-width: 420px;
      height: 180px;
      min-width: 330px;
      display: block;
@@ -17,8 +32,8 @@ paper-textarea.textareaannoyed{
 
 
 neon-animated-pages{
-      min-height: 650px;
-     width: 98%;}
+      height: 100%;
+     width: 100%;}
 
 neon-animated-pages.large {
         width: 720px;
@@ -30,27 +45,24 @@ fc-card{
 }
 
 .tight{
-     max-width: 400px;
-     padding: 8px;
+     max-width: 420px;
+     padding: 4px;
      margin: 4px;
      margin-left: 8px;
      display: block;
      min-width: 340px;
      }
 
-.down {
-        margin-top: 60px;
-      }
 .tighter{
-     width: 336px;
+     width: 343px;
      padding: 4px 8px;
      margin: -20px 5px 5px 0px;
-     display: flex-wrap;
+     display: block;
      }
 paper-material.innercard{
     margin: 4px;
     padding: 2px;
-    max-height: 260px;
+    max-height: 420px;
     overflow-y: scroll;
 }
 paper-material::-webkit-scrollbar {
@@ -59,9 +71,12 @@ paper-material::-webkit-scrollbar {
     </style>
 
 <template>
-<neon-animated-pages id='pages' selected='1'>
-     <fc-cards-list class='vertical layout tight'  id='list'>
-<div style="display: none;">
+ <div class="main">
+ <neon-animated-pages id='pages' selected='0'>
+ <div class="fit layout vertical center-center">
+  <fc-cards-list class="container vertical layout flex wrap" id="list">
+  <div class="fit layout vertical center center-justified">
+
                <fc-chip on-tap='inquiryMemorandum' class='container flex wrap' header-title='Inquiry Memorandum'>
                </fc-chip>
 
@@ -76,17 +91,26 @@ paper-material::-webkit-scrollbar {
 
                <fc-chip  on-tap='focusedMaterials' class='container flex wrap' header-title='Focused Materials'>    
                </fc-chip>   
-    </div>
-               
+    
+              
+                <fc-chip  on-tap='courseReview' class='container flex wrap' header-title='Course Progress'> 
+               </fc-chip>
+
+               <fc-chip  on-tap='admin' class='container flex wrap' header-title='Administration'> 
+               </fc-chip>
+     </div>
+
              <!--  <fc-chip  on-tap='callScripts' class='container flex wrap' header-title='Call Scripts'>    
                </fc-chip>-->
-     
+               
      </fc-cards-list>
+     </div>
 
-                <fc-card class='wrap tight container' header-title='Memorandum and Email'>
+                <fc-card class='layout vertical flex wrap tight container' header-title='Memorandum and Email'>
 
-                    <div id='icycardTwo' class='fit flex wrap down container'>
-                      		<paper-material elevation='-1' class='wrap innercard' style='line-height: 1.5em;'>
+                    <div id='icycardTwo' class='fit.chip fit flex wrap down container'>
+                      		<paper-material class='wrap innercard' style='line-height: 1.5em;'>
+                          <h3 class="title">{{headerTitle}}</h3>
     
                           
                             	<div class='layout flex wrap container tight'>
@@ -116,17 +140,18 @@ paper-material::-webkit-scrollbar {
                                    </paper-textarea></span>
                               	</div>
                                 
-                            </paper-material>   
-                    		</div>
-                
+                    
+                    		</paper-material>
+                         </div>  
             </fc-card><!--end of memo card-->
-                    <fc-card ><div class='fit'>2</div></fc-card>
-                    <fc-card class='fit'>3</fc-card>
-                    <fc-card class='fit'>4</fc-card>
-                    <fc-card class='fit'>5</fc-card>
-                   <!-- <fc-card>6</fc-card>-->
+                    <fc-card><div class='fit.chip fit'>2 <span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button> </span></div></fc-card>
+                    <fc-card><div class='fit.chip fit'>3<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
+                    <fc-card><div class='fit.chip fit'>4<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
+                    <fc-card><div class='fit.chip fit'>5<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
+                   <fc-card><div class='fit.chip fit'>6<span>  <paper-button class='better-platinum' on-tap='onBackClick'>Back</paper-button>  </span></div></fc-card>
             	
-     </neon-animated-pages>       
+     </neon-animated-pages>
+    </div>       
 </template>
 <script>
 Polymer({
@@ -325,8 +350,7 @@ Polymer({
         };
         this.$.pages.selected = 5;
       },
-
-     callScripts:function(event) {
+      admin:function(event) {
         this.$.list.sharedElements = {
           'ripple': event.target,
           'reverse-ripple': event.target

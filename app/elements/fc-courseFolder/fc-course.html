@@ -1,57 +1,41 @@
-<dom-module id="fc-card">
+<dom-module id="fc-course">
 <style is="custom-style">
-:host {
-      display: block;
-      overflow: hidden;
-    }
-
-    #placeholder {
-      opacity: 0;
-      background-color: #1e1e1e;
-    }
-
+:host{
+	display: block;
+}
 
  paper-material.card {
 	margin-left: 4px;
   margin-right: 4px;
-	margin-top: 4px;
-  padding: 8px 0px 2px 14px ;
-  padding: 8px ;
-	padding: 8px ;
+	margin-top: 2px;
+	padding: 4px;
 	text-indent: 0px;
-	min-width: 343.7px;
-	display: flex;
-  height: 880px;
+	width: 333.7px;
+	display: block;
 }
 
 h3.title{
 	text-align: center;
-	text-indent: -33px;
+	text-indent: -3px;
 	font-size: 26px;
 	color: #013483;
-	position: relative;
-  margin: 26px;
+	padding-bottom: 10px;
+	margin-bottom: 16px;
 }
 
 
 </style>
-<template id="fc-cardTemplate">
-	<paper-material class="card" elevation="3">
-  <div class="layout vertical container">
-      <div class="layout horizontal flex wrap container">
-      <div id="placeholder" class="fit.chip fit"> <h3 class="title">{{headerTitle}}</h3></div>
-      <div id="container">
-      <content select="div"></content>
-</div>
+<template>
+		<div class="vertical layout">
+      <span><b>Instructor: </b><span>{{data.instructor}}</span></span>
+      <span><b>StartDate: </b><span>{{data.startDate}}</span></span>
     </div>
-    </div>
-</paper-material>
 </template>
 
 
 <script>
   Polymer({
-    is: 'fc-card',
+    is: 'fc-course',
 
     behaviors: [
       Polymer.NeonSharedElementAnimatableBehavior
@@ -59,13 +43,16 @@ h3.title{
 
     properties: {
       background: '#1e1e1e',
-	  reflectToAttributes: true,
-	  notify: true,
-	  headerTitle: {
-			type: String,
-			reflectToAttributes: true,
-			notify: true
-						},
+	    reflectToAttributes: true,
+	    notify: true,
+      data: {
+        fcid: String
+      },
+      headerTitle: {
+			 type: String,
+			 reflectToAttributes: true,
+			 notify: true
+			},
       animationConfig: {
         value: function() {
           return {
@@ -77,8 +64,7 @@ h3.title{
               name: 'fade-out-animation',
               node: this.$.placeholder,
               timing: {
-                delay: 200,
-                duration: 150
+                delay: 0
               }
             }, {
               name: 'fade-in-animation',
@@ -96,7 +82,7 @@ h3.title{
               name: 'fade-out-animation',
               node: this.$.container,
               timing: {
-                duration: 100
+                duration: 200
               }
             }, {
               name: 'reverse-ripple-animation',
