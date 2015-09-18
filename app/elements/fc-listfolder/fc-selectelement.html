@@ -1,0 +1,114 @@
+<dom-module id="fc-select">
+<style is="custom-style">
+
+array-select
+{	
+	height: 126px;
+	width:150px;
+	border: 9px ridge #aecdfe;
+}
+iron-selector {
+        padding: 8px;
+}
+paper-item {
+	min-width:500px;
+	max-width: 100%;
+	position:relative;
+	color: black;
+}
+paper-menu {
+	max-width: 100%;
+}
+paper-dropdown-menu {
+	min-width:100px;
+}
+paper-menu-button {
+	max-width:100%;
+}
+
+paper-material {
+	max-width:100%;
+}
+
+.dropdown-content {
+	min-width:100px;
+}
+
+.iron-selected {
+        background-color: #3F51B5;
+        color: white;
+}
+
+</style>
+
+<template>
+<firebase-collection id="mydb" data="{{fbdata}}" location="{{path}}" order-by-child={{searchField}} equal-to={{searchValue}}></firebase-collection>
+	<div style="display: flex; min-height:40px; min-width:100px;">
+     	<div style="min-width:350px"></div>
+
+     	<paper-dropdown-menu id="pdm" style="min-width:100px;" label={{label}}>
+     			<paper-menu class="dropdown-content">     				
+     				<paper-item on-tap="doClick">--No Preference--</paper-item>
+					<template is="dom-repeat" items="{{fbdata}}">
+        					<paper-item  value={{item.fcid}} on-tap="doClick">{{item.fcid}}</paper-item> 
+    				</template> 
+     			</paper-menu>
+     	</paper-dropdown-menu>
+    </div>
+</template>
+<script>
+FcSelect = Polymer({
+	is: "fc-select",
+	properties: {
+		path: "https://focusedstudents.firebaseio.com",
+		label: String,
+		id: String,
+		fbid: String,
+		searchField: String,
+		searchValue: String,
+		fbdata: {},
+		notify: true,
+		reflectToAttributes: true
+	},
+
+factoryImpl: function (argId, argPath, argLabel, argSearchField, argSearchValue){
+	console.log("fc-select factoryImpl argPath = " + argPath);
+	this.fbid = "fb" + argId;
+	this.id = argId;
+	this.path = argPath;
+	this.label = argLabel? argLabel:argId;
+	this.searchField = argSearchField? argSearchField:null;
+	this.searchValue = argSearchValue? argSearchValue:null;
+	console.log("fc-select factoryImpl argSearchField = " + argSearchField);
+	if(argSearchField)
+	{
+		console.log(this.$.mydb);
+		this.$.mydb.orderByChild = argSearchField;
+		if(argSearchValue)
+		{
+			this.$.mydb.equalTo = argSearchValue;
+		}
+	}
+
+},
+
+close: function(){
+	console.log(this.$.pdm.selectedItem);
+	this.$.pdm.contentElement.selected = 0;
+	console.log(this.$.pdm.selectedItem);
+},
+
+doClick: function(e){
+	console.log(e.target.value);
+	this.fire("fcValueSelected", {id: this.id, value: e.target.value});
+},
+
+
+destroyed: function(){
+
+
+}
+
+});
+</script>
+</dom-module>

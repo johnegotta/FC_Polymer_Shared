@@ -1,72 +1,129 @@
 <dom-module id="fc-card">
 <style is="custom-style">
-:host{
-	display: block;
-}
+:host {
+      display: block;
+      
+    }
+
+    #placeholder {
+      opacity: 0;
+      background-color: #1e1e1e;
+    }
+
 
  paper-material.card {
-	margin: 4px;
-	padding: 4px 4px 0px 4px;
-	text-indent: 0px;
-	padding-bottom: 20px;
-	width: 420px;
-	height: 480px;
-	display: inline-block;
+  padding: 22px ;
 }
 
 h3.title{
-	text-align: center;
-	text-indent: -3px;
-	font-size: 20px;
-	color: #013483;
-	padding-bottom: 0px;
-	margin-bottom: 0px;
+  text-align: center;
+  font-size: 36px;
+  color: #002c90;
+  font-family: times;
+  padding-bottom: 22px;
+  margin: 10px;
 }
-
 </style>
 <template id="fc-cardTemplate">
-	<paper-material class="card" elevation$="{{elevation}}">
-		<h3 class="title">{{headerTitle}}</h3>
-			<div class="vertical layout">
-			<div class="horizontal layout wrap">
-	 			<content>
+<paper-material class="card" elevation="4">
+    <p class="title center center-justified"><h3 class="title">{{headerTitle}}</h3></p>
 
-	 			</content>
-	  		</div>
-	  	</div>
-	</paper-material>
+
+
+
+<div id="container">
+      
+
+      <content select="div">
+        
+
+           
+
+
+
+      </content>
+    
+
+</div>
+    </paper-material>
+    <div id="placeholder" class="hit"></div>
 </template>
 <script>
-Polymer ({
-	is : "fc-card",
-		properties: {
-			data: {
-					type: Object,
-					reflectToAttributes: true,
-					notify: true
-					},
+(function(){
+  Polymer({
+    is: 'fc-card',
 
-			background: '#fefefe',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+
+  properties: {
+      container: String,
+      background: '#1e1e1e',
+      fcOnTap: String,
+      parElevation: Number, 
+	  reflectToAttributes: true,
+	  notify: true,
+	  
+    headerTitle: {
+			type: String,
 			reflectToAttributes: true,
-			notify: true,
-			headerTitle: {
-							type: String,
-							reflectToAttributes: true,
-							notify: true
+			notify: true
 						},
-			elevation: {
-							type: Number,
-							value:"3",
-							reflectToAttributes: true,
-							notify: true
-						},
-			value: 	{
-							type: Object,
-							notify: true,
-							reflectToAttributes: true
-			}
-	}
+  animationConfig: {
+        value: function() {
+          return {
+            'entry': [{
+              name: 'ripple-animation',
+              id: 'ripple',
+              toPage: this
+            }, 
 
-});
+            { name: 'fade-out-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 0,
+                duration: 150
+              }
+            }, 
+            { name: 'fade-in-animation',
+              node: this.container,
+              timing: {
+                delay: 160,
+                duration: 50
+              }
+            }],
+
+            'exit': [{
+              name: 'opaque-animation',
+              node: this.$.placeholder
+            }, 
+            {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 100
+              }
+            }, 
+            {
+              name: 'reverse-ripple-animation',
+              id: 'reverse-ripple',
+              fromPage: this
+            }]
+          };
+        }
+      },
+
+      sharedElements: {
+        value: function() {
+          return {
+            'ripple': this.$.placeholder,
+            'reverse-ripple': this.$.placeholder
+          };
+        }
+      }
+    }
+  });
+})();
 </script>
 </dom-module>

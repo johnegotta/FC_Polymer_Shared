@@ -1,0 +1,167 @@
+<dom-module id='fc-studentSuperViewElement'>
+<style is='custom-style'>
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      background: white;
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+      @apply(--shadow-elevation-8dp);
+      @apply(--height-750px);
+      @apply(--);
+    }
+
+
+  .main::-webkit-scrollbar {
+    display: none;
+}
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+    }
+
+
+
+      span.linear{
+          width:110px;
+          overflow: hidden;
+        }
+
+    .paper-material {
+      padding: 4px 4px 4px 4px;
+    }
+
+    paper-icon-button {
+        margin-left: 30px;
+        display: block;
+        width: 24px;
+        text-align: center;
+      }
+      .red {
+        color: var(--paper-blue-500);
+      }
+
+  </style>
+  <template>
+
+
+    <paper-toolbar class='medium'>
+      <paper-icon-button id='button' icon='clear' on-click='_onClearButtonClick'></paper-icon-button>
+
+
+    <firebase-collection data='{{studentcalls}}' id='studentCalls' location='https://focusedstaging1.firebaseio.com/calls'></firebase-collection>
+    <firebase-collection data='{{focusedstudents}}' id='focusedStudents' location='https://focusedstudents.firebaseio.com/'></firebase-collection>
+    <firebase-collection data='{{contacts}}' id='contactInfo' location='https://focusedstudents.firebaseio.com/contactinfo'></firebase-collection>
+    <firebase-collection data='{{ROIData}}' id='roi' location='https://focusedstudents.firebaseio.com/ROIData'></firebase-collection>
+    <firebase-collection data='{{coursepurchaseinfo}}' id='fcPurchaseInfo' location='https://focusedstudents.firebaseio.com/StreelandAnna00001/coursepurchaseinfo'></firebase-collection>
+    <firebase-collection data='{{previousAcademics}}' id='previousAcademics' location='https://focusedstudents.firebaseio.com/previousAcademics'></firebase-collection>
+
+
+    </paper-toolbar>
+    <div id='main' class='main'>
+      <div class='image-container'>
+        <div class='image'>
+
+    <div class='middle'>
+        <div class='container horizontal layout'>
+          <paper-material class='container vertical layout flex-2 wrap leftpanel left'>
+            <!-- <span>{{selectedCall.relatedstudent}}</span><br><br> -->
+            <paper-material class='vertical layout'>
+            <img id='studphoto' width='120' height='150' src={{contactinfo.photoURL}} style='padding:4px;'>
+            <div class='container horizontal'>
+              <span id='studfirst'>[[contactinfo.firstname]]</span>
+              <span id='studlast'>[[contactinfo.lastname]]</span>
+            </div>
+            <span id='studemail'>[[contactinfo.email]]</span>
+            <span id='studphone1'>[[contactinfo.phone1]]</span>
+            <span id='studphone2'>[[contactinfo.phone2]]</span>
+            </paper-material>
+            <paper-material class='vertical layout'>
+              <div class='horizontal layout'>
+                <span>School:</span>&nbsp <span id='studschool' class='linear'>[[previousacademics.school]]</span>
+              </div>
+              <div class='horizontal layout'>
+                Grade: <span>[[previousacademics.grade]]</span>
+              </div>
+            </paper-material>
+          </paper-material> <!--end left panel -->
+          <paper-material class='container vertical layout flex-7 wrap centerdisplay display'>
+            <paper-tabs id='studenttabs' selected='{{selected}}'>
+              <paper-tab>Account Information</paper-tab>
+              <paper-tab>Return On Investment</paper-tab>
+              <paper-tab>Academics</paper-tab>
+                 <paper-tab>Previous Inquiries</paper-tab>
+              
+            </paper-tabs>
+
+            <iron-pages selected='{{selected}}'>
+              <div id='studentdetail1'>
+                <div class='horizontal layout'>
+                  Course Selected: <span id='couseSelected1'>[[coursepurchaseinfo.courseSelected1.coursedates]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Course Dates: <span id='datesOfCourse1'>[[coursepurchaseinfo.datesOfCourse1.class1]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Focused Coach: <span id='fccoachSTUDENTID'>[[coursepurchaseinfo.courseSelected1.coach]]</span>
+                </div>
+                <div> Total Cost: <span id='course1cost'>[[coursepurchaseinfo.totalcost]]</span>
+                </div>
+              </div>
+                <div id='studentdetail2'>
+                <div class='horizontal layout'>
+                  Courses Taken: <span id='studcoursestaken'>[[roi.coursesTaken]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  College Savings: $<span id='studcollegesavings'>[[roi.collegeSavings]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Value At Completion 70%: $<span id='studVAC70'>[[roi.FcValueAtCompletion70Percent]]</span>
+                </div>
+              </div>
+              <div id='studentdetail3'>
+                                  <div class='horizontal layout'>
+                  Class Rank: <span>[[previousacademics.classRank]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Overall SAT Percentile: <span>[[previousacademics.SAToverallPerc]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Highest Math Course: <span>[[previousacademics.highestMathCourse]]</span>
+                </div>
+                <div class='horizontal layout'>
+                  Highest Science Course: <span>[[previousacademics.highestScienceCourse]]</span>
+                </div>
+              </div>
+              <div id='studentdetail5'>
+                  <template is='dom-repeat' items={{studentcalls}} filter={{_filterStudentCalls(selectedCall)}}>
+                    <div class='vertical layout'>
+                      <div class='horizontal layout' style='border:1px gray solid'>
+                        <span class='flex-1'>{{item.timestamp}}</span>
+                        <span class='flex-5'>{{item.message}}</span>
+                      </div>
+
+                    </div>
+                  </template>
+              </div>
+            </iron-pages>
+            
+            
+          </paper-material>
+        </div>
+       
+
+      </div>
+    </div>
+
+  </template>
+<script>
+  Polymer({ 
+    is: 'fc-studentSuperViewElement',
+    properties: {}
+  });
+  </script>

@@ -1,0 +1,272 @@
+<dom-module id="fc-list">
+<style is="custom-style">
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      @apply(--layout-block);
+     /* @apply(--layout-scroll);*/
+    }
+
+    iron-icon {
+      color: var(--google-blue-500);
+    }
+
+    paper-item:hover:after{
+      white-space: wrap;
+      cursor: pointer;
+      overflow: normal;
+      display: flex;
+      flex: wrap;
+      max-height: 100%;
+    }
+
+  .fcborder{
+      border: 4px ridge #aecdfe;
+      min-width: 400px;
+      max-width: 750px;
+      max-height: 88px;
+      margin: 2px;
+      background: #fffffc;
+      border-radius: 6px;
+    
+
+    }
+  div.scrollercalendar::-webkit-scrollbar {
+    display: none;
+}
+div.scrollerTwo::-webkit-scrollbar {
+    display: none;
+}
+
+    paper-item-body {
+      padding: 8px;
+      display: flex;
+      flex: wrap;
+    }
+
+     paper-icon-button {
+        margin-left: 8px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+        color: #002c90;
+      }
+      paper-icon-button.blue {
+        color: var(--paper-blue-500);
+      }
+      .scrollerTwo{
+        overflow-y: scroll;
+        height: 635px;
+        padding-top: 10px;
+      }
+
+    
+     iron-icon {
+      color: var(--google-blue-500);
+    }
+    paper-item {
+      display: flex;
+      flex: wrapper;
+      color: #002c90;
+    }
+
+ cards.paper-material{
+  padding: 40px;
+  margin: 12px;
+  
+}   
+ 
+.topdown{margin-top: 84px;}
+  </style>
+<template>
+      <content>
+      </content>
+<firebase-collection data="{{fbdata}}" id="myfb" location={{path}}></firebase-collection>  
+    <div class="main topdown"> 
+       <h3><span>{{dataType}}</span> List</h3>
+
+        <div class="horizontal layout wrapper container">
+        
+     <div class="vertical layout wrapper container block scrollerTwo">
+    
+    <template is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
+
+      <paper-material elevation='4' class="layout horizontal">
+                <paper-item class="fcborder layout container">
+                      <paper-item-body more three-line>
+                            <template is="dom-if" if={{isInquiry}}>
+                              <fc-inquiry data={{item}}></fc-inquiry>
+                            </template>
+                            <template is="dom-if" if={{isCourse}}>
+                              <fc-course data={{item}}></fc-course>
+                            </template>
+                            <template is="dom-if" if={{isStudent}}>
+                              <fc-student data={{item}}></fc-student>
+                            </template>
+                            <!--
+                            <div>
+                               On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
+                            </div>
+                            <div secondary> 
+                              <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u> to discuss <b><span>[[pastinquirer.interest]]</span></b> <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
+                            </div>
+                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
+                          </div>
+                  -->
+                      </paper-item-body>
+                   <iron-icon icon="info" class="horizontal" on-click="_switchToFull"></iron-icon>
+               </paper-item>
+            </paper-material>
+             
+      </template>
+      </div>
+      </div>
+    </div>
+</template>
+<script>
+  Polymer({
+
+    is: 'fc-list',
+
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+
+    listeners: {
+      //'click': '_onClick'
+    },
+
+    properties: {      
+      path: String,
+      dataType: String,
+      isInquiry: {
+        type: Boolean,
+        computed: "computeIsInquiry(dataType)"
+      },
+      isStudent: {
+        type: Boolean,
+        computed: "computeIsStudent(dataType)"
+      },
+      isCourse: {
+        type: Boolean,
+        computed: "computeIsCourse(dataType)"
+      },
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      }
+    },
+    
+    attached: function(){
+      console.log("fc-list attached says dataType = " + this.dataType);
+      console.log("fc-list attached says isCourse = " + this.isCourse);
+    },
+
+    computeIsInquiry: function(argType)
+    {
+      return (argType == "inquiry");
+    },
+
+    computeIsStudent: function(argType)
+    {
+      return (argType == "student");
+    },
+
+    computeIsCourse: function(argType)
+    {
+      return (argType == "course");
+    },
+
+    _switchToFull: function(e){
+      console.log(e.model.item);
+      //this.pastinquirer = e.model.pastinquirer;
+      // configure the page animation
+      this.sharedElements = {
+        'hero': e.target,
+      };
+      this.fire('item-click', {clicked: e.model.item});
+    },
+
+    _oldOnClick: function(event) {
+      var target = event.target;
+      console.log(event.model);
+      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
+      {
+        target = null;
+     } 
+      else {
+        target=target.parentNode;
+        this.pastinquirer=target.details
+        console.log(this.pastinquirer);
+        
+        // configure the page animation
+        this.sharedElements = {
+          'hero': target,
+        };
+
+        this.fire('item-click', {
+          item: target,
+        });
+      }
+
+  },
+   _callFilter: function(inquiry){
+      console.log(inquiry);
+        return function(item){
+
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+          /*
+          var result = true;
+          if(inquiry.studentfirstname)
+          {
+            //if the caller specified a student, pay attention to that, even if other search criteria miss
+            result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
+          }
+          else //no student specified, so use caller criteria
+          {
+            if(inquiry.lastname)
+            {
+              result &= (item.lastname? (item.lastname.indexOf(inquiry.lastname) > -1): false);
+            }
+            if(inquiry.firstname)
+            {
+              result &= (item.firstname? (item.firstname.indexOf(inquiry.firstname) > -1): false);
+            }
+            if(inquiry.email)
+            {
+              result &= (item.email? (item.email.indexOf(inquiry.email) > -1): false);
+            }
+            if(inquiry.phone)
+            {
+              result &= (item.phone? (item.phone.indexOf(inquiry.phone) > -1): false);
+            }
+        }
+        return result;
+        */
+      }  
+    }, 
+
+     
+});
+
+</script>
+</dom-module>

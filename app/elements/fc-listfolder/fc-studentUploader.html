@@ -1,0 +1,245 @@
+<dom-module id="fc-studentUploader">
+<style>
+    :host {
+      @apply(--display-block);
+    }
+      .enabled {
+        border: 1px dashed #555;
+      }
+      paper-button {
+        margin-bottom: 20px;
+        min-width: 200px;
+        min-height: 80px;
+        background: green;
+      }
+      .file {
+        padding: 10px 0px;
+      }
+      .commands {
+        float: right;
+        padding: 0px 10px;
+      }
+      .fileSelects {
+        float: right;
+        padding: 0px 10px;
+      }
+</style>
+
+<template>
+    <firebase-document id="ciloc" location="https://focusedstudents.firebaseio.com/contactinfo"></firebase-document>
+    <firebase-document id="paloc" location="https://focusedstudents.firebaseio.com/pastacademics"></firebase-document>
+    <div>
+      <paper-button id="clickybutton" icon="file-upload" class="blue" on-click="_fileClick">
+        <content></content><span style="color:white">Upload Students From CSV</span>
+      </paper-button>
+     
+    </div>
+    <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv">
+
+</template>
+
+<script>
+  Polymer({
+    is: 'fc-studentUploader',
+    
+    properties: {
+
+      filez: {
+        type: String,
+        value: "philly",
+        notify: true
+      },
+
+      /**
+       * `target` is the target url to upload the files to.
+       * Additionally by adding "<name>" in your url, it will be replaced by
+       * the file name.
+       */
+      target: {
+        type: String,
+        value: ""
+      },
+          
+      /**
+       * `multi` indicates whether or not to allow multiple files to be uploaded.
+      */
+      multi: {
+        type: Boolean,
+        value: true
+      },
+
+      // `files` is the list of files to be uploaded
+      files: {
+        type: Array,
+        value: []
+      },
+
+      // `method` is the http method to be used during upload
+      method: {
+        type: String,
+        value: "PUT"
+      },
+            
+      /**
+       * `headers` is a key value map of header names and values
+      */
+      headers: {
+        type: Object,
+        value: {},
+      },
+      notify: true
+    },
+    /**
+     * Clears the list of files
+    */
+    clear: function() {
+      this.set("files", []);
+    },
+
+    ready: function() {
+      
+      this.filez = "phillyzzz";
+    },
+    
+    /**
+     * Clicks the invisible file input
+    */
+    _fileClick: function() {
+      var elem = this.$.fileInput;
+      if (elem && document.createEvent) { // sanity check
+        var evt = document.createEvent("MouseEvents");
+        evt.initEvent("click", true, false);
+        elem.dispatchEvent(evt);
+      }
+    },
+    /**
+     * Called whenever the list of selected files changes
+    */
+    _fileChange: function(e) {
+      var length = e.target.files.length;
+      for (var i = 0; i < length; i++) {
+        var file = e.target.files[i];
+        file.progress = 0;
+        file.error = false;
+        file.complete = false;
+        this.push("files", file);
+        this.uploadFile(file);
+      }
+    },
+/*       
+    _setFileType: function(e){
+      e.model.__data__.item.filetype = e.target.selectedItem.innerText;
+      if(e.model.__data__.item.filetype && e.model.__data__.item.testname){
+        this.uploadFile(e.model.__data__.item);
+      }
+    },
+*/  
+    /**
+     * Uploads a file
+     *
+     * @param {object} a file, an element of the files array
+    */
+    uploadFile: function(file) {
+      var regex = /.+(.csv)/;
+      if (!file || !regex.test(file.name.toLowerCase())) {
+        alert('Check that the file you want to add exists and that it is a CSV file.')
+        return;
+      } else {
+          this.uploadStudents(file);
+      }
+    },
+
+    uploadStudents: function(file){
+      console.log('Uploading ' + file.name);
+      if(typeof (FileReader) != "undefined")
+      {
+            var reader = new FileReader();
+            var self = this;
+            reader.onload = function (e) {
+               //var text = e.target.result.replace(/\"/g, "");
+                //var rows = text.split(/[\r|\n]+/);
+                var rows = e.target.result.split("****");
+                var numRows = rows.length;
+                var headers = rows[0].split(',');
+                var numColumns = headers.length;
+                var i = 0;
+                var students = {};
+                for(i = 0; i < numRows; i++)
+                {
+                    var j = 1;
+                    var dupeStudentCount = "00001";
+                    var cells = rows[i].split('COMMA');
+                    console.log("row #" + i);
+                    cells[3] = cells[3].replace(/\n/g, "");
+                    cells[3] = cells[3].replace(/\r/g, "");
+                    console.log(cells);
+                    var idRoot = cells[5]+cells[4];
+                    while(students[idRoot+dupeStudentCount])
+                    {
+                         j++;
+                         dupeStudentCount = j.toString();
+                         var numZeroes = 5 - dupeStudentCount.length;
+                         while(numZeroes--) dupeStudentCount = "0".concat(dupeStudentCount);
+                    }
+                    var studentId = idRoot + dupeStudentCount;
+                    console.log("studentId is " + studentId);
+                    students[studentId] = true;
+                    //cells[5]+cells[4]+"00001";
+                    var contactinfo = {
+                         id: cells[0],
+                         fcid: studentId,
+                         email: cells[1],
+                         addressLine1: cells[3],
+                         addressLine2: "",
+                         firstname: cells[4],
+                         lastname: cells[5],
+                         studentemail: cells[6] == "NULL"? "":cells[6],
+                         studentphone: cells[7] == "NULL"? "":cells[7],
+                         parent1firstname: cells[9] == "NULL"? "":cells[9],
+                         parent1lastname: cells[10] == "NULL"? "":cells[10],
+                         parent2firstname: "",
+                         parent2lastname: "",                         
+                         createdTime: cells[15],
+                         phone: cells[35],
+                         additionalEmail: "",
+                         photo: ""
+                    };
+                    var pastac = {
+                         school: cells[11] == "NUll"? "": cells[11],
+                         classRank: cells[13],
+                         graduates: cells[14],
+                         classSize: cells[17],
+                         PSATNMSQ: cells[18],
+                         grade: cells[19],
+                         GPA: cells[20],
+                         maxGPA: cells[21],
+                         highestMathCourse: cells[22],
+                         highestEnglishCourse: cells[23],
+                         highestHistoryCourse: cells[24],
+                         highestScienceCourse: cells[25],
+                         PSAT10: "",
+                         PSAT89: "",
+                         PSATaggragateNationalPercentage: "",
+                         SATnationalMathPerc:'None',
+                         SATnationalReadingPerc:'None', 
+                         SATnationalWritingPerc:'None',
+                         SATnationalSciCrossSectPerc:'None',
+                         SATnationalSocHisCrossSectPerc:'None',
+                         SAToverallPerc: 'None'
+                    };
+                    self.$.ciloc._setRemoteDocumentChild(studentId, contactinfo);
+                    self.$.paloc._setRemoteDocumentChild(studentId, pastac);
+               }
+               this.filez = rows[0];
+               console.log(this.filez);
+            };
+            reader.readAsText(file);
+      }
+      else
+      {
+        console.log("cannot load FileReader");
+      }
+    }
+  });
+</script>
+</dom-module>

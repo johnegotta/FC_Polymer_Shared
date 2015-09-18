@@ -1,23 +1,39 @@
 <dom-module id='fc-studentContacts'>
 <style is='custom-style'>
     :host {
-      display: block;
-      box-sizing: border-box;
+      @apply(--layout-vertical);
+      @apply(--display-block);
+       @apply(--layout-scroll);
+      @apply(--shadow-elevation-8dp);
+      @apply(--height-750px);
     }
     paper-material.blue{
-      backgroun: blue;
+      background: #aecdfe;
+      width: 320px;
+      height: 750px;
+      display: block;
+      border: 4px;
+      flex: wrap;
+      font-weight: 800;
+      color: #002c90;
+      font-family: times;
+      font-size: 30px;
     }
   </style>
   <template>
-  <firebase-document id="FCIDContacts" location="focusedstudents.firebaseio.com/StreelandAnna00001" data="{{StreelandAnna00001}}">
-</firebase-document>  
-    <content></content>
-    <paper-material class="blue" elevation="3">
-     <p>{{contactinfo.firstname}}</p><p>{{contactinfo.lastname}}</p>
+ <firebase-document id="Focusedstudents" location="https://focusedstudents.firebaseio.com/contactinfo"></firebase-document>
+    <content>
+         
+    </content>
+     <paper-material id="bluemangroup" class="blue" elevation="3">
+ <div class="flex wrap">  <span>Student Name:</span> <span>{{contactinfo.firstname}}</span>&nbsp<span>{{contactinfo.lastname}}</span> <br> 
+    <span>FCID:<span class="name">{{contactinfo.fcid}}</span>&nbsp<span>{{contactinfo.lastname}}</span></span>
+    <img src="{{contactinfo.photo}}" alt="">
+    </div>
   </paper-material>
   </template>
 <script>
-  Polymer({
+ FcStudentContacts=Polymer({
     is: 'fc-studentContacts',
     properties: {
      contactinfo:{
@@ -25,86 +41,86 @@
           value:{
                firstname: 'Anna', 
                lastname: 'Streeland', 
-               email: 'jzirkel@gmail.com, gzirkel@gmail.com',
-               phone:'732-887-6738', 
-               fcid: 'StreelandAnna0001',
-               photo: 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg',
+               email: 'bigmc10@gmail.com',
+               phone:'650.856.2762',
+               addressLine1:"",
+               addressLine2:'', 
+               fcid: 'StreelandAnna00001',
+               photo: '',
                parent1firstname:'Dad',
                parent1lastname:'Streeland',
                parent2firstname: 'Mom',
                parent2lastname: 'Streeland',
                studentphone: '7328876738',
                studentemail:'jzirkel@gmail.com',
-               additionalphone: 'none',
-               additionalemail: 'none',
-               additionalinquirers: 'none',
-               additionalinquirerContactInfo:'none',
-               associatedStudents: {referal2: 'Zirkel M. Zirkel', referal1: 'James Brown'}, 
-               siblings: {brother: 'Henry Streeland, jr.'}, 
-               referredStudentToFocused: 'none'
+               additionalphone: '888.222.1121',
+               additionalemail: '',
+               additionalinquirers: '',
+               additionalinquirerContactInfo:'',
+               associatedStudents: ['Zirkel M. Zirkel','James Brown'], 
+               siblings: ['brother: Henry Streeland, jr.'], 
+               referredStudentToFocused: '2'
           }, 
-          notify: true,
-          reflectToAttributes: true
-        }
-     },
+     }
+   },
 
+    // observers: ['loadfromfirebase(contactinfo.firstname, contactinfo.lastname, contactinfo.fcid)'],   
+
+
+          created: function(){
+               //var key=this.contactinfo.fcid;
+               //var student = this.$.focusedstudents.getByKey(key);
+               //console.log("this is before setting the values equal" + student.contactinfo + '' + this.contactinfo);
+               //this.contactinfo=student.contactinfo;
+               //console.log(student.contactinfo + '' + this.contactinfo);
+
+          },
+
+          ready: function(){
+            console.log("SAY HELLO CONTACT INFO");
+ 
+
+
+          },
+
+          attached: function(){
+          
+              // var key=this.contactinfo.fcid;
+              // var student = this.$.focusedSuperstudents.getByKey(key);
+              // console.log("this is before setting the values equal" + student.contactinfo + '' + this.contactinfo);
+              // this.contactinfo=student.contactinfo;
+              // console.log(student.contactinfo + '' + this.contactinfo);
+      
+
+
+
+      console.log('this is the value of inquiries at attached--set to StreelandAnna00001'); 
+    var key = this.contactinfo.fcid;
+    var value = this.contactinfo;
+    this.$.Focusedstudents._setRemoteDocumentChild(key, value);
+                //console.log(this.contactinfo.fcid + '' + JSON.stringify(this.contactinfo));
     
-    }
-      // `ready` is called after all elements have been configured, but
-      // propagates bottom-up. This element's children are ready, but parents
-      // are not.
-      //
-      // This is the point where you should make modifications to the DOM (when
-      // necessary), or kick off any processes the element wants to perform.
-    //},
-   // attached: function() {
-      //this.$.FCIDContacts._setRemoteDocumentChild('StreelandAnna00001', this.$.student);
-      // `attached` fires once the element and its parents have been inserted
-      // into a document.
-      //
-      // This is a good place to perform any work related to your element's
-      // visual state or active behavior (measuring sizes, beginning animations,
-      // loading resources, etc).
-   // },
-   // detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
-  //  }
-    // Element Behavior
-    /**
-     * The `seed-element-lasers` event is fired whenever `fireLasers` is called.
-     *
-     * @event seed-element-lasers
-     * @detail {{sound: String}}
-     */
-    /** Use `value` to provide a default value for a property, by setting it
-        // on your element's prototype.
-        //
-        // If you provide a function, as we do here, Polymer will call that
-        // _per element instance_.
-        //
-        // We do that to ensure that each element gets its own copy of the
-        // value, rather than having it shared across all instances (via the
-        // prototype).
-        
-        /**
-        type: Object,
-        value: {
-          return {function() {
-     * Sometimes it's just nice to say hi.
-     *
-     * @param {string} greeting A positive greeting.
-     * @return {string} The full greeting.
-     */
 
-    /**
-     * Attempt to destroy this element's enemies with a beam of light!
-     *
-     * Or, at least, dispatch an event in the vain hope that someone else will
-     * do the zapping.
-     */
+                //this.$.focusedSuperstudents._updateRemoteDocument;
+
+    }
+
+    /*loadfromfirebase: function(contact, last, fcid){
+          if(contact==""){
+             //  var student = this.$$.focusedSuperstudents.getByKey(this.contactinfo.fcid);
+              // this.set.contact=this.$.focusedSuperstudents.firstname;
+              // this.set.last=this.$.focusedSuperstudents.lastname;
+               //console.log("firstname: " + contact + ' ' + "LASTNAME: " + last + ' ' + fcid);
+          }
+
+
+
+
+
+
+
+          }*/
+
     
   });
 </script>

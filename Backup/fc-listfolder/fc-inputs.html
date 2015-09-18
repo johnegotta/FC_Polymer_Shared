@@ -1,0 +1,641 @@
+<dom-module id="fc-inputs">
+<style is="custom-style">
+ :host {
+      @apply(--layout-vertical);
+    }
+
+.main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+iron-icon {
+      color: var(--google-light-blue-500);
+    }
+
+paper-icon-button {
+        margin-left: 20px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+      }
+
+paper-material.controller{
+     padding: 8px 8px 26px 8px;
+     background: #fffff;
+     color: #002c90;
+     margin: 12px;
+}
+paper-button.gold {
+     background: #edc013;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 800;
+     color: #fff;
+     margin: 8px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+}
+paper-button.red {
+     background: red;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 800;
+     color: #ffffff;
+     position: absolute;
+     right: 65px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+}
+paper-button.green {
+     background: green;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 700;
+     color: #fff;
+     margin: 8px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+     }
+fc-paperInput {
+	display: inline;
+	max-width: 130px;
+	padding: 0px 6px 0px 6px;
+     font-size: 11px;
+}
+
+.adjust {
+	display: inline;
+     margin-top:28px;
+}
+
+span.green {
+  color: green;
+}
+
+h4 { font-size: 18px;
+     margin-top: 8px;
+     margin-right: 6px;
+     margin-bottom: 2px;
+}
+
+paper-material.controller {
+     padding: 8px 8px 26px 8px;
+     background: #fffff;
+     color: #002c90;
+     margin: 12px;
+}
+</style>
+<template>
+     <firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+     </firebase-document>
+     <paper-material class="controller horizontal layout wrap container">
+                         <div class="vertical layout wrap">
+                         <h4> Call Entry:</h4>    
+                              <div><paper-button class="green" on-tap="addCall"> Register </paper-button></div>
+                              <div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div> 
+                         </div>
+          <iron-form id="fcInputsForm" name="fcInputsForm">    
+               <paper-item  class="horizontal layout wrap">
+                         <paper-item-body three-line>     
+                    	    <div class="horizontal layout wrap linear">
+                                   <fc-paperInput id="fcInp1" name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}"></fc-paperInput>  &nbsp<fc-paperInput id="fcInp2" name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}" on-blur="showLogTextOne"></fc-paperInput><span class="adjust">  &nbsp</span><fc-paperInput id="fcInp3" name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}"></fc-paperInput> <fc-paperInput id="fcInp4" name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}"></fc-paperInput>&nbsp <fc-paperInput id="fcInp5" name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput><span class="adjust"> &nbsp </span><fc-paperInput id="fcInp6" name="schoolname" label="Current School Name" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput><span class="adjust"> in </span><fc-paperInput id="fcInp7" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}"></fc-paperInput>
+                              </div>
+                              <div  class="horizontal layout wrap"> 
+                                   <fc-paperInput id="fcInp8" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}"></fc-paperInput>  &nbsp <fc-paperInput id="fcInp9" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}"></fc-paperInput> &nbsp<fc-paperInput id="fcInp10" name="inquirerrole" placeholder="Caller Role" label="Parent, Student, Other" value="{{inquirer.role}}"> </fc-paperInput><fc-paperInput id="fcInp11" name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name"></fc-paperInput>&nbsp<fc-paperInput id="fcInp12" name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date"></fc-paperInput> &nbsp<span class="green adjust">$</span><fc-paperInput id="fcInp14" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput>&nbsp<fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp13" name="coach" value="{{inquirer.coach}}"></fc-paperInput> 
+                              </div>
+                              </paper-item-body>  
+                         <iron-icon icon="info"></iron-icon>
+                         <div class="horizontal layout">
+                              <div class="vertical layout">
+                                   <paper-input label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" maxlength="200" max-rows="4" class="textareaannoyed">
+                                   </paper-input>
+                              </div>
+                              <fc-clockObj class="clock"> </fc-clockObj>
+                         </div>
+                    </paper-item>
+               </iron-form>
+               <div>
+                    <paper-button class="red" on-tap="clearInputs"> Clear </paper-button>
+               </div> 
+                <div id="magicalunblur"></div>  
+          </paper-material> 
+          <content>
+               
+
+          </content>
+</template>
+<script> 
+Polymer({
+	is: "fc-inputs",
+	properties:{
+	    inquirer: {
+               type: Object,
+               value:{
+                    firstname: '', 
+                    lastname: '', 
+                    email: '', 
+                    phone:'', 
+                    studentfirstname: '', 
+                    studentlastname: '', 
+                    relatedstudent: '', 
+                    message: '',
+                    coach:'', 
+                    timestamp: '', 
+                    grade: '', 
+                    school:'', 
+                    schooltown:'', 
+                    interest:'', 
+                    interestprice: '',
+                    intereststartdate: '', 
+                    callbacktime: '', 
+                    dateorder: '', 
+                    ccInfo: '',
+                    role: '', 
+                    notify: true
+                    
+               },
+               notify: true 
+             
+     },
+     show:{
+          type: Object,
+          value: {
+               calledon:'',
+               regarding:'',
+               notify: true          
+               },
+          notify: true     
+          },
+     notify: true 
+
+    },
+  observers: [
+        'inquirerObserver(this.inquirer.firstname,this.inquirer.lastname, this.inquirer.email, this.inquirer.phone, this.inquirer.studentfirstname, this.inquirer.studentlastname, this.inquirer.role, this.inquirer.interest, this.inquirer.timestamp, this.inquirer.message)'
+      ],
+
+	inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
+		var shadowInquirer = {
+          "firstname": first, 
+          "lastname": last, 
+          "email": email, 
+          "phone": phone,
+          "studentfirstname":studentfirstname, 
+          "studentlastname": studentlastname, 
+          "role": role, 
+          "interest": interest, 
+          "timestamp": timestamp,
+          "message": message
+    };
+	this.fire("searchInquiries", shadowInquirer);
+		console.log(first.toString() + " " + " " + "just fired inputChanged event." + " for " + JSON.stringify(shadowInquirer).toString());
+	},
+
+  addCall: function(){  
+    var rawtime= new Date();
+    var callbackTime = new Date();
+    callbackTime.setDate(rawtime.getDate() + 2);
+    callbackTime = callbackTime.toString().slice(0, 21);
+    var time = rawtime.toString().slice(0, 21);
+    var order=-event.timeStamp;
+          this.inquirer.timestamp = time;
+          this.inquirer.timeorder = order;
+          this.inquirer.callbacktime = callbackTime;
+    
+     if(this.inquirer.firstname == '' || this.inquirer.lastname == ''){
+      alert("First and last name are required before adding call.");
+      return;
+    }
+     if(this.inquirer.email == '' && this.inquirer.phone == ''){
+      alert("Must supply either phone number or email before adding call.");
+      return;
+    }
+
+          this.inquirer.relatedstudent = this.inquirer.studentfirstname + " " + this.inquirer.studentlastname + " ";
+          this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
+
+       
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+          sessionStorage.clickcount=0;
+      
+     },
+
+  clearInputs: function(){
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+          this.show.calledon="";
+          this.show.regarding='';
+          sessionStorage.clickcount=0;
+          return;
+
+  },
+
+  showLogTextOne: function(){
+    if(typeof(Storage) !== "undefined") {
+          if (sessionStorage.clickcount) {
+               sessionStorage.clickcount = Number(sessionStorage.clickcount);
+               this.show.calledon="called on";
+               this.inquirer.lastname=this.inquirer.studentfirstname=this.inquirer.firstname;
+               this.notifyPath('this.show.calledon', "called on");
+               var time=Date().toString().slice(0, 21) + ", ";
+               this.inquirer.timestamp=time;
+               this.notifyPath('this.inquirer.timestamp', time);
+               console.log(this.show.calledon);
+               this.show.regarding="regarding, "
+               this.notifyPath('this.show.regarding', "regarding, ");
+               this.inquirer.studentlastname=this.inquirer.lastname;
+               //sessionStorage.clickcount = Number(sessionStorage.clickcount)+1;
+               console.log(this.inquirer.firstname + " and no dollar sign ");
+               console.log(this.show.calledon);
+               console.log(this.inquirer.studentlastname + ' ' + this.inquirer.timestamp);
+               console.log("this is the time " + this.inquirer.timestamp);
+          }
+          //if(sessionStorage.clickcount>3){
+         // sessionStorage.clickcount='';
+          //}
+          //else{this.$.magicalunblur.innerHTML = "You have 'on-blurred' to expose message text " + sessionStorage.clickcount + " time(s) in this session. Look at how the message has changed below!!!";
+          //}
+     } 
+     else {
+          this.$.magicalunblur.innerHTML = "Your browser (time for an update) cannot access session memory implimented in this interface; the interface was designed to create a natural and pleasant work experience, one which--in this instance--would have slowly revealed necessary text around the text you inputted in the call intake fields.  Had your browser permitted access to session storage, as you typed the callers information into the input fields, a full email message and call memo message would hve been slowly organically generated right before your eyes.  The effort of our founder and our design team was enormous during the design process of this interface. The team often worked without sleep for days.  To fully enjoy the fruits of their tireless work, once again, PLEASE UPDATE YOUR BROWSER, preferably to the latest version of Chrome.  You will benefit from following these instructions. All Focused advice aims to personally, intellectually, educationally and financially benefit Focused Clients.  Please listen.  Few often do. Those who do, however, achieve amazing things. UPDATE YOUR BROWSER!"          
+          } 
+          this.fire("searchInputs");
+          sessionStorage.clickcount++;  
+         
+     }
+
+});
+</script>
+</dom-module>
+
+
+<dom-module id="fc-inputs">
+<style is="custom-style">
+ :host {
+      @apply(--layout-vertical);
+    }
+
+.main {
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+    }
+
+iron-icon {
+      color: var(--google-light-blue-500);
+    }
+
+paper-icon-button {
+        margin-left: 20px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+      }
+
+
+paper-button.gold {
+     background: #edc013;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 800;
+     color: #fff;
+     margin: 8px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+}
+paper-button.red {
+     background: red;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 800;
+     color: #ffffff;
+     margin: 8px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+}
+paper-button.green {
+     background: green;
+     raised: true;
+     border-radius: 11px;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 700;
+     color: #fff;
+     margin: 8px;
+     font-size: 11px;
+     text-align: center;
+     text-indent: 0px;
+     min-width: 70px;
+     padding: 0px;
+     }
+fc-paperInput {
+  display: inline;
+  max-width: 145px;
+  padding: 6px 6px 12px 6px;
+     font-size: 11px;
+}
+
+.adjust {
+  display: inline;
+     margin:52px 10px 2px 6px;
+}
+.adjust2{
+     display: inline;
+     margin:6px 16px 2px 8px;;
+}
+span.green {
+  color: green;
+}
+
+h4 { font-size: 18px;
+     margin-top: 8px;
+     margin-right: 6px;
+     margin-bottom: 2px;
+}
+paper-textarea.textareaannoyed{
+     width:340px;
+     height: 52px;
+     display: inline-block;
+     overflow-y: scroll;
+     margin-bottom: -22px;
+     }
+}
+div.block{
+     display: inline-block;
+}
+.alignmentfc{
+margin-left: 36px;
+
+
+}
+</style>
+<template>
+     <firebase-document id="FBcalls" location="focusedstaging1.firebaseio.com/calls" data="{{calls}}">
+     </firebase-document>
+      <paper-material id="total" class="horizontal layout flex wrap container alignmemtfc">  
+                                   <div class="vertical layout wrap adjust2">
+                                        <div><paper-button class="green" on-tap="addCall"> Register </paper-button></div>
+                                        <div><paper-button class="gold" on-tap="addCall">Add Call</paper-button></div>
+                                       <!-- <div><paper-button class="platinum" on-tap="addCall">Search</paper-button></div>  -->
+                                   </div>
+          <div class="horizontal layout flex wrap">
+               <iron-form id="fcInputsForm" name="fcInputsForm">  
+                              <div class="horizontal layout flex wrap">
+                                   <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp1" name="firstname" label="Inquirer First Name" placeholder="First Name" value="{{inquirer.firstname}}">
+                                             </fc-paperInput>  
+                                             <fc-paperInput id="fcInp2" name="lastname" label="Inquirer Last Name" placeholder="Last Name" value="{{inquirer.lastname}}"></fc-paperInput>
+                                               <span>  &nbsp</span>
+                                   </div>
+
+                                        <span>  &nbsp</span>
+                                        <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp3" name="studentfirstname" label="Student Name" placeholder="First Name" value="{{inquirer.studentfirstname}}">
+                                             </fc-paperInput> 
+                                                  &nbsp
+                                             <fc-paperInput id="fcInp4" name="studentlastname" label="Student Name" placeholder="Last Name" value="{{inquirer.studentlastname}}">
+                                             </fc-paperInput>  
+                                                  &nbsp
+                                        </div>
+                                         <span>   &nbsp </span>
+                                        <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp5" name="firstThroughTwelfth" placeholder="Current Grade" label="Current Grade Level" value="{{inquirer.grade}}"></fc-paperInput>
+                                              <span>   &nbsp </span> 
+
+                                             <fc-paperInput id="fcInp6" name="schoolname" label="Current School" placeholder="School Name" value="{{inquirer.school}}"></fc-paperInput>
+                                     </div>
+                                             
+                                        <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp7" name="townname" label="School Location" placeholder="City, State" value="{{inquirer.schooltown}}">
+                                             </fc-paperInput>
+                                                 <span>   &nbsp </span>
+                                             <fc-paperInput id="fcInp10" name="inquirerrole" placeholder="Caller Role" label="Parent, Student, etc." value="{{inquirer.role}}"> 
+                                             </fc-paperInput>
+                                                  &nbsp 
+                                        </div>
+                                         <span>   &nbsp </span><br><br>
+                                        <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp8" name="phone" label="Inquirer Phone" placeholder="Phone" value="{{inquirer.phone}}">
+                                             </fc-paperInput>  
+                                                   <span>   &nbsp </span>
+                                             <fc-paperInput id="fcInp9" name="email" label="Inquirer Email" placeholder="Email" value="{{inquirer.email}}">
+                                             </fc-paperInput> 
+                                               <span>   &nbsp </span>
+                                        </div>
+                                         <span>   &nbsp </span>
+                                         <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp11" name="nameofprogram" value="{{inquirer.interest}}" label="Focused Program" placeholder="Program Name">
+                                             </fc-paperInput>
+                                                 <span> &nbsp </span>
+                                             <fc-paperInput id="fcInp12" name="startdate" value="{{inquirer.intereststartdate}}" label="Program Start Date" placeholder="Start Date">
+                                             </fc-paperInput>
+                                               
+                                        </div>
+                                         <span>   &nbsp </span>
+                                        <div class="horizontal layout wrap linear">
+                                             <fc-paperInput id="fcInp14" name="price" label="Program Price" placeholder="Price" value="{{inquirer.interestprice}}"></fc-paperInput>
+                                                <span>  &nbsp </span>
+                                             <fc-paperInput label="Prefered Coach" placeholder="Coach`s Name" id="fcInp13" name="coach" value="{{inquirer.coach}}">
+                                             </fc-paperInput>
+                                              <span>  &nbsp </span>
+                                        </div>
+                                         <span>  &nbsp </span>
+                               
+                                
+                                   <div class="horizontal layout" id="messagezone">
+                                        <paper-textarea label="Message" id="fcInp15" name="message" value="{{inquirer.message}}" always-float-label="true" placeholder= "Additional Information" class="textareaannoyed" maxlength="380" rows="1">
+                                        </paper-textarea>
+                                   </div>
+                              </div>
+                        
+               </iron-form>
+          </div>
+          <div  class="vertical layout wrap adjust2">
+               <paper-button class="red" on-tap="clearInputs"> Clear </paper-button>
+                <div id="messagezone"></div>
+          </div>
+
+     </paper-material>
+              
+          <content>
+               
+
+          </content>
+</template>
+<script> 
+Polymer({
+  is: "fc-inputs",
+  properties:{
+      inquirer: {
+               type: Object,
+               value:{
+                    firstname: '', 
+                    lastname: '', 
+                    email: '', 
+                    phone:'', 
+                    studentfirstname: '', 
+                    studentlastname: '', 
+                    relatedstudent: '', 
+                    message: '',
+                    coach:'', 
+                    timestamp: '', 
+                    grade: '', 
+                    school:'', 
+                    schooltown:'', 
+                    interest:'', 
+                    interestprice: '',
+                    intereststartdate: '', 
+                    callbacktime: '', 
+                    dateorder: '', 
+                    ccInfo: '',
+                    role: '', 
+                    notify: true
+                    
+               },
+               notify: true 
+
+          },
+          clock: {
+               type: Object
+          }
+},
+     observers: [
+        'inquirerObserver(inquirer.firstname, inquirer.lastname, inquirer.email, inquirer.phone, inquirer.studentfirstname, inquirer.studentlastname, inquirer.role, inquirer.interest, inquirer.timestamp, inquirer.message)'
+      ],
+
+     attached: function(){
+          var c = new FcClockObj("inputclock");
+          this.$.messagezone.appendChild(c);
+     },
+
+     inquirerObserver: function(first, last, email, phone, studentfirstname, studentlastname, role, interest, timestamp, message){
+    var shadowInquirer = {
+          "firstname": first, 
+          "lastname": last, 
+          "email": email, 
+          "phone": phone,
+          "studentfirstname":studentfirstname, 
+          "studentlastname": studentlastname, 
+          "role": role, 
+          "interest": interest, 
+          "timestamp": timestamp,
+          "message": message
+          };
+  
+          this.fire("searchInquiries", shadowInquirer);
+       console.log(first.toString() + " " + " " + "just fired inputChanged event." + " for " + JSON.stringify(shadowInquirer).toString());
+  },
+
+  addCall: function(){  
+    var rawtime= new Date();
+    var callbackTime = new Date();
+    callbackTime.setDate(rawtime.getDate() + 2);
+    callbackTime = callbackTime.toString().slice(0, 21);
+    var time = rawtime.toString().slice(0, 21);
+    var order=-event.timeStamp;
+          this.inquirer.timestamp = time;
+          this.inquirer.timeorder = order;
+          this.inquirer.callbacktime = callbackTime;
+    
+     if(this.inquirer.firstname == '' || this.inquirer.lastname == ''){
+      alert("First and last name are required before adding call.");
+      return;
+    }
+     if(this.inquirer.email == '' && this.inquirer.phone == ''){
+      alert("Must supply either phone number or email before adding call.");
+      return;
+    }
+
+          this.inquirer.relatedstudent = this.inquirer.studentfirstname + " " + this.inquirer.studentlastname + " ";
+          this.$.FBcalls._setRemoteDocumentChild(order, this.inquirer);
+
+       
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+      
+     },
+
+  clearInputs: function(){
+          fcInp1.value = this.inquirer.firstname = "";
+          fcInp2.value = this.inquirer.lastname = "";
+          fcInp3.value = this.inquirer.email = "";
+          fcInp4.value = this.inquirer.phone = "";
+          fcInp5.value = this.inquirer.studentfirstname = "";
+          fcInp6.value = this.inquirer.studentlastname = "";
+          fcInp7.value = this.inquirer.relatedstudent = "";
+          fcInp8.value = this.inquirer.timestamp = "";
+          fcInp9.value = this.inquirer.callbacktime = "";
+          fcInp10.value = this.inquirer.timeorder = "";
+          fcInp11.value = this.inquirer.grade = "";
+          fcInp12.value = this.inquirer.coach = "";
+          fcInp13.value = this.inquirer.school = "";
+          fcInp14.value = this.inquirer.message = "";
+          fcInp15.value = this.inquirer.role = "";
+  }
+ 
+
+});
+</script>
+</dom-module>
+
+
