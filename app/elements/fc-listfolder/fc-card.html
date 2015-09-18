@@ -36,19 +36,34 @@ h3.title{
 
 </style>
 <template id="fc-cardTemplate">
-	<paper-material class="card" elevation="3">
   <div class="layout vertical container">
       <div class="layout horizontal flex wrap container">
-      <div id="placeholder" class="fit.chip fit"> <h3 class="title">{{headerTitle}}</h3></div>
-      <div id="container">
-      <content select="div"></content>
-</div>
+    
+
+
+
+
+<fc-chip on-tap='{{fcOnTap}}'  elevation$='{{parElevation}}' id='{{container}}' header-title='{{headerTitle}}'>
+      
+
+      <content select="fc-chip">
+        
+
+            <!--STUFF-SELECTABLE_CONTENT_STUFF-GOES_HERE-->
+            <!--STUFF THAT GOES HERE, HOWEVER, WILL BE ON THE CARDS-LIST-->
+            <!--Can_I BELIEVE_be placed here by a fctryImpl or PolyAPI-->
+
+
+
+      </content>
+    
+
+
+
+
+</fc-chip>
     </div>
-    </div>
-</paper-material>
 </template>
-
-
 <script>
   Polymer({
     is: 'fc-card',
@@ -57,48 +72,55 @@ h3.title{
       Polymer.NeonSharedElementAnimatableBehavior
     ],
 
-    properties: {
+  properties: {
+      container: String,
       background: '#1e1e1e',
+      fcOnTap: String,
+      parElevation: Number, 
 	  reflectToAttributes: true,
 	  notify: true,
-	  headerTitle: {
+	  
+    headerTitle: {
 			type: String,
 			reflectToAttributes: true,
 			notify: true
 						},
-      animationConfig: {
+  animationConfig: {
         value: function() {
           return {
             'entry': [{
               name: 'ripple-animation',
               id: 'ripple',
               toPage: this
-            }, {
-              name: 'fade-out-animation',
+            }, 
+
+            { name: 'fade-out-animation',
               node: this.$.placeholder,
               timing: {
                 delay: 200,
                 duration: 150
               }
-            }, {
-              name: 'fade-in-animation',
-              node: this.$.container,
+            }, 
+            { name: 'fade-in-animation',
+              node: this,
               timing: {
-                delay: 200,
-                duration: 200
+                delay: 0,
+                duration: 50
               }
             }],
 
             'exit': [{
               name: 'opaque-animation',
               node: this.$.placeholder
-            }, {
+            }, 
+            {
               name: 'fade-out-animation',
               node: this.$.container,
               timing: {
                 duration: 100
               }
-            }, {
+            }, 
+            {
               name: 'reverse-ripple-animation',
               id: 'reverse-ripple',
               fromPage: this
