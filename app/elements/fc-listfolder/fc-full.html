@@ -1,0 +1,148 @@
+<dom-module id="fc-full">
+  <style>
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      background: white;
+      @apply(--layout-flex);
+      @apply(--layout-scroll);
+      @apply(--shadow-elevation-8dp);
+      @apply(--height-750px);
+      @apply(--);
+    }
+
+
+  .main::-webkit-scrollbar {
+    display: none;
+}
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+    }
+
+
+
+      span.linear{
+          width:110px;
+          overflow: hidden;
+        }
+
+    .paper-material {
+      padding: 4px 4px 4px 4px;
+    }
+
+    paper-icon-button {
+        margin-left: 30px;
+        display: block;
+        width: 24px;
+        text-align: center;
+      }
+      .red {
+        color: var(--paper-blue-500);
+      }
+
+  </style>
+  <template>
+
+
+    <paper-toolbar class="medium">
+      <paper-icon-button id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
+
+    </paper-toolbar>
+    <div id="main" class="main">
+      <div class="image-container">
+          <paper-material>
+          <template is="dom-if" if="isCourse">
+            <fc-courseFull data={{data}}>
+            </fc-courseFull>
+          </template>
+          <template is="dom-if" if="isInquiry">
+            <span>INQUIRY NOT CODED YET </span>
+          </template>
+          </paper-material>
+        </div>
+      </div>
+    </div>
+
+  </template>
+<script>
+  Polymer({
+    is: 'fc-full',
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+
+    properties: {
+      data: {
+        type: Object,
+      },
+      
+      sharedElements: {
+        type: Object,
+        value: function() {
+          return {
+            'hero': this.$.main
+          };
+        }
+      },
+
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }],
+
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'scale-down-animation',
+              node: this.$.main,
+              transformOrigin: '50% 50%',
+              axis: 'y'
+            }]
+
+          }
+        }
+      }
+
+    },
+
+    observers: [
+      'itemSelected(data)'
+    ],
+
+    ready: function(){
+      //this.$.studenttabs.selected = 0;
+    },
+    
+    itemSelected: function(argItem){
+      //blah
+      console.log("fc-full::itemSelected");
+      console.log(argItem);
+    },
+
+    _onClearButtonClick: function() {
+      this.fire('close');
+      console.log("fc-full::onClearButtonClick");
+    },
+
+    _filterStudentCalls: function(selectedCall){
+      return function(item){
+        return (item.relatedstudent == selectedCall.relatedstudent);
+        };
+  }
+});
+</script>
+</dom-module>
