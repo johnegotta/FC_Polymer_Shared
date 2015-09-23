@@ -23,10 +23,10 @@
     }
 
   .fcborder{
-      border: 4px ridge #aecdfe;
-      min-width: 400px;
+      border: 5px ridge #aecdfe;
+      min-width: 525px;
       max-width: 750px;
-      max-height: 88px;
+      max-height: 92px;
       margin: 2px;
       background: #fffffc;
       border-radius: 6px;
@@ -59,8 +59,13 @@ div.scrollerTwo::-webkit-scrollbar {
       }
       .scrollerTwo{
         overflow-y: scroll;
-        height: 635px;
+        height: 628px;
         padding-top: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-left:4px;
+        margin-right:4px;
+        border: 5px ridge dodgerblue;
       }
 
     
@@ -80,23 +85,28 @@ div.scrollerTwo::-webkit-scrollbar {
 }   
  
 .topdown{margin-top: 84px;}
-  </style>
+
+</style>
+
 <template>
-      <content>
-      </content>
-<firebase-collection data="{{fbdata}}" id="myfb" location={{path}}></firebase-collection>  
+  <content>
+  </content>
+  <firebase-collection data="{{fbdata}}" id="myfb" location={{path}} ><!-- order-by-child={{currentSearchField}}>
+-->
+  </firebase-collection>
+  <firebase-collection data="{{fbdatatwo}}" id="myfbtwo" location={{pathtwo}}>
+  </firebase-collection>
     <div class="main topdown"> 
-       <h3><span>{{dataType}}</span> List</h3>
-
-        <div class="horizontal layout wrapper container">
-        
-     <div class="vertical layout wrapper container block scrollerTwo">
+       <h2 style="padding: 0px 5px 0px 15px"><span>{{dataType}}</span> List</h2>
+       <h3 style="padding: 0px 5px 0px 15px"><div class="horizontal layout" >Sort By:&nbsp<div style="color:dodgerblue" on-tap="sortOne" role="button">{{searchField}}</div><span>&nbsp</span><div style="color:dodgerblue" on-tap="sortTwo">{{searchFieldTwo}}</div></div></h3>
+      <div class="horizontal layout wrapper container">
+       <div class="vertical layout wrapper container block scrollerTwo" elevation="2">
     
-    <template is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
+        <template id="repeater" is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
 
-      <paper-material elevation='4' class="layout horizontal">
-                <paper-item class="fcborder layout container">
-                      <paper-item-body more three-line>
+            <paper-material elevation='4' class="layout horizontal">
+                <paper-item class="fcborder layout container" style="width:100%">
+                      <paper-item-body more three-line style="width:100%; min-height:520px">
                             <template is="dom-if" if={{isInquiry}}>
                               <fc-inquiry data={{item}}></fc-inquiry>
                             </template>
@@ -106,18 +116,11 @@ div.scrollerTwo::-webkit-scrollbar {
                             <template is="dom-if" if={{isStudent}}>
                               <fc-student data={{item}}></fc-student>
                             </template>
-                            <!--
-                            <div>
-                               On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a <span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
-                            </div>
-                            <div secondary> 
-                              <span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u> to discuss <b><span>[[pastinquirer.interest]]</span></b> <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
-                            </div>
-                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
-                          </div>
-                  -->
+                            <template is="dom-if" if={{isInstructor}}>
+                              <fc-instructor data={{item}}></fc-instructor>
+                            </template>
                       </paper-item-body>
-                   <iron-icon icon="info" class="horizontal" on-click="_switchToFull"></iron-icon>
+                   <iron-icon icon="info" id="button" class="horizontal" on-click="_switchToFull"></iron-icon>
                </paper-item>
             </paper-material>
              
@@ -132,7 +135,7 @@ div.scrollerTwo::-webkit-scrollbar {
     is: 'fc-list',
 
     behaviors: [
-      Polymer.NeonAnimatableBehavior
+      Polymer.NeonSharedElementAnimatableBehavior
     ],
 
     listeners: {
@@ -142,6 +145,16 @@ div.scrollerTwo::-webkit-scrollbar {
     properties: {      
       path: String,
       dataType: String,
+      searchField: String,
+      searchFieldTwo: String,
+      currentSearchField: {
+        type: String,
+        notify: true,
+        reflectToAttributes: true
+      },
+      searchValue: String,
+      data: Object,
+      fbdatatwo: Object,
       isInquiry: {
         type: Boolean,
         computed: "computeIsInquiry(dataType)"
@@ -154,6 +167,13 @@ div.scrollerTwo::-webkit-scrollbar {
         type: Boolean,
         computed: "computeIsCourse(dataType)"
       },
+      isInstructor: {
+        type: Boolean,
+        computed: "computeIsInstructor(dataType)"
+      },
+      notify: true,
+      reflectToAttributes: true,
+
       animationConfig: {
         type: Object,
         value: function() {
@@ -177,33 +197,62 @@ div.scrollerTwo::-webkit-scrollbar {
     },
     
     attached: function(){
+      this.$.myfb.orderByChild = this.currentSearchField = this.searchField;
       console.log("fc-list attached says dataType = " + this.dataType);
       console.log("fc-list attached says isCourse = " + this.isCourse);
+      console.log("fc-list attached says searchField = " + this.searchField);
+      console.log("fc-list attached says searchFieldTwo = " + this.searchFieldTwo);
+      console.log(this.properties);
+    },
+
+    sortOne: function(){
+      //this.$.myfb.orderByChild = this.searchField;
+      this.currentSearchField = this.searchField;
+      this.$.myfb.orderByChild = "";
+      this.$.myfb.orderByChild = this.currentSearchField;
+      console.log("sortOne sort by " + this.$.myfb.orderByChild);
+    },
+
+    sortTwo: function(){
+      //this.$.myfb.orderByChild = this.searchFieldTwo;
+      this.currentSearchField = this.searchFieldTwo;
+      this.$.myfb.orderByChild = "";
+      this.$.myfb.orderByChild = this.currentSearchField;
+      console.log("sortTwo sort by " + this.$.myfb.orderByChild);
     },
 
     computeIsInquiry: function(argType)
     {
-      return (argType == "inquiry");
+      return (argType == "Inquiry");
     },
 
     computeIsStudent: function(argType)
     {
-      return (argType == "student");
+      return (argType == "Student");
     },
 
     computeIsCourse: function(argType)
     {
-      return (argType == "course");
+      return (argType == "Course");
+    },
+
+    computeIsInstructor: function(argType)
+    {
+      return (argType == "Instructor");
     },
 
     _switchToFull: function(e){
+      console.log("fc-list::_switchToFull");
       console.log(e.model.item);
       //this.pastinquirer = e.model.pastinquirer;
+      this.listdata = e.model.item;
       // configure the page animation
       this.sharedElements = {
-        'hero': e.target,
+          'hero': e.target
+//        'hero': document.querySelector("#fcfull")
       };
-      this.fire('item-click', {clicked: e.model.item});
+      console.log(this.sharedElements);
+      this.fire('item-click', {"clicked": e.model.item});
     },
 
     _oldOnClick: function(event) {
