@@ -7,9 +7,8 @@
     .main {
       background: white;
       @apply(--layout-flex);
-      @apply(--layout-scroll);
       @apply(--shadow-elevation-8dp);
-      @apply(--height-750px);
+      @apply(--height-450px);
       @apply(--);
     }
 
@@ -24,15 +23,13 @@
       padding-bottom: 100%;
     }
 
-
-
       span.linear{
           width:110px;
           overflow: hidden;
         }
 
-    .paper-material {
-      padding: 4px 4px 4px 4px;
+    paper-material {
+      padding: 10px 10px 10px 10px;
     }
 
     paper-icon-button {
@@ -49,42 +46,62 @@
   <template>
 
 
-    <paper-toolbar class="medium">
+    <paper-toolbar class="medium" id="fullheader">
       <paper-icon-button id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
 
     </paper-toolbar>
-    <div id="main" class="main">
+    <div id="main" class="main" style="padding:10px 10px 10px 10px">
       <div class="image-container">
           <paper-material>
-          <template is="dom-if" if="isCourse">
-            <fc-courseFull data={{data}}>
+          <template is="dom-if" if={{isCourse}}>
+            <fc-courseFull id="fullco" data={{data}}>
             </fc-courseFull>
-            foo
           </template>
-          <template is="dom-if" if="isInquiry">
-            <span>INQUIRY NOT CODED YET </span>
+          <template is="dom-if" if={{isInquiry}}>
+            <fc-inquiryFull id="fullinq" data={{data}}>
+            </fc-inquiryFull>
+          </template>
+          <template is="dom-if" if={{isInstructor}}>
+            <fc-instructorFull id="fullinst" data={{data}}>
+            </fc-instructorFull>
+          </template>
+          <template is="dom-if" if={{isStudent}}>
+            <fc-studentFull id="fullstud" data={{data}} pathtwo={{pathtwo}} paththree={{paththree}}>
+            </fc-studentFull>
           </template>
           </paper-material>
         </div>
       </div>
-    </div>
 
   </template>
 <script>
   Polymer({
     is: 'fc-full',
     behaviors: [
-      Polymer.NeonAnimatableBehavior
+      Polymer.NeonSharedElementAnimatableBehavior
     ],
 
     properties: {
       data: {
         type: Object,
       },
+      pathtwo: String,
       dataType: Boolean,
       isCourse: {
         type: Boolean,
         computed: "computeIsCourse(dataType)"
+      },
+      isInquiry: {
+        type: Boolean,
+        computed: "computeIsInquiry(dataType)"
+      },
+      isInstructor: {
+        type: Boolean,
+        computed: "computeIsInstructor(dataType)"
+      },
+      isStudent: {
+        type: Boolean,
+        computed: "computeIsStudent(dataType)"
       },
       
       sharedElements: {
@@ -118,8 +135,7 @@
               transformOrigin: '50% 50%',
               axis: 'y'
             }]
-
-          }
+          };
         }
       }
 
@@ -132,16 +148,38 @@
     ready: function(){
       //this.$.studenttabs.selected = 0;
     },
+
+    attached: function(){
+      console.log("fc-full attached");
+      console.log(this.isInquiry);
+    },
     
     itemSelected: function(argItem){
-      //blah
-      console.log("fc-full::itemSelected");
+      console.log("fc-full  itemSelected");
       console.log(argItem);
+      //TBD scroll the full item into view on screen somehow
+      //document.querySelector("#fcscroller").scroller.scrollTop = this.$.fullheader.top;
+      //this.$.fullheader.scrollIntoView(true);
     },
     
     computeIsCourse: function(argType)
     {
-      return (argType == "course");
+      return (argType == "Course");
+    },
+    
+    computeIsInquiry: function(argType)
+    {
+      return (argType == "Inquiry");
+    },
+
+    computeIsInstructor: function(argType)
+    {
+      return (argType == "Instructor");
+    },
+
+    computeIsStudent: function(argType)
+    {
+      return (argType == "Student");
     },
 
     _onClearButtonClick: function() {
