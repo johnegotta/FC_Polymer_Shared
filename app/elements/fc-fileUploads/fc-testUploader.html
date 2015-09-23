@@ -120,7 +120,8 @@
       }
     </style>
 
-    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}"></firebase-collection>
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id"></firebase-collection>
+    <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
     <firebase-collection id="test_names_loc" location="https://focusedstaging1.firebaseio.com/2400_SAT_tests" data="{{2400_SAT_tests}}"></firebase-collection>
@@ -334,6 +335,12 @@
           type: Array,
           value: [],
           notify: true
+        },
+
+        idToSearchBy: {
+          type: String,
+          value: '',
+          notify: true
         }
       },
 
@@ -504,14 +511,15 @@
       },
 
       uploadTestResult: function(file){
-        var start_time = performance.now();
+
         self = this;
         var prefix = "files." + self.files.indexOf(file);
         console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
             if (typeof (FileReader) != "undefined") {
               var reader = new FileReader();
               reader.onload = function (e) {
-
+                var start_time = performance.now();
+console.log(self.$.test_results_loc.data);
                 var essay_index = 0;
                 var student_id_index = 0;
                 var last_name_index = 0;
@@ -649,7 +657,7 @@
                       'test': file.testname,
                       'last_name': last_name,
                       'first_name': first_name,
-                      'student_id': student_id,
+                      'student_id': student_id.toString(),
                       'reading_raw': reading_raw,
                       'reading_correct': reading_num_right,
                       'reading_wrong': reading_num_wrong,
@@ -659,7 +667,7 @@
                       'math_wrong': math_num_wrong,
                       'math_skipped': math_num_skipped,
                       'writing_raw': writing_raw,
-                      'essay_score' : essay_score.toString(),
+                      'essay_score' : parseInt(essay_score),
                       'writing_correct': writing_num_right,
                       'writing_wrong': writing_num_wrong,
                       'writing_skipped': writing_num_skipped,
@@ -667,9 +675,20 @@
                     };
 
                     test_obj = self.convertScores(test_obj);
-                    self.$.test_results_loc.orderByChild = "student_id";
-                    self.$.test_results_loc.equalTo = test_obj.student_id;
-                    console.log(self.test_results);
+                    //self.$.test_results_loc.add(test_obj);
+                    var key_for_added = self.$.temp_test_results_loc.add(test_obj);
+                    //console.log(key_for_added);
+
+                    /*//self.$.test_results_loc.orderByChild = "student_id";
+                    console.log(test_obj['student_id']);
+                    self.$.test_results_loc.setAttribute('equal-to',test_obj.student_id);
+                    //self.$.test_results_loc.equalTo = i%2 == 0 ? 1050 : 1110;
+                    //console.log(self.$.test_results_loc.equalTo);
+                    console.log(self.$.test_results_loc.data);
+                    self.$.test_results_loc.add(test_obj);
+                    //self.$.newly_added_results_loc.add(test_obj);
+                    self.$.test_results_loc.removeAttribute('equal-to');
+                    console.log(self.$.test_results_loc.data);
 
                     if (self.test_results.some( function(e) {
                       if(e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test){
@@ -679,13 +698,12 @@
                         self.$.score_conflicts_loc.add(conflict);
                       }
                       return e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test;
-                    })) {
+                      })) {
                       continue;
                     } else {
                       self.$.test_results_loc.add(test_obj);
                       self.$.newly_added_results_loc.add(test_obj);
-
-                    }
+                    }*/
                   }
                   else {
                     continue;
@@ -696,6 +714,11 @@
                 self.set(prefix + ".complete", true);
                 self.set(prefix + ".progress", 100);
                 self.cancel(file);
+                self.send_temp_test_to_right_fb_loc();
+                var endtime = performance.now();
+                var full_time = endtime - start_time;
+                console.log("Full Time: " + full_time.toString());
+                self.$.uploadSuccessToast.toggle();
               }
               reader.readAsText(file);
             }
@@ -704,11 +727,22 @@
               self.$.uploadFailToast.toggle();
               self.set(prefix + ".error", true);
             }
+            //console.log(self.test_results);
+      },
 
-            var endtime = performance.now();
-            var full_time = endtime - start_time;
-            console.log("Full Time: " + full_time.toString());
-            self.$.uploadSuccessToast.toggle();
+      send_temp_test_to_right_fb_loc: function(){
+        var num_temp_tests = self.temp_test_results.length;
+        //self.$.test_results_loc.setAttribute('equal-to',"1050");
+        for( var i = 0; i < num_temp_tests; i++ ) {
+
+          console.log(this.temp_test_results[i].student_id);
+          //this.$.test_results_loc.setAttribute('equal-to',"1050");
+          //self.$.test_results_loc.setAttribute('equal-to',null);
+          console.log(this.test_results);
+          //this.$.test_results_loc.removeAttribute('equal-to');
+          console.log(this.test_results);
+        }
+        console.log()
       },
 
       convertScores: function(student_test_object){
