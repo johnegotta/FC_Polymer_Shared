@@ -120,7 +120,7 @@
       }
     </style>
 
-    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id"></firebase-collection>
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id" on-query-changed="sayHi" on-data-changed="sayHello"></firebase-collection>
     <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
@@ -519,7 +519,6 @@
               var reader = new FileReader();
               reader.onload = function (e) {
                 var start_time = performance.now();
-console.log(self.$.test_results_loc.data);
                 var essay_index = 0;
                 var student_id_index = 0;
                 var last_name_index = 0;
@@ -731,18 +730,21 @@ console.log(self.$.test_results_loc.data);
       },
 
       send_temp_test_to_right_fb_loc: function(){
+        console.log(this.test_results);
         var num_temp_tests = self.temp_test_results.length;
+        //console.log(this.$.test_results_loc.query);
+        //this.$.test_results_loc.setAttribute('equal-to',"1050");
+        //console.log(this.$.test_results_loc.query);
         //self.$.test_results_loc.setAttribute('equal-to',"1050");
         for( var i = 0; i < num_temp_tests; i++ ) {
 
           console.log(this.temp_test_results[i].student_id);
-          //this.$.test_results_loc.setAttribute('equal-to',"1050");
+          this.$.test_results_loc.setAttribute('equal-to',this.temp_test_results[i].student_id);
           //self.$.test_results_loc.setAttribute('equal-to',null);
-          console.log(this.test_results);
-          //this.$.test_results_loc.removeAttribute('equal-to');
-          console.log(this.test_results);
+          //console.log(this.test_results);
+          this.$.test_results_loc.removeAttribute('equal-to');
+          //console.log(this.test_results);
         }
-        console.log()
       },
 
       convertScores: function(student_test_object){
@@ -911,6 +913,18 @@ console.log(self.$.test_results_loc.data);
             this.$.newly_added_results_loc.removeByKey(this.newly_added_results[0].__firebaseKey__);
           }
         },500);
+      },
+
+      sayHi: function(e){
+        console.log("The query changed");
+        console.log(e);
+        console.log(this.test_results);
+      },
+
+      sayHello: function(e){
+        console.log("The data changed");
+        console.log(e);
+        console.log(this.test_results);
       }
     });
 
