@@ -106,7 +106,7 @@ div.scrollerTwo::-webkit-scrollbar {
     
         <template id="repeater" is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
 
-            <paper-material elevation='4' class="layout horizontal">
+            <paper-material elevation='4' class="layout horizontal" draggable="true" on-dragstart="handleDragStart">
                 <paper-item class="fcborder layout container" style="width:100%">
                       <paper-item-body more three-line style="width:100%; min-height:520px">
                             <template is="dom-if" if={{isInquiry}}>
@@ -255,6 +255,12 @@ div.scrollerTwo::-webkit-scrollbar {
       };
       console.log(this.sharedElements);
       this.fire('item-click', {"clicked": e.model.item});
+    },
+
+    handleDragStart: function(e) {
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+      console.log("drag begun for ");
+      console.log(e.model.item);
     },
 
     _oldOnClick: function(event) {

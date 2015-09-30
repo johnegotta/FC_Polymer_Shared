@@ -22,15 +22,29 @@ h3.title{
 	padding-bottom: 10px;
 	margin-bottom: 16px;
 }
+paper-tabs, paper-toolbar {
+   background-color: #aecdfe;
+}
+paper-tab.iron-selected {
+  color:dodgerblue;
+}
+
 
 </style>
 
 <template>
-  
+  <!--
   <firebase-collection id="roin" data={{roi}} location={{paththree}} order-by-child="fcid" equal-to={{data.fcid}}>
+  -->
+  <firebase-collection id="roin" data={{roi}} location="https://focusedstudents.firebaseio.com/roi" order-by-child="fcid" equal-to={{data.fcid}}>
   </firebase-collection>
 
+<firebase-collection id="calls" data={{studentcalls}} location="https://focusedstudents.firebaseio.com/inquiries" order-by-child="fcid" equal-to={{data.fcid}}>
+  </firebase-collection>
+<!--
   <firebase-collection id="pasta" data={{previousacademicsarray}} location={{pathtwo}} order-by-child="fcid" equal-to={{data.fcid}}>
+  -->
+  <firebase-collection id="pasta" data={{previousacademicsarray}} location="https://focusedstudents.firebaseio.com/pastacademics" order-by-child="fcid" equal-to={{data.fcid}}>
   </firebase-collection> 
   
 
@@ -41,20 +55,22 @@ h3.title{
         <div class="container horizontal layout">
           <paper-material class="container vertical layout flex-2 wrap leftpanel left">
             <paper-material class="vertical layout">
-            <img id="studphoto" width="120" height="150" src={{data.photo}} style="padding:4px;" on-tap="checkAcademics">
+            <img id="studphoto" width="180" height="240" src={{data.photo}} style="padding:4px;" on-tap="checkAcademics">
             <div class="container horizontal">
+            <h3>
               <span id="studfirst">[[data.firstname]]</span>
               <span id="studlast">[[data.lastname]]</span>
+              </h3>
             </div>
-            <span>Email: <span id="studemail">[[data.email]]</span></span>
-            <span>Tel: <span id="studphone1">[[data.phone]]</span></span>
-            <span id="studphone2">[[data.phone]]</span>
+            <span><b>Email: </b><span id="studemail">[[data.email]]</span></span>
+            <span><b>Tel: </b><span id="studphone1">[[data.phone]]</span></span>
+            <b><span id="studphone2">[[data.phone]]</span></b>
               <template is="dom-repeat" items={{previousacademicsarray}}>
                 <div class="horizontal layout">
-                  <span>School:</span>&nbsp <span id="studschool" class="linear">[[item.school]]</span>
+                  <b><span>School:</span></b>&nbsp <span id="studschool" class="linear">[[item.school]]</span>
                 </div>
                 <div class="horizontal layout">
-                  Grade: <span>[[item.grade]]</span>
+                  <b>Grade: </b><span>[[item.grade]]</span>
                 </div>
               </template>
           
@@ -62,7 +78,7 @@ h3.title{
           </paper-material> <!--end left panel -->
          
           <paper-material class="container vertical layout flex-7 wrap centerdisplay display">
-            <paper-tabs id="studenttabs" selected="{{selected}}">
+            <paper-tabs id="studenttabs" selected="{{selected}}" scrollable>
               <paper-tab>Account</paper-tab>
               <paper-tab>ROI</paper-tab>
               <paper-tab>Academics</paper-tab>
@@ -86,17 +102,15 @@ h3.title{
                 
               </div>
               <div id="studentdetail2">
-                <div><b>ROI</b></div>
                 <template is="dom-repeat" items={{roi}}>
-                  <div>[[item.fcid]]</div>
                   <div class="horizontal layout">
-                    Courses Taken: <span id="studcoursestaken">[[item.coursesTaken]]</span>
+                    <b>Courses Taken : </b><span id="studcoursestaken">[[item.coursesTaken]]</span>
                   </div>
                   <div class="horizontal layout">
-                    College Savings: $<span id="studcollegesavings">[[item.collegeSavings]]</span>
+                    <b>College Savings : </b><span id="studcollegesavings">[[item.collegeSavings]]</span>
                   </div>
                   <div class="horizontal layout">
-                    Value At Completion 70%: $<span id="studVAC70">[[item.FcValueAtCompletion70Percent]]</span>
+                    <b>Value At Completion 70% : </b><span id="studVAC70">[[item.FcValueAtCompletion70Percent]]</span>
                   </div>
                 </template>
               </div>
@@ -104,32 +118,28 @@ h3.title{
               
                 <template is="dom-repeat" items={{previousacademicsarray}}>
                   <div class="horizontal layout">
-                    Class Rank: <span>[[item.classRank]]</span>
+                    <b>Class Rank: </b><span>[[item.classRank]]</span>
                   </div>
                   <div class="horizontal layout">
-                    Overall SAT Percentile: <span>[[item.SAToverallPerc]]</span>
+                    <b>Overall SAT Percentile: </b><span>[[item.SAToverallPerc]]</span>
                   </div>
                   <div class="horizontal layout">
-                    Highest Math Course: <span>[[item.highestMathCourse]]</span>
+                    <b>Highest Math Course: </b><span>[[item.highestMathCourse]]</span>
                   </div>
                   <div class="horizontal layout">
-                    Highest Science Course: <span>[[item.highestScienceCourse]]</span>
+                    <b>Highest Science Course: </b><span>[[item.highestScienceCourse]]</span>
                   </div>
                 </template>
                 
               </div>
               <div id="studentdetail4">
-              <!--
-                  <template is="dom-repeat" items={{studentcalls}} filter={{_filterStudentCalls(selectedCall)}}>
-                    <div class="vertical layout">
-                      <div class="horizontal layout" style="border:1px gray solid">
-                        <span class="flex-1">{{item.timestamp}}</span>
-                        <span class="flex-5">{{item.message}}</span>
-                      </div>
-
+                 <template is="dom-repeat" items={{studentcalls}}>
+                    <div class="vertical layout" style="border:1px gray solid">
+                        <span><b>Date : </b><span class="flex-1">{{item.timestamp}}</span></span>
+                        <span><b>Message : </b><span class="flex-5">{{item.message}}</span></span>
                     </div>
                   </template>
-                  -->
+                  
               </div>
             </iron-pages>
             
@@ -154,7 +164,6 @@ h3.title{
       previousacademics: {
         type: Object,
         notify: true,
-        
       },
       previousacademicsarray: {
         type: Array,
@@ -167,6 +176,7 @@ h3.title{
 			 reflectToAttributes: true,
 			 notify: true
 			},
+      selected: 1
     },
 
 
@@ -205,6 +215,9 @@ h3.title{
     attached: function(){
       console.log("fc-studentFull attached");
       console.log(this.data);
+      if(this.data == {} || this.data.fcid == ""){
+        this.data = {photo: "images/imageNotAvailable.jpg"};
+      }
     },
     
     //observers: ['handleStudentChange(this.data)', 'handlePastAcademicsChange(this.previousacademicsarray)'],
