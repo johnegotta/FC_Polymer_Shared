@@ -1,0 +1,121 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<dom-module id="fc-gridElementFullsizePageCard">
+
+<link rel="import" type="css" href="./shared.css">
+
+  <style>
+
+    :host {
+      display: block;
+    }
+
+    .fixed {
+      position: fixed;
+      bottom: 0%;
+      height: 2%;
+      width: 63%;
+    }
+
+    .card {
+      position: relative;
+      margin: -700px 40px 700px 40px;
+      height: 660px;
+    }
+
+  </style>
+
+  <template>
+<div class="fit container center center-justified" style="width: 98%; height: 680px;">
+
+    <div id="fixed" class$="[[_computeFixedBackgroundClass(color)]]"></div>
+
+    <div id="card" class$="[[_computeCardClass(color)]]"><content></content></div>
+</div>
+  </template>
+
+
+
+<script>
+
+  Polymer({
+
+    is: 'fc-gridElementFullsizePageCard',
+
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+
+    properties: {
+
+      color: {
+        type: String
+      },
+
+      sharedElements: {
+        type: Object,
+        value: function() {
+          return {
+            'hero': this.$.card,
+            'ripple': this.$.fixed
+          }
+        }
+      },
+
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'ripple-animation',
+              id: 'ripple',
+              toPage: this,
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this,
+              timing: {
+                delay: 150
+              }
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.fixed
+            }, {
+              name: 'transform-animation',
+              transformFrom: 'none',
+              transformTo: 'translate(0px,-200vh) scale(0.9,1)',
+              node: this.$.card
+            }]
+          }
+        }
+      }
+
+    },
+
+    _computeCardClass: function(color) {
+      var cls = 'card';
+      if (color) {
+        cls += ' ' + color + '-300';
+      }
+      return cls;
+    },
+
+    _computeFixedBackgroundClass: function(color) {
+      var cls = 'fixed';
+      if (color) {
+        cls += ' ' + color + '-100';
+      }
+      return cls;
+    }
+
+  });
+
+</script>
+</dom-module>

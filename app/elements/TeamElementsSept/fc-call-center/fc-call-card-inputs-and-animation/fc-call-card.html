@@ -1,0 +1,119 @@
+<dom-module id="fc-call-card">
+<template id="fc-call-cardTemplate">
+<style is="custom-style">
+:host {
+      display: block;
+      
+    }
+    #placeholder {
+      opacity: 0;
+      background-color: #1e1e1e;
+    }
+ paper-material.card {
+  padding: 8px ;
+  width: 341px;
+  height: 481px;
+  margin: 36px;
+}
+
+fc-paperInput {
+  width: 142px;
+  height: 60px;
+}
+h3.title{
+  text-align: center;
+  font-size: 34px;
+  color: #002c90;
+  font-family: Merriweather;
+  font-weight: 700;
+  margin: 4px;
+  padding: 4px;
+}
+</style>
+<div class="layout center center-justified" style="margin-left:calc((100%-481px)/2); margin-right:calc((100%-481px)/2);">
+<paper-material class="card" elevation="4">
+  <section class="vertical layout container" style="height: 481px; width: 339px;">
+    <span class="title center center-justified"><h3 class="title">{{headerTitle}}</h3></span>
+   <div id="placeholder" class="fit">
+     
+   </div>
+
+    <div id="container">
+      
+      <content select="div">
+      </content>    
+
+    </div>
+  </section>
+</paper-material>
+</div>
+ 
+</template>
+<script>
+  Polymer({
+    is: 'fc-call-card',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+  properties: {
+      container: String,
+      background: '#1e1e1e',
+      fcOnTap: String,
+      parElevation: Number, 
+    reflectToAttributes: true,
+    notify: true,
+    
+    headerTitle: {
+      type: String,
+      reflectToAttributes: true,
+      notify: true
+            },
+  animationConfig: {
+        value: function() {
+          return {
+            'entry': [
+            { name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }, 
+            { name: 'fade-in-animation',
+              node: this.$.container,
+              timing: {
+                delay: 0,
+                duration: 000
+              }
+            }],
+            'exit': [/*{
+              name: 'opaque-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 0,
+                duration: 000
+              }
+            }, */
+            {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 000
+              }
+            }]
+          };
+        }
+      },
+
+      sharedElements: {
+        value: function() {
+          return {
+            'hero': this.$.placeholder
+          };
+        }
+      },
+
+     onBackClick: function(event) {
+        this.$.pages.selected = 0;
+      }
+    }
+  });
+</script>
+</dom-module>
