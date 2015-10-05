@@ -1,4 +1,4 @@
-<dom-module id="fc-listInterior">
+<dom-module id="fc-dragListInterior">
 <style is="custom-style">
     :host {
       @apply(--layout-vertical);
@@ -23,16 +23,15 @@
     }
 
   .fcborder{
-      border: 5px ridge #aecdfe;
+      border: 4px ridge #aecdfe;
       min-width: 525px;
       max-width: 750px;
       max-height: 92px;
       margin: 2px;
       background: #fffffc;
       border-radius: 6px;
-    
+  }
 
-    }
   div.scrollercalendar::-webkit-scrollbar {
     display: none;
 }
@@ -41,7 +40,7 @@ div.scrollerTwo::-webkit-scrollbar {
 }
 
     paper-item-body {
-      padding: 8px;
+      padding: 0px;
       display: flex;
       flex: wrap;
     }
@@ -60,12 +59,12 @@ div.scrollerTwo::-webkit-scrollbar {
       .scrollerTwo{
         overflow-y: scroll;
         height: 628px;
-        padding-top: 10px;
+        padding-top: 0px;
         padding-left: 5px;
         padding-right: 5px;
         margin-left:4px;
         margin-right:4px;
-        border: 5px ridge dodgerblue;
+        border: 8px ridge #aecdfe;
       }
 
     
@@ -79,12 +78,10 @@ div.scrollerTwo::-webkit-scrollbar {
     }
 
  cards.paper-material{
-  padding: 40px;
-  margin: 12px;
-  
-}   
+  padding: 0px;
+  margin: 0px;
+ }   
  
-.topdown{margin-top: 84px;}
 
 </style>
 
@@ -98,18 +95,17 @@ div.scrollerTwo::-webkit-scrollbar {
   </firebase-collection>
     <div class="main topdown"> 
        <h2 style="padding: 0px 5px 0px 15px"><span>{{dataType}}</span> List</h2>
-       <h3 style="padding: 0px 5px 0px 15px">Filter</h3>
-       <fc-select id="listfilter" path="https://focusedstudents.firebaseio.com/instructors/Jason" key-list="true" label="List Filter" search-field={{searchField}} search-value={{searchValue}}></fc-select>
        <h3 style="padding: 0px 5px 0px 15px"><div class="horizontal layout" >Sort By:&nbsp<div style="color:dodgerblue" on-tap="sortOne" role="button">{{searchField}}</div><span>&nbsp</span><div style="color:dodgerblue" on-tap="sortTwo">{{searchFieldTwo}}</div></div></h3>
       <div class="horizontal layout wrapper container">
        <div class="vertical layout wrapper container block scrollerTwo" elevation="2">
     
         <template id="repeater" is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
-            <fc-listItem id="listit" data-type={{dataType}} data={{item}} on-tap="shitay"></fc-listItem>
-            <!--
+        <fc-listItem data={{item}} data-type={{dataType}} draggable="true" on-dragstart="handleDragStart"></fc-listItem>
+      
+<!--
             <paper-material elevation='4' class="layout horizontal" draggable="true" on-dragstart="handleDragStart">
                 <paper-item class="fcborder layout container" style="width:100%">
-                      <paper-item-body more three-line style="width:100%; min-height:520px">
+                      <paper-item-body more three-line style="">
                             <template is="dom-if" if={{isInquiry}}>
                               <fc-inquiry data={{item}}></fc-inquiry>
                             </template>
@@ -123,11 +119,12 @@ div.scrollerTwo::-webkit-scrollbar {
                               <fc-instructor data={{item}}></fc-instructor>
                             </template>
                       </paper-item-body>
-                   <iron-icon icon="info" id="button" class="horizontal" on-click="_switchToFull"></iron-icon>
+                   <iron-icon icon="redo" id="button" class="horizontal" on-click="_switchToFull"></iron-icon>
                </paper-item>
             </paper-material>
-            --> 
-      </template> <!-- end dom repeat -->
+            -->
+             
+      </template>
       </div>
       </div>
     </div>
@@ -135,14 +132,11 @@ div.scrollerTwo::-webkit-scrollbar {
 <script>
   Polymer({
 
-    is: 'fc-listInterior',
+    is: 'fc-dragListInterior',
 
-    behaviors: [
-      Polymer.NeonSharedElementAnimatableBehavior
-    ],
 
     listeners: {
-      'fc-listItemClicked': '_switchToFull'
+      //'click': '_onClick'
     },
 
     properties: {      
@@ -158,7 +152,6 @@ div.scrollerTwo::-webkit-scrollbar {
       searchValue: String,
       data: Object,
       fbdatatwo: Object,
-      /*
       isInquiry: {
         type: Boolean,
         computed: "computeIsInquiry(dataType)"
@@ -175,36 +168,11 @@ div.scrollerTwo::-webkit-scrollbar {
         type: Boolean,
         computed: "computeIsInstructor(dataType)"
       },
-      */
       notify: true,
       reflectToAttributes: true,
 
-      animationConfig: {
-        type: Object,
-        value: function() {
-          return {
-            'entry': [{
-              name: 'fade-in-animation',
-              node: this.$.listit
-            }],
-
-            'exit': [{
-              name: 'fade-out-animation',
-              node: this.$.listit
-            }, {
-              name: 'hero-animation',
-              id: 'hero',
-              fromPage: this
-            }]
-          };
-        }
-      }
     },
-    shitay: function(e)
-    {
-      console.log(e.target);
-    },
-
+    
     attached: function(){
       this.$.myfb.orderByChild = this.currentSearchField = this.searchField;
       console.log("fc-list attached says dataType = " + this.dataType);
@@ -252,82 +220,25 @@ div.scrollerTwo::-webkit-scrollbar {
 
     _switchToFull: function(e){
       console.log("fc-list::_switchToFull");
-      console.log(e.detail);
+      console.log(e.model.item);
       //this.pastinquirer = e.model.pastinquirer;
-      this.listdata = e.detail;
+      this.listdata = e.model.item;
       // configure the page animation
       this.sharedElements = {
           'hero': e.target
 //        'hero': document.querySelector("#fcfull")
       };
       console.log(this.sharedElements);
-      this.fire('item-click', {"clicked": e.detail});
+      this.fire('item-click', {"clicked": e.model.item});
     },
 
     handleDragStart: function(e) {
       e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+      e.dataTransfer.setData("dataType", this.dataType);
       console.log("drag begun for ");
       console.log(e.model.item);
     },
-
-    _oldOnClick: function(event) {
-      var target = event.target;
-      console.log(event.model);
-      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
-      {
-        target = null;
-     } 
-      else {
-        target=target.parentNode;
-        this.pastinquirer=target.details
-        console.log(this.pastinquirer);
-        
-        // configure the page animation
-        this.sharedElements = {
-          'hero': target,
-        };
-
-        this.fire('item-click', {
-          item: target,
-        });
-      }
-
-  },
-   _callFilter: function(inquiry){
-      console.log(inquiry);
-        return function(item){
-
-          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
-          /*
-          var result = true;
-          if(inquiry.studentfirstname)
-          {
-            //if the caller specified a student, pay attention to that, even if other search criteria miss
-            result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
-          }
-          else //no student specified, so use caller criteria
-          {
-            if(inquiry.lastname)
-            {
-              result &= (item.lastname? (item.lastname.indexOf(inquiry.lastname) > -1): false);
-            }
-            if(inquiry.firstname)
-            {
-              result &= (item.firstname? (item.firstname.indexOf(inquiry.firstname) > -1): false);
-            }
-            if(inquiry.email)
-            {
-              result &= (item.email? (item.email.indexOf(inquiry.email) > -1): false);
-            }
-            if(inquiry.phone)
-            {
-              result &= (item.phone? (item.phone.indexOf(inquiry.phone) > -1): false);
-            }
-        }
-        return result;
-        */
-      }  
-    }, 
+ 
 
      
 });
