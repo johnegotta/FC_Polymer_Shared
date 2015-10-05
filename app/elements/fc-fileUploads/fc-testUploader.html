@@ -119,8 +119,8 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
-
-    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id" on-query-changed="sayHi" on-data-changed="sayHello"></firebase-collection>
+<!-- on-query-changed="sayHi" on-data-changed="sayHello" -->
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
@@ -739,10 +739,13 @@
         for( var i = 0; i < num_temp_tests; i++ ) {
 
           console.log(this.temp_test_results[i].student_id);
-          this.$.test_results_loc.setAttribute('equal-to',this.temp_test_results[i].student_id);
+          this.$.test_results_loc.equalTo = "";
+          console.log(this.test_results);
+          this.$.test_results_loc.equalTo = this.temp_test_results[i].student_id;
+          //this.$.test_results_loc.setAttribute('equal-to',this.temp_test_results[i].student_id);
           //self.$.test_results_loc.setAttribute('equal-to',null);
-          //console.log(this.test_results);
-          this.$.test_results_loc.removeAttribute('equal-to');
+          console.log(this.test_results);
+          //this.$.test_results_loc.removeAttribute('equal-to');
           //console.log(this.test_results);
         }
       },
