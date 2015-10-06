@@ -566,7 +566,7 @@
                   }
                 }
 
-                var qasi_size = question_and_score_indices.length;
+                var QASI_size = question_and_score_indices.length;
                 student_id_index = headers.indexOf('id');
                 last_name_index = headers.indexOf('Last Name');
                 first_name_index = headers.indexOf('First Name');
@@ -597,7 +597,7 @@
                     var writing_num_wrong = 0;
                     var writing_num_skipped = 0;
 
-                    for (var j = 0; j < qasi_size; j++) {
+                    for (var j = 0; j < QASI_size; j++) {
 
                         var question_score = parseFloat(cells[question_and_score_indices[j]['score_index']]);
                         var question_response = cells[question_and_score_indices[j]['response_index']];
@@ -752,19 +752,25 @@
       },
 
       checkSingleTempResult: function(){
-        /*console.log(this.$.test_results_loc.equalTo);
-        console.log("currentResult: " + this.currentResult.toString() + " numTempResults: " + this.numIncomingResults.toString());
-        console.log(this.test_results);*/
         var num_results_with_id_match = this.test_results.length;
+        var single_test_conflict_counter = 0;
         for( var i = 0; i < num_results_with_id_match; i++){
           if(this.test_results[i].student_id == this.temp_test_results[this.currentResult].student_id && this.test_results[i].last_name == this.temp_test_results[this.currentResult].last_name && this.test_results[i].first_name == this.temp_test_results[this.currentResult].first_name && this.test_results[i].test == this.temp_test_results[this.currentResult].test){
                         var conflict = {};
                         conflict['old_result'] = this.test_results[i];
+                        delete this.temp_test_results[this.currentResult].__firebaseKey__;
                         conflict['new_result'] = this.temp_test_results[this.currentResult];
                         self.$.score_conflicts_loc.add(conflict);
-                        break;
+                        single_test_conflict_counter++;
             }
         }
+        if(single_test_conflict_counter == 0) {
+          delete this.temp_test_results[this.currentResult].__firebaseKey__;
+          this.$.test_results_loc.add(this.temp_test_results[this.currentResult]);
+        } else {
+          single_test_conflict_counter = 0;
+        }
+
         if(this.currentResult < this.numIncomingResults - 1){
           this.currentResult++;
           this.$.test_results_loc.equalTo = this.temp_test_results[this.currentResult].student_id;
