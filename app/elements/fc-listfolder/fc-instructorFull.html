@@ -26,7 +26,7 @@ h3.title{
 
 </style>
 <template>
-		<div class="vertical layout" id="instHolder" style="height:100%;padding: 15px; white-space:wrap">
+		<div class="vertical layout" id="instHolder" style="height:100%;padding: 15px;">
       <span><b>Id: </b><span>{{data.fcid}}</span></span>
       <span><b>Name: </b><span>{{data.fullname}}</span></span>
       <span><b>Bio: </b><span>{{data.bio}}</span></span>
@@ -37,26 +37,22 @@ h3.title{
 
 
 <script>
-  Polymer({
+  FcInstructorFull = Polymer({
     is: 'fc-instructorFull',
 
     behaviors: [
-      Polymer.NeonSharedElementAnimatableBehavior
+      fcDraggableDataBehavior
     ],
 
     properties: {
       background: '#1e1e1e',
 	    reflectToAttributes: true,
 	    notify: true,
-      data: {
-        type: Object,
-        notify: true
-      },
       headerTitle: {
 			 type: String,
 			 reflectToAttributes: true,
 			 notify: true
-			},
+			}
     },
 
     attached: function(){
@@ -66,6 +62,7 @@ h3.title{
        // this.$.instHolder.hidden = "true";
        this.data = {photo:"images/imageNotAvailable.jpg"};
       }
+      this.dataType = "Instructor";
     },
     
     observers: ['handleInstructorChange(this.data)'],
@@ -73,7 +70,11 @@ h3.title{
     handleInstructorChange: function(argCourse){
       console.log("handleInstructorChange");
       this.$.instHolder.hidden = "false";
-    }
+    },
+
+    factoryImpl: function(argData){
+      this.data = argData;
+    },
 
   });
 </script>
