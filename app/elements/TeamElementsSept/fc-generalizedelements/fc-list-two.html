@@ -75,46 +75,55 @@ cards.paper-material{
 
   </style>
 <template>
-      <content>
-      </content>
+<content>
+</content>
 <firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
-      
-
-    
-    
-    <div class="main">
-        <div class="horizontal layout wrapper container">
-    
-     <div class="vertical layout wrapper container block scrollerTwo">
-    <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
-
-      <paper-material elevation='5' class="layout horizontal cards" style="max-width: 680px;">
-                <paper-item class="horizontal layout container">
-                      <paper-item-body more three-line>
-                            <details>
-                               <summary style="text-overflow: ellipsis;">On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a </summary><span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
-                            </details>
-                            <details secondary> 
-                              <summary><span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u>to discuss <b><span>[[pastinquirer.interest]]</span></b></summary> <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
-                            </details>
-                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
-                          </div>
-                  
-            </paper-item-body>
-            <div class='vertical layout container commands'>
-             <iron-icon icon="info" id="button" class="horizontal" on-click="_scott"></iron-icon>
-            <paper-checkbox style="margin-left: 2px;" checked="{{expand}}"></paper-checkbox>
-              <iron-icon icon="social:person" title="View" hidden$="{{item.complete}}">
-              </iron-icon>
+<div class="main">
+  <div class="horizontal layout wrapper container">
+    <div class="vertical layout wrapper container block scrollerTwo">
+      <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
+          <paper-material elevation='5' class="layout horizontal cards" style="max-width: 680px;">
+            <paper-item class="horizontal layout container">
+              <paper-item-body more three-line>
+                  <div primary style="text-overflow: normal;" id="catcher" on-tap="notHidden">
+                      <!--<u>Date&Time</u>:-->
+                      <b><span>[[pastinquirer.timestamp]]</span></b>
+                      <u>Caller</u>:<b><span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span></b> 
+                      <u>Student</u>:<b><span>[[pastinquirer.relatedstudent]]</span></b>
+                    <span id="crocodile" hidden>
+                      <u>Grade</u>:<span>[[pastinquirer.grade]]</span>
+                      <u>School:</u><span>[[pastinquirer.school]]</span>
+                      <u>Hometown</u>:<span>[[pastinquirer.schooltown]]</span> 
+                      <u>Course Interest</u>:<span>[[pastinquirer.interest]]</span>
+                      <u>Coach Interest</u>:<span>[[pastinquirer.coach]]</span>
+                      <u>Price Point</u>:<span>[[pastinquirer.interestprice]</span>
+                    </span>
+                  </div>
+                  <div secondary>       
+                       <b>Phone</b>:<b><u><span>[[pastinquirer.phone]]</span></u></b>
+                       <b>Email</b>: <u><b><span>[[pastinquirer.email]]</span></b></u>
+                       <u>Course</u>:<b><span>[[pastinquirer.interest]]</span></b> 
+                       <u>Callback</u>:<b><u><span>[[pastinquirer.callbacktime]]</span></u></b>
+                  </div>  
+                  <div secondary><b>Additional Message</b>:
+                          <span>[[pastinquirer.message]]</span>
+                  </div>
+                  <div secondary> Shit</div>
+                  <div secondary> Hell</div>
+              </paper-item-body>
+              <div class='vertical layout container commands'>
+                    <iron-icon icon="info" id="button" class="horizontal" on-click="_scott"></iron-icon>
+                    <paper-checkbox style="margin-left: 2px;" checked="{{expand}}"></paper-checkbox>
+                    <iron-icon icon="social:person" title="View" hidden$="{{item.complete}}">
+                    </iron-icon>
               </div>
-               </paper-item>
-              
-            </paper-material>
-             
+          </paper-item>
+        </paper-material>
       </template>
-      </div>
-      </div>
     </div>
+  </div>
+</div>
+
 </template>
 <script>
   Polymer({
@@ -216,8 +225,7 @@ cards.paper-material{
       if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
       {
         target = null;
-         
-     } 
+      } 
       else {
         target=target.parentNode;
         this.pastinquirer=target.details
@@ -266,7 +274,20 @@ cards.paper-material{
         */
       }  
     }, 
+
+    notHidden: function(e){
+      console.log(e.model);
+      var x = e.model._nodes[10];
+      console.log(x);// = !(e.model.item.$.crocodile.hidden);
+      //var elem = document.querySelector("#" + x);
+      x.hidden = !x.hidden;
+//      this.$.crocodile.hidden = !this.$.crocodile.hidden;
+    }
      
 });
 </script>
 </dom-module>
+<!--
+
+Grade: <span>[[pastinquirer.grade]]</span> School: <span>[[pastinquirer.school]]</span> Hometown: <span>[[pastinquirer.schooltown]]</span> Course Interest: <span>[[pastinquirer.interest]]</span> Coach Interest: <span>[[pastinquirer.coach]]</span> Price Point: <span>[[pastinquirer.interestprice]</span>
+                            
