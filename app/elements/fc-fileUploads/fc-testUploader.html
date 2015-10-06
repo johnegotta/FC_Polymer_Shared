@@ -120,7 +120,7 @@
       }
     </style>
 <!-- on-query-changed="sayHi" on-data-changed="sayHello" -->
-    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id"></firebase-collection>
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id" on-firebase-value="checkSingleTempResult"></firebase-collection>
     <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
@@ -341,6 +341,16 @@
           type: String,
           value: '',
           notify: true
+        },
+
+        numIncomingResults: {
+          type: Number,
+          value: 0
+        },
+
+        currentResult: {
+          type: Number,
+          value: 0
         }
       },
 
@@ -565,7 +575,7 @@
 
                 var question_results = {};
                 var test_results = {};
-
+                this.numIncomingResults = numRows - 1;
                 for (var i = 1; i < numRows; i++) {
 
                   var cells = rows[i].split(",");
@@ -674,8 +684,11 @@
                     };
 
                     test_obj = self.convertScores(test_obj);
+
+                    //console.log(self.$.test_results_loc.equalTo);
                     //self.$.test_results_loc.add(test_obj);
-                    var key_for_added = self.$.temp_test_results_loc.add(test_obj);
+
+                    self.$.temp_test_results_loc.add(test_obj);
                     //console.log(key_for_added);
 
                     /*//self.$.test_results_loc.orderByChild = "student_id";
@@ -713,7 +726,7 @@
                 self.set(prefix + ".complete", true);
                 self.set(prefix + ".progress", 100);
                 self.cancel(file);
-                self.send_temp_test_to_right_fb_loc();
+                self.beginCheckingTempTestResults();
                 var endtime = performance.now();
                 var full_time = endtime - start_time;
                 console.log("Full Time: " + full_time.toString());
@@ -726,27 +739,39 @@
               self.$.uploadFailToast.toggle();
               self.set(prefix + ".error", true);
             }
-            //console.log(self.test_results);
       },
 
-      send_temp_test_to_right_fb_loc: function(){
-        console.log(this.test_results);
-        var num_temp_tests = self.temp_test_results.length;
-        //console.log(this.$.test_results_loc.query);
-        //this.$.test_results_loc.setAttribute('equal-to',"1050");
-        //console.log(this.$.test_results_loc.query);
-        //self.$.test_results_loc.setAttribute('equal-to',"1050");
-        for( var i = 0; i < num_temp_tests; i++ ) {
+      beginCheckingTempTestResults: function(){
+        this.numIncomingResults = self.temp_test_results.length;
+        this.currentResult = 0;
+        if(this.numIncomingResults > 0){
+          this.$.test_results_loc.equalTo = this.temp_test_results[0].student_id;
+        } else {
+          alert("There are no test results waiting to be verified.");
+        }
+      },
 
-          console.log(this.temp_test_results[i].student_id);
-          this.$.test_results_loc.equalTo = "";
-          console.log(this.test_results);
-          this.$.test_results_loc.equalTo = this.temp_test_results[i].student_id;
-          //this.$.test_results_loc.setAttribute('equal-to',this.temp_test_results[i].student_id);
-          //self.$.test_results_loc.setAttribute('equal-to',null);
-          console.log(this.test_results);
-          //this.$.test_results_loc.removeAttribute('equal-to');
-          //console.log(this.test_results);
+      checkSingleTempResult: function(){
+        /*console.log(this.$.test_results_loc.equalTo);
+        console.log("currentResult: " + this.currentResult.toString() + " numTempResults: " + this.numIncomingResults.toString());
+        console.log(this.test_results);*/
+        var num_results_with_id_match = this.test_results.length;
+        for( var i = 0; i < num_results_with_id_match; i++){
+          if(this.test_results[i].student_id == this.temp_test_results[this.currentResult].student_id && this.test_results[i].last_name == this.temp_test_results[this.currentResult].last_name && this.test_results[i].first_name == this.temp_test_results[this.currentResult].first_name && this.test_results[i].test == this.temp_test_results[this.currentResult].test){
+                        var conflict = {};
+                        conflict['old_result'] = this.test_results[i];
+                        conflict['new_result'] = this.temp_test_results[this.currentResult];
+                        self.$.score_conflicts_loc.add(conflict);
+                        break;
+            }
+        }
+        if(this.currentResult < this.numIncomingResults - 1){
+          this.currentResult++;
+          this.$.test_results_loc.equalTo = this.temp_test_results[this.currentResult].student_id;
+        } else {
+          for( var i = this.numIncomingResults - 1; i >= 0; i--){
+            this.$.temp_test_results_loc.removeByKey(this.temp_test_results[i].__firebaseKey__);
+          }
         }
       },
 
