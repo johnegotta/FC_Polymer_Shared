@@ -1,0 +1,290 @@
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+`core-splitter` provides a split bar and dragging on the split bar
+will resize the sibling element.  Use its `direction` property to indicate
+which sibling element to be resized and the orientation.  Usually you would want
+to use `core-splitter` along with flex layout so that the other sibling
+element can be _flexible_.
+
+Example:
+
+    <div horizontal layout>
+      <div>left</div>
+      <core-splitter direction="left"></core-splitter>
+      <div flex>right</div>
+    </div>
+
+In the above example, dragging the splitter will resize the _left_ element.  And
+since the parent container is a flexbox and the _right_ element has
+`flex`, the _right_ element will be auto-resized.
+
+For horizontal splitter set `direction` to `up` or `down`.
+
+Example:
+
+    <div vertical layout>
+      <div>top</div>
+      <core-splitter direction="up"></core-splitter>
+      <div flex>bottom</div>
+    </div>
+
+@group Polymer Core Elements
+@element core-splitter
+@mixins Polymer.CoreResizer https://github.com/polymer/core-resizable
+@homepage github.io
+-->
+
+<dom-module id="fc-splitter">
+  <template>
+  <style is="custom-style">
+  :host {
+  display: block;
+  width: 12px;
+  background: #efefef url(handle.svg) no-repeat center;
+  box-shadow: inset 0 0 2px 1px #ccc;
+  cursor: col-resize;
+}
+
+:host(.horizontal) {
+  width: auto;
+  height: 12px;
+  cursor: row-resize;
+  background-image: url(handle-h.svg);
+}
+
+:host(:hover, :active) {
+  background-color: #ddd;
+}</style>
+  
+
+</template>
+  <script>
+    Polymer({
+      is: 'fc-splitter',
+      properties: {
+        /**
+         * By default the parent and siblings of the splitter are set to overflow hidden. This helps
+         * avoid elements bleeding outside the splitter regions. Set this property to true to allow
+         * these elements to overflow.
+         *
+         * @attribute allowOverflow
+         * @type boolean
+         * @default false
+         */
+        allowOverflow: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        /**
+         * Possible values are `left`, `right`, `up` and `down`.
+         *
+         * @attribute direction
+         * @type string
+         * @default 'left'
+         */
+        direction: {
+          type: String,
+          value: 'left',
+          notify: true,
+          observer: 'directionChanged'
+        },
+        /**
+         * Locks the split bar so it can't be dragged.
+         *
+         * @attribute locked
+         * @type boolean
+         * @default false
+         */
+        locked: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        /**
+         * Minimum width to which the splitter target can be sized, e.g. 
+         * `minSize="100px"`
+         *
+         * @attribute minSize
+         * @type string
+         * @default ''
+         */
+        minSize: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        // Listen for resize requests on parent, since splitter is peer to resizables
+        resizerIsPeer: {
+          type: Boolean,
+          value: true
+        },
+        target: { observer: 'targetChanged' }
+      },
+      ready: function () {
+        this.directionChanged();
+        if (!this.allowOverflow) {
+          this.parentNode.style.overflow = this.nextElementSibling.style.overflow = this.previousElementSibling.style.overflow = 'hidden';
+        }
+      },
+      attached: function () {
+       /* resizerAttachedHandler: function() {*/
+          this.resizableAttachedHandler(this.notifyResize);
+          this._boundResizeRequested = this._boundResizeRequested || this._handleResizeRequested.bind(this);
+          var listener;
+          if (this.resizerIsPeer) {
+          listener = this.parentElement || (this.parentNode && this.parentNode.host);
+          listener._resizerPeers = listener._resizerPeers || [];
+          listener._resizerPeers.push(this);
+          } else {
+          listener = this;
+          }
+          listener.addEventListener('core-request-resize', this._boundResizeRequested);
+          this._resizerListener = listener;
+      },
+      detached: function () {
+        this.resizableDetachedHandler();
+        this._resizerListener.removeEventListener('core-request-resize', this._boundResizeRequested);
+    },
+      directionChanged: function () {
+        this.isNext = this.direction === 'right' || this.direction === 'down';
+        this.horizontal = this.direction === 'up' || this.direction === 'down';
+        this.update();
+      },
+      update: function () {
+        this.target = this.isNext ? this.nextElementSibling : this.previousElementSibling;
+        this.dimension = this.horizontal ? 'height' : 'width';
+        this.classList.toggle('horizontal', this.horizontal);
+      },
+      targetChanged: function (_, old) {
+        if (old) {
+          old.style[old.__splitterMinSize] = '';
+        }
+        var min = this.target.__splitterMinSize = this.horizontal ? 'minHeight' : 'minWidth';
+        this.target.style[min] = this.minSize;
+      },
+      trackStart: function () {
+        this.update();
+        this.size = parseInt(getComputedStyle(this.target)[this.dimension]);
+      },
+      track: function (e) {
+        if (this.locked) {
+          return;
+        }
+        var d = e[this.horizontal ? 'dy' : 'dx'];
+        this.target.style[this.dimension] = this.size + (this.isNext ? -d : d) + 'px';
+        this.notifyResize();
+      },
+      preventSelection: function (e) {
+        e.preventDefault();
+      },
+      resizableAttachedHandler: function(cb) {
+      cb = cb || this._notifyResizeSelf;
+      this.async(function() {
+        var detail = {callback: cb, hasParentResizer: false};
+        this.fire('core-request-resize', detail);
+        if (!detail.hasParentResizer) {
+          this._boundWindowResizeHandler = cb.bind(this);
+          // log('adding window resize handler', null, this);
+          window.addEventListener('resize', this._boundWindowResizeHandler);
+        }
+      }.bind(this));
+    },
+    
+    resizableDetachedHandler: function() {
+      this.fire('core-request-resize-cancel', null, this, false);
+      if (this._boundWindowResizeHandler) {
+        window.removeEventListener('resize', this._boundWindowResizeHandler);
+      }
+    },
+    // Private: fire non-bubbling resize event to self; returns whether
+    // preventDefault was called, indicating that children should not
+    // be resized
+    _notifyResizeSelf: function() {
+      return this.fire('core-resize', null, this, false).defaultPrevented;
+    },
+
+    notifyResize: function() {
+      // Notify self
+      if (!this._notifyResizeSelf()) {
+        // Notify requestors if default was not prevented
+        var r = this.resizeRequestors;
+        if (r) {
+          for (var i=0; i<r.length; i++) {
+            var ri = r[i];
+            if (!this.resizerShouldNotify || this.resizerShouldNotify(ri.target)) {
+              // log('notifying resize', null, ri.target, true);
+              ri.callback.apply(ri.target);
+              // logEnd();
+            }
+          }
+        }
+      }
+    },
+    /**
+     * User should implement to introduce filtering when notifying children.
+     * Generally, children that are hidden by the CoreResizer (e.g. non-active
+     * pages) need not be notified during resize, since they will be notified
+     * again when becoming un-hidden.
+     *
+     * Return `true` if CoreResizable passed as argument should be notified of
+     * resize.
+     *
+     * @method resizeerShouldNotify
+     * @param {Element} el
+     */
+     // resizeerShouldNotify: function(el) { }  // User to implement if needed
+    /**
+     * Set to `true` if the resizer is actually a peer to the elements it
+     * resizes (e.g. splitter); in this case it will listen for resize requests
+     * events from its peers on its parent.
+     *
+     * @property resizerIsPeer
+     * @type Boolean
+     * @default false
+     */
+    // Private: Handle requests for resize
+    _handleResizeRequested: function(e) {
+      var target = e.path[0];
+      if ((target == this) || 
+          (target == this._resizerListener) || 
+          (this._resizerPeers && this._resizerPeers.indexOf(target) < 0)) {
+        return;
+      }
+      // log('resize requested', target, this);
+      if (!this.resizeRequestors) {
+        this.resizeRequestors = [];
+      }
+      this.resizeRequestors.push({target: target, callback: e.detail.callback});
+      target.addEventListener('core-request-resize-cancel', this._cancelResizeRequested.bind(this));
+      e.detail.hasParentResizer = true;
+      e.stopPropagation();
+    },
+    // Private: Handle cancellation requests for resize
+    _cancelResizeRequested: function(e) {
+      // Exit early if we're already out of the DOM (resizeRequestors will already be null)
+      if (this.resizeRequestors) {
+        for (var i=0; i<this.resizeRequestors.length; i++) {
+          if (this.resizeRequestors[i].target == e.target) {
+            // log('resizeCanceled', e.target, this);
+            this.resizeRequestors.splice(i, 1);
+            break;
+          }
+        }
+      }
+    },
+
+      listeners: {
+        trackstart: 'trackStart',
+        track: 'track',
+        down: 'preventSelection'
+      }
+    });
+  </script>
+</dom-module>

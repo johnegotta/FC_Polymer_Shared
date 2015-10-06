@@ -1,0 +1,272 @@
+<dom-module id="fc-list-two">
+<style is="custom-style">
+    :host {
+      @apply(--layout-vertical);
+    }
+    .main {
+      @apply(--layout-block);
+     /* @apply(--layout-scroll);*/
+    }
+
+paper-item:hover:after{
+      white-space: wrap;
+      cursor: pointer;
+      overflow: elipses;
+      display: flex-box;
+      flex: wrap;
+     
+    }
+.commands {
+  width: 30x;
+}
+  
+div.scrollerTwo::-webkit-scrollbar {
+    display: none;
+}
+/*paper-item::before
+       { content: counter(item) ". "; counter-increment: item }
+          }*/
+    
+
+
+paper-icon-button {
+        display: block;
+        width: 22px;
+        height:22px;
+        color: #002c90;
+      }
+paper-icon-button.blue {
+        color: var(--paper-blue-500);
+      }
+.scrollerTwo{
+        overflow-y: scroll;
+        height: 685px;
+        padding: 10px;
+        margin-top: 20px;
+      }
+paper-item-body {
+  border-left: 6px solid red;
+  border-right: 2px solid lightgrey;
+  padding: 4px 0px 4px 4px;
+ display: block;
+ width: 100%;
+}
+    
+iron-icon {
+      color: var(--google-blue-500);
+      padding: 5px 0px 5px 0px;
+
+      width: 22px;
+      height: 22px;
+    }
+paper-item {
+      display: flex;
+      flex: wrap;
+      min-width: 99%;
+      color: #002c90;
+      max-height: 100%;
+      margin: 6px 0px 4px 0px;
+      padding: 6px 0px 6px 6px;
+    }
+cards.paper-material{
+  padding: 25px 0px 10px 10px;
+  margin: 10px 10px 10px 8px;  
+}   
+
+  </style>
+<template>
+      <content>
+      </content>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+      
+
+    
+    
+    <div class="main">
+        <div class="horizontal layout wrapper container">
+    
+     <div class="vertical layout wrapper container block scrollerTwo">
+    <template is="dom-repeat" items="{{calls}}" as="pastinquirer" filter='{{_callFilter(inquiry)}}'>
+
+      <paper-material elevation='5' class="layout horizontal cards" style="max-width: 680px;">
+                <paper-item class="horizontal layout container">
+                      <paper-item-body more three-line>
+                            <details>
+                               <summary style="text-overflow: ellipsis;">On <b> <span>[[pastinquirer.timestamp]]</span>,<b> <span>[[pastinquirer.firstname]]</span> <span>[[pastinquirer.lastname]]</span> </b> called  </b> regarding, <b><span>[[pastinquirer.relatedstudent]]</span></b>: a </summary><span>[[pastinquirer.grade]]</span> grader at <span>[[pastinquirer.school]]</span> in <span>[[pastinquirer.schooltown]]</span> <span>[[pastinquirer.firstname]]</span> is interested in <span>[[pastinquirer.interest]]</span> with <span>[[pastinquirer.coach]]</span>, priced at <span>[[pastinquirer.interestprice]</span>
+                            </details>
+                            <details secondary> 
+                              <summary><span>[[pastinquirer.firstname]]</span> can be reached at <b><u><span>[[pastinquirer.phone]]</span></u></b> or <u><b><span>[[pastinquirer.email]]</span></b></u>to discuss <b><span>[[pastinquirer.interest]]</span></b></summary> <span>[[pastinquirer.firstname]]</span> will be called back on or before <b><u><span>[[pastinquirer.callbacktime]]</span></u></b>.
+                            </details>
+                            <div secondary><b>Additional Message:</b><span>[[pastinquirer.message]]</span>
+                          </div>
+                  
+            </paper-item-body>
+            <div class='vertical layout container commands'>
+             <iron-icon icon="info" id="button" class="horizontal" on-click="_scott"></iron-icon>
+            <paper-checkbox style="margin-left: 2px;" checked="{{expand}}"></paper-checkbox>
+              <iron-icon icon="social:person" title="View" hidden$="{{item.complete}}">
+              </iron-icon>
+              </div>
+               </paper-item>
+              
+            </paper-material>
+             
+      </template>
+      </div>
+      </div>
+    </div>
+</template>
+<script>
+  Polymer({
+    is: 'fc-list-two',
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+    listeners: {
+      //'click': '_onClick'
+    },
+    properties: {
+      
+      inquiry: {
+        type: Object, 
+        value: {
+          firstname: '',
+          lastname: '',
+          studentfirstname: '',
+          studentlastname: '',
+          email: '', 
+          phone: '',
+          notify: true,
+        },
+        notify: true,
+      },
+      pastinquirer:{
+         type: Object,
+         value: {
+               firstname: '', 
+               lastname: '', 
+               email: '', 
+               phone:'', 
+               studentfirstname: '', 
+               studentlastname: '', 
+               relatedstudent: '', 
+               message: '', 
+               coach:'', 
+               grade: '', 
+               school:'', 
+               schooltown:'', 
+               interest:'', 
+               interestprice: '',
+               intereststartdate: '', 
+               role: '',
+               notify: true, 
+               },
+          notify: true
+          }, 
+      
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      }
+    },
+    _scott: function(e){
+      console.log(e.model.pastinquirer);
+      this.pastinquirer = e.model.pastinquirer;
+      // configure the page animation
+      this.sharedElements = {
+        'hero': e.target,
+      };
+      this.fire('item-click', {caller: this.pastinquirer});
+    },
+    writeToInputs: function(){
+    /*   this.fire(
+         this.$.fcInputs.fcInp1.value = this.pastinquirer.firstname = "";
+          this.$.fcInputs.fcInp2.value = this.pastinquirer.lastname = "";
+          this.$.fcInputs.fcInp3.value = this.pastinquirer.email = "";
+          this.$.fcInputs.fcInp4.value = this.pastinquirer.phone = "";
+          this.$.fcInputs.fcInp5.value = this.pastinquirer.studentfirstname = "";
+          this.$.fcInputs.fcInp6.value = this.pastinquirer.studentlastname = "";
+          this.$.fcInputs.fcInp7.value = this.pastinquirer.relatedstudent = "";
+          //this.$.fcInputs.fcInp8.value = this.pastinquirer.timestamp = "";
+          //this.$.fcInputs.fcInp9.value = this.pastinquirer.callbacktime = "";
+          //this.$.fcInputs.fcInp10.value = this.pastinquirer.timeorder = "";
+          this.$.fcInputs.this.$.fcInputs.fcInp11.value = this.pastinquirer.grade = "";
+          this.$.fcInputs.fcInp12.value = this.pastinquirer.coach = "";
+          this.$.fcInputs.fcInp13.value = this.pastinquirer.school = "";
+          this.$.fcInputs.fcInp14.value = this.pastinquirer.message = "";*/
+    },
+    _onClick: function(event) {
+      var target = event.target;
+      console.log(event.model);
+      if (target == this.$.fcpapertoolbar || target==this.$.fcpapertoolbar.child)
+      {
+        target = null;
+         
+     } 
+      else {
+        target=target.parentNode;
+        this.pastinquirer=target.details
+        console.log(this.pastinquirer);
+        
+        // configure the page animation
+        this.sharedElements = {
+          'hero': target,
+        };
+        this.fire('item-click', {
+          item: target,
+        });
+      }
+  },
+   _callFilter: function(inquiry){
+      console.log(inquiry);
+        return function(item){
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+          /*
+          var result = true;
+          if(inquiry.studentfirstname)
+          {
+            //if the caller specified a student, pay attention to that, even if other search criteria miss
+            result &= (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1):true);
+          }
+          else //no student specified, so use caller criteria
+          {
+            if(inquiry.lastname)
+            {
+              result &= (item.lastname? (item.lastname.indexOf(inquiry.lastname) > -1): false);
+            }
+            if(inquiry.firstname)
+            {
+              result &= (item.firstname? (item.firstname.indexOf(inquiry.firstname) > -1): false);
+            }
+            if(inquiry.email)
+            {
+              result &= (item.email? (item.email.indexOf(inquiry.email) > -1): false);
+            }
+            if(inquiry.phone)
+            {
+              result &= (item.phone? (item.phone.indexOf(inquiry.phone) > -1): false);
+            }
+        }
+        return result;
+        */
+      }  
+    }, 
+     
+});
+</script>
+</dom-module>

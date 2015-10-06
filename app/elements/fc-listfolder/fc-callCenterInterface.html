@@ -1,37 +1,27 @@
 <dom-module id="fc-callCenterInterface">
 <style is="custom-style">
+
   :host {
       @apply(--layout-block);
       @apply(--layout-vertical);
-      @apply(--layout-center);
-      @apply(--layout-center-justified);
       margin: 1px;
     }  
 .leftPanel {
      @apply(--layout-block);
       @apply(--layout-vertical);
-      @apply(--layout-center);
-      @apply(--layout-center-justified);
-      @apply(--layout-container);
      height:880px;
-      width: 420px;
+      width: 430px;
      display: block;
-     position:relative;
-     right: 180px;
-     margin: 22px 14px 14px 14px;
-     border: blue;
+     margin: 22px 5px;
      }
 
 .centerPanel {
-     height: 880px;
-         width: 1580px;
-     /*border: 4px goldenrod ridge; */
+      height: 880px;
+      width: 700px;
+      border: 4px goldenrod ridge; 
       display: block;
-      margin-right: 10px;
-      margin-left: -8px;
-      position: relative;
-      right: 200px;
-      border: green;
+      margin-right: 0px;
+      margin-left: 0px;
      }
     
 
@@ -39,21 +29,18 @@
   @apply(--layout-block);
       @apply(--layout-vertical);
       height:880px;
-      max-width: 420px;
+      max-width: 600px;
       min-width: 327px;
-      display: block;
-      margin:10px 14px 14px 22px;
-      position: relative;
-      left: 120px;
-      border: purple;
+      display: inline-block;
+      margin: 10px 14px 14px 22px;
   }
 
 fc-card{
-     padding: 4px;    
+     padding: 4px;
 }
 div.contained{
     margin: 12px;
-   display: block;
+    display: block;
     width: 735px;
     }
 
@@ -66,41 +53,41 @@ div.contained{
 
 }
 
-
 </style>
 <template>
-    
-     <div class="horizontal layout container flex wrap">
-          <div class="vertical layout container wrap">
-         <div class="horizontal layout container wrap">
-                <div class="leftPanel vertical container layout wrap">
-                    <div style="width: 98.9%; display: block; height: 880px;">
+
+
+
+          <div class="horizontal layout container wrap">
+
+                <div class="leftPanel vertical layout wrap">
+
+
                           <fc-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}">
                           </fc-inputs>
                     </div>
-                </div>
                 
-          <div class="centerPanel contained container layout vertical">
-    
     <!--      <fc-callscriptAnime></fc-callscriptAnime>-->
-            <div style="width:98%; display: block; height: 800px;">
-                    <neon-animated-pages class="container" id="pages" selected="0">
-                          <fc-listView id="fcListView" on-item-click="_onItemClick">
-                          </fc-listView>
+
+          <div class="centerPanel container layout vertical" height="750px">
+                <div class="container fit contained">
+                    <neon-animated-pages id="pages" selected="0">
+                          <fc-list-two id="fcListView" on-item-click="_onItemClick">
+
+                          </fc-list-two>
                           <fc-fullView id="fullio" on-close="_onClose">
-                          </fc-fullView> 
+                          </fc-fullView>
                     </neon-animated-pages>
             </div>
           </div><!--center-->
           <div class="rightPanel container layout vertical center center-justified">
-          <div style="width=98.9% display: flex; height: 880;">
            <fc-inquirerCardAndEmail id="fcICE" inq="{{inquirerToInqTransfer}}">
                           </fc-inquirerCardAndEmail>
           </div>
           </div>
-      </div><!--horizontal layout containers-->
-      </div><!--vertical layout containers-->
-      </div><!--horizontal layout containers-->
+    <!--horizontal layout containers-->
+    <!--vertical layout containers-->
+<!--horizontal layout containers-->
 </template>
   <script>
     Polymer({
@@ -109,34 +96,38 @@ div.contained{
           inquirerToInqTransfer:{
                type: Object,
                value: {
-                    firstname: '', 
-                    lastname: '', 
-                    email: '', 
-                    phone:'', 
-                    studentfirstname: '', 
-                    studentlastname: '', 
-                    relatedstudent: '', 
+                    firstname: '',
+                    lastname: '',
+                    email: '',
+                    phone:'',
+                    studentfirstname: '',
+                    studentlastname: '',
+                    relatedstudent: '',
                     message: '',
-                    coach:'', 
-                    timestamp: '', 
-                    grade: '', 
-                    school:'', 
-                    schooltown:'', 
-                    interest:'', 
+                    coach:'',
+                    timestamp: '',
+                    grade: '',
+                    school:'',
+                    schooltown:'',
+                    interest:'',
                     interestprice: '',
-                    intereststartdate: '', 
-                    callbacktime: '', 
-                    dateorder: '', 
+                    intereststartdate: '',
+                    callbacktime: '',
+                    dateorder: '',
                     ccInfo: '',
                     role: '',
+                    notify: true,
                     reflectToAttributes: true 
                },
-               notify: true      
-          } 
-     },
+               notify: true,
+               reflectToAttributes: true      
+          }
+      }, 
+
+                   
 
 
-         _onItemClick: function(e) {
+         _onItemTap: function(e) {
            this.$.pages.selected = 1;
            console.log("received on-item-click event from");
            console.log(e.detail);
@@ -153,7 +144,7 @@ div.contained{
             this.addEventListener('writeToInputs', this.fillInputsFromCall);
             this.addEventListener('searchInquiries', this.inquirerObserver);
         },
-         
+
         fillInputsFromCall: function(e){
            this.$.fcInputs.inquirer = e.detail;
         },
@@ -162,7 +153,7 @@ div.contained{
           this.$.fcListView.inquiry = e.detail;
           this.$.pages.selected = 0;
           console.log("inquirerObserver " + JSON.stringify(this.$.fcListView.inquiry));
-        } 
+        }
 });
   </script>
 </dom-module>
