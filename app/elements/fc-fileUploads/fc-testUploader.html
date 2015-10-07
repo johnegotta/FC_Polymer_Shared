@@ -119,8 +119,7 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
-<!-- on-query-changed="sayHi" on-data-changed="sayHello" -->
-    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="student_id" on-firebase-value="checkSingleTempResult"></firebase-collection>
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="last_name" equal-to="Grusd" on-firebase-value="checkSingleTempResult"></firebase-collection>
     <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
@@ -199,7 +198,7 @@
             <paper-button raised class="red" on-tap="overwriteAllCheckedConflicts">Overwrite Existing Result</paper-button>
             <paper-button raised class="red" on-tap="deletaAllCheckedConflicts">Delete</paper-button>
           </paper-toolbar>
-          <template is="dom-repeat" id="list_of_conflicts" items="{{score_conflicts}}">
+          <!--<template is="dom-repeat" id="list_of_conflicts" items="{{score_conflicts}}">
             <paper-item>
               <div class="horizontal layout center">
                 <div>
@@ -212,12 +211,20 @@
                 </div>
               </div>
             </paper-item>
-          </template>
+          </template>-->
+          <template is="dom-repeat" items="{{test_results}}">
+        <paper-item><p><span>{{item.first_name}}</span> <span>{{item.last_name}}</span> <span>{{item.total_score}}</span>
+          <template is="dom-repeat" items="{{test_results}}" ><span>{{item.total_score}}</span></template>
+          </p>
+        </paper-item>
+      </template>
           <array-selector id="conflict_selector" items="{{score_conflicts}}" selected="{{selected_conflicts}}" multi></array-selector>
         </paper-header-panel>
       </div>
     </div>
+    <div>
 
+    </div>
     <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv"/>
     <paper-toast id="uploadSuccessToast" text="File uploaded successfully!"></paper-toast>
     <paper-toast id="uploadFailToast" text="Error uploading file!"></paper-toast>
@@ -686,9 +693,9 @@
                     test_obj = self.convertScores(test_obj);
 
                     //console.log(self.$.test_results_loc.equalTo);
-                    //self.$.test_results_loc.add(test_obj);
+                    self.$.test_results_loc.add(test_obj);
 
-                    self.$.temp_test_results_loc.add(test_obj);
+                    //self.$.temp_test_results_loc.add(test_obj);
                     //console.log(key_for_added);
 
                     /*//self.$.test_results_loc.orderByChild = "student_id";
