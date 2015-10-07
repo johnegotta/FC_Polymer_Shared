@@ -1,23 +1,60 @@
 <dom-module id="fc-student-intake-form">
 <template>
 <style is="custom-style">
+host: {--container-layout-center-center-justified-block
+	@a
+};
+
+neon-animatable {
+        color: black;
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        @apply(--paper-font-merriweather);
+         @apply(--paper-font-size-.9em);
+      }
+      neon-animatable:nth-child(1) {
+        background: var(--paper-white-500);
+      }
+      neon-animatable:nth-child(2) {
+        background: var(--paper-white-500);
+      }
+      neon-animatable:nth-child(3) {
+        background: var(--paper-white-500);
+      }
+
 .intakeForm {
     --paper-card-header-image: {
-        width: 330px;
-        height: 160px;
+    	display: block;
+        max-width: 240px;
+        min-width: 131.667px;
+        max-height: 106.543px;
+        min-height: 60px;
         margin-top: 22px;
     };
     --paper-card-header-text: {
-    	margin-top: 90px;
-    	margin-left: 120px;
+    	display: flex; 
+    	color: #000066;
+    	font-family: merriweather; 
+    	right: 34px;
+    	font-weight: 700;
+    	padding: 28px;
+    	font-size: 24px;
     	line-height: 0;
+    	display: block;
+
+
     
     	
     };
     --paper-card:{
-    	width: 600px;
+    	max-width: 550px;
+    	min-width: 351px;
+    	max-height: 710px;
+    	min-height: 481px;
     	margin: 25px;
-    	padding: 10px 20px 15px 20px;
+    	padding: 6px 12px 8px 12px;
+    	display: flex;
+    	flex-direction: column;
 
 
 
@@ -27,18 +64,18 @@
     }
     .labelsClass {
     	    width: 240px; 
-    		height: 90px; 
+    		height: 75px; 
     		padding: 0px 15px;
       --paper-input-container-label:{
         font-family: Merriweather;
         font-weight: 700;
-        font-size: 24px;
+        font-size: 21px;
         color: navy;
     };
 
     --paper-input-container-label-focus:{
-        color: green;
-        font-size: 26px;
+        color: #000066;
+        font-size: 21px;
 
 
     };
@@ -47,6 +84,7 @@
 	font-size: .8em;
 	font-family: Merriweather;
 	font-weight: 600;
+	line-height: 0px;
 	
 }
   .offset{
@@ -56,7 +94,7 @@
       --paper-input-container-label:{
         font-family: Merriweather;
         font-weight: 700;
-        font-size: 24px;
+        font-size: 21px;
         color: navy;
         margin-left: -42px;
     };
@@ -64,8 +102,10 @@
   }
 
   paper-input.input { 
-          width: 240px; 
-          height: 75px; 
+          max-width: 240px;
+          min-width: 150px; 
+          max-height: 105px;
+          min-height: 60px; 
           padding: 0px 15px;
         }
     h5{
@@ -80,96 +120,108 @@
     }
 
     .holderClass {
-    	width: 540px;
-    	height: 80px;
+    	min-width: 351px;
+		max-width: 651px;    	
+		min-height: 65px;
+		max-height: 135px;
 }
 	.subheading {
 	font-size: 16px;
 	margin-top: -10px;
-	position: absolute;
-	right: 16px;
     }
+    iron-icon{ 
+    	width: 36px;
+    	height: 36px;
+
+
+    }
+  .setHeight {
+  	height: 720px;
+  	width: 525px;
+  }
 
 </style>
 <iron-form id="studentIntakeForm">
-<!--
-<neon-animated-pages selected='0'>-->
-				<paper-card heading="Student Intake Form Page 1" elevation="3" class="intakeForm" style="min-height: 700px;" image="../../../images/FC_frontpage_logo.png">
+
+<neon-animated-pages id="pages" class="flex" selected="0" entry-animation="[[slide-from-right-animation]]" exit-animation="[[slide-left-animation]]">
+		<neon-animatable class="setHeight fit" selected>
+		<paper-card heading="Intake Form" elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
 				<iron-icon-button class="iconposition" icon="information"></iron-icon-button>
 				<div class="card-content">
-
-
-
-					<section name="callDateAndTime">
-						<span class="questionHeader">Classify this caller as a student, parent (father/mother) or 'other' type of caller.</span>
+					<section name="callDateAndTimeAndCallerRole">
+						<span class="questionHeader">Classify this caller as a student, parent (father/mother) or 'other'.</span>
 						<fc-holder class="horizontal layout container holderClass"> 
-								<paper-input class="labelsClass" value='[[timeStamp]]' read-only=true label='Date & Time'></paper-input>
-								<paper-input type="list" class="labelsClass" id="role" label="Inquirer Role" always-float-label='true' list="two"> </paper-input>
+								<paper-input class="labelsClass" id="callTimestamp" value='[[timeStamp]]' read-only=true label='Date & Time'></paper-input>
+								<paper-input type="list" value='{{callerRole}}' class="labelsClass" id="callerRole" label="Caller Role" always-float-label='true' list="two"> </paper-input>
                                          <datalist id="two">
-                                              <option value="Mother"> Mother</option>
-                                              <option value="Father"> Father </option>
-                                              <option value="Student"> Student </option>
-                                              <option value="Other"> Other </option>
+                                              <option value="{{Mother}}"> Mother</option>
+                                              <option value="{{Father}}"> Father </option>
+                                              <option value="{{Student}}"> Student </option>
+                                              <option value="{{Other}}"> Other </option>
                                          </datalist>
-				        </fc-holder>
+				        		</fc-holder>
 					</section>
 
-					<section name="ClientIntake">
-						<span class="questionHeader">Type the Caller's and <i>Related Student</i>'s names into the labelled fields below.</span>
+					<section name="callerIntake">
+						<span class="questionHeader">Type the Caller's first & last names into the below fields.</span>
 						<fc-holder class="horizontal layout container holderClass">
-				            <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller First Name'  value='{{inquirer.firstname}}'>
+				            <fc-paperInput id='callerFirstName' class="labelsClass" name='callerFirst' tab-index='0' label='Caller First'  value='{{callerFirst}}' on-input="updateInput">
 				            </fc-paperInput>
-				            <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{inquirer.lastname}}'>
+				            <fc-paperInput id='callerLastName' class="labelsClass" name='callerLast' label='Caller Last Name'  value='{{callerLast}}' on-input="updateInput">
 				            </fc-paperInput>
 				        </fc-holder>
-				        <fc-holder class="horizontal layout container holderClass"> 
-				            <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{inquirer.studentfirstname}}'>
+				        </section>
+				        <section name="studentName">
+				        <span class="questionHeader">Type the <a href="http://www.focusedcoaching.com"><i>Related Student</i></a>'s names into the labelled fields below.</span>
+				        <fc-holder class="horizontal layout container holderClass">
+				            <fc-paperInput id='studentFirst' class="labelsClass" name='studentFirst' class="labelsClass" label='Student First' value='{{caller.studentFirst}}' on-input="updateInput">
 				            </fc-paperInput>
-				            <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{inquirer.studentlastname}}'>
+				            <fc-paperInput id='studentLast' class="labelsClass"  name='studentLast' label='Student Last'  value='{{caller.studentLast}}' on-input="updateInput">
 				            </fc-paperInput>
 				        </fc-holder>
 				   
 				    </section>
 					<section>
-				    	<span class="questionHeader">To identify a previous caller, confirm a client's phone number or email address.</span>
+				    	<span class="questionHeader">Confirm a client's phone number or email address.</span>
 				    	<fc-holder class="horizontal layout container holderClass center-justified">  
-				                <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='phone' label='Phone' value='{{inquirer.phone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
+				                <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='callerPhone' label='Phone' value='{{callerPhone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
 				                </gold-phone-input> 
-				                <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{inquirer.email}}'></gold-email-input>   
+				                <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{callerEmail}}'></gold-email-input>   
 				        </fc-holder>
 				    </section>
 
 
 
 					<section>   
-						<span class="questionHeader"> SELECT <a href="http://www.focusedcoaching.com"><u>a Previous Caller's</u></a> <span> contact information from the CALL LIST to your right.</span><span>[[activate]]</span></span>
+						<span class="questionHeader"> SELECT <a href="http://www.focusedcoaching.com"><u>a Previous Caller's</u></a> </span><span class="questionHeader"> contact information from the</span><paper-button class="questionHeader" on-tap="_focusedAssistant">Call List</paper-button>.</span>
 						<br>
-					<div class="layout horizontal center center-justified">	<paper-button> Confirm Caller Selection</paper-button></div>
 					</section>
 
-					<paper-status></paper-status>
+				<paper-status></paper-status>
 				</div>
 
 				    <div class="card-actions horizontal layout flex container center-justified">
-				              <paper-button class="flex-1">End Call</paper-button><paper-button class="flex-1">CONTINUE</paper-button>
-				      </div>
+				              <paper-button class="flex-1">back</paper-button><paper-button class="flex-1" id="one" on-tap="nextPage">CONTINUE</paper-button>
+		</div>
+	</paper-card>
+</neon-animatable>
+<!--NEW CARD SERVICE MATCH-->
 				
-				</paper-card>
-
-				<paper-card heading="Student Intake Page 2" elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
-				<div class="card-content">
-				<div class="card-content layout vertical container flex wrap center center-justify">
-				     <fc-holder class="horizontal layout container holderClass">
-				                <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller First Name'  value='{{inquirer.firstname}}'>
-				                    </fc-paperInput>
-				                <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{inquirer.lastname}}'>
+<neon-animatable class="setHeight fit">
+	<paper-card id="pagetwo" heading="Student Intake Page 2" hidden elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
+			<div class="card-content layout vertical container flex wrap center center-justify">
+			scar
+				<fc-holder class="horizontal layout container holderClass">
+				        <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller First Name'  value='{{}}'>
+				            </fc-paperInput>
+				                <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{}}'>
 				                    </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder   class="horizontal layout container holderClass"> 
-				                <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{inquirer.studentfirstname}}'>
+				                <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{}}'>
 				                </fc-paperInput>
 				              
-				                 <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{inquirer.studentlastname}}'>
+				                 <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{}}'>
 				                  </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder class="horizontal layout container holderClass">  
@@ -187,13 +239,13 @@
 				                                                  <option value="12">12th </option>
 				                                             </datalist>
 				                  
-				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{inquirer.school}}'>
+				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{}}'>
 				                         </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder class='horizontal layout container holderClass'>
-				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{inquirer.schooltown}}'>
+				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{}}'>
 				                         </fc-paperInput>
-				                         <paper-input type="list" class="labelsClass" id="role" label="Inquirer Role" always-float-label='true' list="two"> </paper-input>
+				                         <paper-input type="list" class="labelsClass" id="role" label="caller Role" always-float-label='true' list="two"> </paper-input>
 				                                             <datalist id="two">
 				                                                  <option value="Mother"> Mother</option>
 				                                                  <option value="Father"> Father </option>
@@ -203,19 +255,9 @@
 				               
 				          </fc-holder>
 				          
-				<details><summary>Student Intake Forms</summary>
-				* Required
-				New Student Registration Form
-				This form is for all new students, even if other children in the same family participated in Focused Coaching Classes or other services. 
-				Parents First Name: *
-				 
-				Parent Last Name: *
-				 
-				Student First Name: *
-				 
-				Student Last Name: *
-				 
-				Current School:
+				
+				<details> 
+<summary>					Current School:
 
 				School Town/City/State:
 
@@ -224,7 +266,7 @@
 
 				Caller Role: *
 				 
-				Phone Number(s): *
+				Phone Number(s): *</summary>
 				Please click here to add an additional phone number. [Have Student and Parent]
 				 
 				Email Address(es): *
@@ -243,38 +285,40 @@
 				<paper-progress></paper-progress>
 				</div>
 				<div class="card-actions horizontal layout flex container center-justified">
-				              <paper-button class="flex-1">BACK</paper-button><paper-button class="flex-1">CONTINUE</paper-button>
+				              <paper-button class="flex-1" on-tap='lastPage'>BACK</paper-button><paper-button id="two" class="flex-1" on-tap="nextPage">CONTINUE</paper-button>
 				      </div>
 				      </div>
-				      </paper-card>
-
-				<paper-card heading="Student Intake Page 3" elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
+				 </paper-card>
+</neon-animatable>
+<!--CARD_THREE-->
+<neon-animatable class="setHeight fit">
+				<paper-card id="pagethree" heading="Student Intake Page 3" hidden elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
 				<div class="card-content layout vertical container flex wrap center center-justify">
 				<div class="subheading">Course and Service Match</div>
 				     <fc-holder class="horizontal layout container holderClass">
-				                <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller First Name'  value='{{inquirer.firstname}}'>
+				                <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller First Name'  value='{{caller.firstname}}'>
 				                    </fc-paperInput>
-				                <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{inquirer.lastname}}'>
+				                <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{caller.lastname}}'>
 				                    </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder   class="horizontal layout container holderClass"> 
-				                <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{inquirer.studentfirstname}}'>
+				                <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{caller.studentfirstname}}'>
 				                </fc-paperInput>
 				              
-				                 <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{inquirer.studentlastname}}'>
+				                 <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{caller.studentlastname}}'>
 				                  </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder class="horizontal layout container holderClass">  
 				        
 				                    <paper-input class="labelsClass" always-float-label='true' label="Grade Level" list="betty" name="bday"> </paper-input>
 				                                             
-				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{inquirer.school}}'>
+				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{caller.school}}'>
 				                         </fc-paperInput>
 				          </fc-holder>
 				          <fc-holder class='horizontal layout container holderClass'>
-				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{inquirer.schooltown}}'>
+				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{caller.schooltown}}'>
 				                         </fc-paperInput>
-				                         <paper-input class="labelsClass" id="role" label="Inquirer Role" always-float-label='true' list="two"> </paper-input>
+				                         <paper-input class="labelsClass" id="role" label="caller Role" always-float-label='true' list="two"> </paper-input>
 				                                             <datalist id="two">
 				                                                  <option value="Mother"> Mother</option>
 				                                                  <option value='Father'> Father </option>
@@ -284,9 +328,9 @@
 				               
 				          </fc-holder>
 				          <fc-holder class="horizontal layout container holderClass center-justified">  
-				                <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='phone' label='Phone' value='{{inquirer.phone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
+				                <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='phone' label='Phone' value='{{caller.phone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
 				                    </gold-phone-input> 
-				                <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{inquirer.email}}'></gold-email-input>   
+				                <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{caller.email}}'></gold-email-input>   
 				          </fc-holder>   
 				<details><summary>Student Intake Forms</summary>
 				Student Intake Forms
@@ -314,7 +358,7 @@
 				</div>
 				<paper-progress></paper-progress>
 				<div class="card-actions horizontal layout flex container center-justified">
-				              <paper-button class="flex-1">BACK</paper-button><paper-button class="flex-1">CONTINUE</paper-button>
+				              <paper-button on-tap="nextPage" class="flex-1">BACK</paper-button><paper-button  on-tap="lastPage" class="flex-1">CONTINUE</paper-button>
 				      </div>
 				</paper-card>
 				<!--
@@ -407,36 +451,91 @@
 				<!--</neon-animated-pages>-->
 
 
+</neon-animatable>
+</neon-animated-pages>
 
-
+</iron-form>
 				</template>
 <script>
 Polymer({
 	is: 'fc-student-intake-form',
+	behaviors: [
+    		Polymer.NeonAnimatableBehavior,
+    		],
 	properties: {
+		animatable: true,
 		timeStamp: Date,
 		callerSearch: String,
 		daysOfWeek: String,
 		month: String,
 		day: String, 
-		year: String, 
+		year: String,
+		calls: {
+			type: Object,
+			value: {
+				callerRole: String,
+				callerFirst: String,
+				callerLast: String,
+				studentFirst: String,
+				studentLast: String,
+				callerEmail: String,
+				callerPhone: String,
+				grade: String,
+				school: String, 
+				schoolTown: String,
+				coachChoice: String, 
+				courseScheduleChoice: String,
+				testDateChoice: Date,  
+				studentEmail: String, 
+				studentPhone: String, 
+				studentPastAcademics: Object, 
+				callerCommitsToCourse: Boolean, 
+				reflectToAttributes: true, 
+				notify: true
+			},
+
+			notify: true,
+			reflectToAttributes: true
+		}, 
 		notify: true,
-		reflectToAttributes: true /*,
+		reflectToAttributes: true,
+
+animationConfig: {
+  value: function() {
+    return {
+      // fade-in-animation is run with a 50ms delay from slide-down-animation
+      'entry': [{
+        name: 'slide-from-right-animation',
+        node: this
+      }, {
+        name:  'slide-left-animation',
+        node: this,
+        timing: {delay: 50}
+      }],
+      'exit': [{
+        name: 'slide-left-animation',
+        node: this
+      }, {
+        name:  'slide-from-right-animation',
+        node: this,
+        timing: {delay: 50}
+      }]
+    }
+  }
+},
 		
-
-		animation-config:{ 
-			slide-left:{},
-
-
-
-
-
-
-			slide-right:{}
-		}*/
 
 	},
 
+	updateInput: function(e){
+		var x = document.querySelector("#callList");
+		var tempObj = {"firstname": this.caller.firstname, "lastname": this.caller.lastname, "studentfirstname": this.caller.studentfirstname, "studentlastname": this.caller.studentlastname};
+		if(x)
+		{
+			x.updateFilter(tempObj);
+		}
+	},
+	
 	ready: function(){ 
 		var d = new Date();
 		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -447,12 +546,29 @@ Polymer({
 		console.log(d);
 		var year = this.year = d.getFullYear().toString();
 		this.timeStamp = days[d.getDay()].toString() +',' + ' ' + this.month + ' ' + day + ',' + ' ' +year;
-		
-
-
-
-
 	},
+
+	nextPage: function(e){
+		/*var num = e.target.id;
+		console.log(e.target);
+		console.log("continue clicked for " + num);
+
+		if(num == "one")
+		{
+			this.$.pageone.hidden = true;
+			this.$.pagetwo.hidden = false;
+		}*/
+   		this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+        this.selected = this.selected === 2 ? 0 : (this.selected + 1);
+              },
+
+    lastPage: function() {
+     	this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+     	this.selected = this.selected === 0 ? 2 : (this.selected - 1);
+      },
+
 
 	__someButtonPushLeft: function(){
 
