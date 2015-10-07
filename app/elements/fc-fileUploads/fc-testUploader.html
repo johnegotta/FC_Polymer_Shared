@@ -1,7 +1,7 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!--<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">-->
 
 <dom-module id="fc-testUploader">
   <template>
@@ -22,6 +22,7 @@
         max-height: 300px;
         overflow-y: auto;
         display: inline-block;
+        font-size: 12px;
       }
 
       #dropArea {
@@ -31,32 +32,65 @@
       #conflictBox, #addedResultsBox {
         margin-left: 20px;
         margin-bottom: 10px;
-        height: 600px;
-        overflow-y: none;
-        display: inline-block;
+        height: 500px;
+        overflow-y: auto;
+        display: block;
         color: #555;
         border: 1px solid #111;
       }
 
+<<<<<<< HEAD
       #conflictBox paper-item{
         border: 1px solid #111;
+=======
+      #conflictBox paper-item {
+        border: 1px solid #111;
+        font-size: 10px;
+        height: 25px;
+      }
+
+      #addedResultsBox paper-item {
+        font-size: 10px;
+        height: 16px;
+>>>>>>> John
       }
 
       #conflictBox p span{
         font-weight: bold;
       }
 
+<<<<<<< HEAD
       paper-button.white{
+=======
+      paper-button {
+        font-size: 10px;
+        text-align: center;
+      }
+
+      paper-button iron-icon {
+        height: 10px;
+      }
+
+      paper-button.white {
+>>>>>>> John
         color: black;
         background-color: white;
       }
 
+<<<<<<< HEAD
       paper-button.green{
+=======
+      paper-button.green {
+>>>>>>> John
         color: white;
         background-color: green;
       }
 
+<<<<<<< HEAD
       paper-button.red{
+=======
+      paper-button.red {
+>>>>>>> John
         color: white;
         background-color: red;
       }
@@ -102,12 +136,24 @@
         --paper-progress-active-color: #f40303;
       }
     </style>
+<<<<<<< HEAD
     <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}"></firebase-collection>
     <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="sayHi"></firebase-collection>
+=======
+    <firebase-collection id="test_results_loc" location="https://focusedstaging1.firebaseio.com/test_results" data="{{test_results}}" order-by-child="last_name" equal-to="Grusd" on-firebase-value="checkSingleTempResult"></firebase-collection>
+    <firebase-collection id="temp_test_results_loc" location="https://focusedstaging1.firebaseio.com/temp_test_results" data="{{temp_test_results}}" order-by-child="student_id"></firebase-collection>
+    <firebase-collection id="newly_added_results_loc" location="https://focusedstaging1.firebaseio.com/newly_added_results" data="{{newly_added_results}}" on-firebase-child-added="removeNewlyAddedResult" on-firebase-child-removed="removeNewlyAddedResultsIntervals"></firebase-collection>
+>>>>>>> John
     <firebase-collection id="score_conflicts_loc" location="https://focusedstaging1.firebaseio.com/test_result_conflicts" data="{{score_conflicts}}"></firebase-collection>
+    <firebase-collection id="test_names_loc" location="https://focusedstaging1.firebaseio.com/2400_SAT_tests" data="{{2400_SAT_tests}}"></firebase-collection>
     <firebase-document id="score_chart_loc" location="https://focusedstaging1.firebaseio.com/score_conversion_charts" data="{{score_charts}}"></firebase-document>
+
     <div class="horizontal layout">
+<<<<<<< HEAD
       <div class="flex-1">
+=======
+      <div class="flex-3">
+>>>>>>> John
         <paper-button id="button" icon="file-upload" class="blue" on-click="_fileClick">
           <content></content>
         </paper-button>
@@ -137,11 +183,11 @@
                       <paper-item>Score Table</paper-item>
                     </paper-menu>
                   </paper-dropdown-menu>
-                  <paper-dropdown-menu id="testSelector" label="For Which Test" on-selected-item-changed="_setTestName">
+                  <paper-dropdown-menu label="Test Name" on-selected-item-changed="_setTestName">
                     <paper-menu class="dropdown-content">
-                      <paper-item>Test 1</paper-item>
-                      <paper-item>Test 2</paper-item>
-                      <paper-item>Test B12A</paper-item>
+                      <template is="dom-repeat" items="{{2400_SAT_tests}}">
+                        <paper-item>{{item.testname}}</paper-item>
+                      </template>
                     </paper-menu>
                   </paper-dropdown-menu>
                 </div>
@@ -154,8 +200,12 @@
       <div id= "addedResultsBox" class="flex-1">
         <paper-header-panel>
           <paper-toolbar>
+<<<<<<< HEAD
             <span class="flex"><h2>Added Results For:</h2></span>
             <paper-button raised class="white" on-tap="clearAddedResults">Clear</paper-button>
+=======
+            <span class="flex"><h5>Added Results For:</h5></span>
+>>>>>>> John
           </paper-toolbar>
           <template is="dom-repeat" items="{{newly_added_results}}">
             <paper-item>
@@ -167,23 +217,39 @@
         </paper-header-panel>
       </div>
 
+<<<<<<< HEAD
       <div id= "conflictBox" class="flex-2">
+=======
+      <div id= "conflictBox" class="flex-4">
+>>>>>>> John
         <paper-header-panel>
           <paper-toolbar>
             <span><h2>Test Result Conflicts</h2></span>
             <paper-button raised class="white" on-tap="toggleConflictChecks">
+<<<<<<< HEAD
               <iron-icon icon="check"></iron-icon><span>{{_checkButtonText}}</span>
+=======
+              <iron-icon icon="check"></iron-icon><span class="flex"></span><span>{{_checkButtonText}}</span>
+>>>>>>> John
             </paper-button>
             <span class="flex"></span>
             <paper-button raised class="green" on-tap="addAllCheckedConflictsAsNewResult">Add As New Result</paper-button>
             <paper-button raised class="red" on-tap="overwriteAllCheckedConflicts">Overwrite Existing Result</paper-button>
             <paper-button raised class="red" on-tap="deletaAllCheckedConflicts">Delete</paper-button>
           </paper-toolbar>
+<<<<<<< HEAD
           <template is="dom-repeat" id="list_of_conflicts" items="{{score_conflicts}}">
             <paper-item>
               <div class="horizontal layout center">
                 <div>
                 <paper-checkbox></paper-checkbox>
+=======
+          <!--<template is="dom-repeat" id="list_of_conflicts" items="{{score_conflicts}}">
+            <paper-item>
+              <div class="horizontal layout center">
+                <div>
+                  <paper-checkbox on-iron-change="addConflictToConflictSelector"></paper-checkbox>
+>>>>>>> John
                 </div>
                 <div on-tap="_checkConflict">
                   <p>
@@ -192,122 +258,305 @@
                 </div>
               </div>
             </paper-item>
+<<<<<<< HEAD
           </template>
+=======
+          </template>-->
+          <template is="dom-repeat" items="{{test_results}}">
+        <paper-item><p><span>{{item.first_name}}</span> <span>{{item.last_name}}</span> <span>{{item.total_score}}</span>
+          <template is="dom-repeat" items="{{test_results}}" ><span>{{item.total_score}}</span></template>
+          </p>
+        </paper-item>
+      </template>
+>>>>>>> John
           <array-selector id="conflict_selector" items="{{score_conflicts}}" selected="{{selected_conflicts}}" multi></array-selector>
         </paper-header-panel>
       </div>
     </div>
+<<<<<<< HEAD
     <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv">
     <paper-toast id="uploadSuccessToast" text="File uploaded successfully!"></paper-toast>
     <paper-toast id="uploadFailToast" text="Error uploading file!"></paper-toast>
   </template>
+=======
+    <div>
+>>>>>>> John
 
-</dom-module>
+    </div>
+    <input type="file" id="fileInput" on-change="_fileChange" hidden multiple="{{multi}}" accept=".csv"/>
+    <paper-toast id="uploadSuccessToast" text="File uploaded successfully!"></paper-toast>
+    <paper-toast id="uploadFailToast" text="Error uploading file!"></paper-toast>
+  </template>
 
-<script>
+  <script>
 
-  Polymer({
+    Polymer({
 
-    is: 'fc-testUploader',
+      is: 'fc-testUploader',
 
-     /**
-      * Fired when a response is received status code 200.
-      *
-      * @event success
-    */
-     /**
-      * Fired when a response is received other status code.
-      *
-      * @event error
-    */
+      properties: {
 
-    properties: {
+        /**
+         * `target` is the target url to upload the files to.
+         * Additionally by adding "<name>" in your url, it will be replaced by
+         * the file name.
+         */
+        target: {
+          type: String,
+          value: ""
+        },
 
-      /**
-       * `target` is the target url to upload the files to.
-       * Additionally by adding "<name>" in your url, it will be replaced by
-       * the file name.
-       */
-      target: {
-        type: String,
-        value: ""
+        /**
+         * `progressHidden` indicates whether or not the progress bar should be hidden.
+         */
+        progressHidden: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * `droppable` indicates whether or not to allow file drop.
+        */
+        droppable: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * `dropText` is the  text to display in the file drop area.
+        */
+        dropText: {
+          type: String,
+          value: "Drop CSV Files Here"
+        },
+
+        /**
+         * `multi` indicates whether or not to allow multiple files to be uploaded.
+        */
+        multi: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * `files` is the list of files to be uploaded
+        */
+        files: {
+          type: Array,
+          value: []
+        },
+
+        /**
+         * `method` is the http method to be used during upload
+        */
+        method: {
+          type: String,
+          value: "PUT"
+        },
+
+        /**
+         * `raised` indicates whether or not the button should be raised
+        */
+        raised: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * `noink` indicates that the button should not have an ink effect
+        */
+        noink: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * `_hiddenDropText` indicates whether or not the drop text should be shown
+        */
+        _hiddenDropText: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * `headers` is a key value map of header names and values
+        */
+        headers: {
+          type: Object,
+          value: {},
+        },
+
+        allConflictsChecked: {
+          type: Boolean,
+          value: false
+        },
+
+        _checkButtonText: {
+          type: String,
+          value: 'Check All'
+        },
+
+        addedResults: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+
+        idToSearchBy: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        numIncomingResults: {
+          type: Number,
+          value: 0
+        },
+
+        currentResult: {
+          type: Number,
+          value: 0
+        }
       },
 
       /**
-       * `progressHidden` indicates whether or not the progress bar should be hidden.
-       */
-      progressHidden: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * `droppable` indicates whether or not to allow file drop.
+       * Clears the list of files
       */
-      droppable: {
-        type: Boolean,
-        value: false
+      clear: function() {
+        this.set("files", []);
+        this._showDropText();
+      },
+
+      ready: function() {
+        if (this.raised) {
+          this.toggleAttribute("raised", true, this.$.button);
+        }
+        if (this.noink) {
+          this.toggleAttribute("noink", true, this.$.button);
+        }
+        if (this.droppable) {
+          this._showDropText();
+          this.setupDrop();
+        }
       },
 
       /**
-       * `dropText` is the  text to display in the file drop area.
+       * A function to set up a drop area for drag-and-drop file uploads
       */
-      dropText: {
-        type: String,
-        value: "Drop CSV Files Here"
+      setupDrop: function() {
+        var uploadBorder = this.$.UploadBorder;
+        this.toggleClass("enabled", true, uploadBorder);
+
+        this.ondragover = function(e) {
+          e.stopPropagation();
+          this.toggleClass("hover", true, uploadBorder);
+          return false;
+        }
+
+        this.ondragleave = function() {
+          this.toggleClass("hover", false, uploadBorder);
+          return false;
+        }
+
+        this.ondrop = function(event) {
+          this.toggleClass("hover", false, uploadBorder);
+          event.preventDefault();
+          var length = event.dataTransfer.files.length;
+          for (var i = 0; i < length; i++) {
+            var file = event.dataTransfer.files[i];
+            file.progress = 0;
+            file.error = false;
+            file.complete = false;
+            this.push("files", file);
+            this._showDropText();
+            //this.uploadFile(file);
+          }
+        }
       },
 
       /**
-       * `multi` indicates whether or not to allow multiple files to be uploaded.
+       * Clicks the invisible file input
       */
-      multi: {
-        type: Boolean,
-        value: true
+      _fileClick: function() {
+        var elem = this.$.fileInput;
+        if (elem && document.createEvent) { // sanity check
+          var evt = document.createEvent("MouseEvents");
+          evt.initEvent("click", true, false);
+          elem.dispatchEvent(evt);
+        }
       },
 
       /**
-       * `files` is the list of files to be uploaded
+       * Called whenever the list of selected files changes
       */
-      files: {
-        type: Array,
-        value: []
+      _fileChange: function(e) {
+        var length = e.target.files.length;
+        for (var i = 0; i < length; i++) {
+          var file = e.target.files[i];
+          file.progress = 0;
+          file.error = false;
+          file.complete = false;
+          this.push("files", file);
+          //this.uploadFile(file);
+        }
       },
 
       /**
-       * `method` is the http method to be used during upload
+       * Cancels the file upload for a specific file
+       *
+       * @param {object} a file, an element of the files array
       */
-      method: {
-        type: String,
-        value: "PUT"
+      cancel: function(file) {
+        if (file) {
+          this.splice("files", this.files.indexOf(file), 1);
+          this._showDropText();
+        }
       },
 
       /**
-       * `raised` indicates whether or not the button should be raised
+       * Cancels the file upload
+       *
+       * @param {object}, an event object
       */
-      raised: {
-        type: Boolean,
-        value: false
+      _cancelUpload: function(e) {
+        this.cancel(e.model.__data__.item);
       },
 
       /**
-       * `noink` indicates that the button should not have an ink effect
+       * Retries to upload the file
+       *
+       * @param {object}, an event object
       */
-      noink: {
-        type: Boolean,
-        value: false
+      _retryUpload: function(e) {
+        e.model.set("item.error", false);
+        e.model.set("item.progress", 0);
+        // The async helps give visual feedback of a retry occurring, even though it's less efficient.
+        var self = this;
+        this.async(function() {
+          self.uploadFile(e.model.__data__.item);
+        }, 50);
       },
 
       /**
-       * `_hiddenDropText` indicates whether or not the drop text should be shown
+       * Whether or not to display the drop text
+       (!this.files.length && this.droppable)
       */
-      _hiddenDropText: {
-        type: Boolean,
-        value: true
+      _showDropText: function() {
+        this.set("_hiddenDropText", !this._hiddenDropText);
       },
-
       /**
-       * `headers` is a key value map of header names and values
+       * Tell uploader if the CSV contains test results or score conversion chart
       */
+      _setFileType: function(e){
+        e.model.__data__.item.filetype = e.target.selectedItem.innerText;
+        if(e.model.__data__.item.filetype && e.model.__data__.item.testname){
+          this.uploadFile(e.model.__data__.item);
+        }
+      },
+      /**
+       * Tell uploader what test this goes with
+      */
+<<<<<<< HEAD
       headers: {
         type: Object,
         value: {},
@@ -627,15 +876,235 @@
                               break;
                             case 0:
                               if(question_response == ""){
-                                math_num_skipped++;
-                              } else {
-                                math_num_wrong++;
-                              }
-                              break;
-                          }
-                          break;
-                      }
+=======
+      _setTestName: function(e){
+        e.model.__data__.item.testname = e.target.selectedItem.innerText;
+        if(e.model.__data__.item.filetype && e.model.__data__.item.testname){
+          this.uploadFile(e.model.__data__.item);
+        }
+      },
+      /**
+       * Uploads a file
+       *
+       * @param {object} a file, an element of the files array
+      */
+      uploadFile: function(file) {
+        var regex = /.+(.csv)/;
+        if (!file || !regex.test(file.name.toLowerCase())) {
+          alert('Check that the file you want to add exists and that it is a CSV file.');
+          self.$.uploadFailToast.toggle();
+          return;
+        } else {
+          switch(file.filetype){
+            case 'Test Result':
+              this.uploadTestResult(file);
+              break;
+            case 'Score Table':
+              this.uploadScoreTable(file);
+              break;
+          }
+        }
+      },
+
+      uploadTestResult: function(file){
+
+        self = this;
+        var prefix = "files." + self.files.indexOf(file);
+        console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
+            if (typeof (FileReader) != "undefined") {
+              var reader = new FileReader();
+              reader.onload = function (e) {
+                var start_time = performance.now();
+                var essay_index = 0;
+                var student_id_index = 0;
+                var last_name_index = 0;
+                var first_name_index = 0;
+                var indices_to_skip = [];
+                var question_and_score_indices = [];
+
+                var rows = e.target.result.split(/[\r|\n]+/);
+                var numRows = rows.length;
+                var headers = rows[0].split(',');
+                var num_columns = headers.length;
+
+                //figure out which columns to look at when going through rows
+                for (var i = 0; i < num_columns; i++){
+                  var header_name = headers[i];
+                  var underscore_index = header_name.indexOf('_');
+                  var period_index = header_name.indexOf('.');
+
+                  if (period_index > -1 && underscore_index > -1){
+                    var nums_in_name = header_name.match(/\d+/g);
+                    nums_in_name = nums_in_name.map(function(value){
+                      return parseInt(value);
+                    });
+
+                    if (nums_in_name[2] <= nums_in_name[1]){
+                      var question_index_pair_info = {};
+                      var match_term = header_name.substring(0,underscore_index);
+                      question_index_pair_info['score_index'] = i;
+                      question_index_pair_info['response_index'] = headers.indexOf(match_term);
+                      question_index_pair_info['section_number'] = nums_in_name[0] == 0 ? 10 : nums_in_name[0];
+                      question_index_pair_info['question_number'] = nums_in_name[2];
+                      question_index_pair_info['section_type'] = header_name.indexOf('mfr') < 0 ? header_name[1] : 'mfr';
+                      question_and_score_indices.push(question_index_pair_info);
+                    }
                   }
+                }
+
+                var QASI_size = question_and_score_indices.length;
+                student_id_index = headers.indexOf('id');
+                last_name_index = headers.indexOf('Last Name');
+                first_name_index = headers.indexOf('First Name');
+                essay_index = headers.indexOf('essay_score');
+                indices_to_skip.push(student_id_index,last_name_index,first_name_index,essay_index);
+
+                var question_results = {};
+                var test_results = {};
+                this.numIncomingResults = numRows - 1;
+                for (var i = 1; i < numRows; i++) {
+
+                  var cells = rows[i].split(",");
+                  if(cells[essay_index] != "0" && cells[essay_index] != ""){
+                    var student_id = cells[student_id_index];
+                    var last_name = cells[last_name_index];
+                    var first_name = cells[first_name_index];
+                    var essay_score = cells[essay_index];
+                    var math_raw = 0;
+                    var math_num_right = 0;
+                    var math_num_wrong = 0;
+                    var math_num_skipped = 0;
+                    var reading_raw = 0;
+                    var reading_num_right = 0;
+                    var reading_num_wrong = 0;
+                    var reading_num_skipped = 0;
+                    var writing_raw = 0;
+                    var writing_num_right = 0;
+                    var writing_num_wrong = 0;
+                    var writing_num_skipped = 0;
+
+                    for (var j = 0; j < QASI_size; j++) {
+
+                        var question_score = parseFloat(cells[question_and_score_indices[j]['score_index']]);
+                        var question_response = cells[question_and_score_indices[j]['response_index']];
+                        switch(question_and_score_indices[j]['section_type']){
+                          case 'c':
+                            reading_raw += question_score;
+                            switch(question_score){
+                              case 1:
+                                reading_num_right++;
+                                break;
+                              case 0:
+                                reading_num_skipped++;
+                                break;
+                              case -0.25:
+                                reading_num_wrong++;
+                                break;
+                            }
+                            break;
+                          case 'w':
+                            writing_raw += question_score;
+                            switch(question_score){
+                              case 1:
+                                writing_num_right++;
+                                break;
+                              case 0:
+                                writing_num_skipped++;
+                                break;
+                              case -0.25:
+                                writing_num_wrong++;
+                                break;
+                            }
+                            break;
+                          case 'm':
+                            math_raw += question_score;
+                            switch(question_score){
+                              case 1:
+                                math_num_right++;
+                                break;
+                              case 0:
+>>>>>>> John
+                                math_num_skipped++;
+                                break;
+                              case -0.25:
+                                math_num_wrong++;
+                                break;
+                            }
+                            break;
+                          case 'mfr':
+                            math_raw += question_score;
+                            switch(question_score){
+                              case 1:
+                                math_num_right++;
+                                break;
+                              case 0:
+                                if(question_response == ""){
+                                  math_num_skipped++;
+                                } else {
+                                  math_num_wrong++;
+                                }
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    var date_uploaded = new Date().toString();
+                    var test_obj = {
+                      'test': file.testname,
+                      'last_name': last_name,
+                      'first_name': first_name,
+                      'student_id': student_id.toString(),
+                      'reading_raw': reading_raw,
+                      'reading_correct': reading_num_right,
+                      'reading_wrong': reading_num_wrong,
+                      'reading_skipped': reading_num_skipped,
+                      'math_raw': math_raw,
+                      'math_correct': math_num_right,
+                      'math_wrong': math_num_wrong,
+                      'math_skipped': math_num_skipped,
+                      'writing_raw': writing_raw,
+                      'essay_score' : parseInt(essay_score),
+                      'writing_correct': writing_num_right,
+                      'writing_wrong': writing_num_wrong,
+                      'writing_skipped': writing_num_skipped,
+                      'date_uploaded': date_uploaded
+                    };
+
+                    test_obj = self.convertScores(test_obj);
+
+                    //console.log(self.$.test_results_loc.equalTo);
+                    self.$.test_results_loc.add(test_obj);
+
+                    //self.$.temp_test_results_loc.add(test_obj);
+                    //console.log(key_for_added);
+
+                    /*//self.$.test_results_loc.orderByChild = "student_id";
+                    console.log(test_obj['student_id']);
+                    self.$.test_results_loc.setAttribute('equal-to',test_obj.student_id);
+                    //self.$.test_results_loc.equalTo = i%2 == 0 ? 1050 : 1110;
+                    //console.log(self.$.test_results_loc.equalTo);
+                    console.log(self.$.test_results_loc.data);
+                    self.$.test_results_loc.add(test_obj);
+                    //self.$.newly_added_results_loc.add(test_obj);
+                    self.$.test_results_loc.removeAttribute('equal-to');
+                    console.log(self.$.test_results_loc.data);
+
+                    if (self.test_results.some( function(e) {
+                      if(e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test){
+                        var conflict = {};
+                        conflict['old_result'] = e;
+                        conflict['new_result'] = test_obj;
+                        self.$.score_conflicts_loc.add(conflict);
+                      }
+                      return e.student_id == test_obj.student_id && e.last_name == test_obj.last_name && e.first_name == test_obj.first_name && e.test == test_obj.test;
+                      })) {
+                      continue;
+                    } else {
+                      self.$.test_results_loc.add(test_obj);
+                      self.$.newly_added_results_loc.add(test_obj);
+                    }*/
+                  }
+<<<<<<< HEAD
                   var date_uploaded = new Date().toString();
                   var test_obj = {
                     'test': file.testname,
@@ -673,36 +1142,100 @@
                     self.$.test_results_loc.add(test_obj);
                     self.$.newly_added_results_loc.add(test_obj);
 
+=======
+                  else {
+                    continue;
+>>>>>>> John
                   }
-                }
-                else {
-                  continue;
-                }
-                self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
+                  self.set(prefix + ".progress", Math.floor((i/numRows)*1000)/10);
 
+                }
+                self.set(prefix + ".complete", true);
+                self.set(prefix + ".progress", 100);
+                self.cancel(file);
+                self.beginCheckingTempTestResults();
+                var endtime = performance.now();
+                var full_time = endtime - start_time;
+                console.log("Full Time: " + full_time.toString());
+                self.$.uploadSuccessToast.toggle();
               }
-              self.set(prefix + ".complete", true);
-              self.set(prefix + ".progress", 100);
-              self.cancel(file);
+              reader.readAsText(file);
             }
+<<<<<<< HEAD
             reader.readAsText(file);
           }
           else {
             alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
             self.$.uploadFailToast.toggle();
             self.set(prefix + ".error", true);
-          }
+=======
+            else {
+              alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
+              self.$.uploadFailToast.toggle();
+              self.set(prefix + ".error", true);
+            }
+      },
 
+      beginCheckingTempTestResults: function(){
+        this.numIncomingResults = self.temp_test_results.length;
+        this.currentResult = 0;
+        if(this.numIncomingResults > 0){
+          this.$.test_results_loc.equalTo = this.temp_test_results[0].student_id;
+        } else {
+          alert("There are no test results waiting to be verified.");
+        }
+      },
+
+      checkSingleTempResult: function(){
+        var num_results_with_id_match = this.test_results.length;
+        var single_test_conflict_counter = 0;
+        for( var i = 0; i < num_results_with_id_match; i++){
+          if(this.test_results[i].student_id == this.temp_test_results[this.currentResult].student_id && this.test_results[i].last_name == this.temp_test_results[this.currentResult].last_name && this.test_results[i].first_name == this.temp_test_results[this.currentResult].first_name && this.test_results[i].test == this.temp_test_results[this.currentResult].test){
+                        var conflict = {};
+                        conflict['old_result'] = this.test_results[i];
+                        delete this.temp_test_results[this.currentResult].__firebaseKey__;
+                        conflict['new_result'] = this.temp_test_results[this.currentResult];
+                        self.$.score_conflicts_loc.add(conflict);
+                        single_test_conflict_counter++;
+            }
+        }
+        if(single_test_conflict_counter == 0) {
+          delete this.temp_test_results[this.currentResult].__firebaseKey__;
+          this.$.test_results_loc.add(this.temp_test_results[this.currentResult]);
+        } else {
+          single_test_conflict_counter = 0;
+        }
+
+        if(this.currentResult < this.numIncomingResults - 1){
+          this.currentResult++;
+          this.$.test_results_loc.equalTo = this.temp_test_results[this.currentResult].student_id;
+        } else {
+          for( var i = this.numIncomingResults - 1; i >= 0; i--){
+            this.$.temp_test_results_loc.removeByKey(this.temp_test_results[i].__firebaseKey__);
+>>>>>>> John
+          }
+        }
+      },
+
+<<<<<<< HEAD
           var endtime = performance.now();
           var full_time = endtime - start_time;
           console.log("Full Time: " + full_time.toString());
           self.$.uploadSuccessToast.toggle();
     },
+=======
+      convertScores: function(student_test_object){
+>>>>>>> John
 
-    convertScores: function(student_test_object){
+        var conversion_chart = {};
 
-      var conversion_chart = {};
+        if (typeof self.score_charts[student_test_object['test']] != 'undefined'){
+          conversion_chart = self.score_charts[student_test_object['test']];
+        } else {
+          conversion_chart = self.score_charts['Default'];
+        }
 
+<<<<<<< HEAD
       if (typeof self.score_charts[student_test_object['test']] != 'undefined'){
         conversion_chart = self.score_charts[student_test_object['test']];
       } else {
@@ -738,11 +1271,18 @@
               for (var i = 0; i < num_headers; i++){
                 temp_score_obj_of_arrays[headers[i]] = [];
               }
+=======
+        var reading_raw_rounded = Math.round(student_test_object['reading_raw']);
+        var math_raw_rounded = Math.round(student_test_object['math_raw']);
+        var writing_raw_rounded = Math.round(student_test_object['writing_raw']);
+>>>>>>> John
 
-              for (var i = 1; i < numRows; i++) {
-                var cells = rows[i].split(",");
-                var num_columns = cells.length;
+        student_test_object['reading_score'] = reading_raw_rounded < -3 ? parseInt(conversion_chart['reading']["-3"]) : parseInt(conversion_chart['reading'][reading_raw_rounded.toString()]);
+        student_test_object['math_score'] = math_raw_rounded < -3 ? parseInt(conversion_chart['math']["-3"]) : parseInt(conversion_chart['math'][math_raw_rounded.toString()]);
+        student_test_object['writing_score'] = writing_raw_rounded < -3 ? parseInt(conversion_chart['writing']["-3"][student_test_object['essay_score']]) : parseInt(conversion_chart['writing'][writing_raw_rounded.toString()][student_test_object['essay_score']]);
+        student_test_object['total_score'] = student_test_object['reading_score'] + student_test_object['math_score'] + student_test_object['writing_score'];
 
+<<<<<<< HEAD
                 for (var j = 0; j < num_columns; j++) {
                   if (cells[j] != ''){
                     temp_score_obj_of_arrays[headers[j]].push(cells[j]);
@@ -776,9 +1316,93 @@
               self.set(prefix + ".complete", true);
               self.set(prefix + ".progress", 100);
               self.cancel(file);
+=======
+        return student_test_object;
+      },
+
+      uploadScoreTable: function(file){
+        var start_time = performance.now();
+        self = this;
+        var prefix = "files." + self.files.indexOf(file);
+        console.log('Uploading ' + file.name + ' as a ' + file.filetype + ' for ' + file.testname);
+            if (typeof (FileReader) != "undefined") {
+              var reader = new FileReader();
+              reader.onload = function (e) {
+                var rows = e.target.result.split(/[\r|\n]+/);
+                var numRows = rows.length;
+                var headers = rows[0].split(',');
+                var num_headers = headers.length;
+
+                var temp_score_obj_of_arrays = {};
+                for (var i = 0; i < num_headers; i++){
+                  temp_score_obj_of_arrays[headers[i]] = [];
+                }
+
+                for (var i = 1; i < numRows; i++) {
+                  var cells = rows[i].split(",");
+                  var num_columns = cells.length;
+
+                  for (var j = 0; j < num_columns; j++) {
+                    if (cells[j] != ''){
+                      temp_score_obj_of_arrays[headers[j]].push(cells[j]);
+                    }
+                  }
+                }
+
+                var num_reading_raws = temp_score_obj_of_arrays['reading_raw'].length;
+                var num_math_raws = temp_score_obj_of_arrays['math_raw'].length;
+                var num_writing_raws = temp_score_obj_of_arrays['writing_raw'].length;
+                var score_chart = {};
+                score_chart[file.testname] = {
+                    'reading': {},
+                    'math': {},
+                    'writing': {}
+                };
+                for (var i = 0; i < num_reading_raws; i++) {
+                  score_chart[file.testname].reading[temp_score_obj_of_arrays['reading_raw'][i]] = temp_score_obj_of_arrays['reading_converted'][i];
+                }
+                for (var i = 0; i < num_math_raws; i++) {
+                  score_chart[file.testname].math[temp_score_obj_of_arrays['math_raw'][i]] = temp_score_obj_of_arrays['math_converted'][i];
+                }
+                for (var i = 0; i < num_writing_raws; i++) {
+                  score_chart[file.testname].writing[temp_score_obj_of_arrays['writing_raw'][i]] = {};
+                  for (var j = 1; j <= 12; j++) {
+                    score_chart[file.testname].writing[temp_score_obj_of_arrays['writing_raw'][i]][j.toString()] = temp_score_obj_of_arrays[j.toString()][i];
+                  }
+                }
+
+                self.score_charts = score_chart;
+                self.set(prefix + ".complete", true);
+                self.set(prefix + ".progress", 100);
+                self.cancel(file);
+              }
+              reader.readAsText(file);
             }
-            reader.readAsText(file);
+            else {
+              alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
+              self.set(prefix + ".error", true);
+              self.$.uploadFailToast.toggle();
+>>>>>>> John
+            }
+            var endtime = performance.now();
+            var full_time = endtime - start_time;
+            console.log("Full Time: " + full_time.toString());
+            self.$.uploadSuccessToast.toggle();
+      },
+
+      toggleConflictChecks: function(){
+        this.allConflictsChecked = !this.allConflictsChecked;
+        this._checkButtonText = this.allConflictsChecked == true ? "Uncheck All" : "Check All";
+        var conflict_list = Polymer.dom(this.$.conflictBox).querySelectorAll('paper-item');
+        for(var i = 0; i < conflict_list.length; i++){
+          var checkbox = conflict_list[i].querySelector('paper-checkbox');
+          checkbox.checked = this.allConflictsChecked;
+          if(checkbox.checked == true){
+            this.$.conflict_selector.select(this.$.list_of_conflicts.items[i]);
+          } else {
+            this.$.conflict_selector.deselect(this.$.list_of_conflicts.items[i]);
           }
+<<<<<<< HEAD
           else {
             alert('Your browser does not support HTML 5. Please update your browser to the latest version if you would like to upload files.');
             self.set(prefix + ".error", true);
@@ -857,3 +1481,87 @@
   });
 
 </script>
+=======
+        }
+      },
+
+      _checkConflict: function(e){
+        var conflict_list = Polymer.dom(this.$.conflictBox).querySelectorAll('paper-item');
+        var conflict = conflict_list[e.model.__data__.index];
+        var checkbox = conflict.querySelector('paper-checkbox');
+        checkbox.toggleAttribute('checked');
+      },
+
+      addConflictToConflictSelector: function(e){
+        if(e.target.__data__.checked == true){
+          this.$.conflict_selector.select(e.model.__data__.item);
+        } else {
+          this.$.conflict_selector.deselect(e.model.__data__.item);
+        }
+      },
+
+      deletaAllCheckedConflicts: function(){
+        var num_selected_conflicts = this.selected_conflicts.length;
+        for (var i = num_selected_conflicts - 1; i >= 0; i--){
+          this.deleteSingleConflict(this.selected_conflicts[i]);
+        }
+      },
+
+      deleteSingleConflict: function(obj_to_delete){
+        this.$.score_conflicts_loc.removeByKey(obj_to_delete.__firebaseKey__);
+        this.$.conflict_selector.deselect(obj_to_delete);
+      },
+
+      addAllCheckedConflictsAsNewResult: function(){
+        var num_selected_conflicts = this.selected_conflicts.length;
+        for (var i = num_selected_conflicts - 1; i >= 0; i--){
+          this.$.test_results_loc.add(this.selected_conflicts[i].new_result);
+          this.$.newly_added_results_loc.add(this.selected_conflicts[i].new_result);
+          this.deleteSingleConflict(this.selected_conflicts[i]);
+        }
+      },
+
+      overwriteAllCheckedConflicts: function(){
+        var num_selected_conflicts = this.selected_conflicts.length;
+        for (var i = num_selected_conflicts - 1; i >= 0; i--){
+          this.$.test_results_loc.removeByKey(this.selected_conflicts[i].old_result.__firebaseKey__);
+          this.$.test_results_loc.add(this.selected_conflicts[i].new_result);
+          this.$.newly_added_results_loc.add(this.selected_conflicts[i].new_result);
+          this.deleteSingleConflict(this.selected_conflicts[i]);
+        }
+      },
+
+      removeNewlyAddedResult: function(e){
+        this.async(function(){
+          if(e.detail.previousChildName == null){
+            this.$.newly_added_results_loc.removeByKey(e.detail.childSnapshot.key());
+          }
+        },3000);
+      },
+
+      removeNewlyAddedResultsIntervals: function(){
+        this.async(function(){
+          if(this.newly_added_results.length > 0) {
+            this.$.newly_added_results_loc.removeByKey(this.newly_added_results[0].__firebaseKey__);
+          }
+        },500);
+      },
+
+      sayHi: function(e){
+        console.log("The query changed");
+        console.log(e);
+        console.log(this.test_results);
+      },
+
+      sayHello: function(e){
+        console.log("The data changed");
+        console.log(e);
+        console.log(this.test_results);
+      }
+    });
+
+  </script>
+</dom-module>
+
+
+>>>>>>> John
