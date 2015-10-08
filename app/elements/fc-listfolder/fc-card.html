@@ -2,7 +2,7 @@
 <style is="custom-style">
 :host {
       display: block;
-      
+      overflow: hidden;
     }
 
     #placeholder {
@@ -12,49 +12,44 @@
 
 
  paper-material.card {
+	margin-left: 4px;
+  margin-right: 4px;
+	margin-top: 4px;
+  padding: 8px 0px 2px 14px ;
   padding: 8px ;
-  max-width: 420px;
-  max-height: 680px;
+	padding: 8px ;
+	text-indent: 0px;
+	min-width: 343.7px;
+	display: flex;
+  height: 880px;
 }
 
 h3.title{
-  text-align: center;
-  font-size: 28px;
-  color: #002c90;
-  font-family: times;
-  padding-bottom: 14px;
-  margin: 10px;
-  line-height: 1.1em;
+	text-align: center;
+	text-indent: -33px;
+	font-size: 26px;
+	color: #013483;
+	position: relative;
+  margin: 26px;
 }
+
+
 </style>
 <template id="fc-cardTemplate">
-<paper-material class="card" elevation="3">
-    <p class="title center center-justified"><h3 class="title">{{headerTitle}}</h3></p>
-
-
-
-
-<div id="container">
-      
-
-      <content select="div">
-        
-
-           
-
-
-
-      </content>
-    
-
+	<paper-material class="card" elevation="3">
+  <div class="layout vertical container">
+      <div class="layout horizontal flex wrap container">
+      <div id="placeholder" class="fit.chip fit"> <h3 class="title">{{headerTitle}}</h3></div>
+      <div id="container">
+      <content select="div"></content>
 </div>
-    </paper-material>
-    <div id="placeholder" class="fit"></div>
     </div>
-
+    </div>
+</paper-material>
 </template>
+
+
 <script>
-(function(){
   Polymer({
     is: 'fc-card',
 
@@ -62,57 +57,48 @@ h3.title{
       Polymer.NeonSharedElementAnimatableBehavior
     ],
 
-  properties: {
-      headerTitle: String,
-      container: String,
+    properties: {
       background: '#1e1e1e',
-      fcOnTap: String,
-      parElevation: Number,
-      color: '#002c80', 
 	  reflectToAttributes: true,
 	  notify: true,
-	  
-    headerTitle: {
+	  headerTitle: {
 			type: String,
 			reflectToAttributes: true,
 			notify: true
 						},
-  animationConfig: {
+      animationConfig: {
         value: function() {
           return {
             'entry': [{
               name: 'ripple-animation',
               id: 'ripple',
               toPage: this
-            }, 
-
-            { name: 'ripple-animation',
+            }, {
+              name: 'fade-out-animation',
               node: this.$.placeholder,
               timing: {
-                delay: 0,
-                duration: 0
+                delay: 200,
+                duration: 150
               }
-            }, 
-            { name: 'fade-in-animation',
-              node: this.container,
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.container,
               timing: {
-                delay: 0,
-                duration: 0
+                delay: 200,
+                duration: 200
               }
             }],
 
             'exit': [{
               name: 'opaque-animation',
               node: this.$.placeholder
-            }, 
-            {
+            }, {
               name: 'fade-out-animation',
               node: this.$.container,
               timing: {
-                duration: 0
+                duration: 100
               }
-            }, 
-            {
+            }, {
               name: 'reverse-ripple-animation',
               id: 'reverse-ripple',
               fromPage: this
@@ -125,12 +111,11 @@ h3.title{
         value: function() {
           return {
             'ripple': this.$.placeholder,
-            'reverse-ripple': this
+            'reverse-ripple': this.$.placeholder
           };
         }
       }
     }
   });
-})();
 </script>
 </dom-module>
