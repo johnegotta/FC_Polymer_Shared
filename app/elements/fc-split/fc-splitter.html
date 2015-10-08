@@ -2,12 +2,12 @@
 
 <template>
     <div id="splitHolder" class="layout" style="width:100%; height:100%">
-        <div id="left" style="">
+        <div id="left" style="background:white;overflow:scroll">
             <content select=".left"></content>
         </div>
         <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
         </paper-material>
-        <div id="right" style="">
+        <div id="right" style="background:white;overflow:scroll">
             <content select=".right"></content>
         </div>
     </div>
@@ -31,7 +31,10 @@
       width: Number,
       height: Number,
       minSideWidth: Number,
-      gutterWidth: String,
+      gutterWidth: {
+        type: String,
+        value: "0px"
+      },
       dragging: Boolean,
       borderType: String,
       x: Number,
@@ -45,6 +48,7 @@
       this.left = this.$.left;//document.querySelector("#uno");
       this.right = this.$.right; //document.querySelector("#dos");
       this.dragging = false;
+
       //this.$.draggy.style.width = this.gutterWidth;
       this.minSideWidth = ".15";
       console.log(this.borderType);
@@ -70,7 +74,7 @@
         console.log("setting gutter properties for horizontal");
         this.$.splitHolder.className = 'layout horizontal';
         this.$.draggy.style.width = this.gutterWidth;
-        this.$.draggy.style.height = "100%";
+        //this.$.draggy.style.height = "100%";
         this.$.draggy.style.borderLeft = "5px solid #aecdfe";
         this.$.draggy.style.borderRight = "5px solid #aecdfe";
         this.$.left.style.height = "100%";
@@ -110,6 +114,7 @@
 
             //this.width = this.left.getBoundingClientRect().width + this.right.getBoundingClientRect().width + this.gutterWidth;
             var gw = this.gutterWidth;
+
             gw = gw.replace("px", "");
             if(this.orientation == "horizontal")
             {
