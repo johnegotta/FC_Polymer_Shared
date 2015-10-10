@@ -1,0 +1,81 @@
+<dom-module id="fc-instructorFull">
+<style is="custom-style">
+:host{
+	display: block;
+}
+
+ paper-material.card {
+	margin-left: 4px;
+  margin-right: 4px;`
+	margin-top: 12px;
+	padding: 4px;
+	text-indent: 0px;
+	width: 333.7px;
+	display: block;
+}
+
+h3.title{
+	text-align: center;
+	text-indent: -3px;
+	font-size: 26px;
+	color: #013483;
+	padding-bottom: 10px;
+	margin-bottom: 16px;
+}
+
+
+</style>
+<template>
+		<div class="vertical layout" id="instHolder" style="height:100%;padding: 15px;">
+      <span><b>Id: </b><span>{{data.fcid}}</span></span>
+      <span><b>Name: </b><span>{{data.fullname}}</span></span>
+      <span><b>Bio: </b><span>{{data.bio}}</span></span>
+      <br>
+      <img src={{data.photo}} style="max-width:50%;min-height:600px;max-height:80%;padding:15px 15px 15px 15px">
+    </div>
+</template>
+
+
+<script>
+  FcInstructorFull = Polymer({
+    is: 'fc-instructorFull',
+
+    behaviors: [
+      fcDraggableDataBehavior
+    ],
+
+    properties: {
+      background: '#1e1e1e',
+	    reflectToAttributes: true,
+	    notify: true,
+      headerTitle: {
+			 type: String,
+			 reflectToAttributes: true,
+			 notify: true
+			}
+    },
+
+    attached: function(){
+      console.log("fc-instructorFull attached");
+      console.log(this.data);
+      if(this.data == null || this.data.fullname == ""){
+       // this.$.instHolder.hidden = "true";
+       this.data = {photo:"images/imageNotAvailable.jpg"};
+      }
+      this.dataType = "Instructor";
+    },
+    
+    observers: ['handleInstructorChange(this.data)'],
+
+    handleInstructorChange: function(argCourse){
+      console.log("handleInstructorChange");
+      this.$.instHolder.hidden = "false";
+    },
+
+    factoryImpl: function(argData){
+      this.data = argData;
+    },
+
+  });
+</script>
+</dom-module>

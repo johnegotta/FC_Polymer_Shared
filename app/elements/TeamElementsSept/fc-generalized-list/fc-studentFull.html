@@ -1,0 +1,240 @@
+<dom-module id="fc-studentFull">
+<style is="custom-style">
+:host{
+	display: block;
+}
+
+ paper-material.card {
+	margin-left: 4px;
+  margin-right: 4px;`
+	margin-top: 2px;
+	padding: 4px;
+	text-indent: 0px;
+	width: 333.7px;
+	display: block;
+}
+
+h3.title{
+	text-align: center;
+	text-indent: -3px;
+	font-size: 26px;
+	color: #013483;
+	padding-bottom: 10px;
+	margin-bottom: 16px;
+}
+paper-tabs, paper-toolbar {
+   background-color: #aecdfe;
+}
+paper-tab.iron-selected {
+  color:dodgerblue;
+}
+
+
+</style>
+
+<template>
+  <!--
+  <firebase-collection id="roin" data={{roi}} location={{paththree}} order-by-child="fcid" equal-to={{data.fcid}}>
+  -->
+  <firebase-collection id="roin" data={{roi}} location="https://focusedstudents.firebaseio.com/roi" order-by-child="fcid" equal-to={{data.fcid}}>
+  </firebase-collection>
+
+<firebase-collection id="calls" data={{studentcalls}} location="https://focusedstudents.firebaseio.com/inquiries" order-by-child="fcid" equal-to={{data.fcid}}>
+  </firebase-collection>
+<!--
+  <firebase-collection id="pasta" data={{previousacademicsarray}} location={{pathtwo}} order-by-child="fcid" equal-to={{data.fcid}}>
+  -->
+  <firebase-collection id="pasta" data={{previousacademicsarray}} location="https://focusedstudents.firebaseio.com/pastacademics" order-by-child="fcid" equal-to={{data.fcid}}>
+  </firebase-collection> 
+  
+
+		<div class="vertical layout">
+    </div>
+
+    <div class="middle">
+        <div class="container horizontal layout">
+          <paper-material class="container vertical layout flex-2 wrap leftpanel left">
+            <paper-material class="vertical layout">
+            <img id="studphoto" width="180" height="240" src={{data.photo}} style="padding:4px;" on-tap="checkAcademics">
+            <div class="container horizontal">
+            <h3>
+              <span id="studfirst">[[data.firstname]]</span>
+              <span id="studlast">[[data.lastname]]</span>
+              </h3>
+            </div>
+            <span><b>Email: </b><span id="studemail">[[data.email]]</span></span>
+            <span><b>Tel: </b><span id="studphone1">[[data.phone]]</span></span>
+            <b><span id="studphone2">[[data.phone]]</span></b>
+              <template is="dom-repeat" items={{previousacademicsarray}}>
+                <div class="horizontal layout">
+                  <b><span>School:</span></b>&nbsp <span id="studschool" class="linear">[[item.school]]</span>
+                </div>
+                <div class="horizontal layout">
+                  <b>Grade: </b><span>[[item.grade]]</span>
+                </div>
+              </template>
+          
+            </paper-material>
+          </paper-material> <!--end left panel -->
+         
+          <paper-material class="container vertical layout flex-7 wrap centerdisplay display">
+            <paper-tabs id="studenttabs" selected="{{selected}}" scrollable>
+              <paper-tab>Account</paper-tab>
+              <paper-tab>ROI</paper-tab>
+              <paper-tab>Academics</paper-tab>
+              <paper-tab>Inquiries</paper-tab>
+            </paper-tabs>
+
+            <iron-pages selected="{{selected}}">
+              <div id="studentdetail1">
+                
+                <div class="horizontal layout">
+                  Course Selected: <span id="couseSelected1">[[coursepurchaseinfo.courseSelected1.coursedates]]</span>
+                </div>
+                <div class="horizontal layout">
+                  Course Dates: <span id="datesOfCourse1">[[coursepurchaseinfo.datesOfCourse1.class1]]</span>
+                </div>
+                <div class="horizontal layout">
+                  Focused Coach: <span id="fccoachSTUDENTID">[[coursepurchaseinfo.courseSelected1.coach]]</span>
+                </div>
+                <div> Total Cost: <span id="course1cost">[[coursepurchaseinfo.totalcost]]</span>
+                </div>
+                
+              </div>
+              <div id="studentdetail2">
+                <template is="dom-repeat" items={{roi}}>
+                  <div class="horizontal layout">
+                    <b>Courses Taken : </b><span id="studcoursestaken">[[item.coursesTaken]]</span>
+                  </div>
+                  <div class="horizontal layout">
+                    <b>College Savings : </b><span id="studcollegesavings">[[item.collegeSavings]]</span>
+                  </div>
+                  <div class="horizontal layout">
+                    <b>Value At Completion 70% : </b><span id="studVAC70">[[item.FcValueAtCompletion70Percent]]</span>
+                  </div>
+                </template>
+              </div>
+              <div id="studentdetail3">
+              
+                <template is="dom-repeat" items={{previousacademicsarray}}>
+                  <div class="horizontal layout">
+                    <b>Class Rank: </b><span>[[item.classRank]]</span>
+                  </div>
+                  <div class="horizontal layout">
+                    <b>Overall SAT Percentile: </b><span>[[item.SAToverallPerc]]</span>
+                  </div>
+                  <div class="horizontal layout">
+                    <b>Highest Math Course: </b><span>[[item.highestMathCourse]]</span>
+                  </div>
+                  <div class="horizontal layout">
+                    <b>Highest Science Course: </b><span>[[item.highestScienceCourse]]</span>
+                  </div>
+                </template>
+                
+              </div>
+              <div id="studentdetail4">
+                 <template is="dom-repeat" items={{studentcalls}}>
+                    <div class="vertical layout" style="border:1px gray solid">
+                        <span><b>Date : </b><span class="flex-1">{{item.timestamp}}</span></span>
+                        <span><b>Message : </b><span class="flex-5">{{item.message}}</span></span>
+                    </div>
+                  </template>
+                  
+              </div>
+            </iron-pages>
+            
+          </paper-material>
+        </div>
+      </div>
+
+</template>
+
+
+<script>
+  Polymer({
+    is: 'fc-studentFull',
+
+    properties: {
+      background: '#1e1e1e',
+	    reflectToAttributes: true,
+	    notify: true,
+      data: {
+        type: Object
+      },
+      previousacademics: {
+        type: Object,
+        notify: true,
+      },
+      previousacademicsarray: {
+        type: Array,
+        notify:true,
+      },
+      rank: String,
+      SAToverallPerc: String,
+      headerTitle: {
+			 type: String,
+			 reflectToAttributes: true,
+			 notify: true
+			},
+      selected: 1
+    },
+
+
+    checkAcademics: function(e)
+    {
+      var dat = this.$.pasta.data;
+      var numCA = dat.length;
+      console.log(dat);
+      console.log(numCA);
+      var i = 0;
+      var tbd = 0;  
+              console.log(this.$.pasta);
+
+      for(i = 0; i < numCA; i++)
+      {
+        if(dat[i].__firebaseKey__.indexOf("-Jz") > -1)
+        {
+          tbd++;
+          //console.log(dat[i].__firebaseKey__);
+          //this.$.pasta.removeByKey(dat[i].__firebaseKey__);
+        }
+      }
+      console.log("I would have deleted " + tbd + " records");
+      console.log(this.$.roin.data);
+      console.log(this.$.pasta.data);
+      /*
+      this.previousacademics = this.previousacademicsarray[0];
+      this.rank = this.previousacademicsarray[0].classRank;
+      this.SAToverallPerc = this.previousacademicsarray[0].SAToverallPerc;
+      console.log("rank = " + this.previousacademicsarray[0].classRank);
+      console.log(this.previousacademics);
+      */
+      
+    },
+
+    attached: function(){
+      console.log("fc-studentFull attached");
+      console.log(this.data);
+      if(this.data == {} || this.data.fcid == ""){
+        this.data = {photo: "images/imageNotAvailable.jpg"};
+      }
+    },
+    
+    //observers: ['handleStudentChange(this.data)', 'handlePastAcademicsChange(this.previousacademicsarray)'],
+
+    _handlePAChange: function(argNew, argOld)
+    {
+      /*
+      console.log(argNew);
+      console.log(argOld);
+      this.previousacademics = argNew[0];
+      console.log(this.previousacademics);
+      console.log(this.previousacademicsarray[0]);
+      this.previousacademics = this.previousacademicsarray[0];
+      console.log(this.previousacademics);
+    */
+    }
+
+  });
+</script>
+</dom-module>

@@ -1,0 +1,148 @@
+<dom-module id="fc-dropzone">
+<style is="custom-style">
+    
+
+</style>
+
+<template>
+<!--
+<div id="dropzone" style="border:12px ridge green;width:100%;height:600px" on-dragover="allowDrop" on-drop="handleDrop">
+  <div class="layout vertical">
+    <span>[[mydata.fullname]]</span>
+    <span>[[mydata.bio]]</span>
+  </div>
+</div>
+-->
+<div style="width:100%; height:100%; min-height:300px;min-width:100%" >
+   <iron-icon icon="clear" id="clearButton" class="horizontal" on-tap="clearDisplay" style="height:52px;width:52px;padding:0px 0px 10px 0px" hidden></iron-icon>
+     <fc-instructorFull id="inst" hidden data={{mydata}}>
+     </fc-instructorFull>
+     <fc-courseFull id="cour" hidden data={{mydata}}>
+     </fc-courseFull>
+     <fc-studentFull id="stud" hidden data={{mydata}}>
+     </fc-studentFull>
+     <fc-inquiryFull id="inq" hidden data={{mydata}}>
+     </fc-inquiryFull>
+     <div id="dragmsg" style="padding:10px"><h1>Drag List Elements Here</h1></div>
+     <content></content>
+</div>
+
+</template>
+<script>
+  Polymer({
+
+    is: 'fc-dropzone',
+
+
+    listeners: {
+      //'click': '_onClick'
+    },
+
+    properties: {
+      dataType: String,
+      mydata: {
+        type:Object,
+        value: {
+          bio: {
+            type: String,
+            notify: true
+          },
+          fullname: {
+            type: String,
+            notify: true
+          }
+        },
+        notify: true,
+        reflectToAttributes: true
+      },
+      isInstructor: {
+        type: Boolean,
+        computed: 'computeIsInstructor(dataType)'
+      }
+     },
+
+     ready: function()
+     {
+        this.mydata = {fullname:"",bio:""};
+        console.log("fc-dropzone ready and dataType = " + this.dataType);
+     },
+
+     attached: function()
+     {
+        this.addEventListener("dragover", this.allowDrop);
+        this.addEventListener("drop", this.handleDrop);
+     },
+
+    handleDrop: function (e) {
+      var edata = JSON.parse(e.dataTransfer.getData("fcdata"));
+      console.log("drop");
+      this.mydata = edata;
+      this.dataType = e.dataTransfer.getData("dataType");
+      
+      //this.$.inst.$.instHolder.style.display = "flex";
+      var cour = this.$.cour;
+      var inst = this.$.inst;
+      var stud = this.$.stud; //document.querySelector("#stud");
+      var inq = this.$.inq; //document.querySelector("#inq");
+      console.log(inst.data);
+
+      this.$.clearButton.hidden = false;
+      this.$.dragmsg.hidden = true;
+      inst.hidden = true;
+      cour.hidden = true;
+      inq.hidden = true;
+      stud.hidden = true;
+      if(this.dataType=="Instructor")
+      {
+        inst.data = this.mydata;
+        inst.hidden = false;
+      }
+      else if(this.dataType == "Course")
+      {
+        cour.data = this.mydata;
+        cour.hidden = false;
+      }
+      else if(this.dataType == "Student")
+      {
+        stud.data = this.mydata;
+        stud.hidden = false;
+        stud.selected = 1;
+      }
+      else if(this.dataType == "Inquiry")
+      {
+        inq.data = this.mydata;
+        inq.hidden = false;
+      }
+    },
+
+    allowDrop: function (e) {
+      e.preventDefault();
+      console.log("drag over");
+    },
+
+    clearDisplay: function(e)
+    {
+      this.mydata = {photo:"images/imageNotAvailable.jpg"};
+      this.$.stud.hidden = true;
+      this.$.inst.hidden = true;
+      this.$.inq.hidden = true;
+      this.$.cour.hidden = true;
+      this.$.dragmsg.hidden = false;
+      this.$.clearButton.hidden = true;
+      /*
+      this.$.stud.previousacademicsarray = [];
+      this.$.stud.$.roin.equalTo = "";
+      this.$.stud.$.pasta.equalTo = "";
+      this.$.stud.$.calls.equalTo = "";
+      */
+    },
+
+    computeIsInstructor: function(argType)
+    {
+      return (argType == "Instructor");
+    }
+     
+});
+
+</script>
+</dom-module>
