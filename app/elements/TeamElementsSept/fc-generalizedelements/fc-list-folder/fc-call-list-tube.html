@@ -1,0 +1,272 @@
+<dom-module id="fc-call-list-tube">
+<template>
+<style is="custom-style">
+.cardbody {
+  border-right: 2px solid lightgrey;
+  padding: 4px 0px 4px 4px;
+  display: block;
+  width: 624px;
+}
+    .commands {
+  width: 30px;
+}
+  paper-item:hover:after{
+      white-space: wrap;
+      cursor: pointer;
+      overflow: elipses;
+      display: flex-box;
+      flex: wrap;
+     
+    }
+
+iron-icon {
+      color: var(--google-blue-500);
+      padding: 5px 0px 5px 0px;
+
+      width: 22px;
+      height: 22px;
+    }
+paper-item {
+      display: flex;
+      flex: wrap;
+      /*min-width: 99%;*/
+      color: #002c90;
+      max-height: 100%;
+      margin: 6px 0px 4px 0px;
+      padding: 6px 0px 6px 6px;
+    }
+cards.paper-material{
+  padding: 18px 0px 10px 10px;
+  margin: 10px 10px 10px 8px;  
+}
+br{
+   text-indent: 20px;
+}  
+
+
+</style>
+        <paper-material elevation='4' fit class="layout horizontal cards" style="width: 718px; max-height: 500px;">
+            <paper-item class="horizontal layout container">
+            <content select="section">
+
+
+            </content>
+              <div class="cardbody" style="border-left: 6px solid limegreen;" id="colorWarning">
+                  <div primary style="text-overflow: normal;" id="catcher" on-tap="notHidden">
+                   
+                      <b><span>{{data.timestamp}}</span></b>
+                      <u>Caller</u>: <b><span>{{data.firstname}}</span> <span>{{data.lastname}}</span></b> 
+                      <u>Student</u>: <b><span>{{data.relatedstudent}}</span></b>
+                  
+                    <div secondary id="crocodile" class="horizontal layout wrap" style="line-height: 70%; max-height: 190px; color: black;" hidden>
+                    <section class="vertical layout wrapper">
+                      <br><span style="text-indent: 12px;"><u>Grade</u>: <span>{{data.grade}}</span> </span>
+                      <br><span style="text-indent: 12px;"><u>School</u>: <span>{{data.school}}</span></span>
+                      <br><span style="text-indent: 12px;"><u>Hometown</u>: <span>{{data.schooltown}}</span></span>
+                      <br><span style="text-indent: 12px;"><u>Callback</u>: <span>{{data.callbacktime}}</span></span>
+                      <br><span style="text-indent: 12px;"><u>Course</u>: <span>{{data.interest}}</span></span>
+                      <br><span style="text-indent: 12px;"><u>Coach</u>: <span>{{data.coach}}</span></span>
+                      <br><span style="text-indent: 12px;"><u>Payment Due</u>: <span>{{data.interestprice]</span></span>
+                      <br><span style="text-indent: 12px;"><u>StartDate</u>: <span>{{data.callbacktime}}</span>
+                      </span>
+                      <br>
+                    </section>
+                    <section class="vertical layout wrapper">
+                    <br><span style="text-indent: 20px;"><u>Start Score</u>: <span>{{data.grade}}</span> </span>
+                      <br><span style="text-indent: 20px;"><u>Tests</u>: <span>{{data.school}}</span></span>
+                      <br><span style="text-indent: 20px;"><u>Score</u>: <span>{{data.schooltown}}</span></span>
+                      <br><span style="text-indent: 20px;"><u>Deltas</u>: <span>{{data.interest}}</span></span>
+                      <br><span style="text-indent: 20px;"><u>Hwk %</u>: <span>{{data.coach}}</span></span>
+                      <br><span style="text-indent: 20px;"><u>ROI +/-</u>: <span>{{data.interestprice}}</span></span>
+                      <br><span style="text-indent: 20px;"><u>To Do</u>: <span>{{data.callbacktime}}</span></span>
+                    </section>
+                  </div>
+                </div>
+                  <div secondary>
+                      <div style="overflow-x:hidden;">       
+                       <u>Phone</u>:<b><span>{{data.phone}}</span></b>&nbsp
+                       <u>Email</u>: <u><b><span>{{data.email}}</span></b></u>
+                      </div>
+                  </div>  
+                  <div id="additionalInformation" on-tap="alsoNotHidden" secondary style="height: 24px; max-width: 580px; overflow: hidden;">
+                      <b>Additional Information:</b>: 
+                      <span>{{data.message}}</span>
+                  </div>
+            </div>
+              <content select="div">
+                    
+
+              </content>
+          </paper-item>
+      </paper-material>  
+</template>
+<script>
+  Polymer({
+   is: 'fc-call-list-tube',
+    properties: {
+      inquiry: {
+        type: Object, 
+        value: {
+          firstname: String,
+          lastname: String,
+          studentfirstname: String,
+          studentlastname: String,
+          email: String, 
+          phone: String,
+          notify: true,
+          reflectToAttributes: true
+        },
+        notify: true,
+        reflectToAttributes: true
+      },
+      data:{
+         type: Object,
+         value: {
+               firstname: String, 
+               lastname: String, 
+               email: String, 
+               phone:String, 
+               studentfirstname: String, 
+               studentlastname: String, 
+               relatedstudent: String, 
+               message: String, 
+               coach:String, 
+               grade: String, 
+               school:String, 
+               schooltown:String, 
+               interest:String, 
+               interestprice: String,
+               intereststartdate: String, 
+               role: String,
+               fcid: String, 
+               timeorder: Number,
+               closed: Boolean,
+               notify: true,
+               reflectToAttributes: true 
+               },
+          notify: true,
+          reflectToAttributes: true
+          },
+      headerTitle: {
+       type: String,
+       reflectToAttributes: true,
+       notify: true
+      },
+      dataType: String,
+      animationConfig: {
+        value: function() {
+          return {
+            'entry': [{
+              name: 'ripple-animation',
+              id: 'ripple',
+              toPage: this
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 0
+              }
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.container,
+              timing: {
+                delay: 200,
+                duration: 200
+              }
+            }],
+
+            'exit': [{
+              name: 'opaque-animation',
+              node: this.$.placeholder
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 200
+              }
+            }, {
+              name: 'reverse-ripple-animation',
+              id: 'reverse-ripple',
+              fromPage: this
+            }]
+          };
+      },
+
+
+      sharedElements: {
+        value: function() {
+          return {
+            'ripple': this.$.placeholder,
+            'reverse-ripple': this.$.placeholder
+          };
+        }
+      }
+    },
+      notify: true,
+      reflectToAttributes: true
+    },
+
+    attached: function(){
+          this.dataType = "Inquiry";
+          var currentTime = event.timeStamp;
+          var delta = this.data.timeorder + currentTime;
+         // console.log(delta + ' ' + this.data.timeorder);
+        if (this.data.closed !== true &&  delta > 5000 && delta < 1000000000)  {
+          this.$.colorWarning.style.borderLeft = '6px solid yellow';
+      
+          //console.log(this.$.colorWarning.style.borderLeft);
+              }
+          else if (this.data.closed != true && delta > 1000000000 && delta < 54000000000)
+          {
+            this.$.colorWarning.style.borderLeft = '6x solid orange';
+
+          }
+          else if (this.data.closed != true && delta >= 160000000001)
+            {
+              this.$.colorWarning.style.borderLeft =  '6px solid purple';  
+             // console.log(this.$.colorWarning.style.borderLeft.color);
+            }
+          else if (this.data.closed == true){
+            this.$.colorWarning.style.borderLeft = '6px solid blue';
+           
+          }
+          else {
+            this.$.colorWarning.style.borderLeft = '6px solid red';
+          }
+         // console.log(this.$.colorWarning.style.borderLeft);
+
+        },
+
+
+    notHidden: function(){
+      this.$.crocodile.hidden=!this.$.crocodile.hidden;
+    },
+
+    alsoNotHidden: function(e){
+      var elem = e.target;
+      var overflow = elem.style.overflow;
+      var tallness = elem.style.height;
+        //  console.log(this.$.additionalInformation.style.overflow + " and the value of height " + this.$.additionalInformation.style.height);
+      if (elem.style.overflow == 'hidden' && elem.style.height == "24px") {
+          elem.style.overflow = 'normal';
+          elem.style.height = "200px";
+          //console.log(this.$.additionalInformation.style.overflow + " and the value of height " + this.$.additionalInformation.style.height);
+      }
+     else {
+        elem.style.overflow = 'hidden'; 
+        elem.style.height = "24px";
+        //console.log(overflow + " and the value of height " + tallness);
+        }
+     }
+
+  });
+</script>
+</dom-module>
+
+  <!--    console.log(e.model);
+      var x = e.model._nodes[11];
+      console.log(x);// = !(e.model.item.$.crocodile.hidden);
+      //var elem = document.querySelector("#" + x);
+      x.hidden = !x.hidden;
+//      this.$.crocodile.hidden = !this.$.crocodile.hidden;
+    }-->

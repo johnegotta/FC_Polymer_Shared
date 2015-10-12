@@ -1,4 +1,4 @@
-<dom-module id="fc-listHolder">
+<dom-module id="fc-list-holder">
 <style is="custom-style">
     :host {
       @apply(--layout-vertical);
@@ -51,46 +51,28 @@
         padding-top: 10px;
       }
 
-    
      iron-icon {
       color: var(--google-blue-500);
     }
-    paper-item {
-      display: flex;
-      flex: wrapper;
-      color: #002c90;
-    }
-
- cards.paper-material{
-  padding: 40px;
-  margin: 12px;
-  
-}   
- 
 .topdown{margin-top: 84px;}
 </style>
 
 <template>
-    <div class="main topdown" style="max-height:400px; display:block; width:600px"> 
-      <neon-animated-pages class="container" id="pages" selected="0">
-        <!--<fc-list id="fclist" data-type={{dataType}} path={{path}} search-field={{searchField}} search-field-two={{searchFieldTwo}} search-value={{searchValue}} on-item-click="_onItemClick"></fc-list>
-        <fc-full id="fcfull" data-type={{dataType}} path={{path}} pathtwo={{pathtwo}} paththree={{paththree}} search-field={{searchField}} search-field-two={{searchFieldTwo}} search-value={{searchValue}} on-close="_onClose"></fc-full>-->
-
-            <fc-list-three id="fclist" data-type="{{dataType}}" search-field="searchField" search-value="{{searchValue}}" class='right' inquiry="{{inquiryTransfer}}" path='{{path}}'  on-item-tap="_onItemClick">
-                  <fc-call-list-tube id="listcard" data='{{listdata}}' pastinquirer="{{pastinquirerTransferer}}" inquiry="{{inquiryTransfer}}">
-                  </fc-call-list-tube>
-            </fc-list-two>
-            <fc-full-view id="fcfull" on-close="_onClose">
-                          </fc-full-view> 
-      </neon-animated-pages>
+    <div class="main topdown" style="height:600px; display:block; width:600px"> 
+     <neon-animated-pages class="container" id="pages" selected="0">
+        <fc-list-three id="fcListView" class='right'style="height:700px; width:700px;" path="{{path}}" on-item-tap="_onItemClick" data={{data}}  data-type="{{dataType}}" search-field="firstname" search-field-two="lastname">
+        </fc-list-three>
+        <fc-full-view id="fcfull" on-close="_onClose">
+        </fc-full-view> 
+    </neon-animated-pages>
+  </div>
 </template>
 <script>
 
 Polymer({
 
-    is: 'fc-listHolder',
+    is: 'fc-list-holder',
 
-/*
     behaviors: [
       Polymer.NeonAnimatableBehavior
     ],
@@ -98,7 +80,7 @@ Polymer({
     listeners: {
       //'click': '_onClick'
     },
-*/
+
     properties: {      
       path:'https://focusedstaging1.firebaseio.com/calls',
       pathtwo: String,
@@ -108,7 +90,45 @@ Polymer({
       searchFieldTwo: String,
       searchValue: String,
       listdata: Object,
-  /*
+      inquiryTransferer: {
+        type: Object, 
+        value: {
+          firstname: '',
+          lastname: '',
+          studentfirstname: '',
+          studentlastname: '',
+          email: '', 
+          phone: '',
+          notify: true,
+        },
+        notify: true,
+      },
+      data:{
+         type: Object,
+         value: {
+               firstname: '', 
+               lastname: '', 
+               email: '', 
+               phone:'', 
+               studentfirstname: '', 
+               studentlastname: '', 
+               relatedstudent: '', 
+               message: '', 
+               coach:'', 
+               grade: '', 
+               school:'', 
+               schooltown:'', 
+               interest:'', 
+               interestprice: '',
+               intereststartdate: '', 
+               role: '',
+               notify: true, 
+               reflectToAttributes: true
+               },
+          notify: true,
+          reflectToAttributes: true
+          },
+  
       isInquiry: {
         type: Boolean,
         computed: "computeIsInquiry(dataType)"
@@ -141,8 +161,8 @@ Polymer({
           };
         }
       }
-      */
     },
+    
 
     _onItemClick: function(e) {
         console.log("received on-item-click event from");

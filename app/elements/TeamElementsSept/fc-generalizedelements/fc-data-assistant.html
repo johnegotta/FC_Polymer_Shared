@@ -127,7 +127,7 @@
 			
 </style>
 	<div class="layout container vertical center center-justified iconset">
-		<iron-icon class="fc-icon" icon="hardware:dock" on-tap="flatap" style="z-indez:2;" data-assist="tutorial"></iron-icon><br><span>Focused Assistant</span>
+		<iron-icon class="fc-icon" icon="hardware:dock" on-tap="flattap" style="z-indez:1;" data-assist="tutorial"></iron-icon><br><span>Focused Assistant</span>
 	</div>
 <!--<div id='focusedAssistant' class="assistView" draggable="true" on-startdrag="_startDrag">-->
 
@@ -141,10 +141,11 @@
 									                                 
 			</paper-dialog>-->	
 								
-<paper-dialog id="tutorial" class="tutorial container" class="assistView" draggable="true" on-startdrag="_startDrag" no-cancel-on-outside-click="true">
-<article style="height: 650px;" class="container layout vertical scrollable">
+<paper-dialog id="dragDialog" class="tutorial container" style="position: fixed;" on-mousedown="_startDrag" draggable="false" on-mousemove="_doDrag" on-mouseup="_endDrag" no-cancel-on-outside-click="true">
+<article style="height: 550px;" class="container layout vertical scrollable">
+<h3> Focused Data Assistant</h3>
 <paper-dialog-scrollable>
-<iron-pages id="assistantPages" selected="1">
+<iron-pages id="assistantPages" selected="0">
 <section>
 <h3> Focused Data Assistant</h3>
 	<p class="assistantView container" no-cancel-on-outside-click="true">
@@ -261,12 +262,30 @@ A sibling of a RETURNING CLIENT IS NOT A RETURNING CLIENT.</p>
 	Polymer({
 		is: 'fc-data-assistant',
 		properties:{
+		offsetX: {
+				type: Number,
+				notify: true,
+				reflectToAttributes: true
+				},
+		offsetY: {
+				type: Number,
+				notify: true,
+				reflectToAttributes: true
+				},
+
+			dragging: {
+				type: Boolean, 
+				value: false, 
+				notify: true
+			}
+
 
 		},
 
 		listeners: {
 			'tap': 'conttap',
-			'flattap': 'flattap'
+			'tap': 'flattap',
+			
 			},
 
 
@@ -276,30 +295,65 @@ A sibling of a RETURNING CLIENT IS NOT A RETURNING CLIENT.</p>
   				
   				},
 
-  		flatTap: functions(e) {	
-			var button = e.target;
-			console.log(button);
+  		flattap: function() {	
+			this.$.dragDialog.open();
+		},
 
-			var ids = button.getAttribute('data-assist');
-			console.log(ids);
-			var dialog = document.getElementById(ids);
-				console.log(dialog);
-			if (dialog) {
-				console.log(dialog);
-				dialog.open();
-			}
-			//var i = 0;
-			//var sections[i] = this.get
-
-
+		_startDrag: function(e){
+			console.log(e);
+			this.dragging=true;
+			//var dragbox = this.$.dragDialog.getBoundingClientRect();
+			this.offsetX = e.offsetX;
+			this.offsetY = e.offsetY;
 
 
 
 		},
 
-		_startDrag: function(ev){
-			ev.dataTransfer.setData("jasonDrag", this.$.focusedAssistant);
+		_doDrag: function(e){
+			if (this.dragging==true) {
+				console.log(e.clientX + " " + e.clientY + " " + e.offsetX);
+			}
+			var xnum = e.clientX-this.offsetX;
+			var xstring = xnum.toString() + 'px';
+			var ynum = e.clientY-this.offsetY;
+			var ystring = ynum.toString() + 'px';
+
+			this.$.dragDialog.style.left=xstring;
+			this.$.dragDialog.style.top=ystring;
+
+		},
+	 		
+
+
+
+
+			/*var isIE = document.all?true:false;
+		if (!isIE) document.captureEvents(Event.MOUSEMOVE);
+			document.onmousemove = getMousePosition;
+			function getMousePosition(mp) {
+	  		var _x;
+	  		var _y;
+	  	if (!isIE) {
+				_x = mp.pageX;
+				_y = mp.pageY;
+	  			}
+	  	if (isIE) {
+		_x = event.clientX + document.body.scrollLeft;
+		_y = event.clientY + document.body.scrollTop;
+	  	}
+	  		this.$.dialogDrag.right=_x + '40px';
+	  		this.$.dialogDrag.bottom=_y + '40px';
+	  		console.log(_y + "  this is what I need" +  _x);
+	  	}*/
+
+
+		_endDrag: function(e){
+			this.dragging=false;
+			console.log(e.clientX + " end Drag X then Y Client " + e.clientY + " last is end drag offset X " + e.offsetX)
+
 		}
+
 	
 	
 	
