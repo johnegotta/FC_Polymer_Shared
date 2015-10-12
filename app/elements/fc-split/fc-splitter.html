@@ -5,7 +5,7 @@
         <div id="left" style="">
             <content select=".left"></content>
         </div>
-        <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
+        <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-mousedown="startDragging">
         </paper-material>
         <div id="right" style="">
             <content select=".right"></content>
@@ -14,14 +14,14 @@
 </template>
 <style is="custom-style">
 
-
 </style>
 
 <script>
   Polymer({
     is: 'fc-splitter',
 
-    listeners: {"mouseleave": "stopDragging",
+    listeners: {//"mouseleave": "stopDragging",
+                "mouseenter": "resumeDragging",
                 "mouseup": "stopDragging"},
 
     properties: {
@@ -30,7 +30,12 @@
       orientation: String,
       width: Number,
       height: Number,
-      minSideWidth: Number,
+      minPanePercent: Number,
+      maxPanePercent: Number,
+      minWidth: Number,
+      maxWidth: Number,
+      minHeight: Number,
+      maxHeight: Number,
       gutterWidth: String,
       dragging: Boolean,
       borderType: String,
@@ -46,7 +51,8 @@
       this.right = this.$.right; //document.querySelector("#dos");
       this.dragging = false;
       //this.$.draggy.style.width = this.gutterWidth;
-      this.minSideWidth = ".15";
+      this.minPanePercent = 0.15;
+      this.maxPanePercent = 0.85;
       console.log(this.borderType);
       this.$.splitHolder.style.border = this.borderType == "" ? "8px ridge #aecdfe" : this.borderType;
       if(this.orientation == "")
@@ -113,14 +119,17 @@
             gw = gw.replace("px", "");
             if(this.orientation == "horizontal")
             {
-                //var lw = this.left.style.width;
-                var lw = this.left.getBoundingClientRect().width;
+                var lw = Math.round(this.left.getBoundingClientRect().width);
                 //var rw = this.right.style.width;
-                var rw = this.right.getBoundingClientRect().width;
-                //lw = lw.replace("px", "");
+                var rw = Math.round(this.right.getBoundingClientRect().width);
                 //rw = rw.replace("px", "");
                 var totalWidth = parseInt(lw) + parseInt(rw) + parseInt(gw);
                 this.width = totalWidth;
+                this.minWidth = this.minPanePercent * totalWidth;
+                this.minWidth = Math.round(this.minWidth);
+                this.maxWidth = this.maxPanePercent * totalWidth;
+                this.maxWidth = Math.round(this.maxWidth);
+                console.log("minWidth = " + this.minWidth + " maxWidth = " + this.maxWidth);
                 console.log("lw = " + lw + " rw = " + rw + " this.width = " + this.width);
                 //this.percentage = Math.min(this.width / this.parent.clientWidth * 100, 100);
                 this.x = this.left.getBoundingClientRect().left;
@@ -128,18 +137,21 @@
             }
             else if(this.orientation == "vertical")
             {
-                var lh = this.left.getBoundingClientRect().height;
-                var rh = this.right.getBoundingClientRect().height;
-                //lh = lh.replace("px", "");
-                //rh = rh.replace("px", "");
+                var lh = Math.round(this.left.getBoundingClientRect().height);
+                var rh = Math.round(this.right.getBoundingClientRect().height);
                 var totalHeight = parseInt(lh) + parseInt(rh) + parseInt(gw);
                 this.height = totalHeight;
+                this.minHeight = this.minPanePercent * this.height;
+                this.minHeight = Math.round(this.minHeight);
+                this.maxHeight = this.maxPanePercent * this.height;
+                this.maxHeight = Math.round(this.maxHeight);
+                console.log("minHeight = " + this.minHeight + " maxHeight = " + this.maxHeight);
+                console.log("this.height = " + this.height);
                 this.y = this.left.getBoundingClientRect().top;
             }
             this.addEventListener("mousemove", this.drag);
 
-    /*
-                this.left.addEventListener('selectstart', this.preventSelection);
+    /*          this.left.addEventListener('selectstart', this.preventSelection);
                 this.left.addEventListener('dragstart', this.preventSelection);
                 this.right.addEventListener('selectstart', this.preventSelection);
                 this.right.addEventListener('dragstart', this.preventSelection);
@@ -158,7 +170,7 @@
             if(this.dragging == false) return;
 
             this.dragging = false;
-            //this.style.cursor = "auto";
+            this.useAutoCursor();
             console.log("stopDragging");
 
             this.removeEventListener("mousemove", this.drag);
@@ -178,8 +190,19 @@
             this.right.style.MozUserSelect = '';
     },
 
+    resumeDragging: function(e){
+        if(e.which == 1 || e.buttons == 1 || e.button == 1)
+        {
+            //mouse button presse. do nothing, drag continues
+        }
+        else
+        {
+            this.dragging = false;
+        }
+    },
+
     drag: function(e){
-            if (!this.dragging) return;
+            if (this.dragging == false) return;
             // If within snapOffset of min or max, set offset to min or max
 /*
             if (offsetX <=  this.leftMin + options.snapOffset) {
@@ -207,31 +230,39 @@
             {
                 // Get  relative position of event from the left side of the pair.
                 var offsetX = e.clientX - this.x;
-
                 // Left width is the same as offset. Right width is total width - left width.
                 // Both widths are calculated from the initial parent percentage.
                 //this.left.style.width = 'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
                 
                 var newLeftWidth = offsetX - (gw/2);
+                newLeftWidth = Math.round(newLeftWidth);
+
+                newLeftWidth = newLeftWidth < this.minWidth ? this.minWidth : newLeftWidth;
+                newLeftWidth = newLeftWidth > this.maxWidth ? this.maxWidth : newLeftWidth;
                 var newLeftWidthString = newLeftWidth.toString() + "px";
-                console.log("newLeftWidthString = " + newLeftWidthString);
+                //console.log("newLeftWidthString = " + newLeftWidthString);
                 this.left.style.width = newLeftWidthString; //'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
                 //console.log("just set left width to " + this.left.style.width);
 
                 //this.right.style.width = 'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
-                var newRightWidth = this.width - offsetX - (gw/2);;
+                var newRightWidth = this.width - newLeftWidth - (gw/2);
                 var newRightWidthString = newRightWidth.toString() + "px";
-                console.log("newRightWidthString = " + newRightWidthString);
+                //console.log("newRightWidthString = " + newRightWidthString);
                 this.right.style.width = newRightWidthString; //'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
             }
             else if(this.orientation == "vertical")
             {
                 var offsetY = e.clientY - this.y;
+                offsetY = Math.round(offsetY);
                 var newTopHeight = offsetY - (gw/2);
+                newTopHeight = Math.round(newTopHeight);
+
+                newTopHeight = newTopHeight < this.minHeight ? this.minHeight : newTopHeight;
+                newTopHeight = newTopHeight > this.maxHeight ? this.maxHeight : newTopHeight;
                 var newTopHeightString = newTopHeight.toString() + "px";
                 this.left.style.height = newTopHeightString;
 
-                var newRightHeight = this.height - offsetY - (gw/2);
+                var newRightHeight = this.height - newTopHeight - (gw/2);
                 var newRightHeightString = newRightHeight.toString() + "px";
                 this.right.style.height = newRightHeightString;
             }
