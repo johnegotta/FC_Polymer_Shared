@@ -5,8 +5,8 @@
         <div id="left" style="">
             <content select=".left"></content>
         </div>
-        <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-mousedown="startDragging">
-        </paper-material>
+        <div id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-mousedown="startDragging">
+        </div>
         <div id="right" style="">
             <content select=".right"></content>
         </div>
@@ -20,8 +20,8 @@
   Polymer({
     is: 'fc-splitter',
 
-    listeners: {//"mouseleave": "stopDragging",
-                "mouseenter": "resumeDragging",
+    listeners: {"mouseleave": "mouseLeave",
+                "mouseenter": "mouseEnter",
                 "mouseup": "stopDragging"},
 
     properties: {
@@ -37,6 +37,7 @@
       minHeight: Number,
       maxHeight: Number,
       gutterWidth: String,
+      gutterWidthNum: Number,
       dragging: Boolean,
       borderType: String,
       x: Number,
@@ -51,10 +52,11 @@
       this.right = this.$.right; //document.querySelector("#dos");
       this.dragging = false;
       //this.$.draggy.style.width = this.gutterWidth;
-      this.minPanePercent = 0.15;
-      this.maxPanePercent = 0.85;
+      this.minPanePercent = 20;
+      this.maxPanePercent = 80;
       console.log(this.borderType);
       this.$.splitHolder.style.border = this.borderType == "" ? "8px ridge #aecdfe" : this.borderType;
+      this.gutterWidthNum = parseInt(this.gutterWidth.replace("px",""));
       if(this.orientation == "")
       {
         this.orientation = "horizontal";
@@ -62,27 +64,42 @@
       if(this.orientation == "vertical")
       {
         this.$.splitHolder.className = "layout vertical";
+        var totalHeightStr = this.style.height.replace("px","");
+        var th = parseInt(totalHeightStr);
+        th -= this.gutterWidthNum;
         this.$.draggy.style.width = "100%";
         this.$.draggy.style.height = this.gutterWidth;
-        this.$.draggy.style.borderTop = "5px solid #aecdfe";
-        this.$.draggy.style.borderBottom = "5px solid #aecdfe";
+        //this.$.draggy.style.borderTop = "5px solid #aecdfe";
+        //this.$.draggy.style.borderBottom = "5px solid #aecdfe";
         this.$.left.style.height = "50%";
+        var lh = th / 2;
+        //this.$.left.style.height = lh.toString() + "px";
         this.$.left.style.width = "100%";
         this.$.right.style.height = "50%";
+        var rh = th - lh;
+        //this.$.right.style.height = rh.toString() + "px";
         this.$.right.style.width = "100%";
       }
       else if(this.orientation == "horizontal")
       {
         console.log("setting gutter properties for horizontal");
+        var totalWidthStr = this.style.width.replace("px","");
+        var tw = parseInt(totalWidthStr);
+        console.log("total width = " + tw);
+        tw -= this.gutterWidthNum;
         this.$.splitHolder.className = 'layout horizontal';
         this.$.draggy.style.width = this.gutterWidth;
+        console.log("gutterWidth = " + this.$.draggy.style.width);
         this.$.draggy.style.height = "100%";
-        this.$.draggy.style.borderLeft = "5px solid #aecdfe";
-        this.$.draggy.style.borderRight = "5px solid #aecdfe";
+        //this.$.draggy.style.borderLeft = "5px solid #aecdfe";
+        //this.$.draggy.style.borderRight = "5px solid #aecdfe";
         this.$.left.style.height = "100%";
         this.$.left.style.width = "50%";
+        var lw = tw / 2;
         this.$.right.style.height = "100%";
-        this.$.right.style.width = "50%";   
+        this.$.right.style.width = "50%"; 
+        var rw = tw - lw;
+        console.log(rw);
       }
       console.log(this.left);
       console.log(this.right);
@@ -99,10 +116,20 @@
         }
     },
 
-    useAutoCursor: function(){
-        if(!this.dragging)
+    useAutoCursor: function()
+    {
+        if(true) //!this.dragging)
         {
             this.style.cursor = "auto";
+        }
+    },
+
+    mouseLeave: function(e)
+    {
+        if(this.dragging)
+        {
+            console.log(e);
+            this.useAutoCursor();
         }
     },
 
@@ -111,7 +138,7 @@
             e.preventDefault();
             this.dragging = true;
             this.useSplitCursor();
-            this.$.draggy.elevation = 100; //doesn't work?
+            //this.$.draggy.elevation = 100;
             // Calculate the pairs' width, and percentage of the parent width
 
             //this.width = this.left.getBoundingClientRect().width + this.right.getBoundingClientRect().width + this.gutterWidth;
@@ -127,7 +154,8 @@
                 this.width = totalWidth;
                 this.minWidth = this.minPanePercent * totalWidth;
                 this.minWidth = Math.round(this.minWidth);
-                this.maxWidth = this.maxPanePercent * totalWidth;
+                this.maxWidth = this.width - this.minWidth - parseInt(gw);
+                //this.maxPanePercent * totalWidth;
                 this.maxWidth = Math.round(this.maxWidth);
                 console.log("minWidth = " + this.minWidth + " maxWidth = " + this.maxWidth);
                 console.log("lw = " + lw + " rw = " + rw + " this.width = " + this.width);
@@ -143,7 +171,7 @@
                 this.height = totalHeight;
                 this.minHeight = this.minPanePercent * this.height;
                 this.minHeight = Math.round(this.minHeight);
-                this.maxHeight = this.maxPanePercent * this.height;
+                this.maxHeight = this.height - this.minHeight - parseInt(gw);
                 this.maxHeight = Math.round(this.maxHeight);
                 console.log("minHeight = " + this.minHeight + " maxHeight = " + this.maxHeight);
                 console.log("this.height = " + this.height);
@@ -169,8 +197,14 @@
     stopDragging: function(e){
             if(this.dragging == false) return;
 
+            if(e.target.id != "draggy")
+            {
+                //no longer hovering over gutter/splitter, so normal cursor
+                this.useAutoCursor();
+                console.log("stopDragging auto cursor");
+            }
             this.dragging = false;
-            this.useAutoCursor();
+            //this.useAutoCursor();
             console.log("stopDragging");
 
             this.removeEventListener("mousemove", this.drag);
@@ -190,19 +224,30 @@
             this.right.style.MozUserSelect = '';
     },
 
-    resumeDragging: function(e){
+    mouseEnter: function(e){
+        console.log("mouseEnter dragging = " + this.dragging + " for id = " + this.id);
         if(e.which == 1 || e.buttons == 1 || e.button == 1)
         {
-            //mouse button presse. do nothing, drag continues
+            //mouse button pressed. do nothing, drag continues
+            if(this.dragging == true)
+            {
+                this.useSplitCursor();
+            }
         }
         else
         {
-            this.dragging = false;
+            if(this.dragging)
+            {
+                this.dragging = false;
+                this.useAutoCursor();
+            }
         }
     },
 
     drag: function(e){
             if (this.dragging == false) return;
+            //console.log(this.$.draggy.style.width);
+            //console.log(this.$.draggy.getBoundingClientRect());
             // If within snapOffset of min or max, set offset to min or max
 /*
             if (offsetX <=  this.leftMin + options.snapOffset) {
@@ -229,24 +274,32 @@
             if(this.orientation == "horizontal")
             {
                 // Get  relative position of event from the left side of the pair.
-                var offsetX = e.clientX - this.x;
+                var offsetX = e.clientX - this.x - (gw / 2);
                 // Left width is the same as offset. Right width is total width - left width.
                 // Both widths are calculated from the initial parent percentage.
                 //this.left.style.width = 'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
-                
+                var percentWidth = offsetX / this.width;
+                percentWidth *= 100;
+                percentWidth = Math.round(percentWidth);
+                percentWidth = percentWidth < this.minPanePercent ? this.minPanePercent : percentWidth;
+                percentWidth = percentWidth > this.maxPanePercent ? this.maxPanePercent : percentWidth;
+                //console.log("percentWidth = " + percentWidth);
                 var newLeftWidth = offsetX - (gw/2);
                 newLeftWidth = Math.round(newLeftWidth);
 
                 newLeftWidth = newLeftWidth < this.minWidth ? this.minWidth : newLeftWidth;
                 newLeftWidth = newLeftWidth > this.maxWidth ? this.maxWidth : newLeftWidth;
-                var newLeftWidthString = newLeftWidth.toString() + "px";
+                //var newLeftWidthString = newLeftWidth.toString() + "px";
+                var newLeftWidthString = percentWidth.toString() + "%";
                 //console.log("newLeftWidthString = " + newLeftWidthString);
                 this.left.style.width = newLeftWidthString; //'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
                 //console.log("just set left width to " + this.left.style.width);
 
                 //this.right.style.width = 'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
-                var newRightWidth = this.width - newLeftWidth - (gw/2);
-                var newRightWidthString = newRightWidth.toString() + "px";
+                var newRightWidth = this.width - newLeftWidth; // - (gw/2);
+                var rightPercentWidth = 100 - percentWidth;
+                //var newRightWidthString = newRightWidth.toString() + "px";
+                var newRightWidthString = rightPercentWidth.toString() + "%";
                 //console.log("newRightWidthString = " + newRightWidthString);
                 this.right.style.width = newRightWidthString; //'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
             }
@@ -254,17 +307,26 @@
             {
                 var offsetY = e.clientY - this.y;
                 offsetY = Math.round(offsetY);
+                var percentHeight = offsetY / this.height;
+                percentHeight *= 100;
+                percentHeight = Math.round(percentHeight);
+                percentHeight = percentHeight < this.minPanePercent ? this.minPanePercent : percentHeight;
+                percentHeight = percentHeight > this.maxPanePercent ? this.maxPanePercent : percentHeight;
+
                 var newTopHeight = offsetY - (gw/2);
                 newTopHeight = Math.round(newTopHeight);
 
                 newTopHeight = newTopHeight < this.minHeight ? this.minHeight : newTopHeight;
                 newTopHeight = newTopHeight > this.maxHeight ? this.maxHeight : newTopHeight;
-                var newTopHeightString = newTopHeight.toString() + "px";
+                //var newTopHeightString = newTopHeight.toString() + "px";
+                var newTopHeightString = percentHeight.toString() + "%";
                 this.left.style.height = newTopHeightString;
 
-                var newRightHeight = this.height - newTopHeight - (gw/2);
-                var newRightHeightString = newRightHeight.toString() + "px";
-                this.right.style.height = newRightHeightString;
+                var newBottomHeight = this.height - newTopHeight - (gw/2);
+                var bottomPercentHeight = 100 - percentHeight;
+                //var newRightHeightString = newRightHeight.toString() + "px";
+                var newBottomHeightString = bottomPercentHeight.toString() + "%";
+                this.right.style.height = newBottomHeightString;
             }
     },
 
