@@ -1,4 +1,4 @@
-<dom-module id="fc-list">
+<dom-module id="fc-list-three">
 <style is="custom-style">
     :host {
       @apply(--layout-vertical);
@@ -20,6 +20,28 @@
       display: flex;
       flex: wrap;
       max-height: 100%;
+    }
+
+    paper-icon-button {
+        margin-left: 8px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+        color: #002c90;
+      }
+      paper-icon-button.blue {
+        color: var(--paper-blue-500);
+      }
+      .scrollerTwo{
+        overflow-y: scroll;
+        height: 635px;
+        padding-top: 10px;
+      }
+
+    
+     iron-icon {
+      color: var(--google-blue-500);
     }
 
   .fcborder{
@@ -79,7 +101,7 @@ div.scrollerTwo::-webkit-scrollbar {
     }
 
  cards.paper-material{
-  padding: 40px;
+  padding: 20px;
   margin: 12px;
   
 }   
@@ -102,13 +124,22 @@ div.scrollerTwo::-webkit-scrollbar {
       <div class="horizontal layout wrapper container">
        <div class="vertical layout wrapper container block scrollerTwo" elevation="2">
     
-        <template id="repeater" is="dom-repeat" items="{{fbdata}}"> <!-- filter='{{_callFilter(inquiry)}}'>-->
+        <template id="repeater" is="dom-repeat" items="{{fbdata}}" order-by-child="timeorder" filter='{{_callFilter(inquiry)}}'>
 
             <paper-material elevation='4' class="layout horizontal">
                 <paper-item class="fcborder layout container" style="width:100%">
-                      <div style="width:100%; min-height:520px">
+                      <div style="width:100%; min-height:320px">
                             <template is="dom-if" if={{isInquiry}}>
-                              <fc-call-list-tube data={{item}}></fc-call-list-tube>
+                              <fc-call-list-tube id="listcard" data="{{item}}" class="right" inquiry="{{transferinquiry}}">
+                                  <div class='vertical layout container center-justified commands' style="width: 30px; height: 100px;"> 
+                                      <iron-icon icon="icons:swap-horiz" id="button" class="horizontal layout right-justified" on-click="_scott"></iron-icon>
+                                      <paper-checkbox style="margin-left: 2px;" unchecked></paper-checkbox>
+                                      <iron-icon icon="social:person" title="View">
+                                      </iron-icon>
+                                      <iron-icon style="color: black; font-weight: 900" icon="communication:mail">
+                                      </iron-icon>
+                                  </div>
+                                </fc-call-list-tube>
                             </template>
                             <template is="dom-if" if={{isCourse}}>
                               <fc-course data={{item}}></fc-course>
@@ -120,9 +151,14 @@ div.scrollerTwo::-webkit-scrollbar {
                               <fc-instructor data={{item}}></fc-instructor>
                             </template>
                       </div>
-                   <iron-icon icon="info" id="button" class="horizontal" on-click="_switchToFull"></iron-icon>
-               </paper-item>
-            </paper-material>
+              <div class='vertical layout container right-justified commands' style="width: 30px; height: 100px;">
+                    <iron-icon icon="info" id="button" class="horizontal layout right-justified" on-click="_scott"></iron-icon>
+                    <paper-checkbox style="margin-left: 2px;" checked="{{expand}}"></paper-checkbox>
+                    <iron-icon icon="social:person" title="View" hidden$="{{item.complete}}">
+                    </iron-icon>
+              </div>
+          </paper-item>
+      </paper-material>
              
       </template>
       </div>
@@ -132,7 +168,7 @@ div.scrollerTwo::-webkit-scrollbar {
 <script>
   Polymer({
 
-    is: 'fc-list',
+    is: 'fc-list-three',
 
     behaviors: [
       Polymer.NeonSharedElementAnimatableBehavior
@@ -143,7 +179,7 @@ div.scrollerTwo::-webkit-scrollbar {
     },
 
     properties: {      
-      path: String,
+      path: 'https://focusedstaging1.firebaseio.com/calls',
       dataType: String,
       searchField: String,
       searchFieldTwo: String,
