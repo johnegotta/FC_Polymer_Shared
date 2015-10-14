@@ -1,5 +1,6 @@
-<dom-module id="fc-input-generator"
+<dom-module id="fc-input-generator">
 <template>
+
 <style is="custom-style">
 :root {
       --paper-input-container-label-focus-color, green;
@@ -9,29 +10,37 @@
         font-size: 16px;
     };
   }
-.inputholder {width: 305px; height: 60px padding: 4px;} 
-.inputclass {style="width: 140px; height: 60px; padding: 0px 5px;"}
+.inputholder {
+        width: 305px; 
+        height: 60px; 
+        padding: 4px;
+      } 
+.inputclass {
+        width: 140px; 
+        height: 60px; 
+        padding: 0px 5px;
+      }
 .labelsClass {
       --paper-input-container-label:{
         font-family: merriweather;
         font-weight: 700;
         font-size: 16px;
-    };
-  }
+      }
+  
 </style>
-<paper-card heading="Call Information" elevation="2" style="--paper-card-heading-align-center;" class="layout horiozontal container center center-justify" animated-shadow="true">
+<paper-card heading="{{headingOne}}" elevation="2" style="--paper-card-heading-align-center;" class="layout horiozontal container center center-justify" animated-shadow="true">
 
-     <div class="card-content">  
-     <content select={['fcHolder',
-                     name:'{{mynom}}']}></content>
+<div class="card-content">  
+      <content select=
+                "['fcHolder',
+                name:'{{mynom}}']">
+
+
+      </content>
 
 </div>
           <fc-holder name="inqNames" class="inputholder horizontal layout container" id="callinfo1">
-               <fc-paperInput id='callerFirstName' class="inputclass" name='firstname' tab-index='0' label='Caller First Name'  value='{{inquirer.firstname}}'>
-                    </fc-paperInput>
-
-               <fc-paperInput id='callerLastName' class="inputclass" name='lastname' label='Caller Last Name'  value='{{inquirer.lastname}}'>
-                    </fc-paperInput>
+              
           </fc-holder>
 
 
@@ -39,34 +48,17 @@
 
 
           <fc-holder name="stuNames"  name="callinfo2" sty class="inputholder horizontal layout container">
-                <fc-paperInput  name='studentfirst' class="inputclass labelsClass" name='studentfirstname' label='Student Name' value='{{inquirer.studentfirstname}}'>
-                </fc-paperInput>
-                <fc-paperInput  name='studentlast' class="inputclass" name='studentlastname' label='Student Name'  value='{{inquirer.studentlastname}}'>
-                </fc-paperInput>
+             
           </fc-holder>
 
 
 
           
           <fc-holder  name="callinfo3" name="gradeNschool" style="width: 305px; padding: 0px 5px; height: 65px;" class="horizontal layout container">  
-                    <paper-input class="inputclass"  name="fcInp5" always-float-label='true' label="Grade Level" list="GradeLevel" name="gradelevel"> </paper-input>
-                                             <datalist  name="GradeLevel">
-                                                  <option value='4'> 4th </option>
-                                                  <option value='5'> 5th </option>
-                                                  <option value='6'> 6th</option>
-                                                  <option value='7'> 7th </option>
-                                                  <option value='8'> 8th </option>
-                                                  <option value='9'> 9th </option>
-                                                  <option value='10'> 10th</option>
-                                                  <option value='11'> 11th </option>
-                                                  <option value='12'> 12th </option>
-                                             </datalist>
-                  
-                    <fc-paperInput  name='fcInp6' class="inputclass" name='schoolname' label='Current School' tabindex='0'  value='{{inquirer.school}}'>
-                         </fc-paperInput>
+                    
           </fc-holder>
-          <fc-holder name="datepicker">
-              <paper-input></paper-input>
+        
+            
 
 
 
@@ -77,16 +69,9 @@
 
 
           <fc-holder  name="callinfo4" name="schooltownNrole" class='horizontal layout container inputholder'>
-                      <fc-paperInput  name='this.$.fcInp7' class="inputclass" always-float-label='true' name='townname' label='School Address' value='{{inquirer.schooltown}}'>
-                         </fc-paperInput>
-                      <paper-input type="list" class="inputclass" list="threefour"  name="fcInp8"   label="Inquirer Role" always-float-label='true' name="role">          
-                      <datalist  name="threefour"></paper-input>
-                                                  <option value="mother">Mother</option>
-                                                  <option value="father">Father </option>
-                                                  <option value="student">Student </option>
-                                                  <option value="other">Other </option>
-                                             </datalist>
-                       
+                     
+
+
                               
           </fc-holder>
 
@@ -99,9 +84,9 @@
 
 
           <fc-holder  name="callinfo5" class="horizontal layout container contentholder center-justified">  
-                <gold-phone-input val nameate="true"  name='fcInp9' tabindex='0' name='phone' label='Phone' value='{{inquirer.phone}}' class="inputclass" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
-                    </gold-phone-input> 
-                <gold-email-input label="Email" class="inputclass" tabindex='0' always-float-label='true' value='{{inquirer.email}}'></gold-email-input>   
+                
+
+
           </fc-holder>   
 
 
@@ -144,6 +129,9 @@ FcInputGenerator=Polymer({
       inputPurpose: String,
       special: String,
       mynom: String,
+      inputId: Array,
+      headingOne: "Inputs",
+      disabled: Boolean,
       notify: true,
       reflectToAttributes: true 
     },
@@ -259,9 +247,9 @@ FcInputGenerator=Polymer({
     return [name, label, placeholder]; 
   },
 
-  toggleInput: function(readOnly) {
-      readOnly = !readOnly;
-      return readOnly;
+  toggleInput: function(disabled) {
+      disabled = !disabled;
+      return disabled;
       }
 
     
