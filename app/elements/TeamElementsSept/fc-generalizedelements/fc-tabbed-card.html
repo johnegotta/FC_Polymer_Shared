@@ -1,0 +1,152 @@
+<dom-module id="fc-tabbed-card">
+<template>
+<style is="custom-style">
+.grid-box{
+  width: 300px;
+  height: 480px;
+  padding: 3px;
+  margin: 3px;
+  display: block;
+  color: black;
+  background: white;
+  overflow-x: hidden;
+}
+
+.grid-image{
+    float: left;
+    padding: 3px;
+    height: 72px;
+    color: black;
+    width: 73px;
+    background: aliceblue;
+    display: block;
+
+}
+.grid-holder{
+  width: calc(95%-85px);
+  max-height: 620px;
+  overflow: scroll;
+}
+
+</style>
+
+<firebase-document id="wholeFB" location="focusedstaging1.firebaseio.com" data="{{pickle}}" on-firebase-child-added="firebaseImpl"></firebase-document>
+
+<paper-material elevation="2" class="grid-box">
+    <paper-tabs id="tabHanger" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
+       
+
+
+
+
+    </paper-tabs>
+    <hr>
+    <div class="vertical layout wrap" style="height: 78px;"> 
+        <div class="grid-image">
+        <img src="{{item.photo}}" height="72px" width="73px">
+    	</div>
+    	<div class="horizontal layout wrap" style="width: 210px; height: 78px; overflow-y: scroll;"> 
+	        <b><span>{{item.firstname}}</span>&nbsp <span>{{item.lastname}}</span></b> &nbsp
+	        <b>FCID</b>:<i><u><span>{{item.fcid}}</span></u></i>&nbsp
+	        <b>Phone</b>:<span>[[item.phone]]</span>&nbsp
+	        <b>Email</b>:<span>[[item.email]]</span>&nbsp
+	        <b>S-email</b>:<span>[[item.studentemail]]</span>
+        </div>
+    </div>
+    <hr>
+    <iron-pages id="pageHanger" class="horizontal row wrap layout" style="overflow-y: scroll; padding:3px" selected="{{selected}}">
+
+
+
+
+
+
+    </iron-pages>
+</paper-material>
+</template>
+<script>
+   Polymer({
+   	is: 'fc-tabbed-card',
+   		properties: {
+   			tabs:
+   				type: Array, 
+   				value: function: {
+
+
+
+
+   					return [];
+
+   				notify: true
+   				},
+   			tab: {
+   				type: Object, 
+   				value: {
+   						line1,
+   						line2, 
+   						line3,
+   						line4,
+   						line5,
+   						line6
+   					},
+   				notify: true
+   				},
+   			stuff: {
+   				type: Object,
+   				value: {},
+   				notify: true
+   			}
+
+   		},
+
+   	created: function(){
+
+
+
+
+   		},
+
+   	ready: function(){
+
+
+
+   	},
+
+	attached: function(){
+
+
+
+	},
+
+	firebaseImpl: function(e){
+				var ullabel = document.createElement('h2');
+				var ulToAdd = document.createElement('ul');
+				var everything = e.detail.childSnapshot.val();
+				var ulid = e.detail.childSnapshot.key();
+				ullabel.innerHTML = ulid;
+				var everything_keys = Object.keys(everything);
+				ulToAdd.id = ulid;
+
+				var everything_key_count = everything_keys.length;
+				for( var i = 0; i < everything_key_count; i++){
+					var liToAdd = document.createElement('li');
+					liToAdd.innerHTML = everything_keys[i];
+					ulToAdd.appendChild(liToAdd);
+				}
+				//Polymer.dom(this.$.stacyResultsUL).appendChild(liToAdd);
+				Polymer.dom(this.$.stacyResultsUL).appendChild(ullabel);
+				Polymer.dom(this.$.stacyResultsUL).appendChild(ulToAdd);
+			}
+		});
+
+
+
+
+	}	
+
+
+
+
+   		});
+</script>
+</dom-module>
