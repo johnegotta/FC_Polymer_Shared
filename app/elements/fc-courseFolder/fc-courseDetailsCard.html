@@ -1,29 +1,30 @@
 <dom-module id='fc-courseDetailsCard'>
 <style is='custom-style'>
-article.control {
+div.control {
 
-	min-height: 400px;
-	max-width: 320px;
+	height: 400px;
+	width: 420px;
+  display: block;
 }
 paper-material.coursestuff{
 	border: 3px ridge blue;
-  padding:  10px 6px 4px 8px;
+  padding:  10px;
   color: brown;
   background: #f5f5f5;
   display: block;
-  max-width: 338px;
+  width: 348px;
   font-size: 13px;
   font-weight: 400;
   border-radius: 22px;
+  margin: 24px;
 
 }
 paper-material.callcard{
-  border: 3px ridge blue;
-  padding: 8px 12px 4px 8px;
+  padding: 8px 8px 4px 8px;
   color: brown;
   background: #f5f5f5;
   display: block;
-  max-width: 338px;
+  width: calc(95vw - 585px);
   font-size: 13px;
   font-weight: 400;
   border-radius: 22px;
@@ -40,8 +41,10 @@ section{
 }
 </style>
 <template>
-<article class="container layout vertical fits flex control">
-<paper-material class="coursestuff layout horizontal container" elevation='3'>
+<div class="container layout vertical control">
+  <section class="horizontal layout container" style="width: 400px;">
+   <template is="dom-repeat" items='{{courses}}' as="{{course}}" class="horizontal layout flex">
+    <paper-material class="coursestuff layout horizontal container" elevation='3'>
           <section class='layout vertical container nowrap block'>
                <div>Type: </div>
                <div>Test Date: </div>
@@ -62,42 +65,34 @@ section{
                <div><span>{{course.seatsremaining}}</span></div>
                <div><span>{{course.startdate}}</span></div>
                <div><span>{{course.price}}</span></div>
-               <h6 on-tap='openCoursePerormanceData'>Past Performance</h6>
           </section>
-        </paper-material>
-               <div class='verticle layout'>
-                    <iron-collapse id='courseDescription'>
+    </paper-material>
+    </section>
+    </div>
+      </template>
+
+        <section>
+               <div class='vertical layout'>
+                    <iron-collapse horizontal id='courseDescription' style="position: relative; top: 45px;">
                          <paper-material class='callcard' elevation='4'>
-                              <p>Course Description: <span>{{course.description}}</span></p>
-                    
-           
-                         
+                             <fc-grid></fc-grid>
                          </paper-material>
                     </iron-collapse>
                </div>
           </section>
-          <section>
-               <div class='verticle layout'>
-                    <iron-collapse id='coursePerformanceData'>
-                         <paper-material class='callcard' elevation='4'>
-                              <div>Performance Avg: <span>{{course.thirtysevenpercent}}</span></div>
-                              <div>Performance Top 20%: <span>{{course.twentypercent}}</span></div>
-                              <div>Performance Top 10%: <span>{{course.tenpercent}}</span></div>
-                              <div>Performance Top 5%: <span>{{course.fivepercent}}</span></div>
-                              <div>Performance Top 1%: <span>{{course.onepercent}}</span></div>
-                              <paper-button class='better-platinum' on-tap='doIt'>Select
-                              </paper-button>
-                         </paper-material>
-                    </iron-collapse>
-               </div>
-          </section>
-           </paper-material>
-     </article>
+   
 </template>
 <script>
 Polymer({
 is: 'fc-courseDetailsCard',
 properties:{
+  courses: {
+      type: Array,
+      value: function() {
+        return [this.course,this.course];
+      },
+      notify: true
+    }, 
 	course:{ 
 		type: Object, 
 		value: {
