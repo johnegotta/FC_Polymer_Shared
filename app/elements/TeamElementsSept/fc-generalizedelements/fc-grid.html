@@ -2,59 +2,73 @@
 <template>
 <style is="custom-style">
 .grid-box{
-  width: 149px;
-  height: 300px;
-  border: 2px bevel #cccccc;
+  width: 300px;
+  height: 480px;
   padding: 3px;
   margin: 3px;
   display: block;
-  color: white;
-  overflow-y:scroll;
-  overflow-x:hidden;
+  color: black;
+  background: white;
+  overflow-x: hidden;
 }
 
 .grid-image{
     float: left;
     padding: 3px;
     height: 72px;
-    color: goldenrod;
-    width; 73px;
-    background: #aliceblue;
+    color: black;
+    width: 73px;
+    background: aliceblue;
     display: block;
 
 }
 .grid-holder{
-  width: 1320px;
-  height: 620px;
-  border: 6px ridge limegreen;
+  width: calc(95%-85px);
+  max-height: 620px;
+  overflow: scroll;
 }
 
-.row{
-  min-width: 356px;
-  max-width: 100%;
-  display: block;
-  height: 600px;
-}
 </style>
-<firebase-collection id='grids' location="{{defaultPath}}" data='{{grids}}'>
-  <div class="vertical layout wrapper grid-holder">
-    <div class="row horizontal layout wrap">
+<firebase-collection id='grids' location="https://focusedstudents.firebaseio.com/contactinfo" data='{{grids}}'>
+  <div class="vertical layout wrap grid-holder">
+    <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" data='{{scores}}'>
+       <div class="horizontal layout wrap">
       <template is="dom-repeat" items="{{grids}}">
-        <div class="grid-box">
-          <div class="grid-image">
-          <span>{{item.firstname}}</span> <span>{{item.lastname}}</span> <hr>  <br><span>{{item.fcid}}</span><br>
+        <paper-material elevation="2" class="grid-box">
+        <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
+              <paper-tab>Profile</paper-tab>
+              <paper-tab>Scores</paper-tab>
+              <paper-tab>Account</paper-tab>
+              <paper-tab>ROI</paper-tab>
+              <paper-tab>Academics</paper-tab>
+              <paper-tab>Inquiries</paper-tab>
+            </paper-tabs>
+        <hr>
+        <div class="vertical layout wrap" style="height: 78px;"> <div class="grid-image"><img src="{{item.photo}}" height="72px" width="73px">
+         </div><div class="horizontal layout wrap" style="width: 210px; height: 78px; overflow-y: scroll;"> <b><span>{{item.firstname}}</span>&nbsp <span>{{item.lastname}}</span></b> &nbsp
+         <b>FCID</b>:<i><u><span>{{item.fcid}}</span></u></i>&nbsp<b>Phone</b>:<span>[[item.phone]]</span>&nbsp<b>Email</b>:<span>[[item.email]]</span>&nbsp<b>S-email</b>:<span>[[item.studentemail]]</span>&nbsp<span>[[item.school]]</span></div></div><hr>
+          <template is="dom-repeat" items="{{scores}}">
+          <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
+          <span>pretest: <span>[[item.scoresPreTest]]</span></span><br>
+           <span>test 1: <span>[[item.scoresTest1]]</span></span><br>
+           <span>T2: <span>[[item.scoresTest2]]</span></span><br>
+           <span>T3: <span>[[item.scoresTest3]]</span></span><br>
+           <span>T4: <span>[[item.scoresTest4]]</span></span><br>
+           <span>T5: <span>[[item.scoresTest5]]</span></span><br>
+           <span>T6: <span>[[item.scoresTest6]]</span></span><br>
+          <span>REAL SAT: <span>[[item.realSAT]]</span></span><br>
           </div>
-        </div>
+          </template>
+        </paper-material>
       </template>
-    </div>s
+    </div>
   </div>
 </template>
 <script>
 Polymer({
   is:"fc-grid",
   properties: {
-    defaultPath: "https://focusedstudents.firebaseio.com/contactinfo",
-    grids: 'contactinfo',
+    defaultPath: "",
     pathOne: String, 
     pathTwo: String, 
     pathThree: String, 
