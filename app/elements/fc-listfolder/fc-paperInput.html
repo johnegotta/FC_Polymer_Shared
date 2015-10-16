@@ -1,47 +1,55 @@
 <dom-module id="fc-paperInput">
+  <template>
 <style is="custom-style">
     :host {
       display: block;
     }
     input::-webkit-input-placeholder {
-      color: var(--paper-input-container-light-blue-500);
+      color: var(--paper-input-container-dark-blue-500);
     }
     input:-moz-placeholder {
-      color: var(--paper-input-container-light-blue-500);
+      color: var(--paper-input-container-dark-blue-500);
     }
     input::-moz-placeholder {
-      color: var(--paper-input-container-light-blue-500);
+      color: var(--paper-input-container-dark-blue-500);
     }
     input:-ms-input-placeholder {
-      color: var(--paper-input-container-light-blue-500);
+      color: var(--paper-input-container-dark-blue-500);
     }
     paper-input: {
    		@apply {
-   			color: var(--paper-input-container-green-500);
+   			color: var(--paper-input-container-google-green: 300);
 
-    		color: var(--paper-input-container-invalid-google-red-500;
+    		color: var(--paper-input-container-invalid-google-red: 500);
 	
-			color: var(--paper-input-container-input-google-white-900);
+			color: var(--paper-input-container-input-google-white: 900);
+
+			font-weight: var(--paper-input-container-label-font-weight: 800);
+		
+``
+
+
 
 		}
 paper-input	{
-	width: 80px;
+	width: 110px;
 	display: inline;
-	padding: 0 4px 0 4px;
-	margin: 4px 4px;
+	padding: 0 6px 0 6px;
+	margin: 2px;
+	white-space:2px; 
 }
 
-.add-on-content.is-invalid ::content * {
+/*.add-on-content.is-invalid ::content * {
       color: var(--paper-input-container-invalid-color, --google-red-500);
-    }
+    }*/
 
   </style>
 
-  <template>
+ 
 
-   <paper-input always-float-label="true" auto-validate$="{{autoValidate}}" autocomplete$="{{autocomplete}}" autofocus="true" maxlength="30" required$="{{required}}" name$="{{name}}" autocapitalize="true" autocorrect$="{{true}}" error-message$="{{errorMessage}}" value="{{value}}" label="{{label}}" placeholder="{{placeholder}}" list$="{{list}}"></paper-input>
+   <paper-input always-float-label="true" auto-validate$="{{autoValidate}}" autocomplete$="{{autocomplete}}" autofocus="true" maxlength="30" required$="{{required}}" name$="{{name}}" autocapitalize="true" autocorrect$="{{true}}" error-message$="{{errorMessage}}" type$='{{type}}' value="{{value}}" label="{{label}}" placeholder="{{placeholder}}" list$="{{list}}"></paper-input>
 
-</template>
+  </template>
 <script>
  FcPaperInput=Polymer({
     is: 'fc-paperInput',
@@ -64,146 +72,140 @@ paper-input	{
 		name: 'firstname',
 		label: 'Inquirer First Name', 
 		placeholder: 'First Name', 
-		list:[],
+		list:String,
+		type: String,
 		readOnly: false,
 		notify: true,
 		reflectToAttributes: true
-	},
-
-	attached: function(name, placeholder, label){
-		//initializing the opening values: 
-		if (name==null){
-			name='firstname'; 
-		}
-	},
+	}
 
 
-/*	attached: function(name, placeholder, label){
+	/*
+
+
+	attached: function(name){
 		//initializing the opening values: 
 	if (name==undefined){
-		name='firstname';
+		this.name='firstname';
 
 		
 		if (name=='firstname'){
-			placeholder='First Name';
-			label='Inquirer First Name';
-			return label;
+			this.placeholder='First Name';
+			this.label='Inquirer First Name';
+			
 		}
 		
 		if (name=='lastname'){
 			placeholder='Last Name';
-			label='Inquirer Last Name';
-			return label;
+			this.label='Inquirer Last Name';
+			
 		}
 		
 		if (name=='email'){
-			placeholder='Email';
-			label='Inquirer Email';
-			return label;
-			console.log(label);
+			this.createElement()
 		}
 		
 		if (name=='phone'){
 			placeholder='Phone';
-			label='Inquirer Phone';
-			return label;
+			this.label='Inquirer Phone';
+			return this.label;
 		}
 		
 		if (name=='studentfirstname'){
 			placeholder='Related Student';
-			label='Student First Name';
+			this.label='Student First Name';
 		}
 
 		if (name=='studentlastname'){
 			placeholder='Related Student';
-			label='Student Last Name';
+			this.label='Student Last Name';
 		}
 
 		if (name=='hisHerDaughterSon'){
 			placeholder='His/Her Daughter/Son';
-			label='Inquirer Gender and Student Gender';
-		}
+			this.label='Inquirer Gender and Student Gender';
+		}//dynamic
 
 		if (name=='firstThroughTwelfth'){
 			placeholder='First-Twelfth';
-			label='Current Grade Level (1st-12th)';
-		}
+			this.label='Current Grade Level';
+		}//add input selection here.
 
 		if (name=='schoolname'){
 			placeholder='Current School';
-			label='Name of Student`s Current School';
-		}
+			this.label='Name of Student`s Current School';
+		}//add from database--helper suggestions for schools
 
 		if (name=='townname'){
 			placeholder='School Town Name';
-			label='Town inwhich School is Located';
-		}
+			this.label='Town inwhich School is Located';
+		}//add here from database common names etc
 		
 		if (name=='nameofprogram'){
 			placeholder='Focused Program';
-			label='Program inwhich Inquirer Expressed Interest';
+			this.label='Program inwhich Inquirer Expressed Interest';
 			//list='programs'; etc. ask how to do this???
-		}
+		}//same thing
 		
 		if (name=='startdate'){
 			placeholder='Program Start Date';
-			label='Indicated Focused Program Start Date';
+			this.label='Indicated Focused Program Start Date';
 			//based on above list fill, this should be a limited set
 			// and should auto-fill. ditto on below!
 		}
 		
 		if (name=='coach'){
 			placeholder='Focused Coach';
-			label='Focused Instructor Full Name';
-			return label;
+			this.label='Focused Instructor Full Name';
+			return this.label;
 		}
 		//select or autofill
 
 		if (name=='price'){
 			placeholder='Course Price';
-			label='Price of Focused Course';
+			this.label='Price of Focused Course';
 		}
 		//autofill based on above.
 
 		if (name=='isOrIsNot'){
 			placeholder='Enter "is" or "is not"';
-			label='Is Price an Issue for the Client?';
+			this.label='Is Price an Issue for the Client?';
 		}
 		
 		if (name=='dateOfCallTwo'){
 			placeholder='Focused Coach';
-			label='Focused Instructor Full Name';
+			this.label='Focused Instructor Full Name';
 		}
 		
 		if (name=='haveOrHaveNot'){
 			placeholder='"have" or "have not"?';
-			label='Enter "have" or "have not" Based on Context.';
+			this.label='Enter "have" or "have not" Based on Context.';
 		}
 
 		if (name=='toBeRunOnDate'){
 			placeholder='CC Run Date';
-			label='Processing Date, If One Exists';
+			this.label='Processing Date, If One Exists';
 		}
 		//automated with CC processor
-		else {
+		if {
 			name='pickle';
 			placeholder='pickle';
-			label='pickle';
+			this.label='pickle';
 		}
 
-		return [name, label, placeholder]; 
+		return [this.name, this.label, this.placeholder]; 
 	}
-		console.log(name + " " + label + '' + placeholder);
-		console.log(name);
-		return label;
-	},*/
+		console.log(this.name + " " + this.label + '' + this.placeholder);
+		console.log(this.name);
+		return this.label;
+	},
 
 	toggleInput: function(readOnly) {
       readOnly = !readOnly;
       return readOnly;
   		}
 
-  	
+  	*/
   	});
 </script>
 </dom-module>

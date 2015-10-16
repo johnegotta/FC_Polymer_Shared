@@ -1,19 +1,37 @@
 <dom-module id="fc-splitter">
-
 <template>
     <div id="splitHolder" class="layout" style="width:100%; height:100%">
-        <div id="left" style="">
-            <content select=".left"></content>
+        <div id="left" class="nobar" style="background:white;overflow:scroll">
+            <content style="height: 100%;" select=".left"></content>
         </div>
         <div id="draggy" draggable="true" style="background:#9dbced" on-mouseover="useSplitCursor" on-mouseleave="leaveGutter" on-mousedown="startDragging">
         </div>
-        <div id="right" style="">
+        <div id="right" style="background:white; overflow:scroll">
             <content select=".right"></content>
         </div>
     </div>
 </template>
 <style is="custom-style">
+::--webkit-scrollbar {
+                    display: none;
+}
 
+host::-webkit-scrollbar {
+                    display: none;
+               
+}
+nobar.div::-webkit-scrollbar {
+                    display: none;
+                    @apply;
+
+}
+paper-material::-webkit-scrollbar {
+                    display: none;
+}
+content::-webkit-scrollbar {
+                    width:0;
+
+}
 </style>
 
 <script>
@@ -51,11 +69,12 @@
       this.left = this.$.left;//document.querySelector("#uno");
       this.right = this.$.right; //document.querySelector("#dos");
       this.dragging = false;
+
       //this.$.draggy.style.width = this.gutterWidth;
       this.minPanePercent = 20;
       this.maxPanePercent = 80;
       console.log(this.borderType);
-      this.$.splitHolder.style.border = this.borderType == "" ? "10px groove #aecdfe" : this.borderType;
+      this.$.splitHolder.style.border = this.borderType == "" ? "10px groove #aecdfe" : this.borderType; //E5E4E2
       this.gutterWidthNum = parseInt(this.gutterWidth.replace("px",""));
       if(this.orientation == "")
       {
@@ -71,6 +90,7 @@
         this.$.draggy.style.height = this.gutterWidth;
         this.$.draggy.style.borderTop = "4px groove #aecdfe";
         this.$.draggy.style.borderBottom = "4px groove #aecdfe";
+
         this.$.left.style.height = "50%";
         var lh = th / 2;
         //this.$.left.style.height = lh.toString() + "px";
@@ -93,6 +113,7 @@
         this.$.draggy.style.height = "100%";
         this.$.draggy.style.borderLeft = "4px groove #aecdfe";
         this.$.draggy.style.borderRight = "4px groove #aecdfe";
+
         this.$.left.style.height = "100%";
         this.$.left.style.width = "50%";
         var lw = tw / 2;
@@ -151,6 +172,7 @@
 
             //this.width = this.left.getBoundingClientRect().width + this.right.getBoundingClientRect().width + this.gutterWidth;
             var gw = this.gutterWidth;
+
             gw = gw.replace("px", "");
             if(this.orientation == "horizontal")
             {
