@@ -1,0 +1,29 @@
+<dom-module id="fc-class-creator">
+  <template>
+    <iron-form id="classCreationForm">
+      <paper-input type="list" always-float-label label="Teacher" list="{{teacherList}}"></paper-input>
+      <paper-input type="list" always-float-label label="Location" list=""></paper-input>
+      <paper-input type="date" always-float-label label="Start Date"></paper-input>
+      <paper-input type="date" always-float-label label="End Date"></paper-input>
+      <paper-input type="date" multiple always-float-label label="Class Days"></paper-input>
+    </iron-form>
+  </template>
+  <script>
+    Polymer({
+      is: "fc-class-creator",
+      properties: {
+        teacherList: {
+          type: Array,
+          value: []
+        }
+      },
+      created: function(){
+        var ref = new Firebase("focusedstaging1.firebaseio.com");
+
+        ref.child("test_results").on("child_added", function(snap){
+          this.teacherList.push(snap.key());
+        });
+      }
+    });
+  </script>
+</dom-module>

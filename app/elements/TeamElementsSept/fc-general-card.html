@@ -1,0 +1,72 @@
+<dom-module id="fc-general-card">
+  <template>
+    <paper-header-panel id="fullCard">
+      <paper-toolbar id="fullCardHeader">
+        <paper-tabs id="fullCardHeaderTabs" scrollable>
+          <template is="dom-repeat" items="{{headerTabs}}">
+            <paper-tab>{{item}}</paper-tab>
+          </template>
+        </paper-tabs>
+      </paper-toolbar>
+      <div id="mainCardContent">
+        <div id="mainCardContentTopInfo">
+        </div>
+        <div id="mainCardContentTabbedInfo">
+        </div>
+      </div>
+    </paper-header-panel>
+  </template>
+  <script>
+    Polymer({
+      is: "fc-general-card",
+      properties: {
+        firebaseUrl: {
+          type: String,
+          value: "focusedstaging1.firebaseio.com"
+        },
+        cardTopLevel: {
+          type: String,
+          value: "",
+          observer: "createCardData"
+        },
+        headerTabs: {
+          type: Array,
+          value: []
+        }
+      },
+      attached: function(){
+        this.createCardData();
+      },
+      factoryImpl: function(argCardTopLevel){
+        this.cardTopLevel = argCardTopLevel;
+      },
+      createCardData: function(){
+        var ref = new Firebase(this.firebaseUrl);
+        ref.child(this.cardTopLevel).on("value", function(snap){
+          var snapKey = snap.key();
+          var snapObject = snap.val();
+          var snapRoute = snap.toString();
+          for (var subKey in snapObject){
+            console.log(typeof snapObject[subKey]);
+            switch (typeof snapObject[subKey]){
+              case "string" :
+                var newDisabledInput = document.createElement("paper-input");
+                newDisabledInput.id = snapRoute + "/" + subKey + "_input";
+                newDisabledInput.setAttribute("data-location",snapRoute + "/" + subKey);
+                newDisabledInput.disabled = true;
+                //document.querySelector('#mainCardContentTopInfo').appendChild(newDisabledInput);
+                break;
+              case "object" :
+                /*var newCardTab = document.createElement("paper-tab");
+                newCardTab.innerHTML = subKey;
+                Polymer.dom(this.$.fullCardHeaderTabs).appendChild(newCardTab);*/
+                //this.headerTabs.push(subKey);
+                break;
+            }
+          }
+        });
+      }
+
+    });
+  </script>
+</dom-module>
