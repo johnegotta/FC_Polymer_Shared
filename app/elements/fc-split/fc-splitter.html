@@ -1,38 +1,21 @@
 <dom-module id="fc-splitter">
 <template>
-    <div id="splitHolder" class="layout" style="width:100%; height:100%">
-        <div id="left" class="nobar" style="background:white;overflow:scroll">
+    <style is="custom-style">
+
+    </style>
+  
+  <div id="splitHolder" class="layout flex-box container" style="width:100%; height:100vh;">
+        <div id="left">
             <content style="height: 100%;" select=".left"></content>
         </div>
         <div id="draggy" draggable="true" style="background:#9dbced" on-mouseover="useSplitCursor" on-mouseleave="leaveGutter" on-mousedown="startDragging">
         </div>
-        <div id="right" style="background:white; overflow:scroll">
+        <div id="right">
             <content select=".right"></content>
         </div>
     </div>
+
 </template>
-<style is="custom-style">
-::--webkit-scrollbar {
-                    display: none;
-}
-
-host::-webkit-scrollbar {
-                    display: none;
-               
-}
-nobar.div::-webkit-scrollbar {
-                    display: none;
-                    @apply;
-
-}
-paper-material::-webkit-scrollbar {
-                    display: none;
-}
-content::-webkit-scrollbar {
-                    width:0;
-
-}
-</style>
 
 <script>
   Polymer({
@@ -54,7 +37,10 @@ content::-webkit-scrollbar {
       maxWidth: Number,
       minHeight: Number,
       maxHeight: Number,
-      gutterWidth: String,
+      gutterWidth: {
+        type: String,
+        reflectToAttributes: true
+      },
       gutterWidthNum: Number,
       dragging: Boolean,
       borderType: String,
@@ -70,11 +56,15 @@ content::-webkit-scrollbar {
       this.right = this.$.right; //document.querySelector("#dos");
       this.dragging = false;
 
-      //this.$.draggy.style.width = this.gutterWidth;
       this.minPanePercent = 20;
       this.maxPanePercent = 80;
-      console.log(this.borderType);
       this.$.splitHolder.style.border = this.borderType == "" ? "10px groove #aecdfe" : this.borderType; //E5E4E2
+      if(this.gutterWidth == "")
+      {
+        this.gutterWidth = "8px";
+      }
+      console.log("gutterWidth = " + this.gutterWidth);
+
       this.gutterWidthNum = parseInt(this.gutterWidth.replace("px",""));
       if(this.orientation == "")
       {
@@ -225,8 +215,10 @@ content::-webkit-scrollbar {
     },
 
     stopDragging: function(e){
-            if(this.dragging == false) return;
-
+            if(this.dragging == false)
+            {
+                return;
+            }
             if(e.target.id != "draggy")
             {
                 //no longer hovering over gutter/splitter, so normal cursor
@@ -236,7 +228,6 @@ content::-webkit-scrollbar {
             this.dragging = false;
             //this.useAutoCursor();
             console.log("stopDragging");
-
             this.removeEventListener("mousemove", this.drag);
 
 /*
@@ -342,7 +333,7 @@ content::-webkit-scrollbar {
                 percentHeight = Math.round(percentHeight);
                 percentHeight = percentHeight < this.minPanePercent ? this.minPanePercent : percentHeight;
                 percentHeight = percentHeight > this.maxPanePercent ? this.maxPanePercent : percentHeight;
-
+                console.log("top percentHeight = " + percentHeight);
                 var newTopHeight = offsetY - (gw/2);
                 newTopHeight = Math.round(newTopHeight);
 
