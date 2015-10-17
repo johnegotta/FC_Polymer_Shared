@@ -7,7 +7,7 @@
 		<firebase-collection id="test_results_loc" data="{{stacy_results}}" location="focusedstaging1.firebaseio.com/students/agjasga1234/test_results">
 		</firebase-collection>
 		<paper-button id="startmakingButton" on-tap="makeUpResults">Make Up Results</paper-button>
-		<div id="stacyResults" style="height:400px;width:400px;border:1px solid black;overflow:scroll">
+		<div id="stacyResults" style="height:1200px;width:700px;border:1px solid black;overflow:scroll">
 		<ul id="stacyResultsUL"></ul>
 			<!--<template is="dom-repeat" items="{{keysToGet}}">
 				<fc-model-single-sub-thing crap="{{pickle.test_results.item}}"></fc-model-single-sub-thing>
@@ -31,7 +31,6 @@
 				var reading_score = 0;
 				var writing_score = 0;
 				var fives_counter = 1;
-				console.log("running makeUpResults");
 				for(var i = 0; i < 300; i++){
 					math_score = this.randomSectionScore();
 					reading_score = this.randomSectionScore();
@@ -72,10 +71,10 @@
 					var new_result = this.$.test_results_loc.add(obj_to_add);
 					var new_result_key = new_result.key();
 					//console.log(this.pickle['students'][student_fb_key]);
-					this.$.wholeFB.location = 'focusedstaging1.firebaseio.com/students/' + student_fb_key + '/test_results';
+					/*this.$.wholeFB.location = 'focusedstaging1.firebaseio.com/students/' + student_fb_key + '/test_results';
 					var obj_to_add = {};
 					obj_to_add[new_result_key] = true;
-					this.pickle = obj_to_add;
+					this.pickle = obj_to_add;*/
 				}
 				this.$.wholeFB.location = 'focusedstaging1.firebaseio.com';
 			},
@@ -84,13 +83,14 @@
 			},
 			sayHi: function(e){
 				this.keysToGet = Object.keys(e.detail.val());
-
-				console.log(this.keysToGet);
+				this.ahhh = e.detail.ref();
+				
 			},
 			showTime: function(e){
 				var ullabel = document.createElement('h2');
 				var ulToAdd = document.createElement('ul');
 				var everything = e.detail.childSnapshot.val();
+
 				var ulid = e.detail.childSnapshot.key();
 				ullabel.innerHTML = ulid;
 				var everything_keys = Object.keys(everything);
@@ -99,7 +99,10 @@
 				var everything_key_count = everything_keys.length;
 				for( var i = 0; i < everything_key_count; i++){
 					var liToAdd = document.createElement('li');
-					liToAdd.innerHTML = everything_keys[i];
+					var keyValue = JSON.stringify(everything[everything_keys[i]]);
+					var keyToKeyValue = everything_keys[i];
+					
+					liToAdd.innerHTML = keyToKeyValue + " " + keyValue;
 					ulToAdd.appendChild(liToAdd);
 				}
 				//Polymer.dom(this.$.stacyResultsUL).appendChild(liToAdd);

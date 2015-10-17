@@ -1,9 +1,10 @@
 <dom-module id='fc-courseDetailsCard'>
+<template>
 <style is='custom-style'>
 div.control {
 
 	height: 400px;
-	width: 420px;
+	width: 400px;
   display: block;
 }
 paper-material.coursestuff{
@@ -12,11 +13,11 @@ paper-material.coursestuff{
   color: brown;
   background: #f5f5f5;
   display: block;
-  width: 348px;
   font-size: 13px;
   font-weight: 400;
   border-radius: 22px;
   margin: 24px;
+  width: 400px;
 
 }
 paper-material.callcard{
@@ -40,12 +41,14 @@ section{
   margin: 10px 10px 0px 6px;
 }
 </style>
-<template>
+
+<firebase-collection id="classfirebase" data="{{courses}}" location="https://focused0ne.firebaseio.com/courses"></firebase-collection>
+
 <div class="container layout vertical control">
-  <section class="horizontal layout container" style="width: 400px;">
-   <template is="dom-repeat" items='{{courses}}' as="{{course}}" class="horizontal layout flex">
-    <paper-material class="coursestuff layout horizontal container" elevation='3'>
-          <section class='layout vertical container nowrap block'>
+  <section class="horizontal layout container wrap" style="width: 68vw;">
+   <template is="dom-repeat" items='{{courses}}'  class="horizontal layout wrap">
+    <paper-material class="coursestuff layout horizontal container" style="width:330px;" elevation='3'>
+          <section class='layout vertical container nowrap block' style="width: 158px;">
                <div>Type: </div>
                <div>Test Date: </div>
                <div>Class Schedule: </div>
@@ -54,30 +57,34 @@ section{
                <div>Remaining Seats: </div>
                <div>Start Date:</div>
                <div>Price: </div>
-                <h6 on-tap='openCourseDescription'>Course Description</h6>
+                <h6 >Course Description</h6>
           </section>
-           <section class='layout vertical container nowrap block'>
-                <div><span>{{course.type}}</span></div>
-               <div><span>{{course.title}}</span></div>
-               <div><span>{{course.schedule}}</span></div>
-               <div><span>{{course.testschedule}}</span></div>
-               <div><span>{{course.coaches}}</span></div>
-               <div><span>{{course.seatsremaining}}</span></div>
-               <div><span>{{course.startdate}}</span></div>
-               <div><span>{{course.price}}</span></div>
+           <section class='layout vertical container nowrap block' style="width: 158px;">
+                <div><span>{{item.fctype}}</span>&nbsp</div>
+               <div><span>{{item.title}}</span>&nbsp</div>
+               <div><span>{{item.schedule}}</span>&nbsp</div>
+               <div><span>{{item.testschedule}}</span>&nbsp</div>
+               <div><span>{{item.coaches}}</span>&nbsp</div>
+               <div><span>{{item.seatsremaining}}</span>&nbsp</div>
+               <div><span>{{item.startdate}}</span>&nbsp</div>
+               <div><span>{{item.price}}</span>&nbsp</div>
           </section>
     </paper-material>
+    </template>
     </section>
     </div>
-      </template>
+    
 
         <section>
-               <div class='vertical layout'>
-                    <iron-collapse horizontal id='courseDescription' style="position: relative; top: 45px;">
+               <div class='vertical layout' >
+<h3 on-tap='openCourseDescription'> See Scores</h3>
+                    <div horizontal id='courseDescription' hidden='true' style="position: relative; top: 45px;">
+                        
                          <paper-material class='callcard' elevation='4'>
-                             <fc-grid></fc-grid>
+                            <fc-grid></fc-grid>
                          </paper-material>
-                    </iron-collapse>
+                      
+                    </div>
                </div>
           </section>
    
@@ -89,7 +96,7 @@ properties:{
   courses: {
       type: Array,
       value: function() {
-        return [this.course,this.course];
+        return [this.course];
       },
       notify: true
     }, 
@@ -118,22 +125,24 @@ properties:{
             startdate: 'December 7, 2015',
             coursedates: {
               type: Object, 
-              value: {
-                class1: 'Monday December 7, 2015',
-                class2: 'Wednesday December 9, 2015',
-                class3: 'Monday December 14, 2015',
-                class4: 'Wednesday December 16, 2015',
-                class5: 'Monday December 21, 2015',
-                class6: 'Wednesday December 23, 2015',
-                class7: 'Monday December 28, 2015',
-                class8: 'Wednesday December 30, 2015',
-                class9: 'Monday January 4, 2016',
-                class10: 'Wednesday January 6, 2016',
-                class11: 'Monday January 11, 2016',
-                class12: 'Wednesday January 13, 2016',
-                class13: 'Monday January 18, 2016',
-                class14: 'Wednesday January 20, 2016',     
-                },
+              value: {function(){
+              return  {class1: 'Monday December 7, 2015'},
+                      {class2: 'Wednesday December 9, 2015'},
+                      {class3: 'Monday December 14, 2015'},
+                      {class4: 'Wednesday December 16, 2015'},
+                      {class5: 'Monday December 21, 2015'},
+                      {class6: 'Wednesday December 23, 2015'},
+                      {class7: 'Monday December 28, 2015'},
+                      {class8: 'Wednesday December 30, 2015'},
+                      {class9: 'Monday January 4, 2016'},
+                      {class10: 'Wednesday January 6, 2016'},
+                      {class11: 'Monday January 11, 2016'},
+                      {class12: 'Wednesday January 13, 2016'},
+                      {class13: 'Monday January 18, 2016'},
+                      {class14: 'Wednesday January 20, 2016'};
+
+                }
+              },
               notify: true
             },
             testdates: {
@@ -159,7 +168,7 @@ properties:{
 },
     
     openCourseDescription: function(){
-		     this.$.courseDescription.toggle();
+		     this.$.courseDescription.hidden = ! this.$.courseDescription.hidden;
 		     //this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? 'icons:remove':'icons:add';
 		      },
 

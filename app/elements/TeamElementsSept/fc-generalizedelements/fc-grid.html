@@ -29,11 +29,13 @@
 }
 
 </style>
+<firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
+<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" _on-query-value="showTime2"></firebase-document>
 <firebase-collection id='grids' location="https://focusedstudents.firebaseio.com/contactinfo" data='{{grids}}'>
   <div class="vertical layout wrap grid-holder">
-    <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" data='{{scores}}'>
+    <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" data='{{fcids}}'>
        <div class="horizontal layout wrap">
-      <template is="dom-repeat" items="{{grids}}">
+      <template is="dom-repeat" items="{{grids}}" item="{{item}}">
         <paper-material elevation="2" class="grid-box">
         <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
               <paper-tab>Profile</paper-tab>
@@ -57,19 +59,19 @@
               <b>S-email</b>:<span>[[item.studentemail]]</span>
               &nbsp<span>[[item.school]]</span>
           </div></div><hr>
-          <template is="dom-repeat" items="{{scores}}" as="score" filter="{{_smartScores(fcid)}}">
+          <template is="dom-repeat" data="{{fcids}}">
             <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
-                <span>pretest: <span>[[score.scoresPreTest]]</span></span><br>
-                <span>test 1: <span>[[score.scoresTest1]]</span></span><br>
-                 <span>T2: <span>[[score.scoresTest2]]</span></span><br>
-                 <span>T3: <span>[[score.scoresTest3]]</span></span><br>
-                 <span>T4: <span>[[score.scoresTest4]]</span></span><br>
-                 <span>T5: <span>[[score.scoresTest5]]</span></span><br>
-                 <span>T6: <span>[[score.scoresTest6]]</span></span><br>
-                <span>REAL SAT: <span>[[score.realSAT]]</span></span><br>
+                <span>pretest: <span>[[item.scoresPreTest]]</span></span><br>
+                <span>test 1: <span>[[this.fcid.scoresTest1]]</span></span><br>
+                 <span>T2: <span>[[this.fcid.scoresTest2]]</span></span><br>
+                 <span>T3: <span>[[this.fcid.scoresTest3]]</span></span><br>
+                 <span>T4: <span>[[this.fcid.scoresTest4]]</span></span><br>
+                 <span>T5: <span>[[this.fcid.scoresTest5]]</span></span><br>
+                 <span>T6: <span>[[this.fcid.scoresTest6]]</span></span><br>
+                <span>REAL SAT: <span>[[this.fcid.realSAT]]</span></span><br>
             </div>
-          </template>
         </paper-material>
+        </template>
       </template>
     </div>
   </div>
@@ -83,32 +85,46 @@ Polymer({
     pathTwo: String, 
     pathThree: String, 
     gridType: String, 
-    fcid: 'StreelandAnna00001', 
-    contentSelect: [
-
-
-
-
-
-
-
-      ],
+    fcids: {
+      type: Array,
+      notify: true,
+      reflectToAttributes: true
+    },
+  scores: {
+      type: Array
+      },
     gridImageOne: '',
     gridImageTwo: '',
     reflectToAttributes: true,
     notify: true
   },
 
-_smartScores: function(fcid) {
-  console.log(fcid+ "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-    return function(score){
-          console.log(score + "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-          console.log(fcid);
-          return true;
-        };
+  attached: function(){
+        console.log("this what mtf ");
+       
+   },
 
-          console.log(fcid+ "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-      }
+
+  showTime: function(e){
+        var fcid = e.detail.childSnapshot.key();
+        console.log(fcid);
+        this.fcid=fcid;
+        var ModelClass = e.detail.childSnapshot.val();
+        console.log(ModelClass + " ModelClass");
+       this.fcids.push(fcid);        
+       console.log(this.fcids);
+       return this.fcid;
+
+        },
+showTime2: function(eh){
+        var scores = eh.detail.queryValue();
+        console.log(scores + " scores?");
+        var scoresID = eh.detail.queryValue.key();
+        console.log(scoresID);
+        this.scoresID=scoresID;
+        
+        
+       }
 
 
 
