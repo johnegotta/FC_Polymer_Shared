@@ -1,0 +1,69 @@
+<dom-module id="fc-repeater">
+<style is="custom-style">
+
+</style>
+<template>
+
+<firebase-collection location="https://focusedstudents.firebaseio.com/contactinfo" data={{studinfo}} on-firebase-child-added="studentadded">
+</firebase-collection>
+<firebase-collection location="https://focusedstudents.firebaseio.com/courseresults" data={{fbdata}} on-firebase-child-added="resultadded" order-by-child="fcid" equal-to="{{this.fcid}}"></firebase-collection>
+
+<div style="background:#bbbbbb;width:400px;height:300px;overflow-y:scroll">
+<div type="button" on-tap="doClick" style="background:green;width:150px;height:80px">Click</div>
+<template id="pete" is="dom-repeat" items={{harry}} observe="this">
+	<span>{{item.fcid}}</span><br>
+	<span>{{item.scoresPreTest}}</span><br>
+</template>
+</div>
+
+
+</template>
+<script>
+ 
+ Polymer({
+	is: "fc-repeater",
+	properties: {
+		harry: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		fcid: {
+			type: String,
+			value: "StreelandAnna00001",
+			notify: true,
+			reflectToAttributes: true
+		}
+	},
+
+	ready: function()
+	{
+		//this.harry = ["Shit", "Damn", "Oops"];
+		//this.fcid = "StreelandAnna00001";
+	},
+
+	studentadded: function(e){
+		console.log(e.detail.childSnapshot.val());
+		this.fcid = e.detail.childSnapshot.val().fcid;
+		//this.push("harry", e.detail.childSnapshot.val().fcid);
+	},
+
+	resultadded: function(e){
+		console.log("resultadded");
+		console.log(e.detail.childSnapshot.val());
+		//var newScore = {e.detail.childSnapshot.val().fcid: e.detail.childSnapshot.val().scoresPreTest};
+		this.push("harry", e.detail.childSnapshot.val());
+			//{e.detail.childSnapshot.val().key: e.detail.childSnapshot.val().scoresPreTest});
+	},
+
+	doClick: function(e)
+	{
+		this.push("harry", {fcid:"pickle"});
+		this.$.pete.render();
+		console.log(this.harry);
+	}
+
+});
+</script>
+</dom-module>
