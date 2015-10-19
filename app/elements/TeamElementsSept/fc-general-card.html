@@ -16,15 +16,11 @@
       overflow-x:scroll;
     }
     </style>
-    <!--<firebase-document id="desiredLoc" location="{{cardTopLevelRoute}}" on-firebase-child-added="createCardData"></firebase-document>
-    <firebase-document id="wholeFB" location="focusedstaging1.firebaseio.com" data="{{pickle}}"></firebase-document>
-    <firebase-collection id="test_results_loc" data="{{test_results}}" location="focusedstaging1.firebaseio.com/test_results">
-    <paper-button id="startmakingButton" on-tap="makeUpResults">Make Up Results</paper-button>-->
     <paper-header-panel id="fullCard">
-      <paper-toolbar id="fullCardHeader">
-        <paper-tabs id="fullCardHeaderTabs" selected="{{selectedTab}}">
+      <!--<paper-toolbar id="fullCardHeader">-->
+        <paper-tabs class="paper-header" scrollable id="fullCardHeaderTabs" selected="{{selectedTab}}">
         </paper-tabs>
-      </paper-toolbar>
+      <!--</paper-toolbar>-->
       <div id="mainCardContent">
         <div id="mainCardContentTopInfo" class="horizontal layout wrap">
         </div>
@@ -100,19 +96,20 @@
                 var newCardTab = document.createElement("paper-tab");
                 newCardTab.innerHTML = subKey;
                 Polymer.dom(self.$.fullCardHeaderTabs).appendChild(newCardTab);
-                var pageToAdd = document.createElement("div");
-                var pageToAddUL = document.createElement("ul");
                 var objToGetMoreOf = snapObject[subKey];
                 for (var lowerKey in objToGetMoreOf){
                   var lowerRoute = subKey + "/" + lowerKey;
+                                  var pageToAdd = document.createElement("div");
+                var pageToAddUL = document.createElement("ul");
                   ref.child(lowerRoute).once("value", function(lowerSnap){
                     var newLiToAdd = document.createElement("li");
                     console.log(lowerSnap.key());
                     newLiToAdd.innerHTML = JSON.stringify(lowerSnap.val());
                     pageToAddUL.appendChild(newLiToAdd);
                   });
+                  pageToAdd.appendChild(pageToAddUL);
                 }
-                pageToAdd.appendChild(pageToAddUL);
+
                 Polymer.dom(self.$.mainCardContentTabbedInfoPages).appendChild(pageToAdd);
                 //self.headerTabs.push(subKey);
                 break;
