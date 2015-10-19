@@ -59,7 +59,7 @@
               <b>S-email</b>:<span>[[item.studentemail]]</span>
               &nbsp<span>[[item.school]]</span>
           </div></div><hr>
-          <template is="dom-repeat" data="{{scores}}" as="potato">
+          <template is="dom-repeat" data="{{this.scores}}" as="potato">
             <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
                  <span>pretest: <span>[[potato.scoresPreTest]]</span></span><br>
                 <span>Test 1: <span>[[potato.scoresTest1]]</span></span><br>
@@ -74,10 +74,10 @@
       
         </template>
       </template>
-      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue;" id="showIndices"> 
-      <li id="immabe"></li></ul>
-      <ul style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue;" id="showIndicesTwo"> 
-      <li id="immabeTwo"></li></ul>
+      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndices"> 
+      <li id="immabe"class="flex wrap container"></li></ul>
+      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndicesTwo"> 
+      <li class="flex wrap container" id="immabeTwo"></li></ul>
       </paper-material>
     </div>
   </div>
@@ -143,6 +143,7 @@ Polymer({
           var liToAdd = document.createElement('li');
           var shower = document.getElementById('showIndices');
           console.log(fcid + " just got scores");
+          //here we can set local object arrays, or object objects
         liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
            Polymer.dom(shower).appendChild(liToAdd);
         }
@@ -170,8 +171,9 @@ Polymer({
         },
 _scoreGetter: function(sco){
         var scorekey = sco.detail.childSnapshot.key();
+        var scorevalues = sco.detail.childSnapshot.val();
         console.log(JSON.stringify(scorekey));
-        this.scores.push(scorekey);
+        this.scores.push({scorekey, scorevalues});
 
        },
 
@@ -181,8 +183,7 @@ _doMagic: function(oldMagic, newMagic){
 },
 
 showArrays: function(){
-  
-  this.$.immabe.innerHTML = JSON.stringify(this.scores) + "scores and in the class list " + this.fcids;
+  this.$.immabeTwo.innerHTML = "The first element numbered 1, contained the following: " + JSON.stringify(this.scores[1]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[2]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
   console.log(this.scores + "scores and in the class list " + this.fcids);
 }
 });
