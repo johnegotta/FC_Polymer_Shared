@@ -13,9 +13,13 @@
     #mainCardContentTabbedInfo {
       height: 400px;
       border: 1px dashed red;
+      overflow-x:scroll;
     }
     </style>
-    <!--<firebase-document id="desiredLoc" location="{{cardTopLevelRoute}}" on-firebase-child-added="createCardData"></firebase-document>-->
+    <!--<firebase-document id="desiredLoc" location="{{cardTopLevelRoute}}" on-firebase-child-added="createCardData"></firebase-document>
+    <firebase-document id="wholeFB" location="focusedstaging1.firebaseio.com" data="{{pickle}}"></firebase-document>
+    <firebase-collection id="test_results_loc" data="{{test_results}}" location="focusedstaging1.firebaseio.com/test_results">
+    <paper-button id="startmakingButton" on-tap="makeUpResults">Make Up Results</paper-button>-->
     <paper-header-panel id="fullCard">
       <paper-toolbar id="fullCardHeader">
         <paper-tabs id="fullCardHeaderTabs" selected="{{selectedTab}}">
@@ -26,13 +30,13 @@
         </div>
         <div id="mainCardContentTabbedInfo">
           <iron-pages id="mainCardContentTabbedInfoPages" selected="{{selectedTab}}">
-          <iron-pages>
+          </iron-pages>
         </div>
       </div>
     </paper-header-panel>
   </template>
   <script>
-    Polymer({
+    fcGeneralCard = Polymer({
       is: "fc-general-card",
       properties: {
         firebaseUrl: {
@@ -46,16 +50,23 @@
         cardTopLevelRoute: {
           type: String,
           computed: "computeFullRoute(firebaseUrl,cardTopLevel)"
+        },
+        selectedTab: {
+          type: Number,
+          value: 0,
+          notify: true
         }
       },
       ready: function(){
-        this.createCardData();
+        //console.log(this.cardTopLevel);
+        //this.createCardData();
       },
       computeFullRoute: function(first_part,second_part){
         return first_part + "/" + second_part;
       },
       factoryImpl: function(argCardTopLevel){
         this.cardTopLevel = argCardTopLevel;
+        this.createCardData();
       },
       enableInput: function(e) {
         console.log(e);
@@ -83,15 +94,12 @@
                 newDisabledInputContainerDiv.classList.add("inputEnabler");
                 newDisabledInputContainerDiv.setAttribute("ondblclick","enableInput");
                 newDisabledInputContainerDiv.appendChild(newDisabledInput);
-                //var mainCardContentTopInfo = document.getElementById('mainCardContentTopInfo');
-                //console.log(Polymer.dom(self.$.mainCardContentTopInfo));
                 Polymer.dom(self.$.mainCardContentTopInfo).appendChild(newDisabledInputContainerDiv);
                 break;
               case "object" :
                 var newCardTab = document.createElement("paper-tab");
                 newCardTab.innerHTML = subKey;
                 Polymer.dom(self.$.fullCardHeaderTabs).appendChild(newCardTab);
-
                 var pageToAdd = document.createElement("div");
                 var pageToAddUL = document.createElement("ul");
                 var objToGetMoreOf = snapObject[subKey];
