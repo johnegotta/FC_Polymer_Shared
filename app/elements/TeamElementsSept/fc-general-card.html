@@ -1,5 +1,6 @@
 <dom-module id="fc-general-card">
   <template>
+    <firebase-document id="desiredLoc" location="{{cardTopLevelRoute}}" on-firebase-child-added="createCardData"></firebase-document>
     <paper-header-panel id="fullCard">
       <paper-toolbar id="fullCardHeader">
         <paper-tabs id="fullCardHeaderTabs" scrollable>
@@ -27,6 +28,10 @@
         cardTopLevel: {
           type: String,
           value: "",
+        },
+        cardTopLevelRoute: {
+          type: String,
+          computed: "computeFullRoute(firebaseUrl,cardTopLevel)",
           observer: "createCardData"
         },
         headerTabs: {
@@ -34,8 +39,8 @@
           value: []
         }
       },
-      attached: function(){
-        this.createCardData();
+      computeFullRoute: function(first_part,second_part){
+        return first_part + "/" + second_part;
       },
       factoryImpl: function(argCardTopLevel){
         this.cardTopLevel = argCardTopLevel;
@@ -54,7 +59,7 @@
                 newDisabledInput.id = snapRoute + "/" + subKey + "_input";
                 newDisabledInput.setAttribute("data-location",snapRoute + "/" + subKey);
                 newDisabledInput.disabled = true;
-                //document.querySelector('#mainCardContentTopInfo').appendChild(newDisabledInput);
+                Polymer.dom(this.$.mainCardContentTopInfo).appendChild(newDisabledInput);
                 break;
               case "object" :
                 /*var newCardTab = document.createElement("paper-tab");
