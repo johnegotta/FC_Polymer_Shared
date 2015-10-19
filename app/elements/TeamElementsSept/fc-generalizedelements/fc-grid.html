@@ -30,7 +30,7 @@
 
 </style>
 <firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
-<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" _on-query-value="showTime2"></firebase-document>
+<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" on-firebase-changed="showTime2"></firebase-document>
 <firebase-collection id='grids' location="https://focusedstudents.firebaseio.com/contactinfo" data='{{grids}}'>
   <div class="vertical layout wrap grid-holder">
     <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" data='{{fcids}}'>
@@ -59,20 +59,21 @@
               <b>S-email</b>:<span>[[item.studentemail]]</span>
               &nbsp<span>[[item.school]]</span>
           </div></div><hr>
-          <template is="dom-repeat" data="{{fcids}}">
+          <template is="dom-repeat" data="{{this.fcid}}" on-fcid-changed="_doMagic">
             <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
-                <span>pretest: <span>[[item.scoresPreTest]]</span></span><br>
-                <span>test 1: <span>[[this.fcid.scoresTest1]]</span></span><br>
-                 <span>T2: <span>[[this.fcid.scoresTest2]]</span></span><br>
-                 <span>T3: <span>[[this.fcid.scoresTest3]]</span></span><br>
-                 <span>T4: <span>[[this.fcid.scoresTest4]]</span></span><br>
-                 <span>T5: <span>[[this.fcid.scoresTest5]]</span></span><br>
-                 <span>T6: <span>[[this.fcid.scoresTest6]]</span></span><br>
+                <span>pretest: <span>[[this.fcids.1]]</span></span><br>
+                <span>Test 1: <span>[[this.fcids.2.scoresTest1]]</span></span><br>
+                 <span>T2: <span>[[this.fcids.3.scoresTest2]]</span></span><br>
+                 <span>T3: <span>[[this.fcids.4.scoresTest3]]</span></span><br>
+                 <span>T4: <span>[[this.fcids.5.scoresTest4]]</span></span><br>
+                 <span>T5: <span>[[this.fcids.6.scoresTest5]]</span></span><br>
+                 <span>T6: <span>[[this.fcids.5.scoresTest6]]</span></span><br>
                 <span>REAL SAT: <span>[[this.fcid.realSAT]]</span></span><br>
             </div>
-        </paper-material>
+      
         </template>
       </template>
+      </paper-material>
     </div>
   </div>
 </template>
@@ -83,8 +84,27 @@ Polymer({
     defaultPath: "",
     pathOne: String, 
     pathTwo: String, 
-    pathThree: String, 
+    pathThree: {
+        type: String, 
+        value: "https://focusedstudents.firebaseio.com/courseresults/", 
+        notify: true, 
+        reflectToAttributes: true,
+        observe: '_doMagic'
+      },
+    pathThreeArray: {
+      type: Array, 
+      notify: true, 
+      reflectToAttributes: true, 
+      observe: '_doMagic'
+    },
     gridType: String, 
+    fcid: {
+      type: String, 
+      value:' ',
+      observer: '_doMagic',
+      notify: true,
+      reflectToAttributes: true
+    },
     fcids: {
       type: Array,
       notify: true,
@@ -100,33 +120,46 @@ Polymer({
   },
 
   attached: function(){
-        console.log("this what mtf ");
-       
+        console.log("this what mtf ..................................................................................................................................................... ");
    },
 
-
   showTime: function(e){
+        var path = this.pathThree;
+        console.log(path + " this is the additive path");
         var fcid = e.detail.childSnapshot.key();
         console.log(fcid);
         this.fcid=fcid;
         var ModelClass = e.detail.childSnapshot.val();
         console.log(ModelClass + " ModelClass");
+        var scoreGetterPath = this.pathThree + this.fcid;
+        console.log("this is the score getter path " + scoreGetterPath + " we do some get query here!!!");
+//some get score query here
+// if query resulty null or undefined== record no test score this week
        this.fcids.push(fcid);        
        console.log(this.fcids);
-       return this.fcid;
-
+// push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
+       var repeats = this.fcids.length;
+       console.log(repeats);
+//the above variable is pointless...
+//of note, I expected the above individual ids to be an array from the beginning, not sure why they are not.
         },
 showTime2: function(eh){
         var scores = eh.detail.queryValue();
-        console.log(scores + " scores?");
+        console.log(scores + " scores?........................................................................................................");
         var scoresID = eh.detail.queryValue.key();
-        console.log(scoresID);
+        console.log(scoresID + "-----------------------------------------------------------------------------------------");
         this.scoresID=scoresID;
         
         
-       }
+       },
+
+_doMagic: function(magic){
+  var magFcid = magic.detail;
+  console.log(magFcid + " hello magic________________________________________________________________ " + this.fcid + " I am observing this bullshit, but I get no details of the shit that happened?");
 
 
+
+}
 
 
 });
