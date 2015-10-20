@@ -29,14 +29,14 @@
 }
 
 </style>
-<firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
-<firebase-collection id='scores' location="{{firebasepath}}" _on-query-value="_getScores" order-by-child='fcid' equal-to='{{this.fcid}}' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
+<firebase-document id="ModelClass" on-firebase-child-added="showTime" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}"></firebase-document>
+<firebase-collection id='scores' location="{{firebasepath}}" order-by-child='fcid' equal-to='{{this.fcid}}' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
 <!--<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" on-firebase-changed="showTime2"></firebase-document>-->
-  <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to=[[this.scores.scorekey]] data='{{grids}}'></firebase-collection>
+  <firebase-collection id='contactinfo' on-firebase-child-added="showTime" location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to=[[fcid]] _on-query-value="_getScores" query="{{this.$.contactinfo.location + fcid}}" data='{{grids}}'></firebase-collection>
   <div class="vertical layout wrap grid-holder">
     <div class="horizontal layout wrap">
     
-      <template is="dom-repeat" items="{{grids}}" as="item">
+      <template is="dom-repeat" items="{{grids}}" filter={{__filterItem(item.fcid, fcids)}}as="item">
         <paper-material elevation="2" class="grid-box">
         
         <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
@@ -142,9 +142,9 @@
     notify: true
   },
 
-created: function (){
+attached: function (){
+      console.log(this.$.contactinfo.query);
  
-
 },
 
  showTime: function(e){
@@ -173,6 +173,7 @@ created: function (){
         liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
            Polymer.dom(shower).appendChild(liToAdd);
            this.fcid = fcid;
+           console.log(this.$.contactinfo.query);
         }
         //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
         
@@ -184,6 +185,10 @@ created: function (){
 // if query resulty null or undefined == record no test score this week
        this.fcids.push(this.fcid);        
        console.log(this.fcids);
+      this.push("fcids", e.detail.childSnapshot.val().fcid);
+    //this.scores[this.fcid] = "biscuit";
+    console.log(this.scores);
+    console.log(this.fcids);
 // push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
        var repeats = this.fcids.length;
        console.log(repeats);
@@ -196,7 +201,7 @@ _scoreGetter: function(sco){
         var scorekey = sco.detail.childSnapshot.key();
         var scorevalues = sco.detail.childSnapshot.val();
         console.log(JSON.stringify(scorekey));
-        this.scores.push({scorekey, scorevalues});
+        this.push('scores', {scorekey, scorevalues});
         console.log(this.scores.length);
         //this is happening way in the beginning of time after "app is ready to rock!!!"
 
