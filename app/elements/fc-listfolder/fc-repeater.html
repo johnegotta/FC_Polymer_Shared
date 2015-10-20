@@ -6,14 +6,42 @@
 
 <firebase-collection location="https://focusedstudents.firebaseio.com/contactinfo" data={{studinfo}} on-firebase-child-added="studentadded">
 </firebase-collection>
-<firebase-collection location="https://focusedstudents.firebaseio.com/courseresults" data={{fbdata}} on-firebase-child-added="resultadded" order-by-child="fcid" equal-to="{{this.fcid}}"></firebase-collection>
+<firebase-collection location="https://focusedstudents.firebaseio.com/courseresults" data={{fbdata}} on-firebase-child-added="resultadded" order-by-child="fcid" equal-to="{{fcid}}"></firebase-collection>
 
-<div style="background:#bbbbbb;width:400px;height:300px;overflow-y:scroll">
-<div type="button" on-tap="doClick" style="background:green;width:150px;height:80px">Click</div>
-<template id="pete" is="dom-repeat" items={{harry}} observe="this">
-	<span>{{item.fcid}}</span><br>
-	<span>{{item.scoresPreTest}}</span><br>
+<div style="background:#bbbbbb;width:800px;height:800px;overflow-y:scroll;border: 4px ridge #333399">
+<div type="button" on-tap="doClick" style="background:#5555aa;width:150px;height:80px">Click</div>
+
+<template is="dom-repeat" items="{{fcids}}">
+	<!-- <fc-studentFull data={{getData(fcids)}} pathtwo="https://focusedstudents.firebaseio.com/roi" paththree="https://focusedstudents.firebaseio.com/pastacademics"> -->
+	<b><span>{{item}}</span><br></b>
+		<span>{{getData(item)}}</span><br> 
+		<fc-courseResultCard data={{getData(item)}}></fc-courseResultCard>
+		<fc-roiCard data={{getRoiData(item)}}></fc-roiCard>
+<!--
+	<template is="dom-repeat" as="sco" filter="filterScores">
+		<span>{{sco.scoresPreTest}}</span>
+	</template>
+	 </fc-studentFull> -->
+
 </template>
+<div>{{computeLabel(shit)}}</div>
+
+<!--
+<ul>
+<template id="pete" is="dom-repeat" items={{harry}} observe="this">
+	<li>
+	<b><span>{{item.fcid}}</span></b><br>
+	<span>{{item.scoresPreTest}}</span><br>
+	<span>{{item.scoresTest1}}</span><br>
+	<span>{{item.scoresTest2}}</span><br>
+	<span>{{item.scoresTest3}}</span><br>
+
+	</li>
+</template>
+</ul>
+-->
+
+<div type="button" on-tap="doClick" style="background:#5555aa;width:150px;height:80px">Click</div>
 </div>
 
 
@@ -34,34 +62,84 @@
 			value: "StreelandAnna00001",
 			notify: true,
 			reflectToAttributes: true
-		}
+		},
+		fcids: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		shit: {
+			type: String,
+			value: "",
+			notify: true
+		},
+		scores: {
+			type: Object,
+			value: {},
+			notify:true
+		},
+		pie: ""
 	},
 
-	ready: function()
+	getData: function(argItem)
+	{
+		console.log(argItem);
+		this.fcid = argItem;
+		if(this.scores.hasOwnProperty(argItem))
+		{
+			return this.scores[argItem];
+		}
+		else
+		{
+			return null;
+		}
+
+	},
+
+	attached: function()
 	{
 		//this.harry = ["Shit", "Damn", "Oops"];
 		//this.fcid = "StreelandAnna00001";
+		this.shit = "banana";
+		this.fcids = [];
+		console.log(this.scores);
+		//console.log(this.shit);
+	},
+
+	computeLabel: function(arg)
+	{
+		console.log(arg);
+		//console.log(this.shit);
+		return arg + " rocks!";
 	},
 
 	studentadded: function(e){
-		console.log(e.detail.childSnapshot.val());
+		this.push("fcids", e.detail.childSnapshot.val().fcid);
 		this.fcid = e.detail.childSnapshot.val().fcid;
+		//this.scores[this.fcid] = "biscuit";
+		console.log(this.scores);
+		console.log(this.fcids);
+
 		//this.push("harry", e.detail.childSnapshot.val().fcid);
 	},
 
 	resultadded: function(e){
-		console.log("resultadded");
+		//console.log("resultadded");
 		console.log(e.detail.childSnapshot.val());
 		//var newScore = {e.detail.childSnapshot.val().fcid: e.detail.childSnapshot.val().scoresPreTest};
 		this.push("harry", e.detail.childSnapshot.val());
+		console.log(this.scores);
+		this.scores[e.detail.childSnapshot.val().fcid] = e.detail.childSnapshot.val();
 			//{e.detail.childSnapshot.val().key: e.detail.childSnapshot.val().scoresPreTest});
 	},
 
 	doClick: function(e)
 	{
 		this.push("harry", {fcid:"pickle"});
+		this.shit = this.shit == "shit" ? "cookie" : "shit";
 		//this.$.pete.render();
-		console.log(this.harry);
+		console.log(this.shit);
 	}
 
 });
