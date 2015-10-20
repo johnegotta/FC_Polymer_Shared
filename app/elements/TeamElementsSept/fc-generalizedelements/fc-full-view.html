@@ -1,0 +1,197 @@
+<dom-module id="fc-full">
+  <style>
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      background: white;
+      @apply(--layout-flex);
+      @apply(--shadow-elevation-8dp);
+      @apply(--height-450px);
+      @apply(--);
+    }
+
+
+  .main::-webkit-scrollbar {
+    display: none;
+}
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+    }
+
+      span.linear{
+          width:110px;
+          overflow: hidden;
+        }
+
+    paper-material {
+      padding: 10px 10px 10px 10px;
+    }
+
+    paper-icon-button {
+        margin-left: 30px;
+        display: block;
+        width: 24px;
+        text-align: center;
+      }
+      .red {
+        color: var(--paper-blue-500);
+      }
+
+  </style>
+  <template>
+
+
+    <paper-toolbar class="medium" id="fullheader">
+      <paper-icon-button id="button" icon="clear" on-click="_onClearButtonClick"></paper-icon-button>
+
+    </paper-toolbar>
+    <div id="main" class="main" style="padding:10px 10px 10px 10px">
+      <div class="image-container">
+          <paper-material>
+          <template is="dom-if" if={{isCourse}}>
+            <fc-courseFull id="fullco" data={{data}}>
+            </fc-courseFull>
+          </template>
+          <template is="dom-if" if={{isInquiry}}>
+            <fc-inquiryFull id="fullinq" data={{data}}>
+            </fc-inquiryFull>
+          </template>
+          <template is="dom-if" if={{isInstructor}}>
+            <fc-instructorFull id="fullinst" data={{data}}>
+            </fc-instructorFull>
+          </template>
+          <template is="dom-if" if={{isStudent}}>
+            <fc-studentFull id="fullstud" data={{data}} pathtwo={{pathtwo}} paththree={{paththree}}>
+            </fc-studentFull>
+          </template>
+          </paper-material>
+        </div>
+      </div>
+
+  </template>
+<script>
+  Polymer({
+    is: 'fc-full',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+
+    properties: {
+      data: {
+        type: Object,
+      },
+      pathtwo: String,
+      dataType: Boolean,
+      isCourse: {
+        type: Boolean,
+        computed: "computeIsCourse(dataType)"
+      },
+      isInquiry: {
+        type: Boolean,
+        computed: "computeIsInquiry(dataType)"
+      },
+      isInstructor: {
+        type: Boolean,
+        computed: "computeIsInstructor(dataType)"
+      },
+      isStudent: {
+        type: Boolean,
+        computed: "computeIsStudent(dataType)"
+      },
+      
+      sharedElements: {
+        type: Object,
+        value: function() {
+          return {
+            'hero': this.$.main
+          };
+        }
+      },
+
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }],
+
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'scale-down-animation',
+              node: this.$.main,
+              transformOrigin: '50% 50%',
+              axis: 'y'
+            }]
+          };
+        }
+      }
+
+    },
+
+    observers: [
+      'itemSelected(data)'
+    ],
+
+    ready: function(){
+      //this.$.studenttabs.selected = 0;
+    },
+
+    attached: function(){
+      console.log("fc-full attached");
+      console.log(this.isInquiry);
+    },
+    
+    itemSelected: function(argItem){
+      console.log("fc-full  itemSelected");
+      console.log(argItem);
+      //TBD scroll the full item into view on screen somehow
+      //document.querySelector("#fcscroller").scroller.scrollTop = this.$.fullheader.top;
+      //this.$.fullheader.scrollIntoView(true);
+    },
+    
+    computeIsCourse: function(argType)
+    {
+      return (argType == "Course");
+    },
+    
+    computeIsInquiry: function(argType)
+    {
+      return (argType == "Inquiry");
+    },
+
+    computeIsInstructor: function(argType)
+    {
+      return (argType == "Instructor");
+    },
+
+    computeIsStudent: function(argType)
+    {
+      return (argType == "Student");
+    },
+
+    _onClearButtonClick: function() {
+      this.fire('close');
+      console.log("fc-full onClearButtonClick");
+    },
+
+    _filterStudentCalls: function(selectedCall){
+      return function(item){
+        return (item.relatedstudent == selectedCall.relatedstudent);
+        };
+  }
+});
+</script>
+</dom-module>

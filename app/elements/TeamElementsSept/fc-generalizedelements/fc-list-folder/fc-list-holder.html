@@ -1,0 +1,225 @@
+<dom-module id="fc-list-holder">
+<style is="custom-style">
+    :host {
+      @apply(--layout-vertical);
+    }
+
+    .main {
+      @apply(--layout-block);
+     /* @apply(--layout-scroll);*/
+    }
+
+   
+    paper-item:hover:after{
+      white-space: wrap;
+      cursor: pointer;
+      overflow: normal;
+      display: flex;
+      flex: wrap;
+      max-height: 100%;
+    }
+
+  .fcborder{
+      border: 4px ridge #aecdfe;
+      min-width: 400px;
+      max-width: 750px;
+      max-height: 88px;
+      margin: 2px;
+      background: #fffffc;
+      border-radius: 6px;
+  }
+
+  div.scrollerTwo::-webkit-scrollbar {
+    display: none;
+}
+
+
+     paper-icon-button {
+        margin-left: 8px;
+        display: block;
+        width: 24px;
+        height:24px;
+        text-align: center;
+        color: #002c90;
+      }
+      paper-icon-button.blue {
+        color: var(--paper-blue-500);
+      }
+      .scrollerTwo{
+        overflow-y: scroll;
+        height: 635px;
+        padding-top: 10px;
+      }
+
+     iron-icon {
+      color: var(--google-blue-500);
+    }
+.topdown{margin-top: 84px;}
+</style>
+
+<template>
+    <div class="main topdown" style="height:600px; display:block; width:600px"> 
+     <neon-animated-pages class="container" id="pages" selected="0">
+        <fc-list-three id="fcListView" class='right'style="height:700px; width:700px;" path="{{path}}" on-item-tap="_onItemClick" data={{data}}  data-type="{{dataType}}" search-field="firstname" search-field-two="lastname">
+        </fc-list-three>
+        <fc-full-view id="fcfull" on-close="_onClose">
+        </fc-full-view> 
+    </neon-animated-pages>
+  </div>
+</template>
+<script>
+
+Polymer({
+
+    is: 'fc-list-holder',
+
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+
+    listeners: {
+      //'click': '_onClick'
+    },
+
+    properties: {      
+      path:'https://focusedstaging1.firebaseio.com/calls',
+      pathtwo: String,
+      paththree: String,
+      dataType: String,
+      searchField: String,
+      searchFieldTwo: String,
+      searchValue: String,
+      listdata: Object,
+      inquiryTransferer: {
+        type: Object, 
+        value: {
+          firstname: '',
+          lastname: '',
+          studentfirstname: '',
+          studentlastname: '',
+          email: '', 
+          phone: '',
+          notify: true,
+        },
+        notify: true,
+      },
+      data:{
+         type: Object,
+         value: {
+               firstname: '', 
+               lastname: '', 
+               email: '', 
+               phone:'', 
+               studentfirstname: '', 
+               studentlastname: '', 
+               relatedstudent: '', 
+               message: '', 
+               coach:'', 
+               grade: '', 
+               school:'', 
+               schooltown:'', 
+               interest:'', 
+               interestprice: '',
+               intereststartdate: '', 
+               role: '',
+               notify: true, 
+               reflectToAttributes: true
+               },
+          notify: true,
+          reflectToAttributes: true
+          },
+  
+      isInquiry: {
+        type: Boolean,
+        computed: "computeIsInquiry(dataType)"
+      },
+      isStudent: {
+        type: Boolean,
+        computed: "computeIsStudent(dataType)"
+      },
+      isCourse: {
+        type: Boolean,
+        computed: "computeIsCourse(dataType)"
+      },
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      }
+    },
+    
+
+    _onItemClick: function(e) {
+        console.log("received on-item-click event from");
+        console.log(e.detail);
+        this.$.fcfull.data = e.detail.clicked;
+        console.log(this.$.fcfull.data);
+        this.$.pages.selected = 1;
+    },
+    
+    _onClose: function() {
+      console.log(this.$.fcfull.data);
+      this.$.pages.selected = 0;
+    },
+    
+    attached: function(){
+      console.log("fc-listHolder attached says dataType = " + this.dataType);
+      //console.log("fc-listHolder attached says isCourse = " + this.isCourse);
+    }
+
+/*
+    computeIsInquiry: function(argType)
+    {
+      return (argType == "inquiry");
+    },
+
+    computeIsStudent: function(argType)
+    {
+      return (argType == "student");
+    },
+
+    computeIsCourse: function(argType)
+    {
+      return (argType == "course");
+    },
+
+    _switchToFull: function(e){
+      console.log(e.model.item);
+      //this.pastinquirer = e.model.pastinquirer;
+      this.listdata = e.model.item;
+      // configure the page animation
+      this.sharedElements = {
+        'hero': e.target,
+      };
+      this.fire('item-click', {clicked: e.model.item});
+    },
+
+   _callFilter: function(inquiry){
+      console.log(inquiry);
+        return function(item){
+
+          if( (item.firstname? (item.firstname.indexOf(inquiry.firstname)> -1):false) && (item.phone? (item.phone.indexOf(inquiry.phone)>-1): true) && (item.lastname? (item.lastname.indexOf(inquiry.lastname)>-1):false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentlastname) > -1): false) && (item.relatedstudent? (item.relatedstudent.indexOf(inquiry.studentfirstname) > -1): false) ) return true;
+      }  
+    },
+    */ 
+
+     
+});
+
+</script>
+</dom-module>

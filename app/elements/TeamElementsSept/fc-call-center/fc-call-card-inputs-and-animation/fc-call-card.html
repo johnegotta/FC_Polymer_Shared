@@ -1,0 +1,114 @@
+<dom-module id="fc-call-card">
+<template id="fc-call-cardTemplate">
+<style is="custom-style">
+:host {
+      display: block;
+      
+    }
+    #placeholder {
+      opacity: 0;
+      background-color: #1e1e1e;
+    }
+ paper-material.card {
+  padding: 4px ;
+  max-width: 481px;
+  height: 680px;
+  margin: 4px;
+}
+
+fc-paperInput {
+  width: 150px;
+  height: 60px;
+}
+h3.title{
+  text-align: center;
+  font-size: 34px;
+  color: #002c90;
+  font-family: Merriweather;
+  font-weight: 700;
+  margin: 4px;
+  padding: 4px;
+}
+</style>
+<paper-material class="card" elevation="0">
+<div>
+   <div id="placeholder" class="fit">
+     
+   </div>
+
+    <div id="container">
+      
+      <content select="div">
+      </content>    
+
+    </div>
+</paper-material>
+</template>
+<script>
+  Polymer({
+    is: 'fc-call-card',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+  properties: {
+      container: String,
+      background: '#1e1e1e',
+      fcOnTap: String,
+      parElevation: Number, 
+    reflectToAttributes: true,
+    notify: true,
+    
+    headerTitle: {
+      type: String,
+      reflectToAttributes: true,
+      notify: true
+            },
+  animationConfig: {
+        value: function() {
+          return {
+            'entry': [
+            { name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }, 
+            { name: 'fade-in-animation',
+              node: this.$.container,
+              timing: {
+                delay: 0,
+                duration: 000
+              }
+            }],
+            'exit': [/*{
+              name: 'opaque-animation',
+              node: this.$.placeholder,
+              timing: {
+                delay: 0,
+                duration: 000
+              }
+            }, */
+            {
+              name: 'fade-out-animation',
+              node: this.$.container,
+              timing: {
+                duration: 000
+              }
+            }]
+          };
+        }
+      },
+
+      sharedElements: {
+        value: function() {
+          return {
+            'hero': this.$.placeholder
+          };
+        }
+      },
+
+     onBackClick: function(event) {
+        this.$.pages.selected = 0;
+      }
+    }
+  });
+</script>
+</dom-module>
