@@ -84,7 +84,7 @@ Profile: STUFF
         <div class="selectedp">
     	<div>
     	<div style="overflow-x: scroll; overflow-y: hidden; max-width: 480px;">
-  <firebase-collection id='scores' location="{{pathThree}}" _on-query-value="_getScores" order-by-child='fcid' equal-to='GanaMary00001' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
+  <firebase-collection id='scores' location="{{pathThree}}" on-query-value="_getScores" order-by-child='fcid' equal-to='GanaMary00001' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
           <template is="dom-repeat" items="{{score}}" as="potato">
                  <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Pretest</b>: <span>[[potato.scoresPreTest]]</span></span><br><br>
                 <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 1</b>: <span>[[potato.scoresTest1]]</span></span><br><br>
@@ -144,7 +144,7 @@ Profile: STUFF
 </div>
 </template>
 <script>
-   Polymer({
+ (function(){Polymer({
    	is: 'fc-tabbed-card',
   properties: {
     defaultPath: "",
@@ -259,6 +259,7 @@ _scoreGetter: function(sco){
 
        },
 _getScores: function(vals){
+	console.log("-------------------------------------------------------------------- " + vals.detail.snapshot.val());
 
 
 
@@ -273,6 +274,6 @@ showArrays: function(){
   this.$.immabeTwo.innerHTML = "The first element numbered 0, contained the following: " + JSON.stringify(this.scores[0]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[1]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
   console.log(this.scores + "scores and in the class list " + this.fcids + " " + this.fcids.slice(0,6));
 }
-});
+});})();
 </script>
 </dom-module>
