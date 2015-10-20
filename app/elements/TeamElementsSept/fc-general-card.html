@@ -7,8 +7,15 @@
       overflow-y: scroll;
       border: 1px solid black;
     }
-    .inputEnabler {
+    paper-input {
       padding: 10px;
+    }
+    #submitChangedInputsButton {
+      background: green;
+      color: white;
+    }
+    #mainCardContent {
+      padding-top: 5px;
     }
     #mainCardContentTabbedInfo {
       height: 400px;
@@ -17,11 +24,11 @@
     }
     </style>
     <paper-header-panel id="fullCard">
-      <!--<paper-toolbar id="fullCardHeader">-->
         <paper-tabs class="paper-header" scrollable id="fullCardHeaderTabs" selected="{{selectedTab}}">
         </paper-tabs>
-      <!--</paper-toolbar>-->
       <div id="mainCardContent">
+        <paper-button id="inputEnablerButton" raised hidden$="[[editingDataInputs]]" on-tap="toggleInputs">Edit Info</paper-button>
+        <paper-button id="submitChangedInputsButton" raised hidden$="[[!editingDataInputs]]" on-tap="submitInputChanges">Submit Changes</paper-button>
         <div id="mainCardContentTopInfo" class="horizontal layout wrap">
         </div>
         <div id="mainCardContentTabbedInfo">
@@ -51,6 +58,15 @@
           type: Number,
           value: 0,
           notify: true
+        },
+        editingDataInputs: {
+          type: Boolean,
+          value: false
+        },
+        pageTabs: {
+          type: Array,
+          value: [],
+          notify: true
         }
       },
       ready: function(){
@@ -64,15 +80,26 @@
         this.cardTopLevel = argCardTopLevel;
         this.createCardData();
       },
-      enableInput: function(e) {
-        console.log(e);
+      toggleInputs: function() {
+        var inputsToEnable = Polymer.dom(this.$.mainCardContentTopInfo).querySelectorAll("paper-input");
+        inputsToEnable.map(function(singleInput){
+          singleInput.disabled = !singleInput.disabled;
+        });
+        this.editingDataInputs = !this.editingDataInputs;
+      },
+      submitInputChanges: function(){
+        var inputsToEnable = Polymer.dom(this.$.mainCardContentTopInfo).querySelectorAll("paper-input");
+        inputsToEnable.map(function(singleInput){
+          //console.log(singleInput.getAttribute("data-location"));
+          var ref = new Firebase(singleInput.getAttribute("data-location"));
+          ref.set(singleInput.value);
+        });
+        this.toggleInputs();
       },
       createCardData: function(){
         var self = this;
         var ref = new Firebase(self.firebaseUrl);
-        ref.child(self.cardTopLevel).on("value", function(snap){
-          Polymer.dom(self.$.mainCardContentTopInfo).innerHTML = '';
-          Polymer.dom(self.$.fullCardHeaderTabs).innerHTML = '';
+        ref.child(self.cardTopLevel).once("value", function(snap){
           var snapKey = snap.key();
           var snapObject = snap.val();
           //var snapRoute = ref.toString() + self.cardTopLevel;
@@ -80,41 +107,44 @@
             //console.log(typeof snapObject[subKey]);
             switch (typeof snapObject[subKey]){
               case "string" :
-                var newDisabledInputContainerDiv = document.createElement("div");
                 var newDisabledInput = document.createElement("paper-input");
                 newDisabledInput.id = self.cardTopLevelRoute + "/" + subKey + "_input";
                 newDisabledInput.setAttribute("data-location",self.cardTopLevelRoute + "/" + subKey);
+                newDisabledInput.setAttribute("always-float-label",true);
                 newDisabledInput.disabled = true;
                 newDisabledInput.label = subKey;
-                newDisabledInput.placeholder = snapObject[subKey];
-                newDisabledInputContainerDiv.classList.add("inputEnabler");
-                newDisabledInputContainerDiv.setAttribute("ondblclick","enableInput");
-                newDisabledInputContainerDiv.appendChild(newDisabledInput);
-                Polymer.dom(self.$.mainCardContentTopInfo).appendChild(newDisabledInputContainerDiv);
+                newDisabledInput.value = snapObject[subKey];
+                Polymer.dom(self.$.mainCardContentTopInfo).appendChild(newDisabledInput);
                 break;
               case "object" :
                 var newCardTab = document.createElement("paper-tab");
                 newCardTab.innerHTML = subKey;
                 Polymer.dom(self.$.fullCardHeaderTabs).appendChild(newCardTab);
+                var pageToAdd = document.createElement("div");
+                var pageToAddId = subKey + "_page"
+                pageToAdd.id = pageToAddId;
+                console.log(pageToAddId);
+                var pageToAddUL = document.createElement("ul");
+                pageToAdd.appendChild(pageToAddUL);
+                Polymer.dom(self.$.mainCardContentTabbedInfoPages).appendChild(pageToAdd);
+
                 var objToGetMoreOf = snapObject[subKey];
                 for (var lowerKey in objToGetMoreOf){
                   var lowerRoute = subKey + "/" + lowerKey;
-                                  var pageToAdd = document.createElement("div");
-                var pageToAddUL = document.createElement("ul");
-                  ref.child(lowerRoute).once("value", function(lowerSnap){
-                    var newLiToAdd = document.createElement("li");
-                    console.log(lowerSnap.key());
-                    newLiToAdd.innerHTML = JSON.stringify(lowerSnap.val());
-                    pageToAddUL.appendChild(newLiToAdd);
-                  });
-                  pageToAdd.appendChild(pageToAddUL);
+                  self.addNewLiToCorrectPage(pageToAddId,lowerRoute);
                 }
-
-                Polymer.dom(self.$.mainCardContentTabbedInfoPages).appendChild(pageToAdd);
-                //self.headerTabs.push(subKey);
                 break;
             }
           }
+        });
+      },
+      addNewLiToCorrectPage: function(pageID,routeForNewLi){
+        var self = this;
+        var ref = new Firebase(self.firebaseUrl + "/" + routeForNewLi);
+         ref.once("value", function(newLiSnap){
+          var newLiToAdd = document.createElement("li");
+          newLiToAdd.innerHTML = JSON.stringify(newLiSnap.val());
+          Polymer.dom(self.$.mainCardContentTabbedInfo).querySelector('#' + pageID).querySelector("ul").appendChild(newLiToAdd);
         });
       }
     });
