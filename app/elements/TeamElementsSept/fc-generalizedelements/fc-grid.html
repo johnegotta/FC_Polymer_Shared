@@ -30,13 +30,15 @@
 
 </style>
 <firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
+<firebase-collection id='scores' location="{{firebasepath}}" _on-query-value="_getScores" order-by-child='fcid' equal-to='{{this.fcid}}' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
 <!--<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" on-firebase-changed="showTime2"></firebase-document>-->
-
+  <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to=[[this.scores.scorekey]] data='{{grids}}'></firebase-collection>
   <div class="vertical layout wrap grid-holder">
-    <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" order-by-child='fcid' equal-to='{{this.fcid}}' on-firebase-child-added="_scoreGetter" data='{{FBscores}}'></firebase-collection>
-       <div class="horizontal layout wrap">
-      <template is="dom-repeat" items="{{grids}}" item="{{item}}">
+    <div class="horizontal layout wrap">
+    
+      <template is="dom-repeat" items="{{grids}}" as="item">
         <paper-material elevation="2" class="grid-box">
+        
         <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
               <paper-tab>Profile</paper-tab>
               <paper-tab>Scores</paper-tab>
@@ -53,13 +55,16 @@
 
           <div class="horizontal layout wrap" style="width: 210px; height: 78px; overflow-y: scroll;"> 
               <b><span>{{item.firstname}}</span>&nbsp <span>{{item.lastname}}</span></b> &nbsp
-              <b>FCID</b>:<i><u><span>{{item.fcid}}</span></u></i>&nbsp
+              <b>FCID</b>:<i><u><span>[[item.fcid]]</span></u></i>&nbsp
               <b>Phone</b>:<span>[[item.phone]]</span>&nbsp
               <b>Email</b>:<span>[[item.email]]</span>&nbsp
               <b>S-email</b>:<span>[[item.studentemail]]</span>
               &nbsp<span>[[item.school]]</span>
-          </div></div><hr>
-          <template is="dom-repeat" data="{{this.scores}}" as="potato">
+          </div>
+        </div>
+        <hr>
+  
+          <template is="dom-repeat" data="{{score}}" as="item">
             <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
                  <span>pretest: <span>[[potato.scoresPreTest]]</span></span><br>
                 <span>Test 1: <span>[[potato.scoresTest1]]</span></span><br>
@@ -71,19 +76,24 @@
                 <span>REAL SAT: <span>[[potato.realSAT]]</span></span><br>
                  <span>pretest: <span>[[potato.scoresPreTest]]</span></span><br>
             </div>
-      
+            </template>
+          </paper-material>
         </template>
-      </template>
+      
+    </div>
+  </div>
+   <div class="horizontal layout wrap">
       <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndices"> 
       <li id="immabe"class="flex wrap container"></li></ul>
       <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndicesTwo"> 
-      <li class="flex wrap container" id="immabeTwo"></li></ul>
-      </paper-material>
-    </div>
-  </div>
+      <li class="flex wrap container" id="immabeTwo">
+        
+      </li>
+    </ul>
+    </div>  
 </template>
 <script>
-Polymer({
+(function(){Polymer({
   is:"fc-grid",
   properties: {
     defaultPath: "",
@@ -101,6 +111,12 @@ Polymer({
       reflectToAttributes: true 
 
     },
+    firebasepath: {
+      type: String,
+       value: "https://focusedstudents.firebaseio.com/courseresults", 
+      notify: true, 
+      reflectToAttributes: true
+    },
     gridType: String, 
     fcid: {
       type: String, 
@@ -116,7 +132,7 @@ Polymer({
     },
     scores: {
       type: Array,
-      value: [{}],
+      value: [],
       notify: true,
       reflectToAttributes: true
       },
@@ -126,8 +142,10 @@ Polymer({
     notify: true
   },
 
+created: function (){
+ 
 
-
+},
 
  showTime: function(e){
         var path = this.pathThree;
@@ -137,24 +155,27 @@ Polymer({
         this.fcid=fcid;
         var firebasepath= this.pathThree + this.fcid;
         console.log(firebasepath);
+        this.firebasepath = firebasepath;
         var ref = new Firebase("#!" + firebasepath);
         ref.orderByKey().startAt("real").endAt("scores\uf8ff").on("child_added", function(snapshot) {
-        if (snapshot.val()!= undefined) {
-          var liToAdd = document.createElement('li');
-          var shower = document.getElementById('showIndices');
-          console.log(fcid + " just got scores");
-          //here we can set local object arrays, or object objects
-        liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
-           Polymer.dom(shower).appendChild(liToAdd);
-        }
-        //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
-        else{
+        if(snapshot.exists() == false){
           var liToAddTwo = document.createElement('li');
             var showerTwo = document.getElementById('showIndicesTwo');
            console.log(fcid + ' and fcid ' + fcid);
             liToAddTwo.innerHTML = this.fcid + " " + "Did not take Test!!!";
             Polymer.dom(showerTwo).appendChild(liToAddTwo);
         }
+        else if (snapshot.val()!== null) {
+          var liToAdd = document.createElement('li');
+          var shower = document.getElementById('showIndices');
+          console.log(fcid + " just got scores");
+          //here we can set local object arrays, or object objects
+        liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
+           Polymer.dom(shower).appendChild(liToAdd);
+           this.fcid = fcid;
+        }
+        //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
+        
         });
 
         var ModelClass = e.detail.childSnapshot.val();
@@ -166,6 +187,8 @@ Polymer({
 // push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
        var repeats = this.fcids.length;
        console.log(repeats);
+       console.log(this.fcid);
+       return this.fcid;
 //the above variable is pointless...
 //of note, I expected the above individual ids to be an array from the beginning, not sure why they are not.
         },
@@ -174,8 +197,15 @@ _scoreGetter: function(sco){
         var scorevalues = sco.detail.childSnapshot.val();
         console.log(JSON.stringify(scorekey));
         this.scores.push({scorekey, scorevalues});
+        console.log(this.scores.length);
+        //this is happening way in the beginning of time after "app is ready to rock!!!"
 
        },
+_getScores: function(vals){
+console.log("-------------------------------------------------------------------- " + vals.detail.snapshot.val());
+
+
+},
 
 _doMagic: function(oldMagic, newMagic){
   
@@ -183,10 +213,10 @@ _doMagic: function(oldMagic, newMagic){
 },
 
 showArrays: function(){
-  this.$.immabeTwo.innerHTML = "The first element numbered 1, contained the following: " + JSON.stringify(this.scores[1]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[2]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
-  console.log(this.scores + "scores and in the class list " + this.fcids);
+  this.$.immabeTwo.innerHTML = "The first element numbered 0, contained the following: " + JSON.stringify(this.scores[0]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[1]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
+  console.log(this.scores + "scores and in the class list " + this.fcids + " " + this.fcids.slice(0,6));
 }
-});
+});})();
 </script>
 </dom-module>
 
