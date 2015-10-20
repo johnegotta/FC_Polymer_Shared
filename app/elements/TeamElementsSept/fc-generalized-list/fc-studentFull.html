@@ -14,13 +14,12 @@
 	display: block;
 }
 
-h3.title{
+h5.title{
 	text-align: center;
 	text-indent: -3px;
-	font-size: 26px;
-	color: #013483;
-	padding-bottom: 10px;
-	margin-bottom: 16px;
+
+	padding-bottom: 5px;
+	margin-bottom: 4px;
 }
 paper-tabs, paper-toolbar {
    background-color: #aecdfe;
@@ -46,21 +45,20 @@ paper-tab.iron-selected {
   -->
   <firebase-collection id="pasta" data={{previousacademicsarray}} location="https://focusedstudents.firebaseio.com/pastacademics" order-by-child="fcid" equal-to={{data.fcid}}>
   </firebase-collection> 
-  
 
-		<div class="vertical layout">
-    </div>
+  <firebase-collection id="courseresults" data={{courseresults}} location="https://focusedstudents.firebaseio.com/courseresults" order-by-child="fcid" equal-to={{data.fcid}}>
+  </firebase-collection> 
 
     <div class="middle">
         <div class="container horizontal layout">
           <paper-material class="container vertical layout flex-2 wrap leftpanel left">
             <paper-material class="vertical layout">
-            <img id="studphoto" width="180" height="240" src={{data.photo}} style="padding:4px;" on-tap="checkAcademics">
+            <img id="studphoto" width="90" height="150" src={{data.photo}} style="font-size: .8em; padding:2px;" on-tap="checkAcademics">
             <div class="container horizontal">
-            <h3>
+            <h5>
               <span id="studfirst">[[data.firstname]]</span>
               <span id="studlast">[[data.lastname]]</span>
-              </h3>
+              </h5>
             </div>
             <span><b>Email: </b><span id="studemail">[[data.email]]</span></span>
             <span><b>Tel: </b><span id="studphone1">[[data.phone]]</span></span>
@@ -80,16 +78,20 @@ paper-tab.iron-selected {
           <paper-material class="container vertical layout flex-7 wrap centerdisplay display">
             <paper-tabs id="studenttabs" selected="{{selected}}" scrollable>
               <paper-tab>Account</paper-tab>
+              <paper-tab>CourseResults</paper-tab>
               <paper-tab>ROI</paper-tab>
               <paper-tab>Academics</paper-tab>
               <paper-tab>Inquiries</paper-tab>
             </paper-tabs>
 
             <iron-pages selected="{{selected}}">
-              <div id="studentdetail1">
+             
+
+      
+             <div id="studentdetail1">
                 
                 <div class="horizontal layout">
-                  Course Selected: <span id="couseSelected1">[[coursepurchaseinfo.courseSelected1.coursedates]]</span>
+                  Course Selected: <span id="courseSelected1">[[coursepurchaseinfo.courseSelected1.coursedates]]</span>
                 </div>
                 <div class="horizontal layout">
                   Course Dates: <span id="datesOfCourse1">[[coursepurchaseinfo.datesOfCourse1.class1]]</span>
@@ -100,6 +102,20 @@ paper-tab.iron-selected {
                 <div> Total Cost: <span id="course1cost">[[coursepurchaseinfo.totalcost]]</span>
                 </div>
                 
+              </div>
+              <div id="courseresults">
+               <template is="dom-repeat" items={{courseresults}}>
+                <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
+                 <span>pretest: <span>[[item.scoresPreTest]]</span></span><br>
+                <span>Test 1: <span>[[item.scoresTest1]]</span></span><br>
+                 <span>Test 2: <span>[[item.scoresTest2]]</span></span><br>
+                 <span>Test 3: <span>[[item.scoresTest3]]</span></span><br>
+                 <span>Test 4: <span>[[item.scoresTest4]]</span></span><br>
+                 <span>Test 5: <span>[[item.scoresTest5]]</span></span><br>
+                 <span>Test 6: <span>[[item.scoresTest6]]</span></span><br>
+                <span>REAL SAT: <span>[[item.realSAT]]</span></span><br>
+              </div>
+              </template>
               </div>
               <div id="studentdetail2">
                 <template is="dom-repeat" items={{roi}}>
@@ -134,9 +150,17 @@ paper-tab.iron-selected {
               </div>
               <div id="studentdetail4">
                  <template is="dom-repeat" items={{studentcalls}}>
-                    <div class="vertical layout" style="border:1px gray solid">
-                        <span><b>Date : </b><span class="flex-1">{{item.timestamp}}</span></span>
-                        <span><b>Message : </b><span class="flex-5">{{item.message}}</span></span>
+                    <div class="vertical layout flex wrap container" style="max-height: calc(98vh-96px); max-width: calc(99%-64px);">
+                        <div class="horizontal layout" style="border:1px solid gray;">
+                            <span><b>Date : </b><span class="flex-1">{{item.timestamp}}</span></span>
+                            <span><b>Message : </b><span class="flex-5">{{item.message}}</span></span>
+                        </div>
+                      <hr>
+                        <div class="flex wrap horizontal" style="min-height: 48%; overflow: scroll; border:1px solid gray;">
+
+
+
+                        </div>
                     </div>
                   </template>
                   
@@ -169,6 +193,7 @@ paper-tab.iron-selected {
         type: Array,
         notify:true,
       },
+      selected: "1",
       rank: String,
       SAToverallPerc: String,
       headerTitle: {
@@ -176,7 +201,9 @@ paper-tab.iron-selected {
 			 reflectToAttributes: true,
 			 notify: true
 			},
-      selected: 1
+      selected: 1,
+      notify: true,
+      reflectToAttributes: true
     },
 
 

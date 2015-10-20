@@ -1,32 +1,34 @@
 <dom-module id='fc-courseDetailsCard'>
+<template>
 <style is='custom-style'>
-article.control {
+div.control {
 
-	min-height: 400px;
-	max-width: 320px;
+	height: 400px;
+	width: 400px;
+  display: block;
 }
 paper-material.coursestuff{
 	border: 3px ridge blue;
-  padding:  10px 6px 4px 8px;
+  padding:  10px;
   color: brown;
   background: #f5f5f5;
   display: block;
-  max-width: 338px;
   font-size: 13px;
   font-weight: 400;
   border-radius: 22px;
+  margin: 24px;
+  width: 400px;
 
 }
-paper-material.callcard{
-  border: 3px ridge blue;
-  padding: 8px 12px 4px 8px;
+.callcard{
+  padding: 8px 8px 4px 8px;
   color: brown;
-  background: #f5f5f5;
+  background: #fafafa;
   display: block;
-  max-width: 338px;
+  width: calc(95vw - 585px);
   font-size: 13px;
-  font-weight: 400;
-  border-radius: 22px;
+  font-weight: 700;
+
 }
 
 span{
@@ -39,10 +41,14 @@ section{
   margin: 10px 10px 0px 6px;
 }
 </style>
-<template>
-<article class="container layout vertical fits flex control">
-<paper-material class="coursestuff layout horizontal container" elevation='3'>
-          <section class='layout vertical container nowrap block'>
+
+<firebase-collection id="classfirebase" data="{{courses}}" location="https://focused0ne.firebaseio.com/courses"></firebase-collection>
+
+<div class="container layout vertical control">
+  <section class="horizontal layout container wrap" style="width: 68vw;">
+   <template is="dom-repeat" items='{{courses}}' as="item" class="horizontal layout wrap">
+    <paper-material class="coursestuff layout horizontal container" style="width:330px;" elevation='3'>
+          <section class='layout vertical container nowrap block' style="width: 158px;">
                <div>Type: </div>
                <div>Test Date: </div>
                <div>Class Schedule: </div>
@@ -51,53 +57,49 @@ section{
                <div>Remaining Seats: </div>
                <div>Start Date:</div>
                <div>Price: </div>
-                <h6 on-tap='openCourseDescription'>Course Description</h6>
+              <h6 >Course Description</h6>
           </section>
-           <section class='layout vertical container nowrap block'>
-                <div><span>{{course.type}}</span></div>
-               <div><span>{{course.title}}</span></div>
-               <div><span>{{course.schedule}}</span></div>
-               <div><span>{{course.testschedule}}</span></div>
-               <div><span>{{course.coaches}}</span></div>
-               <div><span>{{course.seatsremaining}}</span></div>
-               <div><span>{{course.startdate}}</span></div>
-               <div><span>{{course.price}}</span></div>
-               <h6 on-tap='openCoursePerormanceData'>Past Performance</h6>
+           <section class='layout vertical container nowrap block' style="width: 158px;">
+                <div><span>{{item.fctype}}</span>&nbsp</div>
+               <div><span>{{item.title}}</span>&nbsp</div>
+               <div><span>{{item.schedule}}</span>&nbsp</div>
+               <div><span>{{item.testschedule}}</span>&nbsp</div>
+               <div><span>{{item.coaches}}</span>&nbsp</div>
+               <div><span>{{item.seatsremaining}}</span>&nbsp</div>
+               <div><span>{{item.startdate}}</span>&nbsp</div>
+               <div><span>{{item.price}}</span>&nbsp</div>
           </section>
-        </paper-material>
-               <div class='verticle layout'>
-                    <iron-collapse id='courseDescription'>
-                         <paper-material class='callcard' elevation='4'>
-                              <p>Course Description: <span>{{course.description}}</span></p>
-                    
-           
-                         
-                         </paper-material>
-                    </iron-collapse>
+    </paper-material>
+    </template>
+    </section>
+    </div>
+    
+
+        <section>
+               <div class='vertical layout' >
+<h3 on-tap='openCourseDescription'> See Scores</h3>
+                    <div horizontal id='courseDescription' hidden='true' style="position: relative; top: 45px;">
+                        
+                         <div class='callcard'>
+                       <!--     <fc-grid></fc-grid>-->
+                         </div>
+                      
+                    </div>
                </div>
           </section>
-          <section>
-               <div class='verticle layout'>
-                    <iron-collapse id='coursePerformanceData'>
-                         <paper-material class='callcard' elevation='4'>
-                              <div>Performance Avg: <span>{{course.thirtysevenpercent}}</span></div>
-                              <div>Performance Top 20%: <span>{{course.twentypercent}}</span></div>
-                              <div>Performance Top 10%: <span>{{course.tenpercent}}</span></div>
-                              <div>Performance Top 5%: <span>{{course.fivepercent}}</span></div>
-                              <div>Performance Top 1%: <span>{{course.onepercent}}</span></div>
-                              <paper-button class='better-platinum' on-tap='doIt'>Select
-                              </paper-button>
-                         </paper-material>
-                    </iron-collapse>
-               </div>
-          </section>
-           </paper-material>
-     </article>
+   
 </template>
 <script>
 Polymer({
 is: 'fc-courseDetailsCard',
 properties:{
+  courses: {
+      type: Array,
+      value: function() {
+        return [];
+      },
+      notify: true
+    }, 
 	course:{ 
 		type: Object, 
 		value: {
@@ -123,22 +125,24 @@ properties:{
             startdate: 'December 7, 2015',
             coursedates: {
               type: Object, 
-              value: {
-                class1: 'Monday December 7, 2015',
-                class2: 'Wednesday December 9, 2015',
-                class3: 'Monday December 14, 2015',
-                class4: 'Wednesday December 16, 2015',
-                class5: 'Monday December 21, 2015',
-                class6: 'Wednesday December 23, 2015',
-                class7: 'Monday December 28, 2015',
-                class8: 'Wednesday December 30, 2015',
-                class9: 'Monday January 4, 2016',
-                class10: 'Wednesday January 6, 2016',
-                class11: 'Monday January 11, 2016',
-                class12: 'Wednesday January 13, 2016',
-                class13: 'Monday January 18, 2016',
-                class14: 'Wednesday January 20, 2016',     
-                },
+              value: {function(){
+              return  {class1: 'Monday December 7, 2015'},
+                      {class2: 'Wednesday December 9, 2015'},
+                      {class3: 'Monday December 14, 2015'},
+                      {class4: 'Wednesday December 16, 2015'},
+                      {class5: 'Monday December 21, 2015'},
+                      {class6: 'Wednesday December 23, 2015'},
+                      {class7: 'Monday December 28, 2015'},
+                      {class8: 'Wednesday December 30, 2015'},
+                      {class9: 'Monday January 4, 2016'},
+                      {class10: 'Wednesday January 6, 2016'},
+                      {class11: 'Monday January 11, 2016'},
+                      {class12: 'Wednesday January 13, 2016'},
+                      {class13: 'Monday January 18, 2016'},
+                      {class14: 'Wednesday January 20, 2016'};
+
+                }
+              },
               notify: true
             },
             testdates: {
@@ -164,7 +168,7 @@ properties:{
 },
     
     openCourseDescription: function(){
-		     this.$.courseDescription.toggle();
+		     this.$.courseDescription.hidden = ! this.$.courseDescription.hidden;
 		     //this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? 'icons:remove':'icons:add';
 		      },
 

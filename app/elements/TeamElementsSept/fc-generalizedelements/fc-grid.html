@@ -2,79 +2,190 @@
 <template>
 <style is="custom-style">
 .grid-box{
-  width: 149px;
-  height: 300px;
-  border: 2px bevel #cccccc;
+  width: 300px;
+  height: 480px;
   padding: 3px;
   margin: 3px;
   display: block;
-  color: white;
-  overflow-y:scroll;
-  overflow-x:hidden;
+  color: black;
+  background: white;
+  overflow-x: hidden;
 }
 
 .grid-image{
     float: left;
     padding: 3px;
     height: 72px;
-    color: goldenrod;
-    width; 73px;
-    background: #aliceblue;
+    color: black;
+    width: 73px;
+    background: aliceblue;
     display: block;
 
 }
 .grid-holder{
-  width: 1320px;
-  height: 620px;
-  border: 6px ridge limegreen;
+  width: calc(95%-85px);
+  max-height: calc(98vh-64px);
+  overflow: scroll;
 }
 
-.row{
-  min-width: 356px;
-  max-width: 100%;
-  display: block;
-  height: 600px;
-}
 </style>
-<firebase-collection id='grids' location="{{defaultPath}}" data='{{grids}}'>
-  <div class="vertical layout wrapper grid-holder">
-    <div class="row horizontal layout wrap">
-      <template is="dom-repeat" items="{{grids}}">
-        <div class="grid-box">
-          <div class="grid-image">
-          <span>{{item.firstname}}</span> <span>{{item.lastname}}</span> <hr>  <br><span>{{item.fcid}}</span><br>
-          </div>
-        </div>
+<firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
+<!--<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" on-firebase-changed="showTime2"></firebase-document>-->
+
+  <div class="vertical layout wrap grid-holder">
+    <firebase-collection id='scores' location="https://focusedstudents.firebaseio.com/courseresults" order-by-child='fcid' equal-to='{{this.fcid}}' on-firebase-child-added="_scoreGetter" data='{{FBscores}}'></firebase-collection>
+       <div class="horizontal layout wrap">
+      <template is="dom-repeat" items="{{grids}}" item="{{item}}">
+        <paper-material elevation="2" class="grid-box">
+        <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
+              <paper-tab>Profile</paper-tab>
+              <paper-tab>Scores</paper-tab>
+              <paper-tab>Account</paper-tab>
+              <paper-tab>ROI</paper-tab>
+              <paper-tab>Academics</paper-tab>
+              <paper-tab>Inquiries</paper-tab>
+            </paper-tabs>
+        <hr>
+        <div class="vertical layout wrap" style="height: 78px;"> 
+            <div class="grid-image">
+            <img src="{{item.photo}}" height="72px" width="73px">
+            </div>
+
+          <div class="horizontal layout wrap" style="width: 210px; height: 78px; overflow-y: scroll;"> 
+              <b><span>{{item.firstname}}</span>&nbsp <span>{{item.lastname}}</span></b> &nbsp
+              <b>FCID</b>:<i><u><span>{{item.fcid}}</span></u></i>&nbsp
+              <b>Phone</b>:<span>[[item.phone]]</span>&nbsp
+              <b>Email</b>:<span>[[item.email]]</span>&nbsp
+              <b>S-email</b>:<span>[[item.studentemail]]</span>
+              &nbsp<span>[[item.school]]</span>
+          </div></div><hr>
+          <template is="dom-repeat" data="{{this.scores}}" as="potato">
+            <div class="horizontal row wrap layout" style="overflow-y: scroll; padding: 3px">
+                 <span>pretest: <span>[[potato.scoresPreTest]]</span></span><br>
+                <span>Test 1: <span>[[potato.scoresTest1]]</span></span><br>
+                 <span>T2: <span>[[potato.scoresTest2]]</span></span><br>
+                 <span>T3: <span>[[potato.scoresTest3]]</span></span><br>
+                 <span>T4: <span>[[potato.scoresTest4]]</span></span><br>
+                 <span>T5: <span>[[potato.scoresTest5]]</span></span><br>
+                 <span>T6: <span>[[potato.scoresTest6]]</span></span><br>
+                <span>REAL SAT: <span>[[potato.realSAT]]</span></span><br>
+                 <span>pretest: <span>[[potato.scoresPreTest]]</span></span><br>
+            </div>
+      
+        </template>
       </template>
-    </div>s
+      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndices"> 
+      <li id="immabe"class="flex wrap container"></li></ul>
+      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndicesTwo"> 
+      <li class="flex wrap container" id="immabeTwo"></li></ul>
+      </paper-material>
+    </div>
   </div>
 </template>
 <script>
 Polymer({
   is:"fc-grid",
   properties: {
-    defaultPath: "https://focusedstudents.firebaseio.com/contactinfo",
-    grids: 'contactinfo',
+    defaultPath: "",
     pathOne: String, 
     pathTwo: String, 
-    pathThree: String, 
+    pathThree: {
+        type: String, 
+        value: "https://focusedstudents.firebaseio.com/courseresults/", 
+        notify: true, 
+        reflectToAttributes: true
+      },
+    pathThreeArray: {
+      type: Array, 
+      notify: true, 
+      reflectToAttributes: true 
+
+    },
     gridType: String, 
-    fcid: String, 
-    contentSelect: [
-
-
-
-
-
-
-
-      ],
+    fcid: {
+      type: String, 
+      value:' ',
+      notify: true,
+      reflectToAttributes: true
+    },
+    fcids: {
+      type: Array,
+      notify: true,
+      value: [],
+      reflectToAttributes: true
+    },
+    scores: {
+      type: Array,
+      value: [{}],
+      notify: true,
+      reflectToAttributes: true
+      },
     gridImageOne: '',
     gridImageTwo: '',
     reflectToAttributes: true,
     notify: true
   },
 
+
+
+
+ showTime: function(e){
+        var path = this.pathThree;
+        console.log(path + " this is the additive path");
+        var fcid = e.detail.childSnapshot.key();
+        console.log(fcid);
+        this.fcid=fcid;
+        var firebasepath= this.pathThree + this.fcid;
+        console.log(firebasepath);
+        var ref = new Firebase("#!" + firebasepath);
+        ref.orderByKey().startAt("real").endAt("scores\uf8ff").on("child_added", function(snapshot) {
+        if (snapshot.val()!= undefined) {
+          var liToAdd = document.createElement('li');
+          var shower = document.getElementById('showIndices');
+          console.log(fcid + " just got scores");
+          //here we can set local object arrays, or object objects
+        liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
+           Polymer.dom(shower).appendChild(liToAdd);
+        }
+        //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
+        else{
+          var liToAddTwo = document.createElement('li');
+            var showerTwo = document.getElementById('showIndicesTwo');
+           console.log(fcid + ' and fcid ' + fcid);
+            liToAddTwo.innerHTML = this.fcid + " " + "Did not take Test!!!";
+            Polymer.dom(showerTwo).appendChild(liToAddTwo);
+        }
+        });
+
+        var ModelClass = e.detail.childSnapshot.val();
+        console.log(ModelClass + " ModelClass");
+// never got to storing it in a this array of objects; not exactly sure how to???
+// if query resulty null or undefined == record no test score this week
+       this.fcids.push(this.fcid);        
+       console.log(this.fcids);
+// push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
+       var repeats = this.fcids.length;
+       console.log(repeats);
+//the above variable is pointless...
+//of note, I expected the above individual ids to be an array from the beginning, not sure why they are not.
+        },
+_scoreGetter: function(sco){
+        var scorekey = sco.detail.childSnapshot.key();
+        var scorevalues = sco.detail.childSnapshot.val();
+        console.log(JSON.stringify(scorekey));
+        this.scores.push({scorekey, scorevalues});
+
+       },
+
+_doMagic: function(oldMagic, newMagic){
+  
+  console.log(oldMagic + " hello magic________________________________________________________________ " + newMagic + "  " +this.fcid + " I am observing this bullshit, but I get no details of the shit that happened?");
+},
+
+showArrays: function(){
+  this.$.immabeTwo.innerHTML = "The first element numbered 1, contained the following: " + JSON.stringify(this.scores[1]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[2]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
+  console.log(this.scores + "scores and in the class list " + this.fcids);
+}
 });
 </script>
 </dom-module>
