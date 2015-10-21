@@ -81,9 +81,9 @@ section{
           <section>
                <div class='vertical layout'>
                     <paper-material horizontal id='courseSchedule' hidden='true' style="width: 36px;">
-                        <ul>
-                        <template is="dom-repeat" items="coursedates">
-                            <li> Class Date: <span>[[item]]</span>
+                        <ul> <b> CLASS DATES</b>
+                        <template is="dom-repeat" items="coursedates" as="item" index-as="class_num">
+                            <li> Class <span>[[class_num]]</span>: <span>[[item.course]]</span>
                             </li>
                         </template>
                         </ul>
@@ -163,27 +163,39 @@ properties:{
         reflectToAttributes: true
     },
     coursedates: {
-              type: Object, 
-              value: {
-                      class1: 'Monday December 7, 2015',
-                      class2: 'Wednesday December 9, 2015',
-                      class3: 'Monday December 14, 2015',
-                      class4: 'Wednesday December 16, 2015',
-                      class5: 'Monday December 21, 2015',
-                      class6: 'Wednesday December 23, 2015',
-                      class7: 'Monday December 28, 2015',
-                      class8: 'Wednesday December 30, 2015',
-                      class9: 'Monday January 4, 2016',
-                      class10: 'Wednesday January 6, 2016',
-                      class11: 'Monday January 11, 2016',
-                      class12: 'Wednesday January 13, 2016',
-                      class13: 'Monday January 18, 2016',
-                      class14: 'Wednesday January 20, 2016'
-                      },
-              notify: true
+              type: Array, 
+              value: function(){ return [
+                      {course: 'Monday December 7, 2015'},
+                      {course: 'Wednesday December 9, 2015'},
+                      {course: 'Monday December 14, 2015'},
+                      {course: 'Wednesday December 16, 2015'},
+                      {course: 'Monday December 21, 2015'},
+                      {course: 'Wednesday December 23, 2015'},
+                      {course: 'Monday December 28, 2015'},
+                      {course: 'Wednesday December 30, 2015'},
+                      {course: 'Monday January 4, 2016'},
+                      {course: 'Wednesday January 6, 2016'},
+                      {course: 'Monday January 11, 2016'},
+                      {course: 'Wednesday January 13, 2016'},
+                      {course: 'Monday January 18, 2016'},
+                      {course: 'Wednesday January 20, 2016'}
+                      ];},
+              notify: true, 
+              reflectToAttributes: true
             }
 },
     
+    ready: function(){
+      var coursedays = this.coursedates.length;
+      var counter = 0;
+      for(counter = 0; counter < coursedays; counter++){
+        console.log(this.coursedates.[counter].course.valueOf().toString() + ' ' + this.coursedates[counter].valueOf().toString() + 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+        this.push('coursedates', this.coursedates[counter]);
+      };
+
+
+
+    },
     openCourseDescription: function(){
 		     this.$.courseDescription.hidden = ! this.$.courseDescription.hidden;
 		     //this.$.headerCollapseIcon.icon = this.$.collapsedDetail.opened ? 'icons:remove':'icons:add';
