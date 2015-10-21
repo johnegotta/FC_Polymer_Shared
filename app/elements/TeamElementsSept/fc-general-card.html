@@ -137,11 +137,15 @@
             }
           }
         });
+        ref.off("value");
+        ref.on("child_changed", function(childSnap){
+          alert(JSON.stringify(childSnap.val()));
+        });
       },
       addNewLiToCorrectPage: function(pageID,routeForNewLi){
         var self = this;
         var ref = new Firebase(self.firebaseUrl + "/" + routeForNewLi);
-         ref.once("value", function(newLiSnap){
+        ref.once("value", function(newLiSnap){
           var newLiToAdd = document.createElement("li");
           newLiToAdd.innerHTML = JSON.stringify(newLiSnap.val());
           Polymer.dom(self.$.mainCardContentTabbedInfo).querySelector('#' + pageID).querySelector("ul").appendChild(newLiToAdd);
