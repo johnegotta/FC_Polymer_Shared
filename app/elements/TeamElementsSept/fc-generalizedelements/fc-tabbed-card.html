@@ -36,10 +36,12 @@ border: 2px solid blue;
 }
 
 </style>
-<firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
+<!-- <firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
+-->
 
+  <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to="{{fcid}}" data='{{ci}}'></firebase-collection>
 
-  <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to="GanaMary00001" data='{{grids}}'></firebase-collection>
+  
   <div class="vertical layout wrap grid-holder">
     <div class="horizontal layout wrap">
         <paper-material elevation="2" class="grid-box">
@@ -52,7 +54,7 @@ border: 2px solid blue;
               <paper-tab>Inquiries</paper-tab>
             </paper-tabs>
         <hr>
-        <template is="dom-repeat" items="{{grids}}" as="item">
+        <template is="dom-repeat" items="{{ci}}">
         <div class="vertical layout wrap" style="height: 78px;"> 
             <div class="grid-image">
             <img src="{{item.photo}}" height="72px" width="73px">
@@ -68,11 +70,12 @@ border: 2px solid blue;
               </span>
           </div>
         </div>
-     </template>
         <hr>
          <iron-pages id="pageHanger" class="horizontal row wrap layout" style="padding:3px" selected="{{selected}}">
          <div class="selectedp">
-Profile: STUFF
+Profile: <br>
+                  <b>Email</b>: <span>[[item.email]]</span>&nbsp
+
 
 
 
@@ -84,7 +87,7 @@ Profile: STUFF
         <div class="selectedp">
     	<div>
     	<div style="overflow-x: scroll; overflow-y: hidden; max-width: 480px;">
-  <firebase-collection id='scores' location="{{pathThree}}" on-query-value="_getScores" order-by-child='fcid' equal-to='GanaMary00001' log="true" on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
+  <firebase-collection id='scores' location="{{firebasepath}}" on-query-value="_getScores" order-by-child='fcid' equal-to='{{fcid}}' on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
           <template is="dom-repeat" items="{{score}}" as="potato">
                  <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Pretest</b>: <span>[[potato.scoresPreTest]]</span></span><br><br>
                 <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 1</b>: <span>[[potato.scoresTest1]]</span></span><br><br>
@@ -101,14 +104,14 @@ Profile: STUFF
         </div>
         <div class="selectedp">
 
-
+Account
 
 
 
         </div>
         <div class="selectedp">
 
-
+ROI
 
 
 
@@ -117,8 +120,19 @@ Profile: STUFF
 
         </div>
 		<div class="selectedp">
+        Past Academics<br>
 
+        <firebase-collection location="https://focusedstudents.firebaseio.com/pastacademics" data="{{pasta}}" order-by-child="fcid" equal-to="{{fcid}}">
+        </firebase-collection>
 
+        <template is="dom-repeat" items="{{pasta}}" as="pa">
+          
+          <b>Graduates: </b><span>{{pa.graduates}}</span><br>
+          <b>School: </b><span>{{pa.school}}</span><br>
+          
+
+        </template>
+        
 
 
 
@@ -126,10 +140,7 @@ Profile: STUFF
 
 
         </div>
-        <div class="selectedp">
-
-
-
+        <div class="selectedp" id="pastacademics">
 
 
 
@@ -137,6 +148,7 @@ Profile: STUFF
 
         </div>
         </iron-pages>
+     </template>
 
 </paper-material>
 
@@ -199,8 +211,8 @@ Profile: STUFF
     notify: true
   },
 
-created: function (){
- 
+ready: function (){
+  this.fcid = "GanaMary00001";
 
 },
 
@@ -210,7 +222,8 @@ created: function (){
         var fcid = e.detail.childSnapshot.key();
         console.log(fcid);
         this.fcid=fcid;
-        var firebasepath= this.pathThree + this.fcid;
+//        var firebasepath= this.pathThree + this.fcid;
+        var firebasepath = this.firebasepath + "/" + this.fcid;
         console.log(firebasepath);
         this.firebasepath = firebasepath;
         var ref = new Firebase("#!" + firebasepath);
