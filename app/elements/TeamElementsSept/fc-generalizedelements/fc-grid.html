@@ -2,7 +2,7 @@
 <template>
 <style is="custom-style">
 .grid-box{
-  width: 300px;
+  width: 340px;
   height: 480px;
   padding: 3px;
   margin: 3px;
@@ -34,9 +34,11 @@
 <!--<firebase-document id="testresultsz" location="https://focusedstaging1.firebaseio.com/students/agjaga1234/test_results" data="{{testresults}}" on-firebase-changed="showTime2"></firebase-document>-->
   <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to=[[this.scores.scorekey]] data='{{grids}}'></firebase-collection>
   <div class="vertical layout wrap grid-holder">
+    <paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
+    </paper-input>
     <div class="horizontal layout wrap">
     
-      <template is="dom-repeat" items="{{grids}}">
+      <template is="dom-repeat" items="{{grids}}" filter="{{doFilter(searchString)}}">
         <paper-material elevation="2" class="grid-box">
         <fc-tabbed-card fcid="{{item.fcid}}" firebasepath="https://focusedstudents.firebaseio.com/courseresults">
         </fc-tabbed-card>
@@ -139,6 +141,10 @@
       },
     gridImageOne: '',
     gridImageTwo: '',
+    searchString: {
+      type: String,
+      observer: 'filterGridContent'
+    },
     reflectToAttributes: true,
     notify: true
   },
@@ -147,8 +153,35 @@ created: function (){
  
 
 },
+  updateFilter: function(argObj){
+    console.log(argObj);
+    this.searchString = argObj.firstname;
 
- showTime: function(e){
+  },
+
+  doFilter: function(e){
+    console.log(e);
+    return function(argItem){
+      //console.log(argItem.fcid);
+      //console.log(e);
+      var fcid = argItem.fcid.toLowerCase();
+      var search = e.toLowerCase();
+      return (fcid.indexOf(search) > -1) //argItem.fcid == "GanaMary00001" || argItem.fcid == "StreelandAnna00001");
+    };
+  },
+
+  filterGridContent: function(e)
+  {
+    //console.log(e.target.value);
+    console.log(e);
+    /*
+    this.$.searcher.filter = function(e){
+      return false;
+    };
+    */
+  },
+
+  showTime: function(e){
         var path = this.pathThree;
         console.log(path + " this is the additive path");
         var fcid = e.detail.childSnapshot.key();
