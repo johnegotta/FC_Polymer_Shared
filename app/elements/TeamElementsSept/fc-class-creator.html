@@ -43,6 +43,7 @@
     <custom-validator id="teacherValid" validator-name="teacherValidator"></custom-validator>
     <custom-validator id="practiceTestDayValid" validator-name="practiceTestDayValidator"></custom-validator>
     <custom-validator id="classDaysValid" validator-name="classDaysValidator"></custom-validator>
+    <custom-validator id="startDateValid" validator-name="startDateValidator"></custom-validator>
     <paper-material class="vertical layout center">
       <h1>Create New Class</h1>
       <form is="iron-form" id="classCreationForm" action="/" method="post">
@@ -63,13 +64,13 @@
                 <paper-item value="{{item.firebaseKey}}"><p><span>{{item.First Name}}</span> <span>{{item.Last Name}}</span></p></paper-item>
               </template>
             </paper-menu>
-            <paper-input is="iron-input" name="formTeacher" hidden required value$="[[selectedTeachers]]" validator="teacherValidator" auto-validate></paper-input>
+            <paper-input is="iron-input" name="formTeacher" hidden required value="[[selectedTeachers]]" validator="teacherValidator" auto-validate></paper-input>
           </div>
 
           <div class="vertical layout menuContainer">
             <paper-input type="time" name="formStartTime" required auto-validate always-float-label label="Class Start Time"></paper-input>
             <paper-input type="time" name="formEndTime" required auto-validate always-float-label label="Class End Time"></paper-input>
-            <paper-input type="date" name="formStartDate" required auto-validate always-float-label label="Pretest Date" value="{{selectedStartDate}}"></paper-input>
+            <paper-input type="date" name="formStartDate" required auto-validate always-float-label label="Pretest Date" value="{{selectedStartDate}}" validator="startDateValidator"></paper-input>
             <paper-input type="date" name="formEndDate" required auto-validate always-float-label label="Real SAT Date" value="{{selectedEndDate}}"></paper-input>
           </div>
 
@@ -79,7 +80,7 @@
               <paper-item value="Saturday">Saturday</paper-item>
               <paper-item value="Sunday">Sunday</paper-item>
             </paper-menu>
-            <paper-input is="iron-input" name="formPracticeTestDay" hidden required value$="[[selectedPracticeTestDay]]" validator="practiceTestDayValidator" auto-validate></paper-input>
+            <paper-input is="iron-input" name="formPracticeTestDay" hidden required value="[[selectedPracticeTestDay]]" validator="practiceTestDayValidator" auto-validate></paper-input>
 
             <h4 id="classDaysMenuHeader">Class Days</h4>
             <paper-menu id="ClassDaysListMenu" class="dropdown-content" multi attr-for-selected="value" selected-values="{{selectedClassDays}}">
@@ -89,7 +90,7 @@
               <paper-item value="Thursday">Thursday</paper-item>
               <paper-item value="Friday">Friday</paper-item>
             </paper-menu>
-            <paper-input is="iron-input" name="formClassDays" required hidden value$="[[selectedClassDays]]" validator="classDaysValidator" auto-validate></paper-input>
+            <paper-input is="iron-input" name="formClassDays" required hidden multi value="[[selectedClassDays]]" validator="classDaysValidator" auto-validate></paper-input>
           </div>
 
           <div class="menuContainer">
@@ -139,7 +140,7 @@
           value: null
         },
         selectedClassDays: {
-          type: String,
+          type: Array,
           value: null
         },
         listeners: {
@@ -147,7 +148,8 @@
         }
       },
       observers: [
-        "addPracticeTestDates(selectedStartDate,selectedEndDate,selectedPracticeTestDay)"
+        "addPracticeTestDates(selectedStartDate,selectedEndDate,selectedPracticeTestDay)",
+        "classDaysChangedAfterDatesPicked(selectedClassDays.splices)"
       ],
       validateSelectedTeacher: function(){
         if(this.selectedTeachers != "" && this.selectedTeachers != null && this.selectedTeachers != []){
@@ -176,10 +178,24 @@
           return false;
         }
       },
+      validateStartDate: function(){
+        if(this.selectedStartDate == "" || this.selectedStartDate == null || this.selectedEndDate == "" || this.selectedEndDate == null){
+          return false;
+        }
+        var start_date = new Date(this.selectedStartDate);
+        var end_date = new Date(this.selectedEndDate);
+        var dayIndexObj = {"Sunday":0,"Monday":1,"Tuesday":2,"Wednesday":3,"Thursday":4,"Friday":5,"Saturday":6};
+        if(end_date - start_date > 0 &&  start_date.getDay() == dayIndexObj[this.selectedPracticeTestDay]){
+          return true;
+        } else {
+          return false;
+        }
+      },
       ready: function(){
         this.$.teacherValid.validate = this.validateSelectedTeacher.bind(this);
         this.$.practiceTestDayValid.validate = this.validateSelectedPracticeTestDay.bind(this);
         this.$.classDaysValid.validate = this.validateSelectedClassDays.bind(this);
+        this.$.startDateValid.validate = this.validateStartDate.bind(this);
       },
       created: function(){
         var self = this;
@@ -203,12 +219,41 @@
           });
         });
       },
+      classDaysChangedAfterDatesPicked: function(){
+        this.addPracticeTestDates(this.selectedStartDate,this.selectedEndDate,this.selectedPracticeTestDay);
+      },
       addPracticeTestDates: function(start_date,end_date,test_day){
-        if(start_date != null && end_date != null && test_day != null && end_date - start_date > 0){
+        start_date = new Date(start_date);
+        end_date = new Date(end_date);
+        if(start_date != null && start_date != "" && end_date != null && end_date != "" && test_day != null && test_day != "" && this.selectedClassDays != null && this.selectedClassDays != [] && end_date - start_date > 0){
 
+          console.log(this.selectedClassDays);
+          var dayIndexObj = {"Sunday":0,"Monday":1,"Tuesday":2,"Wednesday":3,"Thursday":4,"Friday":5,"Saturday":6};
+          var daysToAddArr = this.selectedClassDays.map(function(one_day){
+            switch(dayIndexObj[test_day]) {
+              case 0:
+                return dayIndexObj[one_day]%7;
+                break;
+              case 6:
+                return (dayIndexObj[one_day] + 1)%7;
+                break;
+            }
+          });
+          console.log(daysToAddArr);
+
+          for(var loop_date = start_date; end_date - loop_date > 0; loop_date.setDate(loop_date.getDate() + 7)){
+            console.log(loop_date);
+            /*var week_date = loop_date;
+            console.log(week_date);
+            daysToAddArr.map(function(one_day_index){
+              week_date.setDate(loop_date.getDate() + one_day_index);
+              console.log(week_date);
+            });*/
+          }
         }
       },
       submitForm: function(e){
+        console.log(this.selectedClassDays);
         this.$.classCreationForm.validate();
         var crap = this.$.classCreationForm.serialize();
         console.log(crap);
