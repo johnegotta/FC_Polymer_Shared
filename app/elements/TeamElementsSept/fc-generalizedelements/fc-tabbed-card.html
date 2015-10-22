@@ -162,7 +162,7 @@ Profile: STUFF
       reflectToAttributes: true 
 
     },
-    firebasepath: {
+    firebasepathTwo: {
       type: String,
        value: "https://focusedstudents.firebaseio.com/courseresults", 
       notify: true, 
@@ -206,60 +206,41 @@ created: function (){
 
  showTime: function(e){
         var path = this.pathThree;
-        console.log(path + " this is the additive path");
+ 
         var fcid = e.detail.childSnapshot.key();
-        console.log(fcid);
-        this.fcid=fcid;
-        var firebasepath= this.pathThree + this.fcid;
-        console.log(firebasepath);
-        this.firebasepath = firebasepath;
-        var ref = new Firebase("#!" + firebasepath);
+   
+        this.fcid = fcid;
+        var firebasepathTwo = this.pathThree + this.fcid;
+       
+        this.firebasepathTwo = firebasepathTwo;
+            var ref = new Firebase("#!" + firebasepathTwo);
         ref.orderByKey().startAt("real").endAt("scores\uf8ff").on("child_added", function(snapshot) {
         if(snapshot.exists() == false){
-          var liToAddTwo = document.createElement('li');
+            var liToAddTwo = document.createElement('li');
             var showerTwo = document.getElementById('showIndicesTwo');
-           console.log(fcid + ' and fcid ' + fcid);
+          
             liToAddTwo.innerHTML = this.fcid + " " + "Did not take Test!!!";
             Polymer.dom(showerTwo).appendChild(liToAddTwo);
         }
         else if (snapshot.val()!== null) {
           var liToAdd = document.createElement('li');
-          var shower = document.getElementById('showIndices');
-          console.log(fcid + " just got scores");
-          //here we can set local object arrays, or object objects
-        liToAdd.innerHTML = fcid + " " + snapshot.key() +": " + snapshot.val();
-           Polymer.dom(shower).appendChild(liToAdd);
-           this.fcid = fcid;
+          var showerTwo = document.getElementById('showIndicesTwo');
         }
-        //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
-        
-        });
-
-        var ModelClass = e.detail.childSnapshot.val();
-        console.log(ModelClass + " ModelClass");
-// never got to storing it in a this array of objects; not exactly sure how to???
-// if query resulty null or undefined == record no test score this week
-       this.fcids.push(this.fcid);        
-       console.log(this.fcids);
-// push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
-       var repeats = this.fcids.length;
-       console.log(repeats);
-       console.log(this.fcid);
-       return this.fcid;
-//the above variable is pointless...
-//of note, I expected the above individual ids to be an array from the beginning, not sure why they are not.
-        },
+      });
+    },
+               
+     
 _scoreGetter: function(sco){
         var scorekey = sco.detail.childSnapshot.key();
         var scorevalues = sco.detail.childSnapshot.val();
-        console.log(JSON.stringify(scorekey));
+       
         this.scores.push({scorekey, scorevalues});
-        console.log(this.scores.length);
+
         //this is happening way in the beginning of time after "app is ready to rock!!!"
 
        },
 _getScores: function(vals){
-	console.log("-------------------------------------------------------------------- " + vals.detail.snapshot.val());
+
 
 
 
@@ -267,13 +248,11 @@ _getScores: function(vals){
 
 _doMagic: function(oldMagic, newMagic){
   
-  console.log(oldMagic + " hello magic________________________________________________________________ " + newMagic + "  " +this.fcid + " I am observing this bullshit, but I get no details of the shit that happened?");
+  
 },
 
 showArrays: function(){
-  this.$.immabeTwo.innerHTML = "The first element numbered 0, contained the following: " + JSON.stringify(this.scores[0]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[1]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
-  console.log(this.scores + "scores and in the class list " + this.fcids + " " + this.fcids.slice(0,6));
-}
+  }
 });})();
 </script>
 </dom-module>
