@@ -93,13 +93,13 @@
             <paper-input is="iron-input" name="formClassDays" required hidden multi value="[[selectedClassDays]]" validator="classDaysValidator" auto-validate></paper-input>
           </div>
 
-          <div class="menuContainer">
+          <div class="menuContainer" style="width:460px">
             <h4>Class Events</h4>
             <iron-list>
               <template is="dom-repeat" items="{{classEvents}}">
-                <paper-item>
-                  <span>{{item.type}}</span>
-                  <span>{{item.date}}</span>
+                <paper-item on-dblclick="sayHi">
+                  <div>{{item.type}}</div>
+                  <div><paper-input type="date" disabled always-float-label value="{{item.date}}"></paper-input></div>
                 </paper-item>
               </template>
             </iron-list>
@@ -259,11 +259,19 @@
             }
           });
           daysToAddArr.sort();
-          for(var loop_date = start_date; end_date - loop_date.setDate(loop_date.getDate() + 7) > 0; loop_date){
+          var eventObj = {};
+          eventObj["type"] = "Practice Test";
+          eventObj["date"] = self.getDateInStringFormForInputs(start_date);
+          eventObj["start_time"] = "9:00AM";
+          eventObj["end_time"] = "1:00PM";
+          self.push("classEvents",eventObj);
 
-            var eventObj = {};
+          for(var loop_date = start_date; end_date - loop_date.setDate(loop_date.getDate() + 7) > 0; loop_date){
+            eventObj = {};
             eventObj["type"] = "Practice Test";
-            eventObj["date"] = new Date(loop_date);
+            eventObj["date"] = self.getDateInStringFormForInputs(loop_date);
+            eventObj["start_time"] = "9:00AM";
+            eventObj["end_time"] = "1:00PM";
             self.push("classEvents",eventObj);
             console.log(self.classEvents);
 
@@ -272,17 +280,25 @@
               week_date.setDate(loop_date.getDate() + one_day_index);
               eventObj = {};
               eventObj["type"] = "Class";
-              eventObj["date"] = week_date;
+              eventObj["date"] = self.getDateInStringFormForInputs(week_date);
+              eventObj["start_time"] = self.selectedStartTime;
+              eventObj["end_time"] = self.selectedEndTime;
               self.push("classEvents",eventObj);
             });
           }
         }
+      },
+      getDateInStringFormForInputs: function(inDate){
+        return parseInt(inDate.getFullYear()) + "-" + parseInt(inDate.getMonth() + 1) + "-" + parseInt(inDate.getDate());
       },
       submitForm: function(e){
         console.log(this.selectedClassDays);
         this.$.classCreationForm.validate();
         var crap = this.$.classCreationForm.serialize();
         console.log(crap);
+      },
+      sayHi: function(e){
+        alert(e);
       }
 
     });
