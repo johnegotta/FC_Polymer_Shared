@@ -82,10 +82,10 @@
           </paper-material>
         </template>
 
-<!--      <template is="dom-repeat" items="{{griditemArray}}">
-        <fc-cell-creator draggable="true" holder='{{holder}}' input='{{item.name}}' fclabel='[[index]]'></fc-cell-creator>
+     <template is="dom-repeat" items="{{griditemArray}}">
+        <fc-cell-creator draggable="true" holder='{{holder}}' input='{{item.name}}' fclabel='[[index]]' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop"></fc-cell-creator>
       </template>
-      -->
+      
       
     </div>
   </div>
@@ -134,6 +134,7 @@ Polymer({
       type: String,
       observer: 'filterGridContent'
     },
+    currentDragger: Object,
     reflectToAttributes: true,
     notify: true
   },
@@ -252,12 +253,42 @@ handleDragStart: function(e) {
       e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
       console.log("drag begun for ");
       console.log(e.model.item);
+      var cell = e.target;
+
+      while(cell.nodeName != "FC-CELL-CREATOR")
+      {
+        console.log(cell);
+        cell = cell.parentNode;
+      }
+      this.currentDragger = cell;
     }, 
 
 allowDrop: function (e) {
       e.preventDefault();
       console.log("drag over");
     },
+
+  handleDrop: function(e)
+  {
+    console.log(e.model.item);
+    console.log(e);
+    var cell = e.target;
+    var i = 0;
+    while(cell.nodeName != "FC-CELL-CREATOR")
+    {
+      i++;
+      cell = cell.parentNode;
+      if(i > 5) break;
+    }
+    console.log(cell);
+    console.log("just droppped " + e.target + " on " + e.model.item.name);
+    var temp = cell.input;
+    var dataObj = JSON.parse(e.dataTransfer.getData("fcdata"));
+    cell.input = dataObj.name;
+    console.log(this.currentDragger);
+    this.currentDragger.input = temp;
+//    e.model.item.name = "shit";
+  }
 
 
 });
