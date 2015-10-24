@@ -31,9 +31,8 @@
 </style>
   <div class="vertical layout wrap grid-holder">
     <div class="horizontal layout wrap">
-    <span>{{this.griditemArray.2.name}}</span>
       <template is="dom-repeat" items="{{griditemArray}}">
-      <fc-cell-creator label$='[[item.name]]'><span>[[item.name]]</span></fc-cell-creator>
+        <fc-cell-creator draggable="true" holder='{{holder}}' input='{{item.name}}' fclabel='[[index]]'></fc-cell-creator>
       </template>
       
     </div>
@@ -55,10 +54,13 @@ Polymer({
     fillViewPort: Boolean,
     gridImageOne: String,
     gridImageTwo: String,
-    griditemnumber: Number,
+    griditemnumber: {
+        type: Number,
+        notify: true,
+        reflectToAttributes: true
+      },
     griditemArray: {
-      type: Array,
-      value: [],
+      value: Array,
       notify: true,
       reflectToAttributes: true
     },
@@ -76,25 +78,57 @@ ready: function(){
   var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
   var mglfour = window.matchMedia("screen and (min-width: 1901px)");
   if (mglfour.matches){ // if media query matches
-      this.gridWidthPx= 800 + 'px';
-      this.gridHeightPx= 1400 +'px';
-      var numbcols = Math.round(2100/115);
-      var numbrows = Math.round(1800/54);
+      this.gridWidthPx= 1400 + 'px';
+      this.gridHeightPx= 1200 +'px';
+      var numbcols = Math.round(1400/115);
+      var numbrows = Math.round(1200/54);
       var total = numbcols*numbrows;
       var counter = 0; 
       for(counter=0; counter < total; counter++){
-        this.griditemArray[counter] = {'name': counter};
-        this.griditemArray[counter].name = counter;
-        //this.push('griditemArray', {name: counter});
-        console.log(JSON.stringify(this.griditemArray[counter]));
-        console.log(this.griditemArray[counter].name);
+        //this.griditemArray[counter] = {'name': counter};
+        this.griditemArray[counter].name = "the value of name " + counter;
+        this.push('griditemArray', {name: "the value of name " + counter});
+        console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
+        console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
+        this.griditemnumber=this.griditemArray[counter].name;
+        console.log("this is the grid number at ready in the grid " + this.griditemnumber);
       }
     }
+  else {
+      this.gridWidthPx = 770 + 'px';
+      this.gridHeightPx = 1200 + 'px';
+      var numbcols = Math.round(800/115);
+      var numbrows = Math.round(1200/54);
+      var total = numbcols*numbrows;
+      var counter = 0; 
+      for(counter=0; counter < total; counter++){
+        //this.griditemArray[counter] = {'name': counter};
+        this.griditemArray[counter].name = "the value of name " + counter;
+        this.push('griditemArray', {name: "the value of name " + counter});
+        console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
+        console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
+        this.griditemnumber=this.griditemArray[counter].name;
+        console.log("this is the grid number at ready in the grid " + this.griditemnumber);
+      }
+    }
+
 },
+
 attached: function (){
    
  
-}
+},
+
+handleDragStart: function(e) {
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+      console.log("drag begun for ");
+      console.log(e.model.item);
+    }, 
+
+allowDrop: function (e) {
+      e.preventDefault();
+      console.log("drag over");
+    },
 
 
 
