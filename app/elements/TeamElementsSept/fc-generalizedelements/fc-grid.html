@@ -36,8 +36,7 @@
   <div class="vertical layout wrap grid-holder">
     <paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
     </paper-input>
-    <div class="horizontal layout wrap">
-    
+    <div class="horizontal layout wrap">    
       <template is="dom-repeat" items="{{grids}}" filter="{{doFilter(searchString)}}">
         <paper-material elevation="2" class="grid-box">
         <fc-tabbed-card fcid="{{item.fcid}}" firebasepath="https://focusedstudents.firebaseio.com/courseresults">
@@ -82,48 +81,38 @@
             </template>
           </paper-material>
         </template>
+
+<!--      <template is="dom-repeat" items="{{griditemArray}}">
+        <fc-cell-creator draggable="true" holder='{{holder}}' input='{{item.name}}' fclabel='[[index]]'></fc-cell-creator>
+      </template>
+      -->
       
     </div>
   </div>
-   <div class="horizontal layout wrap">
-      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndices"> 
-      <li id="immabe"class="flex wrap container"></li></ul>
-      <ul on-tap="showArrays" style="width: 900px; height: 900px; border: 3px solid green; background: aliceblue; overflow: scroll;" id="showIndicesTwo"> 
-      <li class="flex wrap container" id="immabeTwo">
-        
-      </li>
-    </ul>
-    </div>  
+    
 </template>
 <script>
-(function(){Polymer({
+Polymer({
   is:"fc-grid",
   properties: {
     defaultPath: "",
     pathOne: String, 
     pathTwo: String, 
-    pathThree: {
-        type: String, 
-        value: "https://focusedstudents.firebaseio.com/courseresults/", 
-        notify: true, 
+    gridWidthPx: Number, 
+    gridHeightPx: Number,
+    scrollX: Boolean,
+    scrollY: Boolean,
+    isDnD: Boolean,
+    fillViewPort: Boolean,
+    gridImageOne: String,
+    gridImageTwo: String,
+    griditemnumber: {
+        type: Number,
+        notify: true,
         reflectToAttributes: true
       },
-    pathThreeArray: {
-      type: Array, 
-      notify: true, 
-      reflectToAttributes: true 
-
-    },
-    firebasepath: {
-      type: String,
-       value: "https://focusedstudents.firebaseio.com/courseresults", 
-      notify: true, 
-      reflectToAttributes: true
-    },
-    gridType: String, 
-    fcid: {
-      type: String, 
-      value:' ',
+    griditemArray: {
+      value: Array,
       notify: true,
       reflectToAttributes: true
     },
@@ -148,10 +137,8 @@
     reflectToAttributes: true,
     notify: true
   },
-
 created: function (){
- 
-
+  
 },
   updateFilter: function(argObj){
     console.log(argObj);
@@ -211,49 +198,68 @@ created: function (){
         //I dont get why nothing happens in this else? save that since there is no snapshot there is no function and the game ends there.
         
         });
+    },
 
-        var ModelClass = e.detail.childSnapshot.val();
-        console.log(ModelClass + " ModelClass");
-// never got to storing it in a this array of objects; not exactly sure how to???
-// if query resulty null or undefined == record no test score this week
-       this.fcids.push(this.fcid);        
-       console.log(this.fcids);
-// push to corresponding array in scores=--I prefer an array of objects so our sinking isnt absurd, which the sending us all over tarnation would seem to imply.
-       var repeats = this.fcids.length;
-       console.log(repeats);
-       console.log(this.fcid);
-       return this.fcid;
-//the above variable is pointless...
-//of note, I expected the above individual ids to be an array from the beginning, not sure why they are not.
-        },
-_scoreGetter: function(sco){
-        var scorekey = sco.detail.childSnapshot.key();
-        var scorevalues = sco.detail.childSnapshot.val();
-        console.log(JSON.stringify(scorekey));
-        this.scores.push({scorekey, scorevalues});
-        console.log(this.scores.length);
-        //this is happening way in the beginning of time after "app is ready to rock!!!"
-
-       },
-_getScores: function(vals){
-console.log("-------------------------------------------------------------------- " + vals.detail.snapshot.val());
-
+ready: function(){
+  var mql = window.matchMedia("screen and (min-width: 601px) and (max-width: 800px");
+  var mqlone = window.matchMedia("screen and (min-width: 801px) and (max-width: 1200px");
+  var mgltwo = window.matchMedia("screen and (min-width: 1201px) and (max-width: 1600px");
+  var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
+  var mglfour = window.matchMedia("screen and (min-width: 1901px)");
+  if (mglfour.matches){ // if media query matches
+      this.gridWidthPx= 1400 + 'px';
+      this.gridHeightPx= 1200 +'px';
+      var numbcols = Math.round(1400/115);
+      var numbrows = Math.round(1200/54);
+      var total = numbcols*numbrows;
+      var counter = 0; 
+      for(counter=0; counter < total; counter++){
+        //this.griditemArray[counter] = {'name': counter};
+        this.griditemArray[counter].name = "the value of name " + counter;
+        this.push('griditemArray', {name: "the value of name " + counter});
+        console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
+        console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
+        this.griditemnumber=this.griditemArray[counter].name;
+        console.log("this is the grid number at ready in the grid " + this.griditemnumber);
+      }
+    }
+  else {
+      this.gridWidthPx = 770 + 'px';
+      this.gridHeightPx = 1200 + 'px';
+      var numbcols = Math.round(800/115);
+      var numbrows = Math.round(1200/54);
+      var total = numbcols*numbrows;
+      var counter = 0; 
+      for(counter=0; counter < total; counter++){
+        //this.griditemArray[counter] = {'name': counter};
+        this.griditemArray[counter].name = "the value of name " + counter;
+        this.push('griditemArray', {name: "the value of name " + counter});
+        console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
+        console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
+        this.griditemnumber=this.griditemArray[counter].name;
+        console.log("this is the grid number at ready in the grid " + this.griditemnumber);
+      }
+    }
 
 },
 
-_doMagic: function(oldMagic, newMagic){
-  
-  console.log(oldMagic + " hello magic________________________________________________________________ " + newMagic + "  " +this.fcid + " I am observing this bullshit, but I get no details of the shit that happened?");
+attached: function (){
+   
+ 
 },
 
-showArrays: function(){
-  this.$.immabeTwo.innerHTML = "The first element numbered 0, contained the following: " + JSON.stringify(this.scores[0]) + " _______________________________________________________________________________ " + [/\n/] + " The second element contained the following: " + JSON.stringify(this.scores[1]) + " ________________________________________________________________________________ " + /\n/  + " The class list from the fcids array is as follows: " + this.fcids;
-  console.log(this.scores + "scores and in the class list " + this.fcids + " " + this.fcids.slice(0,6));
-}
-});})();
+handleDragStart: function(e) {
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+      console.log("drag begun for ");
+      console.log(e.model.item);
+    }, 
+
+allowDrop: function (e) {
+      e.preventDefault();
+      console.log("drag over");
+    },
+
+
+});
 </script>
 </dom-module>
-
-
-
-
