@@ -1,4 +1,4 @@
-<dom-module id="fc-grid">
+<dom-module id="fc-grid-card-portrait">
 <!-- Level Concept: 
 Top: Index
   1. drawer-panel (if we can get it to be the dashboard..awesome);
@@ -72,19 +72,21 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 		</style>
 			<!--a good idea here would be to include the splitter for resizing below this level and perhaps only the drawer panel above it-->
 			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
+			<firebase-collection id="scores" order-by-child="student" data='{{items}}' equal-to="jkdshi283794" location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
 				</paper-input>
 				<paper-button on-tap="__assign">Assign New Positions
 				</paper-button>
+				<paper-button on-tap="go">GO!!!!
+				</paper-button>
 			</div>
-
 			<fc-call-card-input-model-one>
 			 	
 					<fc-content-holder input-names="cells" class="horizontal layout container wrap">
-						<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
-							<fc-cell-creator name="cells" draggable="true" input='{{item.name}}' fclabel='{{item.number}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+						<template is="dom-repeat" items="{{data}}" as="input" filter="{{doFilter(searchString)}}">
+							<fc-cell-creator name="cells" draggable="true" input='{{input.math_score}}' fclabel='{{input.student}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 							</fc-cell-creator>
 				  		</template>
 					</fc-content-holder>
@@ -111,10 +113,10 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 </template>
 <script>
 Polymer({
-  is:"fc-grid",
+  is:"fc-grid-card-portrait",
   properties: {
     defaultPath: "",
-    pathOne: String, 
+    pathOne: "https://focusedstaging1.firebaseio.com/test_results", 
     pathTwo: String, 
     gridWidthPx: Number, 
     gridHeightPx: Number,
@@ -173,54 +175,34 @@ Polymer({
   },
 
   doFilter: function(e){
-    return function(argItem){
-	 var itemname = argItem.name;
-	 var search = e.toLowerCase();
-	 return (itemname.indexOf(search) > -1) 
-    };
+   // return function(argItem){
+	// var itemname = argItem.name;
+	 //var search = e.toLowerCase();
+	 //return (itemname.indexOf(search) > -1) 
+   // };
   },
   
-ready: function(){
-	var mql = window.matchMedia("screen and (min-width: 601px) and (max-width: 800px");
-	var mqlone = window.matchMedia("screen and (min-width: 801px) and (max-width: 1200px");
-	var mgltwo = window.matchMedia("screen and (min-width: 1201px) and (max-width: 1600px");
-	var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
-	var mglfour = window.matchMedia("screen and (min-width: 1901px)");
-	  	//if (mglfour.matches){ // if media query matches
-	 	//this.gridWidthPx= 340 + 'px';
-	 	//this.gridHeightPx= 480 +'px';
-	 	var numbcols = Math.round(340/160);
-	 	var numbrows = Math.round(480/72);
-	 	//Math.round(numbcols*numbrows);
-	   //this.griditemArray[counter] = {'name': counter};
-	     var counter = 0;
-	     for(counter=0; counter<11;counter++){
-					this.push('griditemArray', {name: "the value of name " + counter});
-		   			this.griditemArray[counter].name = "the value of name " + counter;
-		   			this.griditemArray[counter].number = "no " + counter;
+go: function(){
+		var arrayToPrint = this.$.testScores.data;
+		console.log(this.$.testScores.data + " That was what came out, and here is what I saved " + arrayToPrint);
+		var record = arrayToPrint[0];
+		console.log("this is what we saved  " + arrayToPrint[0]);
+		var keys = Object.keys(record);
+		var numbEntries = keys.length;
+		var counter = 0;	
+	     for(counter=0; counter < numbEntries; counter++){
+	     			var sequenceNum = 0;
+	     			sequenceNum = counter + 1;
+					this.push('griditemArray', {name: arrayToPrint[sequenceNum].value});
+		   			this.griditemArray[sequenceNum].name = "the value of name " + arrayToPrint[sequenceNum][0].value;
+		   			this.griditemArray[sequenceNum].number = keys[sequenceNumb];
+		   			console.log(this.griditemArray[sequenceNum].name + "  " + this.griditemArray[sequenceNum].number);
 		   			}
-		   		
+
+		   	
     			
     		},
-  /*else {
-	 this.gridWidthPx = 770 + 'px';
-	 this.gridHeightPx = 1200 + 'px';
-	 var numbcols = Math.round(320/160);
-	 var numbrows = Math.round(480/72);
-	 var total = Math.round(numbcols*numbrows);
-	 var counter = 0; 
-	 for(counter=0; counter < total; counter++){
-	   //this.griditemArray[counter] = {'name': counter};
-	   this.griditemArray[counter].name = "the value of name " + counter;
-	   this.push('griditemArray', {name: "the value of name " + counter});
-	   //console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
-	   //console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
-	   this.griditemnumber=this.griditemArray[counter].name;
-	   console.log("this is the grid number at ready in the grid " + this.griditemnumber);
-	 }
-    }
 
-},*/
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
 	 //console.log("drag begun for ");
