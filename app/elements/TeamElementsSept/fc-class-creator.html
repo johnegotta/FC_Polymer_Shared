@@ -59,7 +59,7 @@
             </paper-dropdown-menu>
 
             <h4 id="teacherMenuHeader">Teacher(s)</h4>
-            <paper-menu name="formTeacher" id="teacherListMenu" class="dropdown-content" multi required attr-for-selected="value" selected-values="{{selectedTeachers}}">
+            <paper-menu name="formTeacher" id="teacherListMenu" multi required attr-for-selected="value" selected-values="{{selectedTeachers}}">
               <template is="dom-repeat" items="{{teacherList}}">
                 <paper-item value="{{item.firebaseKey}}"><p><span>{{item.First Name}}</span> <span>{{item.Last Name}}</span></p></paper-item>
               </template>
@@ -70,8 +70,8 @@
           <div class="vertical layout menuContainer">
             <paper-input type="time" name="formStartTime" value="{{selectedStartTime}}" required auto-validate always-float-label label="Class Start Time"></paper-input>
             <paper-input type="time" name="formEndTime" value="{{selectedEndTime}}" required auto-validate always-float-label label="Class End Time"></paper-input>
-            <paper-input id="startDateInput" type="date" name="formStartDate" required auto-validate always-float-label label="Pretest Date" value="{{selectedStartDate}}" validator="startDateValidator"></paper-input>
-            <paper-input id="endDateInput" type="date" name="formEndDate" required auto-validate always-float-label label="Real SAT Date" value="{{selectedEndDate}}" validator="startDateValidator"></paper-input>
+            <paper-input id="startDateInput" type="date" name="formStartDate" required always-float-label label="Pretest Date" value="{{selectedStartDate}}" validator="startDateValidator"></paper-input>
+            <paper-input id="endDateInput" type="date" name="formEndDate" required always-float-label label="Real SAT Date" value="{{selectedEndDate}}" validator="startDateValidator"></paper-input>
           </div>
 
           <div class="menuContainer">
@@ -132,11 +132,13 @@
         },
         selectedStartDate: {
           type: Date,
-          value: null
+          value: null,
+          notify: true
         },
         selectedEndDate: {
           type: Date,
-          value: null
+          value: null,
+          notify: true
         },
         selectedLocation: {
           type: String,
@@ -196,6 +198,9 @@
       },
       validateStartDate: function(){
         if(this.selectedStartDate == "" || this.selectedStartDate == null || this.selectedEndDate == "" || this.selectedEndDate == null){
+          console.log("Fail 1");
+          console.log(this.selectedStartDate);
+          console.log(this.selectedEndDate);
           return false;
         }
         var start_date = new Date(this.selectedStartDate);
@@ -204,6 +209,7 @@
         if(end_date - start_date > 0 &&  start_date.getDay() == dayIndexObj[this.selectedPracticeTestDay] && end_date.getDay() == 6){
           return true;
         } else {
+          console.log("Fail 2");
           return false;
         }
       },
