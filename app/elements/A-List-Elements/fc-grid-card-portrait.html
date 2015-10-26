@@ -83,12 +83,13 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 				</paper-button>
 			</div>
 			<fc-call-card-input-model-one>
-			 	
 					<fc-content-holder input-names="cells" class="horizontal layout container wrap">
-						<template is="dom-repeat" items="{{data}}" as="input" filter="{{doFilter(searchString)}}">
-							<fc-cell-creator name="cells" draggable="true" input='{{input.math_score}}' fclabel='{{input.student}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+<!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->			
+						<template is="dom-repeat" items="{{griditemArray}}" as="input" filter="{{doFilter(searchString)}}">
+							<fc-cell-creator name="cells" draggable="true" input='{{input.val}}' fclabel='{{input.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 							</fc-cell-creator>
 				  		</template>
+<!--The factoryImpl ends here; perhaps factImpl the holder first, and fact impl the mini headers.  You have the arsenol of a few of those items in the grid/dashboard/modal/splitter framework and we need not much else. It remains dynamic but has binding.  It seems good. We will see.-->
 					</fc-content-holder>
 
 			</fc-call-card-input-model-one>
@@ -106,10 +107,13 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 		</div>
 		<div class="buttons" style="height: 65px; padding: 8px 8px 8px 14px;" class="horizontal layout left-justified">
 			<paper-button on-tap="conttap">Confirm Save</paper-button>
-			<paper-button on-tap="back">Revert Array</paper-button>
+			<paper-button on-tap="__revertArray">Revert Array</paper-button>
 			<paper-button dialog-dismiss on-tap="__clear">Continue Working</paper-button>
 		</div>
 	</paper-dialog>
+
+	<div id="cuck">
+	</div>
 </template>
 <script>
 Polymer({
@@ -126,12 +130,14 @@ Polymer({
     fillViewPort: Boolean,
     gridImageOne: String,
     gridImageTwo: String,
-    griditemNumber: {
-	   type: Number,
+    keyNames: {
+	   type: Array,
+	   value: Array,
 	   notify: true,
 	   reflectToAttributes: true
 	 },
     griditemArray: {
+	 type: Array,
 	 value: Array,
 	 notify: true,
 	 reflectToAttributes: true
@@ -146,9 +152,9 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
-    newOrderArray: {
+    oldGridArray: {
 	 type: Array,
-	 value: [],
+	 value: Array,
 	 notify: true,
 	 reflectToAttributes: true
 	 },
@@ -183,25 +189,25 @@ Polymer({
   },
   
 go: function(){
-		var arrayToPrint = this.$.testScores.data;
-		console.log(this.$.testScores.data + " That was what came out, and here is what I saved " + arrayToPrint);
+		var arrayToPrint = this.$.scores.data;
+		console.log(this.$.scores.data);
+		console.log(arrayToPrint);
 		var record = arrayToPrint[0];
-		console.log("this is what we saved  " + arrayToPrint[0]);
 		var keys = Object.keys(record);
-		var numbEntries = keys.length;
+		var numbEntries = keys.length; 
 		var counter = 0;	
 	     for(counter=0; counter < numbEntries; counter++){
-	     			var sequenceNum = 0;
-	     			sequenceNum = counter + 1;
-					this.push('griditemArray', {name: arrayToPrint[sequenceNum].value});
-		   			this.griditemArray[sequenceNum].name = "the value of name " + arrayToPrint[sequenceNum][0].value;
-		   			this.griditemArray[sequenceNum].number = keys[sequenceNumb];
-		   			console.log(this.griditemArray[sequenceNum].name + "  " + this.griditemArray[sequenceNum].number);
-		   			}
+					this.push('griditemArray', {val: arrayToPrint[0][keys[counter]], key: keys[counter]});
+					this.push('oldGridArray', {val: arrayToPrint[0][keys[counter]], key: keys[counter]});
+					this.push('keyNames', keys[counter]);
 
-		   	
-    			
+		   	}
+		
+		console.log(this.oldGridArray);
+		console.log("KNOW THE OLD ARRAY VALUE KNOW IT")
+				
     		},
+
 
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
@@ -220,8 +226,7 @@ allowDrop: function (e) {
 	 e.preventDefault();
 	 //console.log("drag over");
     },
-handleDrop: function(e)
-  {
+handleDrop: function(e){
     //console.log(e.model.item);
     //console.log(e);
     var cell = e.target;
@@ -236,7 +241,7 @@ handleDrop: function(e)
     
     var temp = cell.input;
     var dataObj = JSON.parse(e.dataTransfer.getData("fcdata"));
-    cell.input = dataObj.name;
+    cell.input = dataObj.key;
     //console.log(this.currentDragger);
     this.currentDragger.input = temp;
     
@@ -246,11 +251,12 @@ handleDrop: function(e)
   __assign: function(){
     var i=0;
     for(i=0; i < this.griditemArray.length; i++){
-    var namenow = this.griditemArray[i].name;
-    console.log(i + " is the index number of " + namenow);
+    var valnow = this.griditemArray[i].val;
+    var keynow = this.griditemArray[i].key;
+    console.log(i + " is the index number of key " + keynow + " which has a value of " + valnow);
     var tadatwo = this.$.superTada;
     var tadathree = document.createElement("li");
-    Polymer.dom(tadathree).innerHTML = "Index position " + i + " now is set to " + namenow + ". ";
+    Polymer.dom(tadathree).innerHTML = "Index position " + i + " now is set to " + keynow + ". ";
     Polymer.dom(tadatwo).appendChild(tadathree);
     };
     this.$.tada.open();
@@ -260,7 +266,38 @@ handleDrop: function(e)
     var myList  = this.$.superTada;
     Polymer.dom(myList).innerHTML = '';
     console.log(myList);
-  }
+  }, 
+
+  __revertArray: function(){
+  	var myList  = this.$.superTada;
+    Polymer.dom(myList).innerHTML = '';
+    this.$.tada.close();
+    var giAl = this.griditemArray.length
+	var oGAL = this.oldGridArray.length;
+	   	if (oGAL< giAl){
+	   		giAl.slice(0,oGal);
+	   	}
+	   	var i = 0;
+	   	for(i=0; i < oGAL; i++){
+	   			this.giAl[i]=null;
+	   			//this.push("griditemArray", {val: this.oldGridArray[i].val, key: this.oldGridArray[i].key});
+	   			}
+	   	for(i=0; i < oGAL; i++){
+	   			this.push("griditemArray", {val: this.oldGridArray[i].val, key: this.oldGridArray[i].key});
+	  		}
+	  	/*for(j=0; j < this.griditemArray.length; j++){
+	    	var keynow = this.griditemArray[j].key;
+	    	var valnow = this.griditemArray[j]..val;
+	    	console.log(j + " hgh " + this.griditemArray[j].key + " which has a value of" + this.griditemArray[j].val);
+	    	var tadatwo = this.$.superTada;
+	    	var tadathree = document.createElement("li");
+	    	Polymer.dom(tadathree).innerHTML = "Index position key is " + this.griditemArray[j].key + " and now is set to " + this.griditemArray[j].val + ". ";
+	    	Polymer.dom(tadatwo).appendChild(tadathree);
+	    	}
+	    }, 3000);*/
+
+    	this.$.tada.open();
+}
 });
 </script>
 </dom-module>
