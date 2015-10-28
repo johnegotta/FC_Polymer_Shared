@@ -1,47 +1,4 @@
 <dom-module id="fc-grid">
-<!-- Level Concept: 
-Top: Index
-  1. drawer-panel (if we can get it to be the dashboard..awesome);
-	    if drawer panel submerged below index could hold data transfers, help in notification and coordinate memory
-	    the "data-assistant" is a design perk the kids like, which provides a calculator, note area, and place to hold data, make items
-	    it could becme the rich text editor, etc for the project
-  2. Dashboard
-  	2.A grid holds the data transfers, does the first level of measuring distances for resizing and laying out the page.
-	2.B three-pane-resizing spliter: will resize to items: fully adjustable. Must change names and organization.  Left and right in class have css meanings, that are hyper difficult to circumvent. they deal with flow alignment.  A simpler version will come from the project. I tend to love the original you made
-  3. Divided areas that hold elements
-  	1. bottom starboard wok in lists data and place wher ethe hand naturally goes. to me mopst natural eye and work local
-  	2. bottom port place where transient input goes should resize, be animated, center and swing to top for a cee all pages of animation option on big screens. 
-  	3. top viewarea: during review of designs with some of the kids and some of professionals this last week, there is a strong preference on large screens for the iconic triptic.  It is a natural eye catcher, I am totally in favory of "drawer options and bringing the possibility forward." (really i just want the drawer out of the index and into an element for scopre control). more importantly, I get the desire to remove it often, it provides however hyper scope advantage.  THe upper display area might offer that same advantage with some iframe same local options.  When I have placed the test materials in there, people do sort of ooh, and ahh.  its a thing to think about.  No baggage with a ditto as home address... we just need to hash bang further into our address for any polymer.
-  	4. Elements
-  		1. Portrait Card
-  			a. ranging in size from 340px w and 480px H th card can grow to 660 by 720 (large tablet portrait)
-  			b. card naturally works with the
-  			 	i. CELL CREATOR, a label + output + input that will be the key building block of our data layout.
-  				ii. the mini headers: not yet completed, bound around the edges of the fc-content-holders or the fc-cell-creators (see input card.)
-  				iii. the fc-content holder, which will define our row heights and widths
-  			c. Portrait Card is based on the polymer Paper card.  I have ussed the header image and title well in the fc-intake-form
-  			d. portrait card works best when it holds 8-12 pieces of information
-  		2. Landscape-Card/list-Tube/Course details Card/Sales Item Card
-  			a.   a potential work horse, dynamically adding logic would be a godsend
-  			b. 	possesses four icons with the option for 8
-			c.   has "time sensitive 'temperature gauge'"
-			d. 	Best used in an animated list, that compliments the tabbed view (will discuss)
-		3. Mini-Card/Monopoly Card/Fast Profile Card
-			a. Have always wanted this for the large view screen teacher page, but am side-lining on the large design project.  It basically is the mini card scott more or less finished, which I was working on. It's tabbed does stuff, but really is just an alert to send a teacher to the top screen.
-		4. Tabbed view... This will be a big project. Lets see what we can do with the data, drag and drop, etc. I believe that will build the 
-				database and the website. 
-		5. Data Assistant... Pivitol 	
-		6. Iron Storage for our API needs... PIVOTAL
-		7. CACHE and Session For API NEEDS
-Other needs we have filled ad dont use
-II. Scott Native binding, John Native Binding, Pivitol
-III. ALL JOHN QUESTIONS FROM POLYMER FOUR... its all the reading diced up for new tests YES I SAID THAT PIVITOL!!!
-IV. SCOTTS WORK ON TEST BUILDER PIVOTAL!!!!
-V. JOHNs WORK ON TEST BUILDER PIVOTAL!!!
-VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOGETHER, BUT WHICH I FEEL I HAD TO COBBLE TOGETHER FROM YOUR WORK IN THE DARK...And via my own hammering out of apparently almost 80,000 lines of code... probably 23000 were dupliates... so 55,000 lines of code...\
-
- I cant do it this way anymore.
--->
 	<template>
 		<style is="custom-style">
 			.grid-box{
@@ -70,8 +27,7 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 			   margin: 16px;
 			}
 		</style>
-			<!--a good idea here would be to include the splitter for resizing below this level and perhaps only the drawer panel above it-->
-			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
+		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{items}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
@@ -79,17 +35,11 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 				<paper-button on-tap="__assign">Assign New Positions
 				</paper-button>
 			</div>
-
-			<fc-call-card-input-model-one>
 			 	
-					<fc-content-holder input-names="cells" class="horizontal layout container wrap">
-						<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
-							<fc-cell-creator name="cells" draggable="true" input='{{item.name}}' fclabel='{{item.number}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
-							</fc-cell-creator>
+						<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{doFilter(searchString)}}">
+						<paper-material elevation="3"><span>[[index]]</span><span>[[item.key]]</span>
+							</paper-material>
 				  		</template>
-					</fc-content-holder>
-
-			</fc-call-card-input-model-one>
 		</div>
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
@@ -113,8 +63,8 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 Polymer({
   is:"fc-grid",
   properties: {
-    defaultPath: "",
-    pathOne: String, 
+    defaultPath: "https://focusedstaging1.firebaseio.com/test_results",
+    pathOne: "https://focusedstaging1.firebaseio.com/test_results", 
     pathTwo: String, 
     gridWidthPx: Number, 
     gridHeightPx: Number,
@@ -134,7 +84,7 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
-    gridHolderArray: {
+    superGridItemHolderArray: {
 	 value: Array,
 	 notify: true,
 	 reflectToAttributes: true
@@ -144,7 +94,7 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
-    newOrderArray: {
+    superOrderArray: {
 	 type: Array,
 	 value: [],
 	 notify: true,
@@ -181,23 +131,24 @@ Polymer({
   },
   
 ready: function(){
+	var theSet = this.$.FBscoreTwo.data;
+	console.log(theSet);
 	var mql = window.matchMedia("screen and (min-width: 601px) and (max-width: 800px");
 	var mqlone = window.matchMedia("screen and (min-width: 801px) and (max-width: 1200px");
 	var mgltwo = window.matchMedia("screen and (min-width: 1201px) and (max-width: 1600px");
 	var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
 	var mglfour = window.matchMedia("screen and (min-width: 1901px)");
 	  	if (mglfour.matches){ // if media query matches
-	 	this.gridWidthPx= 340 + 'px';
-	 	this.gridHeightPx= 480 +'px';
-	 	var numbcols = Math.round(320/160);
-	 	var numbrows = Math.round(480/108);
+	 	this.gridWidthPx= 1940 + 'px';
+	 	this.gridHeightPx= 1480 +'px';
+	 	var numbcols = Math.round(1920/430);
+	 	var numbrows = Math.round(1480/710);
 	 	var limit = Math.round(numbcols*numbrows);
-	   this.griditemArray[counter] = {'name': counter};
+	 	console.log(limit);
 	     var counter = 0;
 	     for(counter=0; counter<limit ;counter++){
-					this.push('griditemArray', {name: "the value of name " + counter});
-		   			this.griditemArray[counter].name = "the value of name " + counter;
-		   			this.griditemArray[counter].number = "no " + counter;
+					this.push('superGridItemHolderArray', {key: counter});
+		   		
 		   			}
 		   		}
     			
@@ -206,21 +157,25 @@ ready: function(){
 	 this.gridWidthPx = 770 + 'px';
 	 this.gridHeightPx = 1200 + 'px';
 	 var numbcols = Math.round(320/160);
-	 var numbrows = Math.round(480/72);
+	 var numbrows = Math.round(480/96);
 	 var total = Math.round(numbcols*numbrows);
 	 var counter = 0; 
 	 for(counter=0; counter < total; counter++){
 	   //this.griditemArray[counter] = {'name': counter};
-	   this.griditemArray[counter].name = "the value of name " + counter;
-	   this.push('griditemArray', {name: "the value of name " + counter});
+	   
+	   this.push('superGridItemArray', {key: counter});
 	   //console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
 	   //console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
-	   this.griditemnumber=this.griditemArray[counter].name;
-	   console.log("this is the grid number at ready in the grid " + this.griditemnumber);
+	   console.log("this is the grid number at ready in the grid " + this.superGridItemNumber);
 	 }
     }
-
 },
+
+attached: function(){
+	var theSet = this.$.FBscoreTWO.data;
+	console.log(theSet);
+},
+
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
 	 //console.log("drag begun for ");
