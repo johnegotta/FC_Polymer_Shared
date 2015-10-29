@@ -1,0 +1,276 @@
+<dom-module id="fc-input-generator">
+<template>
+<style is="custom-style">
+
+
+paper-input.input { 
+      		width: 143px; 
+      		height: 60px; 
+      		padding: 0px 5px;
+      		center center-justified;
+      	}
+
+
+
+
+</style>
+<firebase-collection id="testScores" order-by-child="student" equal-to="{{equals}}" data="{{items}}" location='{{pathlocal}}'></firebase-collection>
+	<fc-list-two-g id="list" transferToLandscapeInquiry="{{inquiry}}">
+		<fc-portrait-card-L id="listcard" data="{{item}}" class="right" inquiry="{{transferinquiry}}">>
+			<section class='vertical layout container center-justified commands' style="width: 30px; height: 100px;">	
+	
+
+
+			</section>
+			<div class='vertical layout container center-justified commands' style="width: 30px; height: 100px;">	
+			    <iron-icon icon="icons:swap-horiz" id="button" class="horizontal layout right-justified" on-click="_scott"></iron-icon>
+			    <paper-checkbox style="margin-left: 2px;" unchecked></paper-checkbox>
+			    <iron-icon icon="social:person" title="View">
+			    </iron-icon>
+			    <iron-icon style="color: black; font-weight: 900" icon="communication:mail">
+			    </iron-icon>
+			</div>
+		</fc-portrait-card-L>
+	</fc-list-two-g>
+
+
+
+
+<paper-button style="width:40px; height: 40px; background: goldenrod;" on-tap="onTap"> GO!</paper-button>
+<div id="keyId" hidden=false>
+
+</div>
+
+<div class='horizontal layout container center center-justified'>
+<paper-card class="center center-justified" heading="Additional Information" id="pickle">
+
+
+
+
+
+
+
+
+</paper-card>
+
+
+<paper-card class="center center-justified" heading="Contact Information" id="cucumber">
+
+
+
+
+
+
+
+
+</paper-card>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+</template>
+<script>
+Polymer({
+	is: 'fc-input-generator',
+	properties: {
+		pathlocal:"https://focusedstaging1.firebaseio.com/test_results",
+		label: String,
+		placeholder: String,
+		id: String,
+		fbid: 'Students',
+		fbdata: Array,
+		itemPassed: Object,
+		itemPathsToObserve: Array,
+		selected:String,  
+		writeId: "keyId",
+		fcid: 'fcid',
+		equals: '-K10eny91P2Qi_U0yvpc',
+		fcCardContentSelected:String,
+		notify: true,
+		reflectToAttributes: true
+	},
+
+
+
+
+	create: function(){
+
+
+	},
+
+	ready: function(){
+
+
+
+
+	},
+
+	attach: function(){
+
+
+
+	},
+
+	detached: function(){
+
+
+
+	},
+
+
+
+	onTap: function(){
+		var contactData = this.$.Students.data;
+		console.log(this.$.Students.data);
+		var record = contactData[0];
+		var keys = Object.keys(record);
+		var numbEntries = keys.length;
+		var j = 0;
+		for (i=0; i<numbEntries; i++){
+				var n = keys[i].length;
+				var entry = keys[i][0].toUpperCase() + keys[i].slice(1);
+				console.log(entry);
+				var textOne = entry.split(/(?=[A-Z])|(?:(first|last|name|email|phone|student|parent|inquirers))|^Additional/g).join('-').replace(/-/g,' ');
+				var textTwo = textOne.replace(/\w\S*/g, function(textOne){return textOne.charAt(0).toUpperCase() + textOne.substr(1).toLowerCase();})
+				console.log(textTwo + ' ' + textTwo.length);
+			
+			var inp = new Array(numbEntries);
+			inp[i] = document.createElement('paper-input');
+			inp[i].setAttribute("label", textTwo); 
+			inp[i].setAttribute("always-float-label", true);
+			inp[i].setAttribute("class", "input");
+			console.log(inp[i]);
+
+			console.log(textTwo);
+			//inp[i].setAttribute("placeholder", textTwo); 
+			var routeText = textTwo.split(" ");
+			console.log(routeText);
+			if (routeText[0] =='__firebase'|| routeText[0] =='Additionalinquirer'){
+				this.$.keyId.innerHTML=routeText;
+			}
+			else if (routeText[0]==='Additional' || routeText[0]=='Associated' || routeText[0] =='Siblings'){
+			Polymer.dom(this.$.pickle).appendChild(inp[i]);
+			}
+			else if (textTwo.length > 20){
+				var shorten = routeText.slice(0,2);
+				inp[i].setAttribute("label", shorten); 
+				Polymer.dom(this.$.pickle).appendChild(inp[i]);
+			}
+			else {
+				Polymer.dom(this.$.cucumber).appendChild(inp[i]);
+			}
+/*
+			var p = i % 2;
+			console.log(routeText);
+			if(p!=0){
+				var beforeNode = Polymer.dom(this.root).childNodes[0];
+					Polymer.dom(this.root).insertBefore(toLocal, beforeNode);
+					this.$.keyId.innerHTML="YEAH!";
+					var q = i-1;
+				var holder = new FcHolder;
+				holder.appendChild(inp[i]);
+				if (j<=5){
+				document.getElementById("pickle").appendChild(holder);
+				j++;
+				}
+				if (j>5){
+					var cardiolo = document.createElement('fc-call-card-input-model-one');
+					cardiolo.setAttribute('id',"pickle"+i);
+					this.$.keyId.appendChild(cardiolo).appendChild(holder);
+					j=0;
+
+					}
+				} */
+			}
+		}
+/*<x-foo>
+  <div></div>
+</x-foo>
+
+<!-- x-foo's template -->
+<template>
+  <content></content>
+</template>
+
+// script
+var div = Polymer.dom(xFoo).querySelector('div');
+var content = Polymer.dom(xFoo.root).querySelector('content');
+var distributed = Polymer.dom(content).getDistributedNodes()[0];
+var insertedTo = Polymer.dom(div).getDestinationInsertionPoints()[0];
+
+// the following should be true:
+assert.equal(distributed, div);
+assert.equal(insertedTo, content)
+
+
+
+
+				}*/	
+
+
+
+			
+
+		
+
+
+
+});
+</script>
+</dom-module>
+
+
+
+<!--2015-09-30 03:06:17.906 fc-input-generator.html:102 additionalemail
+2015-09-30 03:06:17.906 fc-input-generator.html:103 
+2015-09-30 03:06:17.906 fc-input-generator.html:102 additionalinquirerContactInfo
+2015-09-30 03:06:17.906 fc-input-generator.html:103 
+2015-09-30 03:06:17.906 fc-input-generator.html:102 additionalinquirers
+2015-09-30 03:06:17.906 fc-input-generator.html:103 
+2015-09-30 03:06:17.906 fc-input-generator.html:102 additionalphone
+2015-09-30 03:06:17.907 fc-input-generator.html:103 888.222.1121
+2015-09-30 03:06:17.907 fc-input-generator.html:102 addressLine1
+2015-09-30 03:06:17.907 fc-input-generator.html:103 
+2015-09-30 03:06:17.907 fc-input-generator.html:102 addressLine2
+2015-09-30 03:06:17.907 fc-input-generator.html:103 
+2015-09-30 03:06:17.907 fc-input-generator.html:102 associatedStudents
+2015-09-30 03:06:17.907 fc-input-generator.html:103 ["Zirkel M. Zirkel", "James Brown"]
+2015-09-30 03:06:17.908 fc-input-generator.html:102 email
+2015-09-30 03:06:17.908 fc-input-generator.html:103 bigmc10@gmail.com
+2015-09-30 03:06:17.908 fc-input-generator.html:102 fcid
+2015-09-30 03:06:17.908 fc-input-generator.html:103 StreelandAnna00001
+2015-09-30 03:06:17.908 fc-input-generator.html:102 firstname
+2015-09-30 03:06:17.908 fc-input-generator.html:103 Anna
+2015-09-30 03:06:17.908 fc-input-generator.html:102 lastname
+2015-09-30 03:06:17.908 fc-input-generator.html:103 Streeland
+2015-09-30 03:06:17.908 fc-input-generator.html:102 parent1firstname
+2015-09-30 03:06:17.908 fc-input-generator.html:103 Dad
+2015-09-30 03:06:17.908 fc-input-generator.html:102 parent1lastname
+2015-09-30 03:06:17.909 fc-input-generator.html:103 Streeland
+2015-09-30 03:06:17.909 fc-input-generator.html:102 parent2firstname
+2015-09-30 03:06:17.909 fc-input-generator.html:103 Mom
+2015-09-30 03:06:17.909 fc-input-generator.html:102 parent2lastname
+2015-09-30 03:06:17.909 fc-input-generator.html:103 Streeland
+2015-09-30 03:06:17.909 fc-input-generator.html:102 phone
+2015-09-30 03:06:17.909 fc-input-generator.html:103 650.856.2762
+2015-09-30 03:06:17.909 fc-input-generator.html:102 photo
+2015-09-30 03:06:17.909 fc-input-generator.html:103 https://upload.wikimedia.org/wikipedia/en/thumb/b/bb/Tracks-boxartpic.jpg/240px-Tracks-boxartpic.jpg
+2015-09-30 03:06:17.909 fc-input-generator.html:102 referredStudentToFocused
+2015-09-30 03:06:17.909 fc-input-generator.html:103 2
+2015-09-30 03:06:17.910 fc-input-generator.html:102 siblings
+2015-09-30 03:06:17.910 fc-input-generator.html:103 ["brother: Henry Streeland, jr."]
+2015-09-30 03:06:17.910 fc-input-generator.html:102 studentemail
+2015-09-30 03:06:17.910 fc-input-generator.html:103 jzirkel@gmail.com
+2015-09-30 03:06:17.910 fc-input-generator.html:102 studentphone
+2015-09-30 03:06:17.910 fc-input-generator.html:103 7328876738
+2015-09-30 03:06:17.910 fc-input-generator.html:102 __firebaseKey__
+2015-09-30 03:06:17.910 fc-input-generator.html:103 StreelandAnna00001-->

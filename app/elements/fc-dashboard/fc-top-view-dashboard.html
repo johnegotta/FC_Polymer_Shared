@@ -1,32 +1,59 @@
 <dom-module id="fc-top-view-dashboard">
+	<!-- CodeMirror -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.css" />
+
+<!-- Firepad -->
+<link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.css" />
+<script src="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.min.js"></script>
+
 <template>
 <style is="custom-style">
 </style>
+	<div id="firepad" style="height:400px"></div>
+
 	<paper-material elevation="1">
-		<fc-splitter orientation="vertical"  class="horizontal flex layout">
-				<div class="left horizontal layout" style="height: 45vh; width: 98.75vw;"> <h3>Call Center</h3>
-					<fc-course-details-card></fc-course-details-card><!--<iframe class="left horizontal flex layout" style="width: calc(95%-64px); height: calc(50vh-64px);" src={{iPath}} height="90%">
+		<fc-splitter orientation="vertical"  class="horizontal flex layout container center-justified">
+				<div class="left vertical layout enter center-justified" style="height: 45vh; width: 100%;">
+					<div class="horizontal layout center center-justified flex left" style="border: 12px ridge silver; padding: 15px; margin: 8px; width: calc(99.6vw-64px); height: 90vh; overflow: scroll;">
+
+					<!--<iframe class="left horizontal flex layout" style="width: calc(95%-64px); height: 90%;" src="http://www.focusedstaging.com/Fresh_Attempt%20/index-jason.html">
 					</iframe>-->
+
+					<fc-call-list-tube>>
+						</fc-call-list-tube>
+					<fc-call-list-tube>>
+						</fc-call-list-tube>
+						
+
+					</div>
 				</div>
 			<fc-splitter orientation="horizontal" class="right">
-				<div class="left" style="height: 735px; width: 100vw;">
-					<content class="left" select="fc-student-intake-form">
-						<fc-student-intake-form class="left">
-						</fc-student-intake-form>
+				<div class="left horizontal layout container" style="height: 735px; width: 100%;">
+					<content class="left horizontal layout container" select="fc-student-intake-form, fc-grid">
+					
+					
+							<fc-grid class="layout container wrapper left right" style="display: flex; position: relative; left: 10px;"></fc-grid>
+								<fc-student-intake-form class="left">
+							</fc-student-intake-form>
+						
 					</content>	
 				</div>
-				<div class="right" style="height: 735px; width: 100vw;">						
+				<div class="right" style="height: 735px; width: 100%;">						
 					<content class="right" select="fc-list-two">
 						<fc-list-two class="right" inquiry='{{call}}'>
 						</fc-list-two>
 					</content>	
-				</div>-->
+				</div>
 			</fc-splitter>
 		</fc-splitter>	
 	</paper-material>
 </template>
 <script>
-/*FcTopViewDashboard=*/Polymer({
+
+
+/*FcTopViewDashboard=*/
+Polymer({
 	is: "fc-top-view-dashboard", 
 	properties: {
 		iPath: 'http://www.focusedstaging.com/Fresh_Attempt%20/index-jason.html',
@@ -66,7 +93,10 @@
 	},
 	ready: function(){
 
-
+var firepadRef = new Firebase('https://focusedstudents.firebaseio.com/firepad');
+  var codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
+      { richTextShortcuts: true, richTextToolbar: true, defaultText: 'Hello, World!' });
 	},
 
 	attached: function(){
