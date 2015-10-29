@@ -2,7 +2,7 @@
 	<template>
 		<style is="custom-style">
 			.grid-box{
-			   width: 340px;
+			   width: 400px;
 			   height: 480px;
 			   padding: 3px;
 			   margin: 3px;
@@ -27,19 +27,42 @@
 			   margin: 16px;
 			}
 		</style>
-		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{items}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		<firebase-collection id="studentsFB" order-by-child="last_name" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
+		</firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
 				</paper-input>
-				<paper-button on-tap="__assign">Assign New Positions
-				</paper-button>
+				
+				<template is="dom-repeat" items="{{stus}}" as="stu" order-by-key="true">
+				
+						<fc-cell-creator input="{{stu.last_name}}" name="cells" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+						</fc-cell-creator>
+						<fc-cell-creator id="studentkeys" input="{{stu.__firebaseKey__}}" name="cells" onfocus="_filter" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+						</fc-cell-creator>
+				</template>
+						
+<paper-materials elevation="5" class="vertical layout center center-justified" style="max-width: 88px; height: 100%; position: absolute; top: 54px; right: 54px; border: 6px ridge silver;">
+							<template is="dom-repeat" items="{{testsByStudentViewArray}}">								
+								<fc-cell-creator input="{{item.Full_Name}}" name="cells" fclabel="{{item.FCID}}"  draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop"></fc-cell-creator>
+							</template>
+							<fc-cell-creator input
+
+
+</paper-materials>
+			
+
+
+				<paper-button on-tap="__assign">Assign New Positions</paper-button>
 			</div>
-			 	
+			 	<div class="layout horizontal row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
 						<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{doFilter(searchString)}}">
-						<paper-material elevation="3"><span>[[index]]</span><span>[[item.key]]</span>
-							</paper-material>
-				  		</template>
+						<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
+						</fc-cell-creator>
+					</template>
+				</div>
+				  		
 		</div>
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
@@ -71,6 +94,11 @@ Polymer({
     scrollX: Boolean,
     scrollY: Boolean,
     isDnD: Boolean,
+    studentone: {
+    	type: String,
+    	notify: true,
+    	reflectToAttributes: true
+	},
     fillViewPort: Boolean,
     gridImageOne: String,
     gridImageTwo: String,
@@ -79,6 +107,7 @@ Polymer({
 	   notify: true,
 	   reflectToAttributes: true
 	 },
+	studentone:String,
     griditemArray: {
 	 value: Array,
 	 notify: true,
@@ -94,16 +123,30 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
+    testsByStudentViewArray: {
+    	type: Array,
+	 	value: [],
+	 	notify: true,
+	 	reflectToAttributes: true
+    },
     superOrderArray: {
 	 type: Array,
 	 value: [],
 	 notify: true,
 	 reflectToAttributes: true
 	 },
+	numbOfStudentsArray: {
+	 	type: Array,
+	 	value: [],
+	 	notify: true,
+	 	reflectToAttributes: true
+	 },
     gridImageOne: '',
     gridImageTwo: '',
     searchString: {
 	 type: String,
+	 notify: true,
+	 reflectToAttributes: true
     },
       fcid: {
 		 type: Array,
@@ -118,83 +161,93 @@ Polymer({
    },
 
   updateFilter: function(argObj){
-    console.log(argObj);
+    //console.log(argObj);
     this.searchString = argObj.name;
   },
 
   doFilter: function(e){
-    return function(argItem){
-	 var itemname = argItem.name;
-	 var search = e.toLowerCase();
-	 return (itemname.indexOf(search) > -1) 
-    };
+
+  	console.log(e);
+   return function(argItem){
+	 	var itemname = argItem.val;
+	 	var search = e;
+	 	if (itemname !==undefined && search !=='') 
+	 	{	var tagVal = argItem.val;
+	 		return (search.indexOf(tagVal) > -1);
+	 	}
+	 	else {return true;}
+    	};
   },
   
-ready: function(){
-	var theSet = this.$.FBscoreTwo.data;
-	console.log(theSet);
-	var mql = window.matchMedia("screen and (min-width: 601px) and (max-width: 800px");
-	var mqlone = window.matchMedia("screen and (min-width: 801px) and (max-width: 1200px");
-	var mgltwo = window.matchMedia("screen and (min-width: 1201px) and (max-width: 1600px");
-	var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
-	var mglfour = window.matchMedia("screen and (min-width: 1901px)");
-	  	if (mglfour.matches){ // if media query matches
-	 	this.gridWidthPx= 1940 + 'px';
-	 	this.gridHeightPx= 1480 +'px';
-	 	var numbcols = Math.round(1920/430);
-	 	var numbrows = Math.round(1480/710);
-	 	var limit = Math.round(numbcols*numbrows);
-	 	console.log(limit);
-	     var counter = 0;
-	     for(counter=0; counter<limit ;counter++){
-					this.push('superGridItemHolderArray', {key: counter});
+created: function(){
+	 
+	  var setFB2 = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
+	    var self2 = this;
+	    setFB2.on("value", function(snap){
+	    var theSet2 = snap.val();
+		//console.log(theSet2);
+	    var counterPrime2 = 0;
+		var keyfake2 = Object.keys(theSet2);
+		var theSetLimit2 = keyfake2.length;
+		console.log(keyfake2[1].first_name);
+		for (counterPrime2=0; counterPrime2<keyfake2; counterPrime2++){
+			self2.push("testsByStudentViewArray",{FCID: keyfake2[counterPrime2], Full_Name: keyfake2[counterPrime2].first_name + " " + keyfake2[counterPrime2].last_name});
+			console.log(keyfake2[counterPrime2].first_name);
+
+		}
+
+	});
+
+
+	    var setFB = new Firebase("https://focusedstaging1.firebaseio.com/test_results"); 
+	    var self = this;
+	    setFB.on("value", function(snap){
+	    var theSet = snap.val();
+		//console.log(theSet);
+	    var counterPrime = 0;
+		var keyfake = Object.keys(theSet);
+		var theSetLimit = keyfake.length;
+		var record = theSet[keyfake[0]];
+		//console.log(record);
+		var keys = Object.keys(record);
+		var numbEntries = keys.length; 
+		for(counterPrime=0; counterPrime<theSetLimit; counterPrime++){
+		var counter = 0;	
+	     for(counter=0; counter < numbEntries; counter++){
+					self.push('superGridItemHolderArray', {val: theSet[keyfake[counterPrime]][keys[counter]], key: keys[counter]});
 		   		
-		   			}
-		   		}
-    			
-    	
-  else {
-	 this.gridWidthPx = 770 + 'px';
-	 this.gridHeightPx = 1200 + 'px';
-	 var numbcols = Math.round(320/160);
-	 var numbrows = Math.round(480/96);
-	 var total = Math.round(numbcols*numbrows);
-	 var counter = 0; 
-	 for(counter=0; counter < total; counter++){
-	   //this.griditemArray[counter] = {'name': counter};
-	   
-	   this.push('superGridItemArray', {key: counter});
-	   //console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
-	   //console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
-	   console.log("this is the grid number at ready in the grid " + this.superGridItemNumber);
-	 }
-    }
+		   	}
+		}
+	});
 },
 
-attached: function(){
-	var theSet = this.$.FBscoreTWO.data;
-	console.log(theSet);
+ready: function(){
+	console.log(this.testsByStudentViewArray.FCID + " " + this.testsByStudentViewArray.Full_Name);
+
+
+
 },
+		
 
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
-	 //console.log("drag begun for ");
-	 //console.log(e.model.item);
+	 console.log("drag begun for ");
+	 console.log(e.model.item);
 	 var cell = e.target;
 	 console.log(e.target);
 	 while(cell.nodeName != "FC-CELL-CREATOR")
 	 {
-	   //console.log(cell);
+	   console.log(cell);
 	   cell = cell.parentNode;
 	 }
-	 this.currentDragger = cell;
+	 document.querySelector("#dataAdmin").currentDragger = cell;
     }, 
 allowDrop: function (e) {
 	 e.preventDefault();
-	 //console.log("drag over");
+	 console.log("drag over");
     },
-handleDrop: function(e)
-  {
+
+handleDrop: function(e){
     //console.log(e.model.item);
     //console.log(e);
     var cell = e.target;
@@ -207,12 +260,15 @@ handleDrop: function(e)
     console.log(cell);
     //console.log("just droppped " + e.target + " on " + e.model.item.name);
     
-    var temp = cell.input;
+    var tempKey = cell.fclabel;
+    var tempVal = cell.input;
     var dataObj = JSON.parse(e.dataTransfer.getData("fcdata"));
-    cell.input = dataObj.name;
+    cell.fclabel = dataObj.key;
+    cell.input = dataObj.val;
     //console.log(this.currentDragger);
-    this.currentDragger.input = temp;
-    
+    var dashB = document.querySelector("#dataAdmin"); 
+    dashB.currentDragger.fclabel = tempKey;
+    dashB.currentDragger.input = tempVal;
 
   }, 
 
@@ -234,6 +290,7 @@ handleDrop: function(e)
     Polymer.dom(myList).innerHTML = '';
     console.log(myList);
   }
+
 });
 </script>
 </dom-module>

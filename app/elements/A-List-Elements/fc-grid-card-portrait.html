@@ -30,7 +30,7 @@
 			<!--taken care of by dashboard three-->
 			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
 			<firebase-collection id="scores" order-by-child="student" data='{{items}}' equal-to="jkdshi283794" location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
-		<div class="vertical layout wrap grid-holder center center-justified">
+		<div class="vertical layout flex wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
 				</paper-input>
@@ -40,7 +40,7 @@
 				</paper-button>
 			</div>
 			<fc-call-card-input-model-one>
-					<fc-content-holder input-names="cells" class="horizontal layout container wrap">
+					<fc-content-holder input-names="cells" class="horizontal layout container flex wrap">
 <!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->			
 						<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
 							<fc-cell-creator name="cells" draggable="true" input='{{item.val}}' fclabel='{{item.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
@@ -152,7 +152,7 @@ ready: function(){
 	this.searchString = "";
 	this.griditemArray = [];	
 },
-  
+
 go: function(){
 		var arrayToPrint = this.$.scores.data;
 		console.log(this.$.scores.data);
@@ -160,6 +160,7 @@ go: function(){
 		var record = arrayToPrint[0];
 		var keys = Object.keys(record);
 		var numbEntries = keys.length; 
+		
 		var counter = 0;	
 	     for(counter=0; counter < numbEntries; counter++){
 					this.push('griditemArray', {val: arrayToPrint[0][keys[counter]], key: keys[counter]});
@@ -169,7 +170,6 @@ go: function(){
 		   	}
 		this.pop('griditemArray');
 		//this.pop('oldGridArray');
-		
 		console.log(this.oldGridArray);
 				
     		},
