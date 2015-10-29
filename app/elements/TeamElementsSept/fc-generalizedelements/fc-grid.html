@@ -1,7 +1,6 @@
 <dom-module id="fc-grid">
 
 
-
 <!-- Level Concept: 
 Top: Index
   1. drawer-panel (if we can get it to be the dashboard..awesome);
@@ -42,7 +41,6 @@ III. ALL JOHN QUESTIONS FROM POLYMER FOUR... its all the reading diced up for ne
 IV. SCOTTS WORK ON TEST BUILDER PIVOTAL!!!!
 V. JOHNs WORK ON TEST BUILDER PIVOTAL!!!
 VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOGETHER, BUT WHICH I FEEL I HAD TO COBBLE TOGETHER FROM YOUR WORK IN THE DARK...And via my own hammering out of apparently almost 80,000 lines of code... probably 23000 were dupliates... so 55,000 lines of code...\
->>>>>>> f5eb0ccfd5c507e0ab3f93fcb25e943c293c7031
 
  I cant do it this way anymore.
 -->
@@ -74,8 +72,7 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 			   margin: 16px;
 			}
 		</style>
-			<!--a good idea here would be to include the splitter for resizing below this level and perhaps only the drawer panel above it-->
-			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
+		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{items}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
@@ -116,8 +113,8 @@ VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOG
 Polymer({
   is:"fc-grid",
   properties: {
-    defaultPath: "",
-    pathOne: String, 
+    defaultPath: "https://focusedstaging1.firebaseio.com/test_results",
+    pathOne: "https://focusedstaging1.firebaseio.com/test_results", 
     pathTwo: String, 
     gridWidthPx: Number, 
     gridHeightPx: Number,
@@ -137,7 +134,7 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
-    gridHolderArray: {
+    superGridItemHolderArray: {
 	 value: Array,
 	 notify: true,
 	 reflectToAttributes: true
@@ -251,23 +248,24 @@ Polymer({
   },
   
 ready: function(){
+	var theSet = this.$.FBscoreTwo.data;
+	console.log(theSet);
 	var mql = window.matchMedia("screen and (min-width: 601px) and (max-width: 800px");
 	var mqlone = window.matchMedia("screen and (min-width: 801px) and (max-width: 1200px");
 	var mgltwo = window.matchMedia("screen and (min-width: 1201px) and (max-width: 1600px");
 	var mglthree = window.matchMedia("screen and (min-width: 1601px) and (max-width: 1900px");
 	var mglfour = window.matchMedia("screen and (min-width: 1901px)");
 	  	if (mglfour.matches){ // if media query matches
-	 	this.gridWidthPx= 340 + 'px';
-	 	this.gridHeightPx= 480 +'px';
-	 	var numbcols = Math.round(320/160);
-	 	var numbrows = Math.round(480/108);
+	 	this.gridWidthPx= 1940 + 'px';
+	 	this.gridHeightPx= 1480 +'px';
+	 	var numbcols = Math.round(1920/430);
+	 	var numbrows = Math.round(1480/710);
 	 	var limit = Math.round(numbcols*numbrows);
-	   this.griditemArray[counter] = {'name': counter};
+	 	console.log(limit);
 	     var counter = 0;
 	     for(counter=0; counter<limit ;counter++){
-					this.push('griditemArray', {name: "the value of name " + counter});
-		   			this.griditemArray[counter].name = "the value of name " + counter;
-		   			this.griditemArray[counter].number = "no " + counter;
+					this.push('superGridItemHolderArray', {key: counter});
+		   		
 		   			}
 		   		}
     			
@@ -276,20 +274,25 @@ ready: function(){
 	 this.gridWidthPx = 770 + 'px';
 	 this.gridHeightPx = 1200 + 'px';
 	 var numbcols = Math.round(320/160);
-	 var numbrows = Math.round(480/72);
+	 var numbrows = Math.round(480/96);
 	 var total = Math.round(numbcols*numbrows);
 	 var counter = 0; 
 	 for(counter=0; counter < total; counter++){
 	   //this.griditemArray[counter] = {'name': counter};
-	   this.griditemArray[counter].name = "the value of name " + counter;
-	   this.push('griditemArray', {name: "the value of name " + counter});
+	   
+	   this.push('superGridItemArray', {key: counter});
 	   //console.log("this is the grid item counter in the grid element at ready " + JSON.stringify(this.griditemArray[counter]));
 	   //console.log("this is the grid item name in the grid element at ready " + this.griditemArray[counter].name);
-	   this.griditemnumber=this.griditemArray[counter].name;
-	   console.log("this is the grid number at ready in the grid " + this.griditemnumber);
+	   console.log("this is the grid number at ready in the grid " + this.superGridItemNumber);
 	 }
     }
 },
+/*
+attached: function(){
+	var theSet = this.$.FBscoreTWO.data;
+	console.log(theSet);
+},
+*/
 
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
