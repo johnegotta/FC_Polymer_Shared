@@ -50,19 +50,17 @@
 				</div>
 				</template>-->
 				</div>	
-<paper-materials elevation="5" class="horizontal layout center center-justified" style="max-width: 100%; height: 100%; border: 6px ridge silver;">
-							<template is="dom-repeat" items="{{testsByStudentViewArray}}">								
-								<fc-cell-creator input="{{item.Full_Name}}" name="cells" fclabel="{{item.FCID}}"  draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop"></fc-cell-creator>
-							</template>
+<div class="horizontal layout center center-justified" style="max-width: 100%; height: 100%; border: 6px ridge silver;">
+							
 						
 <paper-button on-tap="__assign">Assign New Positions</paper-button>
-</paper-materials>
+</div>
 			
 
 
 			 	<div class="layout horizontal row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
-						<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{doFilter(searchString)}}">
-						<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
+						<template is="dom-repeat" items="{{testsByStudentViewArray}}" filter="{{doFilter(searchString)}}">
+						<fc-cell-creator input='{{item.Full_Name}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" placeholder='{{item.student}}' on-drop="handleDrop" fclabel="{{item.FCID}}">
 						</fc-cell-creator>
 					</template>
 				</div>
@@ -169,32 +167,56 @@ Polymer({
     this.searchString = argObj.name;
   },
 
-  filter: function(eventKey){
+   doFilter: function(e){
 
-  	console.log(eventKey + " this is the event Key");
+  	console.log(e);
    return function(argItem){
-	 	return true;
+	 	var itemname = argItem.student;
+	 	
+	 	var search = e;
+	 	if (itemname !==undefined && search !=='') 
+	 	{	console.log(itemname);
+	 		console.log(search);
+	 		return (itemname.includes(search) > -1);
+	 	}
     	};
   },
 
-  doFilter: function(){},
-  
-created: function(){
+  __filter: function(e2){
+  return function(argItem){
+	 	var itemname = argItem.student;
+	 	/*var search = e2;
+	 	if (itemname !==undefined && search !=='') 
+	 	{	var tagVal = argItem.val;
+	 		return (tagVal.includes(search) > -1);
+	 	}
+	 	else*/ return true;
+	 	 
+    	};
+  },
+
+attached: function(){
 	 
 	  var setFB2 = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
 	    var self2 = this;
 	    setFB2.on("value", function(snap){
 	    var theSet2 = snap.val();
-		//console.log(theSet2);
-	    var counterPrime2 = 0;
+		console.log(theSet2);
+	    var counter2 = 0;
 		var keyfake2 = Object.keys(theSet2);
 		var theSetLimit2 = keyfake2.length;
-		console.log(keyfake2[1].first_name);
-		for (counterPrime2=0; counterPrime2<keyfake2; counterPrime2++){
+		var record2 = theSet2[keyfake2[0]];
+		//console.log(record);
+		var keys2 = Object.keys2(record2);
+		var numbEntries2 = keys2.length; 
+		for(counterPrime2=0; counterPrime2<theSetLimit2; counterPrime2++){
+			var counter = 0;	
+	     for(counter = 0; counter < numbEntries; counter++){
+
 			self2.push("testsByStudentViewArray",{FCID: keyfake2[counterPrime2], Full_Name: theSet2[keyfake2[counterPrime2]].first_name + " " + theSet2[keyfake2[counterPrime2]].last_name});
-
+			console.log(theSet2[keyfake2[counterPrime2]].first_name + " " + theSet2[keyfake2[counterPrime2]]);
 		}
-
+	}
 	});
 
 
@@ -218,13 +240,6 @@ created: function(){
 		   	}
 		}
 	});
-},
-
-ready: function(){
-	console.log(this.testsByStudentViewArray.FCID + " " + this.testsByStudentViewArray.Full_Name);
-
-
-
 },
 		
 
