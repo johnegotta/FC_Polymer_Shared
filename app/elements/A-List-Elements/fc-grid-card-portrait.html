@@ -29,33 +29,38 @@
 		</style>
 			<!--taken care of by dashboard three-->
 			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
-			<firebase-collection id="scores" order-by-child="student" data='{{items}}' equal-to="jkdshi283794" location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
-		<div class="vertical layout flex wrap grid-holder center center-justified">
-		    <div class="horizontal layout"> 
-				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
-				</paper-input>
-				<paper-button on-tap="__assign">Assign New Positions
-				</paper-button>
-				<paper-button on-tap="go">GO!!!!
-				</paper-button>
-			</div>
-			<fc-call-card-input-model-one>
-					<fc-content-holder input-names="cells" class="horizontal layout container flex wrap">
-<!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->			
-						<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
-							<fc-cell-creator name="cells" draggable="true" input='{{item.val}}' fclabel='{{item.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
-							</fc-cell-creator>
-				  		</template>
-<!--The factoryImpl ends here; perhaps factImpl the holder first, and fact impl the mini headers.  You have the arsenol of a few of those items in the grid/dashboard/modal/splitter framework and we need not much else. It remains dynamic but has binding.  It seems good. We will see.-->
-					</fc-content-holder>
 
-			</fc-call-card-input-model-one>
+	<firebase-collection id="scores" order-by-key="true" data='{{testResults}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		
+
+
+
+<div class="vertical layout wrap grid-holder center center-justified">
+    <div class="horizontal layout"> 
+			<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
+			</paper-input>
+			<paper-button on-tap="_doStuff">Do Stuff
+			</paper-button>
+			<paper-button on-tap="go">GO!!!!
+			</paper-button>
+	</div>
+	<fc-call-card-input-model-one>
+		<fc-content-holder input-names="cells" class="horizontal layout container flex wrap">
+<!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->
+			<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
+				<fc-cell-creator name="cells" draggable="true" input='{{item.val}}' fclabel='{{item.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+				</fc-cell-creator>
+			</template>
+<!--The factoryImpl ends here; perhaps factImpl the holder first, and fact impl the mini headers.  You have the arsenol of a few of those items in the grid/dashboard/modal/splitter framework and we need not much else. It remains dynamic but has binding.  It seems good. We will see.-->
+				</fc-content-holder>
+		</fc-call-card-input-model-one>
 		</div>
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
 		-->
+		
 	<paper-dialog id="tada" style="min-height:440px;" no-cancel-on-outside-click="true">
 		<div id="betterTada" style="min-height: 220px; min-width: 280px;">
 			<ul id="superTada">
@@ -63,7 +68,7 @@
 			</ul>
 		</div>
 		<div class="buttons" style="height: 65px; padding: 8px 8px 8px 14px;" class="horizontal layout left-justified">
-			<paper-button on-tap="conttap">Confirm Save</paper-button>
+			<paper-button on-tap="_save">Confirm Save</paper-button>
 			<paper-button on-tap="__revertArray">Revert Array</paper-button>
 			<paper-button dialog-dismiss on-tap="__clear">Continue Working</paper-button>
 		</div>
@@ -128,6 +133,7 @@ Polymer({
 		 reflectToAttributes: true
 	 },
     currentDragger: Object,
+    topKey: String,
     reflectToAttributes: true,
     notify: true
 
@@ -156,8 +162,9 @@ ready: function(){
 go: function(){
 		var arrayToPrint = this.$.scores.data;
 		console.log(this.$.scores.data);
-		//console.log(arrayToPrint);
+		console.log(arrayToPrint[0]);
 		var record = arrayToPrint[0];
+		this.topKey = record.__firebaseKey__;
 		var keys = Object.keys(record);
 		var numbEntries = keys.length; 
 		
@@ -168,7 +175,6 @@ go: function(){
 					this.push('keyNames', keys[counter]);
 
 		   	}
-		//this.pop('oldGridArray');
 		console.log(this.keyNames);
 				
     		},
@@ -216,7 +222,8 @@ handleDrop: function(e){
 
   }, 
 
-  __assign: function(){
+  _doStuff: function()
+  {
     var i=0;
     for(i=0; i < this.griditemArray.length; i++){
     var valnow = this.griditemArray[i].val;
@@ -228,6 +235,27 @@ handleDrop: function(e){
     Polymer.dom(tadatwo).appendChild(tadathree);
     };
     this.$.tada.open();
+  },
+
+  _save: function(e)
+  {
+  	var cellCount = this.griditemArray.length;
+  	var saveObj = {};
+  	var basePath = this.$.scores.location + "/";
+  	var fb = new Firebase(basePath);
+  	console.log(basePath);
+
+  	var mainPath =  this.topKey + "/";
+  	var altPath = "viewOne/"
+  	for(i=0; i < cellCount; i++)
+  	{
+  		saveObj[mainPath + this.griditemArray[i].key] = this.griditemArray[i].val;
+  		saveObj[altPath + this.griditemArray[i].key] = this.griditemArray[i].val;
+  		//saveObj[]
+  	}
+  	console.log(saveObj);
+  	fb.update(saveObj);
+
   },
 
   __clear: function(){

@@ -1,34 +1,35 @@
 <dom-module id="fc-repeater">
 <style is="custom-style">
+
 </style>
 <template>
 
-<firebase-collection location="https://focusedstudents.firebaseio.com/contactinfo" log="true" data={{studinfo}} on-firebase-child-added="studentadded">
+<firebase-collection location="https://focusedstudents.firebaseio.com/contactinfo" data={{studinfo}} on-firebase-child-added="studentadded">
 </firebase-collection>
-<firebase-collection location="https://focusedstudents.firebaseio.com/courseresults" data={{fbdata}} on-firebase-child-added="resultadded" order-by-child="fcid" log="true" equal-to="{{fcid}}"></firebase-collection>
+<firebase-collection location="https://focusedstudents.firebaseio.com/courseresults" data={{fbdata}} on-firebase-child-added="resultadded" order-by-child="fcid" equal-to="{{fcid}}"></firebase-collection>
 
 <div style="background:#bbbbbb;width:800px;height:800px;overflow-y:scroll;border: 4px ridge #333399">
 <div type="button" on-tap="doClick" style="background:#5555aa;width:150px;height:80px">Click</div>
 
-
-<template is="dom-repeat" items="{{fcids}}">
+<template is="dom-repeat" items="{{fcids}}" as="{{cucumber}}">
 	<!-- <fc-studentFull data={{getData(fcids)}} pathtwo="https://focusedstudents.firebaseio.com/roi" paththree="https://focusedstudents.firebaseio.com/pastacademics"> -->
-	<b><span>{{item}}</span><br></b>
-		<span style="font-weight: 700; font-family: Times; font-size: 16px; color: #000066;">{{getData(item)}}</span><br>
+	<b><span>{{cucumber}}</span><br></b>
+	<span style="font-weight: 700; font-family: Times; font-size: 16px; color: #000066;">{{getData(cucumber)}}</span><span>HI HI HI <span><br>
+	<span style="font-weight: 700; font-family: Times; font-size: 26px; color: #000066;">{{cucumber.scoresTest1}}</span> <!-- WHY NO WORK -->
+</template>
+<!--		<fc-courseResultCard data={{getData(item)}}></fc-courseResultCard>
+		<fc-roiCard data={{getRoiData(item)}}></fc-roiCard> -->
 
-		<span style="font-weight: 700; font-family: Times; font-size: 26px; color: #000066;">{{item.scoresTest1}}</span> <!-- WHY NO WORK --> WHY NO WORK???
-		<!--<fc-courseResultCard data={{getData(item)}}></fc-courseResultCard>
-		<fc-roiCard data={{getRoiData(item)}}></fc-roiCard>-->
 <!--
 	<template is="dom-repeat" as="sco" filter="filterScores">
 		<span>{{sco.scoresPreTest}}</span>
 	</template>
-	 </fc-studentFull> -->
+ -->
 
-</template>
+
 <div>{{computeLabel(shit)}}</div>
 
-<!--
+
 <ul>
 <template id="pete" is="dom-repeat" items={{harry}} observe="this">
 	<li>
@@ -40,7 +41,6 @@
 	</li>
 </template>
 </ul>
--->
 
 <div type="button" on-tap="doClick" style="background:#5555aa;width:150px;height:80px">Click</div>
 </div>
@@ -80,7 +80,7 @@
 			value: {},
 			notify:true
 		},
-
+		pie: "",
 		scoresArray: {
 			type: Array,
 			value: function(){ 
@@ -95,16 +95,18 @@
 						];
 					},
 			notify: true
-		},
-		pie: ""
+		}
 	},
+
 	getData: function(argItem)
 	{
 		console.log(argItem);
 		this.fcid = argItem;
 		if(this.scores.hasOwnProperty(argItem))
 		{
-			return ['PRETEST: ' + this.scores[argItem].scoresPreTest + "    |||    ",
+//			return this.scores[argItem];
+		
+			return ['PRETEST: ' + this.scores[argItem].scoresPreTest + "  \n\r",
 					'TEST 1: ' + this.scores[argItem].scoresTest1 + "    |||    ",
 					'TEST 2: ' + this.scores[argItem].scoresTest2 + "    |||    ",
 					'TEST 3: ' + this.scores[argItem].scoresTest3 + "    |||    ",
@@ -114,6 +116,7 @@
 					'REAL SAT: ' + this.scores[argItem].realSAT + "    |||    "
 					];
 		}
+
 		/*
 			<template>
     <div>[[arrayItem(myArray.*, 0, 'name')]]</div>
@@ -142,7 +145,10 @@ LOOOOOOOOOK HEEREEE
 		{
 			return null;
 		}
+
 	},
+
+
 	attached: function()
 	{
 		//this.harry = ["Shit", "Damn", "Oops"];
@@ -152,12 +158,15 @@ LOOOOOOOOOK HEEREEE
 		console.log(this.scores);
 		//console.log(this.shit);
 	},
+
+
 	computeLabel: function(arg)
 	{
 		console.log(arg);
 		//console.log(this.shit);
 		return arg + " rocks!";
 	},
+
 	studentadded: function(e){
 		this.push("fcids", e.detail.childSnapshot.val().fcid);
 		this.fcid = e.detail.childSnapshot.val().fcid;
@@ -166,6 +175,7 @@ LOOOOOOOOOK HEEREEE
 		console.log(this.fcids);
 		//this.push("harry", e.detail.childSnapshot.val().fcid);
 	},
+
 	resultadded: function(e){
 		//console.log("resultadded");
 		console.log(e.detail.childSnapshot.val());
@@ -175,6 +185,8 @@ LOOOOOOOOOK HEEREEE
 		this.scores[e.detail.childSnapshot.val().fcid] = e.detail.childSnapshot.val();
 			//{e.detail.childSnapshot.val().key: e.detail.childSnapshot.val().scoresPreTest});
 	},
+
+
 	doClick: function(e)
 	{
 		this.push("harry", {fcid:"pickle"});
@@ -182,6 +194,8 @@ LOOOOOOOOOK HEEREEE
 		//this.$.pete.render();
 		console.log(this.shit);
 	}
+
+
 });
 </script>
 </dom-module>

@@ -9,71 +9,192 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<html lang="">
+<html lang=''>
 
 <head>
-  <meta charset="utf-8">
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="generator" content="Focused One" />
+  <meta charset='utf-8'>
+  <meta name='description' content=''>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <meta name='generator' content='Polymer Starter Kit' />
+
+
   <title>Focused Coaching</title>
+
   <!-- Place favicon.ico in the `app/` directory -->
 
   <!-- Chrome for Android theme color -->
-  <meta name="theme-color" content="#2E3AA1">
+  <meta name='theme-color' content='#303F9F'>
 
   <!-- Web Application Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <link rel='manifest' href='manifest.json'>
 
   <!-- Tile color for Win8 -->
-  <meta name="msapplication-TileColor" content="#3372DF">
+  <meta name='msapplication-TileColor' content='#3372DF'>
 
   <!-- Add to homescreen for Chrome on Android -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="PSK">
-  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon092x192.png">
+  <meta name='mobile-web-app-capable' content='yes'>
+  <meta name='application-name' content='FC'>
+  <link rel='icon' sizes='300x304' href='images/FC_logo.png'>
 
   <!-- Add to homescreen for Safari on iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Polymer Starter Kit">
-  <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
+  <meta name='apple-mobile-web-app-capable' content='yes'>
+  <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+  <meta name='apple-mobile-web-app-title' content='Focused Coaching'>
+  <link rel='apple-touch-icon' href='images/FC_logo.png'>
 
   <!-- Tile icon for Win8 (144x144) -->
-  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon044x144-precomposed.png">
+  <meta name='msapplication-TileImage' content='images/FC_logo.png'>
+
 
   <!-- build:css styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel='stylesheet' href='styles/main.css'>
   <!-- endbuild-->
 
   <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src='bower_components/webcomponentsjs/webcomponents-lite.js'></script>
   <!-- endbuild -->
 
   <!-- will be replaced with elements/elements.vulcanized.html -->
-  <link rel="import" href="elements/elements.html">
+  <link rel='import' href='elements/elements.html'>
   <!-- endreplace-->
+  <!--MAKE IT GO-->
+<!--  <script>
+/*function fcload(){
+  var instructorSelect = new FcSelect('instructorTest', 'https://focusedstudents.firebaseio.com/instructors', 'Select Coach');
+  var studentSelect = new FcSelect('studentTest', 'https://focusedstudents.firebaseio.com/contactinfo', 'Select Student');
+  var courseSelect = new FcSelect('courseTest', 'https://focusedstudents.firebaseio.com/courses', 'Select Course');
 
-  <!-- For shared styles, shared-styles.html import in elements.html -->
-  <style is="custom-style" include="shared-styles"></style>
-
+  var elem = document.getElementById('fcexperiment');
+  elem.appendChild(instructorSelect);
+  elem.appendChild(studentSelect);
+  elem.appendChild(courseSelect);
+}*/
+</script>-->
 </head>
 
-<body unresolved class="fullbleed layout vertical">
+<body unresolved class='fullbleed layout vertical'>
   <span id="browser-sync-binding"></span>
-  <template is="dom-bind" id="app">
-    <paper-drawer-panel drawer-toggle-attribute="paper-drawer-left" left-drawer>
-       <div fit drawer style="height:900px;">
-     
-      </div>
-        <!-- Drawer Toolbar -->
-   <div main> </div>
-   </paper-drawer-panel>          <fc-call-card-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}" style="padding: 20px;position:absolute;left:200px"></fc-call-card-inputs>
+  <template is='dom-bind' id='app'>
 
+    <paper-drawer-panel force-narrow  id='paperDrawerPanel'>
+      <!-- Drawer Scroll Header Panel -->
+      <paper-scroll-header-panel drawer fixed id="fcscroller">
+
+        <!-- Drawer Toolbar -->
+        <paper-toolbar id='drawerToolbar'>
+          <span class='paper-font-title'>Menu</span>
+        </paper-toolbar>
+
+        <!-- Drawer Content -->
+        <paper-menu class='list' attr-for-selected='data-route' selected='{{route}}' on-iron-select='onMenuSelect'>
+
+          <a data-route='ElSenorDonScott' href='/elsenordonscott'>
+            <iron-icon icon='social:person'></iron-icon>
+            <span>El Senor Don Scott's Pagina Experimental</span>
+          </a>
+
+        </paper-menu>
+      </paper-scroll-header-panel>
+
+      <!-- Main Area -->
+      <paper-header-panel main>
+
+        <!-- Main Toolbar -->
+        <paper-toolbar id='mainToolbar' class='medium'>
+          <paper-icon-button id='paperToggle' icon='menu' paper-drawer-toggle></paper-icon-button>
+
+          <!-- Application name -->
+          <div class='top left-container'>
+            <div class='app-name'>Focused Coaching Español</div>
+          <!-- Application sub title -->
+            <div class='bottom-title paper-font-subhead'><div class='moveover'>Mucho More Than Scores</div></div>
+          </div>
+          <span class='flex'></span>
+
+
+           <!-- Toolbar icons -->
+          <paper-icon-button icon='refresh'></paper-icon-button>
+          <paper-menu-button  horizontal-align='right' vertical-align='top'>
+            <paper-button class='dropdown-trigger'>
+              <iron-icon icon='social:person' ></iron-icon>
+              <span>{{current_user.uid}}</span>
+            </paper-button>
+            <div class='dropdown-content'>
+              <fc-loginform user='{{current_user}}'></fc-loginform>
+            </div>
+          </paper-menu-button>
+
+        </paper-toolbar>
+
+        <!-- Main Content -->
+        <div class='content'>
+          <iron-pages attr-for-selected='data-route' selected='{{route}}'>
+
+            <section data-route='ElSenorDonScott'>
+          
+            <paper-material class=' horizontal layout  wrap' elevation='2' style="min-height:2000px">
+        
+          <!-- <fc-courseGeneratorMC style="min-width:400px;"></fc-courseGeneratorMC> -->
+          <!--
+          <fc-list path="https://focusedstudents.firebaseio.com/instructors" data-type="Instructor" search-field="fcid" search-field-two="lastname"></fc-list>
+
+          <fc-list path="https://focusedstudents.firebaseio.com/courses" data-type="Course" search-field-two="instructor" search-field="startDate"></fc-list>
+          <fc-list path="https://focusedstudents.firebaseio.com/inquiries" data-type="Inquiry" search-field="timestamp" search-field-two="nextFollowUp"></fc-list>
+          <fc-list path="https://focusedstudents.firebaseio.com/contactinfo" data-type="Student" search-field="lastname" search-field-two="email" pathtwo="https://focusedstudents.firebaseio.com/pastacademics" paththree="https://focusedstudents.firebaseio.com/roi"></fc-list>
+-->
+          <fc-dragList path="https://focusedstudents.firebaseio.com/instructors" data-type="Instructor" search-field="fcid" search-field-two="lastname" style="min-width:400px; max-height:628px; margin:0px 10px 10px 10px"></fc-dragList>
+<!--
+          <fc-dropzone id="blah" style="min-width:600px; min-height:650px;max-height:800px;max-width:600px;border: 8px ridge #aecdfe;">
+          </fc-dropzone>
+-->
+          <fc-splitter id="outer" gutter-width="6px" orientation="horizontal" style="width:1600px; height:1400px" border-type="8px ridge #aecdfe">
+            <fc-splitter id="middle" class="left" gutter-width="6px" orientation="vertical" style="" border-type="none">
+              <!-- <fc-dropzone class="left" style="width:100%; height:100%"></fc-dropzone>-->
+               <fc-splitter id="inner" orientation="horizontal" border-type="none" gutter-width="6px" class="left">
+                <img src="http://www.nvcc.edu/home/bpool/images/rainbowhawk.jpg" class="left" style="width:100%; height:100%">
+                <div class="right"> <- Bridgie</div>
+              </fc-splitter>
+              
+              <fc-dropzone class="right" style="width:100%; height:100%"></fc-dropzone>
+              <!--<div class="right"></div>-->
+            </fc-splitter>
+            <!-- <fc-dropzone class="right" style="width:100%; height:100%"></fc-dropzone> -->
+            <div class="right"></div>
+          </fc-splitter>
+          <fc-splitter orientation="vertical" gutter-width="26px" border-type="4px solid blue" style="width:500px;height:500px"></fc-splitter>
+<!--
+          <fc-dropzone id="blahblah" style="min-width:600px; min-height:650px;max-height:800px;max-width:600px;border: 8px ridge #aecdfe;"></fc-dropzone>
+-->
+          <fc-dragList path="https://focusedstudents.firebaseio.com/contactinfo" data-type="Student" search-field="fcid" search-field-two="lastname" pathtwo="https://focusedstudents.firebaseio.com/pastacademics" paththree="https://focusedstudents.firebaseio.com/roi" style="min-width:400px; max-height:628px; margin:0px 10px 10px 10px"></fc-dragList>
+          <fc-dragList path="https://focusedstudents.firebaseio.com/inquiries" data-type="Inquiry" search-field="fcid" search-field-two="instructor" style="min-width:400px;margin:0px 10px 10px 10px"></fc-dragList>
+
+          <fc-dropzone id="blahblah" style="min-width:1000px; min-height:650px;max-height:800px;width:1200px;border: 8px ridge #aecdfe;"></fc-dropzone>
+
+          <fc-list path="https://focusedstudents.firebaseio.com/courses" data-type="Course" search-field-two="instructor" search-field="startDate"></fc-list>
+
+          <!-- <fc-select path="https://focusedstudents.firebaseio.com/courses" search-field="instructor"</fc-select> -->
+          
+          
+           <!-- <fc-selectorXTwo></fc-selectorXTwo>  -->
+
+
+          </paper-material>
+          <!-- <fc-selectorX-holder path="https://focusedstudents.firebaseio.com/satdates" placeholder="fctest" selectorlabel="fctest"></fc-selectorX-holder> -->
+            </section>
+
+          </iron-pages>
+        </div>
+      </paper-scroll-header-panel>
+    </paper-drawer-panel>
+
+    <!-- Uncomment next block to enable Service Worker support (1/2) -->
+
+   
   </template>
 
   <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
+  <script src='scripts/app.js'></script>
+
   <!-- endbuild-->
 </body>
 

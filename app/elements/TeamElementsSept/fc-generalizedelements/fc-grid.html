@@ -1,4 +1,49 @@
 <dom-module id="fc-grid">
+
+
+<!-- Level Concept: 
+Top: Index
+  1. drawer-panel (if we can get it to be the dashboard..awesome);
+	    if drawer panel submerged below index could hold data transfers, help in notification and coordinate memory
+	    the "data-assistant" is a design perk the kids like, which provides a calculator, note area, and place to hold data, make items
+	    it could becme the rich text editor, etc for the project
+  2. Dashboard
+  	2.A grid holds the data transfers, does the first level of measuring distances for resizing and laying out the page.
+	2.B three-pane-resizing spliter: will resize to items: fully adjustable. Must change names and organization.  Left and right in class have css meanings, that are hyper difficult to circumvent. they deal with flow alignment.  A simpler version will come from the project. I tend to love the original you made
+  3. Divided areas that hold elements
+  	1. bottom starboard wok in lists data and place wher ethe hand naturally goes. to me mopst natural eye and work local
+  	2. bottom port place where transient input goes should resize, be animated, center and swing to top for a cee all pages of animation option on big screens. 
+  	3. top viewarea: during review of designs with some of the kids and some of professionals this last week, there is a strong preference on large screens for the iconic triptic.  It is a natural eye catcher, I am totally in favory of "drawer options and bringing the possibility forward." (really i just want the drawer out of the index and into an element for scopre control). more importantly, I get the desire to remove it often, it provides however hyper scope advantage.  THe upper display area might offer that same advantage with some iframe same local options.  When I have placed the test materials in there, people do sort of ooh, and ahh.  its a thing to think about.  No baggage with a ditto as home address... we just need to hash bang further into our address for any polymer.
+  	4. Elements
+  		1. Portrait Card
+  			a. ranging in size from 340px w and 480px H th card can grow to 660 by 720 (large tablet portrait)
+  			b. card naturally works with the
+  			 	i. CELL CREATOR, a label + output + input that will be the key building block of our data layout.
+  				ii. the mini headers: not yet completed, bound around the edges of the fc-content-holders or the fc-cell-creators (see input card.)
+  				iii. the fc-content holder, which will define our row heights and widths
+  			c. Portrait Card is based on the polymer Paper card.  I have ussed the header image and title well in the fc-intake-form
+  			d. portrait card works best when it holds 8-12 pieces of information
+  		2. Landscape-Card/list-Tube/Course details Card/Sales Item Card
+  			a.   a potential work horse, dynamically adding logic would be a godsend
+  			b. 	possesses four icons with the option for 8
+			c.   has "time sensitive 'temperature gauge'"
+			d. 	Best used in an animated list, that compliments the tabbed view (will discuss)
+		3. Mini-Card/Monopoly Card/Fast Profile Card
+			a. Have always wanted this for the large view screen teacher page, but am side-lining on the large design project.  It basically is the mini card scott more or less finished, which I was working on. It's tabbed does stuff, but really is just an alert to send a teacher to the top screen.
+		4. Tabbed view... This will be a big project. Lets see what we can do with the data, drag and drop, etc. I believe that will build the 
+				database and the website. 
+		5. Data Assistant... Pivitol 	
+		6. Iron Storage for our API needs... PIVOTAL
+		7. CACHE and Session For API NEEDS
+Other needs we have filled ad dont use
+II. Scott Native binding, John Native Binding, Pivitol
+III. ALL JOHN QUESTIONS FROM POLYMER FOUR... its all the reading diced up for new tests YES I SAID THAT PIVITOL!!!
+IV. SCOTTS WORK ON TEST BUILDER PIVOTAL!!!!
+V. JOHNs WORK ON TEST BUILDER PIVOTAL!!!
+VI. TO ACTUALLY WORK TOGETHER AND GET BEHIND A PLAN WHICH I THINK IS COMMING TOGETHER, BUT WHICH I FEEL I HAD TO COBBLE TOGETHER FROM YOUR WORK IN THE DARK...And via my own hammering out of apparently almost 80,000 lines of code... probably 23000 were dupliates... so 55,000 lines of code...\
+
+ I cant do it this way anymore.
+-->
 	<template>
 		<style is="custom-style">
 			.grid-box{
@@ -27,27 +72,25 @@
 			   margin: 16px;
 			}
 		</style>
-		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
-		<firebase-collection id="studentsFB" order-by-child="last_name" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
+		<firebase-collection id="FBscoreTwo" order-by-child="student" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results' limit-to-first="10"></firebase-collection>
+
+		<firebase-collection id="studentsFB" limit-to-first="2" order-by-child="last_name" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
 		</firebase-collection>
+<paper-material>
 		<div class="vertical layout wrap grid-holder center center-justified">
 		    <div class="horizontal layout"> 
 				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
 				</paper-input>
 				
 				<template is="dom-repeat" items="{{stus}}" as="stu" order-by-key="true">
-				
+
 						<fc-cell-creator input="{{stu.last_name}}" name="cells" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 						</fc-cell-creator>
+
 						<fc-cell-creator id="studentkeys" input="{{stu.__firebaseKey__}}" name="cells" onfocus="_filter" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 						</fc-cell-creator>
+			
 				</template>
-						
-<paper-materials elevation="5" class="vertical layout center center-justified" style="max-width: 88px; height: 100%; position: absolute; top: 54px; right: 54px; border: 6px ridge silver;">
-							<template is="dom-repeat" items="{{testsByStudentViewArray}}">								
-								<fc-cell-creator input="{{item.Full_Name}}" name="cells" fclabel="{{item.FCID}}"  draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop"></fc-cell-creator>
-							</template>
-							<fc-cell-creator input
 
 
 </paper-materials>
@@ -55,15 +98,18 @@
 
 
 				<paper-button on-tap="__assign">Assign New Positions</paper-button>
-			</div>
+		
 			 	<div class="layout horizontal row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
-						<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{doFilter(searchString)}}">
-						<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
-						</fc-cell-creator>
+					<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{doFilter(searchString)}}">
+							<fc-cell-creator input="{{item.Full_Name}}" name="cells" fclabel="{{item.FCID}}"  draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+							</fc-cell-creator>
+
+							<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
+							</fc-cell-creator>
 					</template>
 				</div>
 				  		
-		</div>
+
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
@@ -81,6 +127,7 @@
 			<paper-button dialog-dismiss on-tap="__clear">Continue Working</paper-button>
 		</div>
 	</paper-dialog>
+
 </template>
 <script>
 Polymer({
@@ -123,92 +170,64 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
-    testsByStudentViewArray: {
-    	type: Array,
-	 	value: [],
-	 	notify: true,
-	 	reflectToAttributes: true
+
+    fcids: {
+      type: Array,
+      notify: true,
+      value: [],
+      reflectToAttributes: true
     },
-    superOrderArray: {
-	 type: Array,
-	 value: [],
-	 notify: true,
-	 reflectToAttributes: true
-	 },
-	numbOfStudentsArray: {
-	 	type: Array,
-	 	value: [],
-	 	notify: true,
-	 	reflectToAttributes: true
-	 },
-    gridImageOne: '',
-    gridImageTwo: '',
+    scores: {
+      type: Array,
+      value: [],
+      notify: true,
+      reflectToAttributes: true
+      },
     searchString: {
-	 type: String,
-	 notify: true,
-	 reflectToAttributes: true
+      type: String,
+      observer: 'filterGridContent'
     },
-      fcid: {
+    fcid: {
 		 type: Array,
 		 value: [],
 		 notify: true,
 		 reflectToAttributes: true
-	 },
+	},
+	draggable: true,
     currentDragger: Object,
     reflectToAttributes: true,
     notify: true
 
    },
 
-  updateFilter: function(argObj){
-    //console.log(argObj);
-    this.searchString = argObj.name;
-  },
+
 
   doFilter: function(e){
-
   	console.log(e);
    return function(argItem){
 	 	var itemname = argItem.val;
 	 	var search = e;
 	 	if (itemname !==undefined && search !=='') 
 	 	{	var tagVal = argItem.val;
-	 		return (search.indexOf(tagVal) > -1);
+	 		return (tagVal.indexOf(search) > -1);
 	 	}
-	 	else {return true;}
-    	};
+	 	else {return true};
+    	}
   },
   
 created: function(){
-	 
-	  var setFB2 = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
-	    var self2 = this;
-	    setFB2.on("value", function(snap){
-	    var theSet2 = snap.val();
-		//console.log(theSet2);
-	    var counterPrime2 = 0;
-		var keyfake2 = Object.keys(theSet2);
-		var theSetLimit2 = keyfake2.length;
-		console.log(keyfake2[1].first_name);
-		for (counterPrime2=0; counterPrime2<keyfake2; counterPrime2++){
-			self2.push("testsByStudentViewArray",{FCID: keyfake2[counterPrime2], Full_Name: keyfake2[counterPrime2].first_name + " " + keyfake2[counterPrime2].last_name});
-			console.log(keyfake2[counterPrime2].first_name);
-
-		}
-
-	});
-
 
 	    var setFB = new Firebase("https://focusedstaging1.firebaseio.com/test_results"); 
 	    var self = this;
 	    setFB.on("value", function(snap){
 	    var theSet = snap.val();
-		//console.log(theSet);
+
 	    var counterPrime = 0;
 		var keyfake = Object.keys(theSet);
 		var theSetLimit = keyfake.length;
 		var record = theSet[keyfake[0]];
-		//console.log(record);
+
+
 		var keys = Object.keys(record);
 		var numbEntries = keys.length; 
 		for(counterPrime=0; counterPrime<theSetLimit; counterPrime++){
@@ -220,14 +239,6 @@ created: function(){
 		}
 	});
 },
-
-ready: function(){
-	console.log(this.testsByStudentViewArray.FCID + " " + this.testsByStudentViewArray.Full_Name);
-
-
-
-},
-		
 
 handleDragStart: function(e) {
 	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
@@ -241,7 +252,8 @@ handleDragStart: function(e) {
 	   cell = cell.parentNode;
 	 }
 	 document.querySelector("#dataAdmin").currentDragger = cell;
-    }, 
+    },
+
 allowDrop: function (e) {
 	 e.preventDefault();
 	 console.log("drag over");
@@ -254,12 +266,11 @@ handleDrop: function(e){
     var i = 0;
     while(cell.nodeName != "FC-CELL-CREATOR")
     {
-	 cell = cell.parentNode;
-	  console.log("in loop" + cell);
+      i++;
+      cell = cell.parentNode;
+      if(i > 5) break;
     }
     console.log(cell);
-    //console.log("just droppped " + e.target + " on " + e.model.item.name);
-    
     var tempKey = cell.fclabel;
     var tempVal = cell.input;
     var dataObj = JSON.parse(e.dataTransfer.getData("fcdata"));

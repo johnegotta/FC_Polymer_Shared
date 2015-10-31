@@ -27,45 +27,40 @@
 			   margin: 16px;
 			}
 		</style>
-		<firebase-collection id="FBscoreTwo" order-by-child="student" limit-to="1" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'equal-to='{{}}'></firebase-collection>
-		<firebase-collection id="studentsFB" order-by-child="last_name" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
+		<firebase-collection id="FBscoreTwo" order-by-child="student" limit-to-first="8" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		<firebase-collection id="studentsFB" order-by-child="last_name" limit-to-first="8" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
 		</firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
-		    <div class="horizontal layout"> 
-				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
+		  
+			<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
 				</paper-input>
-				<!--
-				<template is="dom-repeat" items="{{stus}}" as="stu" order-by-key="true">
 				
-						<fc-cell-creator input="{{stu.last_name}}" name="cells" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+
+				<paper-material style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;" class="horizontal layout wrap container center center-justified">
+				<template is="dom-repeat" class="horizontal layout wrap container center center-justified" items="{{stus}}" as="stu" order-by-key="true">
+				
+						<fc-cell-creator input="{{stu.last_name}}" class="horizontal layout wrap container center center-justified" name="cells" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 						</fc-cell-creator>
 						<fc-cell-creator id="studentkeys" input="{{stu.__firebaseKey__}}" name="cells" onfocus="_filter" fclabel="{{stu.first_name}}" dragable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
 						</fc-cell-creator>
+				</template>
+				</paper-material>
+				<hr>
 
-						<div class="layout horizontal row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
-						<!--<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{filter(stu.__firebaseKey__)}}">
-						<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
-						</fc-cell-creator><span hidden="true">{{}}
-					</template>
+					<div class="layout horizontal center center-justified row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
+						<template is="dom-repeat" items="{{superGridItemHolderArray}}" filter="{{filter(stu.__firebaseKey__)}}">
+							<fc-cell-creator input='{{item.val}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop" fclabel="{{item.key}}">
+							</fc-cell-creator>
+							<span hidden="true">{{item.fcid}}</span>
+						</template>
+					</div>	
+
 				</div>
-				</template>-->
-				</div>	
-<div class="horizontal layout center center-justified" style="max-width: 100%; height: 100%; border: 6px ridge silver;">
+
+<!--<div class="horizontal layout center center-justified" style="max-width: 100%; height: 100%; border: 6px ridge silver;">-->
 							
 						
-<paper-button on-tap="__assign">Assign New Positions</paper-button>
-</div>
-			
 
-
-			 	<div class="layout horizontal row wrap flex" style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;">
-						<template is="dom-repeat" items="{{testsByStudentViewArray}}" filter="{{doFilter(searchString)}}">
-						<fc-cell-creator input='{{item.Full_Name}}' name="cells" draggable="true" on-dragstart="handleDragStart" on-dragover="allowDrop" placeholder='{{item.student}}' on-drop="handleDrop" fclabel="{{item.FCID}}">
-						</fc-cell-creator>
-					</template>
-				</div>
-				  		
-		</div>
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
@@ -195,8 +190,8 @@ Polymer({
     	};
   },
 
-attached: function(){
-	 
+created: function(){
+/*	 
 	  var setFB2 = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
 	    var self2 = this;
 	    setFB2.on("value", function(snap){
@@ -219,7 +214,7 @@ attached: function(){
 	}
 	});
 
-
+*/
 	    var setFB = new Firebase("https://focusedstaging1.firebaseio.com/test_results"); 
 	    var self = this;
 	    setFB.on("value", function(snap){
@@ -239,7 +234,9 @@ attached: function(){
 		   		
 		   	}
 		}
+	return self.susuperGridItemHolderArray;
 	});
+
 },
 		
 

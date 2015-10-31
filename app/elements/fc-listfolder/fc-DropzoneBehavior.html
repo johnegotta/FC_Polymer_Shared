@@ -1,0 +1,67 @@
+<dom-module id="fc-dropzoneBehavior">
+
+<script>
+
+  fcDropzoneBehavior = {
+
+    properties: {      
+      dataType: String,
+      mydata: Object,
+      draggable: {
+        type: Boolean,
+        value: true,
+        reflectToAttributes: true
+      },
+      displayElem: Object,
+      clearElem: String,
+      dragMessageElem: String
+      notify: true,
+      reflectToAttributes: true
+    },
+    
+    attached: function(){
+      console.log("fcDropzoneBehavior::attached dataType = " + this.dataType);
+      this.addEventListener("dragover", this.allowDrop);
+      this.addEventListener("drop", this.handleDrop);
+    },
+    
+    allowDrop: function (e) {
+      e.preventDefault();
+      console.log("fcDropZoneBehavior drag over");
+    },
+
+    handleDrop: function (e) {
+      var edata = JSON.parse(e.dataTransfer.getData("fcdata"));
+      console.log("drop");
+      this.mydata = edata;
+      this.dataType = e.dataTransfer.getData("dataType");
+      
+      var clear = this.$[clearElem];
+      var msg = this.$[dragMessageElem];
+      clear.hidden = false;
+      msg.hidden = true;
+      
+      if(this.dataType=="Instructor")
+      {
+        this.displayElem = new FcInstructorFull(this.mydata);
+      }
+      else if(this.dataType == "Course")
+      {
+        this.displayElem = new FcCourseFull(this.mydata);
+      }
+      else if(this.dataType == "Student")
+      {
+        this.displayElem = new FcStudentFull(this.mydata);
+      }
+      else if(this.dataType == "Inquiry")
+      {
+        this.displayElem = new FcInquiryFull(this.mydata);
+      }
+      this.displayElem.hidden = false;
+      this.displayElem.selected = 1;
+    },
+     
+};
+
+</script>
+</dom-module>
