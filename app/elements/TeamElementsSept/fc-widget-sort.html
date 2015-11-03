@@ -20,6 +20,8 @@
       }
       sortable-list {
         margin: 15px;
+        min-width:50px;
+        min-height:50px;
       }
 
       sortable-list > div {
@@ -41,122 +43,17 @@
     <section id="overlord" class="horizontal layout">
       <div id="availableWidgetsBlock" class="widgetContainer">
         <sortable-list id="grouped-a" group="{{group}}" animation="150" class="horizontal layout wrap" on-sort-remove="sayHi">
-          <div class="vertical center layout">
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="3d-rotation"
               </iron-icon></div>
               <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
+          </span></div>
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="add-alert"
               </iron-icon></div>
             <div>Crap</div>
           </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-            <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-              <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-            <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-              <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-            <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-              <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-circle"
-              </iron-icon></div>
-            <div>Shit</div>
-          </span></div>
-          <div class="vertical center layout">
-              <div><iron-icon icon="3d-rotation"
-              </iron-icon></div>
-            <div>Poop</div>
-          </div>
-          <div><span class="vertical center layout">
-              <div><iron-icon icon="add-alert"
-              </iron-icon></div>
-            <div>Crap</div>
-          </span></div>
-          <div><span class="vertical center layout">
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="add-circle"
               </iron-icon></div>
             <div>Shit</div>
@@ -166,17 +63,17 @@
 
       <div id="yourWidgetsBlock" class="widgetContainer">
         <sortable-list id="grouped-b" group="{{group}}" animation="150" class="horizontal layout wrap" on-sort-remove="sayHi">
-          <div><span class="vertical center layout">
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="add-shopping-cart"
               </iron-icon></div>
             <div>Turd</div>
           </span></div>
-          <div><span class="vertical center layout">
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="alarm"
               </iron-icon></div>
             <div>Excrement</div>
           </span></div>
-          <div><span class="vertical center layout">
+          <div class="sortableWidget"><span class="vertical center layout">
               <div><iron-icon icon="android"
               </iron-icon></div>
             <div>Feces</div>
@@ -197,8 +94,31 @@
       },
       sayHi: function(e){
         var sortable_id = e.detail.from.id;
-        var sortable_element = this.$[sortable_id];
-        console.log(sortable_element.childNodes);
+        var sortable_list = this.$[sortable_id];
+        var crap = Polymer.dom(sortable_list).querySelector(".sortableWidget");
+        console.log(crap);
+        var sortable_list_children = sortable_list.childNodes;
+        var list_is_empty = false;
+
+        for (var child in sortable_list_children){
+          if(this.hasClass(sortable_list_children[child],"sortableWidget")){
+            list_is_empty = true;
+            break;
+          }
+        }
+        console.log(list_is_empty);
+      },
+      hasClass: function(ele, cls) {
+        return ele.hasOwnProperty(cls) && ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
+      },
+      addClass: function(ele, cls) {
+        if (!hasClass(ele, cls)) ele.className += " " + cls;
+      },
+      removeClass: function(ele, cls) {
+        if (hasClass(ele, cls)) {
+          var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+            ele.className = ele.className.replace(reg, ' ');
+        }
       }
     });
   </script>
