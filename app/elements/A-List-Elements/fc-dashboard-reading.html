@@ -1,4 +1,5 @@
 <dom-module id="fc-dashboard-reading">
+<link rel="import" href="./FocusedBehaviors/highlight-behavior.html">
 <template>
 <style is="custom-style">
 .passages:{
@@ -7,14 +8,23 @@
 	padding:12px;
 	background: white;
 }
+tr:{
+	padding: 2px 8px;
+}
+.paddingOl:{
+	margin: 4px 0px;
+	height: 5px;
+	padding: 4px;
+}
+div.checks:{border: 12px ridge silver; resize: both; overflow: auto;}
 </style>
 	<paper-material style="width: calc(100vw-540px); background: white; height:1400px; padding: 24px; overflow-y: scroll;" elevation="1">
-		<fc-splitter-jc border-type="8px ridge #aecdfe; margin: -48px;" orientation="horizontal" style="width:1200px;height:600px">
-									<fc-splitter-jc class="left" border-type="none" orientation="vertical" style="width:100%; height:1400px;">
+		<fc-splitter-jc border-type="8px ridge silver; margin: -24px;" orientation="horizontal" style="width:1200px;height:600px">
+									<fc-splitter-jc class="left" border-type="none" orientation="horizontal" style="width:150%; height:1400px;">
 					
 								<div id="passageShowingArea" class="left passages"></div>
-								<div id="shit1" class="right"></div>
 								
+								<div id="questionShowingArea" class="right"></div>
 
 
 
@@ -25,9 +35,11 @@
 
 									
 									
-	  								 <fc-splitter-jc class="right" style="width: 100%; height: 1400px;" orientation="vertical">
-	  								 	<div id="questionShowingArea" class="left"></div>
-	  								 	<div id="shit2"	class="right"></div>
+	  								 <fc-splitter-jc class="right" style="width: 600px; height: 1400px;" orientation="vertical">
+	  								 	<div class="right layout horizontal columns-2 wrap flex container">
+	  								 	<div id="shit2"	contentEditable="true"  class="right checks"></div>
+	  								 	<div id="shit1" contentEditable="true" class="right checks"></div>
+	  								 	</div>
 	  								 </fc-splitter-jc>
 
 
@@ -36,7 +48,8 @@
 </template>
 <script>
 /*FcTopViewDashboard=*/Polymer({
-	is: "fc-dashboard-reading", 
+	is: "fc-dashboard-reading",
+	behaviors:[FocusedBehaviors.HighlightBehavior], 
 	properties: {
 		iPath: 'http://www.focusedstaging.com/Fresh_Attempt%20/index-jason.html',
 		topClassHidden: {
@@ -96,10 +109,16 @@
 
 	behaviors: [
       Polymer.IronResizableBehavior
+      //FocusedBehaviors-HighlightBehavior
     ],
 
 	listeners: {
-      'iron-resize': '_onIronResize'
+      'iron-resize': '_onIronResize',
+    },
+
+    _onIronResize: function(){
+    	//fc_display_all_passages("passageShowingArea");
+
     },
 	
 	created: function(){
@@ -454,7 +473,11 @@ function fc_display_answer_choices(argQuestionId)
 	var numChoices = 4;
 	var i = 0;
 	var answersOL = document.createElement("ol");
-	setAttributes(answersOL, {"type": "A"});
+	setAttributes(answersOL, 
+		{
+			"type": "A",
+			"class":"paddingOl"
+		});
 	for(i = 0; i < numChoices; i++)
 	{
 		var answerChoiceId = argQuestionId + letter;
@@ -1197,7 +1220,7 @@ function setUserInfo(user_uid){
 function logoutFromFirebase(){
 	var wholeFirebase = new Firebase(fc_firebase_root);
 	wholeFirebase.unauth();
-}*/
+}
 function setSelectedTestName(test_selection){
 	test_name = test_selection;
 	changePassageOptionsIfNeeded();
@@ -1239,7 +1262,7 @@ function setPassageSelectorOptions(passage_root){
 			passage_selector.add(opt);
 		}
 	}
-}
+}*/
 
 
 
@@ -1384,7 +1407,7 @@ function alertFirebaseTree(treePart){
 }
 
 
-// HTML Element Utility Functions
+/* HTML Element Utility Functions
 function showSidebarElement(element_id){
 	var the_element = document.getElementById(element_id);
 	if(the_element.style.display == "" || the_element.style.display == "none"){
@@ -1400,7 +1423,7 @@ function hideSidebarElement(element_id){
 	if(the_element.style.display == "table-row" || the_element.style.display == "block"){
 		the_element.style.display = "none";
 	}
-}
+}*/
 
 fc_init("questionShowingArea", "passageShowingArea", "shit1", "shit2");
 
