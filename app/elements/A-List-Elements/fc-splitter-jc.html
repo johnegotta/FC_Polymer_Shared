@@ -1,0 +1,285 @@
+<dom-module id="fc-splitter-jc">
+<template>
+<style is="custom-style">
+::--webkit-scrollbar {
+                    display: none;
+}
+
+host::-webkit-scrollbar {
+                    display: none;
+               
+}
+nobar.div::-webkit-scrollbar {
+                    display: none;
+                    @apply;
+
+}
+paper-material::-webkit-scrollbar {
+                    display: none;
+}
+content::-webkit-scrollbar {
+                    width:0;
+
+}
+</style>
+
+
+    <div id="splitHolder" class="layout" style="width:100%; height:100%">
+        <fc-resizablePane id="left" class="nobar" style="background:white;overflow:scroll">
+            <content style="height: 100%;" select=".left"></content>
+        </fc-resizablePane>
+        <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
+        </paper-material>
+        <fc-resizablePane id="right" style="background:white;overflow:scroll">
+            <content select=".right"></content>
+        </fc-resizablePane>
+    </div>
+</template>
+
+<script>
+  Polymer({
+    is: 'fc-splitter-jc',
+    
+    behaviors: [
+      //Polymer.IronResizableBehavior
+    ],
+
+    listeners: {"mouseleave": "stopDragging",
+                "mouseup": "stopDragging",
+                'resize': '_onResize'
+    },
+
+    properties: {
+      left: Object,
+      right: Object,
+      orientation: String,
+      width: Number,
+      height: Number,
+      minSideWidth: Number,
+      gutterWidth: {
+        type: String,
+        value: "6px"
+      },
+      dragging: Boolean,
+      borderType: String,
+      x: Number,
+      y: Number,
+	  reflectToAttributes: true,
+	  notify: true
+    },
+
+    attached: function(){
+     // console.log("fc-splitter attached, orientation is " + this.orientation);
+      this.left = this.$.left;//document.querySelector("#uno");
+      this.right = this.$.right; //document.querySelector("#dos");
+      this.dragging = false;
+
+      //this.$.draggy.style.width = this.gutterWidth;
+      this.minSideWidth = ".15";
+     // console.log(this.borderType);
+      this.$.splitHolder.style.border = this.borderType == "" ? "2px ridge #E5E4E2" : this.borderType;
+      if(this.orientation == "")
+      {
+        this.orientation = "horizontal";
+      }
+      if(this.orientation == "vertical")
+      {
+        this.$.splitHolder.className = "layout vertical";
+        this.$.draggy.style.width = "100%";
+        this.$.draggy.style.height = this.gutterWidth;
+        this.$.draggy.style.borderTop = "1px solid #E5E4E2";
+        this.$.draggy.style.borderBottom = "1px solid #E5E4E2";
+        this.$.left.style.height = "50%";
+        this.$.left.style.width = "100%";
+        this.$.right.style.height = "50%";
+        this.$.right.style.width = "100%";
+      }
+      else if(this.orientation == "horizontal")
+      {
+      //  console.log("setting gutter properties for horizontal");
+        this.$.splitHolder.className = 'layout horizontal';
+        this.$.draggy.style.width = this.gutterWidth;
+        //this.$.draggy.style.height = "100%";
+        this.$.draggy.style.borderLeft = "5px solid #E5E4E2";
+        this.$.draggy.style.borderRight = "5px solid #E5E4E2";
+        this.$.left.style.height = "100%";
+        this.$.left.style.width = "50%";
+        this.$.right.style.height = "100%";
+        this.$.right.style.width = "50%";   
+      }
+   //   console.log(this.left);
+     // console.log(this.right);
+    },
+
+    _onResize: function(e)
+    {
+        console.log(e);
+        document.querySelector("#focuseddashboard").resize(e);
+    },
+
+    useSplitCursor: function(){
+        if(this.orientation == "horizontal")
+        {
+            this.style.cursor = "ew-resize";
+        }
+        else if(this.orientation == "vertical")
+        {
+            this.style.cursor = "ns-resize";
+        }
+    },
+
+    useAutoCursor: function(){
+        if(!this.dragging)
+        {
+            this.style.cursor = "auto";
+        }
+    },
+
+    startDragging: function(e){
+         //   console.log("fc-splitter startDragging");
+            e.preventDefault();
+            this.dragging = true;
+            this.useSplitCursor();
+            this.$.draggy.elevation = 100; //doesn't work?
+            // Calculate the pairs' width, and percentage of the parent width
+
+            //this.width = this.left.getBoundingClientRect().width + this.right.getBoundingClientRect().width + this.gutterWidth;
+            var gw = this.gutterWidth;
+
+            gw = gw.replace("px", "");
+            if(this.orientation == "horizontal")
+            {
+                //var lw = this.left.style.width;
+                var lw = this.left.getBoundingClientRect().width;
+                //var rw = this.right.style.width;
+                var rw = this.right.getBoundingClientRect().width;
+                //lw = lw.replace("px", "");
+                //rw = rw.replace("px", "");
+                var totalWidth = parseInt(lw) + parseInt(rw) + parseInt(gw);
+                this.width = totalWidth;
+               // console.log("lw = " + lw + " rw = " + rw + " this.width = " + this.width);
+                //this.percentage = Math.min(this.width / this.parent.clientWidth * 100, 100);
+                this.x = this.left.getBoundingClientRect().left;
+                //console.log("this.x = " + this.x);
+            }
+            else if(this.orientation == "vertical")
+            {
+                var lh = this.left.getBoundingClientRect().height;
+                var rh = this.right.getBoundingClientRect().height;
+                //lh = lh.replace("px", "");
+                //rh = rh.replace("px", "");
+                var totalHeight = parseInt(lh) + parseInt(rh) + parseInt(gw);
+                this.height = totalHeight;
+                this.y = this.left.getBoundingClientRect().top;
+            }
+            this.addEventListener("mousemove", this.drag);
+
+    /*
+                this.left.addEventListener('selectstart', this.preventSelection);
+                this.left.addEventListener('dragstart', this.preventSelection);
+                this.right.addEventListener('selectstart', this.preventSelection);
+                this.right.addEventListener('dragstart', this.preventSelection);
+    */
+            this.left.style.userSelect = 'none';
+            this.left.style.webkitUserSelect = 'none';
+            this.left.style.MozUserSelect = 'none';
+
+            this.right.style.userSelect = 'none';
+            this.right.style.webkitUserSelect = 'none';
+            this.right.style.MozUserSelect = 'none';
+
+    },
+
+    stopDragging: function(e){
+            if(this.dragging == false) return;
+
+            this.dragging = false;
+            //this.style.cursor = "auto";
+            console.log("stopDragging");
+
+            this.removeEventListener("mousemove", this.drag);
+
+/*
+            this.left.removeEventListener('selectstart', this.preventSelection);
+            this.left.removeEventListener('dragstart', this.preventSelection);
+            this.right.removeEventListener('selectstart', this.preventSelection);
+            this.right.removeEventListener('dragstart', this.preventSelection);
+*/
+            this.left.style.userSelect = '';
+            this.left.style.webkitUserSelect = '';
+            this.left.style.MozUserSelect = '';
+
+            this.right.style.userSelect = '';
+            this.right.style.webkitUserSelect = '';
+            this.right.style.MozUserSelect = '';
+
+            document.querySelector("#focuseddashboard").resize(e);
+
+    },
+
+    drag: function(e){
+            if (!this.dragging) return;
+            // If within snapOffset of min or max, set offset to min or max
+/*
+            if (offsetX <=  this.leftMin + options.snapOffset) {
+                offsetX = this.leftMin;
+            } else if (offsetX >= this.width - this.rightMin - options.snapOffset) {
+                offsetX = this.width - this.rightMin;
+            }
+
+             For first and last pairs, left and right gutter width is half.
+
+            var leftGutterWidth = options.gutterWidth;
+            var rightGutterWidth = options.gutterWidth;
+
+            if (this.isFirst) {
+                leftGutterWidth = options.gutterWidth / 2;
+            }
+
+            if (this.isLast) {
+                rightGutterWidth = options.gutterWidth / 2;
+            }
+*/
+            var gws = this.gutterWidth.replace("px", "");
+            var gw = parseInt(gws);
+            if(this.orientation == "horizontal")
+            {
+                // Get  relative position of event from the left side of the pair.
+                var offsetX = e.clientX - this.x;
+
+                // Left width is the same as offset. Right width is total width - left width.
+                // Both widths are calculated from the initial parent percentage.
+                //this.left.style.width = 'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
+                
+                var newLeftWidth = offsetX - (gw/2);
+                var newLeftWidthString = newLeftWidth.toString() + "px";
+                console.log("newLeftWidthString = " + newLeftWidthString);
+                this.left.style.width = newLeftWidthString; //'calc(' + (offsetX / this.width * this.percentage) + '% - ' + leftGutterWidth + 'px)';
+                //console.log("just set left width to " + this.left.style.width);
+
+                //this.right.style.width = 'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
+                var newRightWidth = this.width - offsetX - (gw/2);
+                var newRightWidthString = newRightWidth.toString() + "px";
+               // console.log("newRightWidthString = " + newRightWidthString);
+                this.right.style.width = newRightWidthString; //'calc(' + (this.percentage - (offsetX / this.width * this.percentage)) + '% - ' + rightGutterWidth + 'px)';
+            }
+            else if(this.orientation == "vertical")
+            {
+                var offsetY = e.clientY - this.y;
+                var newTopHeight = offsetY - (gw/2);
+                var newTopHeightString = newTopHeight.toString() + "px";
+                this.left.style.height = newTopHeightString;
+
+                var newRightHeight = this.height - offsetY - (gw/2);
+                var newRightHeightString = newRightHeight.toString() + "px";
+                this.right.style.height = newRightHeightString;
+            }
+    },
+
+    preventSelection: function(){
+            return false;
+    }
+
+  });
+</script>
+</dom-module>

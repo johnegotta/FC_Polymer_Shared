@@ -29,33 +29,38 @@
 		</style>
 			<!--taken care of by dashboard three-->
 			<!--my thinking here is that scopes us nicely, reveals little, and makes our jobs way easier.  The grid goes up two levels and this is easy.-->
-			<firebase-collection id="scores" order-by-key="true" data='{{testResults}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
-		<div class="vertical layout wrap grid-holder center center-justified">
-		    <div class="horizontal layout"> 
-				<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grip...">
-				</paper-input>
-				<paper-button on-tap="_doStuff">Do Stuff!
-				</paper-button>
-				<paper-button on-tap="go">GO!!!!
-				</paper-button>
-			</div>
-			<fc-call-card-input-model-one>
-					<fc-content-holder input-names="cells" class="horizontal layout container wrap">
-<!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->			
-						<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
-							<fc-cell-creator name="cells" draggable="true" input='{{item.val}}' fclabel='{{item.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
-							</fc-cell-creator>
-				  		</template>
-<!--The factoryImpl ends here; perhaps factImpl the holder first, and fact impl the mini headers.  You have the arsenol of a few of those items in the grid/dashboard/modal/splitter framework and we need not much else. It remains dynamic but has binding.  It seems good. We will see.-->
-					</fc-content-holder>
 
-			</fc-call-card-input-model-one>
+	<firebase-collection id="scores" order-by-key="true" data='{{testResults}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		
+
+
+
+<div class="vertical layout wrap grid-holder center center-justified">
+    <div class="horizontal layout"> 
+			<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
+			</paper-input>
+			<paper-button on-tap="_doStuff">Do Stuff
+			</paper-button>
+			<paper-button on-tap="go">GO!!!!
+			</paper-button>
+	</div>
+	<fc-call-card-input-model-one>
+		<fc-content-holder input-names="cells" class="horizontal layout container flex wrap">
+<!--THIS SHOULD BE A FACTORY IMPLIMENTATION OF THE CELLS INTO WHEREVER WE NEED THEM. THIS MAKES THE MOST SENSE-->
+			<template is="dom-repeat" items="{{griditemArray}}" filter="{{doFilter(searchString)}}">
+				<fc-cell-creator name="cells" draggable="true" input='{{item.val}}' fclabel='{{item.key}}' on-dragstart="handleDragStart" on-dragover="allowDrop" on-drop="handleDrop">
+				</fc-cell-creator>
+			</template>
+<!--The factoryImpl ends here; perhaps factImpl the holder first, and fact impl the mini headers.  You have the arsenol of a few of those items in the grid/dashboard/modal/splitter framework and we need not much else. It remains dynamic but has binding.  It seems good. We will see.-->
+				</fc-content-holder>
+		</fc-call-card-input-model-one>
 		</div>
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
 		NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE??? NEW ELEMENT. ASSISTANT FEATURE???
 		-->
+		
 	<paper-dialog id="tada" style="min-height:440px;" no-cancel-on-outside-click="true">
 		<div id="betterTada" style="min-height: 220px; min-width: 280px;">
 			<ul id="superTada">
@@ -145,7 +150,7 @@ Polymer({
     //console.log(argItem);
 	//var itemval = argItem.val;
 	//var search = e.toLowerCase();
-	//return (itemval.indexOf(search) > -1) 
+	//return (itemval.includes(search) > -1) 
     //};
   },
 
@@ -153,7 +158,7 @@ ready: function(){
 	this.searchString = "";
 	this.griditemArray = [];	
 },
-  
+
 go: function(){
 		var arrayToPrint = this.$.scores.data;
 		console.log(this.$.scores.data);
@@ -162,6 +167,7 @@ go: function(){
 		this.topKey = record.__firebaseKey__;
 		var keys = Object.keys(record);
 		var numbEntries = keys.length; 
+		
 		var counter = 0;	
 	     for(counter=0; counter < numbEntries; counter++){
 					this.push('griditemArray', {val: arrayToPrint[0][keys[counter]], key: keys[counter]});
@@ -169,10 +175,7 @@ go: function(){
 					this.push('keyNames', keys[counter]);
 
 		   	}
-		this.pop('griditemArray');
-		//this.pop('oldGridArray');
-		
-		console.log(this.oldGridArray);
+		console.log(this.keyNames);
 				
     		},
 
