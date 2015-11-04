@@ -1,0 +1,95 @@
+<script src="../../bower_components/math-tex/mathjax-loader.js"></script>
+<script src="../../bower_components/math-tex/math-tex.js"></script>
+<script src="../../bower_components/Sortable/Sortable.min.js"></script>
+<dom-module id="fc-math-question-adder">
+  <template>
+    <style>
+      #crap,#slap {
+        margin: 15px;
+        min-width:50px;
+        min-height:50px;
+      }
+      .addable_input {
+        border: 1px solid black;
+        width: 400px;
+      }
+      paper-textarea {
+        min-width: 50px;
+      }
+    </style>
+
+    <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
+    <div class="horizontal layout">
+      <div id="addable_pieces">
+
+        <div id="crap">
+          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input required label="Question Key"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input label="Leading Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><input type="file"></input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+        </div>
+      </div>
+      <div>
+        <iron-form id="math_question_adder_form" on-iron-submit>
+          <div id="slap">
+            <!--<paper-input required label="Question Key"></paper-input>
+            <paper-input label="Leading Equation"></paper-input>
+            <input type="file"></input>
+            <paper-textarea required label="Question Text"></paper-textarea>
+            <paper-input label="Answer A"></paper-input>
+            <paper-input label="Answer B"></paper-input>
+            <paper-input label="Answer C"></paper-input>
+            <paper-input label="Answer D"></paper-input>-->
+          </div>
+        </iron-form>
+        <paper-input label="Type Math Here" value="{{poop}}"></paper-input>
+        <math-tex id="designated_area"></math-tex>
+        <math-tex>\sum{45(\frac{n-1}{4n^2}})</math-tex>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'fc-math-question-adder',
+      properties: {
+        poop: {
+          type: String,
+          value: '',
+          notify: true,
+          observer: 'sayHi'
+        }
+      },
+      ready: function(){
+        var crap = this.$.crap
+        Sortable.create(crap, {
+          group: {
+            name: 'grouped',
+            pull: 'clone',
+            put: false
+          },
+          sort: false,
+          handle: '.handle'
+        });
+        var slap = this.$.slap
+        Sortable.create(slap, {
+          group: {
+            name: 'grouped',
+            put: 'crap'
+          },
+          handle: '.handle',
+          filter: '.js-remove',
+          onFilter: function (e) {
+            slap.removeChild(e.item.parentNode);
+          }
+        });
+      },
+      sayHi: function(){
+        var poop_twp = this.poop;
+        //just effing around with finding other way of writing fractions besides \frac{}{} in case but not important - need iteration to get all and pair correctly
+        var frac_find = new RegExp(/\({1}[\d\w]*\/[\d\w]*\){1}/g);
+        console.log(poop_twp.match(frac_find));
+        this.$.designated_area.textContent = this.poop;
+      }
+    });
+  </script>
+</dom-module>
