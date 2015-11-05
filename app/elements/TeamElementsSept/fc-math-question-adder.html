@@ -4,47 +4,92 @@
 <dom-module id="fc-math-question-adder">
   <template>
     <style>
-      #crap,#slap {
+      #crap,#slap,#trap {
         margin: 15px;
-        min-width:50px;
+        /*min-width:50px;*/
         min-height:50px;
+        border: 1px dashed gray;
       }
       .addable_input {
         border: 1px solid black;
-        width: 400px;
+        /*width: 400px;*/
+        padding: 5px;
       }
-      paper-textarea {
-        min-width: 50px;
+      #crap .js-remove {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: none;
+        cursor: pointer;
+        color: #c00;
+        position: relative;
+        font-style: normal;
+      }
+      #slap .js-remove {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        color: #c00;
+        position: relative;
+        font-style: normal;
+      }
+      #crap .handle {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        position: relative;
+        font-style: normal;
+      }
+      #slap .handle {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        position: relative;
+        font-style: normal;
+      }
+      #slap div:hover .handle{
+        opacity: 1;
+      }
+      #slap div:hover .js-remove{
+        opacity: 1;
+      }
+      #crap div:hover .handle {
+        opacity: 1;
       }
     </style>
 
     <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
     <div class="horizontal layout">
-      <div id="addable_pieces">
 
-        <div id="crap">
-          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input required label="Question Key"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input label="Leading Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><input type="file"></input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-          <div class="horizontal layout addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-        </div>
+      <div id="crap" class="flex-1">
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Question Key" required label="Question Key"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Leading Equation" label="Leading Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><input class="in_value flex" name="Question Image" type="file" on-change="readImage"></input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" name="Question Text" label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
       </div>
-      <div>
-        <iron-form id="math_question_adder_form" on-iron-submit>
+
+      <div "question_input_area" class="flex-2">
+        <form is="iron-form" id="math_question_adder_form" on-iron-submit>
           <div id="slap">
-            <!--<paper-input required label="Question Key"></paper-input>
-            <paper-input label="Leading Equation"></paper-input>
-            <input type="file"></input>
-            <paper-textarea required label="Question Text"></paper-textarea>
-            <paper-input label="Answer A"></paper-input>
-            <paper-input label="Answer B"></paper-input>
-            <paper-input label="Answer C"></paper-input>
-            <paper-input label="Answer D"></paper-input>-->
+
           </div>
-        </iron-form>
+        </form>
+        <paper-button id="preview_button" on-tap="showFormContents">Preview</paper-button>
         <paper-input label="Type Math Here" value="{{poop}}"></paper-input>
         <math-tex id="designated_area"></math-tex>
         <math-tex>\sum{45(\frac{n-1}{4n^2}})</math-tex>
+      </div>
+
+      <div id="trap" class="flex-2">
       </div>
     </div>
   </template>
@@ -84,11 +129,57 @@
         });
       },
       sayHi: function(){
-        var poop_twp = this.poop;
+        var poop_two = this.poop;
         //just effing around with finding other way of writing fractions besides \frac{}{} in case but not important - need iteration to get all and pair correctly
         var frac_find = new RegExp(/\({1}[\d\w]*\/[\d\w]*\){1}/g);
-        console.log(poop_twp.match(frac_find));
+        console.log(poop_two.match(frac_find));
         this.$.designated_area.textContent = this.poop;
+      },
+      readImage: function(input,area_id){
+        var self = this;
+        //console.log(e.path);
+        //var input = e.path[0];
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              console.log(e.target.result);
+              var image_element = document.createElement('img');
+              image_element.src = e.target.result;
+              self.$[area_id].appendChild(image_element);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+      },
+      showFormContents: function(e){
+        var whoa = this.$.math_question_adder_form.serialize();
+        //console.log(whoa);
+        var whoa_array = Polymer.dom(this.$.slap).querySelectorAll('.in_value');
+        //console.log(whoa_array);
+        for(var i =0; i<whoa_array.length;i++){
+          console.log(whoa_array[i].value);
+          console.log(whoa_array[i].name);
+          switch(whoa_array[i].name){
+            case 'Leading Equation':
+              var mtel = document.createElement('math-tex');
+              mtel.textContent = whoa_array[i].value;
+              Polymer.dom(this.$.trap).appendChild(mtel);
+              break;
+            case 'Question Text':
+              var qtel = document.createElement('div');
+              qtel.innerHTML = whoa_array[i].value;
+              Polymer.dom(this.$.trap).appendChild(qtel);
+              break;
+            case 'Question Image':
+              var input = whoa_array[i];
+
+              this.readImage(input,"trap");
+              //qiel.src = whoa_array[i].value;
+              //Polymer.dom(this.$.trap).appendChild(qiel);
+              break;
+          }
+        }
       }
     });
   </script>
