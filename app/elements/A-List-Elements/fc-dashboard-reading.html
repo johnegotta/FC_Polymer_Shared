@@ -18,21 +18,13 @@
 		<fc-splitter-jc border-type="8px ridge #aecdfe; margin: -48px;" orientation="horizontal" style="width:1200px;height:600px">
 									<fc-splitter-jc class="left" border-type="none" orientation="vertical" style="width:100%; height:1400px;">
 					
-								<div id="passageShowingArea" class="left passages"></div>
+								<div id="passageShowingArea" class="left passages" on-scroll="passageScroll" on-select="passageSelect" on-dblclick="passageDoubleClick"></div>
 								<div id="shit1" class="right"></div>
-								
-
-
-
-
 										
 									</fc-splitter-jc>
 									
-
-									
-									
 	  								 <fc-splitter-jc class="right" style="width: 100%; height: 1400px;" orientation="vertical">
-	  								 	<div id="questionShowingArea" class="left questions"></div>
+	  								 	<div id="questionShowingArea" class="left questions" on-scroll="questionScroll"></div>
 	  								 	<div id="shit2"	class="right"></div>
 	  								 </fc-splitter-jc>
 
@@ -493,7 +485,11 @@ function fc_load_passages_from_firebase(argSnapshot)
 	for(key in data)
 	{
 		fc_passages[key] = data[key];
+		
+		fc_passages[key].wordArray = fc_passages[key].text.split(/\s/g);
+		console.log(fc_passages[key].wordArray);		
 	}
+	console.log(fc_passages);
 }
 function fc_load_subtree_from_firebase(argSnapshot, argSubtree)
 {
@@ -1531,6 +1527,26 @@ var fc_raw_questions_data = ["1. Which choice best describes what happens in the
 	created: function()
 	{
 		fc_init("questionShowingArea", "passageShowingArea", "shit1", "shit2");
+	},
+
+	passageScroll: function(e)
+	{
+		console.log(e);
+	},
+
+	passageSelect: function(e)
+	{
+		console.log(e);
+	},
+
+	passageDoubleClick: function(e)
+	{
+		console.log(e.target.innerHTML);
+	},
+
+	questionScroll: function(e)
+	{
+		console.log(e);
 	},
 
 	ready: function(){
