@@ -398,7 +398,7 @@ function fc_display_test_passages(argContainerId, argTestNum)
 
 function fc_display_passage(argContainer, argPassageId)
 {
-	alert("fc_display_passage id" + argPassagId);
+	//alert("fc_display_passage id" + argPassagId);
 	//var header = document.createElement("h3");
 	//header.innerHTML = "Passage " + argPassageNumber;
 	//argContainer.appendChild(header);
@@ -419,7 +419,7 @@ function fc_display_passage(argContainer, argPassageId)
 
 function fc_display_numbered_lines(argContainer, argPassageId)
 {
-	//alert("fc_display_numbered_lines: width = " + argContainer.clientWidth);
+	alert("fc_display_numbered_lines: width = " + argContainer.clientWidth);
 	var canvas = document.createElement('canvas');
 	var context = canvas.getContext("2d");
 	context.font = "12pt Roboto";
