@@ -1,18 +1,17 @@
 <script src="../../bower_components/math-tex/mathjax-loader.js"></script>
 <script src="../../bower_components/math-tex/math-tex.js"></script>
 <script src="../../bower_components/Sortable/Sortable.min.js"></script>
+
 <dom-module id="fc-math-question-adder">
   <template>
     <style>
       #input_choices_area,#desired_questions_inputs_area,#question_preview_area {
         margin: 15px;
-        /*min-width:50px;*/
         min-height:50px;
         border: 1px dashed gray;
       }
       .addable_input {
         border: 1px solid black;
-        /*width: 400px;*/
         padding: 5px;
       }
       #input_choices_area .js-remove {
@@ -65,6 +64,10 @@
       math-tex.display-equation:last-of-type {
         margin-bottom: 15px;
       }
+      #question_preview_area {
+        width: 300px;
+        height: 420px;
+      }
     </style>
 
     <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
@@ -78,6 +81,16 @@
         <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><input class="in_value flex" name="Question Image" type="file" on-change="readImage"></input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
         <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" name="Question Text" label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+          <div class="in_value flex" name="Answer Choices">
+                <paper-item><paper-input label="A"></paper-input></paper-item>
+                <paper-item><paper-input label="B"></paper-input></paper-item>
+                <paper-item><paper-input label="C"></paper-input></paper-item>
+                <paper-item><paper-input label="D"></paper-input></paper-item>
+          </div>
+          <iron-icon class="js-remove" icon="clear"></iron-icon>
+        </div>
       </div>
 
       <div "question_input_area" class="flex-2">
@@ -92,7 +105,7 @@
         <math-tex>\sum{45(\frac{n-1}{4n^2}})</math-tex>
       </div>
 
-      <div id="question_preview_area" class="flex-2 vertical layout">
+      <div id="question_preview_area" class="vertical layout" on-mousedown="onMouseClickOnMyCanvas" on-mousemove="onMouseMoveOnMyCanvas">
       </div>
     </div>
   </template>
@@ -107,6 +120,7 @@
           observer: 'sayHi'
         }
       },
+
       ready: function(){
         var input_choices = this.$.input_choices_area
         Sortable.create(input_choices, {
@@ -130,7 +144,9 @@
             desired_questions_inputs.removeChild(e.item.parentNode);
           }
         });
+        this.createCanvasOverlay('','question_preview_area');
       },
+
       sayHi: function(){
         var poop_two = this.poop;
         //just effing around with finding other way of writing fractions besides \frac{}{} in case but not important - need iteration to get all and pair correctly
@@ -138,16 +154,16 @@
         console.log(poop_two.match(frac_find));
         this.$.designated_area.textContent = this.poop;
       },
+
       readImage: function(input,after_index){
         var self = this;
-        //console.log(e.path);
-        //var input = e.path[0];
 
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function (e) {
               var after_node = Polymer.dom(self.$.question_preview_area).childNodes[after_index];
               var image_element = document.createElement('img');
+              image_element.className="self-center preview_mode"
               image_element.src = e.target.result;
               Polymer.dom(self.$.question_preview_area).insertBefore(image_element,after_node);
             };
@@ -155,6 +171,7 @@
             reader.readAsDataURL(input.files[0]);
         }
       },
+
       showFormContents: function(e){
         Polymer.dom(this.$.question_preview_area).innerHTML='';
         var whoa = this.$.math_question_adder_form.serialize();
@@ -166,12 +183,13 @@
           switch(whoa_array[i].name){
             case 'Leading Equation':
               var mtel = document.createElement('math-tex');
-              mtel.className="self-center display-equation"
+              mtel.className="self-center display-equation preview_mode"
               mtel.textContent = whoa_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(mtel);
               break;
             case 'Question Text':
               var qtel = document.createElement('div');
+              qtel.className="preview_mode"
               qtel.innerHTML = whoa_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(qtel);
               break;
@@ -181,6 +199,65 @@
               break;
           }
         }
+        this.createCanvasOverlay('','question_preview_area');
+      },
+
+      createCanvasOverlay: function(color, canvasContainer){
+            myCanvas = document.createElement('canvas');
+            var superContainer = this.$[canvasContainer];
+            myCanvas.style.width = '300px';
+            myCanvas.style.height = '400px';
+            myCanvas.style['z-index'] = '20';
+            // You must set this otherwise the canvas will be streethed to fit the container
+            //myCanvas.width = '300px';
+            //myCanvas.height = '420px';
+            myCanvas.style.overflow = 'visible';
+            myCanvas.style.position = 'relative';
+            //myCanvas.top = '0';
+            //myCanvas.left = '0';
+
+            var context=myCanvas.getContext('2d');
+            /*//context.fillStyle = color;
+            //context.fillRect(0,0, myCanvas.width, myCanvas.height);
+            context.beginPath();
+            context.strokeStyle='rgb(0,255,0)';  // a green line
+            context.lineWidth=4;                       // 4 pixels thickness
+            context.moveTo(50,50);
+            context.lineTo(150,150);
+            context.stroke();*/
+            superContainer.appendChild(myCanvas);
+
+      },
+
+      onMouseMoveOnMyCanvas: function(event){
+        var myCanvas = Polymer.dom(this.$.question_preview_area).querySelector('canvas');
+
+        if (myCanvas.drawing){
+          var mouseX= event.layerX;
+
+          var mouseY=event.layerY;
+          console.log(mouseY);
+
+          var context = myCanvas.getContext("2d");
+          if (myCanvas.pathBegun==false)
+          {
+            context.beginPath();
+            myCanvas.pathBegun=true;
+          }
+          else
+          {
+            context.lineTo(mouseX, mouseY);
+            context.stroke();
+          }
+        }
+      },
+      onMouseClickOnMyCanvas: function(event){
+        var myCanvas = Polymer.dom(this.$.question_preview_area).querySelector('canvas');
+        console.log(event);
+        myCanvas.drawing=!myCanvas.drawing;
+        // reset the path when starting over
+        if (myCanvas.drawing)
+          myCanvas.pathBegun=false;
       }
     });
   </script>
