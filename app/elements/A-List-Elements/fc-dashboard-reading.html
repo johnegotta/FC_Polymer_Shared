@@ -139,13 +139,14 @@ function fc_display_all_passages(argContainerId)
 	var numTests = 4;
 	var topLevelContainer = document.getElementById(argContainerId);
 	console.log(topLevelContainer);
-	console.log("zebra");
+	//console.log("zebra");
 	var i = 1;
 	var j = 1;
 	for(i=1; i <= numTests; i++)
 	{
 		var testHeader = document.createElement("h2");
 		testHeader.innerHTML = "Test " + i;
+		setAttributes(testHeader, {"id": testHeader.innerHTML});
 		topLevelContainer.appendChild(testHeader);
 		var br = document.createElement("br");
 		//topLevelContainer.appendChild(br);
@@ -367,7 +368,7 @@ function fc_display_test_questions(argTestId, argOLElem)
 	{
 		var passageLI = document.createElement("li");
 		var passageOL = document.createElement("ol");
-		setAttributes(passageLI, {"style": "border:3px ridge silver"});
+		setAttributes(passageLI, {"style": "border:3px ridge silver", "id": "test" + argTestId + "_passage" + i + "_questions"});
 		var firstQ = true;
 		var currentPassageId = "T" + argTestId + "S1P" + i;
 		var questionObj = fc_questions[questionKeys[masterQIndex]];
@@ -514,6 +515,7 @@ function fc_load_subtree_from_firebase(argSnapshot, argSubtree)
 		//console.log(questionData[keys[i]]);
 		objectList[k] = questionData[keys[i]];
 	}
+	alert("loaded " + argSubtree);
 //	updateDataAssistant();
 }
 
@@ -1531,7 +1533,14 @@ var fc_raw_questions_data = ["1. Which choice best describes what happens in the
 
 	passageScroll: function(e)
 	{
-		console.log(e);
+		//console.log(e);
+		var testOne = document.querySelector("#test1_passage1");
+		console.log(testOne);
+		if(testOne.getBoundingClientRect().top >= 0)
+		{
+			//scroll questions into view
+			document.querySelector("test1_passage1_questions").scrollIntoView();
+		}
 	},
 
 	passageSelect: function(e)
