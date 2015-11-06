@@ -25,14 +25,14 @@ content::-webkit-scrollbar {
 
 
     <div id="splitHolder" class="layout" style="width:100%; height:100%">
-        <fc-resizablePane id="left" class="nobar" style="background:white;overflow:scroll">
+        <div id="left" class="nobar" style="background:white;overflow:scroll" on-scroll="scrollLeft">
             <content style="height: 100%;" select=".left"></content>
-        </fc-resizablePane>
+        </div>
         <paper-material id="draggy" draggable="true" style="background:#6666bb" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
         </paper-material>
-        <fc-resizablePane id="right" style="background:white;overflow:scroll">
+        <div id="right" style="background:white;overflow:scroll" on-scroll="scrollRight">
             <content select=".right"></content>
-        </fc-resizablePane>
+        </div>
     </div>
 </template>
 
@@ -115,6 +115,31 @@ content::-webkit-scrollbar {
     {
         console.log(e);
         document.querySelector("#focuseddashboard").resize(e);
+    },
+
+    scrollLeft: function(e)
+    {
+        //console.log(e);
+        var i = 1;
+        for(i = 1; i <= 6; i++)
+        {
+            var pass = document.querySelector("#test1_passage" + i);
+            console.log(pass);
+            var top = pass.getBoundingClientRect().top;
+            console.log("top = " + top);
+            if(top >= 0 && top < this.$.left.getBoundingClientRect().height)
+            {
+                //scroll questions into view
+                var ques = document.querySelector("#test1_passage" + i + "_questions");
+                console.log(ques);
+                ques.scrollIntoView();
+            }
+        }
+    },
+
+    scrollRight: function(e)
+    {
+        console.log("scrollRight");
     },
 
     useSplitCursor: function(){
