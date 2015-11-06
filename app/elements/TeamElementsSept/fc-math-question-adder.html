@@ -4,7 +4,7 @@
 <dom-module id="fc-math-question-adder">
   <template>
     <style>
-      #crap,#slap,#trap {
+      #input_choices_area,#desired_questions_inputs_area,#question_preview_area {
         margin: 15px;
         /*min-width:50px;*/
         min-height:50px;
@@ -15,7 +15,7 @@
         /*width: 400px;*/
         padding: 5px;
       }
-      #crap .js-remove {
+      #input_choices_area .js-remove {
         -webkit-transition: opacity .2s;
         transition: opacity .2s;
         opacity: 0;
@@ -25,7 +25,7 @@
         position: relative;
         font-style: normal;
       }
-      #slap .js-remove {
+      #desired_questions_inputs_area .js-remove {
         -webkit-transition: opacity .2s;
         transition: opacity .2s;
         opacity: 0;
@@ -35,7 +35,7 @@
         position: relative;
         font-style: normal;
       }
-      #crap .handle {
+      #input_choices_area .handle {
         -webkit-transition: opacity .2s;
         transition: opacity .2s;
         opacity: 0;
@@ -44,7 +44,7 @@
         position: relative;
         font-style: normal;
       }
-      #slap .handle {
+      #desired_questions_inputs_area .handle {
         -webkit-transition: opacity .2s;
         transition: opacity .2s;
         opacity: 0;
@@ -53,21 +53,24 @@
         position: relative;
         font-style: normal;
       }
-      #slap div:hover .handle{
+      #desired_questions_inputs_area div:hover .handle{
         opacity: 1;
       }
-      #slap div:hover .js-remove{
+      #desired_questions_inputs_area div:hover .js-remove{
         opacity: 1;
       }
-      #crap div:hover .handle {
+      #input_choices_area div:hover .handle {
         opacity: 1;
+      }
+      math-tex.display-equation:last-of-type {
+        margin-bottom: 15px;
       }
     </style>
 
     <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
     <div class="horizontal layout">
 
-      <div id="crap" class="flex-1">
+      <div id="input_choices_area" class="flex-1">
         <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Question Key" required label="Question Key"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
         <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Leading Equation" label="Leading Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
@@ -79,7 +82,7 @@
 
       <div "question_input_area" class="flex-2">
         <form is="iron-form" id="math_question_adder_form" on-iron-submit>
-          <div id="slap">
+          <div id="desired_questions_inputs_area">
 
           </div>
         </form>
@@ -89,7 +92,7 @@
         <math-tex>\sum{45(\frac{n-1}{4n^2}})</math-tex>
       </div>
 
-      <div id="trap" class="flex-2">
+      <div id="question_preview_area" class="flex-2 vertical layout">
       </div>
     </div>
   </template>
@@ -105,8 +108,8 @@
         }
       },
       ready: function(){
-        var crap = this.$.crap
-        Sortable.create(crap, {
+        var input_choices = this.$.input_choices_area
+        Sortable.create(input_choices, {
           group: {
             name: 'grouped',
             pull: 'clone',
@@ -115,16 +118,16 @@
           sort: false,
           handle: '.handle'
         });
-        var slap = this.$.slap
-        Sortable.create(slap, {
+        var desired_questions_inputs = this.$.desired_questions_inputs_area
+        Sortable.create(desired_questions_inputs, {
           group: {
             name: 'grouped',
-            put: 'crap'
+            put: 'input_choices'
           },
           handle: '.handle',
           filter: '.js-remove',
           onFilter: function (e) {
-            slap.removeChild(e.item.parentNode);
+            desired_questions_inputs.removeChild(e.item.parentNode);
           }
         });
       },
@@ -135,7 +138,7 @@
         console.log(poop_two.match(frac_find));
         this.$.designated_area.textContent = this.poop;
       },
-      readImage: function(input,area_id){
+      readImage: function(input,after_index){
         var self = this;
         //console.log(e.path);
         //var input = e.path[0];
@@ -143,40 +146,38 @@
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function (e) {
-              console.log(e.target.result);
+              var after_node = Polymer.dom(self.$.question_preview_area).childNodes[after_index];
               var image_element = document.createElement('img');
               image_element.src = e.target.result;
-              self.$[area_id].appendChild(image_element);
+              Polymer.dom(self.$.question_preview_area).insertBefore(image_element,after_node);
             };
 
             reader.readAsDataURL(input.files[0]);
         }
       },
       showFormContents: function(e){
+        Polymer.dom(this.$.question_preview_area).innerHTML='';
         var whoa = this.$.math_question_adder_form.serialize();
-        //console.log(whoa);
-        var whoa_array = Polymer.dom(this.$.slap).querySelectorAll('.in_value');
-        //console.log(whoa_array);
+        var whoa_array = Polymer.dom(this.$.desired_questions_inputs_area).querySelectorAll('.in_value');
+
         for(var i =0; i<whoa_array.length;i++){
           console.log(whoa_array[i].value);
           console.log(whoa_array[i].name);
           switch(whoa_array[i].name){
             case 'Leading Equation':
               var mtel = document.createElement('math-tex');
+              mtel.className="self-center display-equation"
               mtel.textContent = whoa_array[i].value;
-              Polymer.dom(this.$.trap).appendChild(mtel);
+              Polymer.dom(this.$.question_preview_area).appendChild(mtel);
               break;
             case 'Question Text':
               var qtel = document.createElement('div');
               qtel.innerHTML = whoa_array[i].value;
-              Polymer.dom(this.$.trap).appendChild(qtel);
+              Polymer.dom(this.$.question_preview_area).appendChild(qtel);
               break;
             case 'Question Image':
               var input = whoa_array[i];
-
-              this.readImage(input,"trap");
-              //qiel.src = whoa_array[i].value;
-              //Polymer.dom(this.$.trap).appendChild(qiel);
+              this.readImage(input,i);
               break;
           }
         }
