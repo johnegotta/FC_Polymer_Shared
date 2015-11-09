@@ -9,16 +9,21 @@
 }
 
 .questionsOL{
-	-webkit-columns: 50% 2; /* Chrome, Safari, Opera */
-    -moz-columns: 50% 2; /* Firefox */
-    columns: 200px 2;
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 20px;
+    column-count: 2;
+    column-gap: 20px;
 }
 </style>
 	<paper-material style="width: calc(100vw-540px); background: white; height:1400px; padding: 24px; overflow-y: scroll;" elevation="1">
 		<fc-splitter-jc border-type="8px ridge #aecdfe; margin: -48px;" orientation="horizontal" style="width:1200px;height:600px">
 									<fc-splitter-jc class="left" border-type="none" orientation="vertical" style="width:100%; height:1400px;">
 					
-								<div id="passageShowingArea" class="left passages" on-scroll="passageScroll" on-select="passageSelect" on-dblclick="passageDoubleClick"></div>
+								<div id="passageShowingArea" style="overflow:scroll" class="left passages" on-scroll="passageScroll" on-select="passageSelect" on-dblclick="passageDoubleClick"> 
+									
+								</div>
 								<div id="shit1" class="right"></div>
 										
 									</fc-splitter-jc>
@@ -33,6 +38,7 @@
 	</paper-material>
 </template>
 <script>
+
 
 		var fc_firebase_root = 'https://amber-inferno-3827.firebaseio.com';
 		var fc_questions = { };
@@ -56,6 +62,8 @@
 		var fc_answer_tag_container_id = "";
 		var fc_question_tag_container_id = "";
 
+
+
 		function FC_Passage(argText, argTestNum, argDouble, argNumQuestions, argAuthor1, argAuthor2, argType)
 			{
 			this.text = argText || "";
@@ -69,7 +77,7 @@
 			console.log(this);
 			};
 
-			function fc_deduce_test_num(argObjId)
+function fc_deduce_test_num(argObjId)
 {
 	//deduce section from argObjId value
 	var testCharLoc = argObjId.indexOf("T");
@@ -78,6 +86,8 @@
 	var testNum = Number(testString);
 	return testNum;
 }
+
+
 function fc_init(argQuestionContainerId, argPassageContainerId, argQuestionTagContainerId, argAnswerTagContainerId)
 {	
 	var wholeFirebase = new Firebase(fc_firebase_root);	
@@ -100,21 +110,29 @@ function fc_init(argQuestionContainerId, argPassageContainerId, argQuestionTagCo
 		initializeListOfTags("answer", snapshot.val());
 		fc_display_tags("answer", argAnswerTagContainerId);
     	});
+
     	
     	passages_location.on("value", function(snapshot,prevChildKey){
     		fc_load_passages_from_firebase(snapshot);
     		//var new_passage_key = snapshot.key();
     		//var new_passage = snapshot.val();
     		//fc_passages[new_passage_key] = new_passage;
+    		
     		questions_location.once("value", function(snapshot) {
-			fc_load_subtree_from_firebase(snapshot, "questions");
-			fc_questions_loaded = true;
-			fc_display_all_questions(argQuestionContainerId);
-			questions_location.on("child_changed", function(snapshot){
-				var mod_key = snapshot.key();
-				fc_questions[mod_key] = snapshot.val();
-				fc_update_tag_display();
+				fc_load_subtree_from_firebase(snapshot, "questions");
+				fc_questions_loaded = true;
+				fc_display_all_questions(argQuestionContainerId);
+				questions_location.on("child_changed", function(snapshot){
+					var mod_key = snapshot.key();
+					fc_questions[mod_key] = snapshot.val();
+					fc_update_tag_display();
+				});
 			});
+	
+			fc_display_all_passages(argPassageContainerId);
+		//var psa = document.querySelector("#passageShowingArea");
+		//fc_display_numbered_lines(psa, "T1S1P1");
+
 		});
 	
 		answers_location.once("value", function(snapshot) {
@@ -127,11 +145,14 @@ function fc_init(argQuestionContainerId, argPassageContainerId, argQuestionTagCo
 				fc_update_tag_display();
 			});
 		});
-		fc_display_all_passages(argPassageContainerId);
-    	});
+
+
+		
+    	//});
 	
 	
 }
+
 
 function fc_display_all_passages(argContainerId)
 {
@@ -146,7 +167,7 @@ function fc_display_all_passages(argContainerId)
 	{
 		var testHeader = document.createElement("h2");
 		testHeader.innerHTML = "Test " + i;
-		setAttributes(testHeader, {"id": testHeader.innerHTML});
+		fcSetAttributes(testHeader, {"id": testHeader.innerHTML});
 		topLevelContainer.appendChild(testHeader);
 		var br = document.createElement("br");
 		//topLevelContainer.appendChild(br);
@@ -170,7 +191,7 @@ function fc_display_test_passages(argContainerId, argTestNum)
 		//topLevelContainer.appendChild(br);
 		var article = document.createElement("article");
 		topLevelContainer.appendChild(article);
-		setAttributes(article, {"id": "test" + argTestNum + "_passage" + i,
+		fcSetAttributes(article, {"id": "test" + argTestNum + "_passage" + i,
 			"class": "reading_passage"
 				});
 //		article.innerHTML = fc_passages[passageId].text;
@@ -180,7 +201,7 @@ function fc_display_test_passages(argContainerId, argTestNum)
 	}
 }
 
-
+/*
 function fc_display_passage(argContainer, argPassageId)
 {
 	alert("fc_display_passage id" + argPassagId);
@@ -191,7 +212,7 @@ function fc_display_passage(argContainer, argPassageId)
 	//argContainer.appendChild(br);
 	//var article = document.createElement("article");
 	//argContainer.appendChild(article);
-	//setAttributes(article, {"id": "test1_passage" + argPassageNumber });
+	//fcSetAttributes(article, {"id": "test1_passage" + argPassageNumber });
 	
 	var articleWidth = article.clientWidth;
 	fc_display_numbered_lines(argContainer, argPassageNumber);
@@ -201,6 +222,7 @@ function fc_display_passage(argContainer, argPassageId)
 	argContainer.appendChild(br);
 	//return container;
 }
+*/
 
 function fc_display_numbered_lines(argContainer, argPassageId)
 {
@@ -209,14 +231,16 @@ function fc_display_numbered_lines(argContainer, argPassageId)
 	var context = canvas.getContext("2d");
 	context.font = "12pt Roboto";
 	var tableHeaderRow = document.createElement("DIV");
-	setAttributes(tableHeaderRow, {
+	
+	fcSetAttributes(tableHeaderRow, {
 	    "id": 'readingHeader_'+ argPassageId,
 	    "class": 'readingHeader_'+ argPassageId
 	});
+
 	tableHeaderRow.innerHTML = "blah blah blah";
 	//argContainer.appendChild(tableHeaderRow);
 	var passageTable = document.createElement("table");
-	setAttributes(passageTable, {
+	fcSetAttributes(passageTable, {
 	    "id": argPassageId } );
     	argContainer.appendChild(passageTable);
 	//tableHanger.appendChild(passageTable);
@@ -227,33 +251,41 @@ function fc_display_numbered_lines(argContainer, argPassageId)
 	var paragraphArray = truePassageContent.split(/\n/);
 	//console.log(paragraphArray);
 	var numParagraphs = paragraphArray.length;
+
 	var currentRow = 0;
 	for(i=0; i< numParagraphs; i++)
 	{
 		var wordArray = paragraphArray[i].split(/\s/g);
-		//console.log(wordArray);
 		var numWords = wordArray.length;
+		//console.log(numWords);
 		var wordCount = 0;
 		var currentWidth = 0;
+		
 		while(wordCount < numWords)
 		{
 			var currentLine = "";
 			var testLine = "";
 			var space="&nbsp&nbsp&nbsp&nbsp&nbsp";
 			var spaceOffset = "";
-			while((currentWidth + 60) < argContainer.clientWidth && wordCount <= numWords)
+			//console.log(argContainer.clientWidth);
+			if(argContainer.clientWidth == 0)
+			{
+				break;
+			}
+			while((currentWidth + 10) < argContainer.clientWidth && wordCount <= numWords)
 			{
 				currentLine = testLine;
+				//console.log("currentLine = " + currentLine);
 				if (testLine != "")
 				{
 					testLine += " "; //add a space if not beginning
-      				}
-      				else if(wordCount == 0)
-      				{
+      			}
+      			else if(wordCount == 0)
+      			{
       					//new paragraph
       					testLine += space;
       					spaceOffset = "aaaaaaaaaaaaaaaaaaaaa";
-      				}
+      			}
 				testLine += wordArray[wordCount]; //add a word
 				wordCount++;
 				currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
@@ -270,32 +302,33 @@ function fc_display_numbered_lines(argContainer, argPassageId)
 			}
 			currentWidth = 0;
 			var passageRow = document.createElement("TR");
-			setAttributes(passageRow, {
+			fcSetAttributes(passageRow, {
 				"id": argPassageId + "R" + currentRow,
-				"class": 'passage1passageRow' + currentRow } );
+				"class": 'passage1passageRow' + currentRow,
+				"contentEditable": "false" } );
 			tableBody.appendChild(passageRow);
 			var passageNumberColumn = document.createElement("TD");
-			setAttributes(passageNumberColumn, {
+			fcSetAttributes(passageNumberColumn, {
 				"id": argPassageId +'numb_col'+ currentRow,
 				"class": "fc_line_no_col" } );
 			passageRow.appendChild(passageNumberColumn);
 			var textColumn = document.createElement("TD");
 			if (currentRow % 5 !== 0 || currentRow == 0)
 			{
-				passageNumberColumn.innerHTML = " ";
+				passageNumberColumn.innerHTML = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
 				//var backgroundColor = window.getComputedStyle(passageNumberColumn).getPropertyValue("background-color");
 				passageNumberColumn.style.color = "transparent";
-				//setAttributes(passageNumberColumn, {"class": 'hidden' } );
+				//fcSetAttributes(passageNumberColumn, {"class": 'hidden' } );
 			}
 			else
 			{
-				passageNumberColumn.innerHTML = currentRow;
+				passageNumberColumn.innerHTML = currentRow + "&nbsp";
 			}
 			if(currentRow == 0)
 			{
 				textColumn.style.fontStyle = "italic";
 			}
-			setAttributes(textColumn, {
+			fcSetAttributes(textColumn, {
 				"id": argPassageId +'R' + currentRow + "text",
 				"class": 'passage1textrow' + currentRow } );
 
@@ -308,9 +341,11 @@ function fc_display_numbered_lines(argContainer, argPassageId)
 				break;
 			}
 		}	
+		
 	}
 
 	return passageTable;
+	
 }
 
 
@@ -330,7 +365,7 @@ function fc_display_all_questions(argContainerId)
 		testTitle.innerHTML = "Test " + testId;
 		topLevelContainer.appendChild(testTitle);
 		var testQuestionsOL = document.createElement("ol");
-		setAttributes(testQuestionsOL, {"id": "T" + testId + "S1", "type": "I", "class": "questionsOL" });
+		fcSetAttributes(testQuestionsOL, {"id": "T" + testId + "S1", "type": "I", "class": "questionsOL" });
 		topLevelContainer.appendChild(testQuestionsOL);
 		fc_display_test_questions(testId, testQuestionsOL);
 		var br = document.createElement("br");
@@ -346,29 +381,15 @@ function fc_display_test_questions(argTestId, argOLElem)
 	var numQuestions = questionKeys.length;
 	//alert("displaying test " + argTestId + " with numQ = " + numQuestions);
 	var i = 0;
-	/*
-	for(i=0; i < numQuestions; i++)
-	{
-		var questionObj = fc_questions[questionKeys[i]];
-		//alert("found section id = " + questionObj.section);
-		if(questionObj.testNum == argTestId)
-		{
-			//append an LI containingg question and two BRs to OL
-			var questionLI = fc_display_question(questionKeys[i]);
-			argOLElem.appendChild(questionLI);
-			var br = document.createElement("br");
-			argOLElem.appendChild(br);
-			br = document.createElement("br");
-			argOLElem.appendChild(br);
-		}
-	}*/
+	
 	var masterQIndex = 0;
 	var testQIndex = 0;
 	for(i=1; i <= 6; i++)
 	{
 		var passageLI = document.createElement("li");
 		var passageOL = document.createElement("ol");
-		setAttributes(passageLI, {"style": "border:3px ridge silver", "id": "test" + argTestId + "_passage" + i + "_questions"});
+		fcSetAttributes(passageLI, {"style": "border:3px ridge silver", "id": "test" + argTestId + "_passage" + i + "_questions"});
+		fcSetAttributes(passageOL, {"class": "questionsOL"});
 		var firstQ = true;
 		var currentPassageId = "T" + argTestId + "S1P" + i;
 		var questionObj = fc_questions[questionKeys[masterQIndex]];
@@ -384,7 +405,7 @@ function fc_display_test_questions(argTestId, argOLElem)
 			if(firstQ == true)
 			{
 				var newIndex = testQIndex + 1;
-				setAttributes(passageOL, {"start": newIndex});
+				passageOL.setAttribute("start", newIndex);
 				console.log("just set ordered list start to " + newIndex);
 				firstQ = false;
 			}
@@ -413,13 +434,14 @@ function fc_display_test_questions(argTestId, argOLElem)
 
 function fc_display_question(argQuestionId)
 {
+	console.log(fc_questions);
 	var questionObj = fc_questions[argQuestionId];
 	var questionLI = document.createElement("li");
-	setAttributes(questionLI, {
+	fcSetAttributes(questionLI, {
 			"id": argQuestionId + "_all"
 	});
 	var stemSPAN = document.createElement("span");
-	setAttributes(stemSPAN, {
+	fcSetAttributes(stemSPAN, {
 			"id": argQuestionId,
 			"onclick": "fc_set_question_context('" + argQuestionId + "')"
 	});
@@ -437,7 +459,7 @@ function fc_display_answer_choices(argQuestionId)
 	var numChoices = 4;
 	var i = 0;
 	var answersOL = document.createElement("ol");
-	setAttributes(answersOL, {"type": "A"});
+	fcSetAttributes(answersOL, {"type": "A"});
 	for(i = 0; i < numChoices; i++)
 	{
 		var answerChoiceId = argQuestionId + letter;
@@ -453,13 +475,14 @@ function fc_display_answer_choice(argAnswerChoiceId)
 	//alert("display_answer_choice: id = " + argAnswerChoiceId);
 	var answerChoiceObj = fc_answer_choices[argAnswerChoiceId];
 	var answerLI = document.createElement("li");
-	setAttributes(answerLI, {"id": argAnswerChoiceId,
+	fcSetAttributes(answerLI, {"id": argAnswerChoiceId,
 				"onclick": "fc_set_answer_context('" + argAnswerChoiceId + "')"
 				});
 	answerLI.innerHTML = answerChoiceObj.text;
 	return answerLI;
 }
 
+/*
 function fc_link_all_quotes()
 {
 	var wholeFirebase = new Firebase(fc_firebase_root);	
@@ -479,6 +502,7 @@ function fc_link_all_quotes()
 		});	
 	});
 }
+*/
 
 function fc_load_passages_from_firebase(argSnapshot)
 {
@@ -488,16 +512,16 @@ function fc_load_passages_from_firebase(argSnapshot)
 		fc_passages[key] = data[key];
 		
 		fc_passages[key].wordArray = fc_passages[key].text.split(/\s/g);
-		console.log(fc_passages[key].wordArray);		
+		//console.log(fc_passages[key].wordArray);		
 	}
-	console.log(fc_passages);
+	//console.log(fc_passages);
 }
 function fc_load_subtree_from_firebase(argSnapshot, argSubtree)
 {
 	var questionData = argSnapshot.val();
-	console.log(questionData);
+	//console.log(questionData);
 	var keys = Object.keys(questionData);
-	console.log(keys);
+	//console.log(keys);
 	var numQ = keys.length;
 	var i = 0;
 	var objectList = null; // pointer to whichever array/list appropriate
@@ -515,7 +539,7 @@ function fc_load_subtree_from_firebase(argSnapshot, argSubtree)
 		//console.log(questionData[keys[i]]);
 		objectList[k] = questionData[keys[i]];
 	}
-	alert("loaded " + argSubtree);
+	//alert("loaded " + argSubtree);
 //	updateDataAssistant();
 }
 
@@ -538,6 +562,7 @@ function fc_strip_non_alpha(argStringArray)
 	}
 }
 
+/*
 function fc_link_passage_quotes()
 {
 	//alert("fc_link_passage_quotes for passage " + argPassageId);
@@ -545,6 +570,7 @@ function fc_link_passage_quotes()
 	//alert("fc_linkpassage passage = " + passageElem.innerHTML);
 	
 	var i = 0;
+	var j = 0;
 	var quote = "";
 
 	for(question_key in fc_questions)
@@ -670,14 +696,13 @@ function fc_link_passage_quotes()
 				}
 				var pElem = document.getElementById(passageId);		
 			}
-			/*
-			else
-			{
-				alert("found quote but no line number strings in question " + question_key);
-			}
-			*/
+			//else
+			//{
+			//	alert("found quote but no line number strings in question " + question_key);
+			//}
 		}
 		//found quotation, now find "line X" or "lines X-Y" string
+*/
 /*
 		var lineNumMatches = qText.match(/Line[s]? [1-9][0-9]?[0-9]?(-[1-9][0-9]?[0-9]?)?/gi);
 		var startingLineNumCharIndices = [];
@@ -698,8 +723,10 @@ function fc_link_passage_quotes()
 			}
 		}
 		*/
+		/*
 	}
 }
+*/
 /*
 		//finds quote string in format used in answer choices
 		var qNum = i+1;
@@ -722,7 +749,7 @@ function fc_link_passage_quotes()
 	}
 */
 
-
+/*
 function displayDataAssistant(displayAreaId)
 {
 	//alert("displayDataAssistant");
@@ -735,9 +762,9 @@ function displayDataAssistant(displayAreaId)
 	{
 		var inp = document.createElement("input");
 		var checkValueJSString = "document.getElementById('" + chx[i] + "').checked";
-		setAttributes(inp, {"id": chx[i], "name": chx[i], "type": "checkbox", "onchange":"fc_update_tag('" + chx[i] + "', " + checkValueJSString + ");"});
+		fcSetAttributes(inp, {"id": chx[i], "name": chx[i], "type": "checkbox", "onchange":"fc_update_tag('" + chx[i] + "', " + checkValueJSString + ");"});
 		var lab = document.createElement("label");
-		setAttributes(lab, {"for": chx[i]});
+		fcSetAttributes(lab, {"for": chx[i]});
 		lab.innerHTML = chx[i];
 		var br = document.createElement("br");
 		dispElem.appendChild(inp);
@@ -745,6 +772,7 @@ function displayDataAssistant(displayAreaId)
 		dispElem.appendChild(br);
 	}
 }
+
 
 function fc_find_question_patterns(argDisplayAreaId, argPatternLength)
 {
@@ -812,7 +840,8 @@ function fc_find_question_patterns(argDisplayAreaId, argPatternLength)
 		}
 	}
 	dispElem.innerHTML += "<br>";
-	
+}
+*/
 /*
 	var j = 0;
 	var numStems = stems.length;
@@ -853,28 +882,8 @@ function fc_find_question_patterns(argDisplayAreaId, argPatternLength)
 	}
 */
 
-}
 
-//NOT currently using local web storage directly
-/*
-function fc_load_from_ls()
-{
-	var allElems = document.getElementsByTagName("*");
-	var max = allElems.length;
-	for (var i=0; i < max; i++)
-	{
-		var elem = allElems[i];
-		var lsVal = localStorage.getItem(elem.id);
-		if(lsVal != null && lsVal != "")
-		{
-			//alert("loading " + elem.id + " value= " + lsVal);
-			fcElems[elem.id] = JSON.parse(lsVal);
-			//elem.setAttribute("data-tags", lsVal); 
-			//elem.setAttribute("data-tags", lsObj.tags);
-		}
-	}
-}
-*/
+
 
 function fc_unhighlight()
 {
@@ -1041,7 +1050,7 @@ function fc_highlight_passage(elemId)
 		passageQuoteSpan.scrollIntoView();
 	}
 }
-
+/*
 function fc_highlight_passage_old(elemId)
 {
 
@@ -1095,7 +1104,7 @@ function fc_highlight_passage_old(elemId)
 		pElem.scrollIntoView();
 	}
 }
-
+*/
 function fc_update_tag(tag, tagValue)
 {
 	var subTree = "";
@@ -1150,21 +1159,25 @@ function fc_persist_obj(objName, obj, subTree)
 	//obj_loc.update(obj[keys[0]]);
 	fb_subtree_location.child(objName).update(obj);
 }
-
+/*
 function fcGenerateTest(testId)
 {
 	//call fcGenerateSection which will call fcGenerateQuestions
 }
+*/
 
 
-
-function setAttributes(el, attrs) {
-		for (var key in attrs) {
-				el.setAttribute(key, attrs[key]);
+function fcSetAttributes(el, attrs) {
+		var fckeys = Object.keys(attrs);
+		var numKeys = fckeys.length;
+		var i = 0;
+		for(i=0; i< numKeys; i++)
+		{
+			el.setAttribute(fckeys[i], attrs[fckeys[i]]);
 		}
 }
 
-// **********************************************************************************************************************
+
 
 
 /*function authDataCallback(authData) {
@@ -1186,6 +1199,8 @@ function logoutFromFirebase(){
 	var wholeFirebase = new Firebase(fc_firebase_root);
 	wholeFirebase.unauth();
 }*/
+
+/*
 function setSelectedTestName(test_selection){
 	test_name = test_selection;
 	changePassageOptionsIfNeeded();
@@ -1222,13 +1237,13 @@ function setPassageSelectorOptions(passage_root){
 		
 			var opt = document.createElement("option");
 			option_id = passage + "option";
-			setAttributes(opt, {"id": option_id, "value": passage});
+			fcSetAttributes(opt, {"id": option_id, "value": passage});
 			opt.text = passages[passage].name || "Double: " + passages[passage].name1 + " & " + passages[passage].name2;
 			passage_selector.add(opt);
 		}
 	}
 }
-
+*/
 
 
 function initializeListOfTags(argTagType, argSnap)
@@ -1260,9 +1275,9 @@ function fc_display_tags(argTagType, argContainerId)
 	{
 		var inp = document.createElement("input");
 		var checkValueJSString = "document.getElementById('" + tag + "').checked";
-		setAttributes(inp, {"id": tag, "name": tag, "type": "checkbox", "onchange":"fc_update_tag('" + tag + "', " + checkValueJSString + ");"});
+		fcSetAttributes(inp, {"id": tag, "name": tag, "type": "checkbox", "onchange":"fc_update_tag('" + tag + "', " + checkValueJSString + ");"});
 		var lab = document.createElement("label");
-		setAttributes(lab, {"for": tag});
+		fcSetAttributes(lab, {"for": tag});
 		lab.innerHTML = tag;
 		var br = document.createElement("br");
 		dispElem.appendChild(inp);
@@ -1295,7 +1310,7 @@ function initializeListOfTags(displayAreaId, tagSnap){
 	initializeTagCheckboxes(displayAreaId,list_of_tags);
 }
 */
-
+/*
 function initializeTagCheckboxes(displayAreaId,tags){
 	var dispElem = document.getElementById(displayAreaId);
 	dispElem.innerHTML = "";
@@ -1304,9 +1319,9 @@ function initializeTagCheckboxes(displayAreaId,tags){
 
 	for(i=0;i<numKeys;i++){
 		var inp = document.createElement("input");
-		setAttributes(inp, {"id": chx[i], "name": chx[i], "type": "checkbox"});
+		fcSetAttributes(inp, {"id": chx[i], "name": chx[i], "type": "checkbox"});
 		var lab = document.createElement("label");
-		setAttributes(lab, {"for": chx[i]});
+		fcSetAttributes(lab, {"for": chx[i]});
 		lab.innerHTML = chx[i];
 		var br = document.createElement("br");
 		dispElem.appendChild(inp);
@@ -1314,12 +1329,13 @@ function initializeTagCheckboxes(displayAreaId,tags){
 		dispElem.appendChild(br);
 	}
 }
+*/
 
 
 /*
 	All functions below are for on child_added or on child_removed function instead of on value [this is nice-jason]
 */
-
+/*
 function addNewTagToList(displayAreaId, tagSnap){
 	switch(displayAreaId) {
     		case "questionTaggingArea":
@@ -1337,19 +1353,13 @@ function insertCheckboxInPlace(displayAreaId){
 	var dispElem = document.getElementById(displayAreaId);
 	var child_elements = dispElem.childNodes;
 	var inp = document.createElement("input");
-	setAttributes(inp, {"id": "IS IT HERE", "name": "IS IT HERE", "type": "checkbox"});
+	fcSetAttributes(inp, {"id": "IS IT HERE", "name": "IS IT HERE", "type": "checkbox"});
 	var lab = document.createElement("label");
-	setAttributes(lab, {"for": "IS IT HERE"});
+	fcSetAttributes(lab, {"for": "IS IT HERE"});
 	lab.innerHTML = "IS IT HERE";
 	var br = document.createElement("br");
 	
-	/*var strg = "";
-	for(var i=0; i < child_elements.length; i++){
-		strg = strg + child_elements[i].id + "\n";
-	}
-	alert (strg);*/
-	
-	
+
 	//	Just seeing how insertAdjacent worked
 	child_elements[6].insertAdjacentHTML('beforebegin',br.outerHTML);
 	child_elements[6].insertAdjacentHTML('beforebegin',lab.outerHTML);	
@@ -1383,12 +1393,14 @@ function showSidebarElement(element_id){
 		}
 	}
 }
+
 function hideSidebarElement(element_id){
 	var the_element = document.getElementById(element_id);
 	if(the_element.style.display == "table-row" || the_element.style.display == "block"){
 		the_element.style.display = "none";
 	}
 }
+*/
 
 fc_raw_passages["T1S1P1"] = new FC_Passage("This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.\n \n Akira came directly, breaking all tradition. Was that it? Had he followed form—hade asked his mother to speak to his father to approach a go-between—would Chie have been more receptive? \n He came on a winter’s eve. He pounded on the door while a cold rain beat on the shuttered veranda, so at first Chie thought him only the wind. The maid knew better. Chie heard her soft scuttling footsteps, the creak of the door. Then the maid brought a calling card to the drawing room, for Chie. \n Chie was reluctant to go to her guest; perhaps she was feeling too cozy. She and Naomi were reading at a low table set atop a charcoal brazier. A thick quilt spread over the sides of the table so their legs were tucked inside with the heat.  \n “Who is it at this hour, in this weather?” Chie questioned as she picked the name card off the maid’s lacquer tray. \n “Shinoda, Akira. Kobe Dental College,” she read. \n Naomi recognized the name. Chie heard a soft intake of air. \n “I think you should go,” said Naomi. \n Akira was waiting in the entry. He was in his early twenties, slim and serious, wearing the black military-style uniform of a student. As he bowed-his hands hanging straight down, a black cap in one, a yellow oil-paper umbrella in the other—Chie glanced beyond him. In the glistening surface of the courtyard’s rain-drenched paving stones, she saw his reflection like a dark double. \n “Madame,” said Akira, “forgive my disruption, but I come with a matter of urgency.” \n His voice was soft, refined. He straightened and stole a deferential peek at her face. \n In the dim light his eyes shone with sincerity. Chie felt herself starting to like him. \n “Come inside, get out of this nasty night. Surely your business can wait for a moment or two.” \n “I don’t want to trouble you. Normally I would approach you more properly but I’ve received word of a position. I’ve an opportunity to go to America, as dentist for Seattle’s Japanese community.” \n “Congratulations,” Chie said with amusement. “That is an opportunity, I’m sure. But how am I involved?” \n Even noting Naomi’s breathless reaction to the name card, Chie had no idea. Akira’s message, delivered like a formal speech, filled her with maternal amusement. You know how children speak so earnestly, so hurriedly, so endearingly about things that have no importance in an adult’s mind? That’s how she viewed him, as a child. \n It was how she viewed Naomi. Even though Naomi was eighteen and training endlessly in the artsneeded to make a good marriage, Chie had made no effort to find her a husband. Akira blushed. \n “Depending on your response, I may stay in Japan. I’ve come to ask for Naomi’s hand.” \n Suddenly Chie felt the dampness of the night. \n “Does Naomi know anything of your...ambitions?” \n “We have an understanding. Please don’t judge my candidacy by the unseemliness of this proposal. I ask directly because the use of a go-between takes much time. Either method comes down to the same thing: a matter of parental approval. If you give your consent, I become Naomi’s yoshi. We’ll live in the House of Fuji. Without your consent, I must go to America, to secure a new home for my bride.” \n Eager to make his point, he’d been looking her full in the face. Abruptly, his voice turned gentle. \n “I see I’ve startled you. My humble apologies. I’ll take no more of your evening. My address is on my card. If you don’t wish to contact me, I’ll reapproach you in two weeks’ time. Until then, good night.” He bowed and left. Taking her ease, with effortlessgrace, like a cat making off with a fish. \n “Mother?” Chie heard Naomi’s low voice and turned from the door. “He has asked you?” \n The sight of Naomi’s clear eyes, her dark brows gave Chie strength. Maybe <i>his</i> hopes were preposterous. \n “Where did you meet such a fellow?” Chai began.  “Imagine! He thinks he can marry the Fuji heir and take her to America all in the snap of his fingers!” \n Chie waited for Naomi’s ripe laughter. Naomi was silent. She stood a full half minute looking straight into Chie’s eyes. Finally, she spoke: \n “Mother.” \n “Yes?” \n “I mean to have him.\n\n", 1, false, 10);
 
@@ -1507,7 +1519,7 @@ var fc_raw_questions_data = ["1. Which choice best describes what happens in the
 	},
 
 	behaviors: [
-      Polymer.IronResizableBehavior
+      //Polymer.IronResizableBehavior
     ],
 
 	listeners: {
@@ -1526,21 +1538,23 @@ var fc_raw_questions_data = ["1. Which choice best describes what happens in the
 		document.querySelector("#passageShowingArea").innerHTML = "";
 	},
 
-	created: function()
+	attached: function()
 	{
 		fc_init("questionShowingArea", "passageShowingArea", "shit1", "shit2");
+		/*
+		var skank = {"apple":"banana"};
+		var elem = document.querySelector("#passageShowingArea");
+		console.log(elem);
+		fcSetAttributes(elem, {"foo": "bar"});
+		fc_update_tag_display();
+		fc_persist_obj("shit", skank, "turtle");
+		*/
 	},
 
 	passageScroll: function(e)
 	{
-		//console.log(e);
-		var testOne = document.querySelector("#test1_passage1");
-		console.log(testOne);
-		if(testOne.getBoundingClientRect().top >= 0)
-		{
-			//scroll questions into view
-			document.querySelector("test1_passage1_questions").scrollIntoView();
-		}
+		console.log("passageScroll");
+		
 	},
 
 	passageSelect: function(e)
@@ -1563,7 +1577,7 @@ var fc_raw_questions_data = ["1. Which choice best describes what happens in the
 
 	},
 
-	attached: function(){
+	created: function(){
 
 		
 	},
