@@ -136,7 +136,7 @@
 			
 </style>
 	<div class="layout container vertical center center-justified iconset">
-		
+		<firebase-document
 		<iron-icon class="fc-icon" icon="hardware:dock" on-tap="flattap" style="z-index:1;" data-assist="tutorial">
 		</iron-icon>
 		<br>
@@ -395,13 +395,23 @@
 
 		},
 
-		paragraphMeasuredWordArrays:{
+		passageWordArray:{
 			type:Array,
 			value: [],
 			notify: true,
 			reflectToAttributes: true
 
+		},
+
+		passageWordObject:{
+			type:Object,
+			value: {},
+			notify: true,
+			reflectToAttributes: true
+
 		}
+
+
 
 
 	},
@@ -423,7 +433,7 @@
 			var testCounter = testKeys.length;
 	     	
 	     	var studenters = keyfirst[counterone];
-			//alert(testCounter + "c " + studenters);
+			alert(testCounter + "c " + studenters);
 			var full = theSet[keyfirst[counterone]].first_name + " " + theSet[keyfirst[counterone]].last_name;
 			self.push('superItemArray', {
 						'Full_Name' : full,
@@ -436,7 +446,7 @@
 					     	testFB.orderByChild('student').equalTo(studenters).on("value", function(snapshot){
 					    			var testies = snapshot.val();
 					    			var testcounter = testies.length;
-					    			//console.log(testcounter);
+					    			console.log(testcounter);
 					    			var i = 0;
 					    			for(i=0; i<testcounter; i++){
 						     			var keysInTestResults = Object.keys(testies);
@@ -446,10 +456,10 @@
 										var it = testies[keysInTestResults[j]].values();
 										var entry;
 											while (!(entry = it.next()).done) {
-    											
+    											console.log(entry.value);
     											self.push('superItemArray', entry.value);
 												}
-											//console.log(entry.value);
+											console.log(entry.value);
 												return entry.value;
 										};
 	     							
@@ -463,16 +473,14 @@
 		},
 
 coolerThings: function(){
-		alert("jkjj");
-		var passageContent = "This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.\n \n Akira came directly, breaking all tradition. Was that it? Had he followed form—hade asked his mother to speak to his father to approach a go-between—would Chie have been more receptive? \n He came on a winter’s eve. He pounded on the door while a cold rain beat on the shuttered veranda, so at first Chie thought him only the wind. The maid knew better. Chie heard her soft scuttling footsteps, the creak of the door. Then the maid brought a calling card to the drawing room, for Chie. \n Chie was reluctant to go to her guest; perhaps she was feeling too cozy. She and Naomi were reading at a low table set atop a charcoal brazier. A thick quilt spread over the sides of the table so their legs were tucked inside with the heat.  \n “Who is it at this hour, in this weather?” Chie questioned as she picked the name card off the maid’s lacquer tray. \n “Shinoda, Akira. Kobe Dental College,” she read. \n Naomi recognized the name. Chie heard a soft intake of air. \n “I think you should go,” said Naomi. \n Akira was waiting in the entry. He was in his early twenties, slim and serious, wearing the black military-style uniform of a student. As he bowed-his hands hanging straight down, a black cap in one, a yellow oil-paper umbrella in the other—Chie glanced beyond him. In the glistening surface of the courtyard’s rain-drenched paving stones, she saw his reflection like a dark double. \n “Madame,” said Akira, “forgive my disruption, but I come with a matter of urgency.” \n His voice was soft, refined. He straightened and stole a deferential peek at her face. \n In the dim light his eyes shone with sincerity. Chie felt herself starting to like him. \n “Come inside, get out of this nasty night. Surely your business can wait for a moment or two.” \n “I don’t want to trouble you. Normally I would approach you more properly but I’ve received word of a position. I’ve an opportunity to go to America, as dentist for Seattle’s Japanese community.” \n “Congratulations,” Chie said with amusement. “That is an opportunity, I’m sure. But how am I involved?” \n Even noting Naomi’s breathless reaction to the name card, Chie had no idea. Akira’s message, delivered like a formal speech, filled her with maternal amusement. You know how children speak so earnestly, so hurriedly, so endearingly about things that have no importance in an adult’s mind? That’s how she viewed him, as a child. \n It was how she viewed Naomi. Even though Naomi was eighteen and training endlessly in the artsneeded to make a good marriage, Chie had made no effort to find her a husband. Akira blushed. \n “Depending on your response, I may stay in Japan. I’ve come to ask for Naomi’s hand.” \n Suddenly Chie felt the dampness of the night. \n “Does Naomi know anything of your...ambitions?” \n “We have an understanding. Please don’t judge my candidacy by the unseemliness of this proposal. I ask directly because the use of a go-between takes much time. Either method comes down to the same thing: a matter of parental approval. If you give your consent, I become Naomi’s yoshi. We’ll live in the House of Fuji. Without your consent, I must go to America, to secure a new home for my bride.” \n Eager to make his point, he’d been looking her full in the face. Abruptly, his voice turned gentle. \n “I see I’ve startled you. My humble apologies. I’ll take no more of your evening. My address is on my card. If you don’t wish to contact me, I’ll reapproach you in two weeks’ time. Until then, good night.” He bowed and left. Taking her ease, with effortlessgrace, like a cat making off with a fish. \n “Mother?” Chie heard Naomi’s low voice and turned from the door. “He has asked you?” \n The sight of Naomi’s clear eyes, her dark brows gave Chie strength. Maybe <i>his</i> hopes were preposterous. \n “Where did you meet such a fellow?” Chai began.  “Imagine! He thinks he can marry the Fuji heir and take her to America all in the snap of his fingers!” \n Chie waited for Naomi’s ripe laughter. Naomi was silent. She stood a full half minute looking straight into Chie’s eyes. Finally, she spoke: \n “Mother.” \n “Yes?” \n “I mean to have him.\n\n";
+		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne");
+		var passageHeader ="This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.\n \n"
+		var passageContent = "This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.\n \n Akira came directly, breaking all tradition. Was that it? Had he followed form—had he asked his mother to speak to his father to approach a go-between—would Chie have been more receptive? \n He came on a winter’s eve. He pounded on the door while a cold rain beat on the shuttered veranda, so at first Chie thought him only the wind. The maid knew better. Chie heard her soft scuttling footsteps, the creak of the door. Then the maid brought a calling card to the drawing room, for Chie. \n Chie was reluctant to go to her guest; perhaps she was feeling too cozy. She and Naomi were reading at a low table set atop a charcoal brazier. A thick quilt spread over the sides of the table so their legs were tucked inside with the heat.  \n “Who is it at this hour, in this weather?” Chie questioned as she picked the name card off the maid’s lacquer tray. \n “Shinoda, Akira. Kobe Dental College,” she read. \n Naomi recognized the name. Chie heard a soft intake of air. \n “I think you should go,” said Naomi. \n Akira was waiting in the entry. He was in his early twenties, slim and serious, wearing the black military-style uniform of a student. As he bowed-his hands hanging straight down, a black cap in one, a yellow oil-paper umbrella in the other—Chie glanced beyond him. In the glistening surface of the courtyard’s rain-drenched paving stones, she saw his reflection like a dark double. \n “Madame,” said Akira, “forgive my disruption, but I come with a matter of urgency.” \n His voice was soft, refined. He straightened and stole a deferential peek at her face. \n In the dim light his eyes shone with sincerity. Chie felt herself starting to like him. \n “Come inside, get out of this nasty night. Surely your business can wait for a moment or two.” \n “I don’t want to trouble you. Normally I would approach you more properly but I’ve received word of a position. I’ve an opportunity to go to America, as dentist for Seattle’s Japanese community.” \n “Congratulations,” Chie said with amusement. “That is an opportunity, I’m sure. But how am I involved?” \n Even noting Naomi’s breathless reaction to the name card, Chie had no idea. Akira’s message, delivered like a formal speech, filled her with maternal amusement. You know how children speak so earnestly, so hurriedly, so endearingly about things that have no importance in an adult’s mind? That’s how she viewed him, as a child. \n It was how she viewed Naomi. Even though Naomi was eighteen and training endlessly in the artsneeded to make a good marriage, Chie had made no effort to find her a husband. Akira blushed. \n “Depending on your response, I may stay in Japan. I’ve come to ask for Naomi’s hand.” \n Suddenly Chie felt the dampness of the night. \n “Does Naomi know anything of your... ambitions?” \n “We have an understanding. Please don’t judge my candidacy by the unseemliness of this proposal. I ask directly because the use of a go-between takes much time. Either method comes down to the same thing: a matter of parental approval. If you give your consent, I become Naomi’s yoshi. We’ll live in the House of Fuji. Without your consent, I must go to America, to secure a new home for my bride.” \n Eager to make his point, he’d been looking her full in the face. Abruptly, his voice turned gentle. \n “I see I’ve startled you. My humble apologies. I’ll take no more of your evening. My address is on my card. If you don’t wish to contact me, I’ll reapproach you in two weeks’ time. Until then, good night.” He bowed and left. Taking her ease, with effortlessgrace, like a cat making off with a fish. \n “Mother?” Chie heard Naomi’s low voice and turned from the door. “He has asked you?” \n The sight of Naomi’s clear eyes, her dark brows gave Chie strength. Maybe his hopes were preposterous. \n “Where did you meet such a fellow?” Chai began.  “Imagine! He thinks he can marry the Fuji heir and take her to America all in the snap of his fingers!” \n Chie waited for Naomi’s ripe laughter. Naomi was silent. She stood a full half minute looking straight into Chie’s eyes. Finally, she spoke: \n “Mother.” \n “Yes?” \n “I mean to have him.\n\n";
 		alert(passageContent);
-		
-	var passageMeasuredWordArrays = [];
-	var paragraphMeasuredWordArrays = [];
 	
 	var canvas = document.createElement('canvas');
 	var context = canvas.getContext("2d");
-	context.font = "12pt Roboto";
+	var theFont = context.font = "12pt Roboto";
 	var truePassageContent = passageContent.replace(/[\—]/g, " — ");
 	var paragraphArray = truePassageContent.split(/\n/);
 	var numParagraphs = paragraphArray.length;
@@ -487,7 +495,6 @@ coolerThings: function(){
 	{
 		
 		var wordArray = paragraphArray[i].split(/\s/g);
-		console.log("here measure each word, separate it, save it, define it, characterize it, and then `objectify it`" + wordArray);
 		var numWords = wordArray.length;
 		var wordCount = 0;
 		
@@ -499,7 +506,7 @@ coolerThings: function(){
 			var space="&nbsp&nbsp&nbsp&nbsp";
 			var spaceOffset = "";
 
-			while((currentWidth + 36) < widths[k] && wordCount <= numWords)
+			while((currentWidth + 48) < widths[k] && wordCount <= numWords)
 			{
 				currentLine = testLine;
 				if (testLine != "")
@@ -510,41 +517,87 @@ coolerThings: function(){
       				{
       					//new paragraph
       					testLine += space;
-      					spaceOffset = "aaaaaaaaaaaa";
+      					spaceOffset = "aaaaaaaaaaaaaaaaaaaaa";
       				}
       			var oldWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
 				testLine += wordArray[wordCount]; //add a word
 				currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
-				console.log(currentWidth);
+				var remainingWidth = widths[k] - currentWidth;
 				var wordWidth = currentWidth - oldWidth;
 				var currentWord = wordArray[wordCount];
+				if (currentWord == undefined) {currentWord = " ";}
 				var index = this.lineMeasuredWordArrays.length;
-					this.push('lineMeasuredWordArrays', {"index": index, line:currentRow, order: wordCount, word: currentWord, pixels: wordWidth, "current line width": currentWidth, definition: 'meaning', "part of speech": "part of speech"});
-				console.log(this.lineMeasuredWordArrays[currentRow]);
+				var indexWord = this.indexWord = currentWord;
+				var mo = this.indexWord.length-1;
+				while(this.indexWord[mo] == "." || this.indexWord[mo] == "#"|| this.indexWord[mo] == "$" || this.indexWord[mo] == "[" || this.indexWord[mo] == "]" || this.indexWord[mo-1] == "." || this.indexWord[mo-1] == "#"|| this.indexWord[mo-1] == "$" || this.indexWord[mo-1] == "[" || this.indexWord[mo-1] == "]")
+						{
+							indexWord = this.indexWord.slice(0,mo); 
+							mo = mo-1;
+						}
+				var strIndex = ("000" + index).slice(-4);
+				var rowRow = ("00" + currentRow).slice(-3);
+				var instance = rowRow + "_" + strIndex + "_Passage_1_at_" + widths[k] + "_" + indexWord;
+				var wordName = instance;
+				this.push('lineMeasuredWordArrays',
+								{ 
+										"instance": instance,
+										"index": strIndex,
+										'line': rowRow,
+										'order': wordCount,
+										'word' : currentWord, 
+										'pixels': wordWidth,
+										'line-length-remaining': remainingWidth, 
+										'font-size': theFont,
+										'font-family': theFont,
+										"current-line-width": currentWidth, 
+										'definition': 'meaning', 
+										"part of speech": "part of speech",
+										'clause': 'phrases are phrase for all of my lasers', 
+										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build."
+							}
+						);
+					this.passageWordObject[instance]={ 
+										"instance": instance,
+										"index": strIndex,
+										'line': rowRow,
+										'order': wordCount,
+										'word' : currentWord, 
+										'pixels': wordWidth,
+										'line-length-remaining': remainingWidth, 
+										'font-size': theFont,
+										'font-family': theFont,
+										"current-line-width": currentWidth, 
+										'definition': 'meaning', 
+										"part of speech": "part of speech",
+										'clause': 'phrases are phrase for all of my lasers', 
+										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build."
+								};
 			
-				wordCount++;
 
-			
-			}
+						wordCount++;
+					}
+
+				
+
 				currentRow++;
 
 			currentWidth = 0;
 			
-		}
+			}
 		
-	}
-
-	var self = this.lineMeasuredWordArrays;
+	
+		}
 	var storethis = window.localStorage;
 	storethis.setItem("Passage_1_@:_" + widths[k], JSON.stringify(this.lineMeasuredWordArrays));
-	alert("stored Passage 1: " + JSON.stringify(this.lineMeasuredWordArrays));
-	console.log(JSON.stringify(this.lineMeasuredWordArrays));
+	var arrayPassage = this.lineMeasuredWordArrays;
+	ref.child("Passage_1_@:_" + widths[k]).set(arrayPassage);
+	ref.child("Passage_1A_@:_" + widths[k]).set(this.passageWordObject);
+	alert("Passage_1_@:_" + widths[k] + JSON.stringify(this.lineMeasuredWordArrays));
 	this.lineMeasuredWordArrays = [];
-
-
-}
-				
-},
+	this.passageWordObject = {};
+	
+			}				
+	},
 
 	
 		coolThings: function(){
@@ -553,7 +606,7 @@ coolerThings: function(){
 			var franklin = this.superItemArray[1];
 			var name = this.superItemArray[1].Full_Name;
 			var email = this.superItemArray[1].Email;
-			//alert(JSON.stringify(this.superItemArray[1]));
+			alert(JSON.stringify(this.superItemArray[1]));
 			adminStorage2.setItem(name,email,len);
 
 			
