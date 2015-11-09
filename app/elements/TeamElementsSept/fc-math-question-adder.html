@@ -5,6 +5,10 @@
 <dom-module id="fc-math-question-adder">
   <template>
     <style>
+      #main_question_toolbar {
+        background-color: gray;
+        height: 20px;
+      }
       #input_choices_area,#desired_questions_inputs_area,#question_preview_area {
         margin: 15px;
         min-height:50px;
@@ -62,33 +66,36 @@
         opacity: 1;
       }
       math-tex.display-equation:last-of-type {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
       }
       #question_preview_area {
         width: 300px;
         height: 420px;
+        padding: 5px;
         z-index: 0;
       }
     </style>
 
     <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
+    <div id="main_question_toolbar"class="flex horizontal"></div>
     <div class="horizontal layout">
 
       <div id="input_choices_area" class="flex-1">
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Question Key" required label="Question Key"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" name="Leading Equation" label="Leading Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><input class="in_value flex" name="Question Image" type="file" on-change="readImage"></input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" name="Question Text" label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" on-focus="sayHi" data-inputtype="Display Equation" label="Display Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
         <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
-          <div class="in_value flex" name="Answer Choices">
-                <paper-item><paper-input label="A"></paper-input></paper-item>
-                <paper-item><paper-input label="B"></paper-input></paper-item>
-                <paper-item><paper-input label="C"></paper-input></paper-item>
-                <paper-item><paper-input label="D"></paper-input></paper-item>
+          <fc-image-upload raised class="in_value flex" data-inputtype="Question Image">Add Images</fc-image-upload>
+          <iron-icon class="js-remove" icon="clear"></iron-icon>
+        </div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" data-inputtype="Question Text" label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+          <div class="in_value flex" data-inputtype="Answer Choices">
+            <paper-input label="A"></paper-input>
+            <paper-input label="B"></paper-input>
+            <paper-input label="C"></paper-input>
+            <paper-input label="D"></paper-input>
           </div>
           <iron-icon class="js-remove" icon="clear"></iron-icon>
         </div>
@@ -100,25 +107,39 @@
 
           </div>
         </form>
-        <paper-button id="preview_button" on-tap="showFormContents">Preview</paper-button>
-        <paper-input label="Type Math Here" value="{{poop}}"></paper-input>
-        <math-tex id="designated_area"></math-tex>
-        <math-tex>\sum{45(\frac{n-1}{4n^2}})</math-tex>
+        <paper-button id="preview_button" raised on-tap="showFormContents">Preview</paper-button>
       </div>
 
-      <div id="question_preview_area" class="" on-mousedown="onMouseClickOnMyCanvas" on-mousemove="onMouseMoveOnMyCanvas">
+      <!--<div id="question_preview_area" class="vertical layout" on-mousedown="onMouseClickOnMyCanvas" on-mousemove="onMouseMoveOnMyCanvas">-->
+      <div id="question_preview_area" class="vertical layout">
       </div>
+
     </div>
   </template>
   <script>
     Polymer({
       is: 'fc-math-question-adder',
+
+      behaviors: [
+        Polymer.IronA11yKeysBehavior
+      ],
+
+      keyBindings: {
+      'ctrl+shift+m': '_insertMathTex'
+      },
+
       properties: {
-        poop: {
-          type: String,
-          value: '',
-          notify: true,
-          observer: 'sayHi'
+        boundKeys: {
+          type: Array,
+          value: function() {
+            return Object.keys(this.keyBindings).join(' ').split(' ');
+          }
+        },
+        keyEventTarget: {
+          type: Object,
+          value: function() {
+            return document.body;
+          }
         }
       },
 
@@ -145,15 +166,7 @@
             desired_questions_inputs.removeChild(e.item.parentNode);
           }
         });
-        this.createCanvasOverlay('','question_preview_area');
-      },
-
-      sayHi: function(){
-        var poop_two = this.poop;
-        //just effing around with finding other way of writing fractions besides \frac{}{} in case but not important - need iteration to get all and pair correctly
-        var frac_find = new RegExp(/\({1}[\d\w]*\/[\d\w]*\){1}/g);
-        console.log(poop_two.match(frac_find));
-        this.$.designated_area.textContent = this.poop;
+        //this.createCanvasOverlay('','question_preview_area');
       },
 
       readImage: function(input,after_index){
@@ -179,10 +192,9 @@
         var whoa_array = Polymer.dom(this.$.desired_questions_inputs_area).querySelectorAll('.in_value');
 
         for(var i =0; i<whoa_array.length;i++){
-          console.log(whoa_array[i].value);
-          console.log(whoa_array[i].name);
-          switch(whoa_array[i].name){
-            case 'Leading Equation':
+          console.log(whoa_array[i].getAttribute('data-inputtype'));
+          switch(whoa_array[i].getAttribute('data-inputtype')){
+            case 'Display Equation':
               var mtel = document.createElement('math-tex');
               mtel.className="self-center display-equation preview_mode"
               mtel.textContent = whoa_array[i].value;
@@ -199,34 +211,48 @@
               var input = whoa_array[i];
               this.readImage(input,i);
               break;
+            case 'Answer Choices':
+              var acel = document.createElement('ol');
+              acel.type = 'A';
+              var choice_array = whoa_array[i].querySelectorAll('paper-input');
+              for(var j=0; j<choice_array.length; j++){
+                var next_choice = document.createElement('li');
+                next_choice.innerHTML = choice_array[j].value;
+                acel.appendChild(next_choice);
+              }
+              Polymer.dom(this.$.question_preview_area).appendChild(acel);
+              break;
           }
         }
-        this.createCanvasOverlay('','question_preview_area');
+        //this.createCanvasOverlay('','question_preview_area');
       },
 
-      createCanvasOverlay: function(color, canvasContainer){
+      _insertMathTex: function(e){
+        console.log(e.detail);
+        console.log(this.keyEventTarget);
+      },
+
+      sayHi: function(e){
+        console.log(e.target);
+        this.keyEventTarget=e.target;
+      }
+
+      /*createCanvasOverlay: function(color, canvasContainer){
             myCanvas = document.createElement('canvas');
             var superContainer = this.$[canvasContainer];
             myCanvas.style.width = '300px';
             myCanvas.style.height = '420px';
             myCanvas.style.zIndex = 1000;
-            // You must set this otherwise the canvas will be streethed to fit the container
+            // You must set this otherwise the canvas will be stretched to fit the container
             myCanvas.width = 300;
             myCanvas.height = 420;
             myCanvas.style.overflow = 'visible';
             myCanvas.style.position = 'relative';
             myCanvas.style.top = '0px';
             myCanvas.style.left = '0px';
+            myCanvas.style.display = 'block';
 
             var context=myCanvas.getContext('2d');
-            /*//context.fillStyle = color;
-            //context.fillRect(0,0, myCanvas.width, myCanvas.height);
-            context.beginPath();
-            context.strokeStyle='rgb(0,255,0)';  // a green line
-            context.lineWidth=4;                       // 4 pixels thickness
-            context.moveTo(50,50);
-            context.lineTo(150,150);
-            context.stroke();*/
             superContainer.appendChild(myCanvas);
 
       },
@@ -236,9 +262,7 @@
 
         if (myCanvas.drawing){
           var mouseX= event.layerX;
-
           var mouseY=event.layerY;
-          console.log(mouseY);
 
           var context = myCanvas.getContext("2d");
           if (myCanvas.pathBegun==false)
@@ -253,6 +277,7 @@
           }
         }
       },
+
       onMouseClickOnMyCanvas: function(event){
         var myCanvas = Polymer.dom(this.$.question_preview_area).querySelector('canvas');
         console.log(event);
@@ -260,7 +285,7 @@
         // reset the path when starting over
         if (myCanvas.drawing)
           myCanvas.pathBegun=false;
-      }
+      }*/
     });
   </script>
 </dom-module>
