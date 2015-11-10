@@ -6,13 +6,14 @@
   <template>
     <style>
       #main_question_toolbar {
-        background-color: gray;
-        height: 20px;
+        background-color: white;
       }
-      #input_choices_area,#desired_questions_inputs_area,#question_preview_area {
+      #main_question_toolbar *{
+        padding: 10px;
+      }
+      #input_choices_box,#desired_questions_inputs_box,#question_preview_box {
         margin: 15px;
         min-height:50px;
-        border: 1px dashed gray;
       }
       .addable_input {
         border: 1px solid black;
@@ -28,6 +29,24 @@
         position: relative;
         font-style: normal;
       }
+      #input_choices_area .handle {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        position: relative;
+        font-style: normal;
+      }
+      #input_choices_area div:hover .handle {
+        opacity: 1;
+      }
+      #desired_questions_inputs_area {
+        min-width: 100px;
+        min-height: 100px;
+        padding-bottom: 10px;
+        border: 1px solid black;
+      }
       #desired_questions_inputs_area .js-remove {
         -webkit-transition: opacity .2s;
         transition: opacity .2s;
@@ -35,15 +54,6 @@
         display: block;
         cursor: pointer;
         color: #c00;
-        position: relative;
-        font-style: normal;
-      }
-      #input_choices_area .handle {
-        -webkit-transition: opacity .2s;
-        transition: opacity .2s;
-        opacity: 0;
-        display: block;
-        cursor: pointer;
         position: relative;
         font-style: normal;
       }
@@ -62,56 +72,106 @@
       #desired_questions_inputs_area div:hover .js-remove{
         opacity: 1;
       }
-      #input_choices_area div:hover .handle {
-        opacity: 1;
-      }
-      math-tex.display-equation:last-of-type {
-        margin-bottom: 10px;
-      }
       #question_preview_area {
         width: 300px;
         height: 420px;
+        border: 1px solid gray;
         padding: 5px;
         z-index: 0;
+        overflow-y: scroll;
+      }
+      #question_preview_area *:not(math-tex) {
+        margin: 6px 0px 6px 0px;
+      }
+      #question_preview_area li,p {
+        word-wrap: break-word;
+      }
+      #question_preview_area *:not(math-tex)+math-tex {
+        margin-top: 6px;
+      }
+      #question_preview_area math-tex+*:not(math-tex) {
+        margin-top: 12px;
+        margin-bottom: 6px;
+      }
+       #question_preview_area math-tex.display-equation+math-tex.display-equation {
+        margin-top: 0px;
+      }
+      paper-button {
+        background: var(--default-primary-color);
+        color: white;
+      }
+      paper-toolbar {
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
       }
     </style>
 
     <firebase-document id="math_questions_loc" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
-    <div id="main_question_toolbar"class="flex horizontal"></div>
+
+    <paper-material id="main_question_toolbar" class="flex horizontal center layout">
+        <paper-toggle-button checked='{{specificTestTrue}}'>For A Specific Test?</paper-toggle-button>
+        <paper-dropdown-menu name="Test Name" always-float-label label="Test" disabled='{{!specificTestTrue}}'>
+          <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedTest}}">
+            <paper-item value="SAT (1600) - Test 1">SAT (1600) - Test 1</paper-item>
+            <paper-item value="SAT (1600) - Test 2">SAT (1600) - Test 2</paper-item>
+            <paper-item value="SAT (1600) - Test 3">SAT (1600) - Test 3</paper-item>
+            <paper-item value="SAT (1600) - Test 4">SAT (1600) - Test 4</paper-item>
+          </paper-menu>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu name="Section" always-float-label label="Section" disabled='{{!specificTestTrue}}'>
+          <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedSection}}">
+            <paper-item value="Section 1 - Reading">Section 1 - Reading</paper-item>
+            <paper-item value="Section 2 - Writing">Section 2 - Writing</paper-item>
+            <paper-item value="Section 3 - Math (No Calculator)">Section 3 - Math (No Calculator)</paper-item>
+            <paper-item value="Section 4 - Math (Calculator)">Section 4 - Math (Calculator)</paper-item>
+          </paper-menu>
+        </paper-dropdown-menu>
+        <paper-input name="Question Number" always-float-label label="Question Number" disabled='{{!specificTestTrue}}' auto-validate pattern="\d{1,2}"></paper-input>
+        <paper-button id="preview_button" raised on-tap="showFormContents" type="number">Preview Question</paper-button>
+    </paper-material>
+
     <div class="horizontal layout">
 
-      <div id="input_choices_area" class="flex-1">
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" on-focus="sayHi" data-inputtype="Display Equation" label="Display Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+      <div id="input_choices_box" class="flex-1">
+        <paper-toolbar><div>Drag Question Elements to Center Area</div></paper-toolbar>
+        <div id="input_choices_area">
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" on-focus="changeKeyboardTarget" data-inputtype="Display Equation" label="Display Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
-          <fc-image-upload raised class="in_value flex" data-inputtype="Question Image">Add Images</fc-image-upload>
-          <iron-icon class="js-remove" icon="clear"></iron-icon>
-        </div>
-
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" data-inputtype="Question Text" label="Question Text"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
-
-        <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
-          <div class="in_value flex" data-inputtype="Answer Choices">
-            <paper-input label="A"></paper-input>
-            <paper-input label="B"></paper-input>
-            <paper-input label="C"></paper-input>
-            <paper-input label="D"></paper-input>
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+            <fc-image-upload raised class="in_value flex" data-inputtype="Question Image">Add Images</fc-image-upload>
+            <iron-icon class="js-remove" icon="clear"></iron-icon>
           </div>
-          <iron-icon class="js-remove" icon="clear"></iron-icon>
+
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" data-inputtype="Question Text" label="Question Text" on-focus="changeKeyboardTarget"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+            <div class="in_value flex" data-inputtype="Answer Choices">
+              <paper-input label="A"></paper-input>
+              <paper-input label="B"></paper-input>
+              <paper-input label="C"></paper-input>
+              <paper-input label="D"></paper-input>
+            </div>
+            <iron-icon class="js-remove" icon="clear"></iron-icon>
+          </div>
         </div>
       </div>
 
-      <div "question_input_area" class="flex-2">
-        <form is="iron-form" id="math_question_adder_form" on-iron-submit>
-          <div id="desired_questions_inputs_area">
-
-          </div>
-        </form>
-        <paper-button id="preview_button" raised on-tap="showFormContents">Preview</paper-button>
+      <!-- <div "question_input_area" class="flex-2">
+        <form is="iron-form" id="math_question_adder_form" on-iron-submit> -->
+      <div id="desired_questions_inputs_box" class="flex-2">
+        <paper-toolbar><div>Drag Question Elements Here to Make Question</div></paper-toolbar>
+        <div id="desired_questions_inputs_area">
+        </div>
       </div>
+        <!-- </form>
+      </div> -->
 
       <!--<div id="question_preview_area" class="vertical layout" on-mousedown="onMouseClickOnMyCanvas" on-mousemove="onMouseMoveOnMyCanvas">-->
-      <div id="question_preview_area" class="vertical layout">
+      <div id="question_preview_box">
+        <paper-toolbar><div>Question Preview</div></paper-toolbar>
+        <div id="question_preview_area" class="vertical layout">
+        </div>
       </div>
 
     </div>
@@ -138,7 +198,7 @@
         keyEventTarget: {
           type: Object,
           value: function() {
-            return document.body;
+            return this;
           }
         }
       },
@@ -188,7 +248,7 @@
 
       showFormContents: function(e){
         Polymer.dom(this.$.question_preview_area).innerHTML='';
-        var whoa = this.$.math_question_adder_form.serialize();
+        //var whoa = this.$.math_question_adder_form.serialize();
         var whoa_array = Polymer.dom(this.$.desired_questions_inputs_area).querySelectorAll('.in_value');
 
         for(var i =0; i<whoa_array.length;i++){
@@ -202,6 +262,7 @@
               break;
             case 'Question Text':
               var qtel = document.createElement('p');
+              //qtel.style.margin = "inherit 0px";
               qtel.style.wordWrap = "break-word";
               qtel.className="preview_mode";
               qtel.innerHTML = whoa_array[i].value;
@@ -228,12 +289,11 @@
       },
 
       _insertMathTex: function(e){
-        console.log(e.detail);
+        console.log(e.detail.keyboardEvent.path[0]);
         console.log(this.keyEventTarget);
       },
 
-      sayHi: function(e){
-        console.log(e.target);
+      changeKeyboardTarget: function(e){
         this.keyEventTarget=e.target;
       }
 
