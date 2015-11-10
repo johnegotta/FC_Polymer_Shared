@@ -1,0 +1,84 @@
+<dom module id="fc-span">
+<template>
+<style is="custom-style">
+</style>
+<span id="focusedSpan" contentEditable='{{contentEdit}}' new-para='{{newPara}}' value="{{bindValue}}" on-tap='_toggleEditable'>
+<content id="spanContentIdOne"> 
+
+<!--Place binding and anchors in here -->
+</content>
+</span>
+<br hidden="{{newPara}}"><span hidden="{{newPara}}">&nbsp&nbsp&nbsp&nbsp</span>
+
+</template>
+<script>
+Polymer({
+    
+    is: 'fc-span',
+
+    behaviors: [
+      
+    ],
+
+    properties: {
+      /**
+       * Use this property instead of `value` for two-way data binding.
+       */
+      bindValue: {
+        observer: '_bindValueChanged',
+        type: String, 
+        notify: true, 
+        reflectToAttributes: true
+      },
+      contentEdit: {
+      	type: Boolean,
+      	value: false,
+      	notify: true, 
+      	reflectToAttributes: true
+      },
+      newPara: {
+      	type: Boolean,
+      	value: true, 
+      	notify: true, 
+      	reflectToAttributes: true
+      },
+      highlighted:{
+      	type: Boolean, 
+      	value: false, 
+      	observer: '_doSomeHighlight',
+      	notify: true, 
+      	reflectToAttributes: true
+      }
+
+
+    },
+
+
+
+       ready: function() {
+      this.bindValue = this.value;
+    },
+
+    /**
+     * @suppress {checkTypes}
+     */
+    _bindValueChanged: function() {
+      if (this.value !== this.bindValue) {
+        this.value = !(this.bindValue || this.bindValue === 0) ? '' : this.bindValue;
+      }
+      // manually notify because we don't want to notify until after setting value
+      this.fire('bind-value-changed', {value: this.bindValue});
+    },
+
+    _toggleEditable: function(){
+    	alert(this.$.focusedSpan.contentEdit);
+		this.$.focusedSpan.contentEdit=!this.$.focusedSpan.contentEdit;
+	},
+	
+	_doSomeHighlight: function(){
+
+	}
+
+    });
+</script>
+</dom-module>
