@@ -493,7 +493,7 @@ coolerThings: function(){
 	var currentRow = 0;
 	for(i=0; i< numParagraphs; i++)
 	{
-		var newPara=false;
+		var newPara=true;
 		var wordArray = paragraphArray[i].split(/\s/g);
 		var numWords = wordArray.length;
 		var wordCount = 0;
@@ -505,9 +505,10 @@ coolerThings: function(){
 			var currentWidth = 0;
 			var space="&nbsp&nbsp&nbsp&nbsp";
 			var spaceOffset = "";
-
+			var newline = true;
 			while((currentWidth + 48) < widths[k] && wordCount <= numWords)
 			{
+				
 				currentLine = testLine;
 				if (testLine != "")
 				{
@@ -538,12 +539,16 @@ coolerThings: function(){
 				var rowRow = ("00" + currentRow).slice(-3);
 				var instance = rowRow + "_" + strIndex + "_Passage_1_at_" + widths[k] + "_" + indexWord;
 				var wordName = instance;
+				var labelLine = false;
+
+				if (currentRow>0 && currentRow%5==0 && newline==true){labelLine=true;} 
 			
 				this.push('lineMeasuredWordArrays',
 								{ 
 										"instance": instance,
 										"index": strIndex,
 										'line': rowRow,
+										'current-line': currentLine,
 										'order': wordCount,
 										'word' : currentWord, 
 										'pixels': wordWidth,
@@ -555,13 +560,17 @@ coolerThings: function(){
 										"part of speech": "part of speech",
 										'clause': 'phrases are phrase for all of my lasers', 
 										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build.",
-										'paragraphBreak': newPara
+										'paragraphBreak': newPara,
+										'labelline': labelLine,
+										'row':currentRow,
+										'newline': newline
 							}
 						);
 					this.passageWordObject[instance]={ 
 										"instance": instance,
 										"index": strIndex,
 										'line': rowRow,
+										'current-line': currentLine,
 										'order': wordCount,
 										'word' : currentWord, 
 										'pixels': wordWidth,
@@ -573,10 +582,14 @@ coolerThings: function(){
 										"part of speech": "part of speech",
 										'clause': 'phrases are phrase for all of my lasers', 
 										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build.",
-										'paragraphBreak': newPara
+										'paragraphBreak': newPara,
+										'labelline': labelLine,
+										'row':currentRow,
+										'newline': newline
 								};
+								newline=false;
 			
-						newPara = true;
+						newPara = false;
 						wordCount++;
 					}
 
