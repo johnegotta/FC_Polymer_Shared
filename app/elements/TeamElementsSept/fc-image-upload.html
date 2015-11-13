@@ -49,6 +49,20 @@
       opacity: 1;
     }
 
+    .name iron-icon:not([icon="cancel"]) {
+      opacity: 0;
+      border-radius: 50%;
+    }
+    .name:hover iron-icon:not([icon="cancel"]) {
+      opacity: 1;
+    }
+    .file[data-correct=true] .name iron-icon:not([icon="cancel"]) {
+        opacity: 1;
+        color: white;
+        background: green;
+        margin-right: 5px;
+    }
+
     [hidden] {
       display: none;
     }
@@ -66,6 +80,7 @@
     paper-progress[error] {
       --paper-progress-active-color: #f40303;
     }
+
   </style>
 
   <template>
@@ -76,9 +91,10 @@
       </paper-button>
       <div id='UploadBorder'>
         <div id="dropArea" hidden$="{{_hiddenDropText}}">{{dropText}}</div>
-        <template is="dom-repeat" items="{{files}}">
+        <template is="dom-repeat" id="chosen_files" items="{{files}}" sort="_fileSort" observe="{{item.correct}}">
           <div class="file">
             <div class="name">
+              <iron-icon prefix icon="check" on-tap="_markAsCorrect" tabindex="-1" hidden$="{{!answerChoices}}"></iron-icon>
               <span>{{item.name}}</span>
               <div class="commands">
                 <iron-icon icon="cancel" title="Remove" on-click="_cancelUpload" hidden$="{{item.complete}}"></iron-icon>
@@ -129,7 +145,12 @@
         */
         multi: {
           type: Boolean,
-          value: true
+          value: false
+        },
+
+        answerChoices: {
+          type: Boolean,
+          value: false
         },
 
         /**
@@ -247,9 +268,14 @@
           file.progress = 0;
           file.error = false;
           file.complete = false;
+          file.correct = false;
           this.push("files", file);
           //this.uploadFile(file);
         }
+      },
+
+      _fileSort: function(img_a, img_b){
+        return img_a.name < img_b.name ? -1 : 1;
       },
 
       /**
@@ -271,6 +297,15 @@
       */
       _cancelUpload: function(e) {
         this.cancel(e.model.__data__.item);
+      },
+
+      _markAsCorrect: function(e) {
+        var image_choices = Polymer.dom(this.root).querySelectorAll(".file");
+        var correct_index = this.files.indexOf(e.model.__data__.item);
+        for (var i = 0; i < image_choices.length; i++){
+          image_choices[i].setAttribute('data-correct', i == correct_index ? true : false);
+          this.files[i].correct = i == correct_index ? true : false;
+        }
       },
 
       /**

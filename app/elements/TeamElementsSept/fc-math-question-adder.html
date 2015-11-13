@@ -52,9 +52,9 @@
         background: rgba(63, 81, 181, .5);
         padding: 0px 10px 10px 10px;
       }
-      #question_instructions_area paper-input{
+      #question_instructions_area>paper-input-container{
         background: white;
-        padding: 5px;
+        padding: 8px 5px 8px 5px;
       }
       #question_tagging_area {
         border-top: 1px solid black;
@@ -98,7 +98,7 @@
         width: 300px;
         height: 420px;
         border: 1px solid gray;
-        padding: 5px 0px 5px 0px;
+        padding: 5px 5px 5px 5px;
         z-index: 0;
         overflow-y: scroll;
       }
@@ -107,6 +107,10 @@
       }
       #question_preview_area li,p {
         word-wrap: break-word;
+      }
+      #question_preview_area li[data-correct=true] {
+        padding: 5px;
+        background: rgba(77, 255, 136, .75);
       }
       #question_preview_area *:not(math-tex)+math-tex {
         margin-top: 6px;
@@ -124,7 +128,7 @@
         border-right: 1px solid black;
         border-bottom: 1px solid rgba(186, 185, 185, .5);
         background: rgba(63, 81, 181, .5);
-        padding: 10px 0px 10px 0px;
+        padding: 10px 5px 10px 5px;
         width: 300px;
       }
       #question_tag_preview_area .js-remove {
@@ -140,6 +144,8 @@
       #question_tag_preview_area div{
         margin: 2px;
         border-radius: 4px;
+        font-size: 10px;
+        height: 16px;
       }
       #question_tag_preview_area div:hover .js-remove {
         opacity: 1;
@@ -169,7 +175,7 @@
     </style>
 
     <firebase-document id="math_questions_loc" location="https://focusedstaging1.firebaseio.com/questions"></firebase-document>
-    <firebase-collection id="question_tags_loc" data="{{question_tags}}" on-firebase-value="sayHi" location="https://focusedstaging1.firebaseio.com/Question_Tags"></firebase-collection>
+    <firebase-collection id="question_tags_loc" data="{{question_tags}}" location="https://focusedstaging1.firebaseio.com/Question Tags"></firebase-collection>
 
     <paper-material id="main_question_toolbar" class="flex horizontal center layout">
         <paper-toggle-button checked='{{specificTestTrue}}'>For A Specific Test?</paper-toggle-button>
@@ -198,32 +204,38 @@
       <div id="input_choices_box" class="flex-1">
         <paper-toolbar><div>Drag Question Elements to Center Area</div></paper-toolbar>
         <div id="input_choices_area">
-          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" on-focus="changeKeyboardTarget" data-inputtype="Display Equation" label="Display Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex" on-focus="_changeKeyboardTarget" data-inputtype="Display Equation" label="Display Equation"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
           <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
-            <fc-image-upload raised class="in_value flex" data-inputtype="Question Image">Add Images</fc-image-upload>
+            <fc-image-upload raised class="in_value flex" data-inputtype="Question Image">Add Display Image</fc-image-upload>
             <iron-icon class="js-remove" icon="clear"></iron-icon>
           </div>
 
-          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" data-inputtype="Question Text" label="Question Text" on-focus="changeKeyboardTarget"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-textarea class="in_value flex" data-inputtype="Question Text" label="Question Text" on-focus="_changeKeyboardTarget"></paper-textarea><iron-icon class="js-remove" icon="clear"></iron-icon></div>
 
           <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
             <div class="in_value flex" data-inputtype="Answer Choices">
-              <paper-input label="A" on-focus="changeKeyboardTarget">
+              <paper-input label="A" on-focus="_changeKeyboardTarget">
                 <paper-icon-button prefix icon="check" on-tap="markAsCorrect" tabindex="-1"></paper-icon-button>
               </paper-input>
-              <paper-input label="B" on-focus="changeKeyboardTarget">
+              <paper-input label="B" on-focus="_changeKeyboardTarget">
                 <paper-icon-button prefix icon="check" on-tap="markAsCorrect" tabindex="-1"></paper-icon-button>
               </paper-input>
-              <paper-input label="C" on-focus="changeKeyboardTarget">
+              <paper-input label="C" on-focus="_changeKeyboardTarget">
                 <paper-icon-button prefix icon="check" on-tap="markAsCorrect" tabindex="-1"></paper-icon-button>
               </paper-input>
-              <paper-input label="D" on-focus="changeKeyboardTarget">
+              <paper-input label="D" on-focus="_changeKeyboardTarget">
                 <paper-icon-button prefix icon="check" on-tap="markAsCorrect" tabindex="-1"></paper-icon-button>
               </paper-input>
             </div>
             <iron-icon class="js-remove" icon="clear"></iron-icon>
           </div>
+
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+            <fc-image-upload raised multi answer-choices class="in_value flex" data-inputtype="Answer Choice Images">Add 4 Answer Images</fc-image-upload>
+            <iron-icon class="js-remove" icon="clear"></iron-icon>
+          </div>
+
         </div>
       </div>
 
@@ -237,19 +249,18 @@
             <li>Math-tex tags are not necessary in display equations</li>
             <li>Click the check mark to mark an answer as correct</li>
           </ul>
-          <paper-input type="search" list="question_tags_datalist" autosave="{{question_tags}}" always-float-label label="Add Question Tags" on-focus="startQuestionTagging"></paper-input>
-          <!-- <fc-paper-input-text-autocomplete choices="{{question_tags}}" always-float-label label="Add Question Tags" on-focus="startQuestionTagging"></fc-paper-input-text-autocomplete> -->
+          <paper-input-container style="background:white">
+            <label for="question_tag_input">Add Question Tags</label>
+            <input name="question_tag_input" id="tag_input_area" is="iron-input" type="text" list="question_tags_datalist" autocomplete="on" list="question_tags_datalist" always-float-label label="Add Question Tags" on-focus="_startQuestionTagging"></input>
+          </paper-input-container>
         </div>
-        <!-- <div id="question_tagging_area">
-          <paper-input type="text" list="question_tags_datalist" always-float-label label="Add Question Tags"></paper-input>
-        </div> -->
         <div id="desired_questions_inputs_area">
         </div>
       </div>
 
       <datalist id="question_tags_datalist">
-        <template is="dom-repeat" items="{{question_tags}}">
-          <option value$="JSON.stringify({{item}});"></option>
+        <template is="dom-repeat" items="{{question_tags}}" sort="_sortTags">
+          <option value="{{item.value}}"></option>
         </template>
       </datalist>
         <!-- </form>
@@ -330,78 +341,103 @@
             applied_questions_tags.removeChild(e.item);
           }
         });
-        //this.createCanvasOverlay('','question_preview_area');
       },
 
-      readImage: function(input,after_index){
+      readImage: function(input,after_index,multiple){
         var self = this;
 
-        if (input.files && input.files[0]) {
+        if (input.files && input.files[0] && multiple == false) {
+
             var reader = new FileReader();
             reader.onload = function (e) {
               var after_node = Polymer.dom(self.$.question_preview_area).childNodes[after_index];
               var image_element = document.createElement('img');
               image_element.className="self-center preview_mode"
               image_element.src = e.target.result;
-              image_element.style.width = '250px';
+              image_element.style.width = '275px';
               Polymer.dom(self.$.question_preview_area).insertBefore(image_element,after_node);
             };
-
             reader.readAsDataURL(input.files[0]);
+
+        } else if (input.files && input.files[0] && multiple == true) {
+
+          var after_node = Polymer.dom(self.$.question_preview_area).childNodes[after_index];
+          var image_ol = document.createElement('ol');
+          image_ol.type = 'A';
+          Polymer.dom(self.$.question_preview_area).appendChild(image_ol);
+
+          for (var i = 0; i < input.files.length; i++) {
+            (function(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                  var image_element_li = document.createElement('li');
+                  image_element_li.setAttribute('data-correct', file.correct);
+                  //image_element_li.setAttribute('data-correct', )
+                  var image_element = document.createElement('img');
+                  image_element.className="self-center preview_mode"
+                  image_element.src = e.target.result;
+                  image_element.style.width = '100px';
+                  image_element.align = 'top';
+                  image_element_li.appendChild(image_element);
+
+                  image_ol.appendChild(image_element_li);
+                }
+                reader.readAsDataURL(file);
+            })(input.files[i]);
+          }
         }
       },
 
       showFormContents: function(e){
         Polymer.dom(this.$.question_preview_area).innerHTML='';
-        //var whoa = this.$.math_question_adder_form.serialize();
-        var whoa_array = Polymer.dom(this.$.desired_questions_inputs_area).querySelectorAll('.in_value');
+        var desired_question_elements_array = Polymer.dom(this.$.desired_questions_inputs_area).querySelectorAll('.in_value');
 
-        for(var i =0; i<whoa_array.length;i++){
-          console.log(whoa_array[i].getAttribute('data-inputtype'));
-          switch(whoa_array[i].getAttribute('data-inputtype')){
+        for(var i =0; i<desired_question_elements_array.length;i++){
+          switch(desired_question_elements_array[i].getAttribute('data-inputtype')){
             case 'Display Equation':
               var mtel = document.createElement('math-tex');
               mtel.className="self-center display-equation preview_mode"
-              mtel.textContent = whoa_array[i].value;
+              mtel.textContent = desired_question_elements_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(mtel);
               break;
             case 'Question Text':
               var qtel = document.createElement('p');
-              //qtel.style.margin = "inherit 0px";
               qtel.style.wordWrap = "break-word";
               qtel.className="preview_mode";
-              qtel.innerHTML = whoa_array[i].value;
+              qtel.innerHTML = desired_question_elements_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(qtel);
               break;
             case 'Question Image':
-              var input = whoa_array[i];
-              this.readImage(input,i);
+              var input = desired_question_elements_array[i];
+              this.readImage(input,i,false);
               break;
             case 'Answer Choices':
               var acel = document.createElement('ol');
               acel.type = 'A';
-              var choice_array = whoa_array[i].querySelectorAll('paper-input');
+              var choice_array = desired_question_elements_array[i].querySelectorAll('paper-input');
               for(var j=0; j<choice_array.length; j++){
-                var next_choice = document.createElement('li');
-                next_choice.innerHTML = choice_array[j].value;
-                acel.appendChild(next_choice);
+                var answer_choice_li = document.createElement('li');
+                answer_choice_li.setAttribute('data-correct', choice_array[j].getAttribute('data-correct'));
+                answer_choice_li.innerHTML = choice_array[j].value;
+                acel.appendChild(answer_choice_li);
               }
               Polymer.dom(this.$.question_preview_area).appendChild(acel);
               break;
+            case 'Answer Choice Images':
+              var input = desired_question_elements_array[i];
+              this.readImage(input,i,true);
+              break;
           }
         }
-        //this.createCanvasOverlay('','question_preview_area');
       },
 
       _insertMathTex: function(e){
-        console.log(e);
         var current_typing_area = e.detail.keyboardEvent.path[0];
         var current_typing_area_start = current_typing_area.selectionStart;
         var current_typing_area_end = current_typing_area.selectionEnd;
         current_typing_area.value = current_typing_area.value.substring(0, current_typing_area_start)
             + '<math-tex></math-tex>'
             + current_typing_area.value.substring(current_typing_area_end, current_typing_area.value.length);
-        //current_typing_area.selectionStart = current_typing_area_start+10;
         current_typing_area.setSelectionRange(current_typing_area_start+10,current_typing_area_start+10);
       },
 
@@ -410,9 +446,9 @@
           var qtel = document.createElement('div');
           qtel.className = "horizontal layout center addable_input";
           qtel.innerText = this.keyEventTarget.value;
-          var tag_obj = {};
-          tag_obj[this.keyEventTarget.value] = this.keyEventTarget.value;
-          this.question_tags.push(tag_obj);
+          if(!this.question_tags.some(single_tag => single_tag.value == this.keyEventTarget.value)){
+            this.push('question_tags',this.keyEventTarget.value);
+          }
           var icel = document.createElement('iron-icon');
           icel.className = "js-remove";
           icel.icon = "clear";
@@ -422,12 +458,16 @@
         }
       },
 
-      changeKeyboardTarget: function(e){
+      _sortTags: function(a_tag, b_tag){
+        return a_tag.value < b_tag.value ? -1 : 1;
+      },
+
+      _changeKeyboardTarget: function(e){
         this.keyEventTarget = e.target;
       },
 
-      startQuestionTagging: function(e){
-        this.keyEventTarget = e.path[0].domHost;
+      _startQuestionTagging: function(e){
+        this.keyEventTarget = e.path[0];
       },
 
       markAsCorrect: function(e){
@@ -442,18 +482,7 @@
             all_choices[i].setAttribute('data-correct',false);
           }
         }
-      },
-
-      sayHi: function(e) {
-        console.log(this.question_tags);
-        console.log(typeof this.question_tags);
-        // var tag_obj = {};
-        // tag_obj[e.detail.childSnapshot.val()] = e.detail.childSnapshot.val();
-        // this.push('availableQuestionTags',tag_obj);
-        // console.log(this.availableQuestionTags);
-        // console.log(typeof this.availableQuestionTags);
-        //console.log(e.detail.childSnapshot.val());
-      },
+      }
 
       // _toArray: function(obj) {
       //       return Object.keys(obj).map(function(key) {
