@@ -1,8 +1,6 @@
-
-
 <dom-module id="fc-top-view-dashboard">
 <template>
-<style is="custom-style">
+<style>
 div.line-number {
 	width: 24px;
 	line-height: 1.25;
@@ -10,9 +8,9 @@ div.line-number {
 	font-family: merriweather;
 	font-weight: 500;
 	font-style: italic;
-	padding: 6px;
-	margin: 6px;
-	max-height: 620px;
+	padding: 3px;
+	margin: 3px;
+	
 }
 .highlighted {
 	background: yellow;
@@ -21,7 +19,7 @@ div.line-number {
 	-moz-column-count: 2;
     -moz-column-gap: 40px;
     -webkit-column-count: 2;
-    -webkit-column-gap: 40px;
+    -webkit-column-gap: 18px;
     column-count: 2;
     column-gap: 40px;
 }
@@ -44,7 +42,7 @@ span.plus {
 }
 br {text-indent: 18px;}
 </style>
-<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_%40%3A_302" data='{{wordArrayOne}}'></firebase-collection>
+<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620" data='{{passageArrayOne}}'></firebase-collection>
 	<paper-material elevation="1">
 		<fc-splitter-jc orientation="horizontal" style="height: 100%;">		
 			<div class="left vertical layout container" style="padding: 8px; margin: 8px; height: 1400px; max-width: 760px; border: 6px ridge silver; overflow-y: scroll;">
@@ -52,19 +50,19 @@ br {text-indent: 18px;}
 					<div  class="horizontal layout left-justified container flex wrap left" style="padding: 0px 8px 8px 8px; margin: 0px 6px 6px 6px;">
 						<div id="linenumbers" class="layout vertical line-number dynamic-class">
 							<span><i>line</i></span>
-    						<template is="dom-repeat" items="{{wordArrayOne}}">
-    							<template is="dom-if" items="{{wordArrayOne}}" if="{{item.newline}}">
+    						<template is="dom-repeat" items="{{passageArrayOne}}">
+    							<template is="dom-if" if="{{item.newline}}">
      								<span id="{{index}}_{{item.line}}" hidden={{!item.labelline}}>{{item.row}}</span>
      								<span id="{{index}}_{{item.line}}_blank" hidden={{item.labelline}}>&nbsp</span>
      							</template>
     						</template>
    					</div>
 					<div id="pringles" class="layout horizontal flex wrap text left-justified">
-						<article>
-						<template is="dom-repeat" items="{{wordArrayOne}}">
- 							<template is="dom-if" if="{{item.paragraphBreak}}"><br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 							</template><a id="{{index}}" contenteditable on-mousedown="highlightWord" id="{{index}}_{{item.word}}">{{item.word}}</a>
-						</template>
+						<article id="stanleySucks">
+							<template is="dom-repeat" items="{{passageArrayOne}}">
+ 								<template is="dom-if" if="{{item.paragraphBreak}}"><br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 								</template><a id="{{index}}" contenteditable={{contentEdit}} on-mousedown="highlightWord" id="{{index}}_{{item.word}}">{{item.word}}</a>
+							</template>
 						</article>
 					</div>
    				</div>
@@ -73,11 +71,10 @@ br {text-indent: 18px;}
 			</fc-splitter-jc>
 
 		
-			<div id="powerBehavior" my-power={{wordArrayOne}}></div>
 		
 		<content class="left horizontal layout container" select="fc-student-intake-form, fc-grid-card-portrait">		
 		</content>	
-			<button class="right" style="position: fixed; top: 30px; opacity: .65; background: goldenrod; border: 6px ridge silver;" on-tap="_outputWordArrayOne"> TAP ME WORD ARRAY</button>			
+		
 	</paper-material>
 </template>
 <script>
@@ -108,37 +105,79 @@ Polymer({
 			notify: true
 			},
 		lowerRight: String,
-		lowerLeft: String, 
-		dimensions: Array,
+		lowerLeft: String,
+		passageWidth: {
+			type: String, 
+			value: function(){return this.$.stanleySucks.clientWidth;},
+			notify: true, 
+			reflectToAttributes: true
+		},
+		passageArrayOne:{
+			type: Array, 
+			value: [],
+			notify: true, 
+			reflectToAttibutes: true
+		}, 
+		passageDimensions: {
+			type: Object,
+			value: {
+				passageWidth: Number,
+				passageHeight: Number,
+				passageInnerWidth: Number, 
+				passageInnerHeight: Number, 
+				passagePositionX: Number, 
+				passagePositionY: Number, 
+				passagePositionZ: Number, 
+			},
+			notify: true, 
+			reflectToAttributes: true
+		},
 		reflectToAttributes: true,
 		notify: true,
-		wordArrayOne: {
-			type: Object, 
+		passageObject: {
+			type: Object,
+			value:{}, 
 			notify: true,
 			reflectToAttributes: true
+		},
+		passageTitle: {
+			type: String, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		contentEdit: {
+			type: Boolean,
+			value: false, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		notify: true,
+		reflectToAttributes: true
 
-		}
+
 
 
 	},
 
 	created: function(){
 
-
 	},
 	ready: function(){
+		
 
 	},
 
 	attached: function(){
-
-		
+		var self = this;
+		var passageTitle = self.passageTitle = "stanleySucks";
+		this.passageDimensions.passageWidth = document.querySelector('#stanleySucks').clientWidth;
+		alert(this.passageDimensions.passageWidth);
 	},
 	attributeChanged: function(){
 		var nooSpans = document.querySelector('[name|=false]');
-		console.log(nooSpans);
-		var nooSpans = document.querySelector('#0011_');
-
+		this.passageDimensions.passageWidth = document.querySelector('#stanleySucks').clientWidth;
+		
+		
 	},
 	destroyed: function(){
 
@@ -150,14 +189,13 @@ Polymer({
 
 	},
 
-	_outputWordArrayOne: function() {
-		console.log( " " + JSON.stringify(this.wordArrayOne) + "\n" + "\n");
+	_outputpassageObject: function() {
+		console.log( " " + JSON.stringify(this.passageObject) + "\n" + "\n");
 
 	},
 
 	highlightWord: function(e)
 	{
-		//console.log(e.model.item);
 		var highlighted = (e.target.className.indexOf("highlighted") > -1);
 		var classString = e.target.className;
 		if(!highlighted)

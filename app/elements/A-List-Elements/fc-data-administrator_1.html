@@ -9,6 +9,7 @@
 
 	<template>
 		<style is="custom-style">
+	 	
 	 	#div1 {
 	 		min-width:365px; 
 	 		max-width: 960px;
@@ -52,6 +53,8 @@
 				z-index: 100000;
 				opacity: 1;
 			}
+
+
 			.subheading{
 				font-size: 13px;
 				color: brown;
@@ -63,6 +66,7 @@
 				font-weight: 800;
 			}
 			
+
 			.fc-headerclass{
 				padding: 4px 2px 2px 4px;
 				font-family: Merriweather;
@@ -453,9 +457,8 @@ coolerThings: function(){
 	// that just determines how many lines to reveal, I guess?
 			var passageWidth = self.passage_width = document.querySelector("#stanleySucks").clientWidth;
 			var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne");
-				var currentRow = 1;
+				var currentRow = 0;
 				self.passageWordObject = {};
-				self.lineMeasuredWordArrays = [];
 				for(i=0; i< numParagraphs; i++)
 					{
 					var newPara = true;
@@ -473,7 +476,7 @@ coolerThings: function(){
 							var space="&nbsp&nbsp&nbsp&nbsp";
 							var spaceOffset = "";
 							var newline = true;
-						while((currentWidth + 64) < self.passage_width && wordCount <= numWords)
+						while((currentWidth + 48) < self.passage_width && wordCount <= numWords)
 						//word loop
 							{
 							
@@ -491,11 +494,11 @@ coolerThings: function(){
 			      			var oldWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
 							testLine += wordArray[wordCount]; //add a word
 							currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
-							var remainingWidth = passageWidth - currentWidth;
+							var remainingWidth = width - currentWidth;
 							var wordWidth = currentWidth - oldWidth;
 							var currentWord = wordArray[wordCount];
 							if (currentWord == undefined) {currentWord = " ";}
-							var index = self.lineMeasuredWordArrays.length;
+							var index = self.passageWordObject.length;
 				//here we are building an array-like key name that is human readable
 							var indexWord = self.indexWord = currentWord;
 							var mo = self.indexWord.length-1;
@@ -514,45 +517,10 @@ coolerThings: function(){
 				//as well as the word or punctuation appear as the keys//
 								var labelLine = false;
 
-								if (currentRow>0 && currentRow%5==0 && newline==true){labelLine=true;}
-							self.push('lineMeasuredWordArrays',
-									{ 
-										"instance": instance,
-										"index": strIndex,
-										'line': rowRow,
-										'current-line': currentLine,
-										'order': wordCount,
-										'word' : currentWord, 
-										'pixels': wordWidth,
-										'line-length-remaining': remainingWidth, 
-										'font-size': theFont,
-										'font-family': theFont,
-										"current-line-width": currentWidth, 
-										'definition': 'meaning', 
-										"part of speech": "part of speech",
-										'clause': 'phrases are phrase for all of my lasers', 
-										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build.",
-										'paragraphBreak': newPara,
-										'labelline': labelLine,
-										'row':currentRow,
-										'newline': newline,
-										'passage_width': passageWidth
-									}
-								); 
+								if (currentRow!==0 && currentRow%5==0 && newline==true){labelLine=true;} 
 					
 								self.passageWordObject[instance]=
 									{ 
-										"instance": instance,
-										"index": strIndex,
-										'line': rowRow,
-										'current-line': currentLine,
-										'order': wordCount,
-										'word' : currentWord, 
-										'pixels': wordWidth,
-										'line-length-remaining': remainingWidth, 
-										'font-size': theFont,
-										'font-family': theFont,
-										"current-line-width": currentWidth, 
 										"instance": instance,
 										'order': wordCount,
 										'word' : currentWord, 
@@ -568,7 +536,7 @@ coolerThings: function(){
 										'labelline': labelLine,
 										'row':currentRow,
 										'newline': newline, 
-										'passage_width': passageWidth,  
+										'passage_width': passageWidth
 									}
 								newline = false;
 								newPara = false;
@@ -578,16 +546,10 @@ coolerThings: function(){
 						currentWidth = 0;
 						}//SINGLE line loop
 					} //this is the paragraph for loop
-					var arrayPassage = self.lineMeasuredWordArrays;
-					ref.child("Passage_1_@:_" + passageWidth).set(arrayPassage);
+					
 					ref.child("Passage_1B:_" + self.passage_width).set(self.passageWordObject);
 					alert("Passage_1B_@:_" + self.passage_width + "-----------");
-					var lastElement = arrayPassage.pop();
-					//var lastRow =self.lastRow[passageWidth + "_width_"] = lastOfWordArray.row;
-					alert(lastElement.row);
 					self.passageWordObject = {};
-					self.lineMeasuredWordArrays =[];
-
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	
 		//this ends the firepad stuff			
 	},
