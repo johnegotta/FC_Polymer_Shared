@@ -1,6 +1,6 @@
 <dom-module id="fc-grid-plus">
 	<template>
-		<style is="custom-style">
+		<style>
 			.grid-box{
 			   width: 400px;
 			   height: 480px;
@@ -27,15 +27,12 @@
 			   margin: 16px;
 			}
 		</style>
-		<firebase-collection id="FBscoreTwo" order-by-child="student" limit-to-first="8" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
-		<firebase-collection id="studentsFB" order-by-child="last_name" limit-to-first="8" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
+		<firebase-collection id="FBscoreTwo" order-by-child="student" limit-to-first="1" data='{{fcscores}}' location='https://focusedstaging1.firebaseio.com/test_results'></firebase-collection>
+		<firebase-collection id="studentsFB" order-by-child="last_name" limit-to-first="1" data='{{stus}}' location='https://focusedstaging1.firebaseio.com/students'>
 		</firebase-collection>
 		<div class="vertical layout wrap grid-holder center center-justified">
-		  
 			<paper-input id="searcher" label="Search" value="{{searchString}}" placeholder="Search Grid...">
-				</paper-input>
-				
-
+			</paper-input>
 				<paper-material style="max-width: calc(100%-128px); height: 100%; border: 9px ridge silver;" class="horizontal layout wrap container center center-justified">
 				<template is="dom-repeat" class="horizontal layout wrap container center center-justified" items="{{stus}}" as="stu" order-by-key="true">
 				
@@ -57,9 +54,6 @@
 
 				</div>
 
-<!--<div class="horizontal layout center center-justified" style="max-width: 100%; height: 100%; border: 6px ridge silver;">-->
-							
-						
 
 <!--SHOULD BE PART OF THE ASSISTANT OR AN ASSISANT LIKE FUNCTION OR ITS OWN ELEMENT
 		NEW ELEMENT. NEW ELEMENT. ASSISTANT FEATURE???  NEW ELEMENT. ASSISTANT FEATURE???
@@ -120,6 +114,11 @@ Polymer({
 	 notify: true,
 	 reflectToAttributes: true
     },
+    wordArray2: {
+	 type: Array,
+	 notify: true,
+	 reflectToAttributes: true
+    },
     testsByStudentViewArray: {
     	type: Array,
 	 	value: [],
@@ -172,7 +171,7 @@ Polymer({
 	 	if (itemname !==undefined && search !=='') 
 	 	{	console.log(itemname);
 	 		console.log(search);
-	 		return (itemname.includes(search) > -1);
+	 		return (search.indexOf(itemname) > -1);
 	 	}
     	};
   },
@@ -180,12 +179,12 @@ Polymer({
   __filter: function(e2){
   return function(argItem){
 	 	var itemname = argItem.student;
-	 	/*var search = e2;
+	 	var search = e2;
 	 	if (itemname !==undefined && search !=='') 
 	 	{	var tagVal = argItem.val;
 	 		return (tagVal.includes(search) > -1);
 	 	}
-	 	else*/ return true;
+	 	else return true;
 	 	 
     	};
   },
