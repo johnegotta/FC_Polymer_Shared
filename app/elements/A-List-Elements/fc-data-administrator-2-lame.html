@@ -8,7 +8,7 @@
 <script src="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.min.js"></script>
 
 	<template>
-<style>
+		<style is="custom-style">
 	 	#div1 {
 	 		min-width:365px; 
 	 		max-width: 960px;
@@ -19,7 +19,17 @@
 	 	}
 	 	article { display: block;}
 	  	
-
+	  	.iconset{
+  			  height: 97px;
+			  width: 164px;
+			  font-family: merriweather;
+			  font-size: 1.05em;
+			  color: black;
+			  padding: 5px;
+			  margin: 5px 5px 5px 0px;
+			  text-align: center;
+			  display: block;
+			}
 
 		div.assistView::--webkit-scrollbar {
 					display: none;
@@ -31,17 +41,16 @@
 			paper-dialog {
 				font-family: merriweather;
 			  	font-size: 1.05em;
+				position: fixed;
 				display: block;
-				min-width: 460px;
-				max-width: 520px;
-				height: 1600px;
+				width: 541px;
+				height: 668px;
 				overflow: hidden;
 				border: 2px ridge #002c90;
 				background: #fff;
 				border-radius: 8px;
 				z-index: 100000;
 				opacity: 1;
-				display: flex;
 			}
 			.subheading{
 				font-size: 13px;
@@ -123,44 +132,64 @@
 			
 </style>
 	<div class="layout container vertical center center-justified iconset">
-		<button class="right" style="position: fixed; left: 400px; top: 30px; opacity: .65; background: goldenrod; border: 6px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME</button>
-				<div "font-size: 8.5pt; width: 500px; height: 39px; font-family: times; color: #000066;">
+		<button class="right" style="position: fixed; top: 30px; opacity: .65; background: goldenrod; border: 6px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME</button>
+				<span "font-size: 8.5pt; font-family: times; color: #000066;">
 					<span hidden="{{getFocused}}">Get Focused!</span>
 				</span>
 	</div>
 
 								
-<paper-dialog id="dragDialog2" class="layout vertical container" style="display: flex; overflow: auto;"  draggable="true" no-cancel-on-outside-click="true">
-<div on-mousedown="_startDrag">
-	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px; margin-top:-16px;">The Focused Data Administrator</h3>
-	<h6  class="subheading horizontal layout center-justified" style="line-height:.2; margin: 10px 3px 0px 3px;">CLICK TO DRAG || CLICK AGAIN TO RELEASE</h6></div>
+<paper-dialog id="dragDialog2" class="layout vertical container" style="position: relative; display: flex; resize:both; overflow: auto;"  draggable="true" no-cancel-on-outside-click="true">
+
+	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px;">The Focused Data Administrator</h3>
+	<h6 on-mousedown="_startDrag" class="subheading horizontal layout center-justified" style="line-height:.2; margin: 10px 3px 0px 3px;">CLICK TO DRAG || CLICK AGAIN TO RELEASE</h6>
 	<div class="scroll-master">
 		<iron-pages id="assistantPages" selected="0">
 			<section>
-				<fc-cell-creator>
-				</fc-cell-creator>
-
-
+				<div id="firepad" style="border: 3px ridge silver; resize:both; overflow: auto;" class="fit"></div>
 			
 
 
 
 
 			</section>
-			<section class="vertical layout flex container">
-				<div id="firepad" style="border: 6px ridge silver; overflow: auto;" class="fit">
-					
-				</div>
+			<section>
+				<h3> Buildng Views: Step One:
+				<h5> Determining the View</h5>
+				</h3>
+				<details> <summary> A Long Aside on Design </summary>
+				<pre> Most complicate the build and design process because of a failure to realize a few crucial pieces of information related to devices and the</pre> PEOPLE WHO USE THEM:
+				<ol> What Everyone Forgets:
+					<li> Phones, Tablets, Laptops, and Desktop displays, while appearing to come in very different shapes and sizes actually fall into very neatly packagable "pixel-screen-width-sizes. </li> 
+						<ul> Regularity of Sizes of Devices:  
+							<li> The smallest phones have 300px widths.</li>
+							<li> Sizes of devices then increase usually in 60 pixel intervals</li>
+							<li> 300, 360, 420, 480, 540, 600, 660, 720...900, 1080, and 1200+</li>
+						</ul>
+					<li> When using phones, a PERSON is closer to the screen than when he or she is sitting at a desktop, hunched over a laptop or even just holding a tablet, which usually requires using both hands.</li>  
+					<li>The simple mechanics of holding something with two hands forces one to keep that something almost twice as far away from the holder's/user's/viewer's/person's eyes.</li>
+					<li> Try this yourself: Hold a small iPhone in one hand, and you will generally find you hold the device about 5-6 inches from your nose, and 7ish inches from your eyes.</li>
+					<li> Hold a tablet and begin to use it.  You will find quickly that you are holding the device almost three times as far away from your nose/eyes. (12-18 inches: usually around 14.) </li>
+					<li>This increased distance from the view port is important because pixels are point light sources, and our eyes map distance (size) and edge clarity based on available light.</li>
+					<li> The ability to discern detail from point lightsources decays with the square of distance from any point source (here--pixel). </li>
+					<li> As a result, when viewing a tablet, at 2 to 3 times the distance as a phone, tablet clarity (and therefore font clarity), is 4 to 9 times worse than on the "smaller" even the smallest iPhone.</li>
+					<details><summary> Note:</summary> Steve Jobs realized this when he and his crew at Apple were first designing the original and the 3G iPhones.  There solution to both offer a phone that could fit comfortably in the respective hands of more than 65% of the population was to double the pixel density of their phones.  This combined with the closer distance from the phones and Apples choice to go with 3:4 aspect ratio, rather than the 9:16 (squared distance everyone else in the industry was using). An additional advantage of the double pixel density was that for the pads, Apple could maintain the same density of pixels and offer a better viewing experience than any other view device on the market.  Not atypical of the browser industry, the other browser providers all rerfused to support the 3:4 aspect ratio--and were similarly not positioned financially to double their pixel density--and thus began the "humbug of design..." HOW CAN WE DESIGN FOR ALL OF THESE DEVICES.  The ansewer is simple.  design for people with real eyes. real hands, real needs.</details>
+					<li> As a result, designing for a 300px cell phone is really no different than designing for 600 width tablet of 900 width laptop, you just have to dynamically adjust your fonts, and spacing. </li>
+					<li> The best way to accomplish this today is to build views based on cells that are always of pixel widths divisible by 6, include padding and borders always (usually 48 to 64 pixels). and break the rows down into cell widths of roughly 24(12--really ten with margins) 48 5 to 6 cells 64px for four across 72 three wide across that flex to a nice spread and 144 for two across. these widths provide lovely spacing and offer input areas, with overhead labels that arecapable of displaying roughly 8-16 inputs on a phone, which is more than enough in a view
+					</li>
+					<li> These row sets of [10 5] 4 3 2 based on the portrait view define a "card" that we will be using.  The larger width areas are for landscape which we also use as a alandscape card.  Everything can be broken into pixels. everything can be broken into cells.  
+					now its time to pick your poison 
+
+					portait of landscape card.</li> 
+					</ol>
+					</details> 
 				
-
-
-
 
 			</section>
 			<section>
 				<h3> Building Cells</h3>
 				<h5> Cell Builder One</h5>
-			</section>
+
 
 
 
@@ -252,7 +281,7 @@
 				</details>
 
 				-->		
-		
+		</section>
 	</iron-pages>
 </div>
 			
