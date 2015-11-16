@@ -11,6 +11,9 @@
       #main_question_toolbar *{
         padding: 10px;
       }
+      #main_question_toolbar paper-input {
+        width: 100px;
+      }
       #input_choices_box,#desired_questions_inputs_box,#question_preview_box {
         margin: 15px;
         min-height:50px;
@@ -154,6 +157,9 @@
         background: var(--default-primary-color);
         color: white;
       }
+      #save_button {
+        background: green;
+      }
       paper-toolbar {
         border-top: 1px solid black;
         border-left: 1px solid black;
@@ -174,29 +180,32 @@
       }
     </style>
 
-    <firebase-document id="math_questions_loc" location="https://focusedstaging1.firebaseio.com/questions"></firebase-document>
+    <firebase-document id="questions_loc" data="all_question" location="https://focusedstaging1.firebaseio.com/questions"></firebase-document>
     <firebase-collection id="question_tags_loc" data="{{question_tags}}" location="https://focusedstaging1.firebaseio.com/Question Tags"></firebase-collection>
 
     <paper-material id="main_question_toolbar" class="flex horizontal center layout">
         <paper-toggle-button checked='{{specificTestTrue}}'>For A Specific Test?</paper-toggle-button>
-        <paper-dropdown-menu name="Test Name" always-float-label label="Test" disabled='{{!specificTestTrue}}'>
-          <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedTest}}">
-            <paper-item value="SAT (1600) - Test 1">SAT (1600) - Test 1</paper-item>
-            <paper-item value="SAT (1600) - Test 2">SAT (1600) - Test 2</paper-item>
-            <paper-item value="SAT (1600) - Test 3">SAT (1600) - Test 3</paper-item>
-            <paper-item value="SAT (1600) - Test 4">SAT (1600) - Test 4</paper-item>
-          </paper-menu>
-        </paper-dropdown-menu>
-        <paper-dropdown-menu name="Section" always-float-label label="Section" disabled='{{!specificTestTrue}}'>
-          <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedSection}}">
-            <paper-item value="Section 1 - Reading">Section 1 - Reading</paper-item>
-            <paper-item value="Section 2 - Writing">Section 2 - Writing</paper-item>
-            <paper-item value="Section 3 - Math (No Calculator)">Section 3 - Math (No Calculator)</paper-item>
-            <paper-item value="Section 4 - Math (Calculator)">Section 4 - Math (Calculator)</paper-item>
-          </paper-menu>
-        </paper-dropdown-menu>
-        <paper-input name="Question Number" always-float-label label="Question Number" disabled='{{!specificTestTrue}}' auto-validate pattern="\d{1,2}"></paper-input>
-        <paper-button id="preview_button" raised on-tap="showFormContents" type="number">Preview Question</paper-button>
+        <!-- <form is="iron-form" id="specific_test_input_area" action="/"> -->
+          <paper-dropdown-menu name="Test Name" always-float-label label="Test" value="{{specificTest}}" disabled='{{!specificTestTrue}}'>
+            <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedTest}}">
+              <paper-item value="SAT (1600) - Test 1">SAT (1600) - Test 1</paper-item>
+              <paper-item value="SAT (1600) - Test 2">SAT (1600) - Test 2</paper-item>
+              <paper-item value="SAT (1600) - Test 3">SAT (1600) - Test 3</paper-item>
+              <paper-item value="SAT (1600) - Test 4">SAT (1600) - Test 4</paper-item>
+            </paper-menu>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu name="Section" always-float-label label="Section" value="{{specificSection}}" disabled='{{!specificTestTrue}}'>
+            <paper-menu id="locationListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedSection}}">
+              <paper-item value="Section 1 - Reading">Section 1 - Reading</paper-item>
+              <paper-item value="Section 2 - Writing">Section 2 - Writing</paper-item>
+              <paper-item value="Section 3 - Math (No Calculator)">Section 3 - Math (No Calculator)</paper-item>
+              <paper-item value="Section 4 - Math (Calculator)">Section 4 - Math (Calculator)</paper-item>
+            </paper-menu>
+          </paper-dropdown-menu>
+          <paper-input name="Question Number" always-float-label label="Question Number" value="{{specificQuestion}}" disabled='{{!specificTestTrue}}' auto-validate pattern="\d{1,2}"></paper-input>
+        <!-- </form> -->
+        <paper-button id="preview_button" raised on-tap="showFormContents">Preview Question</paper-button>
+        <paper-button id="save_button" raised on-tap="saveQuestion">Save Question</paper-button>
     </paper-material>
 
     <div class="horizontal layout">
@@ -232,7 +241,7 @@
           </div>
 
           <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
-            <fc-image-upload raised multi answer-choices class="in_value flex" data-inputtype="Answer Choice Images">Add 4 Answer Images</fc-image-upload>
+            <fc-image-answer-choice-upload raised multi answer-choices class="in_value flex" data-inputtype="Answer Choice Images">Add 4 Answer Images</fc-image-answer-choice-upload>
             <iron-icon class="js-remove" icon="clear"></iron-icon>
           </div>
 
@@ -347,7 +356,7 @@
         var self = this;
 
         if (input.files && input.files[0] && multiple == false) {
-
+            var filename = input.files[0].name;
             var reader = new FileReader();
             reader.onload = function (e) {
               var after_node = Polymer.dom(self.$.question_preview_area).childNodes[after_index];
@@ -355,6 +364,8 @@
               image_element.className="self-center preview_mode"
               image_element.src = e.target.result;
               image_element.style.width = '275px';
+              image_element.setAttribute('data-questionpart', "Display Image");
+              image_element.setAttribute('data-filepath', "Math Images/" + filename);
               Polymer.dom(self.$.question_preview_area).insertBefore(image_element,after_node);
             };
             reader.readAsDataURL(input.files[0]);
@@ -368,18 +379,20 @@
 
           for (var i = 0; i < input.files.length; i++) {
             (function(file) {
+                var filename = file.name;
                 var reader = new FileReader();
                 reader.onload = function(e) {
                   var image_element_li = document.createElement('li');
                   image_element_li.setAttribute('data-correct', file.correct);
-                  //image_element_li.setAttribute('data-correct', )
                   var image_element = document.createElement('img');
                   image_element.className="self-center preview_mode"
                   image_element.src = e.target.result;
                   image_element.style.width = '100px';
                   image_element.align = 'top';
+                  //image_element.setAttribute('data-questionpart','Answer Choice Image Image');
                   image_element_li.appendChild(image_element);
-
+                  image_element_li.setAttribute('data-questionpart','Answer Choice Image');
+                  image_element_li.setAttribute('data-filepath', "Math Images/" + filename);
                   image_ol.appendChild(image_element_li);
                 }
                 reader.readAsDataURL(file);
@@ -397,6 +410,7 @@
             case 'Display Equation':
               var mtel = document.createElement('math-tex');
               mtel.className="self-center display-equation preview_mode"
+              mtel.setAttribute('data-questionpart','Display Equation');
               mtel.textContent = desired_question_elements_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(mtel);
               break;
@@ -404,6 +418,7 @@
               var qtel = document.createElement('p');
               qtel.style.wordWrap = "break-word";
               qtel.className="preview_mode";
+              qtel.setAttribute('data-questionpart','Question Text');
               qtel.innerHTML = desired_question_elements_array[i].value;
               Polymer.dom(this.$.question_preview_area).appendChild(qtel);
               break;
@@ -418,6 +433,7 @@
               for(var j=0; j<choice_array.length; j++){
                 var answer_choice_li = document.createElement('li');
                 answer_choice_li.setAttribute('data-correct', choice_array[j].getAttribute('data-correct'));
+                answer_choice_li.setAttribute('data-questionpart','Answer Choice');
                 answer_choice_li.innerHTML = choice_array[j].value;
                 acel.appendChild(answer_choice_li);
               }
@@ -482,6 +498,54 @@
             all_choices[i].setAttribute('data-correct',false);
           }
         }
+      },
+
+      saveQuestion: function(){
+        var this_question_parts = Polymer.dom(this.$.question_preview_area).childNodes;
+        var this_question_tags = Polymer.dom(this.$.question_tag_preview_area).childNodes;
+        var this_question_obj = {};
+
+        if(this.specificTestTrue == true){
+          this_question_obj['Test'] = this.specificTest;
+          this_question_obj['Section'] = this.specificSection;
+          this_question_obj['Question'] = this.specificQuestion;
+        }
+
+        for(var i = 0; i < this_question_parts.length; i++){
+          if(this_question_parts[i].nodeName == 'OL'){
+            this_question_obj['Answer Choices'] = {
+              'order' : i + 1
+            };
+            for(var j = 0; j < this_question_parts[i].childNodes.length; j++){
+              var choice_letter = String.fromCharCode(65 + j);
+              this_question_obj["Answer Choices"][choice_letter] = {
+                'correct' : this_question_parts[i].childNodes[j].getAttribute('data-correct')
+              };
+              if (this_question_parts[i].childNodes[j].getAttribute('data-correct') == "true") {
+                this_question_obj['Correct Answer'] = choice_letter;
+              }
+              this_question_obj["Answer Choices"][choice_letter].value = this_question_parts[i].childNodes[j].getAttribute('data-filepath') != null ? this_question_parts[i].childNodes[j].getAttribute('data-filepath') : this_question_parts[i].childNodes[j].innerHTML;
+            }
+          } else if(this_question_parts[i].dataset.questionpart != null) {
+            if(this_question_parts[i].dataset.questionpart == "Display Image"){
+              this_question_obj[this_question_parts[i].dataset.questionpart] = {
+                'order' : i + 1,
+                'value' : this_question_parts[i].getAttribute('data-filepath')
+              };
+            } else {
+              this_question_obj[this_question_parts[i].dataset.questionpart] = {
+                'order' : i + 1,
+                'value' : this_question_parts[i].innerHTML
+              };
+            }
+          }
+        }
+        for(var i = 0; i < this_question_tags.length; i++){
+          this_question_obj['Question Tags'][this_question_tags[i].innerText] = true;
+        }
+        console.log(this_question_obj);
+        //var this_question_name = "T" + this.specificTest.match(/\d+/g)[1].toString() + "S" + this.specificSection.match(/\d+/g))[0] + "Q" + this.specificQuestion.toString();
+        this.all_questions[this_question_name] = this_question_obj;
       }
 
       // _toArray: function(obj) {
