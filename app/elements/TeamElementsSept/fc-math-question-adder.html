@@ -180,7 +180,7 @@
       }
     </style>
 
-    <firebase-document id="questions_loc" data="all_question" location="https://focusedstaging1.firebaseio.com/questions"></firebase-document>
+    <firebase-document id="questions_loc" data="{{all_questions}}" location="https://amber-inferno-3827.firebaseio.com/questions"></firebase-document>
     <firebase-collection id="question_tags_loc" data="{{question_tags}}" location="https://focusedstaging1.firebaseio.com/Question Tags"></firebase-collection>
 
     <paper-material id="main_question_toolbar" class="flex horizontal center layout">
@@ -304,6 +304,11 @@
           value: function(){
             return [];
           }
+        },
+        all_questions: {
+          type: Object,
+          value: {},
+          notify: true
         },
         boundKeys: {
           type: Array,
@@ -540,14 +545,19 @@
             }
           }
         }
+        this_question_obj['Question Tags'] = {};
         for(var i = 0; i < this_question_tags.length; i++){
           this_question_obj['Question Tags'][this_question_tags[i].innerText] = true;
         }
-        console.log(this_question_obj);
-        //var this_question_name = "T" + this.specificTest.match(/\d+/g)[1].toString() + "S" + this.specificSection.match(/\d+/g))[0] + "Q" + this.specificQuestion.toString();
-        this.all_questions[this_question_name] = this_question_obj;
+        if(this.specificTestTrue == true){
+          var this_question_name = "T" + this.specificTest.match(/\d+/g)[1].toString() + "S" + this.specificSection.match(/\d+/g)[0].toString() + "Q" + this.specificQuestion.toString();
+          this.$.questions_loc._setRemoteDocumentChild(this_question_name, this_question_obj);
+        }
+
       }
 
+//**********************************************************************************
+// ALL OF THIS WAS JUST CANVAS DRAWING STUFF
       // _toArray: function(obj) {
       //       return Object.keys(obj).map(function(key) {
       //           return {
