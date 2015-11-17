@@ -14,26 +14,25 @@
        
       } 
    
-.cell-outline{
-  min-width: 72px;
+.cells-outline{
+  display: flex;
+  flex-basis: 73px;
+  min-width: 36px;
   max-width: 198px;
   padding: 3px;
-  padding-left: 6px;
-  margin: 3px 3px;
-  min-height: 36px;
+  margin: 3px;
+  min-height: 24px;
   max-height: 72px;
-  display: flex;
   overflow-x: scroll;
   overflow-y: hidden;
-  font-size: 1em;
-  font-weight: 900;
+  font-size: .8em;
+  font-weight: 700;
   font-family: merriweather;
   color: #000066;
   background: white;
-  //box-shadow: 0px -5px 20px #d8d8d8 inset;
 }
- .labelsClass {
-        padding: 0px 3px;
+ .cells-class {
+        padding: 3px;
         font-weight: 900;
         opacity: .93;
   
@@ -66,14 +65,20 @@
 
 
     };
+    --paper-input-container-underline-focus: {
+        color: blue;
+        height: 1.5px;
+        min-width: 36px;
+        max-width: 198px;
+      };
    
   }
 
- .phone-label-offset{
-       min-width: 48px;
-       max-width: 148px; 
-       max-height: 64px;
-       min-height: 18px; 
+ .phone-cell-offset{
+       min-width: 32px;
+       max-width: 198px; 
+       max-height: 72px;
+       min-height: 24px; 
        padding: 0px 15px;
       --paper-input-container-label:{
         font-family: Merriweather;
@@ -85,21 +90,13 @@
     
   }
 
-  paper-input.input { 
-          max-width: 148px;
-          min-width: 64px; 
-          max-height: 64px;
-          min-height: 64px; 
-          padding: 0px 2px;
-        }
-
   paper-material {padding: 1px;}
 </style>
 <div class="horizontal layout wrap center center-justified container cell-outline" on-dblclick="toggleDisabled" on-swipe="toggleDisabled">
       <content id="inputTitleSpan" select="span">
           
       </content>
-      <paper-input label="{{fclabel}}" id="disabled" draggable="true" class="labelsClass input" alway-float-label="true" elevation="1" on-drag-start="handleDragStart" on-drop="allowDrop" value="{{fcInput}}" readonly="{{disabled}}">
+      <paper-input label="{{fclabel}}" id="{{viewSetNumber}}_{{viewNumber}}_{{viewOrder}}_{{viewSetName}}__{{viewName}}" draggable="true" class$="cells-class cells-outline {{cellSize}} {{phoneCellOffset}}" alway-float-label="true" elevation="1" on-drag-start="handleDragStart" on-drop="allowDrop" value="{{fcInput}}" readonly="{{readOnly}}">
       </paper-input>
 </div>
 </template>
@@ -133,13 +130,12 @@ Polymer({
 
 
   ready: function(){
-    //console.log(this.value + ' the value at ready in the cell');
-    //console.log(this.label + ' the label at ready in the cell');
+   
 
   },
 
 	toggleDisabled: function(){
-		this.disabled = ! this.disabled;
+		this.readOnly = ! this.readOnly;
 	},
 
   attached: function (){
