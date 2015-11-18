@@ -3,7 +3,7 @@
 <style>
 div.line-number {
 	width: 28px;
-	line-height: 1.1;
+	line-height: 1.0;
 	font-size: 1.1em;
 	font-family: merriweather;
 	font-weight: 500;
@@ -24,7 +24,7 @@ margin: 1vh 1vw 1vh 0vh;
 	background: yellow;
 }
 div.blurb{
-	line-height: 1.1;
+	line-height: 1.0;
 	font-size: .9em;
 	font-family: merriweather;
 	font-weight: 500;
@@ -38,7 +38,7 @@ div.blurb{
 }
 div.text {
 	max-width: 720px;
-	line-height: 1.1;
+	line-height: 1.0;
 	font-size: 1.1em;
 	font-family: merriweather;
 	font-weight: 500;
@@ -299,50 +299,37 @@ Polymer({
         var linesH=lines.clientHeight;
 		console.log(linesH);
         console.log(screenTrueHeight);
-        if(linesH !==0 && screenTrueHeight>900){
-        	var colOneLines = Math.floor(screenTrueHeight/linesH);
-        	console.log(colOneLines);
+ 		var colOneLines; 
+ 		if(linesH !==0 && screenTrueHeight>900){
         }
         else {
-        	screenTrueHeight=1080; 
-        	var colOneLines = Math.floor(screenTrueHeight/linesH);
-        var oneColumn= document.querySelector('#noJudge').clientWidth;}
-        if(oneColumn!==0 && oneColumn<720){
-        	document.querySelector("#secondColumnContainer").hidden=true;
-
-        }
-        else {document.querySelector("#secondColumnContainer").hidden = false}
-        
+        	screenTrueHeight=1080;
+        	}
+        colOneLines = Math.floor(screenTrueHeight/linesH);
 		var i = 0;
 		var canvas = document.createElement('canvas');
 		var context = canvas.getContext("2d");
 		var calcFontSize = window.getComputedStyle(this.$.pringles, null).getPropertyValue('font-size');
+		var fontSizeInt = parseInt(calcFontSize.replace('px','')); 
+		console.log(fontSizeInt);
+		fontSizeInt*=.75;
+		calcFontSize = fontSizeInt.toString() + 'pt';
 		console.log(calcFontSize);
 		var calcFontFam = window.getComputedStyle(this.$.pringles, null).getPropertyValue('font-family');
 		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620"); //https://focused0ne.firebaseio.com/readingPassageOne");
+		context.font="13.2pt merriweather";
+		//calcFontSize + " " + calcFontFam;
 		var self = this;
 		ref.on("value", function(snap){
 			var words = snap.val();
-			console.log(words);
+			//console.log(words);
 			var numWords = words.length;
-			var left = numWords *1;
-			var j = 0;
-			self.firstColumnWordArray = [];
-			self.secondColumnWordArray = [];
-			for(j=0; j<left; j++)
-			{
-				self.push("firstColumnWordArray", words[j]);
-			}
-
-			for(j=400;j<numWords;j++)
-			{
-				self.push("secondColumnWordArray", words[j]);
-			}
 			//console.log(self.secondColumnWordArray);
 		var line = "";
 		var numLines = 0;
-		var containerWidth = document.querySelector('#colUno').clientWidth-12;
-		//console.log("containerWidth = " + containerWidth);
+		var containerWidth = document.querySelector('#colUno').clientWidth-13.2;
+		console.log("containerWidth = " + containerWidth);
+		var colOneWordIndex;
 		for(i=0; i < numWords; i++)
 		{
 			//console.log(words[i]);
@@ -350,7 +337,7 @@ Polymer({
 			if(words[i].paragraphBreak == true) //paragraph begin
 			{
 				//console.log("a paragraph break");
-				line = "aaaa" + word;
+				line = "aaaaa" + word;
 				numLines++;
 			}
 			else if(word == "" || word == " ")
@@ -363,13 +350,41 @@ Polymer({
 				currentWidth = context.measureText(line).width; //- context.measureText(spaceOffset).width;
 				if(currentWidth > containerWidth)
 				{
-			
+					console.log(word + " " + currentWidth);
+					if (numLines == colOneLines){
+					
+						colOneWordIndex = i - 1;
+					}	
+					
 					line = word;
 					numLines++;
 				}
 			}
 		}
+			var j = 0;
+			self.firstColumnWordArray = [];
+			self.secondColumnWordArray = [];
+			for(j=0; j<colOneWordIndex; j++)
+			{
+				self.push("firstColumnWordArray", words[j]);
+			}
 
+			for(j=colOneWordIndex;j<numWords;j++)
+			{
+				self.push("secondColumnWordArray", words[j]);
+			}
+        var oneColumn= document.querySelector('#noJudge').clientWidth;
+
+        if(oneColumn>0 && oneColumn<680){
+        	document.querySelector("#secondColumnContainer").hidden=true;
+        	colOneLines=numLines;
+
+        }
+        else {document.querySelector("#secondColumnContainer").hidden = false;
+
+				colOneLines = Math.floor(screenTrueHeight/linesH);
+
+    	}
 		console.log(numLines);
 		self.numRows = numLines;
 		self.set("firstColumnLineNumberArray", self.largestLineNumberArray.slice(0, colOneLines));
