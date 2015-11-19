@@ -211,22 +211,19 @@ content::-webkit-scrollbar {
             return false;
     },
       _onMainTransitionEnd: function (e) {
-          if (e.currentTarget === this.$.main && (e.propertyName === 'left' || e.propertyName === 'right')) {
+          e.currentTarget = this.$$('fc-passage-display-dashboard').notifyResize();
             this.notifyResize();
-          }
         },
     _onQueryMatchesChanged: function(event) {
           this._responsiveChange(event.detail.value);
         },
-        _responsiveChange: function(narrow) {
-          this._setNarrow(narrow);
+        _responsiveChange: function(event) {
+          this.fire('resize-passages-on-slide', this.notifyResize());
 
-          if (this.narrow) {
+          if (this.edged) {
             this.selected = this.defaultSelected;
           }
-
-          this.setScrollDirection(this._swipeAllowed() ? 'y' : 'all');
-          this.fire('paper-responsive-change', {narrow: this.narrow});
+          else this.fire('columnSwitch', {columnSwitch: true});
         }
 
   });
