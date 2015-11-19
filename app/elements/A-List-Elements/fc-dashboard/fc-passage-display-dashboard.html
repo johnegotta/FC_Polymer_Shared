@@ -56,7 +56,7 @@ div.text {
 	
 }
 </style>
-	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_@:_620" data='{{passageArrayOne}}'></firebase-collection>
+	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_@:_620" order-by-child="index" data='{{passageArrayOne}}'></firebase-collection>
 		<fc-splitter-jc orientation="horizontal" style="height: 1900px; width: 100vw;">	
 			
 <!--double-column line-number and passage vertical container--> 
@@ -234,7 +234,7 @@ Polymer({
 		}
 		this.lines = document.querySelector('#lines');
 		console.log(this.lines);
-
+			console.log("I am passage array, who are you?   " + this.passageArrayOne);
        this.screenTrueHeight = (window.innerHeight - 180);
        if(this.screenTrueHeight<980){
         	this.screenTrueHeight=1080;
@@ -286,7 +286,7 @@ Polymer({
 		if (this.columnNumber == argNumColumns && this.columnNumber == 1){
 			this.loadColumnOne;
 			var newHeight = this.$.colUno.clientHeight;
-			var newLineNumbers = (hello0newHeight/lineHeight);
+			var newLineNumbers = (newHeight/lineHeight);
 			this.set("firstColumnLineNumberArray", this.largestLineNumberArray.slice(0, newLineNumbers));
 		}
 		else {
@@ -294,20 +294,18 @@ Polymer({
 		console.log(this.rowsOfColumnOne + "  hello");
 		this.set("firstColumnLineNumberArray", this.largestLineNumberArray.slice(0, this.rowsOfColumnOne));
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_@:_300");
+		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620");
 		ref.on("value", function(snapshot){
 		var words = snapshot.val();
 		self.reference = self.measureFont(self.$.lines);
-		console.log(words + words);
-		var numWords = words.length;
 		console.log(numWords);
-		var line = 0;
+		var numWords = this.pop(words[order]);
 		var i = 0;
-		for(i=0; i < numWords; i++)
+		for(i=0; i < 900; i++)
 		{	
 			var word = words[i];
 			console.log(words[i]);
-			if(words[i].paragraphBreak == true) //paragraph begin
+			if(words[index].paragraphBreak == true) //paragraph begin
 			{ 					console.log("a paragraph break");
 				line = "aaaaa" + word;
 				numLines++;
@@ -330,12 +328,12 @@ Polymer({
 				{
 					numLines++;
 					if(numLines == this.colOneNumLines){
-						for(;i<word[i].order;i++)
-							self.set("secondColumnWordArray", words[i]);
+						for(;i<words[index];i++)
+							self.push("secondColumnWordArray", words[i]);
 					}
 				}
 				else {
-						self.set("firstColumnWordArray", words[i]);
+						for(var word of wordsObj)(self.push("firstColumnWordArray", word[i]));self.push("firstColumnWordArray", words[i]);
 						console.log(words[i]);
 				}
 			
@@ -353,15 +351,13 @@ Polymer({
 	_loadColUno: function(){
 		var self=this;
 		this.firstColumnWordArray=[];
-		var pickle = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_@:_620");
+		var pickle = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620");
 		pickle.on("value", function(snap){
-			var words = snap.val();
-			var numWords = words.length;
-			var i = 0;
-			for(i=0; i<numWords; i++){
-				self.set("firstColumnWordArray", words[i]);
-				console.log(words[i]);
-			}
+			var words = [];
+			var wordsObj = snap.val();
+			for(var word of wordsObj)(self.push("firstColumnWordArray", word[i]));
+				console.log(word[i]);
+			
 		});
 	},
 
