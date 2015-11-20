@@ -156,6 +156,10 @@ Polymer({
 			reflectToAttributes: true,
 			notify: true
 			},
+		numColumns: {
+			type: Number,
+			value: 1
+		},
 		lowerRight: String,
 		lowerLeft: String,
 		/*
@@ -307,6 +311,7 @@ Polymer({
  		var colOneLines; 
  		if(linesH !== 0 && screenTrueHeight>900)
  		{
+ 			this.$.pringles.style.height = screenTrueHeight;
         }
         else
         {
@@ -393,21 +398,28 @@ Polymer({
 			{
 				line = line + " " + word;
 				currentWidth = context.measureText(line).width;
+				if (numLines == maxLinesColOne && fcNumColumns == 2)
+				{
+					//reached end of first column
+					containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colDos"), null).getPropertyValue('width'));
+					console.log("containerWidth = " + containerWidth);
+				}
 				if(currentWidth > containerWidth)
 				{
-					console.log("*" + word + "* " + currentWidth);
+					//console.log("*" + word + "* " + currentWidth);
 					line = word;
 					numLines++;
 				}
 			}
 		}
 		console.log(numLines);
+		var numColumnsSwitched = false;
 		if(fcNumColumns == 1)
 		{
 			console.log("fcNumColumns is 1");
 			colOneLines = numLines;
-			document.querySelector("#secondColumnContainer").hidden=true;
-			containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colUno"), null).getPropertyValue('width'));
+			//document.querySelector("#secondColumnContainer").hidden=true;
+			//containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colUno"), null).getPropertyValue('width'));
 		}
 		else
 		{
@@ -419,8 +431,15 @@ Polymer({
 			{
 				colOneLines = numLines;
 				fcNumColumns = 1;
+				numColumnsSwitched = true;
 				console.log("all lines fit in col one so set fcNumColumns=1");
+				//containerWidth = document.querySelector("#colUno").getBoundingClientRect().width;
+				document.querySelector("#secondColumnContainer").hidden=true;
+				var dt = new Date();
+				while ((new Date()) - dt <= 100){}
 				containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colUno"), null).getPropertyValue('width'));
+
+				console.log("new containerWidth = " + containerWidth);
 				//self.$.pringles.style.width = window.getComputedStyle(document.querySelector("#colUno"), null).getPropertyValue('width');
 				//self.$.colUno.style.width;
 				//self.$.pringles.width = self.$.colUno.width;
@@ -429,9 +448,13 @@ Polymer({
 			else
 			{
 				colOneLines = maxLinesColOne;
+				console.log("colOneLines = " + colOneLines);
 			}
 		}
 		console.log(colOneLines);
+		//in case we switched to colDos above, switch back
+		containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colUno"), null).getPropertyValue('width'));
+		console.log("containerWidth = " + containerWidth + " between for loops");
 		var lineCounter = 0;
 		for(i=0; i < numWords; i++)
 		{
@@ -440,14 +463,17 @@ Polymer({
 			if(words[i].paragraphBreak == true) //paragraph begin
 			{
 				//console.log("a paragraph break");
-				line = "all" + word;
-				console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines);
+				line = "all";
+				//console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines);
 				if (lineCounter == colOneLines)
 				{
-					colOneWordIndex = i - 1;
-					console.log("just set colOneWordIndex to " + colOneWordIndex);
+					colOneWordIndex = i;
+					console.log("just set colOneWordIndex to " + colOneWordIndex + " for word = " + words[colOneWordIndex].word);
 				}
-				lineCounter++;
+				//if(lineCounter != 0)
+				//{
+					lineCounter++;
+				//}
 			}
 			else if(word == "" || word == " ")
 			{
@@ -457,22 +483,31 @@ Polymer({
 			{
 				line = line + " " + word;
 				currentWidth = context.measureText(line).width; //- context.measureText(spaceOffset).width;
+				if (lineCounter == maxLinesColOne && fcNumColumns == 2)
+				{
+					//reached end of first column
+					containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colDos"), null).getPropertyValue('width'));
+					console.log("containerWidth = " + containerWidth);
+
+				}
 				if(currentWidth > containerWidth)
 				{
 					//console.log(word + " " + currentWidth);
-					console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines);
-					lineCounter++;
+					//console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines + " and word = " + word);
 					if (lineCounter == colOneLines)
 					{
 						colOneWordIndex = i;
-						console.log("just set colOneWordIndex to " + colOneWordIndex);
+						console.log("just set colOneWordIndex to " + colOneWordIndex + " for word = " + words[colOneWordIndex].word);
 					}	
+					lineCounter++;
 					line = word;
 				}
 			}
 		}
-		
-		
+		if(numColumnsSwitched)
+		{
+			colOneLines = lineCounter;
+		}	
 			var j = 0;
 			self.firstColumnWordArray = [];
 			self.secondColumnWordArray = [];
