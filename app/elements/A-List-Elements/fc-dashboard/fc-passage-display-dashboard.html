@@ -95,6 +95,8 @@ br {text-indent: 18px;}
 					 	<div id="secondColumnContainer" hidden="false" class="layout horizontal flex-1 container" style="border: 1px solid brown; padding-left: 12px;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
+					 			<span id="lines">Lines</span>
+
 					 		 	<template is="dom-repeat" items="{{secondColumnLineNumberArray}}">
      								<span id="col_two_line_{{index}}" hidden="{{!columnOneShowLines}}">{{item}}</span>
      								
@@ -104,6 +106,7 @@ br {text-indent: 18px;}
 			<!--passage-1-column-2 container-->
 					 		<div id="colDos" class="layout vertical text">
 					 		<article>
+					 		<br>
 								<template is="dom-repeat" items="{{secondColumnWordArray}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
@@ -401,7 +404,11 @@ Polymer({
 				if (numLines == maxLinesColOne && fcNumColumns == 2)
 				{
 					//reached end of first column
-					containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colDos"), null).getPropertyValue('width'));
+					var dos = document.querySelector('#colDos');
+					var space = document.createElement("span");
+					space.innerHTML = "";
+					dos.appendChild(space);
+					containerWidth = parseFloat(window.getComputedStyle(dos, null).getPropertyValue('width'));
 					console.log("containerWidth = " + containerWidth);
 				}
 				if(currentWidth > containerWidth)
@@ -464,11 +471,21 @@ Polymer({
 			{
 				//console.log("a paragraph break");
 				line = "all";
-				//console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines);
+				console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines);
 				if (lineCounter == colOneLines)
 				{
 					colOneWordIndex = i;
 					console.log("just set colOneWordIndex to " + colOneWordIndex + " for word = " + words[colOneWordIndex].word);
+				}
+				if (lineCounter == colOneLines && fcNumColumns == 2)
+				{
+					//reached end of first column
+					var dos = document.querySelector('#colDos');
+					var space = document.createElement("span");
+					space.innerHTML = " ";
+					dos.appendChild(space);
+					containerWidth = parseFloat(window.getComputedStyle(dos, null).getPropertyValue('width'));
+					console.log("containerWidth = " + containerWidth);
 				}
 				//if(lineCounter != 0)
 				//{
@@ -483,22 +500,26 @@ Polymer({
 			{
 				line = line + " " + word;
 				currentWidth = context.measureText(line).width; //- context.measureText(spaceOffset).width;
-				if (lineCounter == maxLinesColOne && fcNumColumns == 2)
-				{
-					//reached end of first column
-					containerWidth = parseFloat(window.getComputedStyle(document.querySelector("#colDos"), null).getPropertyValue('width'));
-					console.log("containerWidth = " + containerWidth);
-
-				}
+				
 				if(currentWidth > containerWidth)
 				{
 					//console.log(word + " " + currentWidth);
-					//console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines + " and word = " + word);
+					console.log("lineCounter = " + lineCounter + " and colOneLines = " + colOneLines + " and word = " + word);
 					if (lineCounter == colOneLines)
 					{
 						colOneWordIndex = i;
 						console.log("just set colOneWordIndex to " + colOneWordIndex + " for word = " + words[colOneWordIndex].word);
 					}	
+					if (lineCounter == colOneLines && fcNumColumns == 2)
+					{
+						//reached end of first column
+						var dos = document.querySelector('#colDos');
+						var space = document.createElement("span");
+						space.innerHTML = " ";
+						dos.appendChild(space);
+						containerWidth = parseFloat(window.getComputedStyle(dos, null).getPropertyValue('width'));
+						console.log("containerWidth = " + containerWidth);
+					}
 					lineCounter++;
 					line = word;
 				}
