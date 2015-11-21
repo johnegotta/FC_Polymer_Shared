@@ -108,8 +108,12 @@ br {text-indent: 18px;}
 					 		<article>
 					 		<br>
 								<template is="dom-repeat" items="{{secondColumnWordArray}}">
+ 									<template is="dom-if" if="{{isParagraphBreak(item)}}">
+ 									<!-- {{item.paragraphBreak}}"> -->
+ 										<br>
+ 									</template>
  									<template is="dom-if" if="{{item.paragraphBreak}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 										<span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
  									<a id="two_{{item.order}}_{{item.word}}" hidden="{{columnOneShow}}">{{item.word}}</a>
 								</template>
@@ -302,6 +306,19 @@ Polymer({
 	notifyResize: function()
 	{
 		this.splitIntoColumns(2);
+	},
+
+	isParagraphBreak: function(argItem)
+	{
+		var key = argItem.index;
+		console.log(key + " vs " + this.secondColumnWordArray[0].index);
+		var result = argItem.paragraphBreak;
+		if(key == this.secondColumnWordArray[0].index)
+		{
+			console.log("first word in second column");
+			result = false;
+		}
+		return result;
 	},
 	
 	splitIntoColumns: function(argNumColumns){
