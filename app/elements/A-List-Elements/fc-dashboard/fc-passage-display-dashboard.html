@@ -18,7 +18,7 @@ div.columnContainer{
 }
 div.passageContainer{ 
 	max-width: 1450px !important;
-	margin: 1vh 0vw 1vh 0vh;
+	margin: 1vh 12px 1vh 12px;
 }
 .highlighted {
 	background: yellow;
@@ -74,7 +74,7 @@ div.text {
 					 		<div id="linenumbersA1" class="layout vertical line-number">
 					 		<span id="linesA1">Lines</span>
 					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}">
-     								<span hidden="{{!columnOneShowLines}}" id="colA_one_line_{{index}}">{{item}}</span>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
 					 		</div>
@@ -94,12 +94,12 @@ div.text {
 					 	</div>
 		<!-- end-of-column-1 line number and text container-->
 					<div id="doubleColumnContainer" class="layout horizontal flex container" style="border: 1px solid goldenrod;">
-						<div class="layout horizontal flex-1 container columnContainer" style="border: 1px solid #000066; padding-right: 12px;">
+						<div class="layout horizontal flex-1 container columnContainer" style="border: 1px solid #000066; padding-right: 12px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<span id="lines">Lines</span>
 					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayTwo}}">
-     								<span hidden="{{!columnOneShowLines}}" id="col_one_line_{{index}}">{{item}}</span>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
     							
@@ -121,11 +121,11 @@ div.text {
 		<!-- end-of-column-1 line number and text container-->
 
 		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="border: 1px solid brown; padding-left: 12px;">
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="border: 1px solid brown; padding-left: 12px;overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 		 	<template is="dom-repeat" items="{{secondColumnLineNumberArrayTwo}}">
-     								<span id="col_two_line_{{index}}" hidden="{{!columnOneShowLines}}">{{item}}</span>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
 					 		</div>
@@ -266,9 +266,10 @@ Polymer({
 	},
 	attached: function(){
 
-		for(i=1; i <= 240; i++)
+		for(i=1; i <= 250; i++)
 			{
-			this.push("largestLineNumberArray", i % 5 ? ".": i.toString());
+			j=	i % 5 ? false: true;
+			this.push("largestLineNumberArray", {'number': i, 'show': j});
 			}
 		this.loadPassages();
 		},
@@ -283,10 +284,11 @@ Polymer({
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
 			self.firstColumnWordArrayOne=snap.val();
-			self.goldenRatio = Math.floor(.616*self.numWords);
+			self.goldenRatio = Math.floor(.65*self.numWords)+3;
 			self.firstColumnWordArrayTwo=self.passageArrayOne.slice(0,self.goldenRatio);
 			self.secondColumnWordArrayTwo= self.passageArrayOne.slice(self.goldenRatio, self.numWords);
 		});
+			
 			this.notifyResize();
 	},
 
@@ -346,6 +348,7 @@ Polymer({
 			this.numLines = (delta/document.querySelector('#linesA1').clientHeight)-1;
 			this.set("firstColumnLineNumberArrayOne", this.largestLineNumberArray.slice(0,this.numLines));
 		}
+		this.fire('dom-change');
 	},
 
 	_numberTwoColumns: function(){
@@ -378,6 +381,7 @@ Polymer({
 			else { _NumberTwoColumns();
 
 			}
+			this.fire('dom-change');
 
 	}
 
