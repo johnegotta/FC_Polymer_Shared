@@ -56,20 +56,20 @@ div.text {
 	
 }
 </style>
-	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1A_@:_420" order-by-child="index" data='{{passageArrayOne}}'></firebase-collection>
+	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_2A_443" order-by-child="instance" data='{{passageArrayOne}}'></firebase-collection>
 		<fc-splitter-jc orientation="horizontal" style="height: 1900px; width: 100vw;">	
 			
 <!--double-column line-number and passage vertical container--> 
-			<div id="noJudge" class="layout vertical flex container left passageContainer" style="border: 2px ridge silver;">
+			<div id="noJudge" class="layout vertical flex container left passageContainer">
 	<!--blurb full width container-->
-					<div class="layout horizontal blurb" style="margin: 12px 36px 0px 36px; max-height: 140px; border: 1px ridge red;">
-					This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.<span id="tester"> </span>
+					<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+					The following passage is excerpted from an autobiographical sketch of a former social and political activist for civil rights.<span id="tester"> </span>
 					</div>
 
 	<!--passage-columns container-->
 					
 		<!--column-1-container line numbs and passage | Flex-1 keeps the columns even-->
-				<div id="singleColumnPassage" class="layout horizontal container columnContainer" style="border: 1px solid #000066; padding-right: 12px;">
+				<div id="singleColumnPassage" class="layout horizontal container columnContainer" style="padding-right: 12px;">
 			<!--Line number container-->
 					 		<div id="linenumbersA1" class="layout vertical line-number">
 					 		<span id="linesA1">Lines</span>
@@ -88,13 +88,14 @@ div.text {
  									<a id="oneA_{{index}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
 								</template>
 									<br class="line-numbers">
+									<hr>
 								<span class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</span>
 							</article>
 					 		</div>
 					 	</div>
 		<!-- end-of-column-1 line number and text container-->
-					<div id="doubleColumnContainer" class="layout horizontal flex container" style="border: 1px solid goldenrod;">
-						<div class="layout horizontal flex-1 container columnContainer" style="border: 1px solid #000066; padding-right: 12px; overflow-y:scroll;">
+					<div id="doubleColumnContainer" class="layout horizontal flex container">
+						<div class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<span id="lines">Lines</span>
@@ -114,6 +115,7 @@ div.text {
  									<a id="one_{{item.index}}_{{item.word}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
 								</template>
 								<br class="line-numbers">
+								<hr>
 								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
 							</article>
 					 		</div>
@@ -121,7 +123,7 @@ div.text {
 		<!-- end-of-column-1 line number and text container-->
 
 		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="border: 1px solid brown; padding-left: 12px;overflow-y:scroll;">
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 12px;overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 		 	<template is="dom-repeat" items="{{secondColumnLineNumberArrayTwo}}">
@@ -259,11 +261,7 @@ Polymer({
 		reflectToAttributes: true
 	},
 
-	ready: function(){
-	
-		this.columnize;
 
-	},
 	attached: function(){
 
 		for(i=1; i <= 250; i++)
@@ -279,7 +277,7 @@ Polymer({
 		console.log("loadPassage here " + " am I -->  undefined")
 		this.passageArrayOne=[];
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_420");
+		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_2A_443");
 		ref.on("value", function(snap){
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
@@ -299,9 +297,9 @@ Polymer({
 	},
 	
 	setUp: function(){
-		this.screenTrueHeight =  (window.innerHeight-200);
-		if(this.colUnoHeight!=undefined && this.ColUnoHeight >200){
-			if(this.$.noJudge.clientWidth > 660 && this.colUnoHeight>this.screenTrueHeight){
+		this.screenTrueHeight =  (window.innerHeight-300);
+		if(this.colUnoHeight!=undefined && this.colUnoHeight >=250){
+			if(this.$.noJudge.clientWidth >= 660 && this.colUnoHeight>this.screenTrueHeight){
 				document.querySelector("#singleColumnPassage").hidden = true;
 				document.querySelector("#doubleColumnContainer").hidden = false;
 				this._numberTwoColumns();
@@ -314,7 +312,7 @@ Polymer({
 			}
 		}
 		else {
-			if(this.$.noJudge.clientWidth > 660){
+			if(this.$.noJudge.clientWidth >= 660){
 				document.querySelector("#singleColumnPassage").hidden = true;
 				document.querySelector("#doubleColumnContainer").hidden = false;
 				this.colUnoHeight=this.$.colUno.scrollHeight;
@@ -324,7 +322,7 @@ Polymer({
 					this.linesH = this.$.linesA1.clientHeight;
 					this._numberColumnOne();
 					}
-				else{this._numberTwoColumns();}
+				//else{this._numberTwoColumns();}
 			}
 			else{
 				document.querySelector("#doubleColumnContainer").hidden = true;
@@ -338,7 +336,7 @@ Polymer({
 		
 	},
 	_numberColumnOne: function(){
-		this.screenTrueHeight =  (window.innerHeight - 180);
+		this.screenTrueHeight =  (window.innerHeight - 300);
 		if (this.linesH != 0 && this.linesH != undefined)
 		{
 			var topDistance = document.querySelector('#singleColumnBounder').getBoundingClientRect().top;
@@ -355,24 +353,17 @@ Polymer({
 		this.linesH = this.$.lines.clientHeight;
 		if (this.linesH != 0 && this.linesH != undefined)
 		{
-			var topDistance = document.querySelector('#doubleColumnBounderOne').getBoundingClientRect().top;
-			var basis = document.querySelector('#lines').getBoundingClientRect().top;
+			var topDistance = this.$.doubleColumnBounderOne.getBoundingClientRect().top;
+			var basis = this.$.lines.getBoundingClientRect().top;
 			var delta = topDistance - basis;
-						console.log(delta);
-						console.log(topDistance);
-						console.log(topDistance);
-						console.log(delta);
-						console.log(delta);
-//WASTE TIME
+			var rowsColumnOne = delta/this.linesH-2;
 
-			this.rowsColumnOne = delta/document.querySelector('#lines').clientHeight;
-			var rowsColumnOne = this.rowsColumnOne-1;
 			this.set("firstColumnLineNumberArrayTwo", this.largestLineNumberArray.slice(0,rowsColumnOne));
-//SET LINE Nos. Col 1
-			var topDistanceTwo = document.querySelector('#doubleColumnBounderTwo').getBoundingClientRect().top;
+//Lines Col one
+			var topDistanceTwo = this.$.doubleColumnBounderTwo.getBoundingClientRect().top;
 			var deltaTwo = topDistanceTwo - basis;
 //Distance fro col 2
-			this.rowsColumnTwo = deltaTwo/document.querySelector('#lines').clientHeight;
+			this.rowsColumnTwo = deltaTwo/this.linesH;
 			var numLines= rowsColumnOne + this.rowsColumnTwo;
 //set col two
 			this.set("secondColumnLineNumberArrayTwo", this.largestLineNumberArray.slice(rowsColumnOne, numLines));
