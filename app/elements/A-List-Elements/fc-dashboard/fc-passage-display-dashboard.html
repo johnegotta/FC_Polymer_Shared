@@ -12,6 +12,14 @@ div.line-number {
 	margin: 6px 4px 6px 0px;
 	
 }
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 div.columnContainer{
 	overflow-y: scroll;
 }
@@ -78,13 +86,13 @@ br {text-indent: 18px;}
     							</template>
 					 		</div>
 			<!--passage-1-column-1 container-->
-					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<div id="colUno" class="layout horizontal flex wrap text noselect">
 					 		<article>
 					 	    	<template is="dom-repeat" items="{{firstColumnWordArray}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
- 									<a id="one_{{item.order}}_{{item.word}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+ 									<a id="one_{{item.index}}" hidden="{{!columnOneShow}}" on-mousedown="startSelect" on-mouseup="endSelect">{{item.word}}</a>
 								</template>
 							</article>
 					 		</div>
@@ -123,6 +131,7 @@ br {text-indent: 18px;}
 					 	</div>
 	<!--end of flex passage column container-->
 				</div>
+				<paper-button on-tap="copyText">Copy Selected Text</paper-button>
 <!--End of top container horizontal-->
 			</div>
 <!--End of Vertical passage container-->
@@ -252,6 +261,18 @@ Polymer({
 			type: Boolean,
 			value: false
 		},
+		startSelectWordIndex: {
+			type: Number,
+			value: 0
+		},
+		endSelectWordIndex: {
+			type: Number,
+			value: 0
+		},
+		copiedText: {
+			type: String,
+			value: ""
+		},
 		notify: true,
 		reflectToAttributes: true
 	},
@@ -288,6 +309,49 @@ Polymer({
 	_outputpassageObject: function() {
 		console.log( " " + JSON.stringify(this.passageObject) + "\n" + "\n");
 	},
+
+	startSelect: function(e)
+	{
+		console.log(e.model.item.index);
+		this.startSelectWordIndex = parseInt(e.model.item.index);
+	},
+
+	endSelect: function(e)
+	{
+		console.log(e.model.item);
+		this.endSelectWordIndex = parseInt(e.model.item.index);
+		var smallerIndex = this.startSelectWordIndex < this.endSelectWordIndex ? this.startSelectWordIndex : this.endSelectWordIndex;
+		var largerIndex = this.startSelectWordIndex < this.endSelectWordIndex ? this.endSelectWordIndex : this.startSelectWordIndex;
+		console.log("small = " + smallerIndex + " and large = " + largerIndex);
+		for(i = smallerIndex; i <= largerIndex; i++)
+		{
+			var elemId = "one_" + ("000" + i.toString()).slice(-4);
+			console.log(elemId);
+			var elem = this.$.colUno.querySelector("#" + elemId);
+			console.log(elem);
+			var globElem = document.querySelector("#" + elemId);
+			console.log(globElem);
+			var event = {"target": elem};
+			this.highlightWord(event);
+		}
+	},
+
+	copyText: function()
+	{
+		this.copiedText = "";
+		var smallerIndex = this.startSelectWordIndex < this.endSelectWordIndex ? this.startSelectWordIndex : this.endSelectWordIndex;
+		var largerIndex = this.startSelectWordIndex < this.endSelectWordIndex ? this.endSelectWordIndex : this.startSelectWordIndex;
+		console.log("small = " + smallerIndex + " and large = " + largerIndex);
+		for(i = smallerIndex; i <= largerIndex; i++)
+		{
+			var elemId = "one_" + ("000" + i.toString()).slice(-4);
+			var elem = this.$.colUno.querySelector("#" + elemId);
+			this.copiedText += elem.innerHTML;
+			this.copiedText += " ";
+		}
+		console.log(this.copiedText);
+	},
+
 	highlightWord: function(e)
 	{
 		var highlighted = (e.target.className.indexOf("highlighted") > -1);
