@@ -1,9 +1,9 @@
-<dom-module id="fc-reading-passage-display">	
+<dom-module id="fc-reading-passage-two">	
 <template>
 <style is="custom-style">
 		div.line-number {
 			width: 28px;
-			line-height: 1.25;
+			line-height: 1.1;
 			font-size: 12pt;
 			font-size: 1.25em;
 			font-family: merriweather;
@@ -33,7 +33,7 @@
 		}
 		div.text {
 
-			line-height: 1.25;
+			line-height: 1.1;
 			font-size: 12pt;
 			font-size: 1.25em;
 			font-family: merriweather;
@@ -46,7 +46,7 @@
 			max-width: 620px !important;	
 		}
 </style>
-	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_2A_443" order-by-child="instance" data='{{passageArrayOne}}'></firebase-collection>
+	<firebase-collection location="https://focused0ne.firebaseio.com/reading_questions/passages_2C1_400" order-by-child="instance" data='{{passageArrayOne}}'></firebase-collection>
 <!--double-column line-number and passage vertical container--> 
 			<div id="noJudge" class="layout vertical flex container left passageContainer">
 	<!--blurb full width container-->
@@ -56,38 +56,13 @@
 
 	<!--passage-columns container-->
 					
-		<!--column-1-container line numbs and passage | Flex-1 keeps the columns even-->
-				<div id="singleColumnPassage" class="layout horizontal container columnContainer" style="padding-right: 12px;">
-			<!--Line number container-->
-					 		<div id="linenumbersA1" class="layout vertical line-number">
-					 		<span id="linesA1">Lines</span>
-					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}">
-     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
-     							
-    							</template>
-					 		</div>
-			<!--passage-1-column-1 container-->
-					 		<div id="colUnoA" class="layout horizontal flex wrap text">
-					 		<article>
-					 	    	<template is="dom-repeat" items="{{firstColumnWordArrayOne}}">
- 									<template is="dom-if" if="{{item.paragraphBreak}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id="oneA_{{index}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
-								</template>
-									<br class="line-numbers">
-									<hr>
-								<span class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</span>
-							</article>
-					 		</div>
-					 	</div>
 		<!-- end-of-column-1 line number and text container-->
 					<div id="doubleColumnContainer" class="layout horizontal flex container">
-						<div class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<span id="lines">Lines</span>
-					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayTwo}}">
+					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayTwo}}" filter="{{passageOneLineFilter(showingSecondColumn)}}">
      								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
@@ -96,11 +71,11 @@
 			<!--passage-1-column-1 container-->
 					 		<div id="colUno" class="layout horizontal flex wrap text">
 					 		<article>
-					 	    	<template is="dom-repeat" items="{{firstColumnWordArrayTwo}}">
+					 	    	<template is="dom-repeat" items="{{firstColumnWordArrayTwo}}" filter="{{passageOneFilter(showingSecondColumn)}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
- 									<a id="one_{{item.index}}_{{item.word}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+ 									<a id="one_{{item.order}}" invisibility="false" hidden="{{!columnOneShow}}">{{item.word}}</a>
 								</template>
 								<br class="line-numbers">
 								<hr>
@@ -114,7 +89,7 @@
 					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 12px;overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
-					 		 	<template is="dom-repeat" items="{{secondColumnLineNumberArrayTwo}}">
+					 		 	<template is="dom-repeat" items="{{firstColumnLineNumberArrayTwo}}" filter="{{passageTwoLineFilter(showingSecondColumn)}}">
      								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
@@ -123,11 +98,11 @@
 			<!--passage-1-column-2 container-->
 					 		<div id="colDos" class="layout vertical text">
 					 		<article>
-								<template is="dom-repeat" items="{{secondColumnWordArrayTwo}}">
+								<template is="dom-repeat" items="{{firstColumnWordArrayTwo}}" filter="{{passageTwoFilter(showingSecondColumn)}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
- 									<a id="two_{{item.order}}_{{item.word}}" hidden="{{columnOneShow}}">{{item.word}}</a>
+ 									<a id="two_{{item.order}}" hidden="{{invisibility}}">{{item.word}}</a>
 								</template>
 								<br class="line-numbers">
 								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
@@ -143,10 +118,20 @@
 </template>
 <script>
 Polymer({
-	is:'fc-reading-passage-display',
+	is:'fc-reading-passage-two',
 	behaviors: [Polymer.IronResizableBehavior],
 	properties: {
 		largestLineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		passageWordArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		wordArray: {
 			type: Array,
 			value: [],
 			notify: true
@@ -165,6 +150,11 @@ Polymer({
 			type: Array,
 			value: [],
 			notify: true
+		},
+		passageWordArray:{
+			type: Array, 
+			notify: true, 
+			reflectToAttibutes: true 
 		},
 		passageArrayOne:{
 			type: Array, 
@@ -205,7 +195,11 @@ Polymer({
 			value: '',
 			notify: true
 		},
-		
+		showingSecondColumn: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
 		goldenRatio: {
 			type: Number,
 			notify: true,
@@ -223,35 +217,50 @@ Polymer({
 			{
 			j=	i % 5 ? false: true;
 			this.push("firstColumnLineNumberArrayTwo", {'number': i, 'show': j});
-			this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
 			this.push("secondColumnLineNumberArrayTwo", {'number': i, 'show': j});
 			this.push("largestLineNumberArray",{'number': i, 'show': j});
 			}
 		this.loadPassages();
 		},
 
+	logjunk: function(){
 
+		console.log(this.numWords);
+
+
+	},
 	loadPassages: function(){
-		console.log("loadPassage here " + " am I -->  undefined")
+		
 		this.passageArrayOne=[];
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_2A_443");
+		var ref = new Firebase("https://focused0ne.firebaseio.com/reading_questions/passages_2C1_400");
 		ref.on("value", function(snap){
+			self.passageArrayOne=[];
+			self.wordArray =[];
+			self.firstColumnWordArrayTwo=[];
+			self.secondColumnWordArrayTwo=[];
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
-			self.firstColumnWordArrayOne=snap.val();
-			self.goldenRatio = Math.floor(.65*self.numWords)+3;
+			self.goldenRatio = Math.floor(.618*self.numWords);
+			self.passageTitle = self.passageArrayOne[3].passageTitle;
+			self.passageBlurb = self.passageArrayOne[3].passageBlurb;
 			self.firstColumnWordArrayTwo = snap.val();
-			self.secondColumnWordArrayTwo = snap.val();
-			self.notifyResize();
-			self._numberColumnOne();
-			self._numberTwoColumns();
+
+			var j=0;
+			for(j=0; j<self.numWords;j++){
+				//this.wordArray[wordCount] = this.wordArray[wordCount].replace('&nbsp&nbsp&nbsp&nbsp','aaaa');
+				self.push("wordArray", self.passageArrayOne[j].word.replace('&nbsp&nbsp&nbsp&nbsp','aaaa'));
+			}			self.logjunk();
 		});
+		//this.logjunk();
 	},
 
 
+	
+
 	notifyResize: function(){		
 		this.setUp();
+		console.log(this.wordArray);
 
 	},
 	
@@ -260,69 +269,69 @@ Polymer({
 		this.colUnoHeight=this.$.colUno.scrollHeight;
 		if(this.colUnoHeight!=undefined && this.colUnoHeight >=250){
 			if(this.$.noJudge.clientWidth >= 620 && this.colUnoHeight>this.screenTrueHeight){
-				this.$.singleColumnPassage.hidden = true;
-				this.$.doubleColumnContainer.hidden = false;
+				this.$.secondColumnContainer.hidden = false;
+				this.showingSecondColumn = true;
+				this.fire('dom-change');
 				this._numberTwoColumns();
 			}
 			else{
-				this.$.doubleColumnContainer.hidden = true;
-				this.$.singleColumnPassage.hidden = false;
-				this.linesH = this.$.linesA1.clientHeight;
-				this._numberColumnOne();
+			
+				this.$.secondColumnContainer.hidden = true;
+				this.showingSecondColumn = false;
+				this.linesH = this.$.lines.clientHeight;
+				this.fire('dom-change');
+				this._numberOneColumn();
 				
 			}
 		}
 		else {
 			if(this.$.noJudge.clientWidth >= 620){
-				this.$.singleColumnPassage.hidden = true;
-				this.$.doubleColumnContainer.hidden = false;
+				this.$.secondColumnContainer.hidden = false;
 				this.colUnoHeight=this.$.colUno.scrollHeight;
 				if(this.colUnoHeight < this.screenTrueHeight){
-					this.$.doubleColumnContainer.hidden = true;
-					this.$.singleColumnPassage.hidden = false;
-					this.linesH = this.$.linesA1.clientHeight;
-					this._numberColumnOne();
+					this.$.secondColumnContainer.hidden = false;
+					this.$.firstColumnContainer.hidden = false;
+					this.linesH = this.$.lines.clientHeight;
+					this.fire('dom-change');
+					this._numberOneColumn();
 					this.fire('dom-change');
 					}
 				//else{this._numberTwoColumns();}
 			}
-			else{
-				this.$.doubleColumnContainer.hidden = true;
-				this.$.singleColumnPassage.hidden = false;
-				this.linesH = this.$.linesA1.clientHeight;
-				this._numberColumnOne();
-				this.fire('dom-change');
+				else{
+					this.$.secondColumnContainer.hidden = true;
+					this.$.firstColumnContainer.hidden = false;
+					this.fire('dom-change');
+					this._numberOneColumn();
+					this.fire('dom-change');
 			}
-	this._numberColumnOne();
-	this._numberTwoColumns();
+			this.linesH = this.$.lines.clientHeight;
 
-		}
-		
-	},
-	_numberColumnOne: function(){
+	}
+	this._measureWords();	
+		},
+	_numberOneColumn: function(){
 		this.screenTrueHeight =  (window.innerHeight - 400);
-		if (this.linesH != 0 && this.linesH != undefined)
-		{
-			var topDistance = this.$.singleColumnBounder.getBoundingClientRect().top;
-			var basis = this.$.linesA1.getBoundingClientRect().top;
+		if (this.linesH < 20 || this.linesH == undefined)
+			var topDistance = this.$.doubleColumnBounderOne.getBoundingClientRect().top;
+			var basis = this.$.lines.getBoundingClientRect().top;
 			var delta = topDistance - basis;
-			console.log(delta);console.log(topDistance);console.log(topDistance);console.log(delta);console.log(delta);
-			this.numLines = (delta/this.$.linesA1.clientHeight)-1;
-			console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);
+			//console.log(delta);console.log(topDistance);console.log(topDistance);console.log(delta);console.log(delta);
+			this.numLines = (delta/this.$.linesH)-1;
+			//console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);console.log(this.numLines);
 			this.set("firstColumnLineNumberArrayOne", this.largestLineNumberArray.slice(0,this.numLines));
-		}
 		
 	},
 
-
+	
 	_numberTwoColumns: function(){
 		this.linesH = this.$.lines.clientHeight;
-		if (this.linesH != 0 && this.linesH != undefined)
+		if (this.linesH != 0 && this.linesH != undefined && this.$.doubleColumnBounderOne.getBoundingClientRect().top >200)
 		{
 			var topDistance = this.$.doubleColumnBounderOne.getBoundingClientRect().top;
 			var basis = this.$.lines.getBoundingClientRect().top;
 			var delta = topDistance - basis;
-			var rowsColumnOne = delta/this.linesH;
+			var rowsColumnOne = delta/this.linesH-2;
 
 			this.set("firstColumnLineNumberArrayTwo", this.largestLineNumberArray.slice(0,rowsColumnOne));
 //Lines Col one
@@ -336,13 +345,130 @@ Polymer({
 			this.colUnoHeight=this.$.colUno.scrollHeight;
 			}
 			else { 
-				this.numberOneColumn();
+				this.linesH=28;
+				var topDistance = 1080;
+				var basis = this.$.lines.getBoundingClientRect().top;
+				var delta = topDistance - basis;
+				var rowsColumnOne = delta/this.linesH-2;
 
-			}
-
+				this.set("firstColumnLineNumberArrayTwo", this.largestLineNumberArray.slice(0,rowsColumnOne));
+//Lines Col one
+				var topDistanceTwo = this.$.doubleColumnBounderTwo.getBoundingClientRect().top;
+				var deltaTwo = topDistanceTwo - basis;
+//Distance fro col 2
+				this.rowsColumnTwo = deltaTwo/this.linesH;
+				var numLines= rowsColumnOne + this.rowsColumnTwo;
+//set col two
+				this.set("secondColumnLineNumberArrayTwo", this.largestLineNumberArray.slice(rowsColumnOne, numLines));
+				this.colUnoHeight=this.$.colUno.scrollHeight;
 			
+			}
+		
 
-	}
+		},
+	_measureWords:function(){
+			
+			var canvas = document.createElement('canvas');
+			var context = canvas.getContext("2d");
+			context= this.measureFont();
+			context.font = this.measureFont().font;
+			console.log(context.font);
+			this.passageWordArray=[];	
+			var passageWidth = this.$.colUno.clientWidth;
+		if(passageWidth < 240)
+		{
+			passageWidth = 480;
+		}
+		console.log(passageWidth);
+		var currentRow = 1;
+		var passageTitle = this.passageTitle;
+		var numParagraphs = this.paragraphs;
+			var numWords = this.numWords;
+			var wordCount = 0;
+			var currentLine = "";
+			var currentWidth = 0;
+			for(wordCount=0; wordCount < numWords; wordCount++)
+			{			
+				var wordMeasure = " " + this.wordArray[wordCount];
+				if(currentWidth+context.measureText(wordMeasure).width < passageWidth)
+				{
+					currentLine += wordMeasure; //add a word
+				} 
+				else{
+					currentLine = this.wordArray[wordCount];
+					currentRow++;
+				}
+
+				var currentWord = this.wordArray[wordCount];
+				currentWidth = context.measureText(currentLine).width;
+				this.push("passageWordArray",
+					{ 
+						
+						'current-line': currentLine,
+						'order': wordCount,
+						'word' : currentWord, 
+						"current-line-width": currentWidth, 
+						'row':currentRow,
+						'passage_width': passageWidth
+					}
+				);	
+
+		
+		} 
+		console.log(this.passageWordArray);
+		
+	},
+
+
+
+	measureFont: function(){
+		var lines = this.$.lines;		
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		this.context = context;
+		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
+		var fontSizeInt = parseInt(calcFontSize.replace('px',''));
+		calcFontSize = fontSizeInt.toString() + 'pt';
+		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
+		this.context.font = context.font = calcFontSize + " " + calcFontFam;
+		return this.context;
+				
+	 },
+	passageOneFilter: function(showSecond){
+		if(showSecond){
+			return (item)=>{
+				return (item.order <= this.goldenRatio);
+			};
+		} else {
+			return (item)=>{
+				return true;
+			};
+		}
+		
+	},
+	passageOneLineFilter: function(showSecond){
+		if(showSecond){
+			return (item)=>{
+				//return item.number < this.
+			};
+		} else {
+			return (item)=>{
+				return true;
+			};
+
+		}
+	},
+	passageTwoFilter: function(showSecond){
+		if(showSecond){
+			return (item)=>{
+				return (item.order > this.goldenRatio);
+			};
+		} else {
+			return false;
+		}
+	},
+
+
 });
 </script>
 </dom-module>

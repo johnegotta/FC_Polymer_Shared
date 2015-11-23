@@ -10,10 +10,10 @@
 	<template>
 <style>
 	 	#div1 {
-	 		min-width:765px; 
+	 		min-width:260px; 
 	 		max-width: 960px;
 	 		display: flex;
-	 		height:680 px;
+	 		min-height:280 px;
 	 		padding:10px;
 	 		border:1px solid #aaaaaa;
 	 	}
@@ -32,9 +32,9 @@
 				font-family: merriweather;
 			  	font-size: 1.05em;
 				display: block;
-				min-width: 480px;
-				max-width: 720px;
-				height: 700px;
+				min-width: 270px;
+				max-width: 1080px;
+				min-height: 280px;
 				overflow: hidden;
 				border: 2px ridge #002c90;
 				background: #fff;
@@ -71,7 +71,7 @@
 			}
 
 			section {
-			 	height: 98vh;
+			 
 			 	overflow-y: scroll;
 			}
 			iron-page {
@@ -81,7 +81,7 @@
 				padding-top: 4px;
 			}
 			p.assistant{
-				height: 100vh;
+			
 				font-family: Times;
 				font-size: 14px;
 				font-weight: 500px;
@@ -92,6 +92,7 @@
 
 			div.scroll-master{
 				height: 98%;
+				min-height:460px;
 				overflow: hidden;
 				overflow-y: scroll;
 				border: 0px 3px 0px 3px inset #fffffe;
@@ -107,7 +108,7 @@
 
 			
 			iron-pages{
-				height: calc(100vh-65px);
+			
 				position: relative;
 				display: flex;
 
@@ -119,31 +120,33 @@
 	<div class="layout container vertical center center-justified iconset">
 		<button class="right" style="position: fixed; left: 400px; top: 30px; opacity: .65; background: goldenrod; border: 6px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME
 				<div hidden="{{getFocused}}"style="font-size: 8.5pt; width: 500px; height: 24px; font-family: times; color: #000066;">
-					<span >Get Focused!</span>
+					<span>Get Focused!</span>
 				</div>
 		</button>
 	</div>
 
 								
-<paper-dialog id="dragDialogTwo" class="layout vertical container" style="display: block; overflow: auto; resizable: both;"  draggable="true" no-cancel-on-outside-click="true">
+<paper-dialog id="dragDialogTwo" class="layout vertical container" style="display: block; overflow: auto; resizable: both; resize: auto;"  draggable="true" no-cancel-on-outside-click="true">
 <div on-mousedown="_startDrag">
-	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px; margin-top:16px;">The Focused Data Administrator</h3>
+	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px; margin-top:16px;">The Focused Data Admin</h3>
 	<h6  class="subheading horizontal layout center-justified" style="line-height:2; margin: 10px 3px 0px 3px;">CLICK TO DRAG || CLICK AGAIN TO RELEASE</h6></div>
 	<div class="scroll-master">
 		<iron-pages id="assistantPages" selected="0">
 			<section>
-				<fc-cell-creator>
-				</fc-cell-creator>
-
-
-			
-
-
-
-
+				<!--<fc-cell-creator>
+				</fc-cell-creator>-->
+				<div class="vertical layout flex-1 container">
+					<paper-input value='{{testNumber}}' style="max-width: 340px;" list="Test Number" always-float-label='true' label='Passage Title'></paper-input>
+					<datalist>
+						<option> Test 1</option>
+					</datalist>
+					TAKE JOHN STUFF
+					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Title'></paper-input>
+					<paper-input value='{{passageBlurb}}' style="max-width: 340px;" always-float-label='true' label='Passage Blurb'></paper-input>
+				</div>
 			</section>
 			<section class="vertical layout flex container">
-				<div id="firepad" style="border: 6px ridge silver; overflow: auto;" class="fit">
+				<div id="firepad" style="border: 6px ridge silver; overflow: auto;resize: auto; min-height: 480px;" class="fit">
 					
 				</div>
 				
@@ -156,7 +159,12 @@
 				<h3> Building Cells</h3>
 				<h5> Cell Builder One</h5>
 			</section>
+<section>
 
+
+
+
+</section>
 
 
 
@@ -168,7 +176,7 @@
 				<paper-button class="flex-1" on-tap="conttap">More</paper-button>
 				<paper-button class="flex-1" on-tap="coolThings">Scores</paper-button>
 				<paper-button class="flex-1" dialog-dismiss>Exit</paper-button>
-				<paper-button class="flex-1" on-tap="coolerThings">Passage Save</paper-button>
+				<paper-button class="flex-1" on-tap="_savePassage">Passage Save</paper-button>
 
 	</fc-holder>
 	
@@ -205,6 +213,16 @@
 				value: false, 
 				notify: true
 			},
+		passageTitle: {
+			type: String,
+			value: 'none',
+			notify: true
+		},
+		passageBlurb:{
+			type: String,
+			value: 'none',
+			notify: true
+		}, 
 		open: 	{
 			type: Boolean,
 			value: false, 
@@ -279,58 +297,7 @@
 
 	 created: function(){
 
-	 	var setFB = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
-	    var self = this;
-	    setFB.on("value", function(snap){
-	    var theSet = snap.val();
-		//console.log(theSet);
-	    var counterone = 0;
-		var keyfirst = Object.keys(theSet);
-		var limit = keyfirst.length;
-		//console.log(limit);
-	
-	     for(counterone = 0; counterone < limit; counterone++){
-	     	var testKeys =  Object.keys(theSet[keyfirst[counterone]].test_results);
-			var testCounter = testKeys.length;
-	     	
-	     	var studenters = keyfirst[counterone];
-			//alert(testCounter + "c " + studenters);
-			var full = theSet[keyfirst[counterone]].first_name + " " + theSet[keyfirst[counterone]].last_name;
-			self.push('superItemArray', {
-						'Full_Name' : full,
-						'fcid': theSet[keyfirst[counterone]].student,
-						'Email': theSet[keyfirst[counterone]].email,
-						'Test_Results': {function(){
-			
-					     	var testFB = new Firebase("https://focusedstaging1.firebaseio.com/test_results");
-					     	var thisTestResult = this;
-					     	testFB.orderByChild('student').equalTo(studenters).on("value", function(snapshot){
-					    			var testies = snapshot.val();
-					    			var testcounter = testies.length;
-					    			//console.log(testcounter);
-					    			var i = 0;
-					    			for(i=0; i<testcounter; i++){
-						     			var keysInTestResults = Object.keys(testies);
-						     			var FITRs = keysInTestResults.length;
-						     			console.log(Object.keys(testies[keysInTestResults[j]]));//values we want;
-						     			var scoreHeaders = Object.keys(testies[keysInTestResults[0]]);
-										var it = testies[keysInTestResults[j]].values();
-										var entry;
-											while (!(entry = it.next()).done) {
-    											console.log(entry.value);
-    											self.push('superItemArray', entry.value);
-												}
-											//console.log(entry.value);
-												return entry.value;
-										};
-	     							
-	    							});
-	    						}
-	     					}
-						});
-					
-				}
-			});
+	 	
 		},
 
 attached: function() { 
@@ -338,15 +305,15 @@ attached: function() {
   			this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
   			this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
-			this.passage_width = 443;
+			this.passage_width = 400;
 			},
 
-coolerThings: function(){
+_savePassage: function(){
 	var passageHeader ="The following passage is excerpted from an autobiographical sketch of a former social and political activist for civil rights. \n \n"
 	var self = this;
 	var passageContent = self.firepad.getText();
-		console.log(passageContent + " this is the passageContent property " + self.firepad.getText());
-		console.log(this.firepad);
+		//console.log(passageContent + " this is the passageContent property " + self.firepad.getText());
+		//console.log(this.firepad);
 			var canvas = document.createElement('canvas');
 			var context = canvas.getContext("2d");
 			var theFont = context.font = "13.2pt Merriweather";
@@ -358,10 +325,9 @@ coolerThings: function(){
 	//this should be turned into a local function
 	//in the reading display element
 	// that just determines how many lines to reveal, I guess?
-			var passageWidth = self.passage_width = 443;
-			var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne");
+			var passageWidth = self.passage_width = 400;
+			var ref = new Firebase("https://focused0ne.firebaseio.com/reading_questions");
 				var currentRow = 1;
-				self.passageTitle="Money Can`t Buy Love";
 				self.passageWordObject = [];
 				for(i=0; i< numParagraphs; i++)
 					{
@@ -403,8 +369,7 @@ coolerThings: function(){
 							var currentWord = wordArray[wordCount];
 							if (currentWord == undefined) {currentWord = " ";}
 							var index = self.lineMeasuredWordArrays.length;
-							alert(index);
-				//here we are building an array-like key name that is human readable
+								//here we are building an array-like key name that is human readable
 							var indexWord = self.indexWord = currentWord;
 							var mo = self.indexWord.length-1;
 							while(self.indexWord[mo] == "." || self.indexWord[mo] == "#"|| self.indexWord[mo] == "$" || self.indexWord[mo] == "[" || self.indexWord[mo] == "]" || self.indexWord[mo-1] == "." || self.indexWord[mo-1] == "#"|| self.indexWord[mo-1] == "$" || self.indexWord[mo-1] == "[" || self.indexWord[mo-1] == "]")
@@ -424,11 +389,12 @@ coolerThings: function(){
 								if (currentRow>0 && currentRow%5==0 && newline==true){labelLine=true;}
 						self.push('lineMeasuredWordArrays',
 									{ 
+										"paragraphs": numParagraphs,
 										"instance": instance,
 										"index": strIndex,
 										'line': rowRow,
 										'current-line': currentLine,
-										'order': wordCount,
+										'order': index,
 										'word' : currentWord, 
 										'pixels': wordWidth,
 										'line-length-remaining': remainingWidth, 
@@ -449,11 +415,14 @@ coolerThings: function(){
 					
 								self.push("passageWordArray",
 									{ 
+										"paragraphs": numParagraphs,
+										"passageTitle": self.passageTitle,
+										"passageBlurb": self.passageBlurb,
 										"instance": instance,
 										"index": strIndex,
 										'line': rowRow,
 										'current-line': currentLine,
-										'order': wordCount,
+										'order': index,
 										'word' : currentWord, 
 										'pixels': wordWidth,
 										'line-length-remaining': remainingWidth, 
@@ -461,7 +430,6 @@ coolerThings: function(){
 										//'font-family': theFont,
 										"current-line-width": currentWidth, 
 										"instance": instance,
-										'order': wordCount,
 										'word' : currentWord, 
 										'definition': 'meaning', 
 										"part of speech": "part of speech",
@@ -488,7 +456,7 @@ coolerThings: function(){
 					var arrayPassage= self.passageWordArray;
 					//var arrayPassage = self.lineMeasuredWordArrays;
 					//ref.child("Passage_1_@:_" + passageWidth).set(arrayPassage);
-					ref.child("Passage_2A_" + passageWidth).set(arrayPassage);
+					ref.child("passages_2C1_" + passageWidth).set(arrayPassage);
 					//alert("Passage_1B_@:_" + self.passage_width + "-----------");
 					//var lastElement = arrayPassage.pop();
 					//var lastRow =self.lastRow[passageWidth + "_width_"] = lastOfWordArray.row;
@@ -538,24 +506,7 @@ coolerThings: function(){
 		this.getFocused = !this.getFocused;
 	},
 
-getData: function(argItem)
-	{
-		
-		this.fcid = argItem;
-		if(this.scores.hasOwnProperty(argItem))
-		{
-		
-			return ['PRETEST: ' + this.scores[argItem].scoresPreTest + "  \n\r",
-					'TEST 1: ' + this.scores[argItem].scoresTest1 + "    |||    ",
-					'TEST 2: ' + this.scores[argItem].scoresTest2 + "    |||    ",
-					'TEST 3: ' + this.scores[argItem].scoresTest3 + "    |||    ",
-					'TEST 4: ' + this.scores[argItem].scoresTest4 + "    |||    ",
-					'TEST 5: ' + this.scores[argItem].scoresTest5 + "    |||    ",
-					'TEST 6: ' + this.scores[argItem].scoresTest6 + "    |||    ",
-					'REAL SAT: ' + this.scores[argItem].realSAT + "    |||    "
-					];
-		}
-	},
+
 		_startDrag: function(e){
 		
 			//console.log(e);
@@ -594,7 +545,30 @@ getData: function(argItem)
 
 </script>
 </dom-module>
-<!--<h3> Cell Creation Page</h3>
+<!--
+getData: function(argItem)
+	{
+		
+		this.fcid = argItem;
+		if(this.scores.hasOwnProperty(argItem))
+		{
+		
+			return ['PRETEST: ' + this.scores[argItem].scoresPreTest + "  \n\r",
+					'TEST 1: ' + this.scores[argItem].scoresTest1 + "    |||    ",
+					'TEST 2: ' + this.scores[argItem].scoresTest2 + "    |||    ",
+					'TEST 3: ' + this.scores[argItem].scoresTest3 + "    |||    ",
+					'TEST 4: ' + this.scores[argItem].scoresTest4 + "    |||    ",
+					'TEST 5: ' + this.scores[argItem].scoresTest5 + "    |||    ",
+					'TEST 6: ' + this.scores[argItem].scoresTest6 + "    |||    ",
+					'REAL SAT: ' + this.scores[argItem].realSAT + "    |||    "
+					];
+		}
+	},
+
+
+
+
+<h3> Cell Creation Page</h3>
 				<paper-input>lolo</paper-input>
 				<paper-input>lolo</paper-input>
 				<div style="border: 5px ridge silver; width: 240px; height: 120px;"> 
@@ -682,4 +656,55 @@ getData: function(argItem)
 
 				-->		
 				<!--"\n Akira came directly, breaking all tradition. Was that it? Had he followed form—had he asked his mother to speak to his father to approach a go-between—would Chie have been more receptive? \n He came on a winter’s eve. He pounded on the door while a cold rain beat on the shuttered veranda, so at first Chie thought him only the wind. The maid knew better. Chie heard her soft scuttling footsteps, the creak of the door. Then the maid brought a calling card to the drawing room, for Chie. \n Chie was reluctant to go to her guest; perhaps she was feeling too cozy. She and Naomi were reading at a low table set atop a charcoal brazier. A thick quilt spread over the sides of the table so their legs were tucked inside with the heat.  \n “Who is it at this hour, in this weather?” Chie questioned as she picked the name card off the maid’s lacquer tray. \n “Shinoda, Akira. Kobe Dental College,” she read. \n Naomi recognized the name. Chie heard a soft intake of air. \n “I think you should go,” said Naomi. \n Akira was waiting in the entry. He was in his early twenties, slim and serious, wearing the black military-style uniform of a student. As he bowed-his hands hanging straight down, a black cap in one, a yellow oil-paper umbrella in the other—Chie glanced beyond him. In the glistening surface of the courtyard’s rain-drenched paving stones, she saw his reflection like a dark double. \n “Madame,” said Akira, “forgive my disruption, but I come with a matter of urgency.” \n His voice was soft, refined. He straightened and stole a deferential peek at her face. \n In the dim light his eyes shone with sincerity. Chie felt herself starting to like him. \n “Come inside, get out of this nasty night. Surely your business can wait for a moment or two.” \n “I don’t want to trouble you. Normally I would approach you more properly but I’ve received word of a position. I’ve an opportunity to go to America, as dentist for Seattle’s Japanese community.” \n “Congratulations,” Chie said with amusement. “That is an opportunity, I’m sure. But how am I involved?” \n Even noting Naomi’s breathless reaction to the name card, Chie had no idea. Akira’s message, delivered like a formal speech, filled her with maternal amusement. You know how children speak so earnestly, so hurriedly, so endearingly about things that have no importance in an adult’s mind? That’s how she viewed him, as a child. \n It was how she viewed Naomi. Even though Naomi was eighteen and training endlessly in the artsneeded to make a good marriage, Chie had made no effort to find her a husband. Akira blushed. \n “Depending on your response, I may stay in Japan. I’ve come to ask for Naomi’s hand.” \n Suddenly Chie felt the dampness of the night. \n “Does Naomi know anything of your... ambitions?” \n “We have an understanding. Please don’t judge my candidacy by the unseemliness of this proposal. I ask directly because the use of a go-between takes much time. Either method comes down to the same thing: a matter of parental approval. If you give your consent, I become Naomi’s yoshi. We’ll live in the House of Fuji. Without your consent, I must go to America, to secure a new home for my bride.” \n Eager to make his point, he’d been looking her full in the face. Abruptly, his voice turned gentle. \n “I see I’ve startled you. My humble apologies. I’ll take no more of your evening. My address is on my card. If you don’t wish to contact me, I’ll reapproach you in two weeks’ time. Until then, good night.” He bowed and left. Taking her ease, with effortless grace, like a cat making off with a fish. \n “Mother?” Chie heard Naomi’s low voice and turned from the door. “He has asked you?” \n The sight of Naomi’s clear eyes, her dark brows gave Chie strength. Maybe his hopes were preposterous. \n “Where did you meet such a fellow?” Chai began.  “Imagine! He thinks he can marry the Fuji heir and take her to America all in the snap of his fingers!” \n Chie waited for Naomi’s ripe laughter. Naomi was silent. She stood a full half minute looking straight into Chie’s eyes. Finally, she spoke: \n “Mother.” \n “Yes?” \n “I mean to have him.”\n\n";-->
-		
+	<!--	var setFB = new Firebase("https://focusedstaging1.firebaseio.com/students"); 
+	    var self = this;
+	    setFB.on("value", function(snap){
+	    var theSet = snap.val();
+		//console.log(theSet);
+	    var counterone = 0;
+		var keyfirst = Object.keys(theSet);
+		var limit = keyfirst.length;
+		//console.log(limit);
+	
+	     for(counterone = 0; counterone < limit; counterone++){
+	     	var testKeys =  Object.keys(theSet[keyfirst[counterone]].test_results);
+			var testCounter = testKeys.length;
+	     	
+	     	var studenters = keyfirst[counterone];
+			//alert(testCounter + "c " + studenters);
+			var full = theSet[keyfirst[counterone]].first_name + " " + theSet[keyfirst[counterone]].last_name;
+			self.push('superItemArray', {
+						'Full_Name' : full,
+						'fcid': theSet[keyfirst[counterone]].student,
+						'Email': theSet[keyfirst[counterone]].email,
+						'Test_Results': {function(){
+			
+					     	var testFB = new Firebase("https://focusedstaging1.firebaseio.com/test_results");
+					     	var thisTestResult = this;
+					     	testFB.orderByChild('student').equalTo(studenters).on("value", function(snapshot){
+					    			var testies = snapshot.val();
+					    			var testcounter = testies.length;
+					    			//console.log(testcounter);
+					    			var i = 0;
+					    			for(i=0; i<testcounter; i++){
+						     			var keysInTestResults = Object.keys(testies);
+						     			var FITRs = keysInTestResults.length;
+						     			console.log(Object.keys(testies[keysInTestResults[j]]));//values we want;
+						     			var scoreHeaders = Object.keys(testies[keysInTestResults[0]]);
+										var it = testies[keysInTestResults[j]].values();
+										var entry;
+											while (!(entry = it.next()).done) {
+    											console.log(entry.value);
+    											self.push('superItemArray', entry.value);
+												}
+											//console.log(entry.value);
+												return entry.value;
+										};
+	     							
+	    							});
+	    						}
+	     					}
+						});
+					
+				}
+			});-->
