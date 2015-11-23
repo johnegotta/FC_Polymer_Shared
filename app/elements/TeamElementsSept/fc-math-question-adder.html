@@ -111,7 +111,7 @@
       #question_preview_area li,p {
         word-wrap: break-word;
       }
-      #question_preview_area li[data-correct=true] {
+      #question_preview_area p[data-correct=true],li[data-correct=true] {
         padding: 5px;
         background: rgba(77, 255, 136, .75);
       }
@@ -245,6 +245,7 @@
             <iron-icon class="js-remove" icon="clear"></iron-icon>
           </div>
 
+          <div class="horizontal layout center addable_input"><iron-icon class="handle" icon="hardware:gamepad"></iron-icon><paper-input class="in_value flex"  data-inputtype="Free Response Answer" label="Free Response Answer"></paper-input><iron-icon class="js-remove" icon="clear"></iron-icon></div>
         </div>
       </div>
 
@@ -459,12 +460,20 @@
               var input = desired_question_elements_array[i];
               this.readImage(input,i,true);
               break;
+            case 'Free Response Answer':
+              var frel = document.createElement('p');
+              frel.style.wordWrap = "break-word";
+              frel.className="preview_mode";
+              frel.setAttribute('data-questionpart','Free Response Answer');
+              frel.setAttribute('data-correct', true);
+              frel.innerHTML = desired_question_elements_array[i].value;
+              Polymer.dom(this.$.question_preview_area).appendChild(frel);
+              break;
           }
         }
       },
 
       _insertMathTex: function(e){
-        console.log(e);
         var current_typing_area = e.detail.keyboardEvent.path[0];
         var current_typing_area_start = current_typing_area.selectionStart;
         var current_typing_area_end = current_typing_area.selectionEnd;
