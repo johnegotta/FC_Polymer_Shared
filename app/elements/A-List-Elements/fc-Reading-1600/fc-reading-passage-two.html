@@ -92,7 +92,7 @@
 			<!--passage-1-column-1 container-->
 					 		<div id="colUno" class="layout horizontal flex wrap text">
 					 		<article id="textColumnOne">
-					 	    	<template is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageOneFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
+					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageOneFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
@@ -268,7 +268,6 @@ Polymer({
 			self.finalColumnOneWordIndex = self.goldenRatio;
 			self.passageTitle = self.passageArrayOne[3].passageTitle;
 			self.passageBlurb = self.passageArrayOne[3].passageBlurb;
-			
 
 			var j=0;
 			for(j=0; j<self.numWords;j++){
@@ -298,27 +297,27 @@ Polymer({
 				this.showingSecondColumn = true;
 				this._measureWords(true);
 				var finalWordAnchor = this.$$('#one_'+ this.finalColumnOneWordIndex.toString());
-				//console.log(goldenRatioAnchor);
 				var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
-				//console.log(bottom_of_line_to_cut);
+				console.log(finalWordAnchor.getBoundingClientRect());
 				var previousAnchor = finalWordAnchor;
 				var bottom_of_previous_anchor = bottom_of_line_to_cut;
-				var howManyAheadOfGoldenRatioWord = 0;
-				while(howManyAheadOfGoldenRatioWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+				var howManyAheadOfFinalColumnOneWord = 0;
+				while(howManyAheadOfFinalColumnOneWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
 					previousAnchor = previousAnchor.previousSibling;
 					if(previousAnchor.nodeName == finalWordAnchor.nodeName){
 						bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
-						howManyAheadOfGoldenRatioWord++;
+						howManyAheadOfFinalColumnOneWord++;
 					}
 				}
-				this.finalColumnOneWordIndex = this.goldenRatio - howManyAheadOfGoldenRatioWord;
+				this.finalColumnOneWordIndex = this.finalColumnOneWordIndex - howManyAheadOfFinalColumnOneWord;
 				console.log(this.finalColumnOneWordIndex);
 			}
 			else{ 
 				this.$.doubleColumnContainer.hidden = true;
 				this.$.singleColumnContainer.hidden = false;
 				  this.showingSecondColumn = false;
-				  this._measureWords(false);	
+				  this._measureWords(false);
+				
 			}
 		}
 		else {
@@ -330,21 +329,23 @@ Polymer({
 					this.$.singleColumnContainer.hidden = true; 
 					this.showingSecondColumn = true;
 					this._measureWords(true);
-					var finalWordAnchor = this.$.colUnoLNBR.previousSibling;
-					console.log(finalWordAnchor);
-					// var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
-					// var previousAnchor = finalWordAnchor;
-					// var bottom_of_previous_anchor = bottom_of_line_to_cut;
-					// var howManyAheadOfGoldenRatioWord = 0;
-					// while(howManyAheadOfGoldenRatioWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
-					// 	previousAnchor = previousAnchor.previousSibling;
-					// 	if(previousAnchor.nodeName == finalWordAnchor.nodeName){
-					// 		bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
-					// 		howManyAheadOfGoldenRatioWord++;
-					// 	}
-					// }
-					// this.finalColumnOneWordIndex = this.goldenRatio - howManyAheadOfGoldenRatioWord;
-					// console.log(this.finalColumnOneWordIndex);
+			
+					var finalWordAnchor = this.$$('#one_'+ this.finalColumnOneWordIndex.toString());
+					var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
+					console.log(finalWordAnchor.getBoundingClientRect());
+					console.log(this.passageWordArray[finalColumnOneWordIndex].wordWidth);
+					var previousAnchor = finalWordAnchor;
+					var bottom_of_previous_anchor = bottom_of_line_to_cut;
+					var howManyAheadOfFinalColumnOneWord = 0;
+					while(howManyAheadOfFinalColumnOneWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+						previousAnchor = previousAnchor.previousSibling;
+						if(previousAnchor.nodeName == finalWordAnchor.nodeName){
+							bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
+							howManyAheadOfFinalColumnOneWord++;
+						}
+					}
+					this.finalColumnOneWordIndex = this.finalColumnOneWordIndex - howManyAheadOfFinalColumnOneWord;
+					console.log(this.finalColumnOneWordIndex);
 				}
 	
 			}
@@ -410,16 +411,24 @@ Polymer({
 						'newPara': newPara,
 						'word-width': context.measureText(currentWord).width
 					}
-				);	
+				);
+
 		} 
-	
+		
 		console.log(this.passageWordArray);
+			var checkId = this.finalColumnOneWordIndex;
 			var lastWord = this.numWords -1;
-			var lastRow = this.passageWordArray[lastWord] ? this.passageWordArray[lastWord].row: 100;
-				console.log(lastRow);
-				self=this;
-				this.lastRow = lastRow;
-				this.set("firstColumnLineNumberArrayOne", self.LineNumberArray.slice(0,this.lastRow));		
+			var checkAgain = checkId + 1;
+			var idOne ='#one_'+ checkId.toString();
+			var idTwo = '#two_'+ checkAgain.toString();
+			//console.log(idOne);
+			//console.log(this.$$(idOne));
+			// var position = this.$$(idOne).getBoundingClientRect().right + 52 + this.passageWordArray[checkId].wordWidth < this.$$(idTwo).getBoundingClientRect().right ? "at end of line": "suck word from next column";
+			// 	console.log("Position: " + position);
+			// 	console.log(lastRow);
+			// 	self=this;
+			// 	this.lastRow = lastRow;
+			// 	this.set("firstColumnLineNumberArrayOne", self.LineNumberArray.slice(0,this.lastRow));		
 	},
 
 
