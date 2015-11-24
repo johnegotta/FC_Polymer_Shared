@@ -1,4 +1,4 @@
-<dom-module id="fc-data-administrator">
+<dom-module id="fc-data-administrator-reverse">
 	<!-- CodeMirror -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.css">
@@ -218,7 +218,7 @@
 </template>
 <script>  
 	Polymer({
-		is: 'fc-data-administrator',
+		is: 'fc-data-administrator-reverse',
 		properties:{
 		offsetX: {
 				type: Number,
@@ -350,164 +350,59 @@ attached: function() {
 			},
 
 _savePassage: function(){
-	var blurb = this.Blurb;
+	var blurb = this.passageBlurb;
+	var passageTitle = this.passageTitle;
 	var self = this;
 	var passageContent = self.firepad.getText();
-		//console.log(passageContent + " this is the passageContent property " + self.firepad.getText());
-		//console.log(this.firepad);
-			var canvas = document.createElement('canvas');
-			var context = canvas.getContext("2d");
-			var theFont = context.font = "13.2pt Merriweather";
 			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
-			var paragraphArray = truePassageContent.split(/\n/);
-			var numParagraphs = paragraphArray.length;
-	// Setting and saving
-	// passage widths based on the current screen width
-	//this should be turned into a local function
-	//in the reading display element
-	// that just determines how many lines to reveal, I guess?
-			var passageWidth = self.passage_width = 400;
+			self.paragraphArray = truePassageContent.split(/\n/);
 			var ref = new Firebase("https://focused0ne.firebaseio.com/reading_questions");
-				var currentRow = 1;
 				self.passageWordObject = [];
-				for(i=0; i< numParagraphs; i++)
+				self.passageArray = [];
+				for(var i = self.paragraphArray.length; i> 0; i--)
 					{
+						console.log(i + " " + self.paragraphArray);
 					var newPara = true;
-					var wordArray = paragraphArray[i].split(/\s/g);
+
+					var wordArray = self.paragraphArray[(i-1)].split(/\s/g);
 					var numWords = wordArray.length;
 					var wordCount = 0;
 					var paragraph_number = i;
-
-					while(wordCount < numWords)
+					var holder=numWords;
+					while(numWords>0)
 					// line loop
-						{
-							var currentLine = "";
-							var testLine = "";
-							var currentWidth = 0;
-							var space="&nbsp&nbsp&nbsp&nbsp";
-							var spaceOffset = "";
-							var newline = true;
-						while((currentWidth + 64) < self.passage_width && wordCount <= numWords)
+						{	
+						while(wordCount < holder)
 						//word loop
-					 		{
-							
-							
-							currentLine = testLine;
-							if (testLine != "")
-								{
-								testLine += " "; //add a space if not beginning
-			      				}
-			      			else if(wordCount == 0)
-			      				{
-			      					//new paragraph
-			      					testLine += space;
-			      					spaceOffset = "aaaaaaaaaaaaaaaaaaaaa";
-			      				}
-			      			var oldWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
-							testLine += wordArray[wordCount]; //add a word
-							currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
-							var remainingWidth = passageWidth - currentWidth;
-							var wordWidth = currentWidth - oldWidth;
-							var currentWord = wordArray[wordCount];
-							if (currentWord == undefined) {currentWord = " ";}
-							var index = self.lineMeasuredWordArrays.length;
-								//here we are building an array-like key name that is human readable
-							var indexWord = self.indexWord = currentWord;
-							var mo = self.indexWord.length-1;
-							while(self.indexWord[mo] == "." || self.indexWord[mo] == "#"|| self.indexWord[mo] == "$" || self.indexWord[mo] == "[" || self.indexWord[mo] == "]" || self.indexWord[mo-1] == "." || self.indexWord[mo-1] == "#"|| self.indexWord[mo-1] == "$" || self.indexWord[mo-1] == "[" || self.indexWord[mo-1] == "]")
-									{
-										indexWord = self.indexWord.slice(0,mo); 
-										mo = mo-1;
-									}
-								var strIndex = ("000" + index).slice(-4);
-								var rowRow = ("00" + currentRow).slice(-3);
-								var instance = rowRow + "_" + strIndex + "_Passage_" + self.passageTitle + "_at_" + passageWidth + "_" + indexWord;
-								var wordName = instance;
-				//the build of the words row, words placement in the list of words and characters,
-				// the passage number and Type
-				// the width of the column 
-				//as well as the word or punctuation appear as the keys//
-								var labelLine = false;
-								if (wordCount ==numWords-1){ newPara=true;}
-								else{newPara=false;}
-								if (currentRow>0 && currentRow%5==0 && newline==true){labelLine=true;}
-						self.push('lineMeasuredWordArrays',
+							{var order = holder-wordCount;
+					 	
+							var currentWord = wordArray[numWords-1];
+							if (numWords==holder)
+							{ 
+								var newPara=true;
+							}
+							else{
+								newPara=false;
+							}
+							numWords --;			      				
+								 
+								self.push("passageArray",
 									{ 
-										"paragraphs": numParagraphs,
-										"instance": instance,
-										"index": strIndex,
-										'line': rowRow,
-										'current-line': currentLine,
-										'order': index,
+										"passageTitle": passageTitle,
+										"passageBlurb": blurb,
+										'order': order,
 										'word' : currentWord, 
-										'pixels': wordWidth,
-										'line-length-remaining': remainingWidth, 
-										'font-size': theFont,
-										'font-family': theFont,
-										"current-line-width": currentWidth, 
-										'definition': 'meaning', 
-										"part of speech": "part of speech",
-										'clause': 'phrases are phrase for all of my lasers', 
-										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build.",
-										'paragraphBreak': newPara,
-										'labelline': labelLine,
-										'row':currentRow,
-										'newline': newline,
-										'passage_width': passageWidth
-									}
-								); 
-					
-								self.push("passageWordArray",
-									{ 
-										"paragraphs": numParagraphs,
-										"passageTitle": self.passageTitle,
-										"passageBlurb": self.passageBlurb,
-										"instance": instance,
-										"index": strIndex,
-										'line': rowRow,
-										'current-line': currentLine,
-										'order': index,
-										'word' : currentWord, 
-										'pixels': wordWidth,
-										'line-length-remaining': remainingWidth, 
-										'font-size': theFont,
-										//'font-family': theFont,
-										"current-line-width": currentWidth, 
-										"instance": instance,
-										'word' : currentWord, 
-										'definition': 'meaning', 
-										"part of speech": "part of speech",
-										'clause': 'phrases are phrase for all of my lasers', 
-										'sentence': "the Sentence which the actual word appears in, this will help a ton on the build.",
-										'synonyms': "context synonyms 5 look for high context numbers; multii parts of speech",
-										'antonyms': "context one to three synonyms and antonyms.",
-										'paragraphBreak': newPara,
-										'labelline': labelLine,
-										'row':currentRow,
-										'newline': newline, 
-										'passage_width': passageWidth,
-										'paragraph_number': paragraph_number
+										'newPara': newPara,
+										'paragraph_number': i
 									});
-								newline = false;
-								newPara = false;
 								wordCount++;
 							} //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
-						currentRow++;
-						currentWidth = 0;
 						}//SINGLE line loop
-						console.log(JSON.stringify(self.passageWordObject[instance]));
 					} //this is the paragraph for loop
-					var arrayPassage= self.passageWordArray;
-					//var arrayPassage = self.lineMeasuredWordArrays;
-					//ref.child("Passage_1_@:_" + passageWidth).set(arrayPassage);
-					ref.child("passages_2C1_" + passageWidth).set(arrayPassage);
-					//alert("Passage_1B_@:_" + self.passage_width + "-----------");
-					//var lastElement = arrayPassage.pop();
-					//var lastRow =self.lastRow[passageWidth + "_width_"] = lastOfWordArray.row;
-					//alert(lastElement.row);
+					var arrayPassage= self.passageArray.reverse();
+					ref.child("passages_2C1_" + "2308").set(arrayPassage);
 					console.log(arrayPassage);
-					self.passageWordObject = [];
-					self.lineMeasuredWordArrays =[];
+					self.passageArray = [];
 
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	
 		//this ends the firepad stuff			
