@@ -1,0 +1,90 @@
+<!--This is the paper-menu portion of the paper menu dropdown John built.  I am placing it in a paper menu dropdown so that he will have an all in one menu dropdown than I can select from my menu dropdown selector.  
+which will eventually be a menu dropdown creator.-->
+
+
+<dom-module id="fc-loginform">
+  <template>
+        <firebase-auth id="firebaseLogin" user="{{user}}" status-known="{{statusKnown}}" location="focusedstaging1.firebaseio.com" provider="password" on-error="errorHandler" on-user-created="userSuccessHandler" on-password-changed="userSuccessHandler" on-password-reset="userSuccessHandler" on-user-removed="userSuccessHandler" on-firebase-login="changeStatus"></firebase-auth>
+
+          <gold-email-input label="Email" auto-validate required value="{{email}}">
+          </gold-email-input>
+          <paper-input label="Password" name="login_password" type="password" required value="{{password}}"></paper-input>
+          <paper-button raised on-tap="login" hidden$="{{computeLoginHidden(statusKnown, user)}}">Login</paper-button>
+          <paper-button raised on-tap="logout" hidden$="{{computeLogoutHidden(statusKnown, user)}}">Logout</paper-button>
+          <paper-button raised on-tap='newUser' hidden$='{{computeLoginHidden(statusKnown, user)}}'>Create a Login</paper-button>
+
+               <h3>Login status:</h3>
+    <p>{{computeLoginStatus(statusKnown, user)}}</p>
+
+    <h3>User ID:</h3>
+    <pre>{{user.uid}}</pre>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'fc-loginform',
+
+    properties: {
+      provider: {
+        type: String,
+        value: 'password'
+      },
+
+      message: {
+        type: String,
+        value: ''
+      },
+
+      email: {
+        type: String,
+        value: ''
+      },
+
+      password: {
+        type: String,
+        value: ''
+      },
+
+      user: {
+        type: Object,
+        value: null,
+        notify: true
+      },
+
+      statusKnown: {
+        type: Boolean,
+        notify: true
+      }
+    },
+
+    login: function() {
+      var params = {'email':this.email,'password':this.password};
+      this.$.firebaseLogin.login(params);
+    },
+    logout: function() {
+      this.$.firebaseLogin.logout();
+    },
+    newUser: function(){
+      this.$.firebaseLogin.createUser(this.email, this.password);
+    },
+    errorHandler: function(e) {
+      alert('Error: ' + e.detail.message);
+    },
+    computeLoginHidden: function(statusKnown, user) {
+      return !statusKnown || !!user;
+    },
+    computeLogoutHidden: function(statusKnown, user) {
+      return !statusKnown || !user;
+    },
+    computeLoginStatus: function(statusKnown, user) {
+      if (statusKnown && user) {
+        return 'Logged in';
+      }
+      if (statusKnown) {
+        return 'Logged out';
+      }
+      return 'Unknown (checking status...)';
+    }
+  });
+</script>
+</dom-module>

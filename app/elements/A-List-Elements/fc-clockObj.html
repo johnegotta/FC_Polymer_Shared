@@ -1,0 +1,67 @@
+<dom-module id="fc-clockObj">
+<style is="custom-style">
+p.clok {
+	background: #ffffff;
+	color: #002d90;
+	width: 90px;
+	height: 60px;
+}
+paper-material{
+	background: #ffffff;
+	border: 2px ridge #aecdfe;
+	padding: 2px;
+	margin: 6px;
+	display: flex;
+}
+</style>
+<template>
+<paper-material class="clok" elevation="3">
+<p id='{{clockid}}'>
+</p>
+</paper-material>
+</template>
+<script>
+FcClockObj = Polymer({
+	is: "fc-clockObj",
+	properties: {
+		clockid: ""
+	},
+	behaviors:[],
+
+
+factoryImpl: function(argId){
+	this.id = argId;
+	this.clockid = this.id + "C";
+	console.log("factoryImpl called for " + this.id);
+},
+
+created: function(){
+
+},
+
+ready: function(){
+
+	if(this.id){this.clockid=this.id+"C";}
+},
+
+attached: function(){
+	console.log("clock id =" + this.clockid);
+	setInterval(this.updateClock, 1000, this.clockid);
+},
+
+updateClock: function(argId){
+	var newtime = new Date();
+	document.querySelector("#" + argId).innerHTML = newtime.toLocaleTimeString();
+},
+
+detatched: function(){
+
+},
+
+destroyed: function(){
+
+
+}
+});
+</script>
+</dom-module>
