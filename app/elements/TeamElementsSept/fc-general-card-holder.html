@@ -1,0 +1,34 @@
+<dom-module id="fc-general-card-holder">
+  <template>
+    <style>
+      fc-general-card {
+        padding: 10px;
+      }
+    </style>
+
+    <div id="crapspot" class="horizontal layout wrap">
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "fc-general-card-holder",
+      properties: {
+
+      },
+      ready: function(){
+        this.addCards();
+      },
+      addCards: function(){
+        var self = this;
+        console.log("running");
+        var ref = new Firebase("focusedstaging1.firebaseio.com/students");
+        ref.on("child_added", function(snap){
+          var snapKey = snap.key();
+          var blah = "students/" + snapKey;
+          var dblblah = new fcGeneralCard(blah);
+          Polymer.dom(self.$.crapspot).appendChild(dblblah);
+        });
+      }
+    });
+    </script>
+</dom-module>

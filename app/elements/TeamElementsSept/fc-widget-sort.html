@@ -1,0 +1,124 @@
+<script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+<!--<script src="../../bower_components/html.sortable/dist/html.sortable.min.js"></script>-->
+<dom-module id="fc-widget-sort">
+  <template>
+    <style>
+
+      .widgetContainer {
+        border: 1px dashed black;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 5px;
+        width: 200px;
+        height: 200px;
+        overflow-y: scroll;
+      }
+      .widgetContainer div{
+        font-size: 8px;
+        margin: 1px;
+      }
+      sortable-list {
+        margin: 15px;
+        min-width:50px;
+        min-height:50px;
+      }
+
+      sortable-list > div {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 6px 12px;
+        margin-bottom: 3px;
+      }
+
+      #availableWidgetsBlock div {
+        background: #dfd;
+      }
+
+      #yourWidgetsBlock div {
+        background: #ddf;
+      }
+    </style>
+    <section id="overlord" class="horizontal layout">
+      <div id="availableWidgetsBlock" class="widgetContainer">
+        <sortable-list id="grouped-a" group="{{group}}" animation="150" class="horizontal layout wrap" on-sort-remove="sayHi">
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="3d-rotation"
+              </iron-icon></div>
+              <div>Poop</div>
+          </span></div>
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="add-alert"
+              </iron-icon></div>
+            <div>Crap</div>
+          </span></div>
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="add-circle"
+              </iron-icon></div>
+            <div>Shit</div>
+          </span></div>
+        </sortable-list>
+      </div>
+
+      <div id="yourWidgetsBlock" class="widgetContainer">
+        <sortable-list id="grouped-b" group="{{group}}" animation="150" class="horizontal layout wrap" on-sort-remove="sayHi">
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="add-shopping-cart"
+              </iron-icon></div>
+            <div>Turd</div>
+          </span></div>
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="alarm"
+              </iron-icon></div>
+            <div>Excrement</div>
+          </span></div>
+          <div class="sortableWidget"><span class="vertical center layout">
+              <div><iron-icon icon="android"
+              </iron-icon></div>
+            <div>Feces</div>
+          </span></div>
+        </sortable-list>
+      </div>
+    </section>
+  </template>
+  <script>
+    Polymer({
+      is: "fc-widget-sort",
+      properties: {
+        group: {
+          type: String,
+          value: "grouped",
+          notify: true
+        }
+      },
+      sayHi: function(e){
+        var sortable_id = e.detail.from.id;
+        var sortable_list = this.$[sortable_id];
+        var crap = Polymer.dom(sortable_list).querySelector(".sortableWidget");
+        console.log(crap);
+        var sortable_list_children = sortable_list.childNodes;
+        var list_is_empty = false;
+
+        for (var child in sortable_list_children){
+          if(this.hasClass(sortable_list_children[child],"sortableWidget")){
+            list_is_empty = true;
+            break;
+          }
+        }
+        console.log(list_is_empty);
+      },
+      hasClass: function(ele, cls) {
+        return ele.hasOwnProperty(cls) && ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
+      },
+      addClass: function(ele, cls) {
+        if (!hasClass(ele, cls)) ele.className += " " + cls;
+      },
+      removeClass: function(ele, cls) {
+        if (hasClass(ele, cls)) {
+          var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+            ele.className = ele.className.replace(reg, ' ');
+        }
+      }
+    });
+  </script>
+</dom-module>

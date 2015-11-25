@@ -1,4 +1,4 @@
-<dom-module id="fc-list-two-g">
+<dom-module id="fc-list-two">
 <style is="custom-style">
     :host {
 	@apply(--layout-vertical);
@@ -8,10 +8,24 @@
      /* @apply(--layout-scroll);*/
     }
 
+paper-item:hover:after{
+	white-space: wrap;
+	cursor: pointer;
+	overflow: elipses;
+	display: flex-box;
+	flex: wrap;
+     
+    }
 
 div.scrollerTwo::-webkit-scrollbar {
     display: none;
 }
+/*paper-item::before
+	 { content: counter(item) ". "; counter-increment: item }
+	    }*/
+    
+
+
 paper-icon-button {
 	  display: block;
 	  width: 22px;
@@ -33,83 +47,77 @@ iron-icon {
 	}
   </style>
 <template>
+<firebase-collection data="{{calls}}" id="FBCallReads" limit-to="1009" order-by-child="timeorder" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+  <!--<div class="horizontal layout wrapper container">-->
     	<div class="vertical layout wrapper container block scrollerTwo">
-<template is="dom-repeat" items="{{tests}}"  filter='{{_Filter(inquiry)}}'>
-	<content select="fc-landscape-card">
-
-
-
-	</content>	
+<template is="dom-repeat" items="{{calls}}"  filter='{{_callFilter(inquiry)}}'>
+	<fc-call-list-tube id="listcard" data="{{item}}" class="right" inquiry="{{transferinquiry}}">
+		<section class='vertical layout container center-justified commands' style="width: 30px; height: 100px;">	
+			   <!-- <iron-icon icon="icons:swap-horiz" id="button" class="horizontal layout right-justified" on-click="_scott"></iron-icon>
+			    <paper-checkbox style="margin-left: 2px;" unchecked></paper-checkbox>
+			    <iron-icon icon="social:person" title="View">
+			    </iron-icon>
+			    <iron-icon style="color: black; font-weight: 900" icon="communication:mail"></iron-icon>-->
+			</section>
+			<div class='vertical layout container center-justified commands' style="width: 30px; height: 100px;">	
+			    <iron-icon icon="icons:swap-horiz" id="button" class="horizontal layout right-justified" on-click="_scott"></iron-icon>
+			    <paper-checkbox style="margin-left: 2px;" unchecked></paper-checkbox>
+			    <iron-icon icon="social:person" title="View">
+			    </iron-icon>
+			    <iron-icon style="color: black; font-weight: 900" icon="communication:mail"></iron-icon>
+			</div>
+	</fc-call-list-tube>
+			
 </template>
  </div>
-  
+  <!--</div>-->
 
 
 </template>
 <script>
   Polymer({
-    is: 'fc-list-two-g',
+    is: 'fc-list-two',
+   /* behaviors: [
+	Polymer.NeonAnimatableBehavior
+    ],
+    listeners: {
+	//'click': '_onClick'
+    },*/
     properties: {
-	transferToLandscapeInquiry: {
-	  	type: Object, 
-	  	value: {
-	    	firstname: String,
-	    	lastname: String,
-	    	studentfirstname: String,
-	    	studentlastname: String,
-	    	email: String, 
-	    	phone: String,
-	    	notify: true,
-	    	reflectToAttributes: true
-	  		}
-	  	},
-	data:{ 
-		type: Object,
-		value: {
-
-			},
-		notify: true,
-		reflectToAttributes: true
-	   	},
-	dataArrayOne:{
-		type: Array,
-		notify: true,
-		reflectToAttributes: true
-		}, 
-	dataArrayTwo:{
-		type: Array,
-		notify: true,
-		reflectToAttributes: true
-		},
-	pathOne:{
-		type: String,
-		notify: true,
-		reflectToAttributes: true
-		}, 
-	pathTwo: {
-		type: String,
-		notify: true,
-		reflectToAttributes: true
-		}, 
-	order: {
-		type: Array, //object maybe...observes and a pass system might be awesome here. 
-		notify: true,
-		reflectToAttributes: true  
+	transferinquiry: {
+	  type: Object, 
+	  value: {
+	    firstname: String,
+	    lastname: String,
+	    studentfirstname: String,
+	    studentlastname: String,
+	    email: String, 
+	    phone: String,
+	    notify: true,
+	  },
+	  notify: true,
+	},
+	data:{   firstname: String, 
+		   lastname: String, 
+		   email: String, 
+		   phone:String, 
+		   studentfirstname: String, 
+		   studentlastname: String, 
+		   relatedstudent: String, 
+		   message: String, 
+		   coach:String, 
+		   grade: String, 
+		   school:String, 
+		   schooltown:String, 
+		   interest:String, 
+		   interestprice: String,
+		   intereststartdate: String, 
+		   role: String,
+		   order: Number,
+		   notify: true 
 		   },
-	dataAssistantPasser: {
-		type: Array, 
-		notify: true, 
-		reflectToAttributes: true
-    	}, 
-    itemPasser: {
-    	type: String,
-		notify: true,
-		reflectToAttributes: true
-		}
-
-    }, 
-
-
+	notify: true,
+	reflectToAttributes: true
      /* animationConfig: {
 	  type: Object,
 	  value: function() {
