@@ -144,7 +144,7 @@
 				<fc-holder "horizontal layout no-wrap container center center-justified">
 					<paper-input value='{{testNumber}}' style="max-width: 340px;" list="Test Number" always-float-label='true' label='Test Number'></paper-input>
 					<datalist name="Test Number" list="Test Number" id="Test Number">
-						<option> Test 1</option>
+						<option value={{> Test 1</option>
 						<option> Test 2</option>
 						<option> Test 3</option>
 						<option> Test 4</option>
@@ -174,6 +174,7 @@
 
 				</fc-holder>
 				<fc-holder "horizontal layout no-wrap container">
+					<paper-input value='{{passageNumber}}' style="max-width: 340px;" always-float-label='true' label='Passage Title'></paper-input>
 					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Title'></paper-input>
 					<paper-input value='{{passageBlurb}}' style="max-width: 340px;" always-float-label='true' label='Passage Blurb'></paper-input>
 				</fc-holder>
@@ -241,12 +242,26 @@
 				value: false, 
 				notify: true
 			},
-
+		newPassageRef: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
 		timeout: {
 				type: Boolean, 
 				value: false, 
 				notify: true
 			},
+		passageDestinations: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		passagesArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
 		passageTitle: {
 			type: String,
 			value: 'none',
@@ -273,13 +288,6 @@
 			notify: true,
 			reflectToAttributes: true
 		},
-		lineMeasuredWordArrays:{
-			type:Array,
-			value: [],
-			notify: true,
-			reflectToAttributes: true
-
-		},
 
 		passageWordArray:{
 			type:Array,
@@ -295,6 +303,10 @@
 			notify: true,
 			reflectToAttributes: true
 		},
+		order:{
+			type: Number,
+			notify: true
+		},
 
 		passageWordObject:{
 			type:Object,
@@ -308,7 +320,6 @@
 			type: String,
 			notify: true,
 			reflectToAttributes: true
-
 		},
 
 		firepad: {
@@ -342,12 +353,42 @@
 		},
 
 attached: function() { 
-			this.firepadRef = new Firebase('https://focused0ne.firebaseio.com/firepad');
+	this.loadFirepad();
+	this.loadPassages();
+			
+			},
+
+	loadPassages: function(){
+				self=this;
+				self.passagesArray=[];
+				var ref= new Firebase("https://focused0ne.firebaseio.com/Passages");
+				ref.on("child_added", function(snap){
+					if (snap.val() ==undefined){
+						self.push("passageDestinations","https://focused0ne.firebaseio.com/PassageDestinations/new_Passage_0");
+							self.newPassageRef = 0;
+
+					}
+					else{
+					self.newPassageRef +=self.newPassageRef;
+					self.push("passagesArray", snap.val());
+					var passageKey = self.passageArray.length-1;
+					self.push("self.passageDestinations", "https://focused0ne.firebaseio.com/PassageDestinations/new_Passage_" + self.newPassageRef);
+					self.newPassageRef ++;
+				}
+					});
+			console.log("Passage destinations" + self.passagesArray);
+
+	},
+
+	loadFirepad: function(){
+		this.firepadRef = new Firebase('https://focused0ne.firebaseio.com/firepad');
   			this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
   			this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
 			this.passage_width = 400;
-			},
+
+
+	},
 
 _savePassage: function(){
 	var blurb = this.passageBlurb;
@@ -356,12 +397,14 @@ _savePassage: function(){
 	var passageContent = self.firepad.getText();
 			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
 			self.paragraphArray = truePassageContent.split(/\n/);
-			var ref = new Firebase("https://focused0ne.firebaseio.com/reading_questions");
+			var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/");
 				self.passageWordObject = [];
 				self.passageArray = [];
-				for(var i = self.paragraphArray.length; i> 0; i--)
+				self.order=0;
+				var i = self.paragraphArray.length;
+				for(; i> 0; i--)
 					{
-						console.log(i + " " + self.paragraphArray);
+						console.log(i + " " + self.paragraphArray[i]);
 					var newPara = true;
 
 					var wordArray = self.paragraphArray[(i-1)].split(/\s/g);
@@ -370,22 +413,26 @@ _savePassage: function(){
 					var paragraph_number = i;
 					var holder=numWords;
 					while(numWords>0)
-					// line loop
-						{	
+					// para loop
+						{	console.log(self.newPassageRef);
 						while(wordCount < holder)
 						//word loop
-							{var order = holder-wordCount;
-					 	
+							{
+							var order = holder-wordCount>self.order ? holder-wordCount: self.order;
 							var currentWord = wordArray[numWords-1];
 							if (numWords==holder)
 							{ 
-								var newPara=true;
+								var newPara = true;
 								var isLastWordOfPara = true;
+							}
+							else if(wordCount==1){
+								
 							}
 							else{
 								newPara=false;
 								isLastWordOfPara=false;
 							}
+
 							numWords --;			      				
 								 
 								self.push("passageArray",
@@ -396,14 +443,15 @@ _savePassage: function(){
 										'word' : currentWord, 
 										'newPara': newPara,
 										'paragraph_number': i,
-										'isLastWordOfPara':
+										'isLastWordOfPara':isLastWordOfPara
 									});
 								wordCount++;
 							} //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
+						self.order+=order;
 						}//SINGLE line loop
 					} //this is the paragraph for loop
 					var arrayPassage= self.passageArray.reverse();
-					ref.child("passages_2C1_" + "2308").set(arrayPassage);
+					ref.child('new_Passage_' + self.newPassageRef).set(arrayPassage);
 					console.log(arrayPassage);
 					self.passageArray = [];
 
@@ -412,7 +460,7 @@ _savePassage: function(){
 	},
 
 	
-		coolThings: function(){
+		clearPassage: function(){
 			var adminStorage2 = window.localStorage;
 			var len = this.superItemArray.length;
 			var franklin = this.superItemArray[1];
