@@ -1,19 +1,30 @@
+Skip to content
+This repository  
+Search
+Pull requests
+Issues
+Gist
+ @jfrazzano
+ Unwatch 3
+  Unstar 1
+  Fork 1 johnegotta/FC_Polymer_Shared
+ Tree: 0414ef58d9  FC_Polymer_Shared/app/elements/A-List-Elements/fc-dashboard/fc-dashboard-one.html
+0414ef5  5 hours ago
+@jfrazzano jfrazzano fix in passage 2
+1 contributor
+RawBlameHistory     229 lines (201 sloc)  7.57 KB
 <dom-module id="fc-dashboard-one">
 <template id="fc-dashboard-one-template">
 <style>
-
 div.stretchy-wrapper {
 	width: 100%;
 	padding-bottom: 125.25%; /* 16:9 */
 	position: relative;
-
 	background: blue;
 }
-
 div.stretchy-wrapper > div {
 	position: absolute;
 	top: 0; bottom: 0; left: 0; right: 0;
-
 	color: white;
 	font-size: 24px;
 	text-align: center;
@@ -39,7 +50,6 @@ b.ball {
   background-image: -o-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
   background-image: -ms-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
 }
-
 .biggerBetter{
 width: 100%
 font-weight: 700;
@@ -48,7 +58,6 @@ font-family: times;
 font-color: brown;
 border-bottom: 6px ridge silver;
 }
-
 paper-button.red {
      background: red;
      raised: true;
@@ -87,14 +96,10 @@ paper-button.red {
 	background-color: red;
 	display: flex;
 }
-
 .edged{
-	margin-right: -246px;
+	margin-right: -40px;
 	outline-width: 0px;
-
-
 }
-
 .greened {
 	height: 100%;
 	width: 100%;
@@ -103,17 +108,16 @@ paper-button.red {
 }
 .boardered{
 	border: 4px double #000066;
-
 }
 </style>
-<paper-drawer-panel left-drawer drawer-width="420px">
+<paper-drawer-panel left-drawer drawer-width="360px">
 	
-		<div drawer dragging dragging="true" class="left-drawer horizontal layout container wrap dragging boardered">
-			<image style="margin: 24px 148px 24px 32px; width:150px; height: 75px;" src="../../../images/FC_frontpage_logo.png"></image>
-				<fc-data-administrator data-passed$={{data-recieved}} style="position: fixed; top: 175px; left: 48px; z-index: 100000;" id="newAdmin"></fc-data-administrator>
+		<div drawer id="drawer-1" dragging dragging="true" class="left-drawer horizontal layout container wrap dragging boardered">
+			<image style="margin: 24px 148px 24px 8px; width:150px; height: 75px;" src="../../../images/FC_frontpage_logo.png"></image>
+				
 		
-		<div class="vertical layout center justified edged" style="overflow-y: scroll;">
-			<button on-tap="_toggleRightDrawer"><image style=" width:45px; height: 55px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"> </image></button>
+		<div class="vertical layout center justified edged" style="overflow-x: scroll;">
+			<image on-tap="_toggleRightDrawer" style=" width:45px; height: 55px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"><button></button></image>
 				<image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></image>
 				<image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></image>
 				<image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></image>
@@ -137,9 +141,10 @@ paper-button.red {
 				<image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></image>
 				<image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></image>
 			</div>
+			<fc-data-administrator-reverse name="administrator" data-passed$={{data-recieved}} style="position: fixed; bottom: 175px; left: 48px; z-index: 100000;" id="newAdmin"></fc-data-administrator-reverse>
 		</div>
 	<div main>
-		<fc-paper-drawer-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap"  right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="440px">
+		<fc-paper-drawer-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap"  right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="360px">
 			<div drawer id="rtToggle" class="boardered horizontal layout center-justified flex wrap" dragging class="right-drawer dragging horizontal layout container wrap boardered">
 				  <paper-tabs hideScrollButtons="true" class="layout horizontal biggerBetter flex wrap container center center-justified" scrollable="true">
 	        			<paper-tab name="to-do-list">				
@@ -157,6 +162,9 @@ paper-button.red {
  						<paper-tab name="graphs">
     									Analysis
     			 		</paper-tab>
+    			 		<paper-tab name="administrator">
+    			 						Admin
+    			 		</paper-tab>
     			</paper-tabs>
 					<!--<div class="vertical layout flex wrap scroller">
 						<fc-call-card-inputs id="fcInputs" inquirer="{{inquirerToInqTransfer}}">
@@ -164,9 +172,11 @@ paper-button.red {
 					</div>-->
 					
 					<div class="vertical layout center justified">
+
 					</div>
 				</div>
-		<div main>		
+		<div main>	
+		
 <!-- Drawer Left Ends -->
 <!--Content Begins-->
 
@@ -177,7 +187,7 @@ paper-button.red {
 							
 					
 	
-				
+			
 	</fc-paper-drawer-panel-dashboard>
 	</div>
 </paper-drawer-panel>
@@ -192,7 +202,6 @@ Polymer({
 			value: '1000s',
 			notify: true,
 			reflectToAttributes: true
-
 		}, 
 		responsiveWidth: {
 			type: String,
@@ -207,8 +216,14 @@ Polymer({
 			{drawer.forceNarrow = true;}
 			else{drawer.forceNarrow = false;
 			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = Polymer.dom(this.root).querySelector('#drawer-1');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
 	}
-
 });
 </script>
 </dom-module>

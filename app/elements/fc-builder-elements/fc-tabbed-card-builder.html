@@ -36,13 +36,14 @@ border: 4px dashed green;}
     <div class="horizontal layout wrap">
         <paper-material elevation="2" class="grid-box">
         <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
-            <template is="dom-repeat" data='{{tabsView}}'>
-              <paper-tab>one {{fcTabsView_0001.Title}}</paper-tab>
+           <paper-tab>page.Number page.Title</paper-tab>
+            <template is="dom-repeat" data='{{tabsView}}' as="{{passage}}">
+              <paper-tab value="">{{page.Number}} {{page.Title}}</paper-tab>
               </template>
             </paper-tabs>
         <hr>
         
-        <div class="vertical layout wrap" style="height: 78px;"> 
+        <div class="vertical layout wrap" style="height: 78px; backgrount: goldenrod;"> 
             <div class="grid-image">
             <img src="{{item.photo}}" height="72px" width="50px">
             </div>
@@ -53,20 +54,41 @@ border: 4px dashed green;}
           <div class="horizontal layout wrap left justified" style="width:290px; height: 78px; overflow-y: scroll;"> 
              <template is="dom-repeat" class="horizontal layout flex wrap container"> 
             <a id="{{item.key}}+{{fcid}}"> <span><b>{{item.fcKey}}</b> </span>: <b><span>{{item.fcValue}}&nbsp</span></b></a>
+            </template>
           </div>
-        
+        </template>
         <hr>
         <iron-pages id="pageHanger"  selected="{{selected}}">
+        <template is='dom-repeat' class="neonPageRepeater" data={{NeonPages}}>
          <div class="selectedp">
-         <neon-pages id="pageHanger" class="horizontal row wrap layout" style="padding:3px" selected="{{selected}}">
+         <neon-animated-pages id="pageHanger" class="horizontal row wrap layout" style="padding:3px" selected="{{selected}}">
          
-              <content name="pageRowOne">
-              </content>
 
-          </neon-pages>
+          </neon-animated-pages>
           </div>
+          </template>
         <div class="selectedp">
-         <neon-pages class="pagesSelectedTwo"
+         <neon-animated-pages class="pagesSelectedTwo">
+         <content name="pageRowTwo">
+          
+
+
+
+         </content>
+         </neon-animated-pages>
+      </div>
+      <div class="selectedp">
+         <neon-animated-pages class="pagesSelectedTwo">
+         <content name="pageRowTwo">
+          
+
+
+
+         </content>
+         </neon-animated-pages>
+      </div>
+      <div class="selectedp">
+         <neon-pages class="pagesSelectedTwo">
          <content name="pageRowTwo">
           
 
@@ -76,34 +98,14 @@ border: 4px dashed green;}
          </neon-pages>
       </div>
       <div class="selectedp">
-         <neon-pages class="pagesSelectedTwo"
+         <neon-animated-pages class="pagesSelectedTwo" style="height: 720px; width: 580px;">
          <content name="pageRowTwo">
           
 
 
 
          </content>
-         </neon-pages>
-      </div>
-      <div class="selectedp">
-         <neon-pages class="pagesSelectedTwo"
-         <content name="pageRowTwo">
-          
-
-
-
-         </content>
-         </neon-pages>
-      </div>
-      <div class="selectedp">
-         <neon-pages class="pagesSelectedTwo"
-         <content name="pageRowTwo">
-          
-
-
-
-         </content>
-         </neon-pages>
+         </neon-animated-pages>
       </div>
   </iron-pages>
   <div class="actionArea horizontal layout flex">
@@ -209,7 +211,8 @@ Polymer({
                 '0002': 'Selecting Your View',
                 '0003': 'Measuring Your Task'
               
-            },
+              }
+        },
     notify: true
         }
   },
@@ -227,8 +230,8 @@ created: function (){
         var firebasepathTwo = this.pathThree + this.fcid;
        
         this.firebasepathTwo = firebasepathTwo;
-        var ref = new Firebase("#!" + firebasepathTwo);
-        ref.orderByKey().startAt("real").endAt("scores\uf8ff").on("child_added", function(snapshot) {
+       // var ref = new Firebase("#!" + firebasepathTwo);
+       // ref.orderByKey().startAt("real").endAt("scores\uf8ff").on("child_added", function(snapshot) {
 
         });
       
