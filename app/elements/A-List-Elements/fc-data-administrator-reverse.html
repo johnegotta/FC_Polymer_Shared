@@ -117,7 +117,7 @@
 </style>
 	<div class="layout container vertical center center-justified iconset">
 		<button class="right" style="position: fixed; left: 400px; top: 30px; opacity: .65; background: goldenrod; border: 6px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME
-				<div hidden="{{getFocused}}"style="font-size: 8.5pt; width: 500px; height: 24px; font-family: times; color: #000066;">
+				<div hidden="{{getFocused}}" style="font-size: 8.5pt; width: 500px; height: 24px; font-family: times; color: #000066;">
 					<span>Get Focused!</span>
 				</div>
 		</button>
@@ -135,9 +135,9 @@
 				</fc-cell-creator>-->
 				<div class="vertical layout flex-1 container">
 				<fc-holder "horizontal layout no-wrap container center center-justified">
-					<paper-input value='{{testNumber}}' style="max-width: 340px;" list="Test Number" always-float-label='true' label='Test Number'></paper-input>
+					<paper-input value='{{testId}}' style="max-width: 340px;" list="Test Number" always-float-label='true' label='Test Id'></paper-input>
 					<datalist name="Test Number" list="Test Number" id="Test Number">
-						<option value={{testNumber.one}}> Test 1</option>
+						<option value={{testId}}> Test 1</option>
 						<option> Test 2</option>
 						<option> Test 3</option>
 						<option> Test 4</option>
@@ -156,19 +156,19 @@
 						<option> Writing 40 Questions</option>
 						<option> Essay Prompt and Passage</option>
 					</datalist>
-					<paper-input value='{{sectionType}}' style="max-width: 340px;" list="subSection" always-float-label='true' label='Sub-Section Type'></paper-input>
+					<paper-input value='{{sectionSubType}}' style="max-width: 340px;" list="subSection" always-float-label='true' label='Sub-Section Type'></paper-input>
 					<datalist name="subSection" list="subSection" id="subSection">
-						<option> THESE OPTIONS SHOULD BE BOUND</option>
-						<option> THESE OPTIONS SHOULD BE BOUND</option>
-						<option> THESE OPTIONS SHOULD BE BOUND</option>
-						<option> THESE OPTIONS SHOULD BE BOUND</option>
-						<option> THESE OPTIONS SHOULD BE BOUND</option>
+						<option> Vocabulary Focused</option>
+						<option> Rights Focused </option>
+						<option> Language and Culture Focused</option>
+						<option> Science Focused</option>
+						<option> Soft-Science/Business Focused</option>
 					</datalist>
 
 				</fc-holder>
 				<fc-holder "horizontal layout no-wrap container">
-					<paper-input value='{{passageNumber}}' style="max-width: 340px;" always-float-label='true' label='Passage Title'></paper-input>
-					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Title'></paper-input>
+					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Type'></paper-input>
+					<paper-input value='{{passageSubType}}' style="max-width: 340px;" always-float-label='true' label='Your Name'></paper-input>
 					<paper-input value='{{passageBlurb}}' style="max-width: 340px;" always-float-label='true' label='Passage Blurb'></paper-input>
 				</fc-holder>
 				</div>
@@ -224,35 +224,34 @@
 				notify: true,
 				reflectToAttributes: true
 				},
-		wordArray2: {
-			type: Array,
-			value: [], 
-			notify: true, 
-			reflectToAttributes: true,
-				},
 		dragging: {
 				type: Boolean, 
 				value: false, 
 				notify: true
 			},
-		newPassageRef: {
-			type: Number,
-			value: 0,
-			notify: true
-		},
+
 		timeout: {
 				type: Boolean, 
 				value: false, 
 				notify: true
 			},
-		passageDestinations: {
-			type: Array,
-			value: [],
+		open: 	{
+			type: Boolean,
+			value: false, 
 			notify: true
-		},
-		passagesArray: {
-			type: Array,
-			value: [],
+			},
+		currentDragger:{
+			type: Object,
+			notify: true,
+			reflectToAttributes: true
+		}, 
+
+
+//end of the movement section 
+//test sections. Actual content
+		yourName: {
+			type: String,
+			value: "use your name",
 			notify: true
 		},
 		passageTitle: {
@@ -265,49 +264,27 @@
 			value: 'none',
 			notify: true
 		}, 
-		open: 	{
-			type: Boolean,
-			value: false, 
-			notify: true
-			},
-		currentDragger:{
-			type: Object,
-			notify: true,
-			reflectToAttributes: true
-		}, 
-		superItemArray:{
-			type:Array,
+
+		truePassageArray:{
+			type: Array,
 			value: [],
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageWordArray:{
-			type:Array,
-			value: [],
-			notify: true,
-			reflectToAttributes: true
-		},
-		getFocused: {
-			type: Boolean, 
-			value: true,
-			notify: true,
-			reflectToAttributes: true
-		},
-		order:{
-			type: Number,
 			notify: true
 		},
-		passageWordObject:{
-			type:Object,
-			value: {},
-			notify: true,
-			reflectToAttributes: true
-		}, 
-		passageContent: {
-			type: String,
-			notify: true,
-			reflectToAttributes: true
+		passageArray:{
+			type:Array,
+			value: [],
+			notify: true
 		},
+
+		passagesArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+//last array will hold all passages--so fast
+//Test Input and  Storage 
+//firebase and firepad input
+//key to use unique ids so we dont work on each others test creation
 		firepad: {
 			type:Object,
 			value:{},
@@ -320,19 +297,73 @@
 			notify: true,
 			reflectToAttributes: true	
 		},
-		passageBlurb:{
+//test key and firebase location creation
+//These are inputs
+		fcid:{
 			type: String,
-			value: 'none',
-			reflectToAttributes: true,
+			value: '20_digit_Letter_underscore_spaced_unique_semantic_id',
+			notify: true,
+			reflectToAttributes: true
+		},
+		testId: {
+			type: String,
+			value: "secret",
+			notify: true
+		},
+		sectionType: {
+			type: String,
+			notify: true
+		},
+		sectionSubType:{
+			type: String,
+			value: 'Describe The Goal of Passage',
+			notify: true
+		},
+		
+		sectionCount:{
+			type: Number,
+			value: 0,
+			notify: true
+			//observer of database to be sure no over writing!!!
+		}, 
+
+		saveCounter: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+
+		focusedCounter: {
+			type: Array,
+			value: ['something','focused'],
+			notify: true
+			},
+
+	//necessary technical reference arrays
+	//we should use these in the testing phase... although rapid integration of the above is needed.
+
+	newPassageRef: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+
+	passageDestinations: {
+			type: Array,
+			value: [],
 			notify: true
 		}
+		
+
+
+		
 	},
 	 created: function(){
-	 	
+	 	//here is where we build out our prototypes, set properties
 		},
-attached: function() { 
-	this.loadFirepad();
-	this.loadPassages();
+	attached: function() { 
+		this.loadFirepad();
+		this.loadPassages();
 			
 			},
 	loadPassages: function(){
@@ -340,18 +371,22 @@ attached: function() {
 				self.passagesArray=[];
 				var ref= new Firebase("https://focused0ne.firebaseio.com/passagesDestinations");
 				ref.on("child_added", function(snap){
-					if (snap.val() ==undefined){
+					if (snap.val() ===undefined){
 						self.push('passageDestinations',"https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_0");
 							self.newPassageRef = 0;
-							self.newPassageRef++;	
+							self.newPassageRef++;
+							count++;	
 											
 					}
 					else{
-						var count = 0;
+							count=1;
   							count++;
   							console.log("added", snap.key());
 							// length will always equal count, since snap.val() will include every child_added event
+							//var instance = self.fcid + '_000' + self.testId + '_000' + self.saveCounter
+							//self.section[instance]=  readingIdArray
 							// triggered before this point
+							self.saveCounter = count;
 						ref.once("value", function(snap) {
   						console.log("initial data loaded!", Object.keys(snap.val()).length === count);
 							});
@@ -361,30 +396,32 @@ attached: function() {
 
 	loadFirepad: function(){
 		this.firepadRef = new Firebase('https://focused0ne.firebaseio.com/firepad');
-  			this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
-  			this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
-			this.passage_width = 400;
+		this.passage_width = 400;
 	},
 
 _savePassage: function(){
 	var blurb = this.passageBlurb;
 	var passageTitle = this.passageTitle;
+	var passageType = this.passageType;
+	var test = this.testId;
+	var fcid = this.fcid;
 	var self = this;
 	var passageContent = self.firepad.getText();
 			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
 			var arrayPassed=truePassageContent.split(/\s/g);
-			self.order =arrayPassed.length;
+			self.order =arrayPassed.length-1;
 			self.paragraphArray = truePassageContent.split(/\n/);
-			var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations");
+			var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/");
 				self.passageArray = [];
-				var i = self.paragraphArray.length-1;
+				var i = self.paragraphArray.length;
 				for(; i> 0; i--)
 					{
-						console.log(i + " " + self.paragraphArray[i]);
 					var wordCounter = 0;
 					var newPara = false;
-					var wordArray = self.paragraphArray[i].split(/\s/g);
+					var wordArray = self.paragraphArray[i-1].split(/\s/g);
 					var paraWordRemaining = wordArray.length-1;
 					var paragraph_number = Math.ceil(i/2);
 					var isLastWordOfPara =false;
@@ -421,7 +458,10 @@ _savePassage: function(){
 										'word' : currentWord, 
 										'newPara': newPara,
 										'paragraph_number': paragraph_number,
-										'isLastWordOfPara':isLastWordOfPara
+										'isLastWordOfPara': isLastWordOfPara,
+										'passageType':passageType,
+										'test': test,
+										'fcid': fcid
 									});
 								wordCounter++;
 								paraWordRemaining--;
@@ -429,9 +469,41 @@ _savePassage: function(){
 						}//SINGLE line loop
 					//this is the paragraph for loop
 					var arrayPassage = self.passageArray.reverse();
-					ref.child('new_Passage_1').set(arrayPassage);
-					console.log(arrayPassage);
+					self.truePasageArray = [];
+					var counter = arrayPassage.length;
+
+					for (var i=0; i<=counter; i++){
+						var lastWord = (i === counter) ? true: false;
+						if(i=0){
+							self.push('truePassageArray',
+								{
+										"title": arrayPassage[i].passageTitle,
+										"blurb": arrayPassage[i].passageBlurb,
+										'order': i,
+										'passageType': arrayPassage[i].passageType,
+										'test': test,
+										'fcid': fcid
+								});
+						}
+						else{
+							self.push('truePassageArray', 
+								{ 
+										'order': i,
+										'word' : arrayPassage[i].word, 
+										'newPara': arrayPassage[i].newPara,
+										'paragraph_number': arrayPassage[i].paragraph_number,
+										'isLastWordOfPara': arrayPassage[i].isLastWordOfPara,
+										'lastWord': lastWord
+
+								});
+								}
+				}
+					console.log("this is the mini array made from the beginning of our array: " + miniArray);
+					var passageKey ='000' + (self.saveCounter + 1).toString();
+					ref.child('new_Passage_'+ passageKey).set(self.truePassageArray);
+					self.truePassageArray=[];
 					self.passageArray = [];
+					arrayPassage=[];
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	
 		//this ends the firepad stuff			
 	},
@@ -498,6 +570,18 @@ _savePassage: function(){
 });
 </script>
 </dom-module>
+
+
+<!--	
+		superItemArray:{
+			type:Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},-->
+		
+
+
 <!--
 getData: function(argItem)
 	{
