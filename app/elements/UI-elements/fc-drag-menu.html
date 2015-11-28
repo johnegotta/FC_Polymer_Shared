@@ -1,0 +1,378 @@
+<dom-module id="fc-drag-menu">
+<style>
+:host{resizable: auto;};
+</style>
+<template>
+<div class="layout horizontal right-justified no-wrap flex edged" id="tabsContainer" on-track="_scroll" on-down="_down" style="position: absolute; bottom: 28.75%; left: 900px; max-height: 78px; min-height: 24px; min-width: 200px; max-width: 440px; overflow-x:scroll;">
+			<button><image on-tap="_toggleRightDrawer" style=" width:48px; height: 75px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"></button>
+				<button><image on-tap="_toggleLeftDrawer"style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></button>
+				<button><image style=" width:60px; height: 75px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></button>
+			</div>
+</template>
+<script>
+Polymer({
+	is:'fc-drag-menu',
+	behaviors: [
+				Polymer.IronResizableBehavior,
+				Polymer.NeonAnimationBehavior,
+				Polymer.IronSelectableBehavior,
+				Polymer.NeonAnimationRunnerBehavior,
+				Polymer.IronMenubarBehavior,
+				Polymer.IronRangeBehavior
+				],
+	properties: {
+
+	
+
+	selected: {
+        type: String,
+        notify: true
+      },
+
+      selectable: {
+        type: String,
+        value: 'fc-pages'
+      },
+
+      _step: {
+        type: Number,
+        value: 10
+      },
+
+      _holdDelay: {
+        type: Number,
+        value: 1
+      },
+
+      _leftHidden: {
+        type: Boolean,
+        value: false
+      },
+
+      _rightHidden: {
+        type: Boolean,
+        value: false
+      },
+
+      _previousTab: {
+        type: Object
+    },
+
+    hostAttributes: {
+      role: 'tablist'
+    },
+
+    listeners: {
+      'iron-resize': '_onResize',
+      'iron-select': '_onIronSelect',
+      'iron-deselect': '_onIronDeselect'
+    },
+
+    hostAttributes: {
+      'role': 'menubar'
+    },
+
+    keyBindings: {
+      'left': '_onLeftKey',
+      'right': '_onRightKey'
+    }
+
+},
+
+    created: function() {
+      this._holdJob = null;
+    },
+
+    ready: function() {
+      this.setScrollDirection('y', this.$.tabsContainer);
+    },
+
+  _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
+      if (!scrollable || hideScrollButtons) {
+        return 'hidden';
+      }
+
+      if (hideThisButton) {
+        return 'not-visible';
+      }
+
+      return '';
+    },
+
+    _computeTabsContentClass: function(scrollable) {
+      return scrollable ? 'scrollable' : 'horizontal';
+    },
+
+    _computeSelectionBarClass: function(noBar, alignBottom) {
+      if (noBar) {
+        return 'hidden';
+      } else if (alignBottom) {
+        return 'align-bottom';
+      }
+    },
+
+
+     _onResize: function() {
+      this.debounce('_onResize', function() {
+        this._scroll();
+        this._tabChanged(this.selectedItem);
+      }, 10);
+    },
+
+    _onIronSelect: function(event) {
+      this._tabChanged(event.detail.item, this._previousTab);
+      this._previousTab = event.detail.item;
+      this.cancelDebouncer('tab-changed');
+    },
+
+    _onIronDeselect: function(event) {
+      this.debounce('tab-changed', function() {
+        this._tabChanged(null, this._previousTab);
+      // See polymer/polymer#1305
+      }, 1);
+    },
+
+    get _tabContainerScrollSize () {
+      return Math.max(
+        0,
+        this.$.tabsContainer.scrollWidth -
+          this.$.tabsContainer.offsetWidth
+      );
+    },
+
+
+    _scroll: function(e, detail) {
+      if (!this.scrollable) {
+        return;
+      }
+
+      var ddx = (detail && -detail.ddx) || 0;
+      this._affectScroll(ddx);
+    },
+
+    _down: function(e) {
+      // go one beat async to defeat IronMenuBehavior
+      // autorefocus-on-no-selection timeout
+      this.async(function() {
+        if (this._defaultFocusAsync) {
+          this.cancelAsync(this._defaultFocusAsync);
+          this._defaultFocusAsync = null;
+        }
+      }, 1);
+    },
+
+    _affectScroll: function(dx) {
+      this.$.tabsContainer.scrollLeft += dx;
+
+      var scrollLeft = this.$.tabsContainer.scrollLeft;
+
+      this._leftHidden = scrollLeft === 0;
+      this._rightHidden = scrollLeft === this._tabContainerScrollSize;
+    },
+
+    _onLeftScrollButtonDown: function() {
+      this._scrollToLeft();
+      this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
+    },
+
+    _onRightScrollButtonDown: function() {
+      this._scrollToRight();
+      this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
+    },
+
+    _onScrollButtonUp: function() {
+      clearInterval(this._holdJob);
+      this._holdJob = null;
+    },
+
+    _scrollToLeft: function() {
+      this._affectScroll(-this._step);
+    },
+
+    _scrollToRight: function() {
+      this._affectScroll(this._step);
+    },
+
+    _tabChanged: function(tab, old) {
+      if (!tab) {
+        this._positionBar(0, 0);
+        return;
+      }
+
+      var r = this.$.tabsContent.getBoundingClientRect();
+      var w = r.width;
+      var tabRect = tab.getBoundingClientRect();
+      var tabOffsetLeft = tabRect.left - r.left;
+
+      this._pos = {
+        width: this._calcPercent(tabRect.width, w),
+        left: this._calcPercent(tabOffsetLeft, w)
+      };
+
+      if (this.noSlide || old == null) {
+        // position bar directly without animation
+        this._positionBar(this._pos.width, this._pos.left);
+        return;
+      }
+
+      var oldRect = old.getBoundingClientRect();
+      var oldIndex = this.items.indexOf(old);
+      var index = this.items.indexOf(tab);
+      var m = 5;
+
+      // bar animation: expand
+      this.$.selectionBar.classList.add('expand');
+
+      if (oldIndex < index) {
+        this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
+            this._left);
+      } else {
+        this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
+            this._calcPercent(tabOffsetLeft, w) + m);
+      }
+
+      if (this.scrollable) {
+        this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
+      }
+    },
+
+    _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
+      var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
+      if (l < 0) {
+        this.$.tabsContainer.scrollLeft += l;
+      } else {
+        l += (tabWidth - this.$.tabsContainer.offsetWidth);
+        if (l > 0) {
+          this.$.tabsContainer.scrollLeft += l;
+        }
+      }
+    },
+
+    _calcPercent: function(w, w0) {
+      return 100 * w / w0;
+    },
+
+    _positionBar: function(width, left) {
+      width = width || 0;
+      left = left || 0;
+
+      this._width = width;
+      this._left = left;
+      this.transform(
+          'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+          this.$.selectionBar);
+    },
+
+    _onBarTransitionEnd: function(e) {
+      var cl = this.$.selectionBar.classList;
+      // bar animation: expand -> contract
+      if (cl.contains('expand')) {
+        cl.remove('expand');
+        cl.add('contract');
+        this._positionBar(this._pos.width, this._pos.left);
+      // bar animation done
+      } else if (cl.contains('contract')) {
+        cl.remove('contract');
+      }
+    },
+    	_toggleRightDrawer: function(){
+			var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = Polymer.dom(this.root).querySelector('#drawer-1');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	}, 
+
+	_startDrag: function(e){
+		
+			//console.log(e);
+			this.dragging=true;
+			var dragbox = this.$.dragMenu.getBoundingClientRect();
+			this.offsetX = e.offsetX;
+			//console.log(this.offsetX);
+			var Xoff = this.offsetX = e.offsetX;
+			var Yoff = this.offsetY = e.offsetY;
+			//console.log(Yoff);
+			document.captureEvents(Event.MOUSEMOVE);
+			document.onmousemove = dragmeplease;
+			function dragmeplease(mp){
+				var _x = mp.clientX - 80;
+				var xString = _x.toString() + 'px';
+				var	_y = mp.clientY -80; 
+				var yString = _y.toString() + 'px';
+
+		  		document.querySelector('#dragMenu').style.top = yString;
+		  		//console.log("_y has this value here " + _y);
+		  		document.querySelector("#dragMenu").style.left = xString;
+		  		//console.log(_x + " that was x");
+		  	document.captureEvents(Event.MOUSEUP);
+			document.onmouseup = endThisPlease;
+			function endThisPlease(omu){
+				//console.log(omu.detail);
+				document.onmousemove = null;
+				document.onmouseup = null;
+
+
+			}
+	
+		}
+	}
+});
+  </script>
+
+</dom-module>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		track—moving while finger/button is down
+state—a string indicating the tracking state:
+start—fired when tracking is first detected (finger/button down and moved past a pre-set distance threshold)
+track—fired while tracking
+end—fired when tracking ends
+x—clientX coordinate for event
+y—clientY coordinate for event
+dx—change in pixels horizontally since the first track event
+dy—change in pixels vertically since the first track event
+ddx—change in pixels horizontally since last track event
+ddy—change in pixels vertically since last track event
+hover()—a function that may be called to determine the element currently being hovered

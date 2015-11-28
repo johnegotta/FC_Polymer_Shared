@@ -18,7 +18,7 @@
 		}
 		div.passageContainer{ 
 			max-width: 1450px !important;
-			margin: 48px;
+			margin: 1vh 12px 1vh 12px;
 		}
 		.highlighted {
 			background: yellow;
@@ -42,7 +42,7 @@
 			min-height: 720px !important;
 			display: flex;
 			min-width: 260px !important;
-			max-width: 680px !important;	
+			max-width: 620px !important;	
 		}
 </style>
 <!--double-column line-number and passage vertical container--> 
@@ -53,12 +53,12 @@
 					</div>
 
 	<!--single column container-->
-			<div id="singleColumnContainer" class="layout horizontal container columnContainer" style="padding-right: 8px;">
+			<div id="singleColumnContainer" class="layout horizontal container columnContainer" style="padding-right: 12px;">
 			<!--Line number container-->
 					 		<div id="linenumbersA1" class="layout vertical line-number">
-					 		<span class="line-numbers" id="linesA1">Lines</span>
+					 		<div class="line-numbers" id="linesA1">Lines</div>
 					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}">
-     								<span hidden="{{!item.show}}" id="lines_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
 					 		</div>
@@ -89,9 +89,9 @@
 						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
-					 		<span id="lines" class="line-numbers">Lines</span>
-					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{_oneColumnLineFilter(itemId)}}'>
-     								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+					 		<div id="lines" class="line-numbers">Lines</div>
+					 			<template is="dom-repeat" items="{{LineNumberArray}}">
+     								<span hidden="{{!item.show}}" id$="lines_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
     							</template>
     							
 					 		</div>
@@ -104,7 +104,7 @@
  									</template>
  									<a id$="one_{{item.order}}" invisibility="false" hidden$="{{oneGone}}">{{item.word}}</a>
 								</template>
-								<br id="measurer" class="line-numbers">
+								<br class="line-numbers">
 								<hr>
 								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
 							</article>
@@ -115,12 +115,12 @@
 
 
 		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 columnContainer" >
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 12px;overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 	
-					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}">
-     								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+					 		 	<template is="dom-repeat" items="{{LineNumberArray}}">
+     								<span hidden="{{!item.show}}" id$="lines_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
 					 		</div>
@@ -255,8 +255,8 @@ Polymer({
 			type: Number,
 			notify: true
 		},
-		lastWordIndex:{
-			type: Number,
+		lastWord:{
+			type: String,
 			notify: true
 		},
 		deltaWords:{
@@ -298,7 +298,7 @@ Polymer({
 			self.ColumnTwoWordArray=[];
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
-			self.lastWordIndex = self.numWords-2;
+			self.lastWord = self.numWords-1;
 			self.goldenRatio = Math.floor(.618*self.numWords);
 			self.finalColumnOneWordIndex = self.goldenRatio;
 			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
@@ -314,6 +314,7 @@ Polymer({
 	
 	notifyResize: function(){		
 		this.setUp();
+		
 	},
 	
 	setUp: function()
@@ -322,28 +323,25 @@ Polymer({
 		this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
 		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50)
 		{
-			if(this.$.noJudge.clientWidth >= 670 && this.textColumnOneHeight>this.screenTrueHeight)
+			if(this.$.noJudge.clientWidth >= 620 && this.textColumnOneHeight>this.screenTrueHeight)
 			{
 				this.$.doubleColumnContainer.hidden = false;
 				this.$.singleColumnContainer.hidden = true; 
 				this.showingSecondColumn = true;
 				this._adjustDoubleColumns();
-				this.numberOneColumn();
 			}
 			else
 			{ 
 				this.$.doubleColumnContainer.hidden = true;
 				this.$.singleColumnContainer.hidden = false;
 				this.showingSecondColumn = false;
-				this.numberOneColumn();
-				
 				
 				
 			}
 		}
 		else 
 		{
-			if(this.$.noJudge.clientWidth >= 670)
+			if(this.$.noJudge.clientWidth >= 620)
 			{
 				this.$.secondColumnContainer.hidden = false;
 				this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
@@ -353,7 +351,6 @@ Polymer({
 					this.$.singleColumnContainer.hidden = true; 
 					this.showingSecondColumn = true;
 					this._adjustDoubleColumns();
-					this.numberOneColumn();
 				}
 			}
 			else
@@ -361,8 +358,8 @@ Polymer({
 				this.$.doubleColumnContainer.hidden = true;
 				this.$.singleColumnContainer.hidden = false;
 				this.showingSecondColumn=false;
-				this.numberOneColumn();
-				
+				this.numberOneColumn(85);
+				this.numberOneColumn(this._measureWords(false));
 			}
 					
 		}
@@ -375,12 +372,11 @@ Polymer({
 				console.log("growing the right side");
 				console.log('do we ever enter this function?');
 				var numberAhead=anchorOne;
-				while(numberAhead>=8 && top_of_line_to_reclaim == top_of_next_anchor){
-				self.firstWordAnchor =  (this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()) != undefined) ? this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()): setTimeout(alert("one of these terniary functions worked"),1400);console.log('do we ever enter this function?');
+				while(numberAhead<-9){
+				self.firstWordAnchor =  (this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()) != undefined) ? this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()): setTimeout(self._measureWords(true),1400);console.log('do we ever enter this function?');
 					var top_of_line_to_reclaim = self.firstWordAnchor.getBoundingClientRect().top;
 					var nextAnchor = self.firstWordAnchor;
 					var top_of_next_anchor = top_of_line_to_reclaim;
-					self.numberPlus--;
 				while(top_of_line_to_reclaim == top_of_next_anchor){
 					console.log("growing the right side");				
 					nextAnchor = nextAnchor.nextSibling;	
@@ -390,13 +386,11 @@ Polymer({
 						self.numberPlus--;
 					}
 				}
-			}
-			//this._measureWords(true);
-
+			} alert("grow is last");		
 		},
 
 	_adjustDoubleColumns: function(lastRow){
-				Polymer.dom.flush();
+
 				this.finalColumnOneWordIndex = (this.finalColumnOneWordIndex<.54*this.numWords) ? this.goldenRatio: this.finalColumnOneWordIndex;
 				var theId = '#one_'+ this.finalColumnOneWordIndex.toString()
 				var finalWordAnchor = this.$$(theId);
@@ -406,7 +400,7 @@ Polymer({
 				var howManyAheadOfFinalColumnOneWord = 0;
 
 				
-				while(howManyAheadOfFinalColumnOneWord <18 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+				while(howManyAheadOfFinalColumnOneWord <8 && bottom_of_previous_anchor == bottom_of_line_to_cut){
 					previousAnchor = previousAnchor.previousSibling;
 					if(previousAnchor.nodeName == finalWordAnchor.nodeName){
 						console.log(previousAnchor.nodeName +  ' : compare node to node : ' + finalWordAnchor.nodeName);
@@ -414,116 +408,19 @@ Polymer({
 						howManyAheadOfFinalColumnOneWord++;
 						
 
-					};
+					}
+					;
 				}
 				
 			this.finalColumnOneWordIndex = this.finalColumnOneWordIndex - howManyAheadOfFinalColumnOneWord;
 					this.numberPlus = this.goldenRatio - this.finalColumnOneWordIndex;
 					console.log('this is the two column adjustment and col one anchor: ' + this.numberPlus);
-					//this._measureWords(true);
 					this.growFirstColumn(this.numberPlus);
-					console.log(this.numberPlus);
-
+					alert.log('shrink is active ' + this.numberPlus);
 			},
 
 	
-	
-
-
-	numberTwoColumns: function(colOne, colTwo){
-		this.set("LineNumberArrayTwo", 	this.longestLineNumberArray.slice(colOne,colTwo));
-		this.set("LineNumberArray", this.longestLineNumberArray.slice(0,colOne));		
-	},
-
-	numberOneColumn: function(){
-		 var top_of_first_word = this.$$('#oneA_0').getBoundingClientRect().top;
-		 var last_word_rect = this.$$('#oneA_'+ this.lastWordIndex.toString()).getBoundingClientRect();
-		 var line_height = last_word_rect.height;
-		 var delta = last_word_rect.bottom - top_of_first_word;
-		 console.log(delta);
-		 console.log(line_height);
-		 console.log(last_word_rect);
-		 var num_lines = delta/24;
-		 console.log(num_lines);
-		 // this.firstColumnLineNumberArrayOne = [];
-		 // this.set("firstColumnLineNumberArrayOne", firstColumnLineNumberArrayOne);
-
-		},
-
-		/*
-		var guess_previous_sibling = Polymer.dom(guess).previousSibling; 
-		alert(guess + ' ' + guess_previous_sibling);
-		alert(guess.nodeName);
-		while(guess.nodeName != guess_previous_sibling.nodeName){
-			guess = guess_previous_sibling;
-			guess_previous_sibling = Polymer.dom(guess_previous_sibling).previousSibling;
-		} 
-		var bottom_checker = guess.getBoundingClientRect().bottom;
-		this.bottom_checker = bottom_checker;
-		var last_lines_child = Polymer.dom("linenumbersA1").lastChild;
-		var previous_sibling = Polymer.dom(last_lines_child).previousSibling;
-		while(last_lines_child.nodeName !=previous_sibling.nodeName && last_lines_child.nodeName!='SPAN'){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			console.log(previous_sibling.nodeName + " and the last child: " + "last_lines_child.nodeName");
-		}
-		var last_lines_child_bottom=last_lines_child.getBoundingClientRect().bottom;
-		var previous_sibling_bottom=previous_sibling.getBoundingClientRect().bottom;
-		this.last_lines_child =null;
-		while(last_lines_child.nodeName ==previous_sibling.nodeName && this.last_lines_child ==null){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			last_lines_child_bottom=previous_sibling_bottom;
-			previous_sibling_bottom=Polymer.dom(previous_sibling).previousSibling.getBoundingClientRect().bottom;
-			if(last_lines_child_bottom==this.bottom_checker){
-				this.last_lines_child =last_lines_child;
-			}
-		}
-		var burger = this.last_lines_child.number;
-		console.log(burger);	
-		alert(burger);
-				
-*/
-
-	passageOneFilter: function(showSecond, finalWord){
-		if(showSecond==true && (this.finalColumnOneWordIndex-10)<this.secondColumnFirstWordIndex){
-			return (item)=>{
-				this.numberTwoColumns(65, 102);
-				return (item.order <= this.finalColumnOneWordIndex);
-			};
-		} 
-		else if(showSecond==true){
-			return (item)=>{
-				return (item.order < this.secondColumnFirstWordIndex);
-				}
-			}
-		else{
-			return (items)=>{ return false
-			};
-		}
-	},
-	
-	passageTwoFilter: function(showSecond, finalWord){
-		if(showSecond==true && (this.finalColumnOneWordIndex-10)<this.secondColumnFirstWordIndex){
-			return (item)=>{
-				return (item.order > this.finalColumnOneWordIndex);
-			};
-		} else if(showSecond==true){
-			return (item)=>{
-				return (item.order >= this.secondColumnFirstWordIndex);
-				}
-			}
-		else {
-			return (item)=>{
-				return false;
-			};
-	}
-}
-});
-</script>
-</dom-module>
-
-_masureWords:function(showSecondColumn){
+	_measureWords:function(showSecondColumn){
 		//var referencePassage = this.passageArrayOne;
 		this.passageWordArray =[];
 		var lastWord=this.numWords;
@@ -532,12 +429,12 @@ _masureWords:function(showSecondColumn){
 		context = this.measureFont();
 		context.font = this.measureFont().font;
 		console.log(context.font);
-		var passageWidth = (this.$.textColumnOne != undefined && this.showingSecondColumn ==true) ? this.$.textColumnOne.clientWidth: this.$.singleColumnText.clientWidth;
-		while(passageWidth < 240 && showSecondColumn == true && this.$.textColumnOne == undefined )
+		var passageWidth = (showSecondColumn) ? this.$.textColumnOne.clientWidth: this.$.singleColumnText.clientWidth;
+		if(passageWidth < 240)
 		{
-			this.$.textColumnOne.clientWidth;
+			passageWidth = 360;
 		}
-		console.log("this.is_passage_width: "  + passageWidth);
+		console.log(passageWidth);
 		var currentRow = 0;
 		var passageTitle = this.passageTitle;
 		var numParagraphs = this.paragraphs;
@@ -600,10 +497,9 @@ _masureWords:function(showSecondColumn){
 					});
 					
 				}		
+			
 			}
-			var lastRowLast=this.pop('passageWordArray');
-			this.lastRow=lastRowLast.currentLine;
-			alert("the Last Row " + this.lastRow + ' ' + ' ' + lastRowLast.currentLine);
+		console.log(this.passageWordArray[wordCount].row +  ' ' + this.passageWordArray[wordCount].currentLine +  ' ' + this.passageWordArray[wordCount].word);
 		},
 
 	measureFont: function(){
@@ -616,3 +512,45 @@ _masureWords:function(showSecondColumn){
 		this.context.font = context.font = calcFontSize + " " + calcFontFam;
 		return this.context;			
 	 },
+
+
+	numberTwoColumns: function(colOne, colTwo){
+		this.set("LineNumberArrayTwo", 	this.longestLineNumberArray.slice(colOne,colTwo));
+		this.set("LineNumberArray", this.longestLineNumberArray.slice(0,colOne));		
+	},
+
+	numberOneColumn: function(colOne){
+		this.set("firstColumnLineNumberArrayOne", this.longestLineNumberArray.slice(0,colOne));
+
+	},
+	passageOneFilter: function(showSecond, finalWord){
+		if(showSecond==true && (this.finalColumnOneWordIndex-10)<this.secondColumnFirstWordIndex){
+			return (item)=>{
+				return (item.order <= this.finalColumnOneWordIndex);
+			};
+		} 
+		else if(showSecond==true){
+			return (item)=>{
+				return (item.order < this.secondColumnFirstWordIndex);
+				}
+			}
+		else{
+			return (items)=>{ return false
+			};
+		}
+	},
+	
+	passageTwoFilter: function(showSecond, finalWord){
+		if(showSecond==true){
+			return (item)=>{
+				return (item.order > this.finalColumnOneWordIndex);
+			};
+		} else {
+			return (item)=>{
+				return false;
+			};
+	}
+}
+});
+</script>
+</dom-module>
