@@ -65,7 +65,7 @@
 			<!--passage-1-column-1 container-->
 					 		<div id="colUnoA" class="layout horizontal flex wrap text">
 					 		<article id="singleColumnText">
-					 	    	<template is="dom-repeat" items="{{passageArrayOne}}">
+					 	    	<template is="dom-repeat" filter='{{}}' items="{{passageArrayOne}}">
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
@@ -83,7 +83,7 @@
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<div id="lines" class="line-numbers">Lines</div>
-					 			<template is="dom-repeat" items="{{LineNumberArray}}">
+					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{"{{passageTwoFilter(showingSecondColumn,finalColumnOneWordIndex)}}">}}'>
      								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
     							</template>
     							
@@ -110,7 +110,7 @@
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 		<span id="linesTwo" clas="line-numbers">Lines</span>
-					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}">
+					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}" filter='{{doubleColPassageTwoFilter()}}'>
      								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
@@ -124,7 +124,8 @@
  									<template is="dom-if" if="{{item.paragraphBreak}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
- 									<a id="two_{{item.order}}">{{item.word}}</a>
+ 									<a id="two_{{item.order}}" filter=${{doubleColPassageTwoFilter: true, 
+									html 26.1>{{item.word}}</a>
 								</template>
 								<br class="line-numbers">
 								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
@@ -410,8 +411,11 @@ Polymer({
 			var checkAgain = checkId + 1;
 			var idOne ='#one_'+ checkId.toString();
 			var idTwo = '#two_'+ checkAgain.toString();
-			//console.log(idOne);
-			//console.log(this.$$(idOne));
+			console.log(idOne);
+			console.log(this.$$(idOne));
+			
+			this.idOne
+
 			// var position = this.$$(idOne).getBoundingClientRect().right + 52 + this.passageWordArray[checkId].wordWidth < this.$$(idTwo).getBoundingClientRect().right ? "at end of line": "suck word from next column";
 			// 	console.log("Position: " + position);
 			// 	console.log(lastRow);
@@ -450,10 +454,21 @@ Polymer({
 			};
 		}
 	},
-	passageTwoLineFilter: function(showSecond){
+	doubleColPassageOneFilter: function(showSecond, ref_1){
 		if(showSecond){
 			return (item)=>{
-				return (item.number > this.lastRow);
+				return (item.number <= ref_1);
+			};
+		} else {
+			return (item)=>{
+				return false; 
+			};
+		}
+	},
+	doubleColPassageTwoFilter: function(showSecond, ref_1, lastRow){
+		if(showSecond){
+			return (item)=>{
+				return (item.number > ref_1 && item.number<=this);
 			};
 		} else {
 			return (item)=>{

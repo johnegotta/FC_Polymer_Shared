@@ -57,14 +57,14 @@
 			<!--Line number container-->
 					 		<div id="linenumbersA1" class="layout vertical line-number">
 					 		<span class="line-numbers" id="linesA1">Lines</span>
-					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}">
+					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}" filter="{{filterLineNumbersOneColumn(item.number)}}">
      								<span hidden="{{!item.show}}" id="lines_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
 					 		</div>
 			<!--passage-1-column-1 container-->
-					 		<div id="colUnoA" class="layout horizontal flex wrap text">
-					 		<article id="singleColumnText">
+					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<article id="textColumnOne">
 					 	    	<template is="dom-repeat" items="{{passageArrayOne}}">
  									<template is="dom-if" if="{{item.newPara}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
@@ -90,7 +90,7 @@
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<span id="lines" class="line-numbers">Lines</span>
-					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{_oneColumnLineFilter(itemId)}}'>
+					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{_oneColumnLineFilter(showingSecondColumn, ref_1, lastWordIndex)}}'>
      								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
     							</template>
     							
@@ -120,7 +120,7 @@
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 	
 					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}">
-     								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     								<span hidden="{{!item.show}}" filter='{{ColTwoIn_Col_Two_Filter(item.number)}}'>{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span><!--btw nothing better than a hidden text node in node hopping-->
      								
     							</template>	
 					 		</div>
@@ -268,29 +268,46 @@ Polymer({
 			type: Number,
 			notify: true
 		},
+		counter: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		rowLast: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		numbersAssigned:{
+			type: Array,
+			value: [],
+			notify: true
+		},
 		notify: true,
 		reflectToAttributes: true
 	},
 	attached: function(){
-		for(i=1; i <= 250; i++)
+		for(i=1; i <= 200; i++)
 			{
 			j=	i % 5 ? false: true;
-			this.push("LineNumberArray", {'number': i, 'show': j});
-			this.push("LineNumberArrayTwo", {'number': i, 'show': j});
-			this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
+			 this.push("LineNumberArray", {'number': i, 'show': j});
+			 this.push("LineNumberArrayTwo", {'number': i, 'show': j});
+			 this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
 			this.push("longestLineNumberArray", {'number': i, 'show': j});
 		
 			}
+			this.counter=0;
 		this.loadPassages();
 		},
 	logjunk: function(){
 	
 	},
-	loadPassages: function(){
-		
+	loadPassages: function(passagePath){
+		passagePath = passagePath === undefined ? "new pasages and am outta power" : passagePath;
+	//added path here--really want admin to rain down property
 		this.passageArrayOne=[];
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_2");
+		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/" + passagePath);
 		ref.on("value", function(snap){
 			self.passageArrayOne=[];
 			self.wordArray =[];
@@ -299,6 +316,7 @@ Polymer({
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
 			self.lastWordIndex = self.numWords-2;
+			self.push('lastWordIndex',self.pop('numWords'));
 			self.goldenRatio = Math.floor(.618*self.numWords);
 			self.finalColumnOneWordIndex = self.goldenRatio;
 			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
@@ -322,30 +340,28 @@ Polymer({
 		this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
 		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50)
 		{
-			if(this.$.noJudge.clientWidth >= 670 && this.textColumnOneHeight>this.screenTrueHeight)
+			if(this.$.noJudge.clientWidth >= 650 && this.textColumnOneHeight>this.screenTrueHeight)
 			{
 				this.$.doubleColumnContainer.hidden = false;
 				this.$.singleColumnContainer.hidden = true; 
 				this.showingSecondColumn = true;
 				this._adjustDoubleColumns();
-				this.numberOneColumn();
+				this._measureWords(true);
 			}
 			else
 			{ 
 				this.$.doubleColumnContainer.hidden = true;
 				this.$.singleColumnContainer.hidden = false;
 				this.showingSecondColumn = false;
-				this.numberOneColumn();
-				
-				
+				this._measureWords(false);
 				
 			}
 		}
 		else 
 		{
-			if(this.$.noJudge.clientWidth >= 670)
+			if(this.$.noJudge.clientWidth >= 650)
 			{
-				this.$.secondColumnContainer.hidden = false;
+				this.$.doubleColumnContainer.hidden = false;
 				this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
 				if(this.textColumnOneHeight < this.screenTrueHeight)
 				{
@@ -353,7 +369,7 @@ Polymer({
 					this.$.singleColumnContainer.hidden = true; 
 					this.showingSecondColumn = true;
 					this._adjustDoubleColumns();
-					this.numberOneColumn();
+					this._measureWords(true);
 				}
 			}
 			else
@@ -361,12 +377,13 @@ Polymer({
 				this.$.doubleColumnContainer.hidden = true;
 				this.$.singleColumnContainer.hidden = false;
 				this.showingSecondColumn=false;
-				this.numberOneColumn();
+				this._measureWords(false);
+				
 				
 			}
 					
 		}
-	
+		
 	},
 
 
@@ -423,10 +440,10 @@ Polymer({
 					//this._measureWords(true);
 					this.growFirstColumn(this.numberPlus);
 					console.log(this.numberPlus);
+					this_mission.Cient
 
 			},
 
-	
 	
 
 
@@ -435,57 +452,107 @@ Polymer({
 		this.set("LineNumberArray", this.longestLineNumberArray.slice(0,colOne));		
 	},
 
-	numberOneColumn: function(){
-		 var top_of_first_word = this.$$('#oneA_0').getBoundingClientRect().top;
+	numberOneColumn: function(RowsEstimate){
+		 var top_of_first_word = this.$$('#oneA_1').getBoundingClientRect().top;
 		 var last_word_rect = this.$$('#oneA_'+ this.lastWordIndex.toString()).getBoundingClientRect();
 		 var line_height = last_word_rect.height;
 		 var delta = last_word_rect.bottom - top_of_first_word;
-		 console.log(delta);
-		 console.log(line_height);
-		 console.log(last_word_rect);
-		 var num_lines = delta/24;
-		 console.log(num_lines);
-		 // this.firstColumnLineNumberArrayOne = [];
-		 // this.set("firstColumnLineNumberArrayOne", firstColumnLineNumberArrayOne);
+		 var num_lines = Math.round(delta/24);
+		 num_lines=(num_lines>50 || num_lines < 160 && num_lines<RowsEstimate) ? num_lines: RowsEstimate;
+		 //this.firstColumnLineNumberArrayOne = [];
+		 //this.set("firstColumnLineNumberArrayOne", this.longestLineNumberArray.slice(0, num_lines));
+		 this.filterLineNumbersOneColumn(false, num_lines);
 
 		},
+		_measureWords:function(showSecondColumn){
+			var referencePassage = this.passageArrayOne;
+			this.passageWordArray =[];
+			var lastWord=this.numWords;
+			var canvas = document.createElement('canvas');
+			var context = canvas.getContext("2d");
+			context = this.measureFont();
+			context.font = this.measureFont().font;
+			console.log(context.font);
+			var passageWidth = (this.$.textColumnOne != undefined && this.showingSecondColumn ==true) ? this.$.textColumnOne.clientWidth: this.$.colUno.clientWidth;
+			if(passageWidth < 250 && showSecondColumn == true && this.$.colUno == undefined )
+				{
+					passageWidth=Math.floor(this.$.noJudge.clientWidth/2);
+					
+				}
+			else{
 
-		/*
-		var guess_previous_sibling = Polymer.dom(guess).previousSibling; 
-		alert(guess + ' ' + guess_previous_sibling);
-		alert(guess.nodeName);
-		while(guess.nodeName != guess_previous_sibling.nodeName){
-			guess = guess_previous_sibling;
-			guess_previous_sibling = Polymer.dom(guess_previous_sibling).previousSibling;
-		} 
-		var bottom_checker = guess.getBoundingClientRect().bottom;
-		this.bottom_checker = bottom_checker;
-		var last_lines_child = Polymer.dom("linenumbersA1").lastChild;
-		var previous_sibling = Polymer.dom(last_lines_child).previousSibling;
-		while(last_lines_child.nodeName !=previous_sibling.nodeName && last_lines_child.nodeName!='SPAN'){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			console.log(previous_sibling.nodeName + " and the last child: " + "last_lines_child.nodeName");
-		}
-		var last_lines_child_bottom=last_lines_child.getBoundingClientRect().bottom;
-		var previous_sibling_bottom=previous_sibling.getBoundingClientRect().bottom;
-		this.last_lines_child =null;
-		while(last_lines_child.nodeName ==previous_sibling.nodeName && this.last_lines_child ==null){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			last_lines_child_bottom=previous_sibling_bottom;
-			previous_sibling_bottom=Polymer.dom(previous_sibling).previousSibling.getBoundingClientRect().bottom;
-			if(last_lines_child_bottom==this.bottom_checker){
-				this.last_lines_child =last_lines_child;
+				passageWidth=Math.floor(this.$.colUno.clientWidth);
+
+
 			}
-		}
-		var burger = this.last_lines_child.number;
-		console.log(burger);	
-		alert(burger);
-				
-*/
+			console.log("this.is_passage_width: "  + passageWidth);
+			var currentRow = 0;
+			var passageTitle = this.passageTitle;
+			var numParagraphs = this.paragraphs;
+			var numWords = lastWord;
+			var wordCount = 0;
+			var currentLine = "";
+			var currentWidth = 0;
+			for(wordCount=0; wordCount < numWords; wordCount++)
+			{	
+				var indentOffset = (context.measureText("\x20").width)*5;
+				var currentWord = this.wordArray[wordCount];
+				var wordMeasure = " " + this.wordArray[wordCount];
+				var newPara = this.passageArrayOne[wordCount].newPara;
+				var isLastWordOfPara = this.passageArrayOne[wordCount].isLastWordOfPara;
+				if(newPara == true || wordCount==0){
+					currentWidth= indentOffset + context.measureText(currentWord).width;
+					currentLine = this.wordArray[wordCount];
+					currentRow++;
+				}
+				else if(currentWidth+context.measureText(wordMeasure).width < passageWidth)
+				{
+					currentLine += wordMeasure; //add a word and space
+					currentWidth = context.measureText(currentLine).width;
+				} 
+				else{
+					currentLine = this.wordArray[wordCount];
+					currentWidth = context.measureText(currentLine).width;
+					currentRow++;
+				}
+				//if(this.order!==lastWord){
+					this.push("passageWordArray",
+					{ 	
+						'currentLine': currentLine,
+						'lastWordofPara': isLastWordOfPara,
+						'order': wordCount,
+						'word' : currentWord, 
+						"currentLineWidth": currentWidth, 
+						'row':currentRow,
+						'passage_width': passageWidth,
+						'newPara': newPara,
+						'000001_lastRow': currentRow,
+						'word-width': context.measureText(currentWord).width
+					}
+				);
+		
+			}
+			this.counter++;
+			this.rowLast=[];
+			this.push("rowLast",this.pop('passageWordArray'));
+			var pickle = this.rowLast[0].row -1;
+			this.numberOneColumn(pickle);
+			alert("the Last Row " + pickle.toString() + ' ' + ' ' + JSON.stringify(this.rowLast[0].row));
+		},
 
-	passageOneFilter: function(showSecond, finalWord){
+	measureFont: function(){
+		var lines = this.$.textColumnOne;		
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		this.context = context;
+		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
+		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
+		this.context.font = context.font = calcFontSize + " " + calcFontFam;
+		return this.context;			
+	 },
+
+		
+	passageOneFilter: function(showSecond, finalWordCol){
 		if(showSecond==true && (this.finalColumnOneWordIndex-10)<this.secondColumnFirstWordIndex){
 			return (item)=>{
 				this.numberTwoColumns(65, 102);
@@ -516,9 +583,46 @@ Polymer({
 		else {
 			return (item)=>{
 				return false;
+				};
+			}
+		}, 
+
+	__filter_lineNumbersForOneColumnLayout: function(showSecond, num_lines){
+		if(showSecond==true && num_lines >40){
+		return (item) =>{
+			return(item.number<=num_lines);
 			};
+		}
+		else{
+			return (item)=> {
+				return false;
+				}
+			}
+		},
+	ColOneIn_TwoCol_Filter: function(showSecond, num_lines){
+		if(showSecond==true && num_lines >40){
+			return (item) =>{
+				return(item.number<=num_lines);
+				};
+			}
+			else{
+				return (item)=> {
+					return false;
+					}
+				}
+			},
+	ColTwoIn_Col_Two_Filter: function(showSecond, num_lines, lastWordIndex){
+		if(showSecond==true && num_lines>40){
+			return (item) =>{
+				return(item.number>=num_lines && item.number<=lastWordIndex);
+				};
+			}
+			else{
+				return (item)=>{
+					return false;
+				}
+			}
 	}
-}
 });
 </script>
 </dom-module>
@@ -616,3 +720,38 @@ _masureWords:function(showSecondColumn){
 		this.context.font = context.font = calcFontSize + " " + calcFontFam;
 		return this.context;			
 	 },
+
+	 /*
+		var guess_previous_sibling = Polymer.dom(guess).previousSibling; 
+		alert(guess + ' ' + guess_previous_sibling);
+		alert(guess.nodeName);
+		while(guess.nodeName != guess_previous_sibling.nodeName){
+			guess = guess_previous_sibling;
+			guess_previous_sibling = Polymer.dom(guess_previous_sibling).previousSibling;
+		} 
+		var bottom_checker = guess.getBoundingClientRect().bottom;
+		this.bottom_checker = bottom_checker;
+		var last_lines_child = Polymer.dom("linenumbersA1").lastChild;
+		var previous_sibling = Polymer.dom(last_lines_child).previousSibling;
+		while(last_lines_child.nodeName !=previous_sibling.nodeName && last_lines_child.nodeName!='SPAN'){
+			last_lines_child=previous_sibling;
+			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
+			console.log(previous_sibling.nodeName + " and the last child: " + "last_lines_child.nodeName");
+		}
+		var last_lines_child_bottom=last_lines_child.getBoundingClientRect().bottom;
+		var previous_sibling_bottom=previous_sibling.getBoundingClientRect().bottom;
+		this.last_lines_child =null;
+		while(last_lines_child.nodeName ==previous_sibling.nodeName && this.last_lines_child ==null){
+			last_lines_child=previous_sibling;
+			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
+			last_lines_child_bottom=previous_sibling_bottom;
+			previous_sibling_bottom=Polymer.dom(previous_sibling).previousSibling.getBoundingClientRect().bottom;
+			if(last_lines_child_bottom==this.bottom_checker){
+				this.last_lines_child =last_lines_child;
+			}
+		}
+		var burger = this.last_lines_child.number;
+		console.log(burger);	
+		alert(burger);
+				
+*/

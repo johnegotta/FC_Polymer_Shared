@@ -135,7 +135,7 @@
 				<fc-holder class="horizontal layout flex-box container center center-justified" style="max-width: 100%;">
 					<paper-input value='{{testId}}' style="max-width: 340px; margin: 8px; padding: 6px; @apply::--paper-container-label-color:{text-color: midnightblue; font-size: 1.25em; font-family: merriweather; font-weight: 700;};" list="Test Number" always-float-label='true' label='Test Id'></paper-input>
 					<datalist name="Test Number" list="Test Number" id="Test Number">
-						<option value={{testId}}> Test 1</option>
+						<option> Test 1</option>
 						<option> Test 2</option>
 						<option> Test 3</option>
 						<option> Test 4</option>
@@ -163,6 +163,15 @@
 						<option> Soft-Science/Business Focused</option>
 					</datalist>
 
+				</fc-holder>
+				<fc-holder>
+					<paper-dropdown-menu name="selectedPassage" always-float-label label="Select A Passage" on-iron-select="">
+						<paper-menu id="passageListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedPassage}}">
+							<template is="dom-repeat" items="{{passageDestinations}}" <!-- filter="passageFilter(testId)" -->>
+								<paper-item value="{{item}}">{{item}}</paper-item>
+							</template>
+						</paper-menu>
+					</paper-dropdown-menu>
 				</fc-holder>
 				<fc-holder "horizontal layout no-wrap container">
 					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Type'></paper-input>
@@ -323,7 +332,10 @@
 			type: String,
 			notify: true
 		},
-		
+		selectedPassage: {
+			type: String,
+			notify: true
+		},
 		sectionCount:{
 			type: Number,
 			value: 0,
@@ -386,6 +398,7 @@
 							count=1;
   							count++;
   							console.log("added", snap.key());
+  							self.push('passageDestinations', snap.key());
 							// length will always equal count, since snap.val() will include every child_added event
 							//var instance = self.fcid + '_000' + self.testId + '_000' + self.saveCounter
 							//self.section[instance]=  readingIdArray
