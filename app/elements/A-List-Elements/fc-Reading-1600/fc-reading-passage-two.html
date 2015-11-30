@@ -57,7 +57,7 @@
 			<!--Line number container-->
 					 		<div id="linenumbersA1" class="layout vertical line-number">
 					 		<span class="line-numbers" id="linesA1">Lines</span>
-					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}" filter="{{filterLineNumbersOneColumn(item.number)}}">
+					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}" filter="{{__filter_lineNumbersForOneColumnLayout(showSecond, num_lines}}">
      								<span hidden="{{!item.show}}" id="lines_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
@@ -83,14 +83,12 @@
 
 
 
-
-
 					<div id="doubleColumnContainer" class="layout horizontal flex container">
 						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<span id="lines" class="line-numbers">Lines</span>
-					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{_oneColumnLineFilter(showingSecondColumn, ref_1, lastWordIndex)}}'>
+					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='ColOneIn_TwoCol_Filter{{(showingSecondColumn, ref_1)}}'>
      								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
     							</template>
     							
@@ -120,7 +118,7 @@
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 	
 					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}">
-     								<span hidden="{{!item.show}}" filter='{{ColTwoIn_Col_Two_Filter(item.number)}}'>{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span><!--btw nothing better than a hidden text node in node hopping-->
+     								<span hidden="{{!item.show}}" filter='{{ColTwoIn_Col_Two_Filter(showingSecondColumn, ref_1, ref_2)}}'>{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span><!--btw nothing better than a hidden text node in node hopping-->
      								
     							</template>	
 					 		</div>
@@ -152,6 +150,12 @@ Polymer({
 	is:'fc-reading-passage-two',
 	behaviors: [Polymer.IronResizableBehavior],
 	properties: {
+		passagePath: {
+			type: String,
+			value: 'new_Passage_0',
+			notify: true,
+			reflectToAttributes: true
+		},
 		passageArrayOne:{
 			type: Array, 
 			value: [],
@@ -195,7 +199,17 @@ Polymer({
 			value: [],
 			notify: true
 		},
-		
+		firstColumnLineNumberArrayOne:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		longestLineNumberArray:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+
 		LineNumberArray: {
 			type: Array,
 			value: [],
@@ -303,7 +317,7 @@ Polymer({
 	
 	},
 	loadPassages: function(passagePath){
-		passagePath = passagePath === undefined ? "new pasages and am outta power" : passagePath;
+		passagePath = passagePath === undefined ? 'new_Passage_2' : passagePath;
 	//added path here--really want admin to rain down property
 		this.passageArrayOne=[];
 		var self = this;
@@ -316,7 +330,6 @@ Polymer({
 			self.passageArrayOne = snap.val();
 			self.numWords = self.passageArrayOne.length;
 			self.lastWordIndex = self.numWords-2;
-			self.push('lastWordIndex',self.pop('numWords'));
 			self.goldenRatio = Math.floor(.618*self.numWords);
 			self.finalColumnOneWordIndex = self.goldenRatio;
 			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
@@ -393,7 +406,8 @@ Polymer({
 				console.log('do we ever enter this function?');
 				var numberAhead=anchorOne;
 				while(numberAhead>=8 && top_of_line_to_reclaim == top_of_next_anchor){
-				self.firstWordAnchor =  (this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()) != undefined) ? this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()): setTimeout(alert("one of these terniary functions worked"),1400);console.log('do we ever enter this function?');
+				self.firstWordAnchor =  (this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()) != undefined) ? this.$$('#one_'+ self.secondColumnFirstWordIndex.toString()): setTimeout(alert("one of these terniary functions worked"),1400);
+		console.log('do we ever enter this function?');
 					var top_of_line_to_reclaim = self.firstWordAnchor.getBoundingClientRect().top;
 					var nextAnchor = self.firstWordAnchor;
 					var top_of_next_anchor = top_of_line_to_reclaim;
@@ -440,7 +454,6 @@ Polymer({
 					//this._measureWords(true);
 					this.growFirstColumn(this.numberPlus);
 					console.log(this.numberPlus);
-					this_mission.Cient
 
 			},
 
@@ -448,8 +461,9 @@ Polymer({
 
 
 	numberTwoColumns: function(colOne, colTwo){
-		this.set("LineNumberArrayTwo", 	this.longestLineNumberArray.slice(colOne,colTwo));
-		this.set("LineNumberArray", this.longestLineNumberArray.slice(0,colOne));		
+		
+
+		
 	},
 
 	numberOneColumn: function(RowsEstimate){
@@ -458,98 +472,12 @@ Polymer({
 		 var line_height = last_word_rect.height;
 		 var delta = last_word_rect.bottom - top_of_first_word;
 		 var num_lines = Math.round(delta/24);
-		 num_lines=(num_lines>50 || num_lines < 160 && num_lines<RowsEstimate) ? num_lines: RowsEstimate;
+		 num_lines=(num_lines>35 || num_lines < 160 && num_lines<RowsEstimate) ? num_lines: RowsEstimate;
 		 //this.firstColumnLineNumberArrayOne = [];
 		 //this.set("firstColumnLineNumberArrayOne", this.longestLineNumberArray.slice(0, num_lines));
-		 this.filterLineNumbersOneColumn(false, num_lines);
+		 __line(false, num_lines);
 
 		},
-		_measureWords:function(showSecondColumn){
-			var referencePassage = this.passageArrayOne;
-			this.passageWordArray =[];
-			var lastWord=this.numWords;
-			var canvas = document.createElement('canvas');
-			var context = canvas.getContext("2d");
-			context = this.measureFont();
-			context.font = this.measureFont().font;
-			console.log(context.font);
-			var passageWidth = (this.$.textColumnOne != undefined && this.showingSecondColumn ==true) ? this.$.textColumnOne.clientWidth: this.$.colUno.clientWidth;
-			if(passageWidth < 250 && showSecondColumn == true && this.$.colUno == undefined )
-				{
-					passageWidth=Math.floor(this.$.noJudge.clientWidth/2);
-					
-				}
-			else{
-
-				passageWidth=Math.floor(this.$.colUno.clientWidth);
-
-
-			}
-			console.log("this.is_passage_width: "  + passageWidth);
-			var currentRow = 0;
-			var passageTitle = this.passageTitle;
-			var numParagraphs = this.paragraphs;
-			var numWords = lastWord;
-			var wordCount = 0;
-			var currentLine = "";
-			var currentWidth = 0;
-			for(wordCount=0; wordCount < numWords; wordCount++)
-			{	
-				var indentOffset = (context.measureText("\x20").width)*5;
-				var currentWord = this.wordArray[wordCount];
-				var wordMeasure = " " + this.wordArray[wordCount];
-				var newPara = this.passageArrayOne[wordCount].newPara;
-				var isLastWordOfPara = this.passageArrayOne[wordCount].isLastWordOfPara;
-				if(newPara == true || wordCount==0){
-					currentWidth= indentOffset + context.measureText(currentWord).width;
-					currentLine = this.wordArray[wordCount];
-					currentRow++;
-				}
-				else if(currentWidth+context.measureText(wordMeasure).width < passageWidth)
-				{
-					currentLine += wordMeasure; //add a word and space
-					currentWidth = context.measureText(currentLine).width;
-				} 
-				else{
-					currentLine = this.wordArray[wordCount];
-					currentWidth = context.measureText(currentLine).width;
-					currentRow++;
-				}
-				//if(this.order!==lastWord){
-					this.push("passageWordArray",
-					{ 	
-						'currentLine': currentLine,
-						'lastWordofPara': isLastWordOfPara,
-						'order': wordCount,
-						'word' : currentWord, 
-						"currentLineWidth": currentWidth, 
-						'row':currentRow,
-						'passage_width': passageWidth,
-						'newPara': newPara,
-						'000001_lastRow': currentRow,
-						'word-width': context.measureText(currentWord).width
-					}
-				);
-		
-			}
-			this.counter++;
-			this.rowLast=[];
-			this.push("rowLast",this.pop('passageWordArray'));
-			var pickle = this.rowLast[0].row -1;
-			this.numberOneColumn(pickle);
-			alert("the Last Row " + pickle.toString() + ' ' + ' ' + JSON.stringify(this.rowLast[0].row));
-		},
-
-	measureFont: function(){
-		var lines = this.$.textColumnOne;		
-		var canvas = document.createElement('canvas');
-		var context = canvas.getContext("2d");
-		this.context = context;
-		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
-		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
-		this.context.font = context.font = calcFontSize + " " + calcFontFam;
-		return this.context;			
-	 },
 
 		
 	passageOneFilter: function(showSecond, finalWordCol){
@@ -587,42 +515,7 @@ Polymer({
 			}
 		}, 
 
-	__filter_lineNumbersForOneColumnLayout: function(showSecond, num_lines){
-		if(showSecond==true && num_lines >40){
-		return (item) =>{
-			return(item.number<=num_lines);
-			};
-		}
-		else{
-			return (item)=> {
-				return false;
-				}
-			}
-		},
-	ColOneIn_TwoCol_Filter: function(showSecond, num_lines){
-		if(showSecond==true && num_lines >40){
-			return (item) =>{
-				return(item.number<=num_lines);
-				};
-			}
-			else{
-				return (item)=> {
-					return false;
-					}
-				}
-			},
-	ColTwoIn_Col_Two_Filter: function(showSecond, num_lines, lastWordIndex){
-		if(showSecond==true && num_lines>40){
-			return (item) =>{
-				return(item.number>=num_lines && item.number<=lastWordIndex);
-				};
-			}
-			else{
-				return (item)=>{
-					return false;
-				}
-			}
-	}
+
 });
 </script>
 </dom-module>
