@@ -1,4 +1,4 @@
-<dom-module id="fc-reading-passage-two">	
+<dom-module id="fc-reading-passage-five">	
 <template>
 <style is="custom-style">
 	
@@ -23,7 +23,7 @@
 		}
 		
 </style>
-<firebase-collection location="{{passagePath}}" data={{passageArrayOne}}></firebase-collection>
+
 <!--double-column line-number and passage vertical container--> 
 			<div id="noJudge" class="layout vertical flex container left passageContainer">
 	<!--blurb full width container-->
@@ -57,12 +57,12 @@
 </template>
 <script>
 Polymer({
-	is:'fc-reading-passage-two',
+	is:'fc-reading-passage-five',
 	behaviors: [Polymer.IronResizableBehavior],
 	properties: {
 		passagePath: {
 			type: String,
-			value: 'https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_0',
+			value: 'new_Passage_4',
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -72,7 +72,18 @@ Polymer({
 			notify: true, 
 			reflectToAttibutes: true 
 		},
-		
+		passageArray:{
+			type: Array, 
+			value: [],
+			notify: true, 
+			reflectToAttibutes: true 
+		},
+		passageArrayThree:{
+			type: Array, 
+			value: [],
+			notify: true, 
+			reflectToAttibutes: true 
+		},
 		wordArray: {
 			type: Array,
 			value: [],
@@ -105,45 +116,48 @@ Polymer({
 		notify: true,
 		reflectToAttributes: true
 	},
-	attached: function(){
-		
-		this.loadPassages();
-		},
-	logjunk: function(){
-	
-	},
-	loadPassages: function(passagePath){
-		passagePath = passagePath === undefined ? 'new_Passage_2' : passagePath;
+	ready: function(passagePath){
+		this.passagePath = this.passagePath === undefined ? 'new_Passage_9' : this.passagePath;
 	//added path here--really want admin to rain down property
 		this.passageArrayOne=[];
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/" + passagePath);
+		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_1");
 		ref.on("value", function(snap){
 			self.passageArrayOne=[];
-			self.wordArray =[];
-			self.passageArrayOne = snap.val();
-			self.$.singleDisplay.theContent = self.passageArrayOne;
-			self.$.doubleDisplay.theContent = self.passageArrayOne;
-			self.numWords = self.passageArrayOne.length;
+			self.numWords = 1;
+			snap.forEach(function(childSnapshot){
+				var wordObject = childSnapshot.val();
+				wordObject.order =self.numWords;
+				self.push('passageArrayOne',wordObject);
+				self.numWords++;
+				self.lastWordIndex = self.numWords-1;
+			});
+			console.log(self.passageArrayOne);
 			self.lastWordIndex = self.numWords-1;
 			self.$.singleDisplay.lastWordIndex=self.lastWordIndex;
 			self.$.doubleDisplay.lastWordIndex=self.lastWordIndex;
-			self.passageTitle = self.passageArrayOne[0].passageTitle;
-			self.passageBlurb = self.passageArrayOne[0].passageBlurb;
+			self.passageTitle = self.passageArrayOne[84].passageTitle;
+			self.passageBlurb = self.passageArrayOne[84].passageBlurb;
+			self.$.doubleDisplay.theContent = self.passageArrayOne;
+			self.$.singleDisplay.theContent = self.passageArrayOne;
 			var j=0;
+			self.passageArray =[];
 			for(j=0; j<self.numWords;j++){
-				self.push("wordArray", self.passageArrayOne[j].word.replace('&nbsp&nbsp&nbsp&nbsp','aaaa'));
-					}
+				self.push("passageArray", self.passageArrayOne[j]);
+			}
+		
 		});
-	self.$.singleDisplay.theContent = self.passageArrayOne;
-	self.$.doubleDisplay.theContent = self.wordArray;
-	self.$.singleDisplay.lastWordIndex=self.lastWordIndex;
-	self.$.doubleDisplay.lastWordIndex=self.lastWordIndex;
 	},
-	
+
+
+
 	notifyResize: function(){
 		this.setUp();
-	
+		this.$.singleDisplay.lastWordIndex=this.lastWordIndex;
+		this.$.doubleDisplay.lastWordIndex=this.lastWordIndex;
+		this.$.doubleDisplay.firstColumnLastWordIndex = Math.floor(.618*this.lastWordIndex);
+		this.$.doubleDisplay.secondColumnFirstWordIndex = this.finalColumnOneWordIndex+1;
+		console.log( 'last word index ' + this.lastWordIndex);
 
 	},
 	
@@ -154,149 +168,16 @@ Polymer({
 			{
 				this.showingSecondColumn = true;
 				this.$.doubleDisplay.notifyResize();
-
-				
 			}	
 		else
 			{ 
 				this.showingSecondColumn = false;
 				this.$.singleDisplay.notifyResize();
-				
-				
 			}
-		}
+	}
 
 
 
 });
 </script>
 </dom-module>
-
-_masureWords:function(showSecondColumn){
-		//var referencePassage = this.passageArrayOne;
-		this.passageWordArray =[];
-		var lastWord=this.numWords;
-		var canvas = document.createElement('canvas');
-		var context = canvas.getContext("2d");
-		context = this.measureFont();
-		context.font = this.measureFont().font;
-		console.log(context.font);
-		var passageWidth = (this.$.textColumnOne != undefined && this.showingSecondColumn ==true) ? this.$.textColumnOne.clientWidth: this.$.singleColumnText.clientWidth;
-		while(passageWidth < 240 && showSecondColumn == true && this.$.textColumnOne == undefined )
-		{
-			this.$.textColumnOne.clientWidth;
-		}
-		console.log("this.is_passage_width: "  + passageWidth);
-		var currentRow = 0;
-		var passageTitle = this.passageTitle;
-		var numParagraphs = this.paragraphs;
-			var numWords = lastWord;
-			var wordCount = 0;
-			var currentLine = "";
-			var currentWidth = 0;
-			for(wordCount=0; wordCount < numWords; wordCount++)
-			{	
-				var indentOffset = (context.measureText("\x20").width)*5;
-				var currentWord = this.wordArray[wordCount];
-				var wordMeasure = " " + this.wordArray[wordCount];
-				var newPara = this.passageArrayOne[wordCount].newPara;
-				var isLastWordOfPara = this.passageArrayOne[wordCount].isLastWordOfPara;
-				if(newPara == true || wordCount==0){
-					currentWidth= indentOffset + context.measureText(currentWord).width;
-					currentLine = this.wordArray[wordCount];
-					currentRow++;
-				}
-				else if(currentWidth+context.measureText(wordMeasure).width < passageWidth)
-				{
-					currentLine += wordMeasure; //add a word and space
-					currentWidth = context.measureText(currentLine).width;
-				} 
-				else{
-					currentLine = this.wordArray[wordCount];
-					currentWidth = context.measureText(currentLine).width;
-					currentRow++;
-				}
-				if(this.order!==lastWord){
-					this.push("passageWordArray",
-					{ 	
-						'currentLine': currentLine,
-						'lastWordofPara': isLastWordOfPara,
-						'order': wordCount,
-						'word' : currentWord, 
-						"currentLineWidth": currentWidth, 
-						'row':currentRow,
-						'passage_width': passageWidth,
-						'newPara': newPara,
-						'lastRow': 'unknown',
-						'word-width': context.measureText(currentWord).width
-					}
-				);
-					
-				}
-				else { console.log('in the loop for last word');
-					this.push("passageWordArray",
-					{ 	
-						'currentLine': currentLine,
-						'order': wordCount,
-						'word' : currentWord, 
-						"currentLineWidth": currentWidth, 
-						'row':currentRow,
-						'passage_width': passageWidth,
-						'lastWordofPara': isLastWordOfPara,
-						'newPara': newPara,
-						'lastRow': currentRow,
-						'word-width': context.measureText(currentWord).width
-					});
-					
-				}		
-			}
-			var lastRowLast=this.pop('passageWordArray');
-			this.lastRow=lastRowLast.currentLine;
-			alert("the Last Row " + this.lastRow + ' ' + ' ' + lastRowLast.currentLine);
-		},
-
-	measureFont: function(){
-		var lines = this.$.textColumnOne;		
-		var canvas = document.createElement('canvas');
-		var context = canvas.getContext("2d");
-		this.context = context;
-		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
-		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
-		this.context.font = context.font = calcFontSize + " " + calcFontFam;
-		return this.context;			
-	 },
-
-	 /*
-		var guess_previous_sibling = Polymer.dom(guess).previousSibling; 
-		alert(guess + ' ' + guess_previous_sibling);
-		alert(guess.nodeName);
-		while(guess.nodeName != guess_previous_sibling.nodeName){
-			guess = guess_previous_sibling;
-			guess_previous_sibling = Polymer.dom(guess_previous_sibling).previousSibling;
-		} 
-		var bottom_checker = guess.getBoundingClientRect().bottom;
-		this.bottom_checker = bottom_checker;
-		var last_lines_child = Polymer.dom("linenumbersA1").lastChild;
-		var previous_sibling = Polymer.dom(last_lines_child).previousSibling;
-		while(last_lines_child.nodeName !=previous_sibling.nodeName && last_lines_child.nodeName!='SPAN'){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			console.log(previous_sibling.nodeName + " and the last child: " + "last_lines_child.nodeName");
-		}
-		var last_lines_child_bottom=last_lines_child.getBoundingClientRect().bottom;
-		var previous_sibling_bottom=previous_sibling.getBoundingClientRect().bottom;
-		this.last_lines_child =null;
-		while(last_lines_child.nodeName ==previous_sibling.nodeName && this.last_lines_child ==null){
-			last_lines_child=previous_sibling;
-			previous_sibling=Polymer.dom(last_lines_child).previousSibling;
-			last_lines_child_bottom=previous_sibling_bottom;
-			previous_sibling_bottom=Polymer.dom(previous_sibling).previousSibling.getBoundingClientRect().bottom;
-			if(last_lines_child_bottom==this.bottom_checker){
-				this.last_lines_child =last_lines_child;
-			}
-		}
-		var burger = this.last_lines_child.number;
-		console.log(burger);	
-		alert(burger);
-				
-*/

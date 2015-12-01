@@ -63,6 +63,7 @@ div.line-number {
 <script>
 Polymer({
 	is: 'fc-single-column-layout',
+		observers: ['arrayWatcher(theContent.splices)'],
 		properties: {
 
 		theContent:{
@@ -98,18 +99,19 @@ Polymer({
 
 	},
 
-ready: function(){
-	
-},
 
-attached: function(){
+ready: function(){
 	this.longestLineNumberArray=[];
 		for(i=1; i <= 180; i++)
 			{
 			j=	i % 5 ? false: true;
 			this.push("longestLineNumberArray", {'number': i, 'show': j});
 		
-			}
+			}	
+},
+
+attached: function(){
+
 		this.loadContent();
 	},
 
@@ -117,8 +119,14 @@ loadContent:function(){
 			this.notifyResize();
 
 },
+
+arrayWatcher: function(miki){
+	console.log(this.theContent);
+
+
+},
 notifyResize:function(){
-	this.numberOneColumn(80);
+	this.numberOneColumn();
 
 },
 
@@ -128,8 +136,7 @@ numberOneColumn: function(RowsEstimate){
 		 var last_word_rect =  last_word.getBoundingClientRect();
 		 var line_height = this.$.linesA1.clientHeight;
 		 var delta = last_word_rect.bottom - bottom_of_first_word;
-		 this.num_lines = Math.round(delta/line_height) - 2;
-		 
+		 this.num_lines = Math.round(delta/line_height) - 2.3;
 		 this._numberRowsFilter();
 		},
 _numberRowsFilter: function(){
@@ -146,7 +153,6 @@ _numberRowsFilter: function(){
 
 </script>
 </dom-module>
-
 
 
 		

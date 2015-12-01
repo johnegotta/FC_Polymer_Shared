@@ -430,6 +430,7 @@ _savePassage: function(){
 			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
 			var arrayPassed=truePassageContent.split(/\s/g);
 			self.order =arrayPassed.length;
+			self.orderIndex=0;
 			self.paragraphArray = truePassageContent.split(/\n/);
 			var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations");
 				self.passageArray = [];
@@ -444,11 +445,12 @@ _savePassage: function(){
 					var paragraph_number = Math.ceil(i/2);
 					var isLastWordOfPara =false;
 					var currentWord;
-					
+					var orderIndex = this.orderIndex;
 
  					while(paraWordRemaining>=0)
  					// para word loop
- 					{
+ 					{       
+ 							self.orderIndex++;
  							self.order--;
  							self.wordCounter--;
  							if (paraWordRemaining==0){
@@ -472,6 +474,7 @@ _savePassage: function(){
  									{ 
  										"passageTitle": passageTitle,
  										"passageBlurb": blurb,
+ 										"indexPrime":orderIndex,
  										'order': self.order,
  										'word' : currentWord, 
  										'newPara': newPara,
@@ -485,7 +488,7 @@ _savePassage: function(){
 						}//SINGLE line loop
 					//this is the paragraph for loop
 					var arrayPassage = self.passageArray.reverse();
-					ref.child('new_Passage_3').set(arrayPassage);
+					ref.child('new_Passage_4').set(arrayPassage);
 					console.log(arrayPassage);
 					self.passageArray = [];
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	
