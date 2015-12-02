@@ -36,7 +36,7 @@
 		<!-- end-of-column-1 line number and text container-->
 		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
 					
-					<fc-single-column-layout id="singleDisplay" theContent='{{passageArrayOne}}'hidden='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-single-column-layout id="singleDisplay" theContent='{{passageArray}}'hidden='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
 					</fc-single-column-layout>
 		
 		</div>
@@ -45,7 +45,7 @@
 
 		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
 					
-					<fc-double-column-layout id="doubleDisplay" theContent='{{passageArrayOne}}' shown='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-double-column-layout id="doubleDisplay" theContent='{{passageArrayThree}}' shown='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
 					</fc-double-column-layout>
 		
 		</div>
@@ -63,6 +63,12 @@ Polymer({
 		passagePath: {
 			type: String,
 			value: 'new_Passage_4',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageFullPath: {
+			type: String,
+			value: '',
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -106,7 +112,11 @@ Polymer({
 			reflectToAttributes: true,
 			notify: true
 		},
-
+		lastWordIndex:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
 		showingSecondColumn: {
 			type: Boolean,
 			value: false,
@@ -117,33 +127,24 @@ Polymer({
 		reflectToAttributes: true
 	},
 	ready: function(passagePath){
-		this.passagePath = this.passagePath === undefined ? 'new_Passage_9' : this.passagePath;
-	//added path here--really want admin to rain down property
+		this.passagePath = (this.passagePath === undefined) ? 'new_Passage_3' : this.passagePath;
+		this.fullPassagePath = 'https://focused0ne.firebaseio.com/passagesDestinations/' +passagePath
 		this.passageArrayOne=[];
 		var self = this;
 		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_1");
 		ref.on("value", function(snap){
-			self.passageArrayOne=[];
-			self.numWords = 1;
-			snap.forEach(function(childSnapshot){
-				var wordObject = childSnapshot.val();
-				wordObject.order =self.numWords;
-				self.push('passageArrayOne',wordObject);
-				self.numWords++;
-				self.lastWordIndex = self.numWords-1;
-			});
+			passageArrayOne=snap.val();
 			console.log(self.passageArrayOne);
 			self.lastWordIndex = self.numWords-1;
 			self.$.singleDisplay.lastWordIndex=self.lastWordIndex;
 			self.$.doubleDisplay.lastWordIndex=self.lastWordIndex;
-			self.passageTitle = self.passageArrayOne[84].passageTitle;
-			self.passageBlurb = self.passageArrayOne[84].passageBlurb;
-			self.$.doubleDisplay.theContent = self.passageArrayOne;
-			self.$.singleDisplay.theContent = self.passageArrayOne;
+			self.passageTitle = self.passageArrayOne[64].passageTitle;
+			self.passageBlurb = self.passageArrayOne[64].passageBlurb;
 			var j=0;
 			self.passageArray =[];
 			for(j=0; j<self.numWords;j++){
 				self.push("passageArray", self.passageArrayOne[j]);
+				self.push("passageArrayThree", self.passageArrayOne[j])
 			}
 		
 		});
@@ -157,7 +158,7 @@ Polymer({
 		this.$.doubleDisplay.lastWordIndex=this.lastWordIndex;
 		this.$.doubleDisplay.firstColumnLastWordIndex = Math.floor(.618*this.lastWordIndex);
 		this.$.doubleDisplay.secondColumnFirstWordIndex = this.finalColumnOneWordIndex+1;
-		console.log( 'last word index ' + this.lastWordIndex);
+		console.log( 'last word index ' + (this.lastWordIndex));
 
 	},
 	

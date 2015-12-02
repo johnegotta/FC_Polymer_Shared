@@ -1,0 +1,52 @@
+<script src="../../bower_components/Sortable/Sortable.min.js"></script>
+<script>
+	SortableDropAreaBehavior = {
+
+      properties: {
+        group: {
+        	type: Object,
+        	notify: true;
+        	value: {
+        		name: 'defaultDragAndDropGroup',
+        		put: true,
+        		pull: false
+        	}
+        },
+        sort: {
+        	type: Boolean,
+        	value: true
+       	},
+        draggable: {
+        	type: String,
+        	value: '.draggableElement'
+        },
+        handle: {
+        	type: String,
+        	value: '.dragHandle'
+        },
+        filter: {
+        	type: String,
+        	value: '.dragFilter'
+        }
+      },
+      
+      filterFunction: function(e){
+        this.removeChild(e.item);
+      },
+      
+      created: function() {
+        var dropArea = this;
+        Sortable.create(dropArea, 
+        	{
+        		group: this.group,
+        		sort: this.sort,
+        		draggable: this.dragable,
+        		handle: this.handle,
+        		filter: this.filter,
+        		onFilter: this.filterFunction
+        	}
+        );
+      },
+
+    };
+</script>
