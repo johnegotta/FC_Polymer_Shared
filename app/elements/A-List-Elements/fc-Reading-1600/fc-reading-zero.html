@@ -15,6 +15,8 @@
 		}
 		div.columnContainer{
 			overflow-y: scroll;
+			padding: 25px;
+			margin: 36px;
 		}
 		div.passageContainer{ 
 			max-width: 1450px !important;
@@ -25,7 +27,7 @@
 		}
 		div.blurb{
 			line-height: 1.2;
-			font-size: 1em;
+			font-size: 1.2em;
 			font-family: merriweather;
 			font-weight: 500;
 			font-style: italic;
@@ -42,7 +44,8 @@
 			min-height: 720px !important;
 			display: flex;
 			min-width: 280px !important;
-			max-width: 650px !important;	
+			max-width: 650px !important;
+			overflow-y: scroll;	
 		}
 </style>
 <!--double-column line-number and passage vertical container--> 
@@ -86,7 +89,7 @@
 
 
 					<div id="doubleColumnContainer" class="layout horizontal flex container">
-						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 8px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<div id="lines" class="line-numbers">Lines</div>
@@ -115,7 +118,7 @@
 
 
 		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 12px;overflow-y:scroll;">
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 8px;overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 			<div class="line-numbers" id="linesB2">Lines</div>
@@ -155,7 +158,7 @@ Polymer({
 	properties: {
 		passagePath: {
 			type: String,
-			value: 'new_Passage_4',
+			value: 'new_Test_1',
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -298,11 +301,19 @@ Polymer({
 		secondColumnFirstWordIndex:{
 			type: Number,
 			notify: true
-		},
-		notify: true,
-		reflectToAttributes: true
+		}
 	},
-	ready: function(){	
+	// observers: ['passageExistsNow(passageArrayOne.*)'],
+	// passageExistsNow: function(changeRecord){
+	// 	console.log('PASSAGE EXISTS NOW');
+	// 	console.log(changeRecord);
+	// 	// if(changeRecord.value.length > 0){
+	// 	// 	console.log("We Have Words");
+	// 	// 	this.setUp();
+	// 	// }
+	// },
+	ready: function(){
+		console.log("READY");
 		for(i=1; i <= 200; i++)
 			{
 			j=	i % 5 ? false: true;
@@ -313,7 +324,7 @@ Polymer({
 			}	
 		this.passageArrayOne=[];
 		var self = this;
-		var ref = new Firebase("https://focusedstudents.firebaseio.com/passagesDestinations/new_Passage_4");
+		var ref = new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations/" + this.passagePath);
 		ref.on("value", function(snap){
 			self.passageArrayOne=[];
 			self.passageArrayOne = snap.val();
@@ -324,28 +335,17 @@ Polymer({
 			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
 			self.passageTitle = self.passageArrayOne[58].passageTitle;
 			self.passageBlurb = self.passageArrayOne[58].passageBlurb;
-			self.passageArray=[];
-			var j=0;
-			for(j=0; j<self.numWords;j++){
-				self.push("passageArray", self.passageArrayOne[j]);
-					}
 		});
 	},
-
-	attached: function(){
-		this.notifyResize();
-	},
 	
-	notifyResize: function(){		
+	notifyResize: function(){
+		console.log("NOTIFY RESIZE");		
 		this.setUp();
 		
 	},
-
-	attributeChanged: function(){
-		var nooSpans = document.querySelector('[name|=false]');
-		this.notifyResize();},
 	
 	setUp: function(){
+		console.log('SETUP');
 		this.screenTrueHeight =  (window.innerHeight-340);
 		this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
 		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50){
@@ -456,16 +456,11 @@ Polymer({
 		
 	},
 	passageOneFilter: function(showSecond, finalWord){
-		if(showSecond==true && (this.finalColumnOneWordIndex<this.secondColumnFirstWordIndex)){
+		if(showSecond==true){
 			return (item)=>{
 				return (item.order <= this.finalColumnOneWordIndex);
 			};
 		} 
-		else if(showSecond==true){
-			return (item)=>{
-				return item.order < this.secondColumnFirstWordIndex;
-				}
-			}
 		else{
 			return (items) => { 
 				return false;

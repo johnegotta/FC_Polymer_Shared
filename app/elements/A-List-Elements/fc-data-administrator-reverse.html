@@ -114,15 +114,15 @@
 			
 </style>
 	<div class="layout container vertical center center-justified iconset" style="">
-		<button class="right" style="position: fixed; left: 123px; top: 30px; opacity: .45; background: goldenrod; border: 8px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME
-				<div id="focusedOne" hidden="{{!getFocused}}" style="font-size: 8.5pt; width: 500px; height: 24px; font-family: times; color: #000066;">
+		<button class="right" style="position: fixed; left: 225px; top: 30px; opacity: .45; background: goldenrod; border: 8px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME
+				<div id="focusedOne" hidden="{{!getFocused}}" style="font-size: 8.5pt; z-index: 10000000; width: 500px; height: 24px; font-family: times; color: #000066;">
 					<span>Get Focused!</span>
 				</div>
 		</button>
 	</div>
 
 								
-<paper-dialog id="dragDialogTwo" class="layout vertical container" style="display: block; overflow: auto; resizable: both; resize: auto;"  draggable="true" no-cancel-on-outside-click="true">
+<paper-dialog id="dragDialogTwo" class="layout vertical container" style="display: block; overflow: auto; resize: both;"  draggable="true" no-cancel-on-outside-click="true">
 <div on-mousedown="_startDrag">
 	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px; margin-top:16px;">The Focused Data Admin</h3>
 	<h6  class="subheading horizontal layout center-justified" style="line-height:2; margin: 10px 3px 0px 3px;">CLICK TO DRAG || CLICK AGAIN TO RELEASE</h6></div>
@@ -385,10 +385,10 @@
 	loadPassages: function(){
 				self=this;
 				self.passagesArray=[];
-				var ref= new Firebase("https://focusedstudents.firebaseio.com/passagesDestinations");
+				var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
 				ref.on("child_added", function(snap){
 					if (snap.val() ===undefined){
-						self.push('passageDestinations',"https://focusedstudents.firebaseio.com/passagesDestinations/new_Passage_0");
+						self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1");
 							self.newPassageRef = 0;
 							self.newPassageRef++;
 							count++;	
@@ -412,7 +412,7 @@
 	},
 
 	loadFirepad: function(){
-		this.firepadRef = new Firebase('https://focusedStudents.firebaseio.com/firepad');
+		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
   		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
   		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
@@ -431,8 +431,10 @@ _savePassage: function(){
 			var arrayPassed=truePassageContent.split(/\s/g);
 			self.order =arrayPassed.length;
 			self.orderIndex=0;
+			this.newPassageRef="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_" + (this.saveCounter + 1).toString();
+			console.log("this is the passage ref" + this.newPassageRef);
 			self.paragraphArray = truePassageContent.split(/\n/);
-			var ref = new Firebase("https://focusedStudents.firebaseio.com/passagesDestinations");
+			var ref = new Firebase(this.newPassageRef);
 				self.passageArray = [];
 				var i = self.paragraphArray.length-1;
 				for(; i> 0; i--)
@@ -488,7 +490,7 @@ _savePassage: function(){
 						}//SINGLE line loop
 					//this is the paragraph for loop
 					var arrayPassage = self.passageArray.reverse();
-					ref.child('new_Passage_4').set(arrayPassage);
+					ref.set(arrayPassage);
 					console.log(arrayPassage);
 					self.passageArray = [];
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	

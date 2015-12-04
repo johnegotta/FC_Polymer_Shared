@@ -36,52 +36,103 @@
 		}
 </style>
 		
-		<div class="layout horizontal flex container">
-
-				<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
-					 	<div id="linenumbers" class="layout vertical line-number">
-					 			<span id="lines" class="line-numbers">Lines</span>
-
-
-					 			<template is="dom-repeat" items="{{longestLineNumberArrayTwo}}" filter='columnOneLineNumbersFilter(last_row,num_lines)'>
-     								<span hidden="{{!item.show}}" id$="{{item.number}}">{{item.number}}</span>
-     								<span hidden="{{item.show}}">&nbsp</span>
-    							</template>
-    				
-					 	</div>
-			<!--passage-1-column-1 container-->
-					 	<div id="colUno" class="layout horizontal flex wrap text">
-					 		<article id="textColumnOne">
-					 	    	
-<!--FILTER WORDS COL ONE-->
-					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{theContent}}" observe='{{order}}' filter='{{columnOneWordFilter(firstColumnLastWordIndex, secondColumnFirstWordIndex)}}'>
- 									<template is="dom-if" if="{{item.newPara}}" >
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id$="one_{{item.order}}" invisibility="false"> {{item.word}}</a>
-								</template>
-								<br id="measurer" class="line-numbers">
-								<hr>
-								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
-							</article>
-					 	</div>
-					</div>
-		<!-- end-of-column-1 line number and text container-->
-
-
-
-		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 <div id="secondColumnContainer" class="layout horizontal flex-1 columnContainer" >
-					 	<div id="linenumbersright" class="layout vertical line-number">
-
-					 		 	<template is="dom-repeat" items='{{longestLineNumberArrayTwo}}' >	
-     								<span hidden="{{!item.show}}" filter='{{columnTwoLineNumbersFilter(last_row, num_lines)}}'>{{item.number}}</span>
-     								<span hidden="{{item.show}}">&nbsp</span>
-    							</template>	
-					 	</div>
-
-
-						<div id="colDos" class="layout vertical text">
+		<div
+			id="doubleColumnPassageContainer"
+			class="layout horizontal flex container"
+		>
+			<div 
+				id="firstColumnContainer" 
+				class="layout horizontal flex-1 container columnContainer" 
+				style="padding-right: 12px; overflow-y:scroll;"
+			>
+				<div 
+					id="linenumbers" 
+					class="layout vertical line-number"
+				><!--Start of Column-One-Line-Numbers-->
+					<span 
+						id="lines" 
+						class="line-numbers"
+					>Lines
+					</span>
+					<template
+						id="repeaterForLineNumbersOne" 
+						is="dom-repeat" 
+						items="{{LineNumberArrayTwo}}" 
+						filter='{{columnOneLineNumbersFilter(last_row,num_lines)}}'
+					>
+     					<span 
+     						id$="{{item.number}}"
+     						hidden="{{!item.show}}">{{item.number}}</span>
+     					<span 
+     						id$="hidden_{{item.number}}"
+     						hidden="{{item.show}}"
+     						>&nbsp
+     						</span>
+    				</template>
+    			</div><!--END OF COLUMN ONE LINE NUMBERS-->
+				<div 
+					id="ColumnOne" 
+					class="layout horizontal flex wrap text"
+				><!--START OF COLUMN ONE TEXT-->
+				 	<article 
+				 		id="textColumnOne"
+				 		>
+				 	    <template 
+				 	    	id='columnOneDomRepeat' 
+				 	    	is="dom-repeat" 
+				 	    	items="{{theContent}}" 
+				 	    	observe='{{order}}' 
+				 	    	filter='{{columnOneWordFilter(firstColumnLastWordIndex, secondColumnFirstWordIndex)}}'
+				 	    >
+							<template 
+								is="dom-if" 
+								if="{{item.newPara}}"
+							>
+								<br>
+								<span>&nbsp&nbsp&nbsp&nbsp
+								</span>
+							</template>
+							<a 
+								id$="one_{{item.order}}" 
+								invisibility="{{invisibility}}"
+							>{{item.word}}
+							</a>
+						</template>
+						<br id="measurer" class="line-numbers">
+						<hr>
+						<span 
+							id="doubleColumnBounderOne"
+							class="right right-justified line-numbers" 
+							style="float:right; text-align: right;"
+							> 
+							Focused Coaching (c) 2016
+						</span>
+					</article>
+				</div>
+			</div>				<!-- end-of-column-1 line number and text container-->
+			<div 
+				id="secondColumnContainer" 
+				class="layout horizontal flex-1 columnContainer" 
+			>
+				<div 
+					id="linenumbersright" 
+					class="layout vertical line-number"
+				>
+					<template
+						id="repeaterColTwoLineNums" 
+						is="dom-repeat" 
+						items='{{LineNumberArrayTwo}}'
+					>	
+     					<span 
+     						id$="hiddenLinesTwo_{{item.number}}" 
+     						hidden="{{!item.show}}" 
+     						filter='{{columnTwoLineNumbersFilter(last_row, num_lines)}}'>
+     						{{item.number}}
+     					</span>
+     					<span hidden="{{item.show}}">&nbsp</span>
+    				</template>	
+				</div>
+				<div id="colDos" class="layout vertical text">
 					 		<article id="textColumnTwo">
 <!--FILTER WORDS COL TWO-->									
 								<template is="dom-repeat" items="{{theContent}}" filter='{{columnTwoWordFilter(firstColumnLastWordIndex, secondColumnFirstWordIndex, lastWordIndex)}}'>
@@ -104,11 +155,13 @@
 Polymer({
 	is: 'fc-double-column-layout',
 	behaviors: [Polymer.IronResizableBehavior],
-		properties: {
+	properties: {
 
 		theContent:{
 			type: Array, 
-			value: [],
+			value: function(){
+				return []
+			},
 			notify: true, 
 			reflectToAttibutes: true 
 		},
@@ -146,7 +199,9 @@ Polymer({
 
 		secondColumnFirstWordIndex: {
 			type: Number,
-			value: 456,
+			value: function(){
+				return 456;
+			},
 			notify: true
 		},
 		
@@ -185,7 +240,7 @@ Polymer({
 	},
 
 ready: function(){
-	console.log('READY');
+	console.log('READY DOUBLE COLUMN');
 	this.longestLineNumberArrayThree=[];
 	this.longestLineNumberArrayTwo=[];
 		for(i=1; i <= 180; i++)
@@ -194,14 +249,15 @@ ready: function(){
 			this.push("longestLineNumberArrayThree", {'number': i, 'show': j});
 			this.push("longestLineNumberArrayTwo", {'number': i, 'show': j});
 		}
+	this.goldenRatio = (Math.floor(.618*this.lastWordIndex)!=undefined) ? Math.floor(.618*this.lastWordIndex): 545;
+	this.firstColumnLastWordIndex = (this.goldenRatio!=undefined) ? this.goldenRatio: 545;
+	this.secondColumnFirstWordIndex = (this.firstColumnLastWordIndex!=undefined) ? this.goldenRatio+1:546
 },
 
 attached: function(){ this.loadContent();
-// 	this.goldenRatio = (Math.floor(.618*this.lastWordIndex)!=undefined) ? Math.floor(.618*this.lastWordIndex): 545;
-// 	this.firstColumnLastWordIndex = (this.goldenRatio!=undefined) ? this.goldenRatio: 545;
-// 	this.secondColumnFirstWordIndex = (this.firstColumnLastWordIndex!=undefined) ? this.goldenRatio+1:546
-// 	console.log("firstColumnLastWordIndex: " + this.firstColumnLastWordIndex);
-// 	console.log("secondColumnFirstWordIndex: " + this.secondColumnFirstWordIndex);	
+
+console.log("firstColumnLastWordIndex: " + this.firstColumnLastWordIndex);
+console.log("secondColumnFirstWordIndex: " + this.secondColumnFirstWordIndex);	
  },
 
 loadContent: function(){
@@ -275,7 +331,7 @@ growFirstColumn: function(numberAhead){
 
 		this.columnOneLineNumbersFilter(this.last_row, this.num_lines);
 		this.columnTwoLineNumbersFilter(this.last_row, this.num_lines);
-	console.log( 'number two columns ' + this.last_row + " " + this.num_lines);
+		console.log( 'number two columns ' + this.last_row + " " + this.num_lines);
 	},
 
 	columnOneWordFilter: function(finalWordColOne){
@@ -317,31 +373,3 @@ growFirstColumn: function(numberAhead){
 
 </script>
 </dom-module>
-<!--	passageOneFilter: function(showSecond, finalWord){
-		if(showSecond==true && (this.finalColumnOneWordIndex-10)<this.secondColumnFirstWordIndex){
-			return (item)=>{
-				return (item.order <= this.finalColumnOneWordIndex);
-			};
-		} 
-		else if(showSecond==true){
-			return (item)=>{
-				return (item.order < this.secondColumnFirstWordIndex);
-				}
-			}
-		else{
-			return (items)=>{ return false
-			};
-		}
-	},
-	
-	passageTwoFilter: function(showSecond, finalWord){
-		if(showSecond==true){
-			return (item)=>{
-				return (item.order > this.finalColumnOneWordIndex);
-			};
-		} else {
-			return (item)=>{
-				return false;
-			};
-	}
-}

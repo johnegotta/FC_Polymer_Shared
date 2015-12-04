@@ -1,6 +1,6 @@
 <dom-module id="fc-reading-passage-five">	
 <template>
-<style is="custom-style">
+<style>
 	
 		div.columnContainer{
 			overflow-y: scroll;
@@ -25,18 +25,18 @@
 </style>
 
 <!--double-column line-number and passage vertical container--> 
-			<div id="noJudge" class="layout vertical flex container left passageContainer">
+	<div id="noJudge" class="layout vertical flex container left passageContainer">
 	<!--blurb full width container-->
-					<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
-					{{passageBlurb}}
-					</div>
+		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+			{{passageBlurb}}
+		</div>
 
 	<!--single column container-->
 			
 		<!-- end-of-column-1 line number and text container-->
 		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
 					
-					<fc-single-column-layout id="singleDisplay" theContent='{{passageArray}}'hidden='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-single-column-layout id="singleDisplay" theContent='{{passageArrayOne}}'hidden='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
 					</fc-single-column-layout>
 		
 		</div>
@@ -45,7 +45,7 @@
 
 		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
 					
-					<fc-double-column-layout id="doubleDisplay" theContent='{{passageArrayThree}}' shown='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-double-column-layout id="doubleDisplay" theContent='{{passageArrayOne}}' shown='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
 					</fc-double-column-layout>
 		
 		</div>
@@ -62,7 +62,7 @@ Polymer({
 	properties: {
 		passagePath: {
 			type: String,
-			value: 'new_Passage_4',
+			value: 'new_Test_1',
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -74,26 +74,11 @@ Polymer({
 		},
 		passageArrayOne:{
 			type: Array, 
-			value: [],
+			value: function(){
+				return []
+			},
 			notify: true, 
 			reflectToAttibutes: true 
-		},
-		passageArray:{
-			type: Array, 
-			value: [],
-			notify: true, 
-			reflectToAttibutes: true 
-		},
-		passageArrayThree:{
-			type: Array, 
-			value: [],
-			notify: true, 
-			reflectToAttibutes: true 
-		},
-		wordArray: {
-			type: Array,
-			value: [],
-			notify: true
 		},
 		
 		passageTitle: {
@@ -101,18 +86,14 @@ Polymer({
 			notify: true,
 			reflectToAttributes: true
 		},
-		numWords: {
-			type: Number,
-			notify: true,
-			reflectToAttributes: true
-		},
+
 		passageBlurb:{
 			type: String,
 			value: 'none',
 			reflectToAttributes: true,
 			notify: true
 		},
-		lastWordIndex:{
+		lastWordIndex: {
 			type: Number,
 			value: 0,
 			notify: true
@@ -122,35 +103,26 @@ Polymer({
 			value: false,
 			notify: true, 
 			reflectToAttributes: true
-		},
-		notify: true,
-		reflectToAttributes: true
+		}
 	},
-	ready: function(passagePath){
-		this.passagePath = (this.passagePath === undefined) ? 'new_Passage_3' : this.passagePath;
-		this.fullPassagePath = 'https://focused0ne.firebaseio.com/passagesDestinations/' +passagePath
-		this.passageArrayOne=[];
+	ready: function(){
+		//this.passagePath = (this.passagePath === undefined) ? 'new_Passage_1' : this.passagePath;
+		this.passageFullPath = 'https://focusedstaging1.firebaseio.com/passagesDestinations/' + passagePath;
+		console.log('READY READING FIVE');
 		var self = this;
-		var ref = new Firebase("https://focused0ne.firebaseio.com/passagesDestinations/new_Passage_1");
+		var ref = new Firebase(self.fullPassagePath);
 		ref.on("value", function(snap){
-			passageArrayOne=snap.val();
-			console.log(self.passageArrayOne);
-			self.lastWordIndex = self.numWords-1;
+			self.passageArrayOne=snap.val();
+			console.log(snap.val());
+			self.lastWordIndex = self.passageArrayOne;
 			self.$.singleDisplay.lastWordIndex=self.lastWordIndex;
 			self.$.doubleDisplay.lastWordIndex=self.lastWordIndex;
-			self.passageTitle = self.passageArrayOne[64].passageTitle;
-			self.passageBlurb = self.passageArrayOne[64].passageBlurb;
-			var j=0;
-			self.passageArray =[];
-			for(j=0; j<self.numWords;j++){
-				self.push("passageArray", self.passageArrayOne[j]);
-				self.push("passageArrayThree", self.passageArrayOne[j])
-			}
-		
+			self.passageTitle = self.passageArray[4].passageTitle;
+			self.passageBlurb = self.passageArray[4].passageBlurb;
 		});
+
+
 	},
-
-
 
 	notifyResize: function(){
 		this.setUp();

@@ -1,17 +1,38 @@
 <dom-module id="fc-tabbed-drawer">
 <template>
      <style>
+     .biggerBetter{
+width: 100%
+font-weight: 700;
+font-size: 1.5em;
+font-family: times;
+font-color: brown;
+border-bottom: 6px ridge silver;
+}
+:host{height: 100%;}
      </style>
+
      <paper-tabs 
           hideScrollButtons="true" 
           class="layout horizontal biggerBetter flex wrap container center center-justified" 
-          scrollable="true">
-          	<paper-tab 
-                    name="to-do-list">				
-                	   To-Do (<span class="style-scope app-cart">4</span>)
-            	</paper-tab>
+          scrollable="true"
+          selected="{{selected}}">
+               <template 
+                    is="dom-repeat" 
+                    class="layout horizontal fit"        
+                    items="{{tabsObjectArray}}"
+                    >
+          	    <paper-tab
+                         id$="{{item.tabName}}_{{item.tabNumber}}" 
+                         name="{{item.tabName}}"
+                         fc-pages={{selected}}
+                         >
+                         <span>{{item.tabName}}</span><span>{{item.tabNotification}}</span>			
+            	       </paper-tab>
+               </template>
   			<paper-tab 
-                    name="test-generation">
+                    name="test-generation"
+                    >
                          Test Generation 
  			</paper-tab>
  			<paper-tab 
@@ -32,13 +53,14 @@
     			</paper-tab>
     	</paper-tabs>
           <iron-selector>
-               <iron-pages>
-                    <div>
-                    <fc-model-one-card>
-                    <fc-header></fc-header>
-                    <section>
-                         <div id="download" class="style-scope app-cart iron-selected">
-                              <section 
+               <iron-pages selected="{{selected}}">
+                   
+               <!--    <fc-to-do-list id="ToDo" selectable="true">
+                   </fc-to-do-list>-->
+
+                  
+                         <div id="download" class="style-scope app-cart" fc-pages='0'>
+                         <section
                                    class="style-scope app-cart">
                                    <h4 
                                         class="style-scope app-cart">
@@ -82,7 +104,7 @@
                                         </paper-radio-button>
                                         <paper-radio-button 
                                              name="bower" 
-                                             class="style-scope app-cart x-scope paper-radio-button-0 iron-selected" 
+                                             class="style-scope app-cart x-scope paper-radio-button-0" 
                                              role="radio" 
                                              tabindex="0" 
                                              toggles="" 
@@ -139,8 +161,178 @@
                          </textarea>
                     </section>
                </div>
-          </section>
-     </fc-model-one-card>
-</div>
+               <div id="testCreation" fc-pages="1">
+                    <section>
+                    Hello, how are you!!!?
+                    </section>
+               </div>
+
+
 </iron-pages>
 </iron-selector>
+</template>
+<script>
+FcTabbedDrawer=Polymer({
+     is:"fc-tabbed-drawer",
+   //  behaviors: [Polymer.IronResizeableBehavior],
+     properties: {
+          tabsArrayObjectZero: {
+               type: Object,
+               value: {                    
+                         tabsGroupName: { 
+                              type: String, 
+                              value: "new_Tabs_Number",
+                              notify: true
+                         },
+                         tabsGroupNumber:{
+                              type: Number,
+                              value: 1,
+                              notify: true
+                         },
+                         numberOfTabs: {
+                              type: Number, 
+                              value: 6,
+                              reflectToAttribute: true,
+                              notify: true
+                         },
+                         namesOfTabs: {
+                              type: String,
+                              value: 'tabOne',
+                              notify: true
+                         },
+                         styleObject: {
+                              type: Object,
+                              value: function(){
+                                   var styleObject = {
+                                        "height": "100%",
+                                        "overflow-y": "scroll",
+                                        "border": "4px #000066 double",
+                                        "resize": "vertical"
+                                   }
+                                   return this.styleObject;
+                                   },
+                              notify: true,
+                              reflectToAttribute: true
+                         },
+                         foundHeight: {
+                              type: String,
+                              value: function(){
+                                 //  var currentHeight=this.clientHeight;
+
+                                   return "900px";
+                              },
+                              notify: true,
+                              reflectToAttribute: true
+
+                         },
+                         foundWidth: {
+                              type: String,
+                              value: function(){
+                                  // var currentWidth=this.clientWidth;
+
+                                   return "480px";
+                              },
+                              notify: true,
+                              reflectToAttribute: true
+
+                         },
+                         userType: {
+                              type: String, 
+                              value: "admin",
+                              notify: true
+                         },
+                         headerAdded: {
+                              type: Boolean,
+                              value: false, 
+                              notify: true,
+                              reflectToAttribute: true 
+                         },
+                         header:{
+                                   type: String,
+                                   value:'My Header',
+                                   notify: true
+                         },
+                         profileAdded:{ 
+                              type: Boolean,
+                              value: false, 
+                              notify: true,
+                              reflectToAttribute: true 
+                         },
+                         profileObject: {
+                              type: Object, 
+                              value: function(){
+                              return {
+                                   "stuff": "value", 
+                                   "stuff": "value",  
+                                   "stuff": "value", 
+                                   "stuff": "value",                                   
+                                   "stuff": "value"
+                                   }
+                              },
+                              notify: true
+                         },
+                         imageAdded:{ 
+                              type: Boolean,
+                              value: false, 
+                              notify: true,
+                              reflectToAttribute: true 
+                         },
+                         srcImg: {
+                              type: String, 
+                              value: "../../../images/icon_menu/sail-icons/silver_sail_small.png", 
+                              notify: true
+                         }, 
+                         rows:{
+                              type: Boolean,
+                              value: true,
+                              notify: true
+                         },
+                         dataDensity: {
+                              type: Number,
+                              value: 1,
+                              //1-4 shpuld read device
+                              notify: true
+                         },
+                         numberOfRowsOrColumns: {
+                              type: Number,
+                              value: 5,
+                              //value: '_computed(foundHeight, foundWidth, dataDensity)',
+                              notify: true
+                         },
+
+                         firebaseLocation: {
+                              type: String, 
+                              value: "admin",
+                              notify: true
+                         }
+
+
+                    },
+                    notify: true
+               
+               }
+
+          },
+
+created: function(){
+     this.fcPages=0;
+
+
+
+
+
+
+},
+
+ready: function(){}
+
+
+
+});
+</script>
+</dom-module>
+
+<!--     this.setAttribute.style.height= 100%;
+                         this.setAttribute.style.overflowY= scroll;
+                         this.setAttribute.style.border=4px #000066 double;
+                         this.setAttribute.style.resize= vertical;-->
