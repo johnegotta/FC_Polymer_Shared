@@ -1,114 +1,135 @@
-<dom-module id="fc-double-column-layout">
-<template>
-<style>
-		div.line-number {
-			width: 28px;
-			line-height: 1.2;
-			font-size: 14pt;
-			font-size: 1.25em;
-			font-family: merriweather;
-			font-weight: 500;
-			font-style: italic;
-			padding: 6px 0px 6px 0px;
-			margin: 6px 0px 6px 0px;
-			
-		}
-		div.columnContainer{
-			overflow-y: scroll;
-		}
+
+theContentBehaviors: 
+
+
+var butItsOnlyTwoColumns= this.textContentProperties: {
+
+properties: {
+		contentShortPath: {
+			type: String,
+			value: 'new_Test_1',
+			notify: true,
+
+		},
+		contentFullPath: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageCount: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		passageArray:{
+			type: Array, 
+			value: function(){
+				return [];
+			},
+			notify: true, 
+			reflectToAttibutes: true 
+		},
+		numWords: {
+			type: Number,
+			notify: true,
+			reflectToAttributes: true
+		},
 		
-		.highlighted {
-			background: yellow;
-		}
+		goldenDist:{
+			type: Number,
+			notify: true
+		},
+		//+=- 1
+		lineNumberArray:{
+			type: Array,
+			value: function(){
+				return [];
+			},
+			notify: true
+		},
 		
-		div.text {
-			line-height: 1.2;
-			font-size: 14pt;
-			font-size: 1.25em;
-			font-family: merriweather;
-			font-weight: 500;
-			padding: 6px;
-			margin: 6px 0px 6px 0px;
-			min-height: 720px !important;
-			display: flex;
-			min-width: 260px !important;
-			max-width: 680px !important;	
+		passageTitle: {
+			type: String, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageBlurb:{
+			type: String,
+			value: 'Get The Blurbs',
+			reflectToAttributes: true,
+			notify: true
 		}
-</style>
+create: function(elementsToSeed[];)
+		linesH: {
+			type: String,
+			value: '',
+			notify: true
+		},
+		showingSecondColumn: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		lastRow:{
+			type: Number,
+			notify: true,
+		},
+		goldenRatio: {
+			type: Number,
+			notify: true,
+			reflectToAttributes: true
+		},
+		finalColumnOneWordIndex: {
+			type: Number,
+			notify: true
+		},
 		
+		idPlus:{
+			type: Number,
+			notify: true
+		},
+		lastWord:{
+			type: String,
+			notify: true
+		},
+		deltaWords:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		secondColumnFirstWordIndex:{
+			type: Number,
+			notify: true
+
+	ready: function(){
+		console.log("READY");
+		for(i=1; i <= 200; i++)
+			{
+			j=	i % 5 ? false: true;
+			this.push("LineNumberArray", {'number': i, 'show': j});
+			this.push("LineNumberArrayTwo", {'number': i, 'show': j});
+			this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
+			this.push("longestLineNumberArray", {'number': i, 'show': j});
+			}	
+		this.passageArrayOne=[];
+		var self = this;
+		var ref = new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations/" + this.passagePath);
+		ref.on("value", function(snap){
+			self.passageArrayOne=[];
+			self.passageArrayOne = snap.val();
+			self.numWords = self.passageArrayOne.length;
+			self.lastWord = self.numWords-1;
+			self.goldenRatio = Math.floor(.618*self.numWords);
+			self.finalColumnOneWordIndex = self.goldenRatio;
+			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
+			self.passageTitle = self.passageArrayOne[58].passageTitle;
+			self.passageBlurb = self.passageArrayOne[58].passageBlurb;
+		});
+	},
 
 
-		<div id="doubleColumnContainer" class="layout horizontal flex container">
-						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 8px; overflow-y:scroll;">
-			<!--Line number container-->
-					 		<div id="linenumbers" class="layout vertical line-number">
-					 		<div id="lines" class="line-numbers">Lines</div>
-					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter="{{passageOneLineNumberFilter(num_lines_one)}}">
-     								<span hidden="{{!item.show}}" id$="col_one_line_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
-    							</template>
-    							
-					 		</div>
-			<!--passage-1-column-1 container-->
-					 		<div id="colUno" class="layout horizontal flex wrap text">
-					 		<article id="textColumnOne">
-					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageOneFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id$="one_{{item.order}}" invisibility="false" hidden$="{{oneGone}}">{{item.word}}</a>
-								</template>
-								<br class="line-numbers">
-								<hr>
-								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
-							</article>
-					 		</div>
-					 	</div>
-		<!-- end-of-column-1 line number and text container-->
-
-
-
-		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 8px;overflow-y:scroll;">
-			<!--Line number container-->
-					 		<div id="linenumbersright" class="layout vertical line-number">
-					 			<div class="line-numbers" id="linesB2">Lines</div>
-					 		 	<template is="dom-repeat" items="{{LineNumberArray}}" filter="{{passageTwoLineNumberFilter(start_lines_two,num_lines_two)}}">
-     								<span hidden="{{!item.show}}" id$="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
-     								
-    							</template>	
-					 		</div>
-			<!--end of passage-1-column-1 line number container-->
-			<!--passage-1-column-2 container-->
-					 		<div id="colDos" class="layout vertical text">
-					 		<article id="textColumnTwo">
-					 			<div class="line-numbers"><span>&nbsp </span></div>
-								<template is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageTwoFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id$="one_{{item.order}}" hidden$="{{!oneGone}}">{{item.word}}</a>
-								</template>
-								<br class="line-numbers">
-								<hr>
-								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
-							</article>
-					 		</div>
-		<!--passage-1-column-2 container-->
-					 	</div>
-	<!--end of flex passage column container-->
-				</div>
-<!--End of top container horizontal-->
-			
-	<!--end of flex passage column container-->
-
-</template>
-<script>
-Polymer({
-	is: 'fc-double-column-layout',
-	//behaviors: ,
-	properties: {
-
-		theContent:{
+theContent:{
 			type: Array, 
 			value: function(){
 				return []
@@ -119,8 +140,7 @@ Polymer({
 		lastWordIndex:{
 			type: Number,
 			value: function(){
-				var number = (this.$$fcReadingPassageFive.lastWordIndex===undefined) ? 735:this.$$fcReadingPassageFive.lastWordIndex;	
-				return number;
+				return this.$$fcReadingPassageFive.lastWordIndex;	
 			},
 			notify: true
 			
@@ -344,5 +364,3 @@ Polymer({
 		};
 	}
 });
-</script>
-</dom-module>

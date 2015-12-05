@@ -83,8 +83,10 @@ Polymer({
 		
 		passageTitle: {
 			type: String, 
+			
+			value: 'Focused Reading Passage',
 			notify: true,
-			reflectToAttributes: true
+			reflectToAttributes: true,
 		},
 
 		passageBlurb:{
@@ -126,7 +128,8 @@ Polymer({
 
 	notifyResize: function(){
 		this.setUp();
-		this.$.singleDisplay.lastWordIndex=this.lastWordIndex;
+		return (lastWordIndex)=>{this.$.singleDisplay.lastWordIndex=this.lastWordIndex};
+		return (lastWordIndex)=>{this.$.doubleDisplay.lastWordIndex=this.lastWordIndex};
 		this.$.doubleDisplay.lastWordIndex=this.lastWordIndex;
 		this.$.doubleDisplay.firstColumnLastWordIndex = Math.floor(.618*this.lastWordIndex);
 		this.$.doubleDisplay.secondColumnFirstWordIndex = this.finalColumnOneWordIndex+1;
@@ -136,17 +139,36 @@ Polymer({
 	
 	setUp: function()
 	{
-		this.screenTrueHeight =  (window.innerHeight-340);
-		if(this.$.noJudge4.clientWidth >= 640)
-			{
+		// this.screenTrueHeight =  (window.innerHeight-340);
+		// if(this.$.noJudge4.clientWidth >= 640)
+		// 	{
+		// 		this.showingSecondColumn = true;
+		// 		this.$.doubleDisplay.notifyResize();
+		// 	}	
+		// else
+		// 	{ 
+		// 		this.showingSecondColumn = false;
+		// 		this.$.singleDisplay.notifyResize();
+		// 	}
+		this.screenTrueHeight = (window.innerHeight-340);
+		this.textColumnOneHeight = this.$.singleDisplay.scrollHeight;
+		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50){
+			if(this.$.noJudge4.clientWidth >= 660 && this.textColumnOneHeight>this.screenTrueHeight){
 				this.showingSecondColumn = true;
-				this.$.doubleDisplay.notifyResize();
-			}	
-		else
-			{ 
-				this.showingSecondColumn = false;
-				this.$.singleDisplay.notifyResize();
+				return (showingSecondColumn)=>{this.$.doubleDisplay.notifyResize(this.$.doubleDisplay.numberTwoColumns(this.$.doubleDisplay._adjustDoubleColumns(showingSecondColumn)))};
+				console.log('setUp2col');
 			}
+			else{ 
+				this.$.doubleColumnContainer.hidden = true;
+				this.$.singleColumnContainer.hidden = false;
+				  this.showingSecondColumn = false;
+				  this.numberOneColumn(this.showingSecondColumn);
+				  console.log('setUp1col');
+				
+			}
+		}
+
+
 	}
 
 
