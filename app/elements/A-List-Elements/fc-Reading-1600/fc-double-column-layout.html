@@ -48,17 +48,17 @@
 				<div 
 					id="linenumbers" 
 					class="layout vertical line-number"
-				><!--Start of Column-One-Line-Numbers-->
-					<span 
+				>
+					<div
 						id="lines" 
 						class="line-numbers"
 					>Lines
-					</span>
+					</div>
 					<template
 						id="repeaterForLineNumbersOne" 
 						is="dom-repeat" 
 						items="{{LineNumberArrayTwo}}" 
-						filter='{{columnOneLineNumbersFilter(last_row,num_lines)}}'
+						filter='{{columnOneLineNumbersFilter(num_lines)}}'
 					>
      					<span 
      						id$="{{item.number}}"
@@ -118,15 +118,22 @@
 					id="linenumbersright" 
 					class="layout vertical line-number"
 				>
+				<div 
+						id="lines" 
+						class="line-numbers"
+						style="margin-right: 12px;"
+					>Lines
+					</div>
 					<template
 						id="repeaterColTwoLineNums" 
 						is="dom-repeat" 
 						items='{{LineNumberArrayTwo}}'
+						filter='{{columnTwoLineNumbersFilter(last_row, num_lines)}}'
 					>	
      					<span 
      						id$="hiddenLinesTwo_{{item.number}}" 
      						hidden="{{!item.show}}" 
-     						filter='{{columnTwoLineNumbersFilter(last_row, num_lines)}}'>
+     						>
      						{{item.number}}
      					</span>
      					<span hidden="{{item.show}}">&nbsp</span>
@@ -135,7 +142,10 @@
 				<div id="colDos" class="layout vertical text">
 					 		<article id="textColumnTwo">
 <!--FILTER WORDS COL TWO-->									
-								<template is="dom-repeat" items="{{theContent}}" filter='{{columnTwoWordFilter(firstColumnLastWordIndex, secondColumnFirstWordIndex, lastWordIndex)}}'>
+								<template 
+								is="dom-repeat" 
+								items="{{theContent}}" 
+								filter='{{columnTwoWordFilter(firstColumnLastWordIndex, secondColumnFirstWordIndex, lastWordIndex)}}'>
 	 									<template is="dom-if" if="{{item.newPara}}">
  											<br>
  											<span>&nbsp&nbsp&nbsp&nbsp</span>
@@ -149,7 +159,7 @@
 						</div>
 		</div>
 	<!--end of flex passage column container-->
-</div>
+	</div>
 </template>
 <script>
 Polymer({
@@ -163,15 +173,14 @@ Polymer({
 				return []
 			},
 			notify: true, 
-			reflectToAttibutes: true 
+			reflectToAttibute: true 
 		},
 	
 
 		lastWordIndex:{
 			type: Number,
 			notify: true,
-			reflectToAttributes: true,
-			observer: 'gotRealWordCount'
+			reflectToAttribute: true
 		},
 		
 		longestLineNumberArrayThree:{
@@ -193,7 +202,9 @@ Polymer({
 		},
 		firstColumnLastWordIndex: {
 			type: Number,
-			value: 455,
+			value: function(){
+				return 456;
+			},
 			notify: true
 		},
 
@@ -207,6 +218,7 @@ Polymer({
 		
 		lastRow:{
 			type: Number,
+			value: 111,
 			notify: true,
 		},
 		columnOneLastRow:{
@@ -233,101 +245,109 @@ Polymer({
 			type: Number,
 			value: 500,
 			notify: true
-
-
+		},
+		num_lines:{
+			type: Number,
+			value: 56,
+			notify: true
+		},
+		num_lines_two: {
+			type: Number,
+			value: 96,
+			notify: true
 		}
 
 	},
 
-ready: function(){
-	console.log('READY DOUBLE COLUMN');
-	this.longestLineNumberArrayThree=[];
-	this.longestLineNumberArrayTwo=[];
+	ready: function(){
+		console.log('READY DOUBLE COLUMN');
+		this.longestLineNumberArrayThree=[];
+		this.longestLineNumberArrayTwo=[];
 		for(i=1; i <= 180; i++)
 		{
 			j=	i % 5 ? false: true;
 			this.push("longestLineNumberArrayThree", {'number': i, 'show': j});
 			this.push("longestLineNumberArrayTwo", {'number': i, 'show': j});
 		}
-	this.goldenRatio = (Math.floor(.618*this.lastWordIndex)!=undefined) ? Math.floor(.618*this.lastWordIndex): 545;
-	this.firstColumnLastWordIndex = (this.goldenRatio!=undefined) ? this.goldenRatio: 545;
-	this.secondColumnFirstWordIndex = (this.firstColumnLastWordIndex!=undefined) ? this.goldenRatio+1:546
-},
+		this.goldenRatio = (Math.floor(.618*this.lastWordIndex)!=undefined) ? Math.floor(.618*this.lastWordIndex): 545;
+		this.firstColumnLastWordIndex = (this.goldenRatio!=undefined) ? this.goldenRatio: 545;
+		this.secondColumnFirstWordIndex = (this.firstColumnLastWordIndex!=undefined) ? this.goldenRatio+1:546
+	},
 
-attached: function(){ this.loadContent();
+	attached: function(){ this.loadContent();
+		console.log("firstColumnLastWordIndex: " + this.firstColumnLastWordIndex);
+		console.log("secondColumnFirstWordIndex: " + this.secondColumnFirstWordIndex);	
+	 },
 
-console.log("firstColumnLastWordIndex: " + this.firstColumnLastWordIndex);
-console.log("secondColumnFirstWordIndex: " + this.secondColumnFirstWordIndex);	
- },
+	loadContent: function(){
+		//this.notifyResize();
+	},
 
-loadContent: function(){
-	//this.notifyResize();
-},
+	notifyResize: function(){
+		console.log('NOTIFY RESIZE');
+		//this._adjustDoubleColumns(this.firstColumnLastWordIndex);
+	},
+	gotRealWordCount: function(newValue, oldValue){
+		console.log('GOT REAL WORD COUNT');
+		console.log(newValue);
+		console.log(oldValue);
+		this._adjustDoubleColumns(newValue);
+		this.numberTwoColumns();
+	},
 
-notifyResize: function(){
-	console.log('NOTIFY RESIZE');
-	//this._adjustDoubleColumns(this.firstColumnLastWordIndex);
-},
-gotRealWordCount: function(newValue, oldValue){
-	console.log('GOT REAL WORD COUNT');
-	console.log(newValue);
-	console.log(oldValue);
-	this._adjustDoubleColumns(newValue);
-	this.numberTwoColumns();
-},
-
-growFirstColumn: function(numberAhead){
-				var self=this;
-				alert("growing the right side");
-				var numberAhead=0;
-				while(numberAhead>-8){
-				self.firstWordAnchor =  this.$$('#one_'+ self.secondColumnFirstWordIndex.toString());
-					var top_of_line_to_reclaim = self.firstWordAnchor.getBoundingClientRect().top;
-					var nextAnchor = self.firstWordAnchor;
-					var top_of_next_anchor = top_of_line_to_reclaim;
-				while(top_of_line_to_reclaim == top_of_next_anchor){				
-					nextAnchor = nextAnchor.nextSibling;	
-					if(nextAnchor.nodeName == self.firstWordAnchor.nodeName){
-						console.log(nextAnchor.nodeName +  ' node two: ' + self.firstWordAnchor.nodeName);
-						top_of_next_anchor = nextAnchor.getBoundingClientRect().top;
-						self.numberPlus--;
-					}
+	growFirstColumn: function(numberAhead){
+		var self=this;
+		alert("growing the right side");
+		var numberAhead=0;
+		while(numberAhead>-8){
+			self.firstWordAnchor =  this.$$('#one_'+ self.secondColumnFirstWordIndex.toString());
+			var top_of_line_to_reclaim = self.firstWordAnchor.getBoundingClientRect().top;
+			var nextAnchor = self.firstWordAnchor;
+			var top_of_next_anchor = top_of_line_to_reclaim;
+			while(top_of_line_to_reclaim == top_of_next_anchor){				
+				nextAnchor = nextAnchor.nextSibling;	
+				if(nextAnchor.nodeName == self.firstWordAnchor.nodeName){
+					console.log(nextAnchor.nodeName +  ' node two: ' + self.firstWordAnchor.nodeName);
+					top_of_next_anchor = nextAnchor.getBoundingClientRect().top;
+					self.numberPlus--;
 				}
-			}		
-		},
+			}
+		}		
+	},
 	_adjustDoubleColumns: function(newValue){
-				this.firstColumnLastWordIndex = (this.firstColumnLastWordIndex==undefined || this.firstColumnLastWordIndex<.53*newValue) ? .618*(newValue): this.firstColumnLastWordIndex;
-				var theId = '#one_'+ this.firstColumnLastWordIndex.toString()
-				var finalWordAnchor = this.$$(theId);
-				var bottom_of_line_to_cut = (finalWordAnchor != undefined)? finalWordAnchor.getBoundingClientRect().bottom: this.$.doubleColumnBounderOne.getBoundingClientRect().bottom>80;
-				var previousAnchor = finalWordAnchor;
-				var bottom_of_previous_anchor = bottom_of_line_to_cut;
-				var howManyAheadOfFinalColumnOneWord = 0;
+		this.firstColumnLastWordIndex = (this.firstColumnLastWordIndex==undefined || this.firstColumnLastWordIndex<.53*newValue) ? Math.floor(.618*(newValue)): this.firstColumnLastWordIndex;
+		var theId = '#one_'+ this.firstColumnLastWordIndex.toString()
+		var finalWordAnchor = this.$$(theId);
+		var bottom_of_line_to_cut = (finalWordAnchor != undefined)? finalWordAnchor.getBoundingClientRect().bottom: this.$.doubleColumnBounderOne.getBoundingClientRect().bottom;
+		var previousAnchor = finalWordAnchor;
+		var bottom_of_previous_anchor = bottom_of_line_to_cut;
+		var howManyAheadOfFinalColumnOneWord = 0;
+		
+		while(howManyAheadOfFinalColumnOneWord <12 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+			previousAnchor = previousAnchor.previousSibling;
+			if(previousAnchor.nodeName == finalWordAnchor.nodeName){
+				console.log(previousAnchor.nodeName +  ' : compare node to node : ' + finalWordAnchor.nodeName);
+				bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
+				howManyAheadOfFinalColumnOneWord++;
+				self.numberPlus = howManyAheadOfFinalColumnOneWord;
+			}
+		}
 				
-				while(howManyAheadOfFinalColumnOneWord <12 && bottom_of_previous_anchor == bottom_of_line_to_cut){
-					previousAnchor = previousAnchor.previousSibling;
-					if(previousAnchor.nodeName == finalWordAnchor.nodeName){
-						console.log(previousAnchor.nodeName +  ' : compare node to node : ' + finalWordAnchor.nodeName);
-						bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
-						howManyAheadOfFinalColumnOneWord++;
-						self.numberPlus = howManyAheadOfFinalColumnOneWord;
-					}
-				}
-				
-			this.firstColumnLastWordIndex = this.firstColumnLastWordIndex - howManyAheadOfFinalColumnOneWord;
+		this.firstColumnLastWordIndex = this.firstColumnLastWordIndex - howManyAheadOfFinalColumnOneWord;
 					console.log(this.firstColumnLastWordIndex);
-			},
+	},
 
 	numberTwoColumns: function(){
-		 var top_of_first_column = this.$.lines.getBoundingClientRect().top;
-		 var last_word = this.$.doubleColumnBounderOne;
-		 var last_word_rect =  last_word.client;
-		 var line_height = this.$.lines.clientHeight;
-		 var delta = last_word_rect - top_of_first_column;
-		 this.num_lines = Math.ceil(delta/line_height);
-		 var deltaTwo = top_of_first_column - this.$.doubleColumnBounderTwo.getBoundingClientRect().bottom;
-		 this.num_lines_two = Math.ceil(deltaTwo/line_height);
-		 this.last_row = this.num_lines + this.num_lines_two;
+		var top_of_first_column = this.$.lines.getBoundingClientRect().bottom;
+		var last_word = this.$.doubleColumnBounderOne;
+		var last_word_rect =  last_word.getBoundingClientRect().bottom;
+		var line_height = this.$.lines.clientHeight;
+		var delta = Math.floor(last_word_rect - top_of_first_column);
+		this.num_lines = Math.ceil(delta/line_height);
+		console.log(this.num_lines + "this is what I need");
+		var deltaTwo = Math.ceil(top_of_first_column - this.$.doubleColumnBounderTwo.getBoundingClientRect().bottom);
+		this.num_lines_two = Math.ceil(deltaTwo/line_height);
+		this.last_row = this.num_lines + this.num_lines_two;
 
 		this.columnOneLineNumbersFilter(this.last_row, this.num_lines);
 		this.columnTwoLineNumbersFilter(this.last_row, this.num_lines);
@@ -335,39 +355,28 @@ growFirstColumn: function(numberAhead){
 	},
 
 	columnOneWordFilter: function(finalWordColOne){
-		return (item )=>{
+		return (item ) => {
 			return (item.order <= this.firstColumnLastWordIndex);
+			//return true;
 		};
 	},
 
 	columnTwoWordFilter: function(finalWordColOne){
-		return (item)=>{
+		return (item) => {
 			return (item.order > this.firstColumnLastWordIndex);
 		};
 	}, 
 
-	columnOneLineNumbersFilter: function(last_row,num_lines){
-		if(this.num_lines < 40)
-		{   return null;
-			}
-		else {
-
-			return (item) =>{
-				return(item.number<=this.num_lines);
-				};
-			}
+	columnOneLineNumbersFilter: function(num_lines){
+		return (item) => {
+			return(item.number<=this.num_lines);
+		};
 	},
+
 	columnTwoLineNumbersFilter: function(num_lines,last_row){
-		if(this.num_lines>2){
-			return (item) =>{
-				return(item.number>this.num_lines && item.number<=this.last_row);
-				};
-			}
-			else{
-				return (item)=>{
-					return false;
-				}
-			}
+		return (item) => {
+			return(item.number>this.num_lines && item.number<=this.last_row);
+		};
 	}
 });
 

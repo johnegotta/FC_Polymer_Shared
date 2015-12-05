@@ -25,7 +25,7 @@
 </style>
 
 <!--double-column line-number and passage vertical container--> 
-	<div id="noJudge" class="layout vertical flex container left passageContainer">
+	<div id="noJudge4" class="layout vertical flex container left passageContainer">
 	<!--blurb full width container-->
 		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
 			{{passageBlurb}}
@@ -36,7 +36,7 @@
 		<!-- end-of-column-1 line number and text container-->
 		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
 					
-					<fc-single-column-layout id="singleDisplay" theContent='{{passageArrayOne}}'hidden='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-single-column-layout id="singleDisplay" the-content='{{passageArrayOne}}'hidden='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
 					</fc-single-column-layout>
 		
 		</div>
@@ -45,7 +45,7 @@
 
 		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
 					
-					<fc-double-column-layout id="doubleDisplay" theContent='{{passageArrayOne}}' shown='{{showingSecondColumn}}' lastWordIndex='{{numWords}}'>
+					<fc-double-column-layout id="doubleDisplay" the-content='{{passageArrayOne}}' shown='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
 					</fc-double-column-layout>
 		
 		</div>
@@ -106,19 +106,19 @@ Polymer({
 		}
 	},
 	ready: function(){
-		//this.passagePath = (this.passagePath === undefined) ? 'new_Passage_1' : this.passagePath;
-		this.passageFullPath = 'https://focusedstaging1.firebaseio.com/passagesDestinations/' + passagePath;
-		console.log('READY READING FIVE');
+		this.passagePath = (this.passagePath === undefined) ? 'new_Passage_1' : this.passagePath;
+		this.passageFullPath = 'https://focusedstaging1.firebaseio.com/passagesDestinations/' + this.passagePath;
+		console.log('READY READING FIVE' + this.passageFullPath);
 		var self = this;
-		var ref = new Firebase(self.fullPassagePath);
+		var ref = new Firebase(self.passageFullPath);
 		ref.on("value", function(snap){
 			self.passageArrayOne=snap.val();
 			console.log(snap.val());
-			self.lastWordIndex = self.passageArrayOne;
-			self.$.singleDisplay.lastWordIndex=self.lastWordIndex;
-			self.$.doubleDisplay.lastWordIndex=self.lastWordIndex;
-			self.passageTitle = self.passageArray[4].passageTitle;
-			self.passageBlurb = self.passageArray[4].passageBlurb;
+			self.lastWordIndex = self.passageArrayOne.length;
+			self.$.singleDisplay.lastWordIndex = self.lastWordIndex;
+			self.$.doubleDisplay.lastWordIndex = self.lastWordIndex;
+			self.passageTitle = self.passageArrayOne[4].passageTitle;
+			self.passageBlurb = self.passageArrayOne[4].passageBlurb;
 		});
 
 
@@ -137,7 +137,7 @@ Polymer({
 	setUp: function()
 	{
 		this.screenTrueHeight =  (window.innerHeight-340);
-		if(this.$.noJudge.clientWidth >= 620)
+		if(this.$.noJudge4.clientWidth >= 640)
 			{
 				this.showingSecondColumn = true;
 				this.$.doubleDisplay.notifyResize();

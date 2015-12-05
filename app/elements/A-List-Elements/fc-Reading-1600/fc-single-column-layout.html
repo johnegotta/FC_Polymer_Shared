@@ -39,7 +39,7 @@ div.line-number {
 			<!--Line number container-->
 					 		<div id="linenumbersA1" class="layout vertical line-number">
 					 		<span class="line-numbers" id="linesA1">Lines</span>
-					 			<template is="dom-repeat" items="{{longestLineNumberArray}}" filter="{{_numberRowsFilter(num_lines)}}">
+					 			<template is="dom-repeat" items="{{longestLineNumberArray}}" filter="{{_numberRowsFilter(numLines)}}">
      								<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
@@ -77,6 +77,10 @@ Polymer({
 			notify: true,
 			reflectToAttributes: true
 		},
+		numLines: {
+			type: Number,
+			value: 0
+		},
 		
 		longestLineNumberArray:{
 			type: Array,
@@ -107,32 +111,20 @@ Polymer({
 
 ready: function(){
 	console.log("READY SINGLE COLUMN");
-	this.longestLineNumberArray=[];
-		for(i=1; i <= 180; i++)
-			{
-			j=	i % 5 ? false: true;
-			this.push("longestLineNumberArray", {'number': i, 'show': j});
-		
-			}	
-},
-
-attached: function(){
-
-		this.loadContent();
+		this.lastRow=Math.floor(this.lastWordIndex/12);
+		this.notifyResize();
 	},
 
-loadContent:function(){
-			this.notifyResize();
+attached: function(){
+	
 
 },
 
 arrayWatcher: function(miki){
 	console.log(this.theContent);
-
-
 },
 notifyResize:function(){
-	this.numberOneColumn();
+	this.numberOneColumn(this.lastRow);
 
 },
 
@@ -142,19 +134,13 @@ numberOneColumn: function(RowsEstimate){
 		 var last_word_rect =  last_word.getBoundingClientRect();
 		 var line_height = this.$.linesA1.clientHeight;
 		 var delta = last_word_rect.bottom - bottom_of_first_word;
-		 this.num_lines = Math.round(delta/line_height) - 2.3;
-		 this._numberRowsFilter();
+		 this.numLines = Math.floor(delta/line_height) - 2;
 		},
 _numberRowsFilter: function(){
-		if(this.shown == true || this.shown==false){
-		return (item) =>{
-			return(item.number<=this.num_lines);
-			};
-		}else {return (item) =>{
-			return false;
-			};
-		}
-	}
+	return (item) =>{
+		return(item.number<=this.numLines);
+	};
+}
 });
 
 </script>
