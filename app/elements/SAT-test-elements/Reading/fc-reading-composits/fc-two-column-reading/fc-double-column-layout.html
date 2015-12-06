@@ -1,211 +1,114 @@
-<dom-module id="fc-passage-behaviors">
-<style is="custom-style">
-</style>
-<script>
-theTextContentAndColumnWrapBehaviors: 
-
-
-var butItsOnlyTwoColumns= this.textContentProperties: {
-
-properties: {
-		contentShortPath: {
-			type: String,
-			value: 'new_Test_1',
-			notify: true,
-
-		},
-		contentFullPath: {
-			type: String,
-			value: '',
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageCount: {
-			type: Number,
-			value: 0,
-			notify: true
-		},
-		passageArray:{
-			type: Array, 
-			value: function(){
-				return [];
-			},
-			notify: true, 
-			reflectToAttibutes: true 
-		},
-		numWords: {
-			type: Number,
-			notify: true,
-			reflectToAttributes: true
-		},
-		
-		goldenDist:{
-			type: Number,
-			notify: true
-		},
-		//+=- 1
-		lineNumberArray:{
-			type: Array,
-			value: function(){
-				for(i=1; i <= 200; i++)
-			{
-				j=	i % 5 ? false: true;
-				this.push("lineNumberArray", {'number': i, 'show': j});
-				this.push("lineNumberArrayTwo", {'number': i, 'show': j});
-			},
-			notify: true
-		},
-		
-		passageTitle: {
-			type: String, 
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageBlurb:{
-			type: String,
-			value: 'Get The Blurbs',
-			reflectToAttributes: true,
-			notify: true
-		}
-
-
-created: function()
-
-
-
-
-
-
-
-elementsToSeed=[
-				fc-readingPassagesZero(screenRead,), 
-				fc-doubleColText(), 
-				fc-singleColText(), 
-				fc-readingQuestionsZero(),
-				fc-doubleColumnQuestions(),
-				fc-passageMaker(),
-				],
-seedPassages=[					
-
-
-
-
-
-			],
-loadPassages: function(){
-				self=this;
-				self.passagesArray=[];
-				var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
-				ref.on("child_added", function(snap){
-					if (snap.val() ===undefined){
-						self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_0");
-							self.newPassageRef = 0;
-							self.newPassageRef++;			
-					}
-					else{
-							count=0;
-  							count++;
-  							console.log("added", snap.key());
-  							self.push('seedPassages', snap.key());
-							// length will always equal count, since snap.val() will include every child_added event
-							var instance = self.fcid + '00000' + counter;
-							self.test[instance]=
-							// triggered before this point
-							self.saveCounter = count;
-							self.passageArray[count]=snap.val();
-							console.log(snap.val());
-//Anchoring Object: anchoring values for two columns
-								self.lastWordIndex = self.passageArray[count].length-1;
-								self.colOneAnchor = Math.floor(self.lastWordIndex*.64);
-								self.colTwoAnchor = self.colOneAnchor + 1;
-								self.upperWordBound = self.colTwoAnchor+28;  //THESE NUMBERS COULD GET SMALLER: we have to see;
-								self.lowerWordBound = self.colOneAnchor-28;
-//Measuring middleWordSet
-
-
-
-
-
-
-
-
-
-
-
-//semantic Titling Object
-								self.passageTitle = self.passageArray[count][0].passageTitle;
-								self.passageBlurb = self.passageArray[count][0].passageBlurb;
-								self.passageAuthor = self.passageArray[count][0].passageAuthor;
-								self.passageType = self.passageArray[count][0].passageType;
-								self.passageFcid = self.passageArray[count][0].passageFcid;
-								self.passageClass = self.passageArray[count][0].passageClass;
-								self.passageTest = self.passageArray[count][0].passageTest;
-//Question Reference Object
-	//bunch of junk
-
-
-						ref.once("value", function(snap) {
-  						console.log("initial data loaded!", Object.keys(snap.val()).length === count);
-							});
-						}
-				});
+<dom-module id="fc-double-column-layout">
+<template>
+<style>
+		div.line-number {
+			width: 28px;
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			padding: 6px 0px 6px 0px;
+			margin: 6px 0px 6px 0px;
 			
-
-
-
-
-
-
-
-
-			]
-
-
-
-
-	this.passagePath = (this.passagePath === undefined) ? 'new_Passage_00001' : this.passagePath;
-		this.passageFullPath = 'https://focusedstaging1.firebaseio.com/passagesDestinations/' + this.passagePath;
-		console.log('READY READING' + this.passageFullPath);
-		var self = this;
-		var ref = new Firebase(self.passageFullPath);
-		ref.on("value", function(snap){
-			self.passageArrayOne=snap.val();
-			console.log(snap.val());
-			self.lastWordIndex = self.passageArrayOne.length;
-			self.$.singleDisplay.lastWordIndex = self.lastWordIndex;
-			self.$.doubleDisplay.lastWordIndex = self.lastWordIndex;
-			self.passageTitle = self.passageArrayOne[4].passageTitle;
-			self.passageBlurb = self.passageArrayOne[4].passageBlurb;
-		});
+		}
+		div.columnContainer{
+			overflow-y: scroll;
+		}
 		
-	ready: function(){
-		console.log("READY");
-		for(i=1; i <= 200; i++)
-			{
-			j=	i % 5 ? false: true;
-			this.push("LineNumberArray", {'number': i, 'show': j});
-			this.push("LineNumberArrayTwo", {'number': i, 'show': j});
-			this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
-			this.push("longestLineNumberArray", {'number': i, 'show': j});
-			}	
-		this.passageArrayOne=[];
-		var self = this;
-		var ref = new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations/" + this.passagePath);
-		ref.on("value", function(snap){
-			self.passageArrayOne=[];
-			self.passageArrayOne = snap.val();
-			self.numWords = self.passageArrayOne.length;
-			self.lastWord = self.numWords-1;
-			self.goldenRatio = Math.floor(.618*self.numWords);
-			self.finalColumnOneWordIndex = self.goldenRatio;
-			self.secondColumnFirstWordIndex = self.finalColumnOneWordIndex+1;
-			self.passageTitle = self.passageArrayOne[58].passageTitle;
-			self.passageBlurb = self.passageArrayOne[58].passageBlurb;
-		});
-	},
+		.highlighted {
+			background: yellow;
+		}
+		
+		div.text {
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			padding: 6px;
+			margin: 6px 0px 6px 0px;
+			min-height: 720px !important;
+			display: flex;
+			min-width: 260px !important;
+			max-width: 680px !important;	
+		}
+</style>
+		
 
 
-theContent:{
+		<div id="doubleColumnContainer" class="layout horizontal flex container">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 8px; overflow-y:scroll;">
+			<!--Line number container-->
+					 		<div id="linenumbers" class="layout vertical line-number">
+					 		<div id="lines" class="line-numbers">Lines</div>
+					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter="{{passageOneLineNumberFilter(num_lines_one)}}">
+     								<span hidden="{{!item.show}}" id$="col_one_line_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+    							</template>
+    							
+					 		</div>
+			<!--passage-1-column-1 container-->
+					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<article id="textColumnOne">
+					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageOneFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
+ 									<template is="dom-if" if="{{item.newPara}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id$="one_{{item.order}}" invisibility="false" hidden$="{{oneGone}}">{{item.word}}</a>
+								</template>
+								<br class="line-numbers">
+								<hr>
+								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
+							</article>
+					 		</div>
+					 	</div>
+		<!-- end-of-column-1 line number and text container-->
+
+
+
+		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 8px;overflow-y:scroll;">
+			<!--Line number container-->
+					 		<div id="linenumbersright" class="layout vertical line-number">
+					 			<div class="line-numbers" id="linesB2">Lines</div>
+					 		 	<template is="dom-repeat" items="{{LineNumberArray}}" filter="{{passageTwoLineNumberFilter(start_lines_two,num_lines_two)}}">
+     								<span hidden="{{!item.show}}" id$="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     								
+    							</template>	
+					 		</div>
+			<!--end of passage-1-column-1 line number container-->
+			<!--passage-1-column-2 container-->
+					 		<div id="colDos" class="layout vertical text">
+					 		<article id="textColumnTwo">
+					 			<div class="line-numbers"><span>&nbsp </span></div>
+								<template is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageTwoFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
+ 									<template is="dom-if" if="{{item.newPara}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id$="one_{{item.order}}" hidden$="{{!oneGone}}">{{item.word}}</a>
+								</template>
+								<br class="line-numbers">
+								<hr>
+								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
+							</article>
+					 		</div>
+		<!--passage-1-column-2 container-->
+					 	</div>
+	<!--end of flex passage column container-->
+				</div>
+<!--End of top container horizontal-->
+			
+	<!--end of flex passage column container-->
+
+</template>
+<script>
+Polymer({
+	is: 'fc-double-column-layout',
+	//behaviors: ,
+	properties: {
+
+		theContent:{
 			type: Array, 
 			value: function(){
 				return []
@@ -216,7 +119,8 @@ theContent:{
 		lastWordIndex:{
 			type: Number,
 			value: function(){
-				return this.$$fcReadingPassageFive.lastWordIndex;	
+				var number = (this.$$fcReadingPassageFive==undefined) ? 735:this.$$fcReadingPassageFive.lastWordIndex;	
+				return number;
 			},
 			notify: true
 			
@@ -312,7 +216,7 @@ theContent:{
 			value: 73,
 			notify: true
 		},
-		numLinesTwo: {
+		numLines_two: {
 			type: Number,
 			value: 124,
 			notify: true
@@ -421,7 +325,7 @@ theContent:{
 			//return true;
 		};
 	},
-
+/*
 	columnTwoWordFilter: function(finalWordColOne){
 		return (item) => {
 			return (item.order > this.firstColumnLastWordIndex);
@@ -438,5 +342,7 @@ theContent:{
 		return (item) => {
 			return(item.number>this.num_lines && item.number<=this.last_row);
 		};
-	}
+	}*/
 });
+</script>
+</dom-module>

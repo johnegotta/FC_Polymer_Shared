@@ -11,49 +11,42 @@ border-bottom: 6px ridge silver;
 }
 :host{height: 100%;}
      </style>
+<array-selector id="selector" items="{{Tab_Names}}" selected="{{selectedTab}}"></array-selector>
 
      <paper-tabs 
           hideScrollButtons="true" 
           class="layout horizontal biggerBetter flex wrap container center center-justified" 
           scrollable="true"
-          selected="{{selected}}">
+          selected="{{selectedTab}}">
                <template 
                     is="dom-repeat" 
                     class="layout horizontal fit"        
-                    items="{{tabsObjectArray}}"
+                    items="{{Tab_Names}}"
                     >
           	    <paper-tab
-                         id$="{{item.tabName}}_{{item.tabNumber}}" 
-                         name="{{item.tabName}}"
-                         fc-pages={{selected}}
-                         >
-                         <span>{{item.tabName}}</span><span>{{item.tabNotification}}</span>			
-            	       </paper-tab>
-               </template>
-  			<paper-tab 
-                    name="test-generation"
+
+                   fc-pages="{{index}}" 
+                    name="{{item}}"
                     >
-                         Test Generation 
- 			</paper-tab>
- 			<paper-tab 
-                    name="OPC">
-      				Object Prototyping and Classing
- 			</paper-tab>
- 			<paper-tab 
-                    name="DO">
-      				Database Organization
- 			</paper-tab>
- 			<paper-tab
-                    name="Experiments">
-    					Experiments 
-    			</paper-tab>
-    			<paper-tab 
+                         [[item]]
+               </paper-tab>
+               </template>
+    			<paper-tab fc-pages="7"
                     name="admin">
     			 		Admin
     			</paper-tab>
+              <!-- <paper-tab
+                         class="horrizontal layout flex nowrap scroll" 
+                         id$="{{item}}_{{item.Tab_Number}}" 
+                         name="{{item}}"
+                         fc-pages={{selected}}
+                         style$="width: 103%;"
+                         >
+                         <span>{{item}}</span><span>{{item.Tab_Notification_subHeading}}</span>               
+                      </paper-tab>-->
     	</paper-tabs>
-          <iron-selector>
-               <iron-pages selected="{{selected}}">
+          <iron-selector  selected="{{selectedTab}}">
+               <iron-pages selected="{{selectedTab}}">
                    
                <!--    <fc-to-do-list id="ToDo" selectable="true">
                    </fc-to-do-list>-->
@@ -61,14 +54,13 @@ border-bottom: 6px ridge silver;
                   
                          <div id="download" class="style-scope app-cart" fc-pages='0'>
                          <section
-                                   class="style-scope app-cart">
+                                   class="style-scope test-generator">
                                    <h4 
-                                        class="style-scope app-cart">
-                                        Download Options
+                                        class="style-scope test-generator">
+                                       Test Generation 
                                    </h4>
                                    <paper-radio-group 
-                                        id="dl" 
-                                        class="style-scope app-cart" 
+                                        id="rad1"  
                                         role="radiogroup" 
                                         tabindex="0">
                                              <paper-radio-button 
@@ -102,6 +94,13 @@ border-bottom: 6px ridge silver;
                                                        - the full source for the latestversion of all your selected elements
                                                   </div>
                                         </paper-radio-button>
+                                        </paper-radio-group>
+                                        </section>
+                                        </div>
+                                   <div id="download" class="style-scope app-cart" fc-pages='1'>
+
+                                   <section>
+                                        <paper-radio-group>
                                         <paper-radio-button 
                                              name="bower" 
                                              class="style-scope app-cart x-scope paper-radio-button-0" 
@@ -133,7 +132,10 @@ border-bottom: 6px ridge silver;
                                                   </div>
                                         </paper-radio-button>
                               </paper-radio-group>
-
+                         </section>
+                    </div>
+   <div id="download" class="style-scope app-cart" fc-pages='2'>
+          <section>
                               <paper-button 
                                    raised="" 
                                    class="style-scope app-cart x-scope paper-button-0" 
@@ -145,27 +147,49 @@ border-bottom: 6px ridge silver;
                                         Download
                               </paper-button>
                     </section>
+               </div>
+               <div id="tester" fc-pages="3">
+                    
                     <section 
                          class="style-scope app-cart">
                          <h4 
                               class="style-scope app-cart">
                               Bower Command
                          </h4>
-                         <p 
-                              class="style-scope app-cart">
+                    </section>
+
+               </div>          
+               <div id="teeation" fc-pages="4">
+               <p class="style-scope app-cart">
                               You can copy the command below and paste it into the terminal to install the elements from your cart into a project that already uses Bower.
                          </p>
                          <textarea 
-                              readonly="" 
+                              readonly="FALSE" 
                               class="style-scope app-cart">
                          </textarea>
+
+                         <fc-selector></fc-selector>
                     </section>
                </div>
-               <div id="testCreation" fc-pages="1">
+               <div id="testCreation" fc-pages="5">
                     <section>
                     Hello, how are you!!!?
+                    <fc-selector id="purple"></fc-selector>
                     </section>
                </div>
+               <div id="testCion" fc-pages="6">
+                    <section>
+                    Hello, how are you!!!?
+                    <fc-selector id="purple"></fc-selector>
+                    </section>
+               </div>
+               <div id="testn" fc-pages="7">
+                    <section>
+                    Hello, how are you!!!?
+                    <fc-selector id="purple"></fc-selector>
+                    </section>
+               </div>
+
 
 
 </iron-pages>
@@ -176,28 +200,52 @@ FcTabbedDrawer=Polymer({
      is:"fc-tabbed-drawer",
    //  behaviors: [Polymer.IronResizeableBehavior],
      properties: {
-          tabsArrayObjectZero: {
+       /*   tabsArrayObjectZero: {
                type: Object,
-               value: {                    
-                         tabsGroupName: { 
+               value: { */ 
+
+
+                         selectedTab:{
+                              type: String,
+                              value: "admin",
+                              notify: true,
+                              reflectToAttribute: true
+                         },
+                         Tab_Group_Id:{ 
                               type: String, 
-                              value: "new_Tabs_Number",
+                              value: `Tab_Group_Number + Tab_Group_Name`,
+                              notify: true
+                              },                
+                         Tab_Group_Name: { 
+                              type: String, 
+                              value: "MyNewTabGroup",
                               notify: true
                          },
-                         tabsGroupNumber:{
+                         Tab_Group_Number:{
                               type: Number,
-                              value: 1,
+                              value: 000001,//increasing [five lead zeroes for mistakes]
                               notify: true
                          },
-                         numberOfTabs: {
+                         Number_Of_Tabs: {
                               type: Number, 
-                              value: 6,
+                              value: 8, //1-10 plus the 0 meta tab usually lead tab(tab[0] will carry metadata
                               reflectToAttribute: true,
                               notify: true
                          },
-                         namesOfTabs: {
-                              type: String,
-                              value: 'tabOne',
+                         Tab_Names: {
+                              type: Array, //array of all the junk in a tabGroup
+                              value: function(){  
+                                   return [  
+                                        'Administor',
+                                        'Test Generation',
+                                        'Object Prototyping and Classing',
+                                        'Database Organization', 
+                                        'Experiments',
+                                        'To-Do-List', 
+                                        'Scheduling',
+                                        'Administration'
+                                        ];
+                             },
                               notify: true
                          },
                          styleObject: {
@@ -230,7 +278,7 @@ FcTabbedDrawer=Polymer({
                               value: function(){
                                   // var currentWidth=this.clientWidth;
 
-                                   return "480px";
+                                   return "103%";
                               },
                               notify: true,
                               reflectToAttribute: true
@@ -306,16 +354,10 @@ FcTabbedDrawer=Polymer({
                               notify: true
                          }
 
-
-                    },
-                    notify: true
-               
-               }
-
           },
 
 created: function(){
-     this.fcPages=0;
+    // this.selected=FcPages[0];
 
 
 
@@ -335,4 +377,16 @@ ready: function(){}
 <!--     this.setAttribute.style.height= 100%;
                          this.setAttribute.style.overflowY= scroll;
                          this.setAttribute.style.border=4px #000066 double;
-                         this.setAttribute.style.resize= vertical;-->
+                         this.setAttribute.style.resize= vertical;
+  {'Tab_0000': 'Web Administor Drawer Tabs'},  //Tab_Group_Name
+                                                  {'Tab_0001': 'Test Generation'},//Tab_001_Name
+                                                  {'Tab_0002': 'Object Prototyping and Classing'},//Tab_002_Name
+                                                  {'Tab_0003': 'Database Organization'},//tab 3 etc...
+                                                  {'Tab_0004': 'Experiments'},
+                                                  {'Tab_0005': 'To-Do-List'},
+                                                  {'Tab_0006': 'Scheduling'},
+                                                  {'Tab_0007': 'Administration'}
+                                                 
+                                                  ];
+
+                         -->

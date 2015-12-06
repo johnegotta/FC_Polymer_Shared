@@ -1,0 +1,221 @@
+<dom-module id="fc-passage-display">	
+<template>
+<style>
+	
+		div.columnContainer{
+			overflow-y: scroll;
+		}
+		div.passageContainer{ 
+			min-width: 310px;
+			max-width: 1450px !important;
+			margin: 48px;
+		}
+		.highlighted {
+			background: yellow;
+		}
+		div.blurb{
+			line-height: 1.2;
+			font-size: 1em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			display: block;
+		}
+		
+</style>
+
+<!--double-column line-number and passage vertical container--> 
+	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
+	<!--blurb full width container-->
+		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+			{{passageBlurb}}
+		</div>
+
+	<!--single column container-->
+			
+		<!-- end-of-column-1 line number and text container-->
+		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
+					
+					<fc-single-column-layout id="singleDisplay" the-content='{{passageArray}}'hidden='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
+					</fc-single-column-layout>
+		
+		</div>
+
+
+
+		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
+					
+					<fc-double-column-layout id="doubleDisplay" the-content='{{passageArray}}' shown='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
+					</fc-double-column-layout>
+		
+		</div>
+
+					
+<!--End of top container horizontal-->
+	</div>
+<!--End of Vertical passage container-->
+</template>
+<script>
+Polymer({
+	is:'fc-passage-display',
+	behaviors: [Polymer.IronResizableBehavior],
+	properties: {
+		passagePath: {
+			type: String,
+			value: 'new_Test_3',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageFullPath: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageArray:{
+			type: Array, 
+			value: function(){
+				return []
+			},
+			notify: true, 
+		},
+		
+		passageTitle: {
+			type: String, 
+			
+			value: 'Focused Reading Passage',
+			notify: true,
+			reflectToAttributes: true,
+		},
+
+		passageBlurb:{
+			type: String,
+			value: 'none',
+			reflectToAttributes: true,
+			notify: true
+		},
+		lastWordIndex: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		showingSecond: {
+			type: Boolean,
+			value: false,
+			notify: true, 
+			reflectToAttributes: true
+		}
+	},
+	created: function(){
+
+
+	},
+
+	ready: function(){
+				self=this;
+				self.passagesArray=[];
+				var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
+				ref.on("child_added", function(snap){
+					if (snap.val() ===undefined){
+						self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_0");
+							self.newPassageRef = 0;
+							self.newPassageRef++;			
+					}
+					else{
+							count=0;
+  							count++;
+  							console.log("added", snap.key());
+  							self.passageDestinations[count] = snap.key();
+							// length will always equal count, since snap.val() will include every child_added event
+							var instance = self.fcid + '00000' + self.count;
+							//self.test[instance]=
+							// triggered before this poin
+							self.passageArray[self.count]=snap.val();
+							console.log(snap.val());
+//Anchoring Object: anchoring values for two columns
+								self.lastWordIndex = self.passageArray[self.count].length-1;
+								self.colOneAnchor = Math.floor(self.lastWordIndex*.64);
+								self.colTwoAnchor = self.colOneAnchor + 1;
+								self.upperWordBound = self.colTwoAnchor+28;  //THESE NUMBERS COULD GET SMALLER: we have to see;
+								self.lowerWordBound = self.colOneAnchor-28;
+//Measuring middleWordSet
+
+
+
+
+
+
+
+
+
+
+
+//semantic Titling Object
+								self.passageTitle = self.passageArray[self.count][0].passageTitle;
+								self.passageBlurb = self.passageArray[self.count][0].passageBlurb;
+								self.passageAuthor = self.passageArray[self.count][0].passageAuthor;
+								self.passageType = self.passageArray[self.count][0].passageType;
+								self.passageFcid = self.passageArray[self.count][0].passageFcid;
+								self.passageClass = self.passageArray[self.count][0].passageClass;
+								self.passageTest = self.passageArray[self.count][0].passageTest;
+//Question Reference Object
+	//bunch of junk
+
+
+						ref.once("value", function(snap) {
+  						console.log("initial data loaded!", Object.keys(snap.val()).length === self.count);
+							});
+						}
+				});
+		
+
+
+	},
+
+	notifyResize: function(){
+		this.setUp();
+		
+
+	},
+	
+	setUp: function()
+	{
+		// this.screenTrueHeight =  (window.innerHeight-340);
+		// if(this.$.noJudge4.clientWidth >= 640)
+		// 	{
+		// 		this.showingSecondColumn = true;
+		// 		this.$.doubleDisplay.notifyResize();
+		// 	}	
+		// else
+		// 	{ 
+		// 		this.showingSecondColumn = false;
+		// 		this.$.singleDisplay.notifyResize();
+		// 	}window
+		this.screenTrueHeight = (window.innerHeight-240);
+		this.textColumnOneHeight = this.$.singleDisplay.scrollHeight;
+		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50){
+			if(this.$.noJudge4.clientWidth >= 660 && this.textColumnOneHeight>this.screenTrueHeight){
+				this.showingSecond = true;
+				return (showingSecond)=>{this.$.doubleDisplay.notifyResize(this.$.doubleDisplay.numberTwoColumns(this.$.doubleDisplay._adjustDoubleColumns(showingSecond)))};
+				console.log('setUp2col');
+			}
+		}
+
+		// 	}
+		else{ 
+			this.$.doubleColumnContainer.hidden = true;
+			this.$.singleColumnContainer.hidden = false;
+			  this.showingSecond = false;
+		      this.$.singleDisplay.notifyResize();
+			  console.log('setUp1col');
+				
+			}
+		}
+
+
+
+
+
+});
+</script>
+</dom-module>
