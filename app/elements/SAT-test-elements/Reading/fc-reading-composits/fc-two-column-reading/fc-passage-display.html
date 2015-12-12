@@ -15,7 +15,7 @@
 		}
 		div.blurb{
 			line-height: 1.2;
-			font-size: 1em;
+			font-size: 1.25em;
 			font-family: merriweather;
 			font-weight: 500;
 			font-style: italic;
@@ -23,8 +23,8 @@
 		}
 		
 </style>
-
 <!--double-column line-number and passage vertical container--> 
+<div id="judge9" style="width: 98%;">
 	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
 	<!--blurb full width container-->
 		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
@@ -48,12 +48,11 @@
 					<fc-double-column-layout id="doubleDisplay" the-content='{{passageArray}}' shown='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
 					</fc-double-column-layout>
 		
-		</div>
-
-					
+		</div>	
 <!--End of top container horizontal-->
 	</div>
 <!--End of Vertical passage container-->
+</div>
 </template>
 <script>
 Polymer({
@@ -62,7 +61,15 @@ Polymer({
 	properties: {
 		passagePath: {
 			type: String,
-			value: 'new_Test_3',
+			value: 'new_Test_1',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageRootPath: {
+			type: String,
+			value: function(){
+				return 'https://focusedstaging1.firebaseio.com/passagesDestinations';
+				},
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -74,29 +81,32 @@ Polymer({
 		},
 		passageArray:{
 			type: Array, 
+			value:[],
+			notify: true 
+		},
+		passagesArray:{
+			type: Array, 
 			value: function(){
 				return []
 			},
-			notify: true, 
+			notify: true 
 		},
 		
 		passageTitle: {
 			type: String, 
-			
 			value: 'Focused Reading Passage',
 			notify: true,
-			reflectToAttributes: true,
+			reflectToAttributes: true
 		},
 
 		passageBlurb:{
 			type: String,
-			value: 'none',
-			reflectToAttributes: true,
+			value: 'get the blurb',
 			notify: true
 		},
 		lastWordIndex: {
 			type: Number,
-			value: 0,
+			value: 550,
 			notify: true
 		},
 		showingSecond: {
@@ -104,7 +114,8 @@ Polymer({
 			value: false,
 			notify: true, 
 			reflectToAttributes: true
-		}
+		},
+		
 	},
 	created: function(){
 
@@ -114,107 +125,60 @@ Polymer({
 	ready: function(){
 				self=this;
 				self.passagesArray=[];
-				var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
+				var ref= new Firebase(self.passageRootPath);
 				ref.on("child_added", function(snap){
-					if (snap.val() ===undefined){
-						self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_0");
-							self.newPassageRef = 0;
-							self.newPassageRef++;			
-					}
-					else{
-							count=0;
-  							count++;
   							console.log("added", snap.key());
-  							self.passageDestinations[count] = snap.key();
-							// length will always equal count, since snap.val() will include every child_added event
-							var instance = self.fcid + '00000' + self.count;
-							//self.test[instance]=
-							// triggered before this poin
-							self.passageArray[self.count]=snap.val();
-							console.log(snap.val());
-//Anchoring Object: anchoring values for two columns
-								self.lastWordIndex = self.passageArray[self.count].length-1;
-								self.colOneAnchor = Math.floor(self.lastWordIndex*.64);
-								self.colTwoAnchor = self.colOneAnchor + 1;
-								self.upperWordBound = self.colTwoAnchor+28;  //THESE NUMBERS COULD GET SMALLER: we have to see;
-								self.lowerWordBound = self.colOneAnchor-28;
-//Measuring middleWordSet
+							if(snap.key()=='new_Test_1')
+							{
+								self.set('passageArray', snap.val());
+								console.log(self.passageArray);
+								self.passageBlurb=self.passageArray[1].passageBlurb;
+								self.numWords=self.passageArray.length;
+								self.$.singleDisplay.lastWordIndex=self.numWords;
+								self.$.doubleDisplay.lastWordIndex=self.numWords;
+								self.$.doubleDisplay.splitRatio=Math.ceil(self.numWords*.618);
+								self.$.doubleDisplay.firstColumnLastWordIndex={"ratio": self.$.doubleDisplay.splitRatio, "lineNumberStart": 1, "lineNumberEnd": 53};
+								self.$.doubleDisplay.secondColumnFirstWordIndex={"ratio": self.$.doubleDisplay.firstColumnLastWordIndex + 1, "lineNumberStart": 54, "lineNumberEnd": 87};
 
-
-
-
-
-
-
-
-
-
-
-//semantic Titling Object
-								self.passageTitle = self.passageArray[self.count][0].passageTitle;
-								self.passageBlurb = self.passageArray[self.count][0].passageBlurb;
-								self.passageAuthor = self.passageArray[self.count][0].passageAuthor;
-								self.passageType = self.passageArray[self.count][0].passageType;
-								self.passageFcid = self.passageArray[self.count][0].passageFcid;
-								self.passageClass = self.passageArray[self.count][0].passageClass;
-								self.passageTest = self.passageArray[self.count][0].passageTest;
-//Question Reference Object
-	//bunch of junk
-
-
-						ref.once("value", function(snap) {
-  						console.log("initial data loaded!", Object.keys(snap.val()).length === self.count);
-							});
-						}
-				});
+							}
 		
+				});
+				
+				console.log(this.passageArray);		
+				this.$.singleDisplay.theContent=this.passageArray;
+				this.$.doubleDisplay.theContent=this.passageArray;
+	},
 
-
+	atttached: function(){		
+		this.$.singleDisplay.theContent=this.passageArray;
+		this.$.doubleDisplay.theContent=this.passageArray;
+		this.numWords=this.passageArray.length;
+		this.set('passageBlurb',this.passageArray[1].passageBlurb);
+		this.passageBlurb=this.passageArray[1].passageBlurb;
+		this.notifyResize;
 	},
 
 	notifyResize: function(){
 		this.setUp();
-		
-
 	},
 	
 	setUp: function()
 	{
-		// this.screenTrueHeight =  (window.innerHeight-340);
-		// if(this.$.noJudge4.clientWidth >= 640)
-		// 	{
-		// 		this.showingSecondColumn = true;
-		// 		this.$.doubleDisplay.notifyResize();
-		// 	}	
-		// else
-		// 	{ 
-		// 		this.showingSecondColumn = false;
-		// 		this.$.singleDisplay.notifyResize();
-		// 	}window
-		this.screenTrueHeight = (window.innerHeight-240);
-		this.textColumnOneHeight = this.$.singleDisplay.scrollHeight;
-		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50){
-			if(this.$.noJudge4.clientWidth >= 660 && this.textColumnOneHeight>this.screenTrueHeight){
-				this.showingSecond = true;
-				return (showingSecond)=>{this.$.doubleDisplay.notifyResize(this.$.doubleDisplay.numberTwoColumns(this.$.doubleDisplay._adjustDoubleColumns(showingSecond)))};
-				console.log('setUp2col');
+		this.screenTrueHeight =  (window.innerHeight-320);
+		this.$.singleDisplay.singleWidth = this.$.judge9.clientWidth;
+		if(this.$.noJudge4.clientWidth >= 670 && this.screenTrueHeight>=440)
+			{
+				this.showingSecondColumn = true;
+				this.$.singleDisplay._notifyResize(true);
+				this.$.doubleDisplay.notifyResize(true);
+			}	
+		else
+			{ 
+				this.showingSecondColumn = false;
+				this.$.singleDisplay._notifyResize(false);
+				this.$.doubleDisplay.notifyResize(false);
 			}
 		}
-
-		// 	}
-		else{ 
-			this.$.doubleColumnContainer.hidden = true;
-			this.$.singleColumnContainer.hidden = false;
-			  this.showingSecond = false;
-		      this.$.singleDisplay.notifyResize();
-			  console.log('setUp1col');
-				
-			}
-		}
-
-
-
-
 
 });
 </script>

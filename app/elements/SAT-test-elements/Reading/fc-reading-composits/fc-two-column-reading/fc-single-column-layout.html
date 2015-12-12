@@ -32,15 +32,16 @@ div.line-number {
 			min-height: 720px !important;
 			display: flex;
 			min-width: 260px !important;
-			max-width: 680px !important;	
+			max-width: 660px !important;	
 		}
 </style>
 <div class="layout horizontal container">
 
 					 		<div id="linenumbersA1" class="layout vertical line-number">
-					 		<div class="line-numbers" id="linesA">Lines</div>
-					 			<template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberRowsFilter(numLines,shown)}}">
-     								<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.order}}">{{item.order}}</span><span hidden="{{item.show}}">&nbsp</span>
+					 		<div class="line-numbers" id="linesA1">Lines</div>
+					 		<div class="line-numbers" id="linesA">&nbsp</div>
+					 			<template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberRowsFilter(shown, lastRow)}}">
+     								<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      							
     							</template>
 					 		</div>
@@ -58,25 +59,22 @@ div.line-number {
 								<div class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
 							</article>
 					 		</div>
-					 	</div>					
+					 	</div>	
+					 	<button on-tap="numberOneColumn">number</button>				
 </template>
 <script>
 Polymer({
 	is: 'fc-single-column-layout',
-		observers: ['arrayWatcher(theContent.splices)'],
+		observers: ['arrayWatcher(theContent.splices)', 'columnWatcher(lastRow)'],
 		properties: {
 
 		theContent:{
 			type: Array, 
 			value: [],
 			notify: true, 
-			reflectToAttibutes: true 
 		},
-		lastWordIndex:{
-			type: Number,
-			notify: true,
-		},
-		numLines: {
+	
+		lastWordIndex: {
 			type: Number,
 			value: 0,
 			notify: true
@@ -84,11 +82,14 @@ Polymer({
 		
 		lineNumberArray:{
 			type: Array,
-			value: function(){for(var i=1; i <= 180; i++)
-			{	this.lineNumberArray = new Array(180);
-				j=	i % 5 ? false: true;
-				this.push("lineNumberArray", {'number': i, 'show': j});
+			value: function(){
+				var lineNumberArray = [];
+				for(var i=1; i <= 180; i++)
+				{	
+					j=	i % 5 ? false: true;
+					lineNumberArray.push({'number': i, 'show': j});
 				}
+				return lineNumberArray;
 			},
 			notify: true
 
@@ -96,9 +97,6 @@ Polymer({
 		
 		lastRow:{
 			type: Number,
-			value: function(){
-			return 111;
-			},
 			notify: true
 		},
 		
@@ -106,47 +104,97 @@ Polymer({
 			type: Boolean,
 			value: true,
 			notify: true,
-			reflectToAttributes: true
 		}
 
 	},
 
 
 ready: function(){
-	console.log("READY SINGLE COLUMN");
-		this.lastRow=Math.floor(this.lastWordIndex/11);
-		this.notifyResize();
+	
+
 	},
 
 attached: function(){
-	
+
 
 },
-
-arrayWatcher: function(miki){
-	console.log(this.theContent);
+_linesEst: function(){
+	var colWidth = this.$.textColumnOne.clientWidth;
+	var wordEst = Math.ceil((665/colWidth)*12.2);
+	var linesEst = Math.floor(this.numWords/wordEst);
+	return linesEst;
 },
 
-notifyResize:function(){
-	this.numberOneColumn(this.lastRow);
+arrayWatcher: function(theContent){
+	//console.log(this.theContent);
+	if(this.theContent.length!==undefined){
+	this.set('numWords',this.theContent.length);
+	var lineEst = this._linesEst();
+	this.set('lastRow', lineEst);
+	this.numberOneColumn(lineEst); 
+	//console.log(lineEst);
+	}
+},
+
+computeLastRow: function(){
+ 	var bottom_of_first_word = this.$.linesA1.getBoundingClientRect().bottom;
+	var lwId =  '#oneOneWords_' + this.lastWordIndex;
+	var last_word_top = this.$$(lwId).getBoundingClientRect().bottom;
+ 	//console.log(last_word_top);
+ 	var line_height = this.$.linesA1.clientHeight;
+ 	var delta =  last_word_top - bottom_of_first_word;
+ 	var lastRow = Math.floor(delta/line_height);
+ 	this.lastRow = lastRow;
+ 	//console.log(this.lastRow);
+ 	this.set('lastRow', lastRow);
+},
+
+_notifyResize:function(secondShow){
+	this.numberOneColumn();
+	this.shown= !secondShow;
 
 },
 
 numberOneColumn: function(RowsEstimate){
-		 var bottom_of_first_word = this.$.linesA.getBoundingClientRect().bottom;
-		 var last_word = this.$.singleColumnBounder;
-		 var last_word_rect =  last_word.getBoundingClientRect();
-		 var line_height = this.$.linesA.clientHeight;
-		 var delta = last_word_rect.bottom - bottom_of_first_word;
-		 this.numLines = Math.floor(delta/line_height) - 2;
+		 var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		// console.log(this.$$(lwId));
+		 if(lwId=="#oneOneWords_0" || this.$$(lwId)===undefined)
+		 {
+		 	if(RowsEstimate> 68) 
+		 		{
+		 			this.lastRow=RowsEstimate;
+		 		} 
+		 		else
+		 		{
+		 			var rowsEstimate = this._linesEst();
+					this.lastRow= (rowsEstimate>68) ? rowsEstimatr: 68;
+		 		}
+		 }
+		 else
+		 {
+		 	this.computeLastRow();
+		}
+		
 		},
-_numberRowsFilter: function(numLines,shown){
- 		
+
+columnWatcher: function(lastRow){
+this.numberOneColumn(lastRow);
+},
+_numberRowsFilter: function(shown, lastRow){
+	if(shown==true)
+	{
  			return (item) =>{
- 				return (item.order <= numLines);
+ 				return (item.number <= lastRow);
  			};
 
-}	
+	}
+	else 
+		{
+		return (items) => { 
+				return false;
+			};
+		}
+	}
 });
 
 </script>
