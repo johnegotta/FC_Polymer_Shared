@@ -1,17 +1,22 @@
 
-<dom-module id="fc-data-administrator">
-	
+<dom-module id="fc-data-administrator-reverse">
+	<!-- CodeMirror -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.css">
+
+<!-- Firepad -->
+<link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.css">
+<script src="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.min.js"></script>
+
 	<template>
 <style>
 	 	#div1 {
 	 		min-width:260px; 
-	 	
+	 		max-width: 960px;
 	 		display: flex;
 	 		min-height:280 px;
-	 		flex-basis: 380px;
 	 		padding:10px;
 	 		border:1px solid #aaaaaa;
-	 		resize: both;
 	 	}
 	 	article { display: block;}
 	  	
@@ -29,7 +34,6 @@
 				min-width: 270px;
 				max-width: 1080px;
 				min-height: 280px;
-				flex-basis: 370px;
 				overflow: hidden;
 				border: 2px ridge #002c90;
 				background: #fff;
@@ -37,7 +41,6 @@
 				z-index: 100000;
 				opacity: 1;
 				display: flex;
-				resize: both;
 			}
 			.subheading{
 				font-size: 13px;
@@ -60,7 +63,6 @@
 				margin: 2px 6px 4px 6px;
 				border: 2px dashed green;
 				padding: 3px;
-				max-width: 380px;
 			}
 			
 			h3, h4 {
@@ -91,7 +93,6 @@
 			div.scroll-master{
 				height: 98%;
 				min-height:460px;
-				flex-basis: 340px;
 				overflow: hidden;
 				overflow-y: scroll;
 				border: 0px 3px 0px 3px inset #fffffe;
@@ -99,80 +100,53 @@
 				border-bottom: 1px solid #000066;
 			}
 			iron-icon{
-				height: 32px;
-				width: 32px;
-				color: #000066;
-				background: #aecdfe;
+				height: 36px;
+				width: 36px;
 			}
 			
-			iron-pages
-			{
+			iron-pages{
 			
 				position: relative;
 				display: block;
 			}
-			.dragbox
-			{
-					position: absolute !imporant; 
-					left: 0px; 
-					top: 0px; 
-					width: 20px; 
-					height: 20px;
-					border: 2px dashed green;
-					margin-left: -12px;
-					padding: 4px;
-					background: goldenrod;
-				}
-			p{max-width: 350px;}
-		
+			
+			
+			
 </style>
 	<div class="layout container vertical center center-justified iconset" style="">
-		<button class="right" style="position: fixed; left: 225px; top: 300px; opacity: .45; background: goldenrod; border: 8px ridge silver;" on-tap="_openAdmin"> Admin</button>
+		<button class="right" style="position: fixed; left: 225px; top: 30px; opacity: .45; background: goldenrod; border: 8px ridge silver;" on-tap="flattap" on-hover="{{getFocused}}"> TAP ME
+				<div id="focusedOne" hidden="{{!getFocused}}" style="font-size: 8.5pt; z-index: 10000000; width: 500px; height: 24px; font-family: times; color: #000066;">
+					<span>Get Focused!</span>
+				</div>
+		</button>
 	</div>
 
 								
-<paper-dialog 
-	id="dragDialogAdmin" 
-	class="layout vertical container" 
-	style="display: block; overflow: auto; resize: both;"  
-	draggable="true" 
-	no-cancel-on-outside-click="true"
-	track
-	>
-
-
-	<div class="fc-headerclass horizontal layout" 
-			track style="padding-bottom: 4px;">
-		<iron-icon
-			icon="hardware:dock"  
-			on-mousedown="_startDrag"
-			track
-			class="dragbox"
-
-			
-			>
-		</iron-icon>
-		<span class="center-justified" style="width: 100%; padding: 8px; margin: 4px; font-weight: 700; font-family: merriweather; font-size: 26px; color: #002c90;">The Focused Data Admin</span>
-	</div>
+<paper-dialog id="dragDialogTwo" class="layout vertical container" style="display: block; overflow: auto; resize: both;"  draggable="true" no-cancel-on-outside-click="true">
+<div on-mousedown="_startDrag">
+	<h3 class="fc-headerclass horizontal layout center-justified" style="padding-bottom: 4px; margin-top:16px;">The Focused Data Admin</h3>
+	<h6  class="subheading horizontal layout center-justified" style="line-height:2; margin: 10px 3px 0px 3px;">CLICK TO DRAG || CLICK AGAIN TO RELEASE</h6></div>
 	<div class="scroll-master">
-		<iron-pages id="administratorPages" style="position: relative;" selected="0">
-				<section>
-				<b>Welcome to the Focused Data Administrator!</b><br>
-				<p>Use the Data Admin to view pages on the Focused website, in a Focused app, or in your personal area at focused.  The Admin is like your own personal "second" view into everything Focused.  You can view or do anything on the admin which you could do on a normal Focused Dashboard, or webpage, so in one sense the Admin acts as a second "tab" or "window" for your Focused experience.  The Admin window, however, is "always on top" and will travel with you across different pages and interfaces.</p>
-				<p>We created the Focused Data Admin because it was a feature many of us at Focused had always wanted on web pages and in applications: a window and interface that we could keep on top of the other windows and tabs, which we could take notes in, use for calculations--the Data Admin has a calculator in it--or just use to always have at easy reference all the information we felt was most useful.</p>
-				<p> Good Luck! And, Enjoy!!!</p> 
-
-
-				</section>
-
+		<iron-pages id="assistantPages" selected="0">
 			<section>
 				<!--<fc-cell-creator>
 				</fc-cell-creator>-->
-				<div class="vertical layout flex-box">
-				
-				<fc-holder class="horizontal layout flex-box container top left-justified">
-					
-					<paper-input value='{{sectionType}}' style="max-width: 340px; flex-basis: 110px;" list="SectionType" always-float-label='true' label='Section Type'></paper-input>
+				<div class="vertical layout center center-justified flex-box">
+				<fc-holder class="horizontal layout flex-box container center center-justified" style="max-width: 100%;">
+					<paper-input value='{{testId}}' style="max-width: 340px; margin: 8px; padding: 6px; @apply::--paper-container-label-color:{text-color: midnightblue; font-size: 1.25em; font-family: merriweather; font-weight: 700;};" list="Test Number" always-float-label='true' label='Test Id'></paper-input>
+					<datalist name="Test Number" list="Test Number" id="Test Number">
+						<option> Test 1</option>
+						<option> Test 2</option>
+						<option> Test 3</option>
+						<option> Test 4</option>
+						<option> Test 5</option>
+						<option> Test 6</option>
+						<option> Test 7</option>
+						<option> Test 8</option>
+						<option> Test 9</option>
+						<option> Test 10</option>
+					</datalist>
+					<paper-input value='{{sectionType}}' style="max-width: 340px;" list="SectionType" always-float-label='true' label='Section Type'></paper-input>
 					<datalist name="Test Number" list="Test Number" id="SectionType">
 						<option> Math 55 Questions</option>
 						<option> Math 25 Questions</option>
@@ -180,7 +154,7 @@
 						<option> Writing 40 Questions</option>
 						<option> Essay Prompt and Passage</option>
 					</datalist>
-					<paper-input value='{{sectionSubType}}' style="max-width: 340px; flex-basis: 110px;" list="subSection" always-float-label='true' label='Sub-Section Type'></paper-input>
+					<paper-input value='{{sectionSubType}}' style="max-width: 340px;" list="subSection" always-float-label='true' label='Sub-Section Type'></paper-input>
 					<datalist name="subSection" list="subSection" id="subSection">
 						<option> Vocabulary Focused</option>
 						<option> Rights Focused </option>
@@ -193,21 +167,21 @@
 				<fc-holder>
 					<paper-dropdown-menu name="selectedPassage" always-float-label label="Select A Passage" on-iron-select="">
 						<paper-menu id="passageListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedPassage}}">
-							<template is="dom-repeat" items="{{passageDestinations}}" filter="passageFilter(testId)">
+							<template is="dom-repeat" items="{{passageDestinations}}" <!-- filter="passageFilter(testId)" -->>
 								<paper-item value="{{item}}">{{item}}</paper-item>
 							</template>
 						</paper-menu>
 					</paper-dropdown-menu>
-						<paper-input value='{{passageTitle}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Passage Type'></paper-input>
 				</fc-holder>
 				<fc-holder "horizontal layout no-wrap container">
-					<paper-input value='{{passageSubType}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Your Name'></paper-input>
-					<paper-textarea value='{{passageBlurb}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Passage Blurb'></paper-textarea>
+					<paper-input value='{{passageTitle}}' style="max-width: 340px;" always-float-label='true' label='Passage Type'></paper-input>
+					<paper-input value='{{passageSubType}}' style="max-width: 340px;" always-float-label='true' label='Your Name'></paper-input>
+					<paper-input value='{{passageBlurb}}' style="max-width: 340px;" always-float-label='true' label='Passage Blurb'></paper-input>
 				</fc-holder>
 				</div>
 			</section>
 			<section class="vertical layout flex container">
-				<div id="firepad" style="border: 6px ridge silver; overflow: auto;resize: auto; min-height: 420px; flex-basis: 620px;" class="fit">
+				<div id="firepad" style="border: 6px ridge silver; overflow: auto;resize: auto; min-height: 420px;" class="fit">
 					
 				</div>
 				
@@ -234,10 +208,10 @@
 </div>
 			
 	<fc-holder>	
-				<paper-button class="flex-1" on-tap="_lastAdminPage">Back</paper-button>
-				<paper-button class="flex-1" on-tap="coolThings">Not Used</paper-button>
+				<paper-button class="flex-1" on-tap="conttap">More</paper-button>
+				<paper-button class="flex-1" on-tap="coolThings">Scores</paper-button>
 				<paper-button class="flex-1" dialog-dismiss>Exit</paper-button>
-				<paper-button class="flex-1" on-tap="_nextAdminPage">Next</paper-button>
+				<paper-button class="flex-1" on-tap="_savePassage">Passage Save</paper-button>
 
 	</fc-holder>
 	
@@ -245,7 +219,7 @@
 </template>
 <script>  
 	Polymer({
-		is: 'fc-data-administrator',
+		is: 'fc-data-administrator-reverse',
 		properties:{
 		offsetX: {
 				type: Number,
@@ -400,108 +374,43 @@
 
 		
 	},
-	created: function(){
+	 created: function(){
 	 	//here is where we build out our prototypes, set properties
-		},
-	ready: function() { 
-		
 		},
 	attached: function() { 
 		this.loadFirepad();
-		//this.loadPassages();
+		this.loadPassages();
 			
 			},
-	_openAdmin: function() {
-  			console.log(this.passageDestinations + "sandles");
-			this.$.dragDialogAdmin.open();
-				
+	loadPassages: function(){
+				self=this;
+				self.passagesArray=[];
+				count=1;
+				var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
+				ref.on("child_added", function(snap){
+					if (snap.val() ===undefined){
+						self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1");
+							self.newPassageRef = 0;
+							self.newPassageRef++;
+							count++;	
+											
+					}
+					else{
+							
+  							count++;
+  							console.log("added", snap.key());
+  							self.push('passageDestinations', snap.key());
+							// length will always equal count, since snap.val() will include every child_added event
+							//var instance = self.fcid + '_000' + self.testId + '_000' + self.saveCounter
+							//self.section[instance]=  readingIdArray
+							// triggered before this point
+							self.saveCounter = count;
+						ref.once("value", function(snap) {
+  						console.log("initial data loaded!", Object.keys(snap.val()).length === count);
+							});
+						}
+				});
 	},
-
-	_closeAdmin: function(){
-		this.$.dragDialogAdmin.close();
-
-
-	},
-
- 	_nextAdminPage: function() {
- 			 var pages = this.$.administratorPages;
-    			pages.selectNext();
-  				
-  				},
-  	
-	_lastAdminPage: function(){
-			var pages = this.$.administratorPages;
-    			pages.selectPrevious();
-	},
-
-
-
-
-	_startDrag: function(e){
-		
-			//console.log(e);
-			this.dragging=true;
-			var dragbox = this.$.dragDialogAdmin.getBoundingClientRect();
-			this.offsetX = e.offsetX;
-			//console.log(this.offsetX);
-			var Xoff = this.offsetX = e.offsetX;
-			var Yoff = this.offsetY = e.offsetY;
-			//console.log(Yoff);
-			document.captureEvents(Event.MOUSEMOVE);
-			document.onmousemove = dragmeplease;
-			function dragmeplease(mp){
-				var _x = mp.clientX - 30;
-				var xString = _x.toString() + 'px';
-				var	_y = mp.clientY -30; 
-				var yString = _y.toString() + 'px';
-		  		document.querySelector('#dragDialogAdmin').style.top = yString;
-		  		//console.log("_y has this value here " + _y);
-		  		document.querySelector("#dragDialogAdmin").style.left = xString;
-		  		//console.log(_x + " that was x");
-		  	document.captureEvents(Event.MOUSEUP);
-			document.onmouseup = endThisPlease;
-			function endThisPlease(omu){
-				//console.log(omu.detail);
-				document.onmousemove = null;
-				document.onmouseup = null;
-			}
-	
-	}
-},
-
-
-// 			console.log(e);
-// 			this.dragging=true;
-// 			var dragbox = this.$.dragDialogAdmin.getBoundingClientRect();
-// 			this.offsetX = e.offsetX;
-// 			//console.log(this.offsetX);
-// 			var Xoff = this.offsetX = e.offsetX;
-// 			var Yoff = this.offsetY = e.offsetY;
-// 			//console.log(Yoff);
-// 			var self=this;
-// 			document.captureEvents(Event.MOUSEMOVE);
-// 			document.onmousemove = dragme;
-// 			function dragme(mp){
-// 				var _x = mp.clientX - 30;
-// 				var xString = _x.toString() + 'px';
-// 				var	_y = mp.clientY -30; 
-// 				var yString = _y.toString() + 'px';
-// 		  		document.querySelector('#dragDialogAdmin').style.top = yString;
-// 		  		//console.log("_y has this value here " + _y);
-// 		  		document.querySelector("#dragDialogAdmin").style.left = xString;
-// 		  		//console.log(_x + " that was x");
-// 		  	document.captureEvents(Event.MOUSEUP);
-// 			document.onmouseup = endThisPlease;
-// 			function endThisPlease(omu){
-// 				//console.log(omu.detail);
-// 				document.onmousemove = null;
-// 				document.onmouseup = null;
-// 			}
-	
-// }
-// }
-// }, 
-	
 
 	loadFirepad: function(){
 		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
@@ -511,18 +420,17 @@
 		this.passage_width = 400;
 	},
 
-	_savePassage: function(){
-
-		var blurb = this.passageBlurb;
-		var passageTitle = this.passageTitle;
-		var passageType = this.passageType;
-		var test = this.testId;
-		var fcid = this.fcid;
-		var self = this;
-		var passageContent = self.firepad.getText();
+_savePassage: function(){
+	var blurb = this.passageBlurb;
+	var passageTitle = this.passageTitle;
+	var passageType = this.passageType;
+	var test = this.testId;
+	var fcid = this.fcid;
+	var self = this;
+	var passageContent = self.firepad.getText();
 			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
 			var arrayPassed=truePassageContent.split(/\s/g);
-			var order =arrayPassed.length;
+			self.order =arrayPassed.length;
 			self.orderIndex=0;
 			this.newPassageRef="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_" + (this.saveCounter + 1).toString();
 			console.log("this is the passage ref" + this.newPassageRef);
@@ -546,7 +454,7 @@
  					// para word loop
  					{       
  							self.orderIndex++;
- 							order--;
+ 							self.order--;
  							self.wordCounter--;
  							if (paraWordRemaining==0){
  								newPara = true;
@@ -570,7 +478,7 @@
  										"passageTitle": passageTitle,
  										"passageBlurb": blurb,
  										"indexPrime":orderIndex,
- 										'order': order,
+ 										'order': self.order,
  										'word' : currentWord, 
  										'newPara': newPara,
  										'paragraph_number': paragraph_number,
@@ -586,12 +494,11 @@
 					ref.set(arrayPassage);
 					console.log(arrayPassage);
 					self.passageArray = [];
-					order=0;
 			//	this is the loop for a whole passage. When Dynamic this loop goes away	
 		//this ends the firepad stuff			
 	},
 
-	_clearPassage: function(){
+		clearPassage: function(){
 			var adminStorage2 = window.localStorage;
 			var len = this.superItemArray.length;
 			var franklin = this.superItemArray[1];
@@ -601,33 +508,30 @@
 			adminStorage2.setItem(name,email,len);
 			
 		},
-
-	_clearFirepadMemory: function()
-	{
+		ready: function() { 
 		
- 	
-	}
-
- });
-
-</script>
-</dom-module>
-
-
-<!--	
-		superItemArray:{
-			type:Array,
-			value: [],
-			notify: true,
-			reflectToAttributes: true
 		},
-
-
+ 		conttap: function() {
+ 			 var pages = this.$.assistantPages;
+    			pages.selectNext();
+  				
+  				},
+  		flattap: function() {
+			this.$.dragDialogTwo.open();
+			this.getFocused= !this.getFocused;			
+	},
+		back: function(){
+			var pages = this.$.assistantPages;
+    			pages.selectPrevious();
+	},
+	getFocused: function(){
+		this.getFocused = !this.getFocused;
+	},
 _startDrag: function(e){
-			//console.log(this.passageDestinations + " fire in the sky " + this.passageArray.order);
-			console.log(e);
+		
+			//console.log(e);
 			this.dragging=true;
-			var dragbox = this.$.dragDialogAdmin.getBoundingClientRect();
+			var dragbox = this.$.dragDialogTwo.getBoundingClientRect();
 			this.offsetX = e.offsetX;
 			//console.log(this.offsetX);
 			var Xoff = this.offsetX = e.offsetX;
@@ -640,9 +544,9 @@ _startDrag: function(e){
 				var xString = _x.toString() + 'px';
 				var	_y = mp.clientY -30; 
 				var yString = _y.toString() + 'px';
-		  		document.querySelector('#dragDialogAdmin').style.top = yString;
+		  		document.querySelector('#dragDialogTwo').style.top = yString;
 		  		//console.log("_y has this value here " + _y);
-		  		document.querySelector("#dragDialogAdmin").style.left = xString;
+		  		document.querySelector("#dragDialogTwo").style.left = xString;
 		  		//console.log(_x + " that was x");
 		  	document.captureEvents(Event.MOUSEUP);
 			document.onmouseup = endThisPlease;
@@ -655,9 +559,17 @@ _startDrag: function(e){
 	}
 } 
 });
+</script>
+</dom-module>
 
 
-		-->
+<!--	
+		superItemArray:{
+			type:Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},-->
 		
 
 
@@ -726,7 +638,7 @@ getData: function(argItem)
 						
 					</datalist>
 			<h3> Build Elements From Template Elements</h3>
-				<p class="administratorView container" no-cancel-on-outside-click="true">
+				<p class="assistantView container" no-cancel-on-outside-click="true">
 		
 				
 				<h3>Your Element Collections </h3>

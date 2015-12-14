@@ -3,7 +3,6 @@
 .edged{
   outline-width: 0px;
 }
-
 .menubuttons{
   display: inline-block; 
   width:78px; 
@@ -12,7 +11,7 @@
 </style>
 <template>
   
-<div id="dragMenu" on-track="dragmeplease" draggable  track style="position: absolute; max-height: 82px; min-height: 24px; min-width: 200px; background: #000066; border: 4px ridge #000066;" draggable="true" no-cancel-on-outside-click="true">
+<div id="dragMenu" on-track="dragmeplease" draggable  track style="position: absolute; max-height: 82px; min-height: 24px; min-width: 200px; background: #000066; border: 4px ridge #000066;" draggable="true">
   <paper-tabs style="width:420px; max-height: 78px; min-height: 24px; background: #aecdfe; whitespace: nowrap" class="layout horizontal" hideScrollButtons="true" scrollable="true" selected="{{route}}">
 	<button class="menubuttonsTwo" on-tap="_lockMenu">
           <span hidden="{{lockMenu}}">
@@ -123,7 +122,6 @@ FcDragMenu = Polymer({
 		Polymer.IronRangeBehavior
 	],
 	properties: {
-
           	getfocus: {
                 type: Boolean,
                 value: false, 
@@ -133,91 +131,72 @@ FcDragMenu = Polymer({
                   type: String,
                   notify: true
                 },
-
                 selectable: {
                   type: String,
                   value: 'fc-pages'
                 },
-
                 _step: {
                   type: Number,
                   value: 10
                 },
-
                 lockMenu:{
                     type: Boolean,
                     value: true,
                     notify: true,
                     reflectToAttribute: true
                 },
-
                 _holdDelay: {
                   type: Number,
                   value: 1
                 },
-
                 _leftHidden: {
                   type: Boolean,
                   value: false
                 },
-
                 _rightHidden: {
                   type: Boolean,
                   value: false
                 },
-
                 _previousButton: {
                   type: Object
               },
-
               hostAttributes: {
                 role: 'tabList'
               },
-
               listeners: {
                 'iron-resize': '_onResize',
                 'iron-select': '_onIronSelect',
                 'iron-deselect': '_onIronDeselect'
               },
-
               hostAttributes: {
                 'role': 'menubar'
               },
-
               keyBindings: {
                 'left': '_onLeftKey',
                 'right': '_onRightKey'
-              }
-
+              }, 
+              route: {}
           },
-
     created: function() {
       this._holdJob = null;
     },
-
     ready: function() {
       this.setScrollDirection('y', this.$.tabsContainer);
     },
-
     attached: function(){
     },
-
   _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
       if (!scrollable || hideScrollButtons) {
         return 'hidden';
       }
-
       if (hideThisButton) {
         return 'not-visible';
       }
-
       return '';
     },
-
     _computeTabsContentClass: function(scrollable) {
       return scrollable ? 'scrollable' : 'horizontal';
     },
-
     _computeSelectionBarClass: function(noBar, alignBottom) {
       if (noBar) {
         return 'hidden';
@@ -225,31 +204,26 @@ FcDragMenu = Polymer({
         return 'align-bottom';
       }
     },
-
     opened: function(){
       
     },
-
      _onResize: function() {
       this.debounce('_onResize', function() {
         this._scroll();
         this._tabChanged(this.selectedItem);
       }, 10);
     },
-
     _onIronSelect: function(event) {
       this._tabChanged(event.detail.item, this._previousTab);
       this._previousTab = event.detail.item;
       this.cancelDebouncer('tab-changed');
     },
-
     _onIronDeselect: function(event) {
       this.debounce('tab-changed', function() {
         this._tabChanged(null, this._previousTab);
       // See polymer/polymer#1305
       }, 1);
     },
-
     get _tabContainerScrollSize() {
       return Math.max(
         0,
@@ -257,17 +231,13 @@ FcDragMenu = Polymer({
           this.$.tabsContainer.offsetWidth
       );
     },
-
-
     _scroll: function(e, detail) {
       if (!this.scrollable) {
         return;
       }
-
       var ddx = (detail && -detail.ddx) || 0;
       this._affectScroll(ddx);
     },
-
     _down: function(e) {
       // go one beat async to defeat IronMenuBehavior
       // autorefocus-on-no-selection timeout
@@ -278,39 +248,30 @@ FcDragMenu = Polymer({
         }
       }, 1);
     },
-
     _affectScroll: function(dx) {
       this.$.tabsContainer.scrollLeft += dx;
-
       var scrollLeft = this.$.tabsContainer.scrollLeft;
-
       this._leftHidden = scrollLeft === 0;
       this._rightHidden = scrollLeft === this._tabContainerScrollSize;
     },
-
     _onLeftScrollButtonDown: function() {
       this._scrollToLeft();
       this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
     },
-
     _onRightScrollButtonDown: function() {
       this._scrollToRight();
       this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
     },
-
     _onScrollButtonUp: function() {
       clearInterval(this._holdJob);
       this._holdJob = null;
     },
-
     _scrollToLeft: function() {
       this._affectScroll(-this._step);
     },
-
     _scrollToRight: function() {
       this._affectScroll(this._step);
     },
-
     _tabChanged: function(tab, old) {
       if (!tab) {
         this._positionBar(0, 0);
@@ -322,26 +283,21 @@ FcDragMenu = Polymer({
       var w = r.width;
       var tabRect = tab.getBoundingClientRect();
       var tabOffsetLeft = tabRect.left - r.left;
-
       this._pos = {
         width: this._calcPercent(tabRect.width, w),
         left: this._calcPercent(tabOffsetLeft, w)
       };
-
       if (this.noSlide || old == null) {
         // position bar directly without animation
         this._positionBar(this._pos.width, this._pos.left);
         return;
       }
-
       var oldRect = old.getBoundingClientRect();
       var oldIndex = this.items.indexOf(old);
       var index = this.items.indexOf(tab);
       var m = 5;
-
       // bar animation: expand
       this.$.selectionBar.classList.add('expand');
-
       if (oldIndex < index) {
         this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
             this._left);
@@ -349,12 +305,10 @@ FcDragMenu = Polymer({
         this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
             this._calcPercent(tabOffsetLeft, w) + m);
       }
-
       if (this.scrollable) {
         this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
       }
     },
-
     _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
       var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
       if (l < 0) {
@@ -366,22 +320,18 @@ FcDragMenu = Polymer({
         }
       }
     },
-
     _calcPercent: function(w, w0) {
       return 100 * w / w0;
     },
-
     _positionBar: function(width, left) {
       width = width || 0;
       left = left || 0;
-
       this._width = width;
       this._left = left;
       this.transform(
           'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
           this.$.selectionBar);
     },
-
     _onBarTransitionEnd: function(e) {
       var cl = this.$.selectionBar.classList;
       // bar animation: expand -> contract
@@ -418,14 +368,12 @@ FcDragMenu = Polymer({
           }
      },
 	 
-
 	dragmeplease: function(e) {
      if(this.lockMenu==true){this.dragging=false;}
      else{
-        this.dragging=true;
+       // this.dragging=true;
         var self=this;
-        var dragbox = this.$.dragMenu.getBoundingClientRect();
-
+       // var dragbox = this.$.dragMenu.getBoundingClientRect();
       e.preventDefault();
         switch(e.detail.state) {
           case 'start':
@@ -451,51 +399,14 @@ FcDragMenu = Polymer({
      }
  },
  flip: function(){
-    this.transform('rotateZ(90deg)');
+   // this.transform('rotateZ(90deg)');
  },
  _lockMenu: function(){
      this.lockMenu=!this.lockMenu;
  },
-
  onLocked: function(){
   Polymer.dom(this).setAttribute('');
  }
-
-
-
 });
   </script>
 </dom-module>
-
-<!--
-<paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/red_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/black_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/silver_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/light_blue_sail_small.png"></paper-tab>
-                    <paper-tab><image style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/gold_sail_small.png"></paper-tab>
-                    <paper-tab on-tap="flip"><image  on-tap="flip" style="display: inline-block; width:64px; height: 70px;" src="../../../images/icon_menu/sail-icons/green_sail_small.png">flip</paper-tab>
--->
-
-
-
-
-
-
-
-
-
-

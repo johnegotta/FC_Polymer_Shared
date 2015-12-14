@@ -1,0 +1,156 @@
+<dom-module id="fc-reading-passage-five">	
+<template>
+<style>
+	
+		div.columnContainer{
+			overflow-y: scroll;
+		}
+		div.passageContainer{ 
+			min-width: 310px;
+			max-width: 1450px !important;
+			margin: 48px;
+		}
+		.highlighted {
+			background: yellow;
+		}
+		div.blurb{
+			line-height: 1.2;
+			font-size: 1em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			display: block;
+		}
+		
+</style>
+
+<!--double-column line-number and passage vertical container--> 
+	<div id="noJudge4" class="layout vertical flex container left passageContainer">
+	<!--blurb full width container-->
+		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+			{{passageBlurb}}
+		</div>
+
+	<!--single column container-->
+			
+		<!-- end-of-column-1 line number and text container-->
+		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
+					
+					<fc-single-column-layout id="singleDisplay" the-content='{{passageArrayOne}}'hidden='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
+					</fc-single-column-layout>
+		
+		</div>
+
+
+
+		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
+					
+					<fc-double-column-layout id="doubleDisplay" the-content='{{passageArrayOne}}' shown='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
+					</fc-double-column-layout>
+		
+		</div>
+
+					
+<!--End of top container horizontal-->
+	</div>
+<!--End of Vertical passage container-->
+</template>
+<script>
+Polymer({
+	is:'fc-reading-passage-five',
+	behaviors: [Polymer.IronResizableBehavior],
+	properties: {
+		passagePath: {
+			type: String,
+			value: 'new_Test_1',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageFullPath: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageArrayOne:{
+			type: Array, 
+			value: function(){
+				return []
+			},
+			notify: true, 
+			reflectToAttibutes: true 
+		},
+		
+		passageTitle: {
+			type: String, 
+			notify: true,
+			reflectToAttributes: true
+		},
+
+		passageBlurb:{
+			type: String,
+			value: 'none',
+			reflectToAttributes: true,
+			notify: true
+		},
+		lastWordIndex: {
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		showingSecondColumn: {
+			type: Boolean,
+			value: false,
+			notify: true, 
+			reflectToAttributes: true
+		}
+	},
+	ready: function(){
+		this.passagePath = (this.passagePath === undefined) ? 'new_Passage_1' : this.passagePath;
+		this.passageFullPath = 'https://focusedstaging1.firebaseio.com/passagesDestinations/' + this.passagePath;
+		console.log('READY READING FIVE' + this.passageFullPath);
+		var self = this;
+		var ref = new Firebase(self.passageFullPath);
+		ref.on("value", function(snap){
+			self.passageArrayOne=snap.val();
+			console.log(snap.val());
+			self.lastWordIndex = self.passageArrayOne.length;
+			self.$.singleDisplay.lastWordIndex = self.lastWordIndex;
+			self.$.doubleDisplay.lastWordIndex = self.lastWordIndex;
+			self.passageTitle = self.passageArrayOne[4].passageTitle;
+			self.passageBlurb = self.passageArrayOne[4].passageBlurb;
+		});
+
+
+	},
+
+	notifyResize: function(){
+		this.setUp();
+		this.$.singleDisplay.lastWordIndex=this.lastWordIndex;
+		this.$.doubleDisplay.lastWordIndex=this.lastWordIndex;
+		this.$.doubleDisplay.firstColumnLastWordIndex = Math.floor(.618*this.lastWordIndex);
+		this.$.doubleDisplay.secondColumnFirstWordIndex = this.finalColumnOneWordIndex+1;
+		console.log( 'last word index ' + (this.lastWordIndex));
+
+	},
+	
+	setUp: function()
+	{
+		this.screenTrueHeight =  (window.innerHeight-340);
+		if(this.$.noJudge4.clientWidth >= 640)
+			{
+				this.showingSecondColumn = true;
+				this.$.doubleDisplay.notifyResize();
+			}	
+		else
+			{ 
+				this.showingSecondColumn = false;
+				this.$.singleDisplay.notifyResize();
+			}
+	}
+
+
+
+});
+</script>
+</dom-module>

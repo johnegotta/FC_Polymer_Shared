@@ -1,0 +1,515 @@
+<dom-module id="fc-reading-passage-two">	
+<template>
+<style is="custom-style">
+		div.line-number {
+			width: 28px;
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			padding: 6px 0px 6px 0px;
+			margin: 6px 0px 6px 0px;
+			
+		}
+		div.columnContainer{
+			overflow-y: scroll;
+		}
+		div.passageContainer{ 
+			max-width: 1450px !important;
+			margin: 1vh 12px 1vh 12px;
+		}
+		.highlighted {
+			background: yellow;
+		}
+		div.blurb{
+			line-height: 1.2;
+			font-size: 1em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			display: block;
+		}
+		div.text {
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			padding: 6px;
+			margin: 6px 0px 6px 0px;
+			min-height: 720px !important;
+			display: flex;
+			min-width: 280px !important;
+			max-width: 620px !important;	
+		}
+</style>
+<!--double-column line-number and passage vertical container--> 
+			<div id="noJudge" class="layout vertical flex container left passageContainer">
+	<!--blurb full width container-->
+					<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+					{{passageBlurb}}
+					</div>
+
+	<!--single column container-->
+			<div id="singleColumnContainer" class="layout horizontal container columnContainer" style="padding-right: 12px;">
+			<!--Line number container-->
+					 		<div id="linenumbersA1" class="layout vertical line-number">
+					 		<div class="line-numbers" id="linesA1">Lines</div>
+					 			<template is="dom-repeat" items="{{firstColumnLineNumberArrayOne}}">
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     							
+    							</template>
+					 		</div>
+			<!--passage-1-column-1 container-->
+					 		<div id="colUnoA" class="layout horizontal flex wrap text">
+					 		<article id="singleColumnText">
+					 	    	<template is="dom-repeat" filter='{{}}' items="{{passageArrayOne}}">
+ 									<template is="dom-if" if="{{item.paragraphBreak}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id="oneA_{{index}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+								</template>
+									<br class="line-numbers">
+									<hr>
+								<span class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</span>
+							</article>
+					 		</div>
+					 	</div>					
+		<!-- end-of-column-1 line number and text container-->
+					<div id="doubleColumnContainer" class="layout horizontal flex container">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 12px; overflow-y:scroll;">
+			<!--Line number container-->
+					 		<div id="linenumbers" class="layout vertical line-number">
+					 		<div id="lines" class="line-numbers">Lines</div>
+					 			<template is="dom-repeat" items="{{LineNumberArray}}" filter='{{"{{passageTwoFilter(showingSecondColumn,finalColumnOneWordIndex)}}">}}'>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+    							</template>
+    							
+					 		</div>
+			<!--passage-1-column-1 container-->
+					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<article id="textColumnOne">
+					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageOneFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
+ 									<template is="dom-if" if="{{item.paragraphBreak}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id="one_{{item.order}}" invisibility="false" hidden="{{!columnOneShow}}">{{item.word}}</a>
+								</template>
+								<br class="line-numbers">
+								<hr>
+								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderOne"> Focused Coaching (c) 2016</span>
+							</article>
+					 		</div>
+					 	</div>
+		<!-- end-of-column-1 line number and text container-->
+
+		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 12px;overflow-y:scroll;">
+			<!--Line number container-->
+					 		<div id="linenumbersright" class="layout vertical line-number">
+					 		<span id="linesTwo" clas="line-numbers">Lines</span>
+					 		 	<template is="dom-repeat" items="{{LineNumberArrayTwo}}" filter='{{doubleColPassageTwoFilter()}}'>
+     								<span hidden="{{!item.show}}" id="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     								
+    							</template>	
+					 		</div>
+			<!--end of passage-1-column-1 line number container-->
+			<!--passage-1-column-2 container-->
+					 		<div id="colDos" class="layout vertical text">
+					 		<article id="textColumnTwo">
+					 			<div class="line-numbers"><span>&nbsp </span></div>
+								<template is="dom-repeat" items="{{passageArrayOne}}" filter="{{passageTwoFilter(showingSecondColumn,finalColumnOneWordIndex)}}">
+ 									<template is="dom-if" if="{{item.paragraphBreak}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id="two_{{item.order}}" filter=${{doubleColPassageTwoFilter: true, 
+									html 26.1>{{item.word}}</a>
+								</template>
+								<br class="line-numbers">
+								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
+							</article>
+					 		</div>
+		<!--passage-1-column-2 container-->
+					 	</div>
+	<!--end of flex passage column container-->
+				</div>
+<!--End of top container horizontal-->
+			</div>
+<!--End of Vertical passage container-->
+</template>
+<script>
+Polymer({
+	is:'fc-reading-passage-two',
+	behaviors: [Polymer.IronResizableBehavior],
+	properties: {
+		passageArrayOne:{
+			type: Array, 
+			value: [],
+			notify: true, 
+			reflectToAttibutes: true 
+		},
+		ColumnOneWordArray: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		ColumnTwoWordArray: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		firstColumnLineNumberArrayOne:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		passageWordArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		wordArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		
+		LineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		LineNumberArrayTwo: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		
+		
+		passageTitle: {
+			type: String, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		numWords: {
+			type: Number,
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageBlurb:{
+			type: String,
+			value: 'none',
+			reflectToAttributes: true,
+			notify: true
+		},
+		linesH: {
+			type: String,
+			value: '',
+			notify: true
+		},
+		showingSecondColumn: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		lastRow:{
+			type: Number,
+			notify: true,
+		},
+		goldenRatio: {
+			type: Number,
+			notify: true,
+			reflectToAttributes: true
+		},
+		finalColumnOneWordIndex: {
+			type: Number,
+			notify: true
+		},
+		notify: true,
+		reflectToAttributes: true
+	},
+	attached: function(){
+		for(i=1; i <= 250; i++)
+			{
+			j=	i % 5 ? false: true;
+			this.push("LineNumberArray", {'number': i, 'show': j});
+			this.push("LineNumberArrayTwo", {'number': i, 'show': j});
+			this.push("firstColumnLineNumberArrayOne", {'number': i, 'show': j});
+		
+			}
+		this.loadPassages();
+		},
+	logjunk: function(){
+		console.log(this.numWords);
+	},
+	loadPassages: function(){
+		
+		this.passageArrayOne=[];
+		var self = this;
+		var ref = new Firebase("passageDestinations","https://focused0ne.firebaseio.com/passageDestinations/new_Passage_1");
+		ref.on("value", function(snap){
+			self.passageArrayOne=[];
+			self.wordArray =[];
+			self.ColumnOneWordArray=[];
+			self.ColumnTwoWordArray=[];
+			self.passageArrayOne = snap.val();
+			self.numWords = self.passageArrayOne.length;
+			self.goldenRatio = Math.floor(.62*self.numWords);
+			self.finalColumnOneWordIndex = self.goldenRatio;
+			self.passageTitle = self.passageArrayOne[3].passageTitle;
+			self.passageBlurb = self.passageArrayOne[3].passageBlurb;
+			var j=0;
+			for(j=0; j<self.numWords;j++){
+				self.push("wordArray", self.passageArrayOne[j].word.replace('&nbsp&nbsp&nbsp&nbsp','aaaa'));
+					}
+			self._measureWords(false);
+		});
+	},
+	
+	notifyResize: function(){		
+		this.setUp();
+		console.log(this.wordArray);
+		
+	},
+	
+	setUp: function(){
+		this.screenTrueHeight =  (window.innerHeight-340);
+		this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
+		if(this.textColumnOneHeight!=undefined && this.textColumnOneHeight >=50){
+			if(this.$.noJudge.clientWidth >= 620 && this.textColumnOneHeight>this.screenTrueHeight){
+				this.$.doubleColumnContainer.hidden = false;
+				this.$.singleColumnContainer.hidden = true; 
+				this.showingSecondColumn = true;
+				this._measureWords(true);
+				var finalWordAnchor = this.$$('#one_'+ this.finalColumnOneWordIndex.toString());
+				var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
+				console.log(finalWordAnchor.getBoundingClientRect());
+				var previousAnchor = finalWordAnchor;
+				var bottom_of_previous_anchor = bottom_of_line_to_cut;
+				var howManyAheadOfFinalColumnOneWord = 0;
+				while(howManyAheadOfFinalColumnOneWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+					previousAnchor = previousAnchor.previousSibling;
+					if(previousAnchor.nodeName == finalWordAnchor.nodeName){
+						bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
+						howManyAheadOfFinalColumnOneWord++;
+					}
+				}
+				this.finalColumnOneWordIndex = this.finalColumnOneWordIndex - howManyAheadOfFinalColumnOneWord;
+				console.log(this.finalColumnOneWordIndex);
+			}
+			else{ 
+				this.$.doubleColumnContainer.hidden = true;
+				this.$.singleColumnContainer.hidden = false;
+				  this.showingSecondColumn = false;
+				  this._measureWords(false);
+				
+			}
+		}
+		else {
+			if(this.$.noJudge.clientWidth >= 620){
+				this.$.secondColumnContainer.hidden = false;
+				this.textColumnOneHeight=this.$.textColumnOne.scrollHeight;
+				if(this.textColumnOneHeight < this.screenTrueHeight){
+					this.$.doubleColumnContainer.hidden = false;
+					this.$.singleColumnContainer.hidden = true; 
+					this.showingSecondColumn = true;
+					this._measureWords(true);
+			
+					var finalWordAnchorId = 'one_'+ this.finalColumnOneWordIndex.toString();
+					var finalWordAnchor= this.$.finalWordAnchorId;
+					var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
+					console.log(finalWordAnchor.getBoundingClientRect());
+					console.log(this.passageWordArray[finalColumnOneWordIndex].wordWidth);
+					var previousAnchor = finalWordAnchor;
+					var bottom_of_previous_anchor = bottom_of_line_to_cut;
+					var howManyAheadOfFinalColumnOneWord = 0;
+					while(howManyAheadOfFinalColumnOneWord <10 && bottom_of_previous_anchor == bottom_of_line_to_cut){
+						previousAnchor = previousAnchor.previousSibling;
+						if(previousAnchor.nodeName == finalWordAnchor.nodeName){
+							bottom_of_previous_anchor = previousAnchor.getBoundingClientRect().bottom;
+							howManyAheadOfFinalColumnOneWord++;
+						}
+					}
+					this.finalColumnOneWordIndex = this.finalColumnOneWordIndex - howManyAheadOfFinalColumnOneWord;
+					console.log(this.finalColumnOneWordIndex);
+				}
+	
+			}
+			else{
+				this.$.doubleColumnContainer.hidden = true;
+				this.$.singleColumnContainer.hidden = false;
+				this.showingSecondColumn=false;
+				this._measureWords(false);
+			}
+					
+		}
+	},
+	_measureWords:function(showSecondColumn){
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		context= this.measureFont();
+		context.font = this.measureFont().font;
+		console.log(context.font);
+		
+		var passageWidth = showSecondColumn ? this.$.textColumnOne.clientWidth: this.$.singleColumnText.clientWidth;
+		if(passageWidth < 240)
+		{
+			passageWidth = 280;
+		}
+		console.log(passageWidth);
+		var currentRow = 0;
+		var passageTitle = this.passageTitle;
+		var numParagraphs = this.paragraphs;
+			var numWords = this.numWords;
+			var wordCount = 0;
+			var currentLine = "";
+			var currentWidth = 0;
+			for(wordCount=0; wordCount < numWords; wordCount++)
+			{	
+				var indentOffset = (context.measureText("\x20").width)*4;
+				var currentWord = this.wordArray[wordCount];
+				var wordMeasure = " " + this.wordArray[wordCount];
+				var newPara = this.passageArrayOne[wordCount].newPara;
+				var isLastWord)OfPara = this.passageArrayOne[wordCount].isLastWordOfPara;
+				if(newPara == true || wordCount==0){
+					currentWidth= indentOffset + context.measureText(currentWord).width;
+					currentLine = this.wordArray[wordCount];
+					currentRow++;
+				}
+				else if(currentWidth+context.measureText(wordMeasure).width < passageWidth)
+				{
+					currentLine += wordMeasure; //add a word and space
+					currentWidth = context.measureText(currentLine).width;
+				} 
+				else{
+					currentLine = this.wordArray[wordCount];
+					currentWidth = context.measureText(currentLine).width;
+					currentRow++;
+				}
+				this.push("passageWordArray",
+					{ 	
+						'current-line': currentLine,
+						'order': wordCount,
+						'word' : currentWord, 
+						"current-line-width": currentWidth, 
+						'row':currentRow,
+						'passage_width': passageWidth,
+						'newPara': newPara,
+						'word-width': context.measureText(currentWord).width.
+						'isLastWordOfPara':isLastWordOfPara
+					}
+				);
+		} 
+		
+		console.log(this.passageWordArray);
+			var checkId = this.finalColumnOneWordIndex;
+			var lastWord = this.numWords -1;
+			var checkAgain = checkId + 1;
+			var idOne ='#one_'+ checkId.toString();
+			var idTwo = '#two_'+ checkAgain.toString();
+			console.log(idOne);
+			console.log(this.$$(idOne));
+			
+			this.idOne
+
+			// var position = this.$$(idOne).getBoundingClientRect().right + 52 + this.passageWordArray[checkId].wordWidth < this.$$(idTwo).getBoundingClientRect().right ? "at end of line": "suck word from next column";
+			// 	console.log("Position: " + position);
+			// 	console.log(lastRow);
+			// 	self=this;
+			// 	this.lastRow = lastRow;
+			// 	this.set("firstColumnLineNumberArrayOne", self.LineNumberArray.slice(0,this.lastRow));		
+	},
+	measureFont: function(){
+		var lines = this.$.textColumnOne;		
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		this.context = context;
+		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
+		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
+		this.context.font = context.font = calcFontSize + " " + calcFontFam;
+		return this.context;			
+	 },
+	passageOneFilter: function(showSecond, finalWord){
+		if(showSecond){
+			return (item)=>{
+				return (item.order <= this.finalColumnOneWordIndex);
+			};
+		} else {
+			return true;
+		}
+	},
+	
+	passageTwoFilter: function(showSecond, finalWord){
+		if(showSecond){
+			return (item)=>{
+				return (item.order > this.finalColumnOneWordIndex);
+			};
+		} else {
+			return (item)=>{
+				return false;
+			};
+		}
+	},
+	doubleColPassageOneFilter: function(showSecond, ref_1){
+		if(showSecond){
+			return (item)=>{
+				return (item.number <= ref_1);
+			};
+		} else {
+			return (item)=>{
+				return false; 
+			};
+		}
+	},
+	doubleColPassageTwoFilter: function(showSecond, ref_1, lastRow){
+		if(showSecond){
+			return (item)=>{
+				return (item.number > ref_1 && item.number<=this);
+			};
+		} else {
+			return (item)=>{
+				return false; 
+			};
+		}
+	}
+});
+</script>
+</dom-module>
+	 	
+	 <!--	var self=this;
+	 	this.middleWordsArray =[];
+	 	var referenceId = '#two_'+ self.goldenRatio.toString();
+	 	var referenceNode =  self.$$(referenceId);
+	 	for(var k=1;k<14;k++){
+	 		var counter = self.goldenRatio;
+	 		this.counterMinus =  counter - k;
+	 		var counterMinusId = '#two_'+ this.counterMinus.toString();
+			var counterNode = this.$$(counterMinusId);
+			var dist = counterNode.getBoundingClientRect().top - referenceNode.getBoundingClientRect().top;
+			var deltaTwo = dist.toString();
+			console.log(" This is the Golden Ration Id: " + referenceId
+			+	" This is the counter from GRatio element: " + counterMinusId);
+			console.log(" This is the GR distance from the counter elements top distance in pxls: " + deltaTwo);
+			self=this;
+			this.push('middleWordsArray', 
+				{ 
+					'anchor_id' : counterMinusId,
+					'delta': deltaTwo,
+					'word': this.passageWordArray[self.counterMinus].word,
+					'lastRowFirstCol': this.passageWordArray[self.counterMinus].row,
+					'lastRow': lastRow,
+					"row": this.passageWordArray[self.counterMinus].row,
+					'order':self.counterMinus, 
+					'newEndColOne': self.goldenRatio
+				});
+			var colOne = self.middleWordsArray[1].lastRowFirstCol;
+			var colTwo = lastRow; 
+
+			this.numberTwoColumns(colOne, colTwo);
+			alert("WE SURVIVED THE LOOPS" + middleWordsArray);
+			return colOne;
+-->

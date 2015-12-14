@@ -1,0 +1,396 @@
+<dom-module id="paper-calendar">
+  <template>
+    <style>
+      :host {
+        -webkit-font-smoothing: antialiased;
+        display: block;
+        color: var(--primary-text-color);
+        @apply(--paper-font-body1);
+      }
+      #calendarList {
+        background: var(--primary-background-color);
+      }
+      :host:not([no-scroll]) #calendarList {
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 270px;
+        height: 240px;
+      }
+      :host:not([no-scroll]) {
+      }
+      .month-header {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      .month {
+        padding: 0;
+      }
+      .month-name {
+        padding: 8px;
+        text-align: center;
+        font-weight: bold;
+        @apply(--paper-font-body2);
+      }
+      .month-name:hover {
+        cursor: pointer;
+      }
+      .month-weekdays {
+        font-size: 13px;
+        font-weight: bold;
+        @apply(--layout-horizontal);
+      }
+      .month-days {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      .month-weekdays .day {
+        height: 20px;
+        line-height: 20px;
+      }
+      .week {
+        width: 238px;
+        @apply(--layout-horizontal);
+      }
+      .month-days .month-day {
+        @apply(--layout-vertical-center);
+      }
+      .day {
+        padding: 0 1px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        line-height: 32px;
+        text-align: center;
+        vertical-align: middle;
+      }
+      .day-item:not([disabled]) .day {
+        border-radius: 100%;
+      }
+      .day-item:not([disabled]) .day:hover {
+        cursor: pointer;
+      }
+      .day-item[disabled] {
+        color: var(--text-disabled-color, #9d9d9d);
+      }
+      .day-item.selected .day {
+        background: var(--default-primary-color);
+        color: var(--text-primary-color);
+      }
+      .day-item.today .day {
+        color: var(--default-primary-color);
+      }
+      .day-item.selected.today .day {
+        color: var(--text-primary-color);
+      }
+      :host([isTouch]) #calendarList::-webkit-scrollbar {
+        width: 0 !important 
+      }
+    </style>
+    <div id="calendarList" cross-fade>
+      <template is="dom-repeat" items="{{_months}}" as="month">
+        <div class$="{{getMonthClass(month)}}">
+          <div class="month-header">
+            <div class="month-name" on-tap="_tapMonth">
+              <span>{{getMonthName(month.month)}}</span> <span>{{month.year}}</span>
+            </div>
+            <div class="month-weekdays">
+              <template is="dom-repeat" items="{{weekdays}}" as="weekday">
+                <div class="day">{{weekday.0}}</div>
+              </template>
+            </div>
+          </div>
+          <div class="month-days">
+            <template is="dom-repeat" items="{{month.weeks}}" as="week">
+              <div class="week">
+                <template is="dom-repeat" items="{{week}}">
+                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{isDisabled(item.day, item.date, minDate, maxDate)}}"
+                    class$="{{getDayClass('day-item', item.date, today, date)}}">
+                    <div class="day">{{item.day}}</div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+        is: 'paper-calendar',
+        properties: {
+          /*
+           * The selected date
+           */
+          date: {
+            type: Date,
+            notify: true,
+            value: null,
+            observer: '_dateChanged'
+          },
+          /**
+           * The current locale
+           */
+          locale: {
+            type: String,
+            value: 'en',
+            observer: 'localeChanged'
+          },
+          /**
+           * The minimum allowed date
+           */
+          minDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The maximum allowed date
+           */
+          maxDate: {
+            type: Date,
+            value: null
+          },
+          /*
+           * The minumum allowable year
+           */
+          minYear: {
+            type: Number,
+            value: 1900
+          },
+          /*
+           * The maximum allowable year
+           */
+          maxYear: {
+            type: Number,
+            value: 2100
+          },
+          /*
+           * Disable scrolling
+           */
+          noScroll: {
+            type: Boolean,
+            value: false,
+            reflectAttribute: true
+          },
+          initialDate: {
+            type: Date,
+            value: function() {
+              return this.today || new Date();
+            },
+          },
+          _year: {
+            type: Number,
+            computed: '_computeYear(initialDate, minDate, maxDate)'
+          },
+          years: {
+            type: Array,
+            computed: '_computeYears(minYear, maxYear, minDate, maxDate)',
+            notify: true
+          },
+          isTouch: {
+            type: Boolean,
+            value: false,
+            reflectAttribute: true
+          }
+        },
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        observers: [
+          'populate(_year, minDate, maxDate)'
+        ],
+        listeners: {
+          'iron-resize': '_resizeHandler'
+        },
+        localeChanged: function() {
+         // moment().locale(this.locale);
+        },
+        ready: function() {
+          this.isTouch = 'ontouchstart' in window;
+          this._physicalYears = [];
+          this._updateToday();
+          this.weekdays = moment().weekdaysMin();
+          this.monthNames = moment().months();
+          this.localeChanged();
+          setInterval(this._updateToday, 60000);
+          this.scrollToDate(this.initialDate);
+        },
+        _computeYear: function(initialDate, minDate, maxDate) {
+          var year = initialDate.getFullYear();
+          if (minDate && year < minDate.getFullYear()) {
+            year = minDate.getFullYear();
+          } else if (maxDate && year > maxDate.getFullYear()) {
+            year = maxDate.getFullYear();
+          }
+          return year;
+        },
+        _computeYears: function(minYear, maxYear, minDate, maxDate) {
+          var years = [];
+          if (minDate) {
+            var minDateYear = minDate.getFullYear();
+            minYear = minYear > minDateYear ? minYear : minDateYear;
+          }
+          if (maxDate) {
+            var maxDateYear = maxDate && maxDate.getFullYear();
+            maxYear = maxYear < maxDateYear ? maxYear : maxDateYear;
+          }
+          for (var y=minYear; y<=maxYear; y++) {
+            years.push(y);
+          }
+          return years;
+        },
+        populate: function(year, minDate, maxDate) {
+          var months = [];
+          var month, weeks, day, d, dayInfo, monthData, date = new Date();
+          date.setYear(year);
+          date.setHours(0, 0, 0, 0);
+          var startMonth = 0;
+          var endMonth = 12;
+          if (minDate && year === minDate.getFullYear()) {
+            startMonth = minDate.getMonth();
+          }
+          if (maxDate && year === maxDate.getFullYear()) {
+            endMonth = maxDate.getMonth() + 1;
+          }
+          for (month=startMonth; month<endMonth; month++) {
+            weeks = [[]];
+            day = 1;
+            date.setMonth(month);
+            date.setDate(1);
+            // add "padding" days
+            for (d=0; d<date.getDay(); d++) {
+              weeks[0].push({day: null});
+            }
+            // add actual days
+            while (date.getMonth() === month) {
+              if (d % 7 === 0) {
+                // start new week
+                weeks.push([]);
+              }
+              dayInfo = {
+                date: new Date(year, month, day),
+                name: this.isoFormat(year, month, day),
+                year: year,
+                month: month,
+                day: day,
+              };
+              weeks[weeks.length-1].push(dayInfo);
+              date.setDate(++day);
+              d++;
+            }
+            monthData = {
+              year: year,
+              month: month,
+              weeks: weeks,
+              domReady: false
+            };
+            months.push(monthData);
+          }
+          this.set('_months', months);
+        },
+        isoFormat: function(year, month, day) {
+          var date;
+          if (arguments.length === 1) {
+            date = arguments[0];
+            year = date.getFullYear();
+            month = date.getMonth() + 1;
+            day = date.getDate();
+          }
+          return (
+            year + '-' + 
+            ('0' + month).slice(-2) + '-' + 
+            ('0' + day).slice(-2)
+          );
+        },
+        getDayClass: function(cssClass, date) {
+          if (!date) {
+            return cssClass;
+          }
+          if (date.getTime() === this.today.getTime()) {
+            cssClass += ' today';
+          }
+          if (this.date && date.getTime() === this.date.getTime()) {
+            cssClass += ' selected';
+          }
+          return cssClass;
+        },
+        isDisabled: function(day, date) {
+          return !day || !this._isDateInBounds(date);
+        },
+        getMonthClass: function(month) {
+          return 'month month-' + month.year + '-' + month.month;
+        },
+        getMonthIdx: function(year, month) {
+          var yearDiff = (year - this._months[0].year);
+          var monthDiff = (month - this._months[0].month);
+          return (yearDiff * 12) + monthDiff;
+        },
+        scrollToMonth: function(year, month) {
+          if (!this._sized) {
+            var _this = this;
+            this.addEventListener('paper-calendar-sized', function() {
+              this.scrollToMonth(year, month);
+              _this.removeEventListener('paper-calendar-sized', this);
+            });
+          } else {
+            var el = this.querySelector('.month-' + year + '-' + month);
+            if (el) {
+              this.$.calendarList.scrollTop = el.offsetTop;
+            }
+          }
+        },
+        scrollToDate: function(date) {
+          if (!date) {
+            date = this.initialDate || this.today;
+          }
+          this.scrollToMonth(date.getFullYear(), date.getMonth());
+        },
+        _dateChanged: function(date) {
+          if (date) {
+            this.scrollToDate(date);
+          }
+        },
+        _tapMonth: function(event) {
+          var month = event.model.month;
+          this.scrollToMonth(month.year, month.month);
+        },
+        _tapDay: function(event) {
+          if (!this._isDateInBounds(event.model.item.date)) {
+            return false;
+          }
+          this.date = event.model.item.date;
+        },
+        _isDateInBounds: function(date) {
+          return !date || (
+            (!this.minDate || this.minDate.getTime() <= date.getTime()) && 
+            (!this.maxDate || this.maxDate.getTime() >= date.getTime())
+          );
+        },
+        _resizeHandler: function() {
+          this.updateSize();
+        },
+        updateSize: function() {
+          if (this.$.calendarList.offsetHeight > 0) {
+            this._sized = true;
+            this.fire('paper-calendar-sized');
+          } else {
+            this._sized = false;
+          }
+        },
+        getMonthName: function(month) {
+          return this.monthNames[month];
+        },
+        _updateToday: function() {
+          var today = new Date();
+          today.setHours(0, 0, 0, 0);
+          this._todayYear = today.getFullYear();
+          this._todayMonth = today.getMonth();
+          this._todayDay = today.getDate();
+          this.today = today;
+        },
+        _getDayName: function(date) {
+          return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        },
+    });
+  </script>
+</dom-module>

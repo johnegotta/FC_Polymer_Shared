@@ -1,0 +1,501 @@
+<dom-module id="fc-passage-display-dashboard">
+<template>
+<style>
+div.line-number {
+	width: 28px;
+	line-height: 1.0;
+	font-size: 1.1em;
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+	padding: 6px 0px 6px 0px;
+	margin: 6px 0px 6px 0px;
+	
+}
+div.columnContainer{
+	overflow-y: scroll;
+}
+div.passageContainer{ 
+	height:calc(100vh-290px);
+
+margin: 1vh 1vw 1vh 0vh;
+}
+.highlighted {
+	background: yellow;
+}
+div.blurb{
+	line-height: 1.0;
+	font-size: .9em;
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+}
+#pringles {
+	margin: 0px 4px 6px 4px;
+	padding: 16px;
+	width:calc(100%+64px);
+	
+}
+div.text {
+	max-width: 720px;
+	line-height: 1.0;
+	font-size: 1.1em;
+	font-family: merriweather;
+	font-weight: 500;
+	padding: 6px;
+	margin: 6px 0px 6px 0px;
+	max-height: 1900px;
+	min-height: 480px;
+	display: flex;
+		max-width: 730px !important;
+	
+	
+}
+
+br {text-indent: 18px;}
+</style>
+	<firebase-collection location="https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620" data='{{passageArrayOne}}'></firebase-collection>
+		<fc-splitter-jc orientation="horizontal" style="height: 1900px; width: 100vw;">	
+			
+<!--double-column line-number and passage vertical container--> 
+			<div id="noJudge" class="layout vertical flex container left passageContainer" style="border: 2px ridge silver;">
+	<!--blurb full width container-->
+					<div class="layout horizontal blurb" style="margin: 12px 36px 0px 36px; max-height: 140px; border: 1px ridge red;">
+					This passage is from Lydia Minatoya, The Strangeness of Beauty. ©1999 by Lydia Minatoya. The setting is Japan in 1920. Chie and her daughter Naomi are members of the House of Fuji, a noble family.<span id="tester"> </span>
+					</div>
+
+	<!--passage-columns container-->
+					<div id="pringles" class="layout horizontal flex container" style="border: 1px solid goldenrod;">
+		<!--column-1-container line numbs and passage | Flex-1 keeps the columns even-->
+						<div class="layout horizontal flex-1 container columnContainer" style="border: 1px solid #000066; padding-right: 12px;">
+			<!--Line number container-->
+					 		<div id="linenumbers" class="layout vertical line-number">
+					 		<span id="lines">Lines</span>
+					 			<template is="dom-repeat" items="{{firstColumnLineNumberArray}}">
+     								<span hidden="{{!columnOneShowLines}}" id="col_one_line_{{index}}">{{item}}</span>
+     							
+    							</template>
+					 		</div>
+			<!--passage-1-column-1 container-->
+					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<article>
+					 	    	<template is="dom-repeat" items="{{firstColumnWordArray}}">
+ 									<template is="dom-if" if="{{item.paragraphBreak}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<a id="one_{{item.order}}_{{item.word}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+								</template>
+							</article>
+					 		</div>
+					 	</div>
+		<!-- end-of-column-1 line number and text container-->
+
+		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
+					 	<div id="secondColumnContainer" hidden="false" class="layout horizontal flex-1 container" style="border: 1px solid brown; padding-left: 12px;">
+			<!--Line number container-->
+					 		<div id="linenumbersright" class="layout vertical line-number">
+					 		 	<template is="dom-repeat" items="{{secondColumnLineNumberArray}}">
+     								<span id="col_two_line_{{index}}" hidden="{{!columnOneShowLines}}">{{item}}</span>
+     								
+    							</template>	
+					 		</div>
+			<!--end of passage-1-column-1 line number container-->
+			<!--passage-1-column-2 container-->
+					 		<div id="colDos" class="layout vertical text">
+					 		<article>
+								<template is="dom-repeat" items="{{secondColumnWordArray}}">
+ 									<template is="dom-if" if="{{item.paragraphBreak}}">
+ 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+ 									</template>
+ 									<span id="two_{{item.order}}_{{item.word}}" hidden="{{columnOneShow}}">{{item.word}}</span>
+								</template>
+							</article>
+					 		</div>
+		<!--passage-1-column-2 container-->
+					 	</div>
+	<!--end of flex passage column container-->
+				</div>
+<!--End of top container horizontal-->
+			</div>
+<!--End of Vertical passage container-->
+
+		</fc-splitter-jc>
+		<content class="left horizontal layout container" select="fc-student-intake-form, fc-grid-card-portrait">		
+		</content>	
+	<fc-data-administrator id="scottAdmin"></fc-data-administrator>
+	<paper-button on-tap="columnize">2 Columnize</paper-button>
+</template>
+<script>
+/*FcTopViewDashboard=*/
+Polymer({
+	is: "fc-passage-display-dashboard", 
+	behaviors: [Polymer.IronResizableBehavior],
+	properties: {
+		iPath: 'http://www.focusedstaging.com/Fresh_Attempt%20/index-jason.html',
+		topClassHidden: {
+			type: Boolean, 
+			value: true, 
+		/*	observe: however you do this Scott,*/
+			reflectToAttributes: true,
+			notify: true
+			},
+		shitty: String,
+		bottomLeftClassHidden: {
+			type: Boolean, 
+			value: true, 
+		/*	observe: however you do this Scott,*/
+			reflectToAttributes: true,
+			notify: true
+			}, 
+		bottomRightClassHidden: {
+			type: Boolean, 
+			value: true, 
+		/*	observe: however you do this Scott,*/
+			reflectToAttributes: true,
+			notify: true
+			},
+		lowerRight: String,
+		lowerLeft: String,
+		passageWidth: {
+			type: String, 
+			value: function(){return this.$.noJudge.clientWidth;},
+			notify: true, 
+			reflectToAttributes: true
+		},
+		largestLineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		firstColumnLineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		secondColumnLineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		passageArrayOne:{
+			type: Array, 
+			value: [],
+			notify: true, 
+			reflectToAttibutes: true
+		}, 
+		passageDimensions: {
+			type: Object,
+			value: {
+				passageWidth: Number,
+				passageHeight: Number,
+				lineNumCellHeight: Number,
+				numberOfLinesColOne: Number, 
+				passageInnerHeight: Number, 
+				passagePositionX: Number, 
+				passagePositionY: Number, 
+				passagePositionZ: Number
+			},
+			notify: true, 
+			reflectToAttributes: true
+		},
+		passageObject: {
+			type: Object,
+			value:{}, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageTitle: {
+			type: String, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		contentEdit: {
+			type: Boolean,
+			value: false, 
+			notify: true,
+			reflectToAttributes: true
+		},
+		firstColumnWordArray: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		secondColumnWordArray: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		flitty: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttributes: true
+		},
+		notify: true,
+		reflectToAttributes: true
+	},
+	created: function(){
+	},
+	ready: function(){
+		
+	},
+	attached: function(){
+		
+		var lines = document.querySelector('#lines');
+		console.log(lines);
+		for(i=1; i <= 400; i++)
+		{
+			this.push("largestLineNumberArray", i % 5 ? ".": i.toString());
+		}
+	},
+	attributeChanged: function(){
+		var nooSpans = document.querySelector('[name|=false]');
+		this.passageDimensions.passageWidth = document.querySelector('#pringles').clientWidth;
+		
+	},
+	columnize: function()
+	{
+		console.log("columnize");
+		this.splitIntoColumns(2);
+	},
+	destroyed: function(){
+		
+	},
+	timer: function(){
+	},
+	_outputpassageObject: function() {
+		console.log( " " + JSON.stringify(this.passageObject) + "\n" + "\n");
+	},
+	highlightWord: function(e)
+	{
+		var highlighted = (e.target.className.indexOf("highlighted") > -1);
+		var classString = e.target.className;
+		if(!highlighted)
+		{
+			classString += " highlighted";
+			e.target.setAttribute("class", classString);
+		}
+		else
+		{
+			classString = classString.replace(" highlighted", "");
+			e.target.className = classString;
+		}
+	},
+	notifyResize: function()
+	{
+		this.splitIntoColumns(2);
+	},
+	
+	splitIntoColumns: function(argNumColumns){
+
+        var screenTrueHeight = (window.innerHeight - 180);
+        console.log(screenTrueHeight);
+        var lines = document.querySelector('#lines');
+        var linesH=lines.clientHeight;
+		console.log(linesH);
+        console.log(screenTrueHeight);
+ 		var colOneLines; 
+ 		if(linesH !==0 && screenTrueHeight>900){
+        }
+        else {
+        	screenTrueHeight=1080;
+        	}
+        colOneLines = Math.floor(screenTrueHeight/linesH);
+		var i = 0;
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		var calcFontSize = window.getComputedStyle(this.$.pringles, null).getPropertyValue('font-size');
+		var fontSizeInt = parseInt(calcFontSize.replace('px','')); 
+		console.log(fontSizeInt);
+		fontSizeInt*=.75;
+		calcFontSize = fontSizeInt.toString() + 'pt';
+		console.log(calcFontSize);
+		var calcFontFam = window.getComputedStyle(this.$.pringles, null).getPropertyValue('font-family');
+		var ref = new Firebase("https://focused0ne.firebaseio.com/readingPassageOne/Passage_1_%40%3A_620"); //https://focused0ne.firebaseio.com/readingPassageOne");
+		context.font="13.2pt merriweather";
+		//calcFontSize + " " + calcFontFam;
+		var self = this;
+		ref.on("value", function(snap){
+			var words = snap.val();
+			//console.log(words);
+			var numWords = words.length;
+			//console.log(self.secondColumnWordArray);
+		var line = "";
+		var numLines = 0;
+		console.log(numWords + "  " + numLines + "numberers     ");
+		var containerWidth = document.querySelector('#colUno').clientWidth-13.2;
+		console.log("containerWidth = " + containerWidth);
+		var colOneWordIndex;
+		for(i=0; i < numWords; i++)
+		{
+			//console.log(words[i]);
+			var word = words[i].word;
+			if(words[i].paragraphBreak == true) //paragraph begin
+			{
+				//console.log("a paragraph break");
+				line = "aaaaa" + word;
+				numLines++;
+			}
+			else if(word == "" || word == " ")
+			{
+				//continue;
+			}
+			else
+			{
+				line = line + " " + word;
+				currentWidth = context.measureText(line).width; //- context.measureText(spaceOffset).width;
+				if(currentWidth > containerWidth)
+				{
+					console.log(word + " " + currentWidth);
+					if (numLines == colOneLines){
+					
+						colOneWordIndex = i - 1;
+					}	
+					
+					line = word;
+					numLines++;
+				}
+			}
+		}
+		var numColumns;
+		 var oneColumn = document.querySelector('#noJudge').clientWidth;
+
+        if(oneColumn>0 && oneColumn<730){
+        	numColumns=1;
+        	document.querySelector("#secondColumnContainer").hidden=true;
+        	colOneLines=numLines;
+
+        }
+        else {
+        	document.querySelector("#secondColumnContainer").hidden = false;
+        	numColumns=2;
+			colOneLines = Math.floor(screenTrueHeight/linesH);
+
+    	}
+			var j = 0;
+			self.firstColumnWordArray = [];
+			self.secondColumnWordArray = [];
+			if (numColumns==1)
+			{
+				colOneWordIndex=numWords;
+			}
+			for(j=0; j<colOneWordIndex; j++)
+			{
+				self.push("firstColumnWordArray", words[j]);
+			}
+
+			for(j=colOneWordIndex;j<numWords;j++)
+			{
+				self.push("secondColumnWordArray", words[j]);
+			}
+        var oneColumn = document.querySelector('#noJudge').clientWidth;
+
+        if(oneColumn>0 && oneColumn<680){
+        	document.querySelector("#secondColumnContainer").hidden=true;
+        	colOneLines=numLines;
+
+        }
+        else {document.querySelector("#secondColumnContainer").hidden = false;
+
+				colOneLines = Math.floor(screenTrueHeight/linesH);
+
+    	}
+		console.log(numLines);
+		self.numRows = numLines;
+		self.push("firstColumnLineNumberArray", self.largestLineNumberArray.slice(0, colOneLines));
+		self.push("secondColumnLineNumberArray", self.largestLineNumberArray.slice(colOneLines, numLines));
+	
+		var pring = self.$.pringles.getBoundingClientRect();
+		//console.log(pring.bottom + " " + pring.left + " " + cell);
+		});
+			
+	},
+	measuring:function(){
+		
+	}
+});
+</script>
+</dom-module>
+
+
+			
+				<!--var currentRow = 1;
+				self.passageWordObject = {};
+				self.lineMeasuredWordArrays = [];
+				
+
+					while(wordCount < numWords)
+					// line loop
+						{
+							var currentLine = "";
+							var testLine = "";
+							var currentWidth = 0;
+							var space="&nbsp&nbsp&nbsp&nbsp";
+							var spaceOffset = "";
+							var newline = true;
+						while((currentWidth + 64) < self.passage_width && wordCount <= numWords)
+						//word loop
+							{
+							
+							currentLine = testLine;
+							if (testLine != "")
+								{
+								testLine += " "; //add a space if not beginning
+			      				}
+			      			else if(wordCount == 0)
+			      				{
+			      					//new paragraph
+			      					testLine += space;
+			      					spaceOffset = "aaaaaaaaaaaaaaaaaaaaa";
+			      				}
+			      			var oldWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
+							testLine += wordArray[wordCount]; //add a word
+							currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
+							var remainingWidth = passageWidth - currentWidth;
+							var wordWidth = currentWidth - oldWidth;
+							var currentWord = wordArray[wordCount];
+							
+							var indexWord = self.indexWord = currentWord;
+							var mo = self.indexWord.length-1;
+							
+									
+								var strIndex = ("000" + index).slice(-4);
+								var rowRow = ("00" + currentRow).slice(-3);
+								var instance = rowRow + "_" + strIndex + "_Passage_" + self.passageTitle + "_at_" + passageWidth + "_" + indexWord;
+								var wordName = instance;
+	
+
+								self.push('lineMeasuredWordArrays',
+									{ 
+										'row':currentRow,
+										'instance': instance,
+									}
+								); 
+					
+								self.passageWordObject[instance]=
+									{ 
+										"instance": instance,
+										'line': rowRow,
+										'order': wordCount,
+										'paragraphBreak': newPara,
+										'row':currentRow, 
+										'passage_width': passageWidth,  
+									}
+								newline = false;
+								newPara = false;
+								wordCount++;
+							} //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
+						currentRow++;
+						currentWidth = 0;
+						}//SINGLE line loop
+					} //this is the paragraph for loop
+					var arrayPassage = self.lineMeasuredWordArrays;
+					alert(lastElement.row);
+					self.passageWordObject = {};
+					self.lineMeasuredWordArrays =[];
+
+			//	this is the loop for a whole passage. When Dynamic this loop goes away	
+		//this ends the firepad stuff			
+	},-->
