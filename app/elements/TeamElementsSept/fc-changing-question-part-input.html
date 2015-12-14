@@ -1,0 +1,64 @@
+<dom-module id="fc-changing-question-part-input">
+  <template>
+    <style>
+      paper-dialog {
+        background: white;
+      }
+    </style>
+    <paper-button raised data-dialog="actions" on-tap="clickHandler">{{variable_name}}</paper-button>
+    <paper-dialog id="actions">
+      <div class="vertical layout">
+        <div>
+          <paper-input placeholder="{{variable_name}}" value="{{variable_name}}"></paper-input>
+          <paper-input id="equation_input_area" value="{{equation}}"></paper-input>
+          <math-tex id="equation_display"></math-tex>
+        </div>
+        <div>
+          <paper-button dialog-dismiss>Decline</paper-button>
+          <paper-button dialog-confirm autofocus>Accept</paper-button>
+        </div>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: "fc-changing-question-part-input",
+      properties: {
+        variable_name: {
+          type: String,
+          value: function(){
+            return "Choose Name";
+          }
+        },
+        equation: {
+          type: String,
+          value: function(){
+            return "";
+          },
+          observer: "updateDisplayedEquation"
+        }
+      },
+      clickHandler: function(e) {
+        var button = e.target;
+        while (!button.hasAttribute('data-dialog') && button !== document.body) {
+          button = button.parentElement;
+        }
+
+        if (!button.hasAttribute('data-dialog')) {
+          return;
+        }
+
+        var id = button.getAttribute('data-dialog');
+        var dialog = this.$[id];
+        if (dialog) {
+          dialog.open();
+        }
+      },
+      updateDisplayedEquation: function(e){
+        this.$.equation_display.innerText = this.equation;
+        this.$.equation_display.update();
+      }
+    });
+  </script>
+</dom-module>

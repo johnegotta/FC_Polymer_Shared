@@ -1,0 +1,153 @@
+<script src="fc-question.js"></script>
+
+<dom-module id="fc-math-prototyper">
+  <template>
+    <style>
+      .boxed_area {
+        margin: 10px;
+      }
+      #input_choices_area .js-remove {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: none;
+        cursor: pointer;
+        color: #c00;
+        position: relative;
+        font-style: normal;
+      }
+      #input_choices_area .handle {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        position: relative;
+        font-style: normal;
+      }
+      #input_choices_area div:hover .handle {
+        opacity: 1;
+      }
+      #desired_questions_inputs_area .js-remove {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        color: #c00;
+        position: relative;
+        font-style: normal;
+      }
+      #desired_questions_inputs_area .handle {
+        -webkit-transition: opacity .2s;
+        transition: opacity .2s;
+        opacity: 0;
+        display: block;
+        cursor: pointer;
+        position: relative;
+        font-style: normal;
+      }
+      #desired_questions_inputs_area div:hover .handle{
+        opacity: 1;
+      }
+      #desired_questions_inputs_area div:hover .js-remove{
+        opacity: 1;
+      }
+    </style>
+
+
+    <div id="container_of_all" class="horizontal layout">
+
+<!-- START OF FIRST BOX -->
+      <div id="input_choices_box" class="flex-1 boxed_area">
+        <paper-toolbar>
+          <div>Drag Unchanging or Changing Parts $$hdgd$$</div>
+        </paper-toolbar>
+        <div id="input_choices_area">
+          <div class="horizontal layout center addable_input">
+            <iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+            <paper-textarea class="in_value flex"  data-inputtype="Unchanging Part" label="Unchanging Part" style="min-width:50px"></paper-textarea>
+            <iron-icon class="js-remove" icon="clear"></iron-icon>
+          </div>
+          <div class="horizontal layout center addable_input">
+            <iron-icon class="handle" icon="hardware:gamepad"></iron-icon>
+            <fc-changing-question-part-input></fc-changing-question-part-input>
+            <iron-icon class="js-remove" icon="clear"></iron-icon>
+          </div>
+        </div>
+      </div>
+<!-- END OF FIRST BOX-->
+<!-- START OF SECOND BOX -->
+      <div id="desired_questions_inputs_box" class="flex-2 boxed_area">
+        <paper-toolbar>
+          <div>Question Parts</div>
+          <paper-button raised on-tap="getChangingParts">Get Changing Parts</paper-button>
+        </paper-toolbar>
+        <div id="desired_questions_inputs_area" class="horizontal layout wrap" style="min-height: 30px">
+        </div>
+      </div>
+<!-- END OF SECOND BOX -->
+<!-- START OF THIRD BOX -->
+      <div id="identified_variables_box" class="flex-1 boxed_area">
+        <paper-toolbar>
+          <div>Changing Parts</div>
+        </paper-toolbar>
+        <div id="indentified_variables_area" class="vertical layout">
+        </div>
+      </div>
+<!-- END OF THIRD BOX -->
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "fc-math-prototyper",
+      properties: {
+        myVariables: {
+          type: Array,
+          value: function(){
+            return [];
+          }
+        }
+      },
+      ready: function(){
+        var self = this;
+        var input_choices = self.$.input_choices_area;
+        Sortable.create(input_choices, {
+          group: {
+            name: 'grouped',
+            pull: 'clone',
+            put: false
+          },
+          sort: false,
+          handle: '.handle'
+        });
+        var desired_questions_inputs = self.$.desired_questions_inputs_area;
+        Sortable.create(desired_questions_inputs, {
+          group: {
+            name: 'grouped',
+            put: 'input_choices'
+          },
+          handle: '.handle',
+          filter: '.js-remove',
+          onFilter: function (e) {
+            desired_questions_inputs.removeChild(e.item.parentNode);
+          },
+          onAdd: function(e){
+            var equation_area = e.item.querySelector('math-tex');
+            console.log(e.item);
+            if(equation_area){
+              equation_area.createdCallback();
+              console.log("CALLED CREATE CALLBACK");
+            }
+          }
+        });
+      },
+      getChangingParts: function() {
+        console.log(this.$.desired_questions_inputs_area);
+        var jax = MathJax.Hub.getAllJax();
+        console.log(jax);
+      }
+    });
+  </script>
+</dom-module>
