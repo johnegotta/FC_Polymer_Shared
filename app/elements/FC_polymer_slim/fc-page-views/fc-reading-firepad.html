@@ -1,0 +1,210 @@
+<dom-module id="fc-reading-firepad">
+	<!-- CodeMirror -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.2.0/codemirror.css">
+	<!-- Firepad -->
+	<link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.css">
+	<script src="https://cdn.firebase.com/libs/firepad/1.2.0/firepad.min.js"></script>
+	<template>
+		<style>
+		</style>
+		<section 
+			class="vertical layout flex container">
+			<div 
+				id="firepad" 
+				style="border: 6px ridge silver; overflow: auto; resize: both; min-height: 480px; max-height: 750px; padding: 6px; margin: 6px; margin-right: 24px;">
+					
+			</div>
+		</section>
+</template>
+<script>
+Polymer({
+	is: 'fc-reading-firepad',
+	properties: {
+		firepad: {
+			type:Object,
+			value:{},
+			notify: true,
+			reflectToAttributes: true	
+		},
+		firepadRef: {
+			type:Object,
+			value:{},
+			notify: true,
+			reflectToAttributes: true	
+		},
+
+
+
+
+
+
+
+
+
+	},
+
+created: function(){
+
+
+
+},
+
+ready: function(){
+this.loadFirepad();
+this.loadPassages();
+
+},
+
+attached: function(){
+
+},
+
+notifyResize: function(){
+
+},
+
+loadFirepad: function(){
+		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
+		this.passage_width = 400;
+	},
+
+loadPassages: function(){
+				// self=this;
+				// self.passagesArray=[];
+				// //var ref= new Firebase("https://focusedstaging1.firebaseio.com/passagesDestinations");
+				// var count=1;
+				// ref.on("child_added", function(snap){
+				// 	if (snap.val() ===undefined){
+				// 		self.push('passageDestinations',"https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_0");
+				// 			self.newPassageRef = 0;
+				// 			self.newPassageRef++;
+						
+											
+				// 	}
+				// 	else{
+							
+  		// 					count++;
+  		// 					console.log("added", snap.key());
+  		// 					//self.push('passageDestinations', snap.key());
+				// 			// length will always equal count, since snap.val() will include every child_added event
+				// 			//var instance = self.fcid + '_000' + self.testId + '_000' + self.saveCounter
+				// 			//self.section[instance]=  readingIdArray
+				// 			// triggered before this point
+				// 			//self.saveCounter = count;
+				// 			console.log(count);
+				// 		ref.once("value", function(snap) {
+  		// 				console.log("initial data loaded!", Object.keys(snap.val()).length === count);
+				// 			});
+				// 		 }
+				// });
+	},
+
+_savePassage: function(){
+
+		var blurb = this.passageBlurb;
+		var passageTitle = this.passageTitle;
+		var passageType = this.passageType;
+		var test = this.testId;
+		var fcid = this.fcid;
+		var self = this;
+		var passageContent = self.firepad.getText();
+			var truePassageContent = passageContent.replace(/[\—]/g, " — ");
+			var arrayPassed=truePassageContent.split(/\s/g);
+			var order =arrayPassed.length;
+			self.orderIndex=0;
+			this.newPassageRef="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_" + (this.saveCounter + 1).toString();
+			console.log("this is the passage ref" + this.newPassageRef);
+			self.paragraphArray = truePassageContent.split(/\n/);
+			var ref = new Firebase(this.newPassageRef);
+				self.passageArray = [];
+				var i = self.paragraphArray.length-1;
+				for(; i> 0; i--)
+					{
+						console.log(i + " " + self.paragraphArray[i]);
+					var wordCounter = 0;
+					var newPara = false;
+					var wordArray = self.paragraphArray[i].split(/\s/g);
+					var paraWordRemaining = wordArray.length-1;
+					var paragraph_number = Math.ceil(i/2);
+					var isLastWordOfPara =false;
+					var currentWord;
+					var orderIndex = this.orderIndex;
+
+ 					while(paraWordRemaining>=0)
+ 					// para word loop
+ 					{       
+ 							self.orderIndex++;
+ 							order--;
+ 							self.wordCounter--;
+ 							if (paraWordRemaining==0){
+ 								newPara = true;
+ 								
+ 								
+ 							}
+ 							else if(wordCounter==0)
+ 							{ 
+ 			
+ 								isLastWordOfPara = true;
+ 							}
+ 							else{
+ 								newPara=false;
+ 								isLastWordOfPara=false;
+ 							
+ 							}
+ 								
+ 								currentWord = wordArray[paraWordRemaining];	      				
+ 								self.push("passageArray",
+ 									{ 
+ 										"passageTitle": passageTitle,
+ 										"passageBlurb": blurb,
+ 										"indexPrime":orderIndex,
+ 										'order': order,
+ 										'word' : currentWord, 
+ 										'newPara': newPara,
+ 										'paragraph_number': paragraph_number,
+ 										'isLastWordOfPara':isLastWordOfPara,
+ 										'paragraphsRemaining': i
+ 									});
+ 								wordCounter++;
+ 								paraWordRemaining--;
+ 							} //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
+						}//SINGLE line loop
+					//this is the paragraph for loop
+					var arrayPassage = self.passageArray.reverse();
+					ref.set(arrayPassage);
+					console.log(arrayPassage);
+					self.passageArray = [];
+					order=0;
+			//	this is the loop for a whole passage. When Dynamic this loop goes away	
+		//this ends the firepad stuff			
+	},
+
+	_clearPassage: function(){
+			var adminStorage2 = window.localStorage;
+			var len = this.superItemArray.length;
+			var franklin = this.superItemArray[1];
+			var name = this.superItemArray[1].Full_Name;
+			var email = this.superItemArray[1].Email;
+			alert(JSON.stringify(this.superItemArray[1]));
+			adminStorage2.setItem(name,email,len);
+			
+		},
+
+	_clearFirepadMemory: function()
+	{
+		
+ 	
+	}
+
+
+
+
+
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,218 @@
+<dom-module id="fc-dashboard-one">
+<template id="fc-dashboard-one-template">
+<style>
+:host { 
+		padding: 10px 0px 36px 10px;
+		height: 100vh;
+		width: 100vh;
+		overflow-y: scroll;
+}
+
+#div { 
+		height: calc(99.67vh+164px);
+		width: 100%;
+		overflow: scroll;
+}
+.fc-div-class{
+	height: 300px;
+	width: calc(99.62%/10);
+	background-color: goldenrod;
+	display: flex;
+	border: 2px solid black;
+}
+
+.boardered{
+	border: 4px double #000066;
+}
+</style>
+<paper-drawer-panel id="drawerPrimed" left-drawer drawer-width="460px">
+	
+<!--this is the left drawer.  It-like the right drawer is now- will eventually be its own element, so that it can be added or removed at will-->
+	<div id="drawerPrime" drawer class="left-drawer layout vertical container wrap boardered">
+		<div class="vertical layout left left-justified" style="box-shadow: 0px  -5px 15px #d9d9d9 inset;">
+	<!--FC logo, image and branding-->
+			<div class="layout vertical nowrap" style="width: 100%; height: 150px;">
+				<image style="margin: 24px 199px 24px 8px; width:200px; height: 100px;" src="../../../images/FC_frontpage_logo.png">
+				</image>
+			</div>
+			<div class="layout horizontal">
+				<br>	
+				<hr style="color: navyblue; background: #000066; height: 4px; max-width: 600px; min-width: 300px; basis: 370px;">
+		<!--should be an sibling UI element of Drag Menu element-->
+				<div class="flex">
+					<paper-menu-button vertical-align="top" horizontal-align="right">
+						<paper-button class="dropdown-trigger">
+							<iron-icon icon="social:person">
+							</iron-icon>
+							<span hidden$="[[!user]]">{{user.uid}}</span>
+						</paper-button>
+						<div class="dropdown-content">
+							<fc-loginform user="{{user}}" status-known="{{statusKnown}}"></fc-loginform>
+						</div>
+					</paper-menu-button>
+				</div>
+			</div>
+		<!--end of log-in element and br hr area. picture above.  Note: right drawer is its own element.  Having drawers as elements makes sense as they should be swappable-->	
+<!--these two devices are unique and controlling should have routing integrated into an area here for a third device-->
+			<div control-device-area>
+				<fc-drag-menu 
+					id="dragMenuDrawer" 
+					selected="{{route}}" 
+					class="draggable scrollable on-tracking" 
+					style="position: fixed; z-index=100000; opacity:.85;"
+				>	
+				</fc-drag-menu>
+				<fc-data-administrator 
+					class="data-admin draggable scrollable on-tracking"
+					>
+				</fc-data-administrator>
+			</div>
+<!-- This is the device area end-->
+		</div><!--drawer wrapper end-->
+	</div><!--drawer end-->
+	<div main style="height: 100%;"> 
+<!--main of basic paper-drawer panel-inserted is fc-drawer panel-would like to remove the two and go to single main panel dropping arrangement.  UI still beyond me-->
+		<fc-paper-drawer-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="480px">
+		<!--fc-paper-drawer-panel-dashboard begins- our separated tabbed drawer is below.  I am doing the design over in stages. One drawer panel, one drawer at a time so I know I can do it and dont destroy whole things.-->
+			<div drawer id="rtToggle" dragging class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below-->
+				<fc-tabbed-drawer>
+				</fc-tabbed-drawer>
+			</div><!--end of tabbed drawer holder area-->
+		<div main style="height:100%">
+			<button on-tap="_toggleLeftDrawer" class="layout vertical" hidden="{{!leftHidden}}" style="position: fixed; opacity:.65; top: 12px' left: 12px;">
+				<image style="display: inline-block; width:64px; height: 64px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png">
+				</image>
+				<div>Open Drawer</div>
+			</button>
+<!--index and routing fall in the content below.  they are the index page.  eventually will eliminate the need for index at all-->
+<!--I will try to integrate a switchable splitter set here to surround the routing content unit. it is a little complicated, but doable.  Splitter, for now, movd to index;-->
+			<!--<fc-splitter-jc orientation="horizontal">-->
+				<content>
+
+
+				</content>
+		<!--</fc-splitter-jc>-->
+			</div>		
+		</fc-paper-drawer-panel-dashboard>
+	</div>			
+</paper-drawer-panel>
+</template>
+<script>
+FcDashboardOne=Polymer({
+	is:'fc-dashboard-one',
+	properties: {
+		measured: {
+			type: String,
+			value: '1000s',
+			notify: true,
+			reflectToAttributes: true
+		}, 
+		responsiveWidth: {
+			type: String,
+			value: '0px',
+			notify: true,
+			reflectToAttributes: true
+		},
+		route:{
+			type: String,
+		 	notify: true,
+		 	reflectToAttribute: true
+		}, 
+		leftHidden: {
+			type: Boolean,
+			value: false,
+			notify: true
+		}
+	},
+	_toggleRightDrawer: function(){
+			var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = document.querySelector('#drawerPrimed');	
+		if (drawer.forceNarrow!==true)
+		{
+			drawer.forceNarrow = true;
+        	drawer.responsiveWidth='90000px';
+        	this.leftHidden=true;
+        }
+		else
+		{
+			drawer.forceNarrow = false;
+        	drawer.responsiveWidth ='1080px';
+        	this.leftHidden=false;
+		}
+	}, 
+});
+</script>
+</dom-module>
+<!-- 	
+					 <section class="dashboard" data-route="home">
+							<paper-material elevation="1">
+						
+									
+							
+							
+							</paper-material>
+							
+						</section>					
+						<section class="dashboard"  data-route="users">
+			
+			
+						</section>
+
+						<section class="dashboard"  data-route="user-info">
+							<paper-material elevation="1">
+
+						
+							</paper-material>
+						</section>
+
+						<section class="dashboard"  data-route='reading'>
+
+					<paper-material elevation="2" class="layout horizontal flex container fit-content">
+						<fc-splitter-jc orientation="horizontal">
+									<fc-reading-zero class="left" id="readingStuff">
+									</fc-reading-zero>
+
+									
+									
+						</fc-splitter-jc>
+						</paper-material>
+						</section>
+	
+							<section class="dashboard" data-route='johntest'>
+						<paper-material elevation="2" class="layout horizontal flex container fit-content">
+						<fc-splitter-jc orientation="horizontal">
+									<fc-reading-passage-five class="left" id="readingStuff">
+									</fc-reading-passage-five>
+
+							
+						</fc-splitter-jc>
+						</paper-material>
+							
+						
+
+
+
+							</section>
+
+
+
+							<section class="dashboard"  data-route="testarea1">
+										<fc-tabbed-card-builder>
+								</fc-tabbed-card-builder>
+						</section>
+					
+
+						<section class="dashboard"  data-route="testarea2">
+						</section>
+						</iron-pages>
+						</div>
+
+
+-->
+ -->
