@@ -53,12 +53,16 @@
 
 
 		<div id="doubleColumnContainer" class="layout horizontal flex container">
-						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 8px; overflow-y:scroll;">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 8px; overflow-y:scroll; height:{{}}">
 			<!--Line number container-->
 					 		<div id="linenumbers" class="layout vertical line-number">
 					 		<div id="lines" class="line-numbers">Lines</div>
 					 		<div>&nbsp</div>
-					 			<template is="dom-repeat" items="{{lineNumberArrayOne}}" filter="{{columnOneLineNumberFilter(shown, lof)}}">
+					 			<template 
+					 			is="dom-repeat" 
+					 			items="{{lineNumberArrayOne}}" 
+					 			filter="{{columnOneLineNumberFilter(lof)}}"
+					 			>
      								<span hidden="{{!item.show}}" id$="col_one_line_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
     							</template>
     							
@@ -66,7 +70,7 @@
 			<!--passage-1-column-1 container   filter="{{passageOneLineNumberFilter(num_lines_one)}}"-->
 					 		<div id="colUno" class="layout horizontal flex wrap text">
 					 		<article id="textColumnOne">
-					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{theContent}}" filter="{{columnOneFilter(shown, lwa)}}">
+					 	    	<template id='columnOneDomRepeat' is="dom-repeat" items="{{theContent}}" filter="{{columnOneFilter(lwa)}}">
  									<template is="dom-if" if="{{item.newPara}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
@@ -83,12 +87,12 @@
 
 
 		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 8px;overflow-y:scroll;">
+					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container" style="padding-left: 8px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div id="linenumbersright" class="layout vertical line-number">
 					 			<div id="linesB2">Lines</div>
 					 			<div>&nbsp</div>
-					 		 	<template is="dom-repeat" items="{{lineNumberArrayTwo}}" filter="{{columnTwoLineNumberFilter(shown, lof, los)}}" >
+					 		 	<template is="dom-repeat" items="{{lineNumberArrayTwo}}" filter="{{columnTwoLineNumberFilter(lof, los)}}" >
      								<span hidden="{{!item.show}}" id$="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
@@ -99,11 +103,11 @@
 					 		<div>&nbsp</div>
 					 		<article id="textColumnTwo">
 					 			<div ><span>&nbsp </span></div>
-								<template is="dom-repeat" items="{{theContent}}" filter="{{columnTwoFilter(shown, lwa)}}">
+								<template is="dom-repeat" items="{{theContent}}" filter="{{columnTwoFilter(lwa)}}">
  									<template is="dom-if" if="{{item.newPara}}">
  										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
- 									<a id$="dd_one_{{item.order}}" hidden$="{{!oneGone}}">{{item.word}}</a>
+ 									<fc-span id$="dd_two_{{item.order}}">{{item.word}}</fc-span>
 								</template>
 								<br>
 								<hr>
@@ -122,18 +126,22 @@
 <script>
 Polymer({
 	is: 'fc-double-column-layout',
-	//behaviors: ,
+	listeners: {
+      'iron-resize': '_onIronResize'
+    },
+	behaviors: [
+      Polymer.IronResizableBehavior
+    ],
 	properties: {
 		theContent:{
 			type: Array, 
-			value: [],
 			notify: true 
 		},
 		lastWordIndex:{
 			type: Number,
-			value: 730,
 			notify: true
-		},
+		},//should pull the measurer here for some heights etc
+		//read method on calculating width/height... miserable;
 		lineNumberArrayOne:{
 			type: Array,
 			value: function(){ 
@@ -160,74 +168,58 @@ Polymer({
 			},
 			notify: true
 		},
-	
 		splitRatio: {
 			type: Number,
-			computed: 'computeSplitRatio(lastWordIndex)',
 			notify: true,
-		
 		},
-		
 		lwa: {
 			type: Number,
-			value: 480,
 			notify: true
 		},
 		bottom_ofc:{
 			type: Number,
-			value: 480,
 			notify: true
 		},
 		lof:{
 			type: Number,
-			value: 480,
+			value: 65,
 			notify: true
 		},
 		los:{
 			type: Number,
+			value: 120,
 			notify: true
 		},
 		secondColumnFirstWordIndex: {
 			type: Object,
-			value: {
-				ratio: this.splitRatio + 1, 
-				lineNumberStart: 54, 
-				lineNumberEnd: 87,
-				notify: true
-			},
 			notify: true
-		},
-		
+		},	
 		deltaWords:{
 			type: Number,
 			value: 0,
 			notify: true
-		},
-		shown:{
-			type: Boolean,
-			value: false,
-			notify: true,
-			reflectToAttributes: true
-		}, 
+		}
 	},
-	
 	ready: function(){
-	
+
 	},
+    _onIronResize: function() {
+    		console.log('DC IRONRESIZE',this.theContent);
+    },
 
 	computeSplitRatio: function(lastWordIndex){
+		console.log('COMPUTESPLITRATIO');
 	 	var lastWordAnchor = Math.ceil(lastWordIndex*.618);
 	 	console.log(lastWordAnchor);
 	 	return lastWordAnchor;
 
-	 },
+	},
+
 	notifyResize: function(showingSecond){
-		
 		if(showingSecond==false){this.shown=showingSecond; return this.shown;}
 		else {
 			this.shown=showingSecond;
 			this._adjustDoubleColumns(this.lwa);
-		
 		}
 	},
 	
@@ -243,8 +235,7 @@ Polymer({
 			var nextAnchor = firstWordAnchor;
 			var bottom_of_next_anchor = bottom_of_line_to_reclaim;
 			var gainedwords =0;
-			while(bottom_of_line_to_reclaim == bottom_of_next_anchor && numberBehind>10){
-				this.classFollows('lwanchor', nextAnchor, nextAnchor.nextSibling);				
+			while(bottom_of_line_to_reclaim == bottom_of_next_anchor && numberBehind>10){			
 				nextAnchor = nextAnchor.nextSibling;
 				console.log(nextAnchor);
 				if(nextAnchor.nodeName == firstWordAnchor.nodeName)
@@ -268,9 +259,12 @@ Polymer({
 	_adjustDoubleColumns: function(newValue){
 		this.lwa = (this.lwa==undefined || this.lwa<.58*this.lastWordIndex) ? this.splitRatio: this.lwa;
 		//here we need first value to be wiped to right side
+		console.log(this.lwa);
+		console.log(this.lwa.toString());
 		var theId = '#dd_one_'+ this.lwa.toString();
+		console.log(theId);
 		var finalWordAnchor = this.$$(theId);
-		Polymer.dom(finalWordAnchor).setAttribute('class', 'lofanchor');
+		console.log(finalWordAnchor);
 		var bottom_of_line_to_cut = finalWordAnchor.getBoundingClientRect().bottom;
 		var previousAnchor = finalWordAnchor;
 		var bottom_of_previous_anchor = bottom_of_line_to_cut;
@@ -288,7 +282,6 @@ Polymer({
 				this.deltaWords = howManyAheadOfFinalColumnOneWord;
 				this.set('bottom_ofc',bottom_of_previous_anchor);
 				console.log(this.lwa + ' ' + this.lof + ' ' +  this.los);
-				
 			}
 		}
 				this.set('bottom_ofc',bottom_of_previous_anchor);
@@ -298,55 +291,25 @@ Polymer({
 		console.log(this.lwa + ' ' + this.lof + ' ' +  this.los); 
 		this.growFirstColumn(this.deltaWords);
 	},
-	numberTwoColumns: function(shown){
+	columnOneFilter: function(lwa){
+		return (item)=>{
+			return (item.order <= lwa);
+		};
 	},
-	columnOneFilter: function(shown, lwa){
-		if(shown==true){
-			return (item)=>{
-				return (item.order <= lwa);
-			};
-		} 
-		else{
-			return (item) => { 
-				return false;
-			};
-		}
+	columnTwoFilter: function(lwa){
+		return (item)=>{
+			return item.order > lwa;
+		};
 	},
-	
-	columnTwoFilter: function(shown, lwa){
-		if(shown==true){
-			return (item)=>{
-				return item.order > lwa;
-			};
-		} else {
-			return (item)=>{
-				return false;
-			};
-		}
+	columnOneLineNumberFilter: function(lof){
+		return (item)=>{
+			return (item.number <= this.lof)
+		};
 	},
-	columnOneLineNumberFilter: function(shown, lof){
-		if(shown==true){
+	columnTwoLineNumberFilter: function(lof, los){
 			return (item)=>{
-				return (item.number <= lof);
+				return (item.number > this.lof && item.number <= this.los);
 			};
-		} 
-		else{
-			return (item) => { 
-				return false;
-			};
-		}
-	},
-	columnTwoLineNumberFilter: function(shown, lof, los){
-		if(shown==true){
-			return (item)=>{
-				return (item.number > lof && item.number <= los);
-			};
-		} 
-		else{
-			return (item) => { 
-				return false;
-			};
-		}
 	}
 });
 </script>

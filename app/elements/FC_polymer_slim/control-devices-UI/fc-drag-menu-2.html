@@ -1,4 +1,4 @@
-<dom-module id="fc-drag-menu">
+<dom-module id="fc-drag-router">
 <style>
 .edged{
   outline-width: 0px;
@@ -15,14 +15,16 @@
 </style>
 <template>
   
-<div id="dragMenu" style="position: absolute; max-height: 96px; min-height: 24px; min-width: 350px; background: #000066; border: 4px ridge #000066;"> 
+<div id="dragMenu" draggable dragging="true" track style="max-height: 96px; min-height: 24px; min-width: 350px; background: #000066; border: 4px ridge #000066;"> 
         
 
+<paper-tabs style$="width:{{basePlusDelta}}px; max-height: 92px; min-height: 24px; background: #aecdfe; whitespace: nowrap" class$="{{class}}" hide-scroll-buttons="true" scrollable="true" selected="{{route}}">
+  
 
-<content select="{{select}}">
-<iron-icon  class="dragTag"
+
+    <iron-icon class="dragTag"
             name="fcdragtag"
-            id="fcdragtag"
+            id="dragtag{{dragtagid}}"
             on-track="dragmeplease" 
             draggable 
             dragging
@@ -31,91 +33,9 @@
             description="the dragable edge of the card"
             class="menuItems-light"
             on-mousedown="_startDrag"
-        
           >
     </iron-icon>
 
-
-<iron-icon 
-            
-            icon="icons:perm-identity"  
-            on-tap="_menuLaunch, "
-            name: 
-            id: 
-            description: 
-            class="menuItems-light dropdown-trigger"
-            pressed='{{!pressed}}'
-
-          >
-         <fc-loginform></fc-loginform>
-    </iron-icon>
-        <iron-icon 
-           
-            icon="icons:spellcheck"  
-        
-            class="menuItems-light"
-          >
-    </iron-icon>
-      <span 
-        on-tap="_toggleLeftDrawer" 
-        class="menuItems-light" 
-        style="font-size: 1.1em;">
-      L
-        <iron-icon 
-            icon="icons:swap-horiz"  
-            on-mousedown="doSomething"
-            class="menuItems-light"
-          >
-    </iron-icon>
-    </span>
-   
-     <span on-tap="_toggleRightDrawer" 
-          class="menuItems-light" 
-          style="font-size: 1.1em;"
-          >
-       <iron-icon 
-            icon="icons:swap-horiz"  
-            class="menuItems-light"
-          >
-    </iron-icon>
-    R
-    </span>
-
-    
-    <iron-icon 
-            
-             icon="av:repeat"  
-            
-            track
-            class="menuItems-light"
-          >
-    </iron-icon>
-    <iron-icon 
-            
-                        id="theBest" 
-            dragging
-            icon="av:repeat"  
-            track
-            class="menuItems-light"
-          >
-    </iron-icon>
-    <iron-icon
-            on-track="_extendWidth"
-            track
-            icon="icons:input"  
-            on-mousedown="extend"
-            class="menuItems-light"
-            >
-    </iron-icon>
-<hr>
-      
-
-
-
-
-
-  <paper-tabs style$="width:{{basePlusDelta}}px; max-height: 78px; min-height: 24px; background: #aecdfe; whitespace: nowrap" class$="{{class}}" hide-scroll-buttons="true" scrollable="true" selected="{{route}}">
-	
      <paper-tab link>
           <button class="menubuttons"> 
           <a
@@ -187,15 +107,13 @@
                     <span>Test 2</span>
                </a>
           </button>
-     </paper-tab>
-              
-      </button>
+     </paper-tab>       
 </paper-tabs>
 </div>
 </template>
 <script>
-FcDragMenu = Polymer({
-	is:'fc-drag-menu',
+FcDragMenuProto = Polymer({
+	is:'fc-drag-menu-two',
 	behaviors: [
 		Polymer.IronResizableBehavior,
 		Polymer.NeonAnimationBehavior,
@@ -495,7 +413,6 @@ FcDragMenu = Polymer({
 	dragmeplease: function(e) {
      this.dragging=true;
         var self=this;
-
        // var dragbox = this.$.dragMenu.getBoundingClientRect();
       e.preventDefault();
         switch(e.detail.state) {

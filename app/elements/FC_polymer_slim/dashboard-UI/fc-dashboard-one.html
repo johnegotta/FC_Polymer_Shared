@@ -20,7 +20,7 @@
 	border: 2px solid black;
 }
 .boardered{
-	border: 4px double #000066;
+	border: 4px ridge #000066;
 }
 </style>
 <fc-lt-panel-dashboard id="drawerPrimed" left-drawer drawer-width="460px">
@@ -33,48 +33,62 @@
 				<image style="margin: 24px 199px 24px 8px; width:200px; height: 100px;" src="../../../images/FC_frontpage_logo.png">
 				</image>
 			</div>
-			<div class="layout horizontal">
+			<div class="layout vertical">
+
 				<br>	
 				<hr style="color: navyblue; background: #000066; height: 4px; max-width: 600px; min-width: 300px; basis: 370px;">
 		<!--should be an sibling UI element of Drag Menu element-->
-		
-							<fc-loginform user="{{user}}" status-known="{{statusKnown}}"></fc-loginform>
-						
-		
+		<div class="layout horizontal flex">
+			
+			
+		<!--<fc-loginform user="{{user}}" status-known="{{statusKnown}}"></fc-loginform>-->
 
-			</div>
+		</div>
 		<!--end of log-in element and br hr area. picture above.  Note: right drawer is its own element.  Having drawers as elements makes sense as they should be swappable-->	
 <!--these two devices are unique and controlling should have routing integrated into an area here for a third device-->
-			<div control-device-area>
-				<fc-drag-menu 
-					id="dragMenuDrawer" 
+		
+				
+				
+				
+			<fc-data-administrator 
+              class="data-admin draggable scrollable on-tracking">
+        </fc-data-administrator>
+				
+			</div>
+			<fc-drag-router
+					id="dragRouter" 
 					selected="{{route}}" 
 					class="draggable scrollable on-tracking" 
-					style="position: fixed; z-index=100000; opacity:.85;"
+					style=""
 				>	
-				</fc-drag-menu>
-				<fc-data-administrator 
-					class="data-admin draggable scrollable on-tracking"
-					>
-				</fc-data-administrator>
-			</div>
+				</fc-drag-router>
 <!-- This is the device area end-->
 		</div><!--drawer wrapper end-->
+		<fc-drag-menu-proto
+					id="dragMenuDrawer"
+					style="display: float; float: bottom;" 
+					selected="{{route}}" 
+					class="draggable scrollable on-tracking" 
+				>
+				</fc-drag-menu-proto>
 	</div><!--drawer end-->
 	<div main style="height: 100%;"> 
 <!--main of basic paper-drawer panel-inserted is fc-drawer panel-would like to remove the two and go to single main panel dropping arrangement.  UI still beyond me-->
-		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="480px">
+		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="{{slideWidth}}px;">
 		<!--fc-paper-drawer-panel-dashboard begins- our separated tabbed drawer is below.  I am doing the design over in stages. One drawer panel, one drawer at a time so I know I can do it and dont destroy whole things.-->
-			<div drawer id="rtToggle" dragging class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below-->
-				<fc-tabbed-drawer>
+
+			<div drawer id="rtToggle" dragging class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below--><fc-slide-tag slide-width='{{drawerWidth}}px;'>
+				<fc-tabbed-drawer style="width:{{slideWidth}}px;">
 				</fc-tabbed-drawer>
+				</fc-slide-tag>
 			</div><!--end of tabbed drawer holder area-->
 		<div main style="height:100%">
-			<button on-tap="_toggleLeftDrawer" class="layout vertical" hidden="{{!leftHidden}}" style="position: fixed; opacity:.65; top: 12px' left: 12px;">
-				<image style="display: inline-block; width:64px; height: 64px;" src="../../../images/icon_menu/sail-icons/dblue_sail_small.png">
-				</image>
-				<div>Open Drawer</div>
-			</button>
+		<paper-menu-button icon="menu" on-tap="_toggleLeftDrawer" class="layout horizontal" hidden="{{!leftHidden}}" style="display: inline; opacity:.65;">
+		<iron-icon icon="stars">
+			
+			</iron-icon>
+			</paper-menu-button>
+			
 <!--index and routing fall in the content below.  they are the index page.  eventually will eliminate the need for index at all-->
 <!--I will try to integrate a switchable splitter set here to surround the routing content unit. it is a little complicated, but doable.  Splitter, for now, movd to index;-->
 			<!--<fc-splitter-jc orientation="horizontal">-->

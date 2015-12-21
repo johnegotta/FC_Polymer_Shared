@@ -32,152 +32,158 @@ div.line-number {
 			min-height: 720px !important;
 			display: flex;
 			min-width: 260px !important;
-			max-width: 660px !important;	
+			max-width: 720px !important;	
 		}
 </style>
-<div class="layout horizontal container">
+	<div class="layout horizontal container">
 
-					 		<div id="linenumbersA1" class="layout vertical line-number">
-					 		<div class="line-numbers" id="linesA1">Lines</div>
-					 		<div class="line-numbers" id="linesA">&nbsp</div>
-					 			<template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberRowsFilter(shown, lastRow)}}">
-     								<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
-     							
-    							</template>
-					 		</div>
-			<!--passage-1-column-1 container-->
-					 		<div id="colUno" class="layout horizontal flex wrap text">
-					 		<article id="textColumnOne">
-					 	    	<template is="dom-repeat" items="{{theContent}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id="oneOneWords_{{item.order}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
-								</template>
-									<br class="line-numbers">
-									<hr>
-								<div class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
-							</article>
-					 		</div>
-					 	</div>	
-					 	<button on-tap="numberOneColumn">number</button>				
+		<div id="linenumbersA1" class="layout vertical line-number">
+		 	<div class="line-numbers" id="linesA1">Lines</div>
+		 	<div class="line-numbers" id="linesA">&nbsp</div>
+	 			<template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberRowsFilter(firstRowIndex, lastRowIndex)}}">
+					<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.number}}">{{item.number}}</span>
+					<span hidden="{{item.show}}">&nbsp</span>
+				</template>
+		</div>
+	<!--passage-1-column-1 container-->
+		<div id="colUno" class="layout horizontal flex wrap text">
+		 	<article id="textColumnOne">
+		 		<section hidden$="{{columnOne}}"> <br><br></section>
+		 	    <template is="dom-repeat" items="{{theContent}}" on-dom-change='checkForLastNode' filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
+						<template is="dom-if" if="{{item.newPara}}">
+							<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+						</template>
+						<a id="oneOneWords_{{item.order}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+				</template>
+				<br class="line-numbers">
+				<hr>
+				<div class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+			</article>
+		</div>
+	</div>		
+
 </template>
+
 <script>
 Polymer({
 	is: 'fc-single-column-layout',
-		observers: ['arrayWatcher(theContent.splices)', 'columnWatcher(lastRow)'],
-		properties: {
+	behaviors: [Polymer.IronResizableBehavior],
+	listeners: {'iron-resize':'checkForLastNode'},
+	properties: {
 		theContent:{
-			type: Array, 
-			value: [],
-			notify: true, 
+			type: Array,
+			observer: 'gotContent',
+			//not sure if will work when it is all changed
+			notify: true
 		},
-	
+		columnOne: {
+			type: Boolean,
+			observer: 'isColumnOne', 
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		firstWordIndex: {
+			type: Number,
+			value: 0
+		},
+
 		lastWordIndex: {
 			type: Number,
-			value: 0,
+			observer: 'gotLastWordIndex',
 			notify: true
 		},
 		
-		lineNumberArray:{
+		firstRowIndex: {
+			type: Number,
+			value: 1,
+			notify: true
+		},
+
+		lastRowIndex:{
+			type: Number,
+			value: 1,
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		lineNumberArray: {
 			type: Array,
 			value: function(){
 				var lineNumberArray = [];
 				for(var i=1; i <= 180; i++)
 				{	
-					j=	i % 5 ? false: true;
-					lineNumberArray.push({'number': i, 'show': j});
+					var fifth =	i % 5 ? false: true;
+					lineNumberArray.push({'number': i, 'show': fifth});
 				}
 				return lineNumberArray;
 			},
 			notify: true
-		},
-		
-		lastRow:{
-			type: Number,
-			notify: true
-		},
-		
-		shown:{
-			type: Boolean,
-			value: true,
-			notify: true,
 		}
 	},
-ready: function(){
-	
+	gotContent: function(newTheContent){
+		//console.log('IN gotContent', newTheContent);
+		this.lastWordIndex = newTheContent.length;
 	},
-attached: function(){
-},
-_linesEst: function(){
-	var colWidth = this.$.textColumnOne.clientWidth;
-	var wordEst = Math.ceil((665/colWidth)*12.2);
-	var linesEst = Math.floor(this.numWords/wordEst);
-	return linesEst;
-},
-arrayWatcher: function(theContent){
-	//console.log(this.theContent);
-	if(this.theContent.length!==undefined){
-	this.set('numWords',this.theContent.length);
-	var lineEst = this._linesEst();
-	this.set('lastRow', lineEst);
-	this.numberOneColumn(lineEst); 
-	//console.log(lineEst);
-	}
-},
-computeLastRow: function(){
- 	var bottom_of_first_word = this.$.linesA1.getBoundingClientRect().bottom;
-	var lwId =  '#oneOneWords_' + this.lastWordIndex;
-	var last_word_top = this.$$(lwId).getBoundingClientRect().bottom;
- 	//console.log(last_word_top);
- 	var line_height = this.$.linesA1.clientHeight;
- 	var delta =  last_word_top - bottom_of_first_word;
- 	var lastRow = Math.floor(delta/line_height);
- 	this.lastRow = lastRow;
- 	//console.log(this.lastRow);
- 	this.set('lastRow', lastRow);
-},
-_notifyResize:function(secondShow){
-	this.numberOneColumn();
-	this.shown= !secondShow;
-},
-numberOneColumn: function(RowsEstimate){
-		 var lwId =  '#oneOneWords_' + this.lastWordIndex;
-		// console.log(this.$$(lwId));
-		 if(lwId=="#oneOneWords_0" || this.$$(lwId)===undefined)
-		 {
-		 	if(RowsEstimate> 68) 
-		 		{
-		 			this.lastRow=RowsEstimate;
-		 		} 
-		 		else
-		 		{
-		 			var rowsEstimate = this._linesEst();
-					this.lastRow= (rowsEstimate>68) ? rowsEstimatr: 68;
-		 		}
-		 }
-		 else
-		 {
-		 	this.computeLastRow();
-		}
+	gotLastWordIndex: function(newLastWordIndex){
+		//console.log("IN gotLastWordIndex", newLastWordIndex);
+		this.checkForLastNode();
+	},
+	decideToCutWordsFromLastLine: function(){
 		
-		},
-columnWatcher: function(lastRow){
-this.numberOneColumn(lastRow);
-},
-_numberRowsFilter: function(shown, lastRow){
-	if(shown==true)
-	{
- 			return (item) =>{
- 				return (item.number <= lastRow);
- 			};
-	}
-	else 
-		{
-		return (items) => { 
-				return false;
+	},
+	computeLastRowIndex: function(){
+		var bottom_of_first_word = this.$.linesA1.getBoundingClientRect().bottom;
+		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var last_word_top = this.$$(lwId).getBoundingClientRect().bottom;
+	 	var line_height = this.$.linesA1.clientHeight;
+	 	var delta =  last_word_top - bottom_of_first_word;
+	 	var numRows = Math.floor(delta/line_height);
+	 	this.lastRowIndex = this.firstRowIndex + numRows - 1;
+	},
+	_numberRowsFilter: function(firstRowIndex, lastRowIndex){
+		console.log("IN _numberRowsFilter", this.id, firstRowIndex, lastRowIndex);
+		return (item) =>{
+			return (item.number >= firstRowIndex && item.number <= lastRowIndex);
+		};
+	},
+	_theContentFilter: function(firstWordIndex, lastWordIndex){
+		if(!isNaN(lastWordIndex)){
+			return (item) =>{
+				return (item.order >= firstWordIndex && item.order <= lastWordIndex);
 			};
+		} else {
+			return (item) =>{
+				return true;
+			}
 		}
+	},
+
+	getLastWordNode: function(nodeId){
+		var lastNode = this.$$(nodeId);
+
+		var lastNodePromise = new Promise(function(resolve, reject){
+			if(lastNode != undefined){
+				resolve(lastNode);
+			} else {
+				reject(Error("lastNode doesn't exist"));
+			}
+		});
+		
+		return lastNodePromise;
+	},
+	checkForLastNode: function(){
+		var self = this;
+
+		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var lastNode = this.getLastWordNode(lwId);
+
+		lastNode.then( (lastNode)=>{
+			self.computeLastRowIndex();
+		},
+		(error)=>{
+			console.log(error);
+		});
 	}
 });
 </script>

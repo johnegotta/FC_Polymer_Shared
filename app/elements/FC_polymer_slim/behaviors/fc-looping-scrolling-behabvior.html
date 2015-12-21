@@ -1,0 +1,118 @@
+    <script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.loopingScrollMenuBehavior = {
+
+
+    _scroll: function(e, detail) {
+      if (!this.scrollable) {
+        return;
+      }
+      var ddx = (detail && -detail.ddx) || 0;
+      this._affectScroll(ddx);
+    },
+    _down: function(e) {
+      // go one beat async to defeat IronMenuBehavior
+      // autorefocus-on-no-selection timeout
+      this.async(function() {
+        if (this._defaultFocusAsync) {
+          this.cancelAsync(this._defaultFocusAsync);
+          this._defaultFocusAsync = null;
+        }
+      }, 1);
+    },
+    _affectScroll: function(dx) {
+      this.$.tabsContainer.scrollLeft += dx;
+      var scrollLeft = this.$.tabsContainer.scrollLeft;
+      this._leftHidden = scrollLeft === 0;
+      this._rightHidden = scrollLeft === this._tabContainerScrollSize;
+    },
+    _onLeftScrollButtonDown: function() {
+      this._scrollToLeft();
+      this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
+    },
+    _onRightScrollButtonDown: function() {
+      this._scrollToRight();
+      this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
+    },
+    _onScrollButtonUp: function() {
+      clearInterval(this._holdJob);
+      this._holdJob = null;
+    },
+    _scrollToLeft: function() {
+      this._affectScroll(-this._step);
+    },
+    _scrollToRight: function() {
+      this._affectScroll(this._step);
+    },
+    _tabChanged: function(tab, old) {
+      if (!tab) {
+        this._positionBar(0, 0);
+        return;
+      }
+    },
+    _slideTab: function(){
+      var r = this.$.tabsContent.getBoundingClientRect();
+      var w = r.width;
+      var tabRect = tab.getBoundingClientRect();
+      var tabOffsetLeft = tabRect.left - r.left;
+      this._pos = {
+        width: this._calcPercent(tabRect.width, w),
+        left: this._calcPercent(tabOffsetLeft, w)
+      };
+      if (this.noSlide || old == null) {
+        // position bar directly without animation
+        this._positionBar(this._pos.width, this._pos.left);
+        return;
+      }
+      var oldRect = old.getBoundingClientRect();
+      var oldIndex = this.items.indexOf(old);
+      var index = this.items.indexOf(tab);
+      var m = 5;
+      // bar animation: expand
+      this.$.selectionBar.classList.add('expand');
+      if (oldIndex < index) {
+        this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
+            this._left);
+      } else {
+        this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
+            this._calcPercent(tabOffsetLeft, w) + m);
+      }
+      if (this.scrollable) {
+        this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
+      }
+    },
+    _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
+      var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
+      if (l < 0) {
+        this.$.tabsContainer.scrollLeft += l;
+      } else {
+        l += (tabWidth - this.$.tabsContainer.offsetWidth);
+        if (l > 0) {
+          this.$.tabsContainer.scrollLeft += l;
+        }
+      }
+    },
+    _calcPercent: function(w, w0) {
+      return 100 * w / w0;
+    },
+    _positionBar: function(width, left) {
+      width = width || 0;
+      left = left || 0;
+      this._width = width;
+      this._left = left;
+      this.transform(
+          'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+          this.$.selectionBar);
+    },
+    _onBarTransitionEnd: function(e) {
+      var cl = this.$.selectionBar.classList;
+      // bar animation: expand -> contract
+      if (cl.contains('expand')) {
+        cl.remove('expand');
+        cl.add('contract');
+        this._positionBar(this._pos.width, this._pos.left);
+      // bar animation done
+      } else if (cl.contains('contract')) {
+        cl.remove('contract');
+      }
+    },

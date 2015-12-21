@@ -1,0 +1,126 @@
+<dom-module id="fc-style-binding">
+	<template>
+	<style> 
+	:host{	width: 1200px;
+			height: 1200px;
+			background: #fff;
+			border:3px dashed green;
+			display: block;
+
+		}
+		.inputClass {
+			height: 65px;
+			width: 150px;
+			margin: 4px 40px 4px 40px;
+			padding: 3px;
+		}
+	</style>
+	<div class="layout horizontal">
+		<paper-input 
+			id="widthInput" 
+			label="Change My Width" 
+			type="number"
+			class="inputClass"
+			always-float-label 
+			value={{inputWidth}}>
+		</paper-input>
+		<paper-input 
+			id="backgroundInput" 
+			label="Change My Background Color" 
+			class="inputClass"
+			always-float-label 
+			value={{inputBackground}}>
+		</paper-input>
+		<paper-input 
+			id="heightInput" 
+			label="Change My height" 
+			type="number"
+			class="inputClass" 
+			always-float-label 
+			value={{inputHeight}}>
+		</paper-input>
+		</div>
+		<span> Enter Values and Change the div's dimensions.
+	<div 
+		id="myDiv" 
+		style$="[[_computeHeight(startHeight, inputHeight)]] [[_computeWidth(startWidth, inputWidth)]] [[_computeBackground(startBackground, inputBackground)]] border: 3px ridge silver; display: flex; overflow-y:scroll;"
+		>
+		<content></content>
+	</div>
+		
+		
+	</template>
+	<script>
+		(function() {
+			'use strict';
+			class fcStyleBinding {
+    			 beforeRegister() {
+    // Takes camelcase class name "StockTicker" -> "stock-ticker".
+    				this.is = 'fc-style-binding';
+					this.properties = {
+						spanData: {
+							type: Object,
+							value: function(){return {};}
+						}, 
+						startBackground:{
+							type: String, 
+							value: function(){
+								return '#aedefe';
+							},
+							notify: true
+						},
+						inputBackground:{
+							type: String, 
+							value: function(){
+								return '#aedefe';
+							},
+							notify: true
+						},
+
+						startWidth:{
+							type: Number, 
+							value: function(){
+								return 1400;
+							},
+							notify: true
+						},
+						inputWidth: {
+							type: Number,
+							value: function(){
+								return 1400;
+							},
+							notify: true
+						},
+
+						startHeight:{
+							type: Number, 
+							value: function(){
+								return 1080;
+							},
+							notify: true
+						},
+						inputHeight:{
+							type: Number,
+							value: function(){
+								return 0;
+							},
+							notify: true
+						},
+					};
+				}
+				
+				_computeWidth(startWidth, inputWidth){
+					return `width:${inputWidth > 0 ? inputWidth: startWidth}px;`;
+				}
+				_computeHeight(startHeight, inputHeight){
+					return `height:${inputHeight > 0 ? inputHeight: startHeight}px;`;
+				}
+				_computeBackground(startBackground, inputBackground){
+					return `background:${inputBackground != undefined ? inputBackground : startBackground};`;
+				}  
+			}		
+
+			Polymer(fcStyleBinding);
+		})();
+	</script>
+</dom-module>

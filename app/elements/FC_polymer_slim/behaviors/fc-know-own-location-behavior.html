@@ -1,18 +1,38 @@
-<link rel="import" href="../polymer/polymer.html">
-
 <script>
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.KnowOwnLocationBehaviorImpl = {
     properties: {
-	    topLeftX: {
+	    currentTopLeftX: {
 	        type: Number,
 	        reflectToAttribute: true,
-	        readOnly: true
+	        readOnly: true,
+	        value: function(){
+	    		return this.getBoundingClientRect().left;
+	    	}
 	    },
-	    topLeftY: {
+	    priorTopLeftX: {
+	        type: Number,
+	        reflectToAttribute: true,
+	        readOnly: true,
+	        value: function(){
+	    		return this.getBoundingClientRect().left;
+	    	}
+	    },
+	    currentTopLeftY: {
 	    	type: Number,
 	    	reflectToAttribute: true,
-	    	readOnly: true
+	    	readOnly: true,
+	    	value: function(){
+	    		return this.getBoundingClientRect().top;
+	    	}
+	    },
+	    priorTopLeftY: {
+	        type: Number,
+	        reflectToAttribute: true,
+	        readOnly: true,
+	        value: function(){
+	    		return this.getBoundingClientRect().top;
+	    	}
 	    },
 	    centerX: {
 	    	type: Number,
@@ -27,17 +47,46 @@ FCBehaviors.KnowOwnLocationBehaviorImpl = {
 	 	width: {
 			type: Number,
 	    	reflectToAttribute: true,
-	    	readOnly: true
+	    	readOnly: true,
+	    	value: function(){
+	    		return this.getBoundingClientRect().width;
+	    	}
 	 	},
 	 	height: {
 	 		type: Number,
 	    	reflectToAttribute: true,
-	    	readOnly: true
-	 	}
+	    	readOnly: true,
+	    	value: function(){
+	    		return this.getBoundingClientRect().height;
+	    	}
+	 	}//,
+	 	// style: {
+	 	// 	type: String,
+	 	// 	value: 'background: red',
+	 	// 	reflectToAttribute: true
+	 	// }
+    },
+    listeners: {
+    	'iron-resize': '_onParentResize'
+    },
+    created: function(){
+    	this._boundOnParentResize = this._onParentResize.bind(this);
+    },
+    attached: function(){
+    	this.parentNode.addEventListener('resize', this._boundOnParentResize);
+    },
+    detached: function(){
+    	this.parentNode.removeEventListener('resize', this._boundOnParentResize);
+    },
+    _onParentResize: function(event){
+    	this.priorTopLeftX = this.currentTopLeftX;
+    	this.priorTopLeftY = this.currentTopLeftY;
+    	this.currentTopLeftX = this.getBoundingClientRect().left;
+    	this.currentTopLeftY = this.getBoundingClientRect().top;
+    	//this.fire('imhere', {currentTopYLeft: this.currentTopLeftY} ,{bubbles: true,cancelable: true});
     }
 };
 FCBehaviors.KnowOwnLocationBehavior = [
-	Polymer.IronControlState,
 	Polymer.IronResizableBehavior,
 	FCBehaviors.KnowOwnLocationBehaviorImpl];
 </script>

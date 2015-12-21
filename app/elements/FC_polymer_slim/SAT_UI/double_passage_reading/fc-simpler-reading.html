@@ -48,7 +48,7 @@
 			min-height: 720px !important;
 			display: flex;
 			min-width: 280px !important;
-			max-width: 720px !important;
+			max-width: 680px !important;
 			overflow-y: scroll;	
 		}
 </style>
@@ -65,82 +65,63 @@
 					</div>
 
 	<!--single column container-->
-			<div id="singleColumnContainer" class="layout horizontal container columnContainer" style="padding-right: 3px; overflow-y: scroll;">
-			<!--Line number container-->
-				<div id="linenumbersA1" class="layout vertical line-number">
-					<div id="linesA1">Lines</div>
-					<template 
-					 	is="dom-repeat" 
-					 	items="{{lineNumberArray}}" 
-					 	filter="{{singleColumnFilter(numLines)}}"
-					 >
-     					<span 
-     						hidden="{{!item.show}}" 
-     						id="col_one_line_{{index}}">
-     						{{item.number}}
-     					</span>
-     					<span 
-     						hidden="{{item.show}}">
-     						&nbsp
-     					</span>			
-    				</template>
-				</div>
-			<!--passage-1-column-1 container-->
-					 		<div id="colUnoA" class="layout horizontal flex wrap text">
-					 		<article id="singleColumnText">
-					 	    	<template is="dom-repeat" items="{{passageArrayOne}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
- 									</template>
- 									<a id="oneA_{{index}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
-								</template>
-									<br class="line-numbers">
-									<hr>
-								<span class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</span>
-							</article>
-					 		</div>
-					 	</div>					
-		<!-- end-of-column-1 line number and text container-->
-		
-
-
-
-
-
-
-					<div id="doubleColumnContainer" class="layout horizontal flex container">
-						<div id="firstColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-right: 4px; overflow-y:scroll;">
+					<div id="doubleColumnContainer" class="layout horizontal flex">
+						<div id="firstColumnContainer" class="layout horizontal flex-1 columnContainer" style="padding-right: 4px; overflow-y:scroll;">
 			<!--Line number container-->
 					 		<div 
 					 			id="linenumbers" 
-					 			class="layout vertical line-number">
+					 			class="layout vertical line-number"
+					 		>
 					 		<div 
-					 			id="lines">
+					 			id="lines"
+					 		>
 					 			Lines
 					 		</div>
-					 			<div>&nbsp</div>
+					 			<div>
+					 				&nbsp
+					 			</div>
 					 			<template 
 					 				is="dom-repeat" 
 					 				items="{{lineNumberArray}}" 
 					 				filter="{{singleColumnFilter(numLines)}}"
 					 			>
-     								<span hidden="{{!item.show}}" 
-     								id$="col_one_line_{{item.number}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
+     								<span 
+     									hidden="{{!item.show}}" 
+     									id$="lineNumId{{item.number}}"
+     								>
+     									{{item.number}}
+     								</span>
+     								<span 
+     									hidden="{{item.show}}"
+     								>
+     								&nbsp
+     								</span>
     							</template>
-    							
 					 		</div>
 			<!--passage-1-column-1 container-->
-					 		<div id="colUno" class="layout horizontal flex wrap text">
+					 		<div 
+					 			id="colUno" class="layout horizontal flex wrap text">
 					 		<article id="textColumnOne">
 					 	    	<template 
 					 	    		id='columnOneDomRepeat' 
 					 	    		is="dom-repeat" 
 					 	    		items="{{passageArrayOne}}" 
-					 	    		filter="{{columnOneFilter(showSecond,finalColumnOneWordIndex)}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+					 	    		filter="{{columnOneFilter(showSecond, lof)}}"
+					 	    	><!--last of first-->
+ 									<template 
+ 										is="dom-if" 
+ 										if="{{item.newPara}}"
+ 									>
+ 										<br>
+ 										<span>
+ 											&nbsp&nbsp&nbsp&nbsp
+ 										</span>
  									</template>
- 									<a id$="one_{{item.order}}" hidden$="{{oneGone}}">{{item.word}}</a>
+ 									<a 
+ 										id$="oneA{{item.order}}" 
+ 										hidden$="{{oneGone}}">
+ 											{{item.word}}
+ 									</a>
 								</template>
 								<br>
 								<hr>
@@ -150,18 +131,21 @@
 					 	</div>
 		<!-- end-of-column-1 line number and text container-->
 
-
-
-		<!--column-2-container line numbs and passage | Flex-1 keeps the columns veen-->
-					 	<div id="secondColumnContainer" class="layout horizontal flex-1 container columnContainer" style="padding-left: 4px;overflow-y:scroll;">
+		<!--column-2-container line numbs and passage | Flex-1 keeps the columns even-->
+					 	<div 
+					 		id="secondColumnContainer" 
+					 		class="layout horizontal flex-1columnContainer" 
+					 		style="padding-left: 4px; overflow-y:scroll;"
+					 	>
 			<!--Line number container-->
-					 		<div id="linenumbersright" class="line-number layout vertical">
+					 		<div 
+					 			id="101_los" class="line-number layout vertical">
 					 			<div id="linesB2">Lines</div>
 					 			<div>&nbsp</div>
 				
 					 		 	<template is="dom-repeat" 
-					 		 	items="{{lineNumberArrayTwo}}" 
-					 		 	filter="{{columnTwoLineNumberFilter(numLines,finalLine)}}">
+					 		 		items="{{lineNumberArrayTwo}}" 
+					 		 		filter="{{columnTwoLineNumberFilter(numLines,los)}}">
      								<span hidden="{{!item.show}}" id$="col_one_line_{{index}}">{{item.number}}</span><span hidden="{{item.show}}">&nbsp</span>
      								
     							</template>	
@@ -173,14 +157,15 @@
 								<template 
 									is="dom-repeat" 
 									items="{{passageArrayOne}}" 
-										filter="{{columnTwoFilter(showSecond,finalColumnOneWordIndex)}}">
- 									<template is="dom-if" if="{{item.newPara}}">
- 										<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+									filter="{{columnTwoFilter(showSecond, lof, los)}}">
+ 									<template 
+ 										is="dom-if" 
+ 										if="{{item.newPara}}">
+ 										<br>
+ 										<span>&nbsp&nbsp&nbsp&nbsp</span>
  									</template>
  									<a id="one_{{item.order}}" hidden$="{{!oneGone}}">{{item.word}}</a>
-
 								</template>
-								<br class="line-numbers">
 								<hr>
 								<span class="right right-justified line-numbers" style="float:right; text-align: right;" id="doubleColumnBounderTwo"> End of Passage</span>
 							</article>

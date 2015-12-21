@@ -1,153 +1,164 @@
 <dom-module id="fc-to-do-list">
-+<template>
-+	<style>
-+		form {
-+		  display: flex;
-+		  flex-direction: row;
-+		  align-items: center;
-+		  margin-bottom: 20px;
-+		}
-+
-+		paper-button {
-+		  flex-shrink: 1;
-+		}
-+		paper-input {
-+		  flex-grow: 1;
-+		}
-+
-+		paper-checkbox {
-+		  display: inline-block;
-+		  margin: 5px 0;
-+		  transition: opacity 0.3s;
-+		}
-+
-+		paper-checkbox[checked] {
-+		  opacity: 0.5;
-+		}
-+	</style>
-+		<firebase-auth
-+			  auto-login
-+
-+			  location="[[firebaseURL]]"
-+			  provider="[[firebaseProvider]]"
-+			  on-error="onFirebaseError"
-+			  on-login="onFirebaseLogin">
-+		</firebase-auth>
-+		<paper-toast id="errorToast">
-+		</paper-toast>
-+		<form on-submit="addItem">
-+	      	<paper-input 
-+	      		value="{{newItemValue}}" 
-+	        	placeholder="Enter your item here...">
-+	        </paper-input>
-+	      	<paper-button on-click="addItem">
-+	      		Add
-+	      	</paper-button>
-+	    </form>
-+	    <template is="dom-repeat" items="{{items}}">
-+	      	<div>
-+	        	<paper-icon-button
-+	        	 	icon="delete" 
-+	          		on-tap="deleteItem">
-+	          	</paper-icon-button>
-+	        	<paper-checkbox 
-+	        		on-change="toggleItem"
-+	          		checked="{{item.done}}">[[item.text]]</paper-checkbox>
-+	      	</div>
-+	    </template>
-+	</template>
-+	<script>
-+  Polymer({
-+  	is: 'fc-to-do-list',
-+  	properties: {
-+  		items: {
-+  			type: Array,
-+  			value: function(){
-+  				return [ 	{	
-+  							text: 'Write a TODO app', 
-+  							done: false
-+  							},
-+  							{
-+   	 						text: 'Use Firebase',
-+   	 						done: false
-+  							}
-+  						];
-+  				},
-+  			notify: true
-+  			},
-+  		item: {
-+  			type: Object,
-+  			value: {
-+  				done: false,
-+  				text: String,
-+  				},
-+  			notify: true
-+  			},
-+  		firebaseURL: {
-+  			type: String, 
-+  			value: "https://focused0ne.firebaseio.com/passagesDestinations/toDoLists",
-+  			notify: true
-+  			},
-+  		firebaseProvider: {
-+  			type: String,
-+  			value: 'google',
-+  			notify: true
-+  			}
-+
-+	},
-+		addItem: function(event) {
-+		  	event.preventDefault(); // Don't send the form!
-+		  	this.push('toDos', {
-+		    	done: false,
-+		    	text: newItemValue
-+		  });
-+		  	this.newItemValue = '';
-+		},
-+
-+		toggleItem: function(event) {
-+		  	event.model.set('done', !event.model.item.done);
-+		},
-+
-+		deleteItem: function(event) {
-+		  	this.splice('items', event.model.index, 1);
-+		},
-+
-+		onFirebaseLogin: function(event) {
-+		  	this.ref = new Firebase(this.firebaseURL + '/user/' + 
-+		                                                  event.detail.user.uid);
-+		  	this.ref.on('value', function(snapshot) {
-+		    	this.updateItems(snapshot);
-+		  });
-+		},
-+
-+		updateItems: function(snapshot) {
-+		  	this.items = [];
-+		  	snapshot.forEach(function(childSnapshot) {
-+		    	var item = childSnapshot.val();
-+		    	item.uid = childSnapshot.key();
-+		    	this.push('items', item);
-+		  	}.bind(this));
-+		},
-+
-+		addItem: function(event) {
-+		  	event.preventDefault(); // Don't send the form!
-+		  	this.ref.push({
-+		    	done: false,
-+		    	text: newItemValue// yes we would need that huh
-+		  	});
-+		  	this.newItemValue = '';
-+		},
-+
-+		toggleItem: function(event) {
-+		  	this.ref.
-+		    	child(event.model.item.uid).
-+		    	update({done: event.model.item.done});
-+		},
-+
-+		deleteItem: function(event) {
-+		  	this.ref.child(event.model.item.uid).remove();
-+		}
-+	});
-+</script>
-+</dom-module> 
+<template>
+	<style>
+		form {
+		  display: flex;
+		  flex-direction: row;
+		  align-items: center;
+		  margin-bottom: 20px;
+		}
+		.toDoItem paper-icon-button[icon=delete]{
+			-webkit-transition: opacity 0.5s;
+			transition: opacity 0.5s;
+			opacity: 0;
+		}
+		.toDoItem:hover paper-icon-button[icon=delete]{
+			opacity: 100;
+		}
+
+		paper-button {
+		  flex-shrink: 1;
+		}
+		paper-input {
+		  flex-grow: 1;
+		}
+
+		paper-checkbox {
+		  display: inline-block;
+		  margin: 5px 0;
+		  transition: opacity 0.3s;
+		}
+
+		paper-checkbox[checked] + .label {
+		  opacity: 0.5;
+		  text-decoration: line-through;
+		}
+	</style>
+		<firebase-auth
+			  location="[[firebaseURL]]"
+			  provider="[[firebaseProvider]]"
+			  on-login="onFirebaseLogin"
+			  on-logout="onFirebaseLogout">
+		</firebase-auth>
+		<paper-toast id="errorToast">
+		</paper-toast>
+		<form on-submit="addItem">
+	      	<paper-input 
+	      		value="{{newItemValue}}" 
+	        	placeholder="Enter your item here...">
+	        </paper-input>
+	      	<paper-button on-click="addItem">
+	      		Add
+	      	</paper-button>
+	    </form>
+	    <template is="dom-repeat" items="{{toDos}}">
+	      	<div class="toDoItem">
+	        	<paper-checkbox
+	        		on-change="toggleItem"
+	          		checked="{{item.done}}"></paper-checkbox>
+	          	<span class="label">[[item.text]]</span>
+	          	<paper-icon-button
+	        	 	icon="delete" 
+	          		on-tap="deleteItem">
+	          	</paper-icon-button>
+	      	</div>
+	    </template>
+	</template>
+	<script>
+  Polymer({
+  	is: 'fc-to-do-list',
+  	properties: {
+  		toDos: {
+  			type: Array,
+  			value: function(){
+  				return [ 	{	
+  							text: 'Write a TODO app', 
+  							done: false
+  							},
+  							{
+   	 						text: 'Use Firebase',
+   	 						done: false
+  							}
+  						];
+  				},
+  			notify: true
+  			},
+  		item: {
+  			type: Object,
+  			value: {
+  				done: false,
+  				text: String,
+  				},
+  			notify: true
+  			},
+  		firebaseURL: {
+  			type: String, 
+  			value: "https://focused0ne.firebaseio.com/toDoLists",
+  			notify: true
+  			},
+  		firebaseProvider: {
+  			type: String,
+  			value: 'password',
+  			notify: true
+  			}
+
+	},
+		addItem: function(event) {
+		  	event.preventDefault(); // Don't send the form!
+		  	this.push('toDos', {
+		    	done: false,
+		    	text: newItemValue
+		  });
+		  	this.newItemValue = '';
+		},
+
+		toggleItem: function(event) {
+		  	event.model.item.set('done', !event.model.item.done);
+		},
+
+		deleteItem: function(event) {
+		  	this.splice('toDos', event.model.index, 1);
+		},
+
+		onFirebaseLogin: function(event) {
+		  	this.ref = new Firebase(this.firebaseURL + '/users/' + 
+		                                                  event.detail.user.uid);
+		  	this.ref.on('value', function(snapshot) {
+		    	this.updateToDos(snapshot);
+		  	}.bind(this));
+		},
+
+		onFirebaseLogout: function(event) {
+			this.updateToDos();
+		},
+
+		updateToDos: function(snapshot) {
+		  	this.toDos = [];
+		  	snapshot.forEach(function(childSnapshot) {
+		    	var item = childSnapshot.val();
+		    	item.uid = childSnapshot.key();
+		    	this.push('toDos', item);
+		  	}.bind(this));
+		},
+
+		addItem: function(event) {
+		  	event.preventDefault();
+		  	this.ref.push({
+		    	'done': false,
+		    	'text': this.newItemValue
+		  	});
+		  	this.newItemValue = '';
+		},
+
+		toggleItem: function(event) {
+		  	this.ref.child(event.model.item.uid).
+		    	update({done: event.model.item.done});
+		},
+
+		deleteItem: function(event) {
+		  	this.ref.child(event.model.item.uid).remove();
+		}
+	});
+</script>
+</dom-module> 
 View

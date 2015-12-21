@@ -1,0 +1,322 @@
+<dom-module id="fc-object-element-mapping">
+<template>
+<style>
+:root {  
+    font-family: Times;
+   
+	  
+	 }
+ :host{
+	   opacity: 1.00;
+	   display: flex;
+	  
+	 } 
+.cell-outline{
+  min-width: 72px;
+  max-width: 198px;
+  padding: 3px;
+  padding-left: 6px;
+  margin: 3px 9px;
+  min-height: 36px;
+  max-height: 66px;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  font-size: 1em;
+  font-weight: 700;
+  font-family: merriweather;
+  color: #000066;
+  background: white;
+  //box-shadow: 0px -5px 20px #d8d8d8 inset;
+}
+ .labelsClass {
+	    min-width: 72px;
+		max-width: 162px;
+		min-height: 64px; 
+	   max-height: 72px; 
+	   padding: 0px 2px 2px 2px;
+	   margin: 0px 2px 2px 2px;
+	 
+	   opacity: .93;
+  --paper-input-container-label-focus:{
+	   font-family: Merriweather;
+	   font-weight: 700;
+	   color: brown;
+	   font-size: 1.25em;
+	 
+    };
+	 --paper-input-container-label:{
+	   font-family: Merriweather;
+	   font-weight: 700;
+	   color: brown;
+	   font-size: 1.25em;
+	   padding: 0px 2px;
+	 
+    };
+    --paper-input-container-underline: {
+	   display: inline-block;
+	   height: 1.3px;
+	   color: navy;
+	   margin: 0px 3px 0px 3px;
+	 };
+--paper-input-container-input: {
+	   color: #000066;
+	   font-family: merriweather;
+	   font-size: 1.15em;
+	   font-weight: 700;
+	   margin: 0px 3px 2px 3px;
+};
+   
+  }
+  --fc-card-header-image: {
+    height: 50px;
+    width: 90px;
+  };
+
+.grid-box{
+  min-width: 340px;
+  min-height: 480px;
+  padding: 3px;
+  margin: 3px;
+  display: block;
+  color: black;
+  background: white;
+  overflow-x: hidden;
+}
+.grid-holder{
+  width: calc(95%-85px);
+  max-height: calc(98vh-64px);
+  overflow: scroll;
+}
+  --fc-card-header-image:{width: 61px; height: 36px;};
+ .phone-label-offset{
+	  min-width: 72px;
+	  max-width: 198px; 
+	  max-height: 72px;
+	  min-height: 48px; 
+	  padding: 0px 3px 0px 3px;
+	 --paper-input-container-label:{
+	   font-family: times;
+	   font-weight: 700;
+	   font-size: 1.05em;
+	   color: navy;
+	  margin-left: calc(-width/6);*/
+    };
+    
+  }
+  paper-input.input { 
+		max-width: 198px;
+		min-width: 72px; 
+		max-height: 96px;
+		min-height: 48px;
+		padding: 4px;
+		margin: 3px; 
+	   }
+  paper-material {padding: 16px;}
+
+</style>
+
+
+			<fc-call-card-input-model-one class="vertical layout flex container skootch nowrap">
+			<div class="card-content vertical layout flex-1 container">
+				<pre>The Firebase Path and View Model</pre>
+				<div class="horizontal layout">
+			  <paper-input label="Firebase" id="baseFirebasePath" value={{firebaseLocation}} class="labelsClass flex input" always-float-label="true" elevation="1"> 
+			 
+				    <paper-tooltip for="baseFirebasePath"> 
+						 This first input is the base path or "first part" of the 'location' (internet address) that will lead to your rich set of view data, accessible to your users.  If you are just starting out, this address will be the same for all the subsequent steps of the process, at least for the forseeable future. 
+				    </paper-tooltip>
+				      </paper-input>
+				    <paper-input label="Local Path" id="localPath" class="labelsClass input flex" always-float-label="true" elevation="1" value="{{localPath}}">
+				
+					<paper-tooltip for="localPath">This is the first subheading to your local and long-term view storage database which your users will access to view their relevant data.  Naming views well is of high value!!! This name will be the part of the path to your data and the views, so be <b>"polite and proper"</b> in your naming. If you are making a view for a user, you would likely use the term "user" here.  Making your path: 
+					 <hr>
+					 [firebase-base-path]/[users]/...
+					 </paper-tooltip>
+		    		</paper-input>
+				<paper-input-container always-float-label>
+					<label for="">User Type</label>
+					<input name="new_user_type_input"
+						id="new_user_type_input"
+						is="iron-input"
+						type="text"
+						list="user_types_list"
+						autocomplete="on"
+						on-keypress="_keyPressed"></input>
+				</paper-input-container>
+
+				<datalist id="user_types_list">
+					<template is="dom-repeat"
+						items="{{userTypes}}">
+						<option value="{{item.value}}"></option>
+					</template>
+				</datalist>
+				<!-- <paper-input type="list" label="View User Type" id="UserType" class="labelsClass input flex" always-float-label="true" placeholder="{{userType.1}}" elevation="1" value="{{userType}}">
+				<template is="dom-repeat" items='{{userType}}' hidden$='{{!userTypeArray}}'>
+						<option value="{{item}}">{{item}}</option>
+
+				</template>
+				</paper-input> -->
+				<paper-input label="View Set Name" id="fcSemanticPathfour" class="labelsClass input flex" always-float-label="true" elevation="1" value="{{fcSemanticPathFour}}">
+				
+					 <paper-tooltip for="fcSementicPathFour">This is the name of the view set you are sending out. It will be the path that leads to the set of views contained in an view set you are building. In our example, lets say that we are making current Student Test Scores View Set.<br><br>
+					 New Path: [firebase-base-path]/[users]/[students]/[Current_Students]/[Test_Scores_Set]/...
+					 </paper-tooltip>
+				</paper-input>
+				<paper-input label="View Name" id="fcSemanticPathFive" class="labelsClass input flex" always-float-label="true" elevation="1" value="{{fcSemanticPathFive}}">
+				
+					 <paper-tooltip for="fcSementicPathFive">This is the name of the actual view you are making. In our example, lets say it is Math Overview.<br><br>
+					 New Path: [firebase-base-path]/[users]/[students]/[Current_Students]/[Test_Scores_Set]/[Math_OverView]
+					 </paper-tooltip>
+				</paper-input>
+		   
+	</div>
+	<pre> See Your Object Modeling In Action</pre>
+	<div class="vertical layout">
+	<paper-textarea readonly="true" style="min-height:500px; max-height: 800px; margin: 20px; max-width:88%; border: 3px ridge silver; font-family: merriweather; font-weight: 700; font-size: 13px;" 
+		 value="Firebase Path as Constructed: 
+ https://{{firebaseLocation}}/{{localPath}}
+ Here are the Keys as constructed:
+  *  {{fcKey}}_000_{{fcSemanticPathFour}} 		object: {{baseClassPrototype}}
+  *  {{fcKey}}_001_                          	object_Extension: {{object_Extension}} object_Customization: {{listsOfProperties}}
+  *  {{fcKey}}_002_                            
+  	  00{{fcItemOrder}}_{{fclabel}}:'{{fcinput}}'  
+  *  {{fcKey}}_00{{fcNumberOfThisView}}_{{fcSemanticPathFour}}_{{fcSemanticPathFive}}             
+  *  {{fcKey}}_004_
+  *  {{fcKey}}_005_
+  *  {{fcKey}}_00_{{fcNumberOfViews}}_
+ The 00006 was derived from the input into the field: Number of Views:  {{fcNumberOfViews}}
+ The value of the one completed key was derived from the view number inputed by the user.  Here,  {{fcNumberOfThisView}}.
+ By the way, this is a `textarea` with binding">
+
+			</paper-textarea>
+	</div>	
+		 
+</div>
+</fc-call-card-input-model-one> 
+</template>
+<script>
+Polymer({
+  is:"fc-object-element-mapping",
+  properties: {
+  localPath: {
+    type: Boolean, 
+    value: true,
+    notify: true,
+    reflectToAttributes: true
+    },
+  selected: {
+	 type: Number,
+	 value: 0,
+	 notify: true,
+	 reflectToAttributes: true
+    },
+  holder: {
+	 type: Array,
+	 notify: true, 
+	 reflectToAttributes: true
+    },
+  fcItemOrder: {
+	 type: Number,
+	 notify: true, 
+	 reflectToAttributes: true
+    },
+  fclabel: {
+	 type: String,
+	 notify: true, 
+	 reflectToAttributes: true
+    },
+  input: {
+	 type: String,
+	 notify: true, 
+	 reflectToAttributes: true
+    },
+  fcViewName: {
+	 type: String,
+	 notify: true, 
+	 reflectToAttributes: true
+    },
+  fcNumberOfViews: {
+	 type: Number,
+	 notify: true, 
+	 reflectToAttributes: true
+    }, 
+  fcTabs: {
+    type: Object, 
+    value: function(){
+	 return {'0000': 'Self-Generating Views',
+			 '0001': 'Charting Your Path',
+			 '0002': 'Selecting Your View',
+			 '0003': 'Measuring Your Task',
+			 '0004': 'Charting Your Path',
+			 '0005': 'Selecting Your View',
+			 '0006': 'Measuring Your Task',
+			 '0007': '',
+			 '0008': '',
+			 '0009': ''
+		    };
+		  },
+    notify: true
+    }, 
+    userType: {
+	 	type: Array,
+	 	value:function(){
+	 			return [
+	 				'admin',
+	 				'software',
+	 				'clientAdmin',
+	 				'student',
+	 				'parent',
+	 				'guest',
+	 				'institution'
+	 			];
+	 		},
+	 	notify: true 
+    },
+    userTypeArray: {
+    	type: Boolean, 
+    	computed: 'computeUserTypeArray(userType)',
+    	notify: true
+
+    },
+    userTypes: {
+    	type: Array,
+    	value: function(){return [];}
+    }
+},
+	ready: function(){
+		this.ref = new Firebase("https://focusedstaging1.firebaseio.com");
+	  	this.ref.child("User Types").on('child_added', function(childSnapshot) {
+	    	this.push("userTypes",childSnapshot.val());
+	    	console.log(childSnapshot.val());
+	  	}.bind(this));
+	},
+	_keyPressed: function(e) {
+        if (13 === e.charCode) {
+            this.addNewUserTypeToFirebase(e.target.bindValue);
+        }
+    },
+    addNewUserTypeToFirebase: function(userType){
+    	this.ref.child("User Types").push({'value':userType});
+    },
+	computeUserTypeArray: function(userType){
+		var showSelect = (typeof userType !=Object || userType !=Array)?false: true;
+		return showSelect;
+	},
+  toggleDisabled: function(){
+    this.disabled = ! this.disabled;
+  },
+  attached: function (){
+    //console.log(this.value + ' the value at attached in the cell');
+    //console.log(this.label + ' the label at attached in the cell');
+  },
+  handleDragStart: function(e) {
+	 e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+    },
+  allowDrop: function (e) {
+	 e.preventDefault();
+	// console.log("drag over");
+    }
+});
+</script>
+</dom-module>

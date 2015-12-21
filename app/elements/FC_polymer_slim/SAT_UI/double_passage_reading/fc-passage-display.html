@@ -14,8 +14,8 @@
 			background: yellow;
 		}
 		div.blurb{
-			line-height: 1.2;
-			font-size: 1.25em;
+			line-height: .9;
+			font-size: 1.00em;
 			font-family: merriweather;
 			font-weight: 500;
 			font-style: italic;
@@ -30,38 +30,40 @@
 		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
 			{{passageBlurb}}
 		</div>
-
 	<!--single column container-->
 			
 		<!-- end-of-column-1 line number and text container-->
-		<div id="singleColumnContainer" class="layout horizontal container columnContainer" hidden="{{showingSecondColumn}}" style="padding-right: 8px;">
-					
-					<fc-single-column-layout id="singleDisplay" the-content='{{passageArray}}'hidden='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
-					</fc-single-column-layout>
-		
+		<div id="doubleColumnContainer" onscroll="this.notifyResize()" class="layout horizontal columnContainer"  style="padding-right: 8px;">
+			<fc-single-column-layout
+				class="flex-1 left-passage-column"
+				id="firstColumn"
+				the-content='{{passageArray}}'
+				column-one='true'
+				last-word-index='[[lastWordIndexOfFirst]]'
+				last-row-index='{{lastRowIndexOfFirst}}'>
+			</fc-single-column-layout>
+			<fc-single-column-layout
+				class="flex-1 right-passage-column"
+				id="secondColumn"
+				firstColumn='false'
+				hidden='{{!showingSecondColumn}}'
+				the-content='{{passageArray}}'
+				first-word-index='[[firstWordIndexOfSecond]]'
+				last-word-index='[[finalWordIndex]]'
+				first-row-index='[[firstRowIndexOfSecond]]'>
+			</fc-single-column-layout>
 		</div>
 
-
-
-		<div id="doubleColumnContainer" class="layout horizontal flex container" hidden='{{!showingSecondColumn}}'>
-					
-					<fc-double-column-layout id="doubleDisplay" the-content='{{passageArray}}' shown='{{showingSecondColumn}}' last-word-index='{{numWords}}'>
-					</fc-double-column-layout>
-		
-		</div>	
-<!--End of top container horizontal-->
 	</div>
 <!--End of Vertical passage container-->
 </div>
 </template>
 <script>
+
 Polymer({
 	is:'fc-passage-display',
 	behaviors: [Polymer.IronResizableBehavior],
-	listeners: {
-        'fcpassagedisplay.scroll': 'anyScroll',
-        'this.$$(root).track': 'rootTrack'
-      },
+	listeners: {'iron-resize':'setUp'},
 	properties: {
 		passagePath: {
 			type: String,
@@ -73,7 +75,7 @@ Polymer({
 			type: String,
 			value: function(){
 				return 'https://focusedstaging1.firebaseio.com/passagesDestinations';
-				},
+			},
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -84,96 +86,86 @@ Polymer({
 			reflectToAttributes: true
 		},
 		passageArray:{
-			type: Array, 
-			value:[],
+			type: Array,
 			notify: true 
 		},
-		passagesArray:{
-			type: Array, 
-			value: function(){
-				return []
-			},
-			notify: true 
-		},
-		
 		passageTitle: {
 			type: String, 
-			value: 'Focused Reading Passage',
 			notify: true,
 			reflectToAttributes: true
 		},
 		passageBlurb:{
 			type: String,
-			value: 'get the blurb',
 			notify: true
 		},
-		lastWordIndex: {
+		lastWordIndexOfFirst: {
 			type: Number,
-			value: 550,
 			notify: true
 		},
-		showingSecond: {
+		firstWordIndexOfSecond: {
+			type: Number,
+			notify: true
+		},
+		finalWordIndex: {
+			type: Number,
+			notify: true
+		},
+		lastRowIndexOfFirst: {
+			type: Number,
+			notify: true
+		},
+		firstRowIndexOfSecond: {
+			type: Number,
+			computed: 'computeFirstRowIndexOfSecond(lastRowIndexOfFirst)',
+			notify: true
+		},
+		showingSecondColumn: {
 			type: Boolean,
 			value: false,
+			observer: 'splitPassageForColumns',
 			notify: true, 
 			reflectToAttributes: true
 		}
 		
 	},
 
-	created: function(){
-	},
 	ready: function(){
 		self=this;
-		self.passagesArray=[];
-		var ref= new Firebase(self.passageRootPath);
-		ref.on("child_added", function(snap)
-				{
-					console.log("added", snap.key());
-					if(snap.key()=='new_Test_1')
-					{
-						self.set('passageArray', snap.val());
-						console.log(self.passageArray);
-						self.passageBlurb=self.passageArray[1].passageBlurb;
-						self.numWords=self.passageArray.length;
-						self.$.singleDisplay.lastWordIndex=self.numWords;
-						self.$.doubleDisplay.lastWordIndex=self.numWords;
-						}									
-				}
-			);
-			
-		this.$.singleDisplay.theContent=this.passageArray;
-		this.$.doubleDisplay.theContent=this.passageArray;
-},
+		var ref = new Firebase(self.passageRootPath);
+		ref.on("child_added", function(snap) {
+			//console.log("added", snap.key());
+			if(snap.key()=='new_Test_1') {
+				self.passageArray = snap.val();
+				self.passageBlurb=self.passageArray[1].passageBlurb;
+				self.finalWordIndex=self.passageArray.length;
+			}									
+		});	
+	},
 
-	atttached: function(){		
-		this.$.singleDisplay.theContent=this.passageArray;
-		this.$.doubleDisplay.theContent=this.passageArray;
-		this.numWords=this.passageArray.length;
-		this.set('passageBlurb',this.passageArray[1].passageBlurb);
-		this.passageBlurb=this.passageArray[1].passageBlurb;
-		this.notifyResize;
-	},
-	notifyResize: function(){
-		this.setUp();
-	},
-	
 	setUp: function()
 	{
 		this.screenTrueHeight =  (window.innerHeight-320);
-		this.$.singleDisplay.singleWidth = this.$.fcpassagedisplay.clientWidth;
-		if(this.$.noJudge4.clientWidth >= 670 && this.screenTrueHeight>=440)
-			{
-				this.showingSecondColumn = true;
-				this.$.doubleDisplay.notifyResize(true);
-			}	
-		else
-			{ 
-				this.showingSecondColumn = false;
-				this.$.singleDisplay._notifyResize(false);
-			}
-	}
+		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
+		if(this.$.noJudge4.clientWidth >= 640 && this.screenTrueHeight>=440) {
+			this.showingSecondColumn = true;
+		} else { 
+			this.showingSecondColumn = false;
+		}
+	},
 
+	splitPassageForColumns: function(newValue){
+		if(newValue == true){
+			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
+			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+		} else {
+			this.lastWordIndexOfFirst = this.finalWordIndex;
+			this.firstWordIndexOfSecond = this.finalWordIndex;
+		}
+	},
+
+	computeFirstRowIndexOfSecond: function(lastRowIndexOfFirst){
+		return lastRowIndexOfFirst + 1;
+	}
 });
 </script>
 </dom-module>

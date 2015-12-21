@@ -32,15 +32,13 @@
                 line-height: 1.0; 
                 font-weight: 700; 
                 color: blue; 
-                margin-bottom: -20px;
+                margin-bottom:20px;
                 max-width: 220px;
                 min-width: 64px; 
-                height: 36px; 
-                opacity: .69;
-               
-              
-               
-                z-index: 1; 
+             font-size: 13pt;
+     font-size: 1.25em;
+                border-radius: 11px;
+                z-index: 4; 
     }
     paper-button.better-red {
      background: red;
@@ -108,7 +106,7 @@ paper-button.better-platinum {
 			class="dropdown-content" 
 			attr-for-selected="value" 
 			style="width: 100%;" 
-			selected="{{menuSelected}}">
+			selected="{{!menuSelected}}">
 			<template is="dom-repeat" items="{{liArray}}">
 				<paper-item value="{{item}}">{{item}}
 				</paper-item>
@@ -138,7 +136,7 @@ paper-button.better-platinum {
 		id$='{{selectorInputId}}' 
 		always-float-label label$="{{fcselectorinputlabel}}" 
 		value="{{optionToBeAdded}}">
-	</paper-input>
+	</paper-input>`
 	<paper-button 
 		id="addooooo" 
 		class="better-green"
@@ -302,7 +300,7 @@ FcSelector=Polymer({
         instancePath: {
           type: String,
           value: function(){
-            var instancePath = '00001_What_The_View_Class_Does_number_of_views__dataIndex_NUMBER/00000/class_view_instances';
+            var instancePath = '00001_ModelDataViewBuilder__dataIndex_AdminNCoders_00000/class_view_instances';
             return instancePath;
           },
           notify: true
@@ -344,25 +342,26 @@ computefullPath(rootPath, instancePath){
     var olive = fullPath;
     console.log(olive);
     var ref = new Firebase(olive);
-    self.count = 0;
+    count = 0;
       ref.on("child_added", function(snap) {
          
           self.push('startTempArray', snap.val());
-          console.log("added", snap.key() + ' ' + snap.val() + ' ' + self.startTempArray[self.count] + " this is the count: " + self.count);
+          count++;
           self.count++;
-          console.log(self.startTempArray + " this is the whole array");
+        
           var cucumber = self.startTempArray;
-          console.log("here i am here here here" + cucumber);
+        
           });
         
         
         // length will always equal count, since snap.val() will include every child_added event
         // triggered before this point
-        ref.once("value", function(snap) {
-        console.log("initial data loaded!" + self.count, Object.keys(snap.val()).length === self.count);
-        console.log(snap.val());
-      });
-        return self.count;
+      //   ref.once("value", function(snap) {
+      //   //console.log("initial data loaded!" + count, Object.keys(snap.val()).length === count);
+      //   //console.log(snap.val());
+      // });
+      //   
+      return count;
   },
 
 	computeSelectorInputId: function(selectorId){
@@ -431,17 +430,13 @@ computefullPath(rootPath, instancePath){
                           };
                     };
           ref.child(instanceClass).set(self.instanceClass);
-          console.log(instanceClass + 'liArray ' + self.liArray + ' were just saved');
           
-
 
 
   },
 
-  removeItem: function(){
-    console.log(this.liArray);
-    alert(this.liArray);
-
+  removeItem: function(event) {
+       //this.ref.child(event.model.item.uid).remove();
   },
 
 	factoryImpl: function(){
