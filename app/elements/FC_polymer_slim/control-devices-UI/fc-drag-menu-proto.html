@@ -240,9 +240,7 @@ FcDragMenuProto = Polymer({
     },
     attached: function(){
     },
-    _computeWidth(currentWidth){
-          return currentWidth;
-        },
+  
   _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
       if (!scrollable || hideScrollButtons) {
         return 'hidden';
@@ -281,11 +279,12 @@ FcDragMenuProto = Polymer({
       }, 1);
     },
     get _tabContainerScrollSize() {
+      console.log("Scroller Got Called");
       return Math.max(
         0,
         this.$.tabsContainer.scrollWidth -
           this.$.tabsContainer.offsetWidth
-      );
+      );  
     },
 
     	_toggleRightDrawer: function(){
@@ -322,17 +321,13 @@ FcDragMenuProto = Polymer({
       e.preventDefault();
         switch(e.detail.state) {
           case 'start':
-            self._x = e.detail.x;
-            self._y = e.detail.y;
+            
             console.log('START');
             console.log(e);
             break;
           case 'track':
-            self._ddx = e.detail.ddx; //last event x change
-            self._ddy = e.detail.ddy; //last event y change
-            self._dx = e.detail.dx; //from start x change 
-            self._dy = e.detail.dy; // from start y change
-            self.translate3d(self._dx.toString() + 'px', self._dy.toString() + 'px', 0);
+           
+            self.translate3d(e.detail.dx.toString() + 'px', e.detail.dy.toString() + 'px', 0);
             break;
           case 'end':
             console.log("ENDING", e.detail.x, e.detail.y, e.detail.dx, e.detail.dy);
@@ -353,21 +348,17 @@ FcDragMenuProto = Polymer({
 
      _resetWidth: function(e){
           var self=this;
-        e.preventDefault();
+          e.preventDefault();
               switch(e.detail.state) {
                 case 'start':
-                  self._xo = e.detail.x;
-                  self._yo = e.detail.y;
-                  console.log('START');
-                  console.log(e);
+                  console.log(e.detail);
+                  console.log('START', self._xo, self._yo);
                   break;
                 case 'track':
-                  self._ddxo = e.detail.ddx; //last event x change
-                  self._ddyo = e.detail.ddy; //last event y change
-                  self._dxo = e.detail.dx; //from start x change 
-                  self._dyo = e.detail.dy; // from start y change
-                  var nwidth = parseInt(self.currentWidth) + e.detail.dx;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
                   var trueWidth = nwidth.toString()+'px';
+                  console.log("Tracking", self.currentWidth, e.detail.x, e.detail.dx, e.detail.ddx, trueWidth);
+                  self.currentWidth=trueWidth;
                   this.$.protoMenu.style.width= trueWidth;
                   this.$.protoDragMenu.style.width= trueWidth;
                   
@@ -377,11 +368,11 @@ FcDragMenuProto = Polymer({
                   // var nwidth = parseInt(self.currentWidth) + e.detail.dx;
                   // var trueWidth = nwidth.toString()+'px';
                   // this.$.protoMenu.style.width= trueWidth;
-                  // this.$.protoDragMenu.style.width= trueWidth;
-                  // Polymer.dom(this.$.protoMenu).setAttribute('style.width', trueWidth);
-                  // Polymer.dom(this.$.protoDragMenu).setAttribute('style.width', trueWidth);
-                  //    console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, trueWidth);
-                     console.log(this.$.protoMenu.style.width);
+                  //this.$.protoDragMenu.style.width= trueWidth;
+                  //Polymer.dom(this.$.protoMenu).setAttribute('style.width', trueWidth);
+                  //Polymer.dom(this.$.protoDragMenu).setAttribute('style.width', trueWidth);
+                  console.log("Tracking", e.detail.x, e.detail.ddx, trueWidth);
+                     console.log('can I get a width' + this.$.protoMenu.style.width);
                   break;
           }
         },

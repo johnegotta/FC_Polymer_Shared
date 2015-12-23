@@ -76,19 +76,20 @@
 		>
 		
 		<content></content>
-		<paper-icon-button 
-			icon="fc-editor-icons:stretch-horizontal" 
-            name="fc-editor-icons:stretch-horizontal"
-            on-track="resetWidth" 
-            draggable="true"
-         
-            
-            description="the dragable edge of the card"
-            class="menuItems-light"
-            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px;"
-          >
-    </paper-icon-button>
-
+		<span style="width: 32px; background:red; height: 32px" on-track="resetWidth">
+			<!-- <iron-icon 
+				icon="fc-editor-icons:stretch-horizontal" 
+	            name="fc-editor-icons:stretch-horizontal"
+	        
+	          
+	         
+	            
+	            description="the dragable edge of the card"
+	            class="menuItems-light"
+	            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px;"
+	          >
+	    	</ iron-icon>-->
+	    </span>
 	<paper-icon-button 
 			icon="fc-editor-icons:translate" 
             name="fc-editor-icons:translate"
@@ -174,29 +175,20 @@
 				}
 				resetWidth(e){
 					var self=this;
-					self.draggable=true;
 					e.preventDefault();
 					
 			        switch(e.detail.state) {
 			          case 'start':
-			            self._x = e.detail.x;
-			            self._y = e.detail.y;
 			            console.log('START');
 			            console.log(e);
 			            break;
 			          case 'track':
-			            self._ddx = e.detail.ddx; //last event x change
-			            self._ddy = e.detail.ddy; //last event y change
-			            self._dx = e.detail.dx; //from start x change 
-			            self._dy = e.detail.dy; // from start y change
-			            
+			            self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
 			            break;
 			          case 'end':
 			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
-			            self.currentWidth = parseInt(self.currentWidth) + e.detail.dx;
-			            self.draggable=false;
+			            //self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
 			            self.notifyResize();
-			           
 			            break;
 			           
 					}
@@ -204,26 +196,16 @@
 
 				_resizeHeight(e){
 					var self=this;
-					self.draggable=true;
 					e.preventDefault();
 					
 			        switch(e.detail.state) {
 			          case 'start':
-			            self._x = e.detail.x;
-			            self._y = e.detail.y;
-			            console.log('START');
-			            console.log(e);
 			            break;
 			          case 'track':
-			            self._ddx = e.detail.ddx; //last event x change
-			            self._ddy = e.detail.ddy; //last event y change
-			            self._dx = e.detail.dx; //from start x change 
-			            self._dy = e.detail.dy; // from start y change
-			            
+			            self.currentHeight = parseInt(self.currentHeight) + e.detail.ddy;
 			            break;
 			          case 'end':
 			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
-			            self.currentWidth = parseInt(self.currentHeight) + e.detail.dy;
 			            self.draggable=false;
 			            self.notifyResize();
 			            break;
