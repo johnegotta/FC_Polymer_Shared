@@ -6,14 +6,23 @@
 }
 .menuItems-dark{
   color: #000066;
+  
+  vertical-align: center;
 }
 .menuItems-light{
   color: #aedafd;
+  vertical-align: center;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+button.dragtoolbar{
+  width: 42px;
+  height: 26px;
 }
 .menubuttons{
   display: inline-block; 
-  width:78px; 
-  height: 48px;
+  width: 42px; 
+  height: 36px;
 }
 iron-icon.selected{
         height: 32px;
@@ -23,11 +32,11 @@ iron-icon.selected{
       }
 </style>
 <template>
-  <paper-tabs id="dragMenu" draggable="true" style="max-height: 96px; min-height: 24px; min-width: 250px; background: #000066;"> 
-        
-    <iron-icon 
+<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 280px; background: #000066; position: absolute; border: 3px ridge silver;'>
+<span draggable="true" on-track="dragmeplease">
+<iron-icon 
             name="fcdragtag"
-            on-track="dragmeplease" 
+            
             draggable="true" 
             dragging
             icon="icons:label-outline"  
@@ -35,35 +44,38 @@ iron-icon.selected{
             class="menuItems-light"
           >
     </iron-icon>
+  </span>
+  <paper-tabs id="protoDragMenu" hide-scroll-buttons="true" scrollable="true" style="max-height: 96px; min-height: 24px; min-width: 250px; background: #000066;"> 
+        
+    
 
-    <button>
+    <button class="menubuttons">
       <span 
         on-tap="_toggleLeftDrawer" 
         class="menuItems-dark" 
-        style="font-size: 1.1em;"
+        style="font-size: 1.0em;"
         >
-      L
+     <b> L</b>
         <iron-icon 
             icon="icons:swap-horiz"  
-            on-mousedown="doSomething"
             class="menuItems-dark"
           >
         </iron-icon>
       </span>
     </button>
-<button>
-        <iron-icon  
-            icon="icons:perm-identity"  
-            on-tap="_menuLaunch,"
-            name: "loginAndProfile"
-            id:'drag-menu{{dragmenuid}}'
-            description: 'a button designed to launch a modal loginrform and profile'
-            class="menuItems-dark dropdown-trigger"
-            pressed='{{!pressed}}'
+<content>
+</content>
+
+<button class="menubuttons">
+        <iron-icon 
+           
+            icon="icons:hardware:dock"  
+            on-tap="_openAdmin"
+            class="menuItems-dark"
           >
         </iron-icon>
-</button>
-    <button>
+    </button>
+    <button class="menubuttons">
         <iron-icon 
            
             icon="icons:spellcheck"  
@@ -73,8 +85,8 @@ iron-icon.selected{
         </iron-icon>
     </button>
     
-
-    <button>
+_openAdmin
+    <button class="menubuttons">
         <iron-icon 
            
             icon="icons:visibility"  
@@ -84,7 +96,7 @@ iron-icon.selected{
         </iron-icon>
     </button>
 
-  <button>
+  <button class="menubuttons">
         <iron-icon 
            
             icon="icons:view-list"  
@@ -96,7 +108,7 @@ iron-icon.selected{
 
   
     
-    <button>
+    <button class="menubuttons">
         <iron-icon 
             icon="icons:stars"  
             track
@@ -105,7 +117,7 @@ iron-icon.selected{
         </iron-icon>
     </button>
     
-    <button>
+    <button class="menubuttons">
     <iron-icon         
             id="theBest" 
             dragging
@@ -116,7 +128,7 @@ iron-icon.selected{
           >
     </iron-icon>
     </button>
-    <button>
+    <button class="menubuttons">
     <iron-icon         
             id="theBest" 
             dragging
@@ -128,11 +140,10 @@ iron-icon.selected{
     </iron-icon>
     </button>
 
-    <button>
+    <button class="menubuttons">
         
         <span on-tap="_toggleRightDrawer" 
           class="menuItems-dark" 
-          style="font-size: 1.1em;"
           >
           <iron-icon 
               icon="icons:swap-horiz"  
@@ -141,19 +152,24 @@ iron-icon.selected{
           </iron-icon>
     <b>R</b>
     </span>
-    </button>
+   </button>
+   
+     
+</paper-tabs>
+ 
    
         <iron-icon
-            
+            draggable="true"
             track
             icon="icons:input"  
-            on-track="_resizer"
-            class="menuItems-light"
+            on-track="_resetWidth"
+            class="center center-justified menuItems-light"
+            style="position: relative; right: 0; top: 0;"
             >
+
         </iron-icon>
-   
-  </template>      
-</paper-tabs>
+</div>
+</template>
 <script>
 FcDragMenuProto = Polymer({
 	is:'fc-drag-menu-proto',
@@ -173,25 +189,19 @@ FcDragMenuProto = Polymer({
                 notify: true,
                 reflectToAttribute: true
                },
-               newWidth:{
-                  type: Number,
-                  computed: 'computeNewWidth(base, delta)',
-                  notify: true
+              currentWidth:{
+                  type: String, 
+                  value: function(){
+                            return '280';
+                      },
+                  notify: true, 
+                  reflectToAttribute: true
               },
-                base:{
-                  type: Number,
-                  value: function(){return 620;},
-                  notify: true
-                },
+
                 slide:{
                         type: Boolean,
                         value: false,
                         notify: true
-                },
-                delta: {
-                  type: Number, 
-                  animationcomputed: '_extendWidth(base)',
-                  notify: true
                 },
 
                 _leftHidden: {
@@ -230,6 +240,9 @@ FcDragMenuProto = Polymer({
     },
     attached: function(){
     },
+    _computeWidth(currentWidth){
+          return currentWidth;
+        },
   _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
       if (!scrollable || hideScrollButtons) {
         return 'hidden';
@@ -300,9 +313,7 @@ FcDragMenuProto = Polymer({
           }
      },
 	
-  computebasePlusDelta: function(e, base){
-            return (base + 1000);
-  },
+  
 
 	dragmeplease: function(e) {
      this.dragging=true;
@@ -331,16 +342,71 @@ FcDragMenuProto = Polymer({
             self.dragging=false;
             break;
         }
+     }, 
+
+     _openAdmin: function(){
+      var elem=document.getElementById("dragDialogAdmin");
+      console.log(elem._openAdmin());
+
+     
      },
- 
- _lockMenu: function(){
-     this.lockMenu=!this.lockMenu;
- },
- onLocked: function(){
-  Polymer.dom(this).setAttribute('');
- }
- 
+
+     _resetWidth: function(e){
+          var self=this;
+        e.preventDefault();
+              switch(e.detail.state) {
+                case 'start':
+                  self._xo = e.detail.x;
+                  self._yo = e.detail.y;
+                  console.log('START');
+                  console.log(e);
+                  break;
+                case 'track':
+                  self._ddxo = e.detail.ddx; //last event x change
+                  self._ddyo = e.detail.ddy; //last event y change
+                  self._dxo = e.detail.dx; //from start x change 
+                  self._dyo = e.detail.dy; // from start y change
+                  var nwidth = parseInt(self.currentWidth) + e.detail.dx;
+                  var trueWidth = nwidth.toString()+'px';
+                  this.$.protoMenu.style.width= trueWidth;
+                  this.$.protoDragMenu.style.width= trueWidth;
+                  
+                  break;
+                case 'end':
+               
+                  // var nwidth = parseInt(self.currentWidth) + e.detail.dx;
+                  // var trueWidth = nwidth.toString()+'px';
+                  // this.$.protoMenu.style.width= trueWidth;
+                  // this.$.protoDragMenu.style.width= trueWidth;
+                  // Polymer.dom(this.$.protoMenu).setAttribute('style.width', trueWidth);
+                  // Polymer.dom(this.$.protoDragMenu).setAttribute('style.width', trueWidth);
+                  //    console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, trueWidth);
+                     console.log(this.$.protoMenu.style.width);
+                  break;
+          }
+        },
+          _computeWidth: function(currentWidth){
+                   return currentWidth;
+    }
+
 
 });
   </script>
 </dom-module>
+
+// <script>
+//     function clickHandler(e) {
+//       var button = e.target;
+//       while (!button.hasAttribute('data-dialog') && button !== document.body) {
+//         button = button.parentElement;
+//       }
+//       if (!button.hasAttribute('data-dialog')) {
+//         return;
+//       }
+//       var id = button.getAttribute('data-dialog');
+//       var dialog = document.getElementById(id);
+//       if (dialog) {
+//         dialog.open();
+//       }
+//     }
+//   </script>

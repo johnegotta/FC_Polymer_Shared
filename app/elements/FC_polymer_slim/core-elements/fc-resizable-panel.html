@@ -1,0 +1,250 @@
+<dom-module id="fc-resizable-panel">
+	<template>
+	<style> 
+	:host{	width: 1190px;
+			height: 1200px;
+			background: #fff;
+			display: block;
+
+		}
+		.inputClass {
+			height: 65px;
+			width: 150px;
+			margin: 4px 40px 4px 40px;
+			padding: 3px;
+		}
+		.buttonone {
+			height: 24px;
+			width: 24px;
+
+		}
+		.controlpanel {
+			color: #000066;
+			background: #fafafa;
+			border: 6px ridge silver;
+
+		}
+		.header{
+			text-align: center;
+			font-size: 16px;
+			color: #000066;
+			font-weight: 700;
+
+		}
+	</style>
+	<paper-dialog id="controlpanel" class="layout vertical flex wrap controlpanel">
+	
+	<span class="header"> Enter Values to Change Display Properties</span>
+	<div class="horizontal layout flex wrap">
+		<paper-input 
+			id="widthInput" 
+			label="Change My Width" 
+			type="number"
+			class="inputClass"
+			always-float-label 
+			value={{currentWidth}}>
+		</paper-input>
+		<paper-input 
+			id="backgroundInput" 
+			label="Change My Background Color" 
+			class="inputClass"
+			always-float-label 
+			value={{currentBackground}}>
+		</paper-input>
+		<paper-input 
+			id="heightInput" 
+			label="Change My height" 
+			type="number"
+			class="inputClass" 
+			always-float-label 
+			value={{currentHeight}}>
+		</paper-input>
+		
+	</div>
+	<div class="horizontal layout flex wrap">
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+	</div>
+	</paper-dialog>
+	<div 
+		id="myDiv" 
+		style$="[[_computeHeight(currentHeight)]] [[_computeWidth(currentWidth)]] [[_computeBackground(currentBackground)]] border: 3px ridge silver; display: flex; overflow-y:scroll; position: absolute;"
+		>
+		
+		<content></content>
+		<paper-icon-button 
+			icon="fc-editor-icons:stretch-horizontal" 
+            name="fc-editor-icons:stretch-horizontal"
+            on-track="resetWidth" 
+            draggable="true"
+         
+            
+            description="the dragable edge of the card"
+            class="menuItems-light"
+            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px;"
+          >
+    </paper-icon-button>
+
+	<paper-icon-button 
+			icon="fc-editor-icons:translate" 
+            name="fc-editor-icons:translate"
+            on-tap="openDialog" 
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-light"
+            style="position: absolute; right: 0px; top: 32px; z-index: 50;"
+          >
+    </paper-icon-button>
+	</div>
+		
+		
+	</template>
+	<script>
+		(function() {
+			'use strict';
+			class fcResizablePanel {
+				 get behaviors() { 
+				 	return [
+				 	Polymer.IronResizableBehavior,
+      				Polymer.IronRangeBehavior];
+				 }
+    			 beforeRegister() {
+
+    				this.is = 'fc-resizable-panel';
+					this.properties = {
+						spanData: {
+							type: Object,
+							value: function(){return {};}
+						}, 
+						currentBackground:{
+							type: String, 
+							value: function(){
+								return '#aedefe';
+							},
+							notify: true
+						},
+
+						currentWidth:{
+							type: Number, 
+							value: function(){
+								return 1780;
+							},
+							notify: true
+						},
+
+						rightLeftPanel:{
+							type: String,
+							value: function(){
+								return 'right';
+							},
+							notify: true,
+							reflectToAttribute: true
+						},
+			
+						currentHeight:{
+							type: Number,
+							value: function(){
+								return 1420;
+							},
+							notify: true
+						},
+						_notifyingDescendant: {
+        					type: Boolean,
+        					value: true, 
+        					notify: true
+        				
+    					},
+				};
+
+				this.listeners = {
+                		'iron-resize': '_onIronResize'
+    	
+					};
+				}
+
+				openDialog(){
+					this.$.controlpanel.open();
+				}
+				_onIronResize(){
+					
+				}
+				resetWidth(e){
+					var self=this;
+					self.draggable=true;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            self._x = e.detail.x;
+			            self._y = e.detail.y;
+			            console.log('START');
+			            console.log(e);
+			            break;
+			          case 'track':
+			            self._ddx = e.detail.ddx; //last event x change
+			            self._ddy = e.detail.ddy; //last event y change
+			            self._dx = e.detail.dx; //from start x change 
+			            self._dy = e.detail.dy; // from start y change
+			            
+			            break;
+			          case 'end':
+			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
+			            self.currentWidth = parseInt(self.currentWidth) + e.detail.dx;
+			            self.draggable=false;
+			            self.notifyResize();
+			           
+			            break;
+			           
+					}
+				}
+
+				_resizeHeight(e){
+					var self=this;
+					self.draggable=true;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            self._x = e.detail.x;
+			            self._y = e.detail.y;
+			            console.log('START');
+			            console.log(e);
+			            break;
+			          case 'track':
+			            self._ddx = e.detail.ddx; //last event x change
+			            self._ddy = e.detail.ddy; //last event y change
+			            self._dx = e.detail.dx; //from start x change 
+			            self._dy = e.detail.dy; // from start y change
+			            
+			            break;
+			          case 'end':
+			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
+			            self.currentWidth = parseInt(self.currentHeight) + e.detail.dy;
+			            self.draggable=false;
+			            self.notifyResize();
+			            break;
+			           
+					}
+				}
+				_computeWidth(currentWidth){
+					return `width:${currentWidth}px;`;
+				}
+				_computeHeight(currentHeight){
+					return `height:${currentHeight}px;`;
+				}
+				_computeBackground(currentBackground){
+					return `background:${currentBackground};`;
+				}
+				_computeRightLeft(rightLeftPanel){
+					return `${rightLeftPanel}:0px;`;
+				}
+					
+			}
+			Polymer(fcResizablePanel);
+		})();
+	</script>
+</dom-module>

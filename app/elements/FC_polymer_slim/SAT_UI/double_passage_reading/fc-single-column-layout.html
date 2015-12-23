@@ -11,6 +11,256 @@ div.line-number {
 			font-style: italic;
 			padding: 6px 0px 6px 0px;
 			margin: 6px 0px 6px 0px;
+
+		}
+		div.columnContainer{
+			overflow-y: scroll;
+		}
+
+		.highlighted {
+			background: yellow;
+		}
+
+		div.text {
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			padding: 6px;
+			margin: 6px 0px 6px 0px;
+			min-height: 720px !important;
+			display: flex;
+			min-width: 260px !important;
+			max-width: 720px !important;
+		}
+</style>
+	<div class="layout horizontal container">
+
+		<div id="linenumbersA1" class="layout vertical line-number">
+		 	<div class="line-numbers" id="linesA1">Lines</div>
+		 	<div class="line-numbers" id="linesA">&nbsp</div>
+	 			<template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberRowsFilter(firstRowIndex, lastRowIndex)}}">
+					<span hidden="{{!item.show}}" id="oneOneNumbers_{{item.number}}">{{item.number}}</span>
+					<span hidden="{{item.show}}">&nbsp</span>
+				</template>
+		</div>
+	<!--passage-1-column-1 container-->
+	 <!-- <firebase-collection
+          location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1"
+          data="{{wordArray}}">
+          </firebase-collection> -->
+		<div id="colUno" class="layout horizontal flex wrap text">
+		 	<article id="textColumnOne">
+		 		<section hidden$="{{columnOne}}"> <br><br></section>
+		 	    <template is="dom-repeat" items="{{theContent}}" on-dom-change='checkForLastNode' filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
+						<template is="dom-if" if="{{item.newPara}}">
+							<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+						</template>
+						<a id="oneOneWords_{{item.order}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
+				</template>
+				<br class="line-numbers">
+				<hr>
+				<div class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+			</article>
+		</div>
+	</div>
+
+</template>
+
+<script>
+FcSingleColumnLayout = Polymer({
+	is: 'fc-single-column-layout',
+	behaviors: [Polymer.IronResizableBehavior],
+	//listeners: {'iron-resize':'checkForLastNode'},
+	properties: {
+		theContent:{
+			type: Array,
+			observer: 'gotContent',
+			notify: true
+		},
+		wordArray:{
+			value: Array,
+			observer: 'gotContent',
+			notify: true
+		},
+
+		columnOne: {
+			type: Boolean,
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		firstWordIndex: {
+			type: Number,
+			value: 0
+		},
+
+		lastWordIndex: {
+			type: Number,
+			observer: 'gotLastWordIndex',
+			notify: true
+		},
+
+		firstRowIndex: {
+			type: Number,
+			value: 1,
+			notify: true
+		},
+
+		lastRowIndex:{
+			type: Number,
+			value: 1,
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		lineNumberArray: {
+			type: Array,
+			value: function(){
+				var lineNumberArray = [];
+				for(var i=1; i <= 180; i++)
+				{
+					var showLine =	i % 5 ? false: true;
+					lineNumberArray.push({'number': i, 'show': showLine});
+				}
+				return lineNumberArray;
+			},
+			notify: true
+		}
+	},
+
+	gotContent: function(newTheContent){
+		//console.log('IN gotContent', newTheContent);
+		this.lastWordIndex = newTheContent.length;
+	},
+
+	gotLastWordIndex: function(newLastWordIndex){
+		//console.log("IN gotLastWordIndex", newLastWordIndex);
+		this.checkForLastNode();
+	},
+
+	wordsOffBottom: function(){
+
+    var lwId =  '#oneOneWords_' + this.lastWordIndex;
+    var lastWordNode = this.$$(lwId);
+    var lastWordNodeBottom = lastWordNode.getBoundingClientRect().bottom;
+
+    var previousWordNode = lastWordNode;
+    var previousWordNodeBottom = lastWordNodeBottom;
+    var numberOfWordsToCut = 0;
+
+    while(previousWordNodeBottom == lastWordNodeBottom){
+      previousWordNode = previousWordNode.previousSibling;
+      if(previousWordNode.nodeName == lastWordNode.nodeName){
+        previousWordNodeBottom = previousWordNode.getBoundingClientRect().bottom;
+        numberOfWordsToCut++;
+      }
+    }
+
+    console.log("IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
+    return numberOfWordsToCut;
+	},
+
+  wordsOffTop: function(){
+
+    var lwId =  '#oneOneWords_' + this.firstWordIndex;
+    var firstWordNode = this.$$(lwId);
+    var firstWordNodeBottom = firstWordNode.getBoundingClientRect().bottom;
+
+    var nextWordNode = firstWordNode;
+    var nextWordNodeBottom = firstWordNodeBottom;
+    var numberOfWordsToCut = 0;
+
+    while(nextWordNodeBottom == firstWordNodeBottom){
+      nextWordNode = nextWordNode.nextSibling;
+      if(nextWordNode.nodeName == firstWordNode.nodeName){
+        nextWordNodeBottom = nextWordNode.getBoundingClientRect().bottom;
+        numberOfWordsToCut++;
+      }
+    }
+    console.log("IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
+    return numberOfWordsToCut;
+  },
+
+	computeLastRowIndex: function(lastWordNode){
+		var bottom_of_top_mark = this.$.linesA1.getBoundingClientRect().bottom;
+		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var last_word_bottom = this.$$(lwId).getBoundingClientRect().bottom;
+	 	var line_height = this.$.linesA1.clientHeight;
+
+	 	var delta =  last_word_bottom - bottom_of_top_mark;
+	 	var numRows = Math.floor(delta/line_height);
+	 	this.lastRowIndex = this.firstRowIndex + numRows - 1;
+	},
+
+
+	getLastWordNode: function(nodeId){
+		var lastNode = this.$$(nodeId);
+
+		var lastNodePromise = new Promise(function(resolve, reject){
+			if(lastNode != undefined){
+				resolve(lastNode);
+			} else {
+				reject(Error("lastNode doesn't exist"));
+			}
+		});
+
+		return lastNodePromise;
+	},
+
+	checkForLastNode: function(){
+		var self = this;
+
+		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var lastNode = this.getLastWordNode(lwId);
+
+		lastNode.then( (lastNode)=>{
+			self.computeLastRowIndex();
+		},
+		                (error)=>{
+			console.log(error);
+		});
+	},
+
+
+  // FILTERS
+  _numberRowsFilter: function(firstRowIndex, lastRowIndex){
+    return (item) =>{
+      return (item.number >= firstRowIndex && item.number <= lastRowIndex);
+    };
+  },
+
+  _theContentFilter: function(firstWordIndex, lastWordIndex){
+    if(!isNaN(lastWordIndex)){
+      return (item) =>{
+        return (item.order >= firstWordIndex && item.order <= lastWordIndex);
+      };
+    } else {
+      return (item) =>{
+        return true;
+      }
+    }
+  }
+
+});
+</script>
+</dom-module>
+
+
+<!-- <dom-module id="fc-single-column-layout">
+<template>
+<style>
+div.line-number {
+			width: 28px;
+			line-height: 1.2;
+			font-size: 14pt;
+			font-size: 1.25em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			padding: 6px 0px 6px 0px;
+			margin: 6px 0px 6px 0px;
 			
 		}
 		div.columnContainer{
@@ -46,7 +296,7 @@ div.line-number {
 				</template>
 		</div>
 	<!--passage-1-column-1 container-->
-		<div id="colUno" class="layout horizontal flex wrap text">
+		<!-- <div id="colUno" class="layout horizontal flex wrap text">
 		 	<article id="textColumnOne">
 		 		<section hidden$="{{columnOne}}"> <br><br></section>
 		 	    <template is="dom-repeat" items="{{theContent}}" on-dom-change='checkForLastNode' filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
@@ -187,4 +437,4 @@ Polymer({
 	}
 });
 </script>
-</dom-module>
+</dom-module> --> -->

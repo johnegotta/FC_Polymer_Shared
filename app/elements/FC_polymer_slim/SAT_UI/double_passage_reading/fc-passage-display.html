@@ -1,14 +1,15 @@
-<dom-module id="fc-passage-display">	
+<dom-module id="fc-passage-display">
 <template>
 <style>
-	
+
 		div.columnContainer{
 			overflow-y: scroll;
 		}
-		div.passageContainer{ 
-			min-width: 310px;
+		div.passageContainer{
+			min-width: 320px;
 			max-width: 1450px !important;
-			margin: 48px;
+			margin: 36px;
+			padding-top: 4px;
 		}
 		.highlighted {
 			background: yellow;
@@ -20,32 +21,39 @@
 			font-weight: 500;
 			font-style: italic;
 			display: block;
+			padding-bottom: 18px;
 		}
+
 		
+		.passage-column{
+			padding-left: 8px;
+			margin-left: 6px;
+			padding-right: 8px;
+			margin-right: 6px;
+		}
+
 </style>
-<!--double-column line-number and passage vertical container--> 
-<div id="fcpassagedisplay" style="width: 98%;">
-	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
-	<!--blurb full width container-->
-		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+<!--double-column line-number and passage vertical container-->
+<div id="fcpassagedisplay" style="width: 98%; height: 99.2%;" class="vertical layout flex">
+	<div id="passageHolder" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
+		<div class="layout horizontal blurb" style="margin: 0px 24px 0px 24px; min-width: 240px !important; max-width: 740px !important; max-height: 64px;">
 			{{passageBlurb}}
 		</div>
 	<!--single column container-->
-			
+
 		<!-- end-of-column-1 line number and text container-->
-		<div id="doubleColumnContainer" onscroll="this.notifyResize()" class="layout horizontal columnContainer"  style="padding-right: 8px;">
+		<div id="doubleColumnContainer" class="layout horizontal columnContainer">
 			<fc-single-column-layout
-				class="flex-1 left-passage-column"
+				class="flex-1 passage-column"
 				id="firstColumn"
 				the-content='{{passageArray}}'
-				column-one='true'
+				column-one
 				last-word-index='[[lastWordIndexOfFirst]]'
 				last-row-index='{{lastRowIndexOfFirst}}'>
 			</fc-single-column-layout>
 			<fc-single-column-layout
-				class="flex-1 right-passage-column"
+				class="flex-1 passage-column"
 				id="secondColumn"
-				firstColumn='false'
 				hidden='{{!showingSecondColumn}}'
 				the-content='{{passageArray}}'
 				first-word-index='[[firstWordIndexOfSecond]]'
@@ -86,14 +94,10 @@ Polymer({
 			reflectToAttributes: true
 		},
 		passageArray:{
-			type: Array,
-			notify: true 
+			type: Array,	
+			notify: true
 		},
-		passageTitle: {
-			type: String, 
-			notify: true,
-			reflectToAttributes: true
-		},
+		
 		passageBlurb:{
 			type: String,
 			notify: true
@@ -123,10 +127,15 @@ Polymer({
 			type: Boolean,
 			value: false,
 			observer: 'splitPassageForColumns',
-			notify: true, 
+			notify: true,
 			reflectToAttributes: true
-		}
-		
+		},
+    growingFirstColumn: {
+      type: Boolean,
+      value: false,
+      notify: true
+    }
+
 	},
 
 	ready: function(){
@@ -134,34 +143,50 @@ Polymer({
 		var ref = new Firebase(self.passageRootPath);
 		ref.on("child_added", function(snap) {
 			//console.log("added", snap.key());
-			if(snap.key()=='new_Test_1') {
-				self.passageArray = snap.val();
+			if(snap.key()==self.passagePath) {
+				self.passageArray=snap.val();
+				var counts = snap.val().length;
+				console.log(`this is the incalculable length of snap.val() ${counts}`);
 				self.passageBlurb=self.passageArray[1].passageBlurb;
 				self.finalWordIndex=self.passageArray.length;
-			}									
-		});	
+			}
+		});
 	},
+
 
 	setUp: function()
 	{
 		this.screenTrueHeight =  (window.innerHeight-320);
 		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
-		if(this.$.noJudge4.clientWidth >= 640 && this.screenTrueHeight>=440) {
+		if(this.$.passageHolder.clientWidth >= 680 /*&& this.screenTrueHeight>=440*/) {
 			this.showingSecondColumn = true;
-		} else { 
+      this.readjustWordSplit();
+		} else {
 			this.showingSecondColumn = false;
 		}
 	},
 
-	splitPassageForColumns: function(newValue){
-		if(newValue == true){
+	splitPassageForColumns: function(){
+		if(this.showingSecondColumn == true){
 			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
 			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+      //this.readjustWordSplit();
 		} else {
 			this.lastWordIndexOfFirst = this.finalWordIndex;
-			this.firstWordIndexOfSecond = this.finalWordIndex;
 		}
 	},
+
+  readjustWordSplit: function(){
+    if(this.growingFirstColumn == true) {
+      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst - this.querySelector('#firstColumn').wordsOffBottom();
+      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+    } else {
+      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst + this.querySelector('#secondColumn').wordsOffTop();
+      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+    }
+
+    this.growingFirstColumn = !this.growingFirstColumn;
+  },
 
 	computeFirstRowIndexOfSecond: function(lastRowIndexOfFirst){
 		return lastRowIndexOfFirst + 1;

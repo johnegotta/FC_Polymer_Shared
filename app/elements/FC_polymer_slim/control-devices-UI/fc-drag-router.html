@@ -12,29 +12,29 @@
   width:78px; 
   height: 48px;
 }
+:host {position:fixed;}
 </style>
 <template>
   
-<div id="dragMenu" draggable dragging="true" track style="max-height: 96px; min-height: 24px; min-width: 350px; background: #000066; border: 4px ridge #000066;"> 
+<div id="dragMenu" track style="max-height: 96px; min-height: 24px; min-width: 350px; background: #000066; border: 4px ridge #000066;"> 
+ 
         
-
-<paper-tabs style$="width:{{basePlusDelta}}px; max-height: 92px; min-height: 24px; background: #aecdfe; whitespace: nowrap" class$="{{class}}" hide-scroll-buttons="true" scrollable="true" selected="{{route}}">
-  
-
-
-    <iron-icon class="dragTag"
+<paper-tabs style$="width:280px; max-height: 92px; min-height: 24px; background: #aecdfe; whitespace: nowrap;" class$="{{class}}" hide-scroll-buttons="true" scrollable="true" selected="{{route}}">
+  <iron-icon class="dragTag"
             name="fcdragtag"
             id="dragtag{{dragtagid}}"
             on-track="dragmeplease" 
-            draggable 
+            draggable="true" 
             dragging
             icon="icons:label-outline"  
             track
             description="the dragable edge of the card"
             class="menuItems-light"
-            on-mousedown="_startDrag"
           >
     </iron-icon>
+
+
+   
 
      <paper-tab link>
           <button class="menubuttons"> 
@@ -130,33 +130,13 @@ FcDragMenuProto = Polymer({
                 notify: true,
                 reflectToAttribute: true
                },
-               basePlusDelta:{
-                  type: Number,
-                  computed: 'computebasePlusDelta(base, delta)',
-                  notify: true
-              },
-                base:{
-                  type: Number,
-                  value: function(){return 620;},
-                  notify: true
-                },
+   
                 slide:{
                         type: Boolean,
                         value: false,
                         notify: true
                 },
-                delta: {
-                  type: Number, 
-                 animationcomputed: 'computedAnimation(base)',
-                  notify: true
-                },
-
-                pressed: {
-                  type: Boolean, 
-                  value: false,
-                  notify: true
-
-                },
+  
 
 
 
@@ -174,12 +154,7 @@ FcDragMenuProto = Polymer({
                   type: Number,
                   value: 10
                 },
-                lockMenu:{
-                    type: Boolean,
-                    value: true,
-                    notify: true,
-                    reflectToAttribute: true
-                },
+              
                 _holdDelay: {
                   type: Number,
                   value: 1
@@ -405,15 +380,11 @@ FcDragMenuProto = Polymer({
                dashboard.leftHidden=false;
           }
      },
-	
-  computebasePlusDelta: function(e, base){
-            return (base + e);
-  },
+
 
 	dragmeplease: function(e) {
      this.dragging=true;
         var self=this;
-       // var dragbox = this.$.dragMenu.getBoundingClientRect();
       e.preventDefault();
         switch(e.detail.state) {
           case 'start':
@@ -439,9 +410,6 @@ FcDragMenuProto = Polymer({
         }
      },
  
- _lockMenu: function(){
-     this.lockMenu=!this.lockMenu;
- },
  onLocked: function(){
   Polymer.dom(this).setAttribute('');
  }
