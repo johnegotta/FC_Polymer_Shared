@@ -76,11 +76,27 @@
 	<fc-drag-menu-proto
 					id="dragMenuDrawer"
 					class="draggable scrollable on-tracking"
-					style="z-index:50000; position: absolute; top: 0; left: 0;" 
+					style="z-index:50000; position: absolute; top: 0; left: 0;"
+					on-tap="clickHandler"
 				>
-				<fc-modal-menu>
-				</fc-modal-menu>
-				</fc-drag-menu-proto>
+		<span 
+			class="menubuttons"
+			data-dialog="loginDialog"
+			style="width: 48px; height:32px;"
+			>thing
+	        	<!-- <iron-icon  
+	            	icon="icons:perm-identity"  
+	            	name: "loginAndProfile"
+	            	id:''
+	            	description: 'a button designed to launch a modal login form and profile'
+	            	class="menuItems-dark dropdown-trigger"
+	            	data-dialog="loginDialog"
+	          		>
+	        	</iron-icon> -->
+		</span>
+	</fc-drag-menu-proto>
+				<fc-login-dialog id="loginDialog">
+				</fc-login-dialog>
 <!--main of basic paper-drawer panel-inserted is fc-drawer panel-would like to remove the two and go to single main panel dropping arrangement.  UI still beyond me-->
 		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="{{slideWidth}}px;">
 		<!--fc-paper-drawer-panel-dashboard begins- our separated tabbed drawer is below.  I am doing the design over in stages. One drawer panel, one drawer at a time so I know I can do it and dont destroy whole things.-->
@@ -113,6 +129,9 @@
 <script>
 FcDashboardOne=Polymer({
 	is:'fc-dashboard-one',
+	listeners: {
+		'tap': 'clickHandler'
+	},
 	properties: {
 		measured: {
 			type: String,
@@ -158,7 +177,24 @@ FcDashboardOne=Polymer({
         	drawer.responsiveWidth ='1080px';
         	this.leftHidden=false;
 		}
-	}, 
+	},
+
+    clickHandler: function(e) {
+    	console.log(e);
+      var button = e.target;
+      while (!button.hasAttribute('data-dialog') && button!==document.body) {
+        button = button.parentElement;
+      }
+      if (!button.hasAttribute('data-dialog')) {
+        return;
+      }
+      var id = button.getAttribute('data-dialog');
+      var dialog = this.$.id;
+      if (dialog) {
+        dialog.open();
+      }
+    }
+
 });
 </script>
 </dom-module>
