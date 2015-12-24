@@ -31,6 +31,7 @@
 			{{passageBlurb}}
 		</div>
 	<!--single column container-->
+		<!-- <firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> -->
 
 		<!-- end-of-column-1 line number and text container-->
 		<div id="doubleColumnContainer" class="layout horizontal columnContainer"  style="padding-right: 8px;">
@@ -58,7 +59,6 @@
 </div>
 </template>
 <script>
-
 Polymer({
 	is:'fc-passage-display',
 	behaviors: [Polymer.IronResizableBehavior],
@@ -125,12 +125,11 @@ Polymer({
 			notify: true,
 			reflectToAttributes: true
 		},
-    growingFirstColumn: {
-      type: Boolean,
-      value: false,
-      notify: true
-    }
-
+	    growingFirstColumn: {
+	      type: Boolean,
+	      value: false,
+	      notify: true
+	    }
 	},
 
 	ready: function(){
@@ -142,11 +141,25 @@ Polymer({
 				self.passageArray = snap.val();
 				self.passageBlurb=self.passageArray[1].passageBlurb;
 				self.finalWordIndex=self.passageArray.length;
+				console.log(self, "JUST GOT FIREBASE PASSAGE", self.passageArray);
 				self.splitPassageForColumns();
 			}
+			ref.off();
 		});
 	},
-
+	altMethod: function(e){
+		/*
+		USED IN CONJUNCTION WITH FIREBASE-COLLECTION
+		THIS ONE ALLOWS IT TO GO TO MULTIPLE INSTANCES OF PASSAGE DISPLAY, 
+		BUT THE PASSAGE DISPLAY ON THE LEFT SIDE STILL WON'T USE ITS SECOND COLUMN AT ALL
+		*/ 
+		//console.log(e);
+		self.passageBlurb=self.passageArray[1].passageBlurb;
+		self.finalWordIndex=self.passageArray.length;
+		console.log(self, "JUST GOT FIREBASE PASSAGE", self.passageArray, e);
+		//Line above always logs the second instance of passage display
+		self.splitPassageForColumns();
+	},
 	setUp: function()
 	{
 		this.screenTrueHeight =  (window.innerHeight-320);

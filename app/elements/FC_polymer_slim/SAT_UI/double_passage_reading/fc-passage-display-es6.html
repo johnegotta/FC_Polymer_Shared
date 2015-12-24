@@ -1,4 +1,4 @@
-<dom-module id="fc-passage-display">
+<dom-module id="fc-passage-display-es">
 <template>
 <style>
 
@@ -8,7 +8,7 @@
 		div.passageContainer{
 			min-width: 310px;
 			max-width: 1450px !important;
-			margin: 48px;
+			margin: 16px;
 		}
 		.highlighted {
 			background: yellow;
@@ -24,25 +24,25 @@
 
 </style>
 <!--double-column line-number and passage vertical container-->
-<div id="fcpassagedisplay" style="width: 98%;">
+<div id="fcpassagedisplay" style="width: 99.6%;">
 	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
-	<!--blurb full width container-->
+	
 		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
 			{{passageBlurb}}
 		</div>
-	<!--single column container-->
+	
 
 		<!-- end-of-column-1 line number and text container-->
-		<div id="doubleColumnContainer" class="layout horizontal columnContainer"  style="padding-right: 8px;">
-			<fc-single-column-layout
+		<div id="doubleColumnContainer" class="layout horizontal columnContainer">
+			<fc-single-column-layout-es
 				class="flex-1 left-passage-column"
 				id="firstColumn"
 				the-content='{{passageArray}}'
 				column-one
 				last-word-index='[[lastWordIndexOfFirst]]'
 				last-row-index='{{lastRowIndexOfFirst}}'>
-			</fc-single-column-layout>
-			<fc-single-column-layout
+			</fc-single-column-layout-es>
+			<fc-single-column-layout-es
 				class="flex-1 right-passage-column"
 				id="secondColumn"
 				hidden='{{!showingSecondColumn}}'
@@ -50,7 +50,7 @@
 				first-word-index='[[firstWordIndexOfSecond]]'
 				last-word-index='[[finalWordIndex]]'
 				first-row-index='[[firstRowIndexOfSecond]]'>
-			</fc-single-column-layout>
+			</fc-single-column-layout-es>
 		</div>
 
 	</div>
@@ -58,82 +58,88 @@
 </div>
 </template>
 <script>
+'use strict';
+(function() {
 
-Polymer({
-	is:'fc-passage-display',
-	behaviors: [Polymer.IronResizableBehavior],
-	listeners: {'iron-resize':'setUp'},
-	properties: {
-		passagePath: {
-			type: String,
-			value: 'new_Test_1',
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageRootPath: {
-			type: String,
-			value: function(){
-				return 'https://focusedstaging1.firebaseio.com/passagesDestinations';
+class FCPassageDisplayES6 {
+	get behaviors() {
+		return [Polymer.IronResizableBehavior];
+	}
+
+	beforeRegister() {
+		this.is ='fc-passage-display-es';
+		this.listeners = {'iron-resize':'setUp'};
+		this.properties = {
+			passagePath: {
+				type: String,
+				value: 'new_Test_1',
+				notify: true,
+				reflectToAttributes: true
 			},
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageFullPath: {
-			type: String,
-			value: '',
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageArray:{
-			type: Array,
-			notify: true
-		},
-		passageTitle: {
-			type: String,
-			notify: true,
-			reflectToAttributes: true
-		},
-		passageBlurb:{
-			type: String,
-			notify: true
-		},
-		lastWordIndexOfFirst: {
-			type: Number,
-			notify: true
-		},
-		firstWordIndexOfSecond: {
-			type: Number,
-			notify: true
-		},
-		finalWordIndex: {
-			type: Number,
-			notify: true
-		},
-		lastRowIndexOfFirst: {
-			type: Number,
-			notify: true
-		},
-		firstRowIndexOfSecond: {
-			type: Number,
-			computed: 'computeFirstRowIndexOfSecond(lastRowIndexOfFirst)',
-			notify: true
-		},
-		showingSecondColumn: {
-			type: Boolean,
-			value: false,
-			observer: 'splitPassageForColumns',
-			notify: true,
-			reflectToAttributes: true
-		},
-    growingFirstColumn: {
-      type: Boolean,
-      value: false,
-      notify: true
-    }
+			passageRootPath: {
+				type: String,
+				value: function(){
+					return 'https://focusedstaging1.firebaseio.com/passagesDestinations';
+				},
+				notify: true,
+				reflectToAttributes: true
+			},
+			passageFullPath: {
+				type: String,
+				value: '',
+				notify: true,
+				reflectToAttributes: true
+			},
+			passageArray:{
+				type: Array,
+				notify: true
+			},
+			passageTitle: {
+				type: String,
+				notify: true,
+				reflectToAttributes: true
+			},
+			passageBlurb:{
+				type: String,
+				notify: true
+			},
+			lastWordIndexOfFirst: {
+				type: Number,
+				notify: true
+			},
+			firstWordIndexOfSecond: {
+				type: Number,
+				notify: true
+			},
+			finalWordIndex: {
+				type: Number,
+				notify: true
+			},
+			lastRowIndexOfFirst: {
+				type: Number,
+				notify: true
+			},
+			firstRowIndexOfSecond: {
+				type: Number,
+				computed: 'computeFirstRowIndexOfSecond(lastRowIndexOfFirst)',
+				notify: true
+			},
+			showingSecondColumn: {
+				type: Boolean,
+				value: false,
+				observer: 'splitPassageForColumns',
+				notify: true,
+				reflectToAttributes: true
+			},
+		    growingFirstColumn: {
+		      type: Boolean,
+		      value: false,
+		      notify: true
+		    }
+		};
+	}
 
-	},
-
-	ready: function(){
+	ready() {
 		self=this;
 		var ref = new Firebase(self.passageRootPath);
 		ref.on("child_added", function(snap) {
@@ -145,10 +151,9 @@ Polymer({
 				self.splitPassageForColumns();
 			}
 		});
-	},
+	}
 
-	setUp: function()
-	{
+	setUp() {
 		this.screenTrueHeight =  (window.innerHeight-320);
 		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
 		if(this.$.noJudge4.clientWidth >= 640 /*&& this.screenTrueHeight>=440*/) {
@@ -157,9 +162,9 @@ Polymer({
 			this.showingSecondColumn = false;
 		}
 		this.splitPassageForColumns();
-	},
+	}
 
-	splitPassageForColumns: function(){
+	splitPassageForColumns() {
 		console.log(this.id, "IN splitPassageForColumns")
 		if(this.showingSecondColumn == true){
 			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
@@ -168,9 +173,9 @@ Polymer({
 		} else {
 			this.lastWordIndexOfFirst = this.finalWordIndex;
 		}
-	},
+	}
 
-	readjustWordSplit: function(){
+	readjustWordSplit() {
 	    this.growingFirstColumn = !this.growingFirstColumn;
 	    if(this.growingFirstColumn == true) {
 	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst - this.querySelector('#firstColumn').wordsOffBottom();
@@ -180,11 +185,15 @@ Polymer({
 	      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
 	      this.readjustWordSplit();
 	    }
-	},
+	}
 
-	computeFirstRowIndexOfSecond: function(lastRowIndexOfFirst){
+	computeFirstRowIndexOfSecond(lastRowIndexOfFirst){
 		return lastRowIndexOfFirst + 1;
 	}
-});
+}
+
+Polymer(FCPassageDisplayES6);
+
+})();
 </script>
 </dom-module>

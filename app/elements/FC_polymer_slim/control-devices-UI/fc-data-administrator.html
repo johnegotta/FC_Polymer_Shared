@@ -114,7 +114,7 @@
 			p{max-width: 350px;}
 		
 </style>
-	
+	<span hidden$={{hideButton}}>
 		<button class="right" on-tap="_openAdmin">
 			<iron-icon
 				icon="hardware:dock"  
@@ -124,12 +124,13 @@
 				>
 				</iron-icon>
 		</button>
+	</span>
 <!-- on-mousedown="_openAdmin" -->
 								
 <paper-dialog 
-	id="dragDialogAdmin" 
+	id="dragAdmin" 
 	class="layout vertical container" 
-	style="display: block; overflow: auto; resize: both;position:absolute; left: 0px; top: 0px;'"  
+	style="display: block; overflow: auto; resize: both; position:absolute;"  
 	draggable="true" 
 	no-cancel-on-outside-click="true"
 	track
@@ -248,12 +249,10 @@
 	</iron-pages>
 </div>
 			
-	<fc-holder>	
+<div style="width: 100%; margin: 0px auto; padding: 8px;" class="horizontal layout center-justified">	
 				<paper-button class="flex-1" on-tap="_lastAdminPage">Back</paper-button>
-		
 				<paper-button class="flex-1" on-tap="_nextAdminPage">Next</paper-button>
-
-	</fc-holder>
+</div>
 	
 </paper-dialog>
 </template>
@@ -394,6 +393,14 @@
 			value: ['something','focused'],
 			notify: true
 			},
+		hideButton: {
+			type: Boolean,
+			value: function(){
+				return false;
+			},
+			notify: true,
+			reflectToAttribute: true
+		},
 
 	//necessary technical reference arrays
 	//we should use these in the testing phase... although rapid integration of the above is needed.
@@ -427,12 +434,12 @@
 			},
 	_openAdmin: function() {
   			console.log(this.passageDestinations + "sandles");
-			this.$.dragDialogAdmin.open();
+			this.$.dragAdmin.open();
 				
 	},
 
 	_closeAdmin: function(){
-		this.$.dragDialogAdmin.close();
+		this.$.dragAdmin.close();
 
 
 	},
@@ -455,7 +462,7 @@
 		
 			//console.log(e);
 			this.dragging=true;
-			var dragbox = this.$.dragDialogAdmin.getBoundingClientRect();
+			var dragbox = this.$.dragAdmin.getBoundingClientRect();
 			this.offsetX = e.offsetX;
 			//console.log(this.offsetX);
 			var Xoff = this.offsetX = e.offsetX;
@@ -464,13 +471,13 @@
 			document.captureEvents(Event.MOUSEMOVE);
 			document.onmousemove = dragmeplease;
 			function dragmeplease(mp){
-				var _x = mp.clientX - 30;
+				var _x = mp.clientX - Xoff;
 				var xString = _x.toString() + 'px';
-				var	_y = mp.clientY -30; 
+				var	_y = mp.clientY - Yoff; 
 				var yString = _y.toString() + 'px';
-		  		document.querySelector('#dragDialogAdmin').style.top = yString;
+		  		document.querySelector('#dragAdmin').style.top = yString;
 		  		//console.log("_y has this value here " + _y);
-		  		document.querySelector("#dragDialogAdmin").style.left = xString;
+		  		document.querySelector("#dragAdmin").style.left = xString;
 		  		//console.log(_x + " that was x");
 		  	document.captureEvents(Event.MOUSEUP);
 			document.onmouseup = endThisPlease;

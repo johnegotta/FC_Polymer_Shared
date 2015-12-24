@@ -3,24 +3,51 @@
 <style>
 :host { 
 		padding: 10px 0px 36px 10px;
-		height: 100vh;
+		height: calc(100vh-64px);
 		width: calc(99.46vw -64px);
 		overflow-y: scroll;
+		margin: auto;
 }
 #div { 
 		height: calc(99.67vh+164px);
 		width: 100%;
 		overflow: scroll;
 }
-.fc-div-class{
-	height: 300px;
-	width: calc(99.62%/10);
-	background-color: goldenrod;
-	display: flex;
-	border: 2px solid black;
+
+.tools{
+	width: 620px;
+	height: 480px
 }
+
 .boardered{
 	border: 4px ridge #000066;
+}
+.menubuttons{
+  display: inline-block; 
+  width: 42px; 
+  height: 36px;
+  background: silver;
+  z-index: 1;
+  box-shadow: 0px  -5px 15px #d9d9d9 inset;
+  align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: buttontext;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    background-color: buttonface;
+    box-sizing: border-box;
+    padding: 2px 6px 3px;
+    border: 2px outset buttonface;
+
+}
+.longer{width: 64px;}
+.longest{width: 108px;}
+.menuItems-light{
+  color: #aedafd;
 }
 </style>
 <fc-lt-panel-dashboard id="drawerPrimed" left-drawer drawer-width="460px">
@@ -30,44 +57,13 @@
 		<div class="vertical layout left left-justified" style="box-shadow: 0px  -5px 15px #d9d9d9 inset;">
 	<!--FC logo, image and branding-->
 			<div class="layout vertical nowrap" style="width: 100%; height: 150px;">
-				<image style="margin: 24px 199px 24px 8px; width:200px; height: 100px;" src="../../../images/FC_frontpage_logo.png">
+				<image style="margin: 24px 199px 24px 8px; width:200px; height: 91px;" src="../../../images/FC_frontpage_logo.png">
 				</image>
 			</div>
 			<div class="layout vertical">
-
 				<br>	
 				<hr style="color: navyblue; background: #000066; height: 4px; max-width: 600px; min-width: 300px; basis: 370px;">
-		<!--should be an sibling UI element of Drag Menu element-->
-		<div class="layout horizontal flex">
-			
-			
-		<!--<fc-loginform user="{{user}}" status-known="{{statusKnown}}"></fc-loginform>-->
-
-		</div>
-		<!--end of log-in element and br hr area. picture above.  Note: right drawer is its own element.  Having drawers as elements makes sense as they should be swappable-->	
-<!--these two devices are unique and controlling should have routing integrated into an area here for a third device-->
-		
-				
-				
-				
-			<fc-data-administrator 
-              class="data-admin draggable scrollable on-tracking"
-              id="dataAdminPrime"
-
-
-
-              >
-        	</fc-data-administrator>
-				
 			</div>
-			<fc-drag-router
-					id="dragRouter" 
-					selected="{{route}}" 
-					class="draggable scrollable on-tracking" 
-					style=""
-				>	
-				</fc-drag-router>
-<!-- This is the device area end-->
 		</div><!--drawer wrapper end-->
 		
 
@@ -76,30 +72,61 @@
 	<fc-drag-menu-proto
 					id="dragMenuDrawer"
 					class="draggable scrollable on-tracking"
-					style="z-index:50000; position: absolute; top: 0; left: 0;"
-					on-tap="clickHandler"
+					style="z-index:50000; position: fixed; top: 0; left: 200px;"
 				>
-		<span 
-			class="menubuttons"
-			data-dialog="loginDialog"
-			style="width: 48px; height:32px;"
-			>thing
-	        	<!-- <iron-icon  
-	            	icon="icons:perm-identity"  
-	            	name: "loginAndProfile"
-	            	id:''
-	            	description: 'a button designed to launch a modal login form and profile'
-	            	class="menuItems-dark dropdown-trigger"
-	            	data-dialog="loginDialog"
-	          		>
-	        	</iron-icon> -->
-		</span>
-	</fc-drag-menu-proto>
-				<fc-login-dialog id="loginDialog">
-				</fc-login-dialog>
-<!--main of basic paper-drawer panel-inserted is fc-drawer panel-would like to remove the two and go to single main panel dropping arrangement.  UI still beyond me-->
+		<paper-tabs id="protoTabMenu" hide-scroll-buttons="true" scrollable="true" style="max-height: 96px; min-height: 24px; min-width: 65px; background: #000066;"on-tap="clickHandler"> 
+        	<section class="menubuttons longer" on-tap="_toggleLeftDrawer" >
+     			<b>L</b>
+        		<iron-icon
+            		icon="icons:swap-horiz"  
+            		class="menuItems-dark"
+          		>
+        		</iron-icon>
+    	</section>
+<template is='dom-repeat' items="{{iconDialogArray}}">
+<section class$="[[item.sectionClass]]" hidden$="{{!notRouter}}" data-dialog$="[[item.dDialogOne]]">
+        <iron-icon 
+            icon$="[[item.iconUsed]]"  
+            class$="[[item.iconClass]]"
+            data-dialog$="[[item.dDialogTwo]]"
+            hidden$="{{!notRouter}}"
+          >
+        </iron-icon>
+ </section>
+ </template>
+  <fc-router hidden$='{{notRouter}}'>
+ </fc-router>
+   <section class="menubuttons longer" on-tap="_toggleRightDrawer">
+          <iron-icon 
+              icon="icons:swap-horiz"  
+              class="menuItems-dark"
+          >
+          </iron-icon>
+    <b>R</b>
+  </section>'
+   </paper-tabs>
+          <iron-icon 
+              icon="icons:autorenew"  
+              class="menuItems-light"
+              on-tap="swapMenu"
+          >
+          </iron-icon>
+</fc-drag-menu-proto>
+	<fc-login-dialog id="loginDialog" class="" dialog="loginMenu"></fc-login-dialog>
+	<fc-data-administrator class="data-admin draggable scrollable on-tracking" hide-button="true" id="dataAdminPrime" dialog="dragAdmin"></fc-data-administrator>
+		<fc-dialog-proto
+			style="height: 520px; width: 640px; position: fixed; z-index: 200000; background: yellow;"
+			id="toDoList"
+			entry-animation="scale-up-animation"
+            exit-animation="fade-out-animation">
+            
+      		<fc-to-do-list>
+      		</fc-to-do-list>
+      			
+            </fc-dialog-proto>
+
 		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="{{slideWidth}}px;">
-		<!--fc-paper-drawer-panel-dashboard begins- our separated tabbed drawer is below.  I am doing the design over in stages. One drawer panel, one drawer at a time so I know I can do it and dont destroy whole things.-->
+		
 
 			<div drawer id="rtToggle" draggable="true" style="width: 550px;" class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below-->
 				<fc-tabbed-drawer>
@@ -107,15 +134,7 @@
 				
 			</div><!--end of tabbed drawer holder area-->
 		<div main style="height:100%">
-		<paper-menu-button icon="menu" on-tap="_toggleLeftDrawer" class="layout horizontal" hidden="{{!leftHidden}}" style="display: inline; opacity:.65;">
-		<iron-icon icon="stars">
-			
-			</iron-icon>
-			</paper-menu-button>
-
-<!--index and routing fall in the content below.  they are the index page.  eventually will eliminate the need for index at all-->
-<!--I will try to integrate a switchable splitter set here to surround the routing content unit. it is a little complicated, but doable.  Splitter, for now, movd to index;-->
-			<!--<fc-splitter-jc orientation="horizontal">-->
+		
 				<content>
 
 
@@ -129,9 +148,9 @@
 <script>
 FcDashboardOne=Polymer({
 	is:'fc-dashboard-one',
-	listeners: {
-		'tap': 'clickHandler'
-	},
+	// listeners: {
+	// 	'tap': 'clickHandler'
+	// },
 	properties: {
 		measured: {
 			type: String,
@@ -154,46 +173,142 @@ FcDashboardOne=Polymer({
 			type: Boolean,
 			value: false,
 			notify: true
+		},
+		iconDialogArray:{
+			type: Array,
+			value: function(){
+				return [{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "loginMenu",
+ 							"iconUsed": "icons:account-circle",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "loginMenu"
+ 						},
+ 						{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "dragAdmin",
+ 							"iconUsed": "icons:hardware:dock",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "dragAdmin"
+ 						},
+ 						
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "toDoList",
+ 							"iconUsed": "icons:list",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "toDoList"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "completedTasks",
+ 							"iconUsed": "icons:toc",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "completedTasks"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "clockTimer",
+ 							"iconUsed": "icons:alarm-on",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "clockTimer"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "firePadPrime",
+ 							"iconUsed": "icons:spellcheck",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "firePadPrime"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "geoCalculator",
+ 							"iconUsed": "icons:view-module",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "geoCalculator"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "calendar",
+ 							"iconUsed": "icons:today",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "calendar"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "readView",
+ 							"iconUsed": "icons:chrome-reader-mode",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "readView"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "howWeDoin",
+ 							"iconUsed": "icons:assessment",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "howWeDoin"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "whatToSee",
+ 							"iconUsed": "icons:visibility",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "whatToSee"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "starRated",
+ 							"iconUsed": "icons:stars",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "starRated"
+ 						}
+				];
+			},
+			notify: true
+		},
+		notRouter:{
+			type: Boolean,
+			value: function(){
+				return true;
+			},
+			notify: true
+			
 		}
-	},
-	_toggleRightDrawer: function(){
-			var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
-			if(drawer.forceNarrow!==true)
-			{drawer.forceNarrow = true;}
-			else{drawer.forceNarrow = false;
-			}
-	},
-	_toggleLeftDrawer: function(){
-		var drawer = document.querySelector('#drawerPrimed');	
-		if (drawer.forceNarrow!==true)
-		{
-			drawer.forceNarrow = true;
-        	drawer.responsiveWidth='90000px';
-        	this.leftHidden=true;
-        }
-		else
-		{
-			drawer.forceNarrow = false;
-        	drawer.responsiveWidth ='1080px';
-        	this.leftHidden=false;
-		}
-	},
 
-    clickHandler: function(e) {
-    	console.log(e);
-      var button = e.target;
-      while (!button.hasAttribute('data-dialog') && button!==document.body) {
-        button = button.parentElement;
-      }
-      if (!button.hasAttribute('data-dialog')) {
-        return;
-      }
-      var id = button.getAttribute('data-dialog');
-      var dialog = this.$.id;
-      if (dialog) {
-        dialog.open();
-      }
-    }
+
+	},
+		_toggleRightDrawer: function(){
+				var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+				if(drawer.forceNarrow!==true)
+				{drawer.forceNarrow = true;}
+				else{drawer.forceNarrow = false;
+				}
+		},
+		_toggleLeftDrawer: function(){
+			var drawer = document.querySelector('#drawerPrimed');	
+			if (drawer.forceNarrow!==true)
+			{
+				drawer.forceNarrow = true;
+		    	drawer.responsiveWidth='90000px';
+		    	this.leftHidden=true;
+		    }
+			else
+			{
+				drawer.forceNarrow = false;
+		    	drawer.responsiveWidth ='1080px';
+		    	this.leftHidden=false;
+			}
+		},
+		swapMenu: function(){
+			this.notRouter = !this.notRouter;
+		},
+
+		clickHandler: function(e) {
+			console.log(e);
+		  var button = e.target;
+		  while (!button.hasAttribute('data-dialog') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-dialog')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-dialog');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		}
 
 });
 </script>

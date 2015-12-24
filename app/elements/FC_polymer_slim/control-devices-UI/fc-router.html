@@ -1,0 +1,176 @@
+<dom-module id="fc-router">
+<style>
+.edged{
+  outline-width: 0px;
+}
+
+.menuItems-light{
+  color: #aedafd;
+}
+.menubuttons{
+  display: inline-block; 
+  width:78px; 
+  height: 48px;
+}
+:host {position:relative;}
+</style>
+<template>
+     <paper-tab link>
+          <button class="menubuttons"> 
+          <a
+               data-route="home" 
+               href="/" 
+               class="horizontal layout center center-justified">
+               <span>HOME</span>
+          </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='users' 
+                    class="horizontal layout center center-justified" 
+                    href='/users'>
+               <span>Users</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='user-info' 
+                    class="horizontal layout center center-justified" 
+                    href='/user-info'>
+                    <span>User-Info</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='reading' 
+                    class="horizontal layout center center-justified" 
+                    href='/reading'>
+                     <span>Reading</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab 
+          link 
+          hidden$="[[!user]]">
+          <button class="menubuttons"> 
+               <a data-route='johntest' 
+                    class="horizontal layout center center-justified" 
+                    href='/johntest'>
+               <span>John Test</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab 
+          link>
+          <button class="menubuttons">
+               <a 
+                    data-route='testarea1' 
+                    class="horizontal layout center center-justified" 
+                    href='/testarea1'>
+                    <span>Test 1</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons">
+               <a   
+                    data-route='testarea2' 
+                    class="horizontal layout center center-justified" 
+                    href='/testarea2'>
+                    <span>Test 2</span>
+               </a>
+          </button>
+     </paper-tab>       
+</template>
+<script>
+FcRouter = Polymer({
+	is:'fc-router',
+	behaviors: [
+		Polymer.IronResizableBehavior,
+		Polymer.NeonAnimationBehavior,
+		Polymer.IronSelectableBehavior,
+		Polymer.NeonAnimationRunnerBehavior,
+		Polymer.IronMenubarBehavior,
+		Polymer.IronRangeBehavior],
+	properties: {
+          	class: {
+                type: String,
+                value: function(){
+                    return 'horizontal layout'
+                }, 
+                notify: true,
+                reflectToAttribute: true
+               },
+              
+              
+                _leftHidden: {
+                  type: Boolean,
+                  value: false
+                },
+                _rightHidden: {
+                  type: Boolean,
+                  value: false
+                },
+                
+              hostAttributes: {
+                role: 'tabList'
+              },
+              listeners: {
+                'iron-resize': '_onResize',
+                'iron-select': '_onIronSelect',
+                'iron-deselect': '_onIronDeselect'
+              },
+              hostAttributes: {
+                'role': 'menubar'
+              },
+              keyBindings: {
+                'left': '_onLeftKey',
+                'right': '_onRightKey'
+              }, 
+              route: {}
+          },
+    _menuLaunch: function(){
+      this.pressed=!this.pressed;
+    },
+    created: function() {
+      this._holdJob = null;
+    },
+    ready: function() {
+      this.setScrollDirection('y', this.$.tabsContainer);
+    },
+    attached: function(){
+    },
+  
+    	_toggleRightDrawer: function(){
+			var drawer = document.querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = document.querySelector('#drawerPrimed');
+          var dashboard = document.querySelector("#dashboardPrime");	
+		if(drawer.forceNarrow!==true)
+          {
+               drawer.forceNarrow = true;
+               drawer.responsiveWidth='90000px';
+               dashboard.leftHidden=true;
+          }
+          else
+          {
+               drawer.forceNarrow = false;
+               drawer.responsiveWidth ='1080px';
+               dashboard.leftHidden=false;
+          }
+     },
+
+});
+  </script>
+</dom-module>

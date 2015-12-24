@@ -1,38 +1,22 @@
 <dom-module id="fc-drag-menu-proto">
+<template>
 <style>
 :host {position:fixed;}
 .edged{
   outline-width: 0px;
 }
-.menuItems-dark{
-  color: #000066;
-  
-  vertical-align: center;
-}
+
 .menuItems-light{
   color: #aedafd;
   vertical-align: center;
   margin-top: auto;
   margin-bottom: auto;
 }
-button.dragtoolbar{
-  width: 42px;
-  height: 26px;
-}
-.menubuttons{
-  display: inline-block; 
-  width: 42px; 
-  height: 36px;
-}
-iron-icon.selected{
-        height: 32px;
-        width: 32px;
-        color: #000066;
-        background: #aecdfe;
-      }
+
+
 </style>
-<template>
-<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 280px; background: #000066; position: absolute; border: 3px ridge silver;'>
+
+<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 120px; background: #000066; position: absolute; border: 3px ridge silver;'>
 <span draggable="true" on-track="dragmeplease">
 <iron-icon 
             name="fcdragtag"
@@ -45,129 +29,22 @@ iron-icon.selected{
           >
     </iron-icon>
   </span>
-  <paper-tabs id="protoDragMenu" hide-scroll-buttons="true" scrollable="true" style="max-height: 96px; min-height: 24px; min-width: 250px; background: #000066;"> 
-        
-    
-
-    <button class="menubuttons">
-      <span 
-        on-tap="_toggleLeftDrawer" 
-        class="menuItems-dark" 
-        style="font-size: 1.0em;"
-        >
-     <b> L</b>
-        <iron-icon 
-            icon="icons:swap-horiz"  
-            class="menuItems-dark"
-          >
-        </iron-icon>
-      </span>
-    </button>
-<content>
+ 
+    <content>
 </content>
 
-<button class="menubuttons">
-        <iron-icon 
-           
-            icon="icons:hardware:dock"  
-            on-tap="_openAdmin"
-            class="menuItems-dark"
-          >
-        </iron-icon>
-    </button>
-    <button class="menubuttons">
-        <iron-icon 
-           
-            icon="icons:spellcheck"  
-        
-            class="menuItems-dark"
-          >
-        </iron-icon>
-    </button>
-    
-
-    <button class="menubuttons">
-        <iron-icon 
-           
-            icon="icons:visibility"  
-        
-            class="menuItems-dark"
-          >
-        </iron-icon>
-    </button>
-
-  <button class="menubuttons">
-        <iron-icon 
-           
-            icon="icons:view-list"  
-        
-            class="menuItems-dark"
-          >
-        </iron-icon>
-    </button>
-
-  
-    
-    <button class="menubuttons">
-        <iron-icon 
-            icon="icons:stars"  
-            track
-            class="menuItems-dark"
-          >
-        </iron-icon>
-    </button>
-    
-    <button class="menubuttons">
-    <iron-icon         
-            id="theBest" 
-            dragging
-            icon="icons:account-circle"  
-            track
-            class="menuItems-dark"
-            wanted="av:repeat"
-          >
-    </iron-icon>
-    </button>
-    <button class="menubuttons">
-    <iron-icon         
-            id="theBest" 
-            dragging
-            icon="icons:account-circle"  
-            track
-            class="menuItems-dark"
-            wanted="av:repeat"
-          >
-    </iron-icon>
-    </button>
-
-    <button class="menubuttons">
-        
-        <span on-tap="_toggleRightDrawer" 
-          class="menuItems-dark" 
-          >
-          <iron-icon 
-              icon="icons:swap-horiz"  
-              class="menuItems-dark"
-          >
-          </iron-icon>
-    <b>R</b>
-    </span>
-   </button>
-   
-     
-</paper-tabs>
- 
-   
         <iron-icon
             draggable="true"
             track
             icon="icons:input"  
             on-track="_resetWidth"
             class="center center-justified menuItems-light"
-            style="position: relative; right: 0; top: 0;"
+            style="position: absolute; right: -24px; top: 0; background: #000066; border: 2px ridge biege;"
+            
             >
 
         </iron-icon>
+        
 </div>
 </template>
 <script>
@@ -220,8 +97,6 @@ FcDragMenuProto = Polymer({
               },
               listeners: {
                 'iron-resize': '_onResize',
-                'iron-select': '_onIronSelect',
-                'iron-deselect': '_onIronDeselect'
               },
               hostAttributes: {
                 'role': 'menubar'
@@ -240,26 +115,6 @@ FcDragMenuProto = Polymer({
     },
     attached: function(){
     },
-  
-  _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
-      if (!scrollable || hideScrollButtons) {
-        return 'hidden';
-      }
-      if (hideThisButton) {
-        return 'not-visible';
-      }
-      return '';
-    },
-    _computeTabsContentClass: function(scrollable) {
-      return scrollable ? 'scrollable' : 'horizontal';
-    },
-    _computeSelectionBarClass: function(noBar, alignBottom) {
-      if (noBar) {
-        return 'hidden';
-      } else if (alignBottom) {
-        return 'align-bottom';
-      }
-    },
     
      _onResize: function() {
       this.debounce('_onResize', function() {
@@ -267,26 +122,7 @@ FcDragMenuProto = Polymer({
         this._tabChanged(this.selectedItem);
       }, 10);
     },
-    _onIronSelect: function(event) {
-      this._tabChanged(event.detail.item, this._previousTab);
-      this._previousTab = event.detail.item;
-      this.cancelDebouncer('tab-changed');
-    },
-    _onIronDeselect: function(event) {
-      this.debounce('tab-changed', function() {
-        this._tabChanged(null, this._previousTab);
-      // See polymer/polymer#1305
-      }, 1);
-    },
-    get _tabContainerScrollSize() {
-      console.log("Scroller Got Called");
-      return Math.max(
-        0,
-        this.$.tabsContainer.scrollWidth -
-          this.$.tabsContainer.offsetWidth
-      );  
-    },
-
+   
     	_toggleRightDrawer: function(){
 			var drawer = document.querySelector('#drawer-2');	
 			if(drawer.forceNarrow!==true)
@@ -339,40 +175,25 @@ FcDragMenuProto = Polymer({
         }
      }, 
 
-     _openAdmin: function(){
-      var elem=document.getElementById("dragDialogAdmin");
-      console.log(elem._openAdmin());
-
-     
-     },
-
      _resetWidth: function(e){
           var self=this;
           e.preventDefault();
               switch(e.detail.state) {
                 case 'start':
                   console.log(e.detail);
-                  console.log('START', self._xo, self._yo);
                   break;
                 case 'track':
                   var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
                   var trueWidth = nwidth.toString()+'px';
-                  console.log("Tracking", self.currentWidth, e.detail.x, e.detail.dx, e.detail.ddx, trueWidth);
                   self.currentWidth=trueWidth;
                   this.$.protoMenu.style.width= trueWidth;
-                  this.$.protoDragMenu.style.width= trueWidth;
-                  
+                  var insertionPoint = Polymer.dom(this.root).querySelector('content');
+                  var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[1];
+                  distributed.style.width= trueWidth;
+                
                   break;
                 case 'end':
                
-                  // var nwidth = parseInt(self.currentWidth) + e.detail.dx;
-                  // var trueWidth = nwidth.toString()+'px';
-                  // this.$.protoMenu.style.width= trueWidth;
-                  //this.$.protoDragMenu.style.width= trueWidth;
-                  //Polymer.dom(this.$.protoMenu).setAttribute('style.width', trueWidth);
-                  //Polymer.dom(this.$.protoDragMenu).setAttribute('style.width', trueWidth);
-                  console.log("Tracking", e.detail.x, e.detail.ddx, trueWidth);
-                     console.log('can I get a width' + this.$.protoMenu.style.width);
                   break;
           }
         },

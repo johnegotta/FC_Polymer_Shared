@@ -1,4 +1,4 @@
-<dom-module id="fc-single-column-layout">
+<dom-module id="fc-single-column-layout-es">
 <template>
 <style>
 		:host {
@@ -70,74 +70,82 @@
 </template>
 
 <script>
-Polymer({
-	is: 'fc-single-column-layout',
-	behaviors: [Polymer.IronResizableBehavior],
-	//listeners: {'iron-resize':'checkForLastNode'},
-	properties: {
-		theContent:{
-			type: Array,
-			observer: 'gotContent',
-			notify: true
-		},
+(function() {
 
-		columnOne: {
-			type: Boolean,
-			value: false,
-			notify: true,
-			reflectToAttribute: true
-		},
+'use strict';
+class FCSingleColumnLayoutES6 {
+	get behaviors() {
+		return [Polymer.IronResizableBehavior];
+	}
 
-		firstWordIndex: {
-			type: Number,
-			value: 0
-		},
+	beforeRegister() {
 
-		lastWordIndex: {
-			type: Number,
-			observer: 'gotLastWordIndex',
-			notify: true
-		},
-
-		firstRowIndex: {
-			type: Number,
-			value: 1,
-			notify: true
-		},
-
-		lastRowIndex:{
-			type: Number,
-			value: 1,
-			notify: true,
-			reflectToAttribute: true
-		},
-
-		lineNumberArray: {
-			type: Array,
-			value: function(){
-				var lineNumberArray = [];
-				for(var i=1; i <= 180; i++)
-				{
-					var showLine =	i % 5 ? false: true;
-					lineNumberArray.push({'number': i, 'show': showLine});
-				}
-				return lineNumberArray;
+		this.is = 'fc-single-column-layout-es';
+		this.properties = {
+			theContent:{
+				type: Array,
+				observer: 'gotContent',
+				notify: true
 			},
-			notify: true
-		}
-	},
 
-	gotContent: function(newTheContent){
+			columnOne: {
+				type: Boolean,
+				value: false,
+				notify: true,
+				reflectToAttribute: true
+			},
+
+			firstWordIndex: {
+				type: Number,
+				value: 0
+			},
+
+			lastWordIndex: {
+				type: Number,
+				observer: 'gotLastWordIndex',
+				notify: true
+			},
+
+			firstRowIndex: {
+				type: Number,
+				value: 1,
+				notify: true
+			},
+
+			lastRowIndex:{
+				type: Number,
+				value: 1,
+				notify: true,
+				reflectToAttribute: true
+			},
+
+			lineNumberArray: {
+				type: Array,
+				value: function(){
+					var lineNumberArray = [];
+					for(var i=1; i <= 180; i++)
+					{
+						var showLine =	i % 5 ? false: true;
+						lineNumberArray.push({'number': i, 'show': showLine});
+					}
+					return lineNumberArray;
+				},
+				notify: true
+			}
+		};
+	}
+
+	gotContent(newTheContent) {
 		console.log(this.id, 'IN gotContent', newTheContent);
 		this.lastWordIndex = newTheContent.length;
-	},
+	}
 
-	gotLastWordIndex: function(newLastWordIndex){
+	gotLastWordIndex(newLastWordIndex) {
 		console.log(this.id, "IN gotLastWordIndex", newLastWordIndex);
 		this.checkForLastNode();
-	},
+	}
 
-	wordsOffBottom: function(){
+	wordsOffBottom() {
 	    var lwId =  '#oneOneWords_' + this.lastWordIndex;
 	    var lastWordNode = this.$$(lwId);
 	    var lastWordNodeBottom = lastWordNode.getBoundingClientRect().bottom;
@@ -156,9 +164,9 @@ Polymer({
 
 	    console.log("IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
 	    return numberOfWordsToCut;
-	},
+	}
 
-	wordsOffTop: function(){
+	wordsOffTop() {
 
 	    var lwId =  '#oneOneWords_' + this.firstWordIndex;
 	    var firstWordNode = this.$$(lwId);
@@ -177,9 +185,9 @@ Polymer({
 	    }
 	    console.log("IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
 	    return numberOfWordsToCut;
-	},
+	}
 
-	computeLastRowIndex: function(lastWordNode){
+	computeLastRowIndex(lastWordNode) {
 		var bottom_of_top_mark = this.$.linesA1.getBoundingClientRect().bottom;
 		var lwId =  '#oneOneWords_' + this.lastWordIndex;
 		var last_word_bottom = this.$$(lwId).getBoundingClientRect().bottom;
@@ -188,10 +196,10 @@ Polymer({
 	 	var delta =  last_word_bottom - bottom_of_top_mark;
 	 	var numRows = Math.floor(delta/line_height);
 	 	this.lastRowIndex = this.firstRowIndex + numRows - 1;
-	},
+	}
 
 
-	getLastWordNode: function(nodeId){
+	getLastWordNode(nodeId) {
 		var lastNode = this.$$(nodeId);
 
 		var lastNodePromise = new Promise(function(resolve, reject){
@@ -203,9 +211,9 @@ Polymer({
 		});
 
 		return lastNodePromise;
-	},
+	}
 
-	checkForLastNode: function(){
+	checkForLastNode() {
 		var self = this;
 
 		var lwId =  '#oneOneWords_' + this.lastWordIndex;
@@ -217,28 +225,32 @@ Polymer({
 		                (error)=>{
 			console.log(error);
 		});
-	},
+	}
 
 
-  // FILTERS
-  _numberRowsFilter: function(firstRowIndex, lastRowIndex){
-    return (item) =>{
-      return (item.number >= firstRowIndex && item.number <= lastRowIndex);
-    };
-  },
+// FILTERS
+	_numberRowsFilter(firstRowIndex, lastRowIndex) {
+	    return (item) =>{
+	    	return (item.number >= firstRowIndex && item.number <= lastRowIndex);
+	    };
+	}
 
-  _theContentFilter: function(firstWordIndex, lastWordIndex){
-    if(!isNaN(lastWordIndex)){
-      return (item) =>{
-        return (item.order >= firstWordIndex && item.order <= lastWordIndex);
-      };
-    } else {
-      return (item) =>{
-        return true;
-      }
-    }
-  }
+	_theContentFilter(firstWordIndex, lastWordIndex) {
+	    if(!isNaN(lastWordIndex)){
+	    	return (item) =>{
+	        	return (item.order >= firstWordIndex && item.order <= lastWordIndex);
+	    	};
+	    } else {
+	    	return (item) =>{
+	        	return true;
+	    	};
+	    }
+	}
 
-});
+}
+
+Polymer(FCSingleColumnLayoutES6);
+
+})();
 </script>
 </dom-module>
