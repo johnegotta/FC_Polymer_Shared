@@ -3,10 +3,11 @@
 <style>
 :host { 
 		padding: 10px 0px 36px 10px;
-		height: calc(100vh-64px);
-		width: calc(99.46vw -64px);
+		height: calc(100%-64px);
+		width: calc(99.46% -64px);
 		overflow-y: scroll;
 		margin: auto;
+		margin: 32px;
 }
 #div { 
 		height: calc(99.67vh+164px);
@@ -19,8 +20,10 @@
 	height: 480px
 }
 
-.boardered{
-	border: 4px ridge #000066;
+.bordered{
+	margin: 4px;
+	border: 6px ridge #aedefe;
+	outline: 2px solid #006;
 }
 .menubuttons{
   display: inline-block; 
@@ -46,14 +49,12 @@
 }
 .longer{width: 64px;}
 .longest{width: 108px;}
-.menuItems-light{
-  color: #aedafd;
-}
+.mini{width: 64px; height: 48px; color: border: 1px solid #aedefe; font-size: 12px;}
+.micro{color: blue; width: 16px; height: 16px;} 
+
 </style>
 <fc-lt-panel-dashboard id="drawerPrimed" left-drawer drawer-width="460px">
-	
-<!--this is the left drawer.  It-like the right drawer is now- will eventually be its own element, so that it can be added or removed at will-->
-	<div id="drawerPrime" drawer class="left-drawer layout vertical container wrap boardered">
+	<div id="drawerPrime" drawer class="left-drawer layout vertical container wrap bordered">
 		<div class="vertical layout left left-justified" style="box-shadow: 0px  -5px 15px #d9d9d9 inset;">
 	<!--FC logo, image and branding-->
 			<div class="layout vertical nowrap" style="width: 100%; height: 150px;">
@@ -69,12 +70,13 @@
 
 	</div><!--drawer end-->
 	<div main style="height: 100%;"> 
+	<div>
 	<fc-drag-menu-proto
 					id="dragMenuDrawer"
 					class="draggable scrollable on-tracking"
-					style="z-index:50000; position: fixed; top: 0; left: 200px;"
+					style="z-index:50000; position: fixed; top: 0; left: 200px; min-width: 165px;"
 				>
-		<paper-tabs id="protoTabMenu" hide-scroll-buttons="true" scrollable="true" style="max-height: 96px; min-height: 24px; min-width: 65px; background: #000066;"on-tap="clickHandler"> 
+		<paper-tabs id="protoTabMenu" hide-scroll-buttons="true" scrollable="true" style="max-height: 96px; min-height: 24px; min-width: 150px; background: #000066;"on-tap="clickHandler"> 
         	<section class="menubuttons longer" on-tap="_toggleLeftDrawer" >
      			<b>L</b>
         		<iron-icon
@@ -105,17 +107,23 @@
     <b>R</b>
   </section>'
    </paper-tabs>
+   <section class="menubuttons mini"  on-tap="swapMenu">
+   		MENU
           <iron-icon 
               icon="icons:autorenew"  
-              class="menuItems-light"
-              on-tap="swapMenu"
+              class="menuItems-light micro"
+             
           >
           </iron-icon>
+          SWAP
+    </section>
 </fc-drag-menu-proto>
 	<fc-login-dialog id="loginDialog" class="" dialog="loginMenu"></fc-login-dialog>
 	<fc-data-administrator class="data-admin draggable scrollable on-tracking" hide-button="true" id="dataAdminPrime" dialog="dragAdmin"></fc-data-administrator>
 		<fc-dialog-proto
-			style="height: 520px; width: 640px; position: fixed; z-index: 200000; background: yellow;"
+			style="height: 520px; width: 640px; position: absolute; z-index: 200000; background: yellow;"
+  			no-cancel-on-outside-click="true"
+  			track
 			id="toDoList"
 			entry-animation="scale-up-animation"
             exit-animation="fade-out-animation">
@@ -124,15 +132,12 @@
       		</fc-to-do-list>
       			
             </fc-dialog-proto>
-
-		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="{{slideWidth}}px;">
-		
-
-			<div drawer id="rtToggle" draggable="true" style="width: 550px;" class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below-->
+</div>
+		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="550px;">
+			<div drawer id="rtToggle" draggable="true" style="width: 550px;" class="right-drawer dragging vertical layout container wrap bordered">
 				<fc-tabbed-drawer>
 				</fc-tabbed-drawer>
-				
-			</div><!--end of tabbed drawer holder area-->
+			</div>
 		<div main style="height:100%">
 		
 				<content>

@@ -100,9 +100,24 @@
   			type: String,
   			value: 'password',
   			notify: true
+  			},
+  		completedItems:{
+  			type: Array,
+  			computed: 'computeCompletedItems(completedItem, item)',
+  			notify: true
+  		},
+  		completedItem:{
+  			type: Object, 
+  			value: {
+  				done: true,
+  				dateStarted: Date,
+  				dateCompleted: Date, 
+  				userFullName: function(){return 'Jason C. Frazzano';},
+  				notes: String
+  			},
+  			notify: true
   			}
-
-	},
+  		},
 		addItem: function(event) {
 		  	event.preventDefault(); // Don't send the form!
 		  	this.push('toDos', {
@@ -118,6 +133,10 @@
 
 		deleteItem: function(event) {
 		  	this.splice('toDos', event.model.index, 1);
+		},
+
+		computeCompletedItems: function(event, completedItem, item){
+			return {"silly": "object"};
 		},
 
 		onFirebaseLogin: function(event) {

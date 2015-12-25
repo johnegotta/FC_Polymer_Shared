@@ -1,0 +1,100 @@
+<dom-module id="fc-clockObj">
+<template>
+<style>
+:host{
+	position: absolute;
+	border: 3px solid purple;
+	width: 200px;
+	height: 95px;
+	left: 0px;
+	background: #ffffff;
+	border: 2px ridge #aecdfe;
+	padding: 2px;
+	margin: 6px;
+	display: flex;
+	z-index: 3;
+	/*box-shadow: 5px 5px 2.5px #888888;*/
+	box-shadow: 10px 5px 5px #afafaf;
+	/*box-shadow: 0px -5px 20px #d8d8d8 inset;
+	*/
+
+}
+span {
+	background: #ffffff;
+	color: #002d90;
+	width: 90px;
+	height: 60px;
+	position: absolute;
+}
+
+</style>
+
+
+<paper-input value='{{_computeTime(theTime)}}' always-float-label='true' label="Local Time" read-only="true" style="width: 50%; margin: auto;"></paper-input>
+
+
+
+</template>
+<script>
+FcClockObj = Polymer({
+	is: "fc-clockObj",
+	properties: {
+		clockid: "",
+		theTime: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttribute: true
+			}
+	},
+	behaviors:[FCBehaviors.DraggableBehavior],
+
+
+factoryImpl: function(argId){
+	this.id = argId;
+	this.clockid = this.id + "C";
+	console.log("factoryImpl called for " + this.id);
+},
+
+created: function(){
+
+},
+
+ready: function(){
+
+	if(this.id){this.clockid=this.id+"C";}
+	console.log("clock id =" + this.clockid);
+	setInterval(this.updateClock, 1000, this.clockid);
+	
+},
+
+attached: function(){
+	
+},
+
+updateClock: function(argId){
+	self = this;
+	var newtime = new Date();
+	var timenow = newtime.toLocaleTimeString();
+	self.theTime=timenow;
+	// self.push('theTime', timenow);
+	
+},
+
+_computeTime: function(theTime){
+	var newtime = new Date();
+	var timenow = newtime.toLocaleTimeString();
+	return timenow;
+},
+
+detatched: function(){
+
+},
+
+destroyed: function(){
+
+
+}
+});
+</script>
+</dom-module>
