@@ -138,19 +138,31 @@ class FCPassageDisplayES6 {
 		    }
 		};
 	}
+	splitPassageForColumns() {
+		console.log(this.id, "IN splitPassageForColumns")
+		if(this.showingSecondColumn == true){
+			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
+			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+      		this.readjustWordSplit();
+		} else {
+			this.lastWordIndexOfFirst = this.finalWordIndex;
+		}
+	}
 
 	ready() {
 		self=this;
 		var ref = new Firebase(self.passageRootPath);
-		ref.on("child_added", function(snap) {
+		()=>{ref.on("child_added", function(snap) {
 			//console.log("added", snap.key());
 			if(snap.key()=='new_Test_1') {
+				self.splitPassageForColumns();
 				self.passageArray = snap.val();
 				self.passageBlurb=self.passageArray[1].passageBlurb;
-				self.finalWordIndex=self.passageArray.length;
-				self.splitPassageForColumns();
+				self.finalWordIndex=self.passageArray.length;	
 			}
-		});
+			});
+		};
+		self.splitPassageForColumns();
 	}
 
 
@@ -165,16 +177,7 @@ class FCPassageDisplayES6 {
 		this.splitPassageForColumns();
 	}
 
-	splitPassageForColumns() {
-		//console.log(this.id, "IN splitPassageForColumns")
-		if(this.showingSecondColumn == true){
-			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
-			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
-      		this.readjustWordSplit();
-		} else {
-			this.lastWordIndexOfFirst = this.finalWordIndex;
-		}
-	}
+	
 
 	readjustWordSplit() {
 	    this.growingFirstColumn = !this.growingFirstColumn;

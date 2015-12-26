@@ -1,0 +1,134 @@
+<dom-module id="fc-widget-prime">
+<template>
+<style>
+:host{
+	position: absolute;
+	border: 3px solid purple;
+	/*width: 200px;
+	height: 95px;
+	left: 0px;
+	background: #ffffff;
+	border: 2px ridge #aecdfe;
+	padding: 2px;
+	margin: 6px;
+	display: flex;
+	z-index: 3;*/
+	/*box-shadow: 5px 5px 2.5px #888888;*/
+	box-shadow: 10px 5px 5px #afafaf;
+	/*box-shadow: 0px -5px 20px #d8d8d8 inset;
+	*/
+
+}
+	.blue .paper-header {
+        background-color: var(--paper-light-blue-500);
+      }
+.blue .content {
+        background: linear-gradient(white, #b3e5fc);
+      }
+
+     paper-header-panel {
+        float: left;
+        width: 240px;
+        height: 240px;
+        margin: 12px;
+        @apply(--shadow-elevation-2dp);
+      }
+      .paper-header {
+        height: 60px;
+        font-size: 16px;
+        line-height: 60px;
+        padding: 0 10px;
+        color: white;
+        transition: height 0.2s;
+      }
+.content {
+        height: 1600px;
+      }
+
+
+}
+span {
+	background: #ffffff;
+	color: #002d90;
+	position: absolute;
+}
+
+</style>
+<paper-header-panel mode="waterfall" class="blue">
+        <div class="paper-header">waterfall</div>
+
+
+
+
+<div class="content">
+	<paper-input value='{{_computeTime(theTime)}}' always-float-label='true' label="Local Time" read-only="true" style="width: 50%; margin: auto;"></paper-input>
+
+
+</div>
+      </paper-header-panel>
+
+
+</template>
+<script>
+FcClockObj = Polymer({
+	is: "fc-clockObj",
+	properties: {
+		clockid: "",
+		theTime: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttribute: true
+			}
+	},
+	behaviors:[FCBehaviors.DraggableBehavior, FCBehaviors.ResizableRootBehavior],
+
+
+factoryImpl: function(argId){
+	this.id = argId;
+	this.clockid = this.id + "C";
+	console.log("factoryImpl called for " + this.id);
+},
+
+created: function(){
+
+},
+
+ready: function(){
+
+	if(this.id){this.clockid=this.id+"C";}
+	console.log("clock id =" + this.clockid);
+	setInterval(this.updateClock, 1000, this.clockid);
+	
+},
+
+attached: function(){
+	
+},
+
+updateClock: function(argId){
+	self = this;
+	var newtime = new Date();
+	var timenow = newtime.toLocaleTimeString();
+	self.theTime=timenow;
+	// self.push('theTime', timenow);
+	
+},
+
+_computeTime: function(theTime){
+	var newtime = new Date();
+	var timenow = newtime.toLocaleTimeString();
+	return timenow;
+},
+
+detatched: function(){
+
+},
+
+destroyed: function(){
+
+
+}
+});
+</script>
+</dom-module>

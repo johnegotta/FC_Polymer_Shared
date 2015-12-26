@@ -1,0 +1,65 @@
+<dom-module id="fc-iron-icon">
+<template>
+<style>
+</style>
+
+<iron-icon 
+            icon="icons:aspect-ratio" 
+            name="fc-resizer"
+            on-track="_focusedRootResize"
+            track
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-dark resizertag"
+            style="position: absolute; width: 12px; height: 12px; right: 0px; bottom: 0px;"
+          >
+      </iron-icon>
+</template>
+<script>
+FcIronIcon=Polymer({
+	properties: {
+		draggable: true,
+
+	},
+	listeners:{
+		'track': '_focusedRootResize'},
+
+attached: function(){
+
+},
+
+_focusedRootResize: function(e){
+		  var self = this;
+          e.preventDefault();
+          console.log(self.parentNode);
+              switch(e.detail.state) {
+                case 'start':
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                 // console.log(self.parentNode);
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.currentHeight=trueHeight
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
+                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+                
+                  break;
+                case 'end':
+               		Polymer.dom.flush();
+                  break;
+          }
+        }
+
+
+
+
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,109 @@
+<dom-module id="fc-iron-icon-drag">
+<template>
+<style>
+:host{
+
+
+
+}
+</style>
+
+<iron-icon 	
+            track
+            draggable="true"
+            class="menuItems-dark"
+            style="background: red; visibility: hidden;"
+            
+          >
+      </iron-icon>
+</template>
+<script>
+FcIronIconDrag=Polymer({
+	is: 'fc-iron-icon-drag',
+	properties: {
+		draggable: true,
+
+	},
+	listeners:{
+		'track': '_focusedRootResize', 
+		'track': '_focusedDraggable'},
+
+attached: function(){
+	this.updateStyles();
+},
+
+
+_focusedRootResize: function(e){
+		  var self = this;
+          e.preventDefault();
+              switch(e.detail.state) {
+                case 'start':
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentElement, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentElement, null).getPropertyValue("width"));
+                  console.log(self.parentNode.scrollHeight);console.log(self.parentNode.scrollHeight);console.log(self.parentNode.scrollHeight);console.log(self.parentNode.scrollHeight);
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                 
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.currentHeight=trueHeight
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
+                  
+                
+                  break;
+                case 'end':
+               		Polymer.dom.flush();
+                  break;
+          }
+        },
+
+_focusedDraggable:function(e){
+      this.parentNode.dragging=true;
+      var self=this;
+      e.preventDefault();
+      
+      switch(e.detail.state) {
+        case 'start':
+          console.log('START');
+          console.log(e);
+          self._leftprime = parseInt(window.getComputedStyle(self.parentNode, null).getPropertyValue("left"))-e.detail.x;
+          self._topprime = self.parentNode.getBoundingClientRect().top-e.detail.y;
+          console.log('top distance differenced' + self._topprime);
+          self.changeX=0;
+          self.changeY=0;
+          Polymer.dom.flush();
+          break;
+        case 'track':
+          self.changeX=e.detail.ddx + self.changeX;
+          self.changeY=e.detail.ddy + self.changeY;
+          self.parentNode.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+          break;
+        case 'end':
+          console.log(self._topprime);
+          self._right = parseInt(window.getComputedStyle(self.parentNode, null).getPropertyValue("right"))
+          self._bottom = self.parentNode.getBoundingClientRect().top;
+          self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+          self._y=((self._topprime + e.detail.y-42)>=0)?Math.ceil(self._topprime + e.detail.y-42):0;
+          self.parentNode.translate3d(0, 0, 0);
+
+          console.log("ENDING", self._x);
+          self.parentNode.style.left=self._x.toString()+'px';
+          self.parentNode.style.top=self._y.toString()+'px';
+          console.log('y: ' + e.detail.y);
+          self.parentNode.dragging=false;
+          Polymer.dom.flush();
+          break;
+      }
+  }
+
+
+
+
+
+});
+</script>
+</dom-module>
