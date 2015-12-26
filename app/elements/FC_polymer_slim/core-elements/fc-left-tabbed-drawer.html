@@ -1,0 +1,260 @@
+<dom-module id="fc-left-tabbed-drawer">
+	<template>
+		<style>
+		:host{
+
+		}
+		.menubuttons{
+  display: inline-block; 
+  width: 42px; 
+  height: 36px;
+  background: silver;
+  z-index: 1;
+  box-shadow: 0px  -5px 15px #d9d9d9 inset;
+  align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: buttontext;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    background-color: buttonface;
+    box-sizing: border-box;
+    padding: 2px 6px 3px;
+    border: 2px outset buttonface;
+    
+    outline: 32px;
+
+}
+.longer{width: 64px;}
+.longest{width: 108px;}
+.mini{width: 64px; height: 48px; color: border: 1px solid #aedefe; font-size: 12px;}
+.micro{color: blue; width: 16px; height: 16px;} 
+
+		</style>
+								<fc-clockObj clockid="eleven" class="blue clock" mode="waterfall" clockid="eight" style="border:1px dashed black" draggable="true">
+        							<div class="paper-header">
+        							<div>
+        								<div 
+        									class="layout vertical nowrap" 
+        									style="width: 100%; height: 150px;">
+											<image style="margin: 24px 199px 24px 8px; width:200px; height: 91px;" src="../../../images/FC_frontpage_logo.png">
+											</image>
+										</div>
+										<div class="layout vertical">
+											<br>	
+											<hr style="color: navyblue; background: #000066; height: 4px; max-width: 600px; min-width: 300px; basis: 370px;">
+										</div>
+        							waterfall
+        							</div>
+        							</div>
+										<div class="content">
+										
+		
+		<paper-tabs id="blubko" class="layout horizontal flex wrap" hide-scroll-buttons="true" scrollable="true" style="max-height: 960px; min-height: 24px; width: 480px;"on-tap="clickHandler"> 
+
+<template is='dom-repeat' class="horizontal layout flex wrap" items="{{iconArray}}">
+<section class$="[[item.sectionClass]]" hidden$="{{!notRouter}}" data-dialog$="[[item.dDialogOne]]">
+        <iron-icon 
+            icon$="[[item.iconUsed]]"  
+            class$="[[item.iconClass]]"
+            data-dialog$="[[item.dDialogTwo]]"
+            hidden$="{{!notRouter}}"
+          >
+        </iron-icon>
+ </section>
+ </template>
+  <fc-router hidden$='{{notRouter}}'>
+ </fc-router>
+   <section class="menubuttons longer" on-tap="_toggleRightDrawer">
+          <iron-icon 
+              icon="icons:swap-horiz"  
+              class="menuItems-dark"
+          >
+          </iron-icon>
+    <b>R</b>
+  </section>'
+   </paper-tabs>
+   <section class="menubuttons mini"  on-tap="swapMenu">
+   		MENU
+          <iron-icon 
+              icon="icons:autorenew"  
+              class="menuItems-light micro"
+             
+          >
+          </iron-icon>
+          SWAP
+    </section>
+											
+										</div>
+								</fc-clockObj>
+</template>
+<script>
+FcLeftTabbedDrawer=Polymer({
+  is:"fc-left-tabbed-drawer",
+	// listeners: {
+	// 	'tap': 'clickHandler'
+	// },
+	properties: {
+		measured: {
+			type: String,
+			value: '1000s',
+			notify: true,
+			reflectToAttributes: true
+		}, 
+		responsiveWidth: {
+			type: String,
+			value: '0px',
+			notify: true,
+			reflectToAttributes: true
+		},
+		route:{
+			type: String,
+		 	notify: true,
+		 	reflectToAttribute: true
+		}, 
+		leftHidden: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		iconArray:{
+			type: Array,
+			value: function(){
+				return [{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "loginMenu",
+ 							"iconUsed": "icons:account-circle",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "loginMenu"
+ 						},
+ 						{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "dragAdmin",
+ 							"iconUsed": "icons:hardware:dock",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "dragAdmin"
+ 						},
+ 						
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "toDoList",
+ 							"iconUsed": "icons:list",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "toDoList"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "completedTasks",
+ 							"iconUsed": "icons:toc",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "completedTasks"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "clockTimer",
+ 							"iconUsed": "icons:alarm-on",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "clockTimer"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "firePadPrime",
+ 							"iconUsed": "icons:spellcheck",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "firePadPrime"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "geoCalculator",
+ 							"iconUsed": "icons:view-module",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "geoCalculator"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "calendar",
+ 							"iconUsed": "icons:today",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "calendar"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "readView",
+ 							"iconUsed": "icons:chrome-reader-mode",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "readView"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "howWeDoin",
+ 							"iconUsed": "icons:assessment",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "howWeDoin"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "whatToSee",
+ 							"iconUsed": "icons:visibility",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "whatToSee"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "starRated",
+ 							"iconUsed": "icons:stars",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "starRated"
+ 						}
+				];
+			},
+			notify: true
+		},
+		notRouter:{
+			type: Boolean,
+			value: function(){
+				return true;
+			},
+			notify: true
+			
+		}
+
+
+	},
+		_toggleRightDrawer: function(){
+				var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+				if(drawer.forceNarrow!==true)
+				{drawer.forceNarrow = true;}
+				else{drawer.forceNarrow = false;
+				}
+		},
+		_toggleLeftDrawer: function(){
+			var drawer = document.querySelector('#drawerPrimed');	
+			if (drawer.forceNarrow!==true)
+			{
+				drawer.forceNarrow = true;
+		    	drawer.responsiveWidth='90000px';
+		    	this.leftHidden=true;
+		    }
+			else
+			{
+				drawer.forceNarrow = false;
+		    	drawer.responsiveWidth ='1080px';
+		    	this.leftHidden=false;
+			}
+		},
+		swapMenu: function(){
+			this.notRouter = !this.notRouter;
+		},
+
+		clickHandler: function(e) {
+			console.log(e);
+		  var button = e.target;
+		  while (!button.hasAttribute('data-dialog') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-dialog')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-dialog');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		}
+});
+</script>
+</dom-module>
