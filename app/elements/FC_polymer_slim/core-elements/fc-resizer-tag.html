@@ -1,0 +1,138 @@
+<dom-module id="fc-resizer-tab">
+<template>
+  <style></style>
+
+  <iron-icon    
+    `[[_computeMarkUp(name)]]`
+  >
+  </iron-icon>
+</template>
+<script>
+    'use strict';
+    (function() {
+      class fcResizerTag {
+         get behaviors() { 
+          return [FCBehaviors
+         ];
+        }
+          beforeRegister() {
+
+          this.is = 'fc-resizer-tag';
+          this.properties = {
+          currentBackground:{
+              type: String, 
+              value: function(){
+                return '#fafafa';
+              },
+              notify: true
+            },
+
+            currentWidth:{
+              type: Number, 
+              value: function(){
+                return 320;
+              },
+              notify: true
+            },
+
+            isRightDrawerPanel:{
+              type: Boolean,
+              value: function(){
+                return false;
+              },
+              notify: true,
+              reflectToAttribute: true
+            },
+            
+            currentHeight:{
+              type: Number,
+              value: function(){
+                return 1220;
+              },
+              notify: true
+            },
+            _notifyingDescendant: {
+                  type: Boolean,
+                  value: true, 
+                  notify: true
+              }
+          }
+        };
+
+""
+      // openDialog(){
+      //     this.$.propertiesDialog.open();
+      //   }
+
+    //   dialogOpen(e) {
+    //   let trigger = e.target;
+    //   while (!trigger.hasAttribute('data-dialog') && trigger!==document.body) {
+    //     trigger = trigger.parentElement;
+    //   }
+    //   if (!trigger.hasAttribute('data-dialog')) {
+    //     return;
+    //   }
+    //   let dialogId = trigger.getAttribute('data-dialog');
+    //   let dialog = document.getElementById(dialogId);
+    //   console.log(document.getElementById(id), id);
+    //   if (dialog) {
+    //     dialog.open();
+    //   }
+    // }
+
+
+        _resizeWidth(e){
+          var self=this;
+          e.preventDefault();
+          
+              switch(e.detail.state) {
+                case 'start':
+                  console.log('START');
+                  console.log(e);
+                  break;
+                case 'track':
+                  self.currentWidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  break;
+                case 'end':
+                  //self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  self.notifyResize();
+                  break;
+                 
+          }
+        }
+
+    _resizeHeight(e){
+      var self=this;
+      e.preventDefault();
+        switch(e.detail.state) {
+          case 'start':
+            break;
+          case 'track':
+            self.currentHeight = parseInt(self.parrentHeight.currentHeight) + e.detail.ddy;
+            break;
+          case 'end':
+            self.draggable=false;
+            self.notifyResize();
+            break;     
+      }
+    }
+    _computeWidth(currentWidth){
+          return `width:${currentWidth}px;`;
+    }
+    _computeHeight(currentHeight){
+          return `height:${currentHeight}px;`;
+    }
+      _computeBackground(currentBackground){
+        return `background:${currentBackground};`;
+    }
+     _computeRightLeft(rightLeftPanel){
+        return `${rightLeftPanel}:0px;`;
+    } 
+  }
+      Polymer(fcResizerTag);
+    })();
+  </script>
+
+});
+</script>
+</dom-module>

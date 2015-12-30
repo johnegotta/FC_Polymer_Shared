@@ -14,31 +14,81 @@ FCBehaviors.DraggableRootBehavior = {
         type: Number,
         computed: 'computeOffSet(noOffset)',
         notify: true
+      },
+      lameDragCounter: {
+        type: Number,
+        value: 0,
+        notify: true
       }
+  },
+  listeners:{
+    'headerPanel.track': '_focusedDraggable'
+  },
+
+  computeOffSet: function(noOffset){
+    return "0px";
   },
 
 
-    computeOffSet: function(noOffset){
-      return "0px";
-
-    },
-
-
   ready: function(){
-    var dragger = document.createElement('fc-iron-icon-drag');
-    Polymer.dom(dragger).setAttribute('icon','icons:open-with');
-    Polymer.dom(dragger).setAttribute("on-track","_focusedDraggable");
-    Polymer.dom(dragger).setAttribute("draggable", true);
-    var rndmNum = new Date().getMilliseconds();
-    var theDragId=(this.id)?this.id+'_dragger': rndmNum.toString() + '_dragger';
-    Polymer.dom(dragger).setAttribute("id", theDragId);
-    // Polymer.dom(dragger).classList.add("dragtag"); 
-    // Polymer.dom(dragger).classList.add("menuItems-dark");
-    Polymer.dom(dragger).setAttribute("style", "position: absolute; width:12px;height:12px;left:0px;top:0px;background: red; border-radius: 180px; padding: 4px;z-indez:50; margin-bottom: -20px; ");
-    var beforeNode = Polymer.dom(this.root).firstElementChild;
-    Polymer.dom(this.root).insertBefore(dragger, beforeNode);
-    this.updateStyles();
-    Polymer.dom.flush();
+    if(!this.$.headerPanel){
+      var dragger = document.createElement('fc-iron-icon-drag');
+      Polymer.dom(dragger).setAttribute('icon','icons:open-with');
+      Polymer.dom(dragger).setAttribute("on-track","_focusedDraggable");
+      Polymer.dom(dragger).setAttribute("draggable", true);
+      var rndmNum = new Date().getMilliseconds();
+      var theDragId=(this.id)?this.id+'_dragger': rndmNum.toString() + '_dragger';
+      Polymer.dom(dragger).setAttribute("id", theDragId);
+      Polymer.dom(dragger).setAttribute("style", "position: absolute; width:12px;height:12px;left:0px;top:0px;background: red; border-radius: 180px; padding: 4px;z-indez:50; margin-bottom: -20px; cursor: move;");
+      var beforeNode = Polymer.dom(this.root).firstElementChild;
+      Polymer.dom(this.root).insertBefore(dragger, beforeNode);
+      this.updateStyles();
+      Polymer.dom.flush();
+    } else{this.$.headerPanel.style.cursor='move';}
+  },
+
+  _focusedDraggable:function(e){
+    var self=this;
+    e.preventDefault();
+    
+    switch(e.detail.state) {
+      case 'start':
+        console.log('START NoWayAreWe Draggin');
+        console.log(e);
+        if (this.lameDragCounter<1){
+          self.style.left=0;
+          self.style.top=0;
+          this.lameDragCounter++;
+        }
+        self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+        self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+        console.log('top distance differenced?' + self._topprime);
+        // }
+        self.changeX=0;
+        self.changeY=0;
+        Polymer.dom.flush();
+        break;
+      case 'track':
+        self.changeX=e.detail.ddx + self.changeX;
+        self.changeY=e.detail.ddy + self.changeY;
+        self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+        break;
+      case 'end':
+        console.log(self._topprime);
+        self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+        self._bottom = self.getBoundingClientRect().top;
+        self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+        self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+        self.translate3d(0, 0, 0);
+
+        console.log("ENDING", self._x);
+        self.style.left=self._x.toString()+'px';
+        self.style.top=self._y.toString()+'px';
+        console.log('y: ' + e.detail.y);
+        self.dragging=false;
+        Polymer.dom.flush();
+        break;
+    }
   }
   
 };

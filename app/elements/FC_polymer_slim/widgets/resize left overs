@@ -1,0 +1,43 @@
+
+ready: function(){
+    var theId=this.id?this.id+'_theResizerTag': rndmNum.toString() + '_theResizerTag';
+    Polymer.dom(resizerTag).setAttribute("id", theId);
+
+
+},
+
+attached: function(){
+
+},
+
+_focusedRootResize: function(e){
+		  var self = this;
+          e.preventDefault();
+          console.log(self.parentNode);
+              switch(e.detail.state) {
+                case 'start':
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                 // console.log(self.parentNode);
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.currentHeight=trueHeight;
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
+                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+                
+                  break;
+                case 'end':
+               		Polymer.dom.flush();
+                  break;
+          }
+        }
+
+
+
+

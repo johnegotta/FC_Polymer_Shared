@@ -3,6 +3,18 @@ window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.ResizableRootBehaviorImpl = {
 
 properties: {
+    staticwidth: { 
+      type: Boolean, //options are up, down and false
+      value: false,
+      notify: true,
+      reflectToAttribute: true
+    },
+    staticheight: {
+      type: Boolean,
+      value: false, //options are up, down and false
+      reflectToAttribute: true,
+      notify: true
+    },
 		currentWidth: {
           type: String, 
           value: function(){
@@ -10,30 +22,79 @@ properties: {
           },
           notify: true, 
           reflectToAttribute: true
-      },
+            },
       currentHeight: {
           type: String, 
           value: function(){
             return this.style.height;
           },
+          readonly:false,
           notify: true, 
           reflectToAttribute: true
       },
       _notifyingDescendant: {
-		  type: Boolean,
-		  value: true, 
-	 	  notify: true
+		      type: Boolean,
+		      value: true, 
+	 	      notify: true
     	  },
+      theId: {
+        type:String,
+        notify: true,
+        reflectToAttribute:true
+      },
+  },
+    listeners: {
+      
+
     },
+    observers: ['_selectResizable(staticwidth,staticheight)'
+    ],
 
  ready: function(){
-    var resizerTag = document.createElement('fc-iron-icon');
+    var resizerTag = document.createElement('fc-resizer-tag');
     var rndmNum = new Date().getMilliseconds();
-    var theId=(this.id)?this.id+'_theResizerTag': rndmNum.toString() + '_theResizerTag';
-    Polymer.dom(resizerTag).setAttribute("id", theId);//fixed for unique instances
-   Polymer.dom(this.root).appendChild(resizerTag);
-   Polymer.dom.flush();
+    //fixed for unique instances
+    Polymer.dom(resizerTag).setAttribute("name","leftDrawerResizer");
+    Polymer.dom(this.root).appendChild(resizerTag);    
+    Polymer.dom.flush();
   },
+
+  
+
+_selectResizable(staticwidth,staticheight){
+    (staticheight)?this.set('currentHeight.readOnly', true): this.set('currentHeight.readOnly', false);console.log(staticheight);
+    (staticwidth)?this.set('currentWidth.readOnly', true): this.set('currentWidth.readOnly', false);
+},
+
+
+  _focusedRootResize: function(e){
+      var self = this;
+          e.preventDefault();
+          console.log(self.parentNode);
+              switch(e.detail.state) {
+                case 'start':
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                 // console.log(self.parentNode);
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.currentHeight=trueHeight;
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
+                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+                
+                  break;
+                case 'end':
+                  Polymer.dom.flush();
+                  break;
+          }
+        }
+
 };
 
   FCBehaviors.ResizableRootBehavior = [

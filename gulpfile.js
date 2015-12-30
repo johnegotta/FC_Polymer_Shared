@@ -123,6 +123,7 @@ gulp.task('html', function () {
   var assets = $.useref.assets({searchPath: ['.tmp', 'dist']});
 
   return gulp.src(['app/**/*.html', '!app/{elements,test}/**/*.html'])
+  //return gulp.src(['dist/**/*.html', '!dist/{elements,test}/**/*.html'])
     // Replace path for vulcanized assets
     .pipe($.if('*.html', $.replace('elements/elements.html', 'elements/elements.vulcanized.html')))
     .pipe(assets)
@@ -178,7 +179,8 @@ gulp.task('precache', function (callback) {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles', 'elements', 'images', 'js'], function () {
+//gulp.task('serve', ['styles', 'elements', 'images', 'js'], function () {
+  gulp.task('serve', ['styles', 'elements', 'images'], function () {
   browserSync({
     notify: true,
     logPrefix: 'PSK',
@@ -206,11 +208,12 @@ gulp.task('serve', ['styles', 'elements', 'images', 'js'], function () {
     }
   });
 
-  //gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/**/*.html'], ['js', reload]); // Added 'js' and the array here!
+  gulp.watch(['app/**/*.html'], reload);
+  //gulp.watch(['app/**/*.html'], ['js', reload]); // Added 'js' and the array here!
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  gulp.watch(['app/{scripts,elements}/**/*.js'], ['jshint', 'js']);// Added 'js' and the array here!
+  //gulp.watch(['app/{scripts,elements}/**/*.js'], ['jshint', 'js']);// Added 'js' and the array here!
+  //gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['jshint', 'js']);
   gulp.watch(['app/images/**/*'], reload);
 
   
@@ -242,7 +245,8 @@ gulp.task('serve:dist', ['default'], function () {
 gulp.task('default', ['clean'], function (cb) {
   runSequence(
     ['copy', 'styles'],
-    ['elements', 'js'],
+    'elements',
+    //['elements', 'js'],
     ['jshint', 'images', 'fonts', 'html'],
     'vulcanize',
     cb);
@@ -250,9 +254,9 @@ gulp.task('default', ['clean'], function (cb) {
 });
 
 gulp.task('js', function () {
- return gulp.src(['app/**/*.{js,html}'])
+ return gulp.src(['app/**/*.{js,html}', '!app/bower_components/**/*'])
    .pipe($.sourcemaps.init())
-   .pipe($.if('*.html', $.crisper())) // Extract JS from .html files
+   .pipe($.if('*.html', $.crisper({scriptInHead:false}))) // Extract JS from .html files
    .pipe($.if('*.js', $.babel({
      presets: ['es2015']
    })))

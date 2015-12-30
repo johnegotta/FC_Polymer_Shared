@@ -1,4 +1,4 @@
-<dom-module id="fc-drag-header-panel">
+<dom-module id="fc-resizing-drag-panel">
 <template>
 <style>
 :host{
@@ -13,7 +13,7 @@
         };
         @apply(--layout-vertical center-justified);
         position: absolute;
-        height: 10vh;
+        height: 100vh;
         @apply(--fc-resizing-drag-panel);
       }
       #mainContainer {
@@ -98,16 +98,18 @@
 
     </style>
 
-    <content id="headerContent" select="paper-toolbar, .paper-header"></content>
+    <div id="headerPanel">
+      <content id="headerContent" select="paper-toolbar, .paper-header, .blue"></content>
+    </div>
 
     <div id="mainPanel">
     
       <div id="mainContainer" class$="[[_computeMainContainerClass(mode)]]">
      
-                    </div>
+      </div>           
         <content id="mainContent" select="*"></content>
-        
-      </div>
+       
+    </div>
      
       <div id="dropShadow"></div>
     </div>
@@ -132,7 +134,7 @@
         }
       };
       Polymer({
-    is: "fc-drag-header-panel",
+        is: "fc-resizing-drag-panel",
       behaviors:[FCBehaviors.DraggableRootBehavior, FCBehaviors.ResizableRootBehavior],
       properties: {
       clockid: "",
@@ -141,6 +143,12 @@
         value: '',
         notify: true,
         reflectToAttribute: true
+    },
+    staticwidth:{
+      type:Boolean,
+      value: false,
+      reflectToAttribute: true,
+      notify: true
     },
       _notifyDescendants:{
         type: Boolean,
@@ -237,7 +245,7 @@
         ready: function() {
           this.scrollHandler = this._scroll.bind(this);
           if(this.id){this.clockid=this.id+"C";}
-  console.log("clock id =" + this.clockid);
+  
   setInterval(this.updateClock, 1000, this.clockid);
         },
         attached: function() {

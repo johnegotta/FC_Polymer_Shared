@@ -1,0 +1,79 @@
+<dom-module id="fc-iron-icon">
+<template>
+<style>
+:host.right iron-icon{
+  right: 0px;
+  bottom: 0px;
+  /*left: auto;*/
+}
+:host.left iron-icon{
+  left: 0px;
+  bottom: 0px;
+  /*right: auto;*/
+}
+</style>
+
+<iron-icon
+            icon="icons:aspect-ratio"
+            name="fc-resizer"
+            on-track="_focusedRootResize"
+            track
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-dark resizertag"
+            style="position: absolute; width: 12px; height: 12px;"
+          >
+  </iron-icon>
+</template>
+<script>
+FcIronIcon=Polymer({
+	properties: {
+		draggable: true,
+
+	},
+	listeners:{
+		'track': '_focusedRootResize'},
+
+attached: function(){
+
+},
+
+_focusedRootResize: function(e){
+		  var self = this;
+          e.preventDefault();
+
+              switch(e.detail.state) {
+                case 'start':
+                  console.log(self.classList.contains("left")==true, this);
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                  break;
+                case 'track':
+                  var newheight = 0;
+                  var nwidth = 0;
+                  self.parentNode.style.position = "absolute";
+                  console.log(self.parentNode, self.parentNode.getBoundingClientRect());
+                  if(self.classList.contains("left")==true){
+                    self.parentNode.style.right = self.parentNode.getBoundingClientRect().right.toString() + "px";
+                    self.parentNode.style.left = "";
+                    newheight = parseInt(self.parentNode.currentHeight) - e.detail.dy;
+                    nwidth = parseInt(self.parentNode.currentWidth) - e.detail.dx;
+                  } else {
+                    //self.parentNode.style.left = self.parentNode.getBoundingClientRect().left.toString() + "px";
+                    self.right="";
+                    newheight = parseInt(self.parentNode.currentHeight) + e.detail.dy;
+                    nwidth = parseInt(self.parentNode.currentWidth) + e.detail.dx;
+                  }
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
+                  break;
+                case 'end':
+               		Polymer.dom.flush();
+                  break;
+              }
+}
+});
+</script>
+</dom-module>

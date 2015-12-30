@@ -24,6 +24,7 @@
 
 </style>
 <!--double-column line-number and passage vertical container-->
+<firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection>
 <div id="fcpassagedisplay" style="width: 99.6%;">
 	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
 	
@@ -62,6 +63,7 @@
 (function() {
 
 class FCPassageDisplayES6 {
+
 	get behaviors() {
 		return [Polymer.IronResizableBehavior];
 	}
@@ -74,7 +76,7 @@ class FCPassageDisplayES6 {
 				type: String,
 				value: 'new_Test_1',
 				notify: true,
-				reflectToAttributes: true
+				reflectToAttribute: true
 			},
 			passageRootPath: {
 				type: String,
@@ -82,13 +84,13 @@ class FCPassageDisplayES6 {
 					return 'https://focusedstaging1.firebaseio.com/passagesDestinations';
 				},
 				notify: true,
-				reflectToAttributes: true
+				reflectToAttribute: true
 			},
 			passageFullPath: {
 				type: String,
 				value: '',
 				notify: true,
-				reflectToAttributes: true
+				reflectToAttribute: true
 			},
 			passageArray:{
 				type: Array,
@@ -97,7 +99,7 @@ class FCPassageDisplayES6 {
 			passageTitle: {
 				type: String,
 				notify: true,
-				reflectToAttributes: true
+				reflectToAttribute: true
 			},
 			passageBlurb:{
 				type: String,
@@ -129,7 +131,7 @@ class FCPassageDisplayES6 {
 				value: false,
 				observer: 'splitPassageForColumns',
 				notify: true,
-				reflectToAttributes: true
+				reflectToAttribute: true
 			},
 		    growingFirstColumn: {
 		      type: Boolean,
@@ -138,8 +140,16 @@ class FCPassageDisplayES6 {
 		    }
 		};
 	}
+
+	altMethod(e){
+		this.passageBlurb=self.passageArray[1].passageBlurb;
+		this.finalWordIndex=self.passageArray.length;
+		console.log(this, "JUST GOT FIREBASE PASSAGE", this.passageArray, e);
+		this.splitPassageForColumns();
+	}
+
 	splitPassageForColumns() {
-		console.log(this.id, "IN splitPassageForColumns")
+		console.log(this, "IN splitPassageForColumns")
 		if(this.showingSecondColumn == true){
 			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
 			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
@@ -150,21 +160,21 @@ class FCPassageDisplayES6 {
 	}
 
 	ready() {
-		self=this;
+		self = this;
 		var ref = new Firebase(self.passageRootPath);
-		()=>{ref.on("child_added", function(snap) {
-			//console.log("added", snap.key());
-			if(snap.key()=='new_Test_1') {
-				self.splitPassageForColumns();
-				self.passageArray = snap.val();
-				self.passageBlurb=self.passageArray[1].passageBlurb;
-				self.finalWordIndex=self.passageArray.length;	
-			}
-			});
-		};
-		self.splitPassageForColumns();
+		console.log(self, "IN READY", self.passageRootPath);
+		// ref.on("child_added", function(snap) {
+		// 	console.log(self, "added", snap.key());
+		// 	if(snap.key()=='new_Test_1') {
+		// 		//self.splitPassageForColumns();
+		// 		self.passageArray = snap.val();
+		// 		console.log(self, self.passageArray);
+		// 		self.passageBlurb=self.passageArray[1].passageBlurb;
+		// 		self.finalWordIndex=self.passageArray.length;	
+		// 	}
+		// }).bind(self);
+		//self.splitPassageForColumns();	
 	}
-
 
 	setUp() {
 		this.screenTrueHeight =  (window.innerHeight-320);
@@ -174,10 +184,9 @@ class FCPassageDisplayES6 {
 		} else {
 			this.showingSecondColumn = false;
 		}
+		console.log(this, "IN SETUP", this.showingSecondColumn);
 		this.splitPassageForColumns();
 	}
-
-	
 
 	readjustWordSplit() {
 	    this.growingFirstColumn = !this.growingFirstColumn;

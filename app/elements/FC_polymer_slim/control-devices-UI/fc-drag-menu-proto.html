@@ -7,6 +7,8 @@ min-width: 200px !important;}
 .edged{
   outline-width: 0px;
 }
+this.$.elem.person="mary"
+Polymer.dom(this.$.elem).setAttribute('person','mary');
 
 .menuItems-light{
   color: #aedafd;
@@ -19,24 +21,25 @@ min-width: 200px !important;}
 </style>
 
 <div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 236px !important; background: #000066; position: fixed; border: 3px ridge silver;'>
-<span draggable="true" on-track="dragmeplease">
+<span draggable$="[[_computestaticmenu(dragmenu)]]" hidden="[[_computestaticmenu(dragmenu)]]" on-track="dragmeplease">
 <iron-icon 
             name="fcdragtag"
             
-            draggable="true" 
-            dragging
+            draggable$="[[_computestaticmenu(dragmenu)]]" 
             icon="icons:label-outline"  
             description="the dragable edge of the card"
             class="menuItems-light"
           >
     </iron-icon>
+
+          
   </span>
  
     <content>
 </content>
 
         <iron-icon
-            draggable="true"
+            draggable="[[_computestaticmenu(dragmenu)]]"
             track
             icon="icons:input"  
             on-track="_resetWidth"
@@ -63,12 +66,23 @@ FcDragMenuProto = Polymer({
           	class: {
                 type: String,
                 value: function(){
-                    return 'horizontal layout'
+                    return 'horizontal layout';
                 }, 
                 notify: true,
                 reflectToAttribute: true
                },
-              currentWidth:{
+            dragmenu:{
+                type: Boolean,
+                value: false,
+                reflectToAttruibute: true,
+                notify: true
+               },
+            staticmenu:{
+                type: Boolean,
+                computed:'_computestaticmenu(dragmenu)',
+                notify: true
+               },
+            currentWidth:{
                   type: String, 
                   value: function(){
                             return '280';
@@ -116,8 +130,11 @@ FcDragMenuProto = Polymer({
       this.setScrollDirection('y', this.$.tabsContainer);
     },
     attached: function(){
-    },
     
+    },
+    _computestaticmenu: function(dragmenu){
+        return dragmenu;
+    },
      _onResize: function() {
       this.debounce('_onResize', function() {
         this._scroll();
@@ -149,10 +166,13 @@ FcDragMenuProto = Polymer({
 
           }
      },
+
 	
   
 
 	dragmeplease: function(e) {
+    if (!this.staticmenu==true){
+      console.log(this.staticmenu, this.dragmenu);
      this.dragging=true;
         var self=this;
       e.preventDefault();
@@ -174,7 +194,10 @@ FcDragMenuProto = Polymer({
             self.style.top = e.detail.y.toString() + 'px';
             self.dragging=false;
             break;
-        }
+        };
+      }
+      else return;
+
      }, 
 
      _resetWidth: function(e){

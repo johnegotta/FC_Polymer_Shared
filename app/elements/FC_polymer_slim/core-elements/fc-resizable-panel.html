@@ -2,7 +2,7 @@
 	<template>
 	<style> 
 	:host{	width: 1190px;
-			height: 99.5%;
+			height: 1800px;
 			background: #fff;
 			display: block;
 
@@ -37,7 +37,8 @@
 	<span class="header"> Enter Values to Change Display Properties</span>
 	<div class="horizontal layout flex wrap">
 		<paper-input 
-			id="widthInput" 
+			id="widthInput"
+			step="10" 
 			label="Change My Width" 
 			type="number"
 			class="inputClass"
@@ -45,6 +46,7 @@
 			value={{currentWidth}}>
 		</paper-input>
 		<paper-input 
+			name="backgroundInput"
 			id="backgroundInput" 
 			label="Change My Background Color" 
 			class="inputClass"
@@ -52,11 +54,12 @@
 			value={{currentBackground}}>
 		</paper-input>
 		<paper-input 
+			step="10"
 			id="heightInput" 
 			label="Change My height" 
 			type="number"
 			class="inputClass" 
-			always-float-label 
+			always-float-label
 			value={{currentHeight}}>
 		</paper-input>
 		
@@ -77,22 +80,22 @@
 		
 		<content></content>
 		<span style="width: 32px; background:red; height: 32px" on-track="resetWidth">
-			<!-- <iron-icon 
-				icon="fc-editor-icons:stretch-horizontal" 
+			<iron-icon 
+				icon="" 
 	            name="fc-editor-icons:stretch-horizontal"
 	        
 	          
 	         
 	            
 	            description="the dragable edge of the card"
-	            class="menuItems-light"
-	            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px;"
+	            
+	            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px; border-radius: 180px; background-color: red; box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);cursor: move;"
 	          >
-	    	</ iron-icon>-->
+	    	</iron-icon>
 	    </span>
 	<paper-icon-button 
 			icon="fc-editor-icons:translate" 
-            name="fc-editor-icons:translate"
+            name="resizableBoth"
             on-tap="openDialog" 
             draggable="true"
             description="the dragable edge of a panel intended to change height"
@@ -105,8 +108,8 @@
 		
 	</template>
 	<script>
+		'use strict';
 		(function() {
-			'use strict';
 			class fcResizablePanel {
 				 get behaviors() { 
 				 	return [
@@ -137,7 +140,7 @@
 							notify: true
 						},
 
-						rightLeftPanel:{
+						rightLeftRight:{
 							type: String,
 							value: function(){
 								return 'right';
@@ -183,7 +186,7 @@
 			            console.log(e);
 			            break;
 			          case 'track':
-			            self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
+			            self.currentWidth = self.currentWidth> 18? parseInt(self.currentWidth) + e.detail.ddx: self.currentWidth=23;
 			            break;
 			          case 'end':
 			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
@@ -220,8 +223,8 @@
 				_computeBackground(currentBackground){
 					return `background:${currentBackground};`;
 				}
-				_computeRightLeft(rightLeftPanel){
-					return `${rightLeftPanel}:0px;`;
+				_computeRightLeft(rightLeftDrawer){
+					return `position: absolute; ${rightLeftDrawer=="right"? right:(currentWidth+0)}px; height: 100vh;`;
 				}
 					
 			}

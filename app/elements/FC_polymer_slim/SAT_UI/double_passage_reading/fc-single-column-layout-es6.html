@@ -70,20 +70,24 @@
 </template>
 
 <script>
-(function() {
+
+
 
 'use strict';
+(function() {
+
 class FCSingleColumnLayoutES6 {
 	get behaviors() {
 		return [Polymer.IronResizableBehavior];
 	}
 
 	beforeRegister() {
-
-		this.is = 'fc-single-column-layout-es';
+		this.is ='fc-single-column-layout-es';
+		this.listeners = {'iron-resize':'checkForLastNode'};
 		this.properties = {
+
 			theContent:{
-				type: Array,
+ 				type: Array,
 				observer: 'gotContent',
 				notify: true
 			},
@@ -136,12 +140,12 @@ class FCSingleColumnLayoutES6 {
 	}
 
 	gotContent(newTheContent) {
-		console.log(this.id, 'IN gotContent', newTheContent);
+		console.log(this, 'IN gotContent', newTheContent);
 		this.lastWordIndex = newTheContent.length;
 	}
 
 	gotLastWordIndex(newLastWordIndex) {
-		console.log(this.id, "IN gotLastWordIndex", newLastWordIndex);
+		console.log(this, "IN gotLastWordIndex", newLastWordIndex);
 		this.checkForLastNode();
 	}
 
@@ -162,12 +166,11 @@ class FCSingleColumnLayoutES6 {
 	      }
 	    }
 
-	    console.log("IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
+	    console.log(this, "IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
 	    return numberOfWordsToCut;
 	}
 
 	wordsOffTop() {
-
 	    var lwId =  '#oneOneWords_' + this.firstWordIndex;
 	    var firstWordNode = this.$$(lwId);
 	    var firstWordNodeBottom = firstWordNode.getBoundingClientRect().bottom;
@@ -183,7 +186,7 @@ class FCSingleColumnLayoutES6 {
 	        numberOfWordsToCut++;
 	      }
 	    }
-	    console.log("IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
+	    console.log(this, "IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
 	    return numberOfWordsToCut;
 	}
 
@@ -196,6 +199,7 @@ class FCSingleColumnLayoutES6 {
 	 	var delta =  last_word_bottom - bottom_of_top_mark;
 	 	var numRows = Math.floor(delta/line_height);
 	 	this.lastRowIndex = this.firstRowIndex + numRows - 1;
+	 	console.log(this, "IN computeLastRowIndex", this.lastRowIndex);
 	}
 
 

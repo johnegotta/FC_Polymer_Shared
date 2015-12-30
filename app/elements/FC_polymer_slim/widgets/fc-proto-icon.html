@@ -1,0 +1,261 @@
+<dom-module id="fc-resizer-icon">
+<template>
+<style>
+</style>
+
+<iron-icon 
+            id$="[[computeTheId(name.id)]]"
+            icon$="[[computeIcon(name.icon)]]" 
+            name$="[[computeName(name.name)]]"
+            draggable$="compute(name.draggable)]]"
+            on-track$="[[computeTrackMethod(trackMethod)]]"
+            `[[computeTap(name.tap)]]`
+            on-tap$="[[computeTapMethod(tap)]]"
+            draggable$="[[computeDraggable(draggable)]]"
+            description$="[[computeDescription(description)]]"
+            class$="[[class]]"
+            style$="[[computeStyle(style)]]"
+            
+            
+          >
+      </iron-icon>
+</template>
+<script>
+    'use strict';
+    (function() {
+      class fcResizerIcon {
+         get behaviors() { 
+          return [
+         ];
+         }
+          beforeRegister() {
+
+          this.is = 'fc-resizer-icon';
+          this.properties = {
+            dataName:{
+              type: Object,
+              computed: 'computeDataName(name)'
+              },
+            }
+          dataIconParams: {
+              type: Object,
+              computed: 'computedataIconParams(dataName)',
+              reflectoAttribute: true,
+              notify: true
+            },
+    iconArray:{
+      type: Array,
+      value: function(){
+        return [{
+              "sectionClass": "menu large",
+              "data-dialog": "loginMenu",
+              "icon": "icons:account-circle",
+              "iconClass": "menuItems-dark", 
+              "on-tap": "loginMenu",
+              "on-track": "",
+              "name": "loginIcon",
+              "style":"border-radius: 180px; background: green; border: 1px solid black; fill:#aecefe; stroke:#006;",
+              "indexNum": "000"
+            },
+            {
+              "sectionClass": "menu large",
+              "dDialogOne": "dragAdmin",
+              "iconUsed": "icons:hardware:dock",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "dragAdmin",
+              "indexNum": "001"
+            },
+            
+            { "sectionClass": "menu large",
+              "dDialogOne": "toDoList",
+              "iconUsed": "icons:list",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "toDoList",
+              "indexNum": "002"
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "completedTasks",
+              "iconUsed": "icons:toc",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "completedTasks",
+              "indexNum": "003"
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "clockTimer",
+              "iconUsed": "icons:alarm-on",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "clockTimer",
+              "indexNum": "004"
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "firePadPrime",
+              "iconUsed": "icons:spellcheck",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "firePadPrime",
+              "indexNum": "005"
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "geoCalculator",
+              "iconUsed": "icons:view-module",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "geoCalculator",
+              "indexNum" : "006" 
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "calendar",
+              "iconUsed": "icons:today",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "calendar",
+              "indexNum" : "007" 
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "readView",
+              "iconUsed": "icons:chrome-reader-mode",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "readView",
+              'indexNum': '008'
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "howWeDoin",
+              "iconUsed": "icons:assessment",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "howWeDoin",
+              'indexNum': '009', 
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "whatToSee",
+              "iconUsed": "icons:visibility",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "whatToSee",
+              'indexNum': '010', 
+            },
+            { "sectionClass": "menu large",
+              "dDialogOne": "starRated",
+              "iconUsed": "icons:stars",
+              "iconClass": "menuItems-dark", 
+              "dDialogTwo": "starRated",
+              "indexNum": '010'
+            }
+
+            
+        
+            currentBackground:{
+              type: String, 
+              value: function(){
+                return '#fafafa';
+              },
+              notify: true
+            },
+
+            currentWidth:{
+              type: Number, 
+              value: function(){
+                return 1780;
+              },
+              notify: true
+            },
+
+            isRightPanel:{
+              type: Boolean,
+              value: function(){
+                return false;
+              },
+              notify: true,
+              reflectToAttribute: true
+            },
+            
+            currentHeight:{
+              type: Number,
+              value: function(){
+                return 1220;
+              },
+              notify: true
+            },
+            _notifyingDescendant: {
+                  type: Boolean,
+                  value: true, 
+                  notify: true
+              }
+          }
+        };
+
+
+      openDialog(){
+          this.$.propertiesDialog.open();
+        },
+
+      dialogOpen(e) {
+      let trigger = e.target;
+      while (!trigger.hasAttribute('data-dialog') && trigger!==document.body) {
+        trigger = trigger.parentElement;
+      }
+      if (!trigger.hasAttribute('data-dialog')) {
+        return;
+      }
+      let dialogId = trigger.getAttribute('data-dialog');
+      let dialog = document.getElementById(dialogId);
+      console.log(document.getElementById(id), id);
+      if (dialog) {
+        dialog.open();
+      }
+    }
+
+
+        _resizeWidth(e){
+          var self=this;
+          e.preventDefault();
+          
+              switch(e.detail.state) {
+                case 'start':
+                  console.log('START');
+                  console.log(e);
+                  break;
+                case 'track':
+                  self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  break;
+                case 'end':
+                  //self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  self.notifyResize();
+                  break;
+                 
+          }
+        }
+
+  _resizeHeight(e){
+    var self=this;
+    e.preventDefault();
+    
+        switch(e.detail.state) {
+          case 'start':
+            break;
+          case 'track':
+            self.currentHeight = parseInt(self.currentHeight) + e.detail.ddy;
+            break;
+          case 'end':
+            self.draggable=false;
+            self.notifyResize();
+            break;
+           
+    }
+  }
+    _computeWidth(currentWidth){
+          return `width:${currentWidth}px;`;
+    }
+    _computeHeight(currentHeight){
+          return `height:${currentHeight}px;`;
+    }
+      _computeBackground(currentBackground){
+        return `background:${currentBackground};`;
+    }
+     _computeRightLeft(rightLeftPanel){
+        return `${rightLeftPanel}:0px;`;
+    }
+      
+  }
+      Polymer(fcIronIcon);
+    })();
+  </script>
+
+});
+</script>
+</dom-module>
