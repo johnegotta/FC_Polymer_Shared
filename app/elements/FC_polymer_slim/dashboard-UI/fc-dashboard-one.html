@@ -2,17 +2,17 @@
 <template id="fc-dashboard-one-template">
 <style>
 :host { 
-		position:fixed;
+		position:absolute;
 		left: 0px;
 		top:0px;
-		right:0px;
-		bottom: 0px;
+		right: 0px;
+		bottom: 15px;
+
 		padding: 10px 10px 36px 10px;
-		height: calc(100%-64px);
+		height: calc(99.46%-64px);
 		width: calc(99.46% -64px);
 		/*overflow-y: scroll;*/
 		margin: auto;
-		margin: 32px;
 	}
 		img{
 			draggable:false;
@@ -66,7 +66,7 @@
 </style>
 <fc-lt-panel-dashboard id="drawerPrimed" left-drawer drawer-width="460px">
 	<div id="drawerPrime" drawer class="left-drawer layout vertical container wrap bordered">
-	<fc-left-tabbed-drawer class="fit"> <!--style=position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px;--></fc-left-tabbed-drawer>
+	<fc-left-tabbed-drawer class="fit"></fc-left-tabbed-drawer>
 		</div><!--drawer wrapper end-->
 		
 
@@ -136,18 +136,40 @@
       			
             </fc-dialog-proto>
 </div>
-		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="550px;">
-			<div drawer id="rtToggle" draggable="true" style="width: 550px;" class="right-drawer dragging vertical layout container wrap bordered">
-				<fc-tabbed-drawer>
-				</fc-tabbed-drawer>
-			</div>
+		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap blue" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="[[rightDrawerWidth]]">
+			<fc-resizing-drag-panel
+						id="rightDrawer" 
+						mode="waterfall"  
+						drawer 
+						right-drawer='true'
+						current-width="{{rightDrawerWidth}}" 
+						style="position: absolute; right: 0px; top: 0px; bottom: 0px; width: 500px;"
+						>
+						<div 
+							class="paper-header" 
+							style="height: 240px; background: yellow;">
+							<section 
+							style="height: 240px: background: yellow;" 
+							onclick="alert('I am a drawer');">
+							I am a drawer header section
+							</section>
+						</div>
+						<div class="content" 
+						style="border: 8px dashed orange;">
+							<h3 style="margin: 10px; padding: 30px;">I am a right drawer. I do not drag. I do not drop.  My height does not change. I do, however, resize to the left.
+
+							Yeah, right drawer!</h3>
+							<fc-tabbed-drawer>
+							</fc-tabbed-drawer>
+						</div>
+			</fc-resizing-drag-panel>
 		<div main style="height:100%">
 		
 				<content>
 
 
 				</content>
-		<!--</fc-splitter-jc>-->
+	
 			</div>		
 		</fc-rt-panel-dashboard>
 	</div>			
@@ -158,6 +180,10 @@ FcDashboardOne=Polymer({
 	is:'fc-dashboard-one',
 
 	properties: {
+		rightDrawerWidth:{
+			type: String,
+			notify: true
+		},
 		measured: {
 			type: String,
 			value: '1000s',

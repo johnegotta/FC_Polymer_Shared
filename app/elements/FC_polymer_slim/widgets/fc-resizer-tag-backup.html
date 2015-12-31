@@ -1,0 +1,303 @@
+<dom-module id="fc-resizer-tag">
+<template>
+  <style>
+:host{position: absolute;
+  right: 0px;
+  bottom: 0px;
+  border:3px dashed red;
+
+}
+
+  </style>
+
+</template>
+<script>
+    'use strict';
+    (function() {
+      class fcResizerTag {
+         get behaviors() { 
+          return [FCBehaviors.ResizerTagBehavior
+         ];
+        }
+          beforeRegister() {
+
+          this.is = 'fc-resizer-tag';
+           this.properties = {
+              id: {
+                type: String, 
+                notify: true
+              },
+              name: {
+                type: String, 
+                notify: true
+              },
+            currentWidth:{
+              type: Number, 
+             
+              notify: true
+            },
+            stupidCounter:{
+              type: Number,
+              value: 0,
+              notify: true
+            },
+
+            isRightDrawerPanel:{
+              type: Boolean,
+              value: function(){
+                return false;
+              },
+              notify: true,
+              reflectToAttribute: true
+            },
+            
+            currentHeight:{
+              type: Number,
+              notify: true
+            },
+            _notifyingDescendant: {
+                  type: Boolean,
+                  value: true, 
+                  notify: true
+              }
+          }
+
+          this.listeners={
+             track: '_focusedRootResize'
+
+          }
+
+        };
+
+      //   _focusedRootResize(e){
+      //     console.log(this.id);
+      // var self = this;
+      //     e.preventDefault();
+      //     console.log(self.parentNode);
+      // switch(self.name){
+      //   case 'resizer':
+      //         switch(e.detail.state) {
+      //           case 'start':
+      //             self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+      //             self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+      //            break;
+      //           case 'track':
+      //             var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+      //             var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+      //             var trueWidth = nwidth.toString()+'px';
+      //             var trueHeight = newheight.toString()+'px';
+             
+      //             self.parentNode.currentWidth=trueWidth;
+      //             self.parentNode.currentHeight=trueHeight;
+      //             self.parentNode.style.width= trueWidth;
+      //             self.parentNode.style.height= trueHeight;
+                
+      //             break;
+      //           case 'end':
+      //             self.parentNode.notifyResize();
+      //             self.notifyResize();
+      //             Polymer.dom.flush();
+      //             break;
+      //         }
+      //       break;
+      //   case 'widthResizer':
+      //       switch(e.detail.state) {
+      //           case 'start':
+      //             self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+      //             break;
+      //           case 'track':
+      //             var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+      //             var trueWidth = nwidth.toString()+'px';
+      //             self.parentNode.currentWidth=trueWidth;
+      //             self.parentNode.style.width= trueWidth;
+
+      //             break;
+      //           case 'end':
+      //             self.parentNode.notifyResize();
+      //             self.notifyResize();
+      //             Polymer.dom.flush();
+      //             break;
+      //         }
+      //       break;
+      //   case 'heightResizer':
+      //       switch(e.detail.state) {
+      //           case 'start':
+      //                 self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+      //                 break;
+      //           case 'track':
+      //                 var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+      //                 var trueHeight = newheight.toString()+'px';
+      //                 self.parentNode.currentHeight=trueHeight;
+      //                 self.parentNode.style.height= trueHeight;
+      //                 break;
+      //           case 'end':
+      //                 self.parentNode.notifyResize();
+      //                 self.notifyResize();
+      //                 Polymer.dom.flush();
+      //                 break;     
+      //           }
+      //       break;
+      //   case 'rightDrawer': 
+      //       switch(e.detail.state) {
+      //           case 'start':
+      //           if(self.stupidCounter < 1){
+      //            self.parentNode.style.position = "absolute";
+      //             self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+      //             console.log(screen.width - e.detail.x - parseInt(self.parentNode.currentWidth));
+      //             var newRight = (screen.width-(e.detail.x+ parseInt(self.parentNode.currentWidth))).toString() + 'px';
+      //             console.log(newRight);
+      //             self.parentNode.style.right = '0px';
+      //             self.parentNode.style.right = newRight;
+      //              self.stupidCounter++;
+      //              }
+
+      //             break;
+      //           case 'track':
+      //             var nwidth = parseInt(self.parentNode.currentWidth) - e.detail.ddx;
+      //             var trueWidth = nwidth.toString()+'px';
+      //             self.parentNode.currentWidth=trueWidth;
+      //             self.parentNode.style.width= trueWidth;
+
+      //             break;
+      //           case 'end':
+      //             self.parentNode.notifyResize();
+      //             self.notifyResize();
+      //             Polymer.dom.flush();
+      //             break;      
+      //         }
+      //     break;
+      //   }
+      // }
+
+
+
+
+
+ //        _resizeWidth(e){
+ //          var self=this;
+ //          e.preventDefault();
+          
+ //              switch(e.detail.state) {
+ //                case 'start':
+ //                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+ //                  break;
+ //                case 'track':
+ //                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+ //                  var trueWidth = nwidth.toString()+'px';
+ //                  self.parentNode.currentWidth=trueWidth;
+ //                  self.parentNode.style.width= trueWidth;
+
+ //                  break;
+ //                case 'end':
+ //                  self.parentNode.notifyResize();
+ //                  self.notifyResize();
+ //                  Polymer.dom.flush();
+ //                  break;
+                 
+ //          }
+ //        }
+
+ //        _resizeRightDrawer(e){
+ //          var self=this;
+ //          e.preventDefault();
+          
+ //              switch(e.detail.state) {
+ //                case 'start':
+ //                if(self.stupidCounter < 1){
+ //                 self.parentNode.style.position = "absolute";
+ //                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+ //                  console.log(screen.width - e.detail.x - parseInt(self.parentNode.currentWidth));
+ //                  let newRight = (screen.width-(e.detail.x+ parseInt(self.parentNode.currentWidth))).toString() + 'px';
+ //                  console.log(newRight);
+ //                  self.parentNode.style.right = '0px';
+ //                  self.parentNode.style.right = newRight;
+ //                   self.stupidCounter++;
+ //                   }
+
+ //                  break;
+ //                case 'track':
+ //                  var nwidth = parseInt(self.parentNode.currentWidth) - e.detail.ddx;
+ //                  var trueWidth = nwidth.toString()+'px';
+ //                  self.parentNode.currentWidth=trueWidth;
+ //                  self.parentNode.style.width= trueWidth;
+
+ //                  break;
+ //                case 'end':
+ //                  self.parentNode.notifyResize();
+ //                  self.notifyResize();
+ //                  Polymer.dom.flush();
+ //                  break;
+                 
+ //          }
+ //        }
+
+ //    _resizeHeight(e){
+ //      var self=this;
+ //      e.preventDefault();
+ //        switch(e.detail.state) {
+ //          case 'start':
+ //                self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+ //                break;
+ //          case 'track':
+ //                var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+ //                var trueHeight = newheight.toString()+'px';
+ //                self.parentNode.currentHeight=trueHeight;
+ //                self.parentNode.style.height= trueHeight;
+ //                break;
+ //          case 'end':
+ //                self.parentNode.notifyResize();
+ //                self.notifyResize();
+ //                Polymer.dom.flush();
+ //            break;     
+ //      }
+ //    }
+
+ // _rootResize(e){
+ //      var self = this;
+ //          e.preventDefault();
+ //          console.log(self.parentNode);
+ //              switch(e.detail.state) {
+ //                case 'start':
+ //                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+ //                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+ //                 break;
+ //                case 'track':
+ //                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+ //                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+ //                  var trueWidth = nwidth.toString()+'px';
+ //                  var trueHeight = newheight.toString()+'px';
+             
+ //                  self.parentNode.currentWidth=trueWidth;
+ //                  self.parentNode.currentHeight=trueHeight;
+ //                  self.parentNode.style.width= trueWidth;
+ //                  self.parentNode.style.height= trueHeight;
+                
+ //                  break;
+ //                case 'end':
+ //                  self.parentNode.notifyResize();
+ //                  self.notifyResize();
+ //                  Polymer.dom.flush();
+ //                  break;
+ //          }
+ //        }
+
+    _computeWidth(currentWidth){
+          return `width:${currentWidth}px;`;
+    }
+    _computeHeight(currentHeight){
+          return `height:${currentHeight}px;`;
+    }
+      _computeBackground(currentBackground){
+        return `background:${currentBackground};`;
+    }
+     _computeRightLeft(rightLeftPanel){
+        return `${rightLeftPanel}:0px;`;
+    } 
+  }
+      Polymer(fcResizerTag);
+    })();
+  </script>
+
+});
+</script>
+</dom-module>

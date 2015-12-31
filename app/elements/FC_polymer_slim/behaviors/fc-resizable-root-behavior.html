@@ -3,13 +3,24 @@ window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.ResizableRootBehaviorImpl = {
 
 properties: {
-    staticwidth: { 
-      type: Boolean, //options are up, down and false
-      value: false,
-      notify: true,
-      reflectToAttribute: true
+    resizing:{
+          type: Boolean,
+          value: false,
+          notify: true
+        }, 
+    resizeWidth: { 
+        type: Boolean, //options are up, down and false
+        value: false,
+        notify: true,
+        reflectToAttribute: true
+      },
+    resizeHeight: {
+      type: Boolean,
+      value: false, //options are up, down and false
+      reflectToAttribute: true,
+      notify: true
     },
-    staticheight: {
+    rightDrawer: {
       type: Boolean,
       value: false, //options are up, down and false
       reflectToAttribute: true,
@@ -32,6 +43,13 @@ properties: {
           notify: true, 
           reflectToAttribute: true
       },
+      currentRightEdge:{
+        type: String, 
+          value: function(){
+            return this.style.right;
+            },
+        notify: true
+      },
       _notifyingDescendant: {
 		      type: Boolean,
 		      value: true, 
@@ -44,56 +62,54 @@ properties: {
       },
   },
     listeners: {
+
+
       
 
     },
-    observers: ['_selectResizable(staticwidth,staticheight)'
-    ],
+    // observers: ['_selectResizable(staticwidth,staticheight)'
+    // ],
 
  ready: function(){
+  if(this.resizing){
     var resizerTag = document.createElement('fc-resizer-tag');
     var rndmNum = new Date().getMilliseconds();
     //fixed for unique instances
-    Polymer.dom(resizerTag).setAttribute("name","leftDrawerResizer");
-    Polymer.dom(this.root).appendChild(resizerTag);    
+    Polymer.dom(resizerTag).setAttribute("name","resizer");
+    Polymer.dom(this.root).appendChild(resizerTag);  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: green; width: 18px; height: 18px;")  
     Polymer.dom.flush();
-  },
+    }
+  else if(this.resizeWidth){
+    var resizerTag = document.createElement('fc-resizer-tag');
+    var rndmNum = new Date().getMilliseconds();
+    //fixed for unique instances
+    Polymer.dom(resizerTag).setAttribute("name","widthResizer");
+    Polymer.dom(this.root).appendChild(resizerTag);  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: blue; width: 18px; height: 100%;")  
+    Polymer.dom.flush();
+  }
+  else if(this.resizeHeight){
+    var resizerTag = document.createElement('fc-resizer-tag');
+    var rndmNum = new Date().getMilliseconds();
+    //fixed for unique instances
+    Polymer.dom(resizerTag).setAttribute("name","heightResizer");
+    Polymer.dom(this.root).appendChild(resizerTag);  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: yellow; width: 100%; height: 18px;")  
+    Polymer.dom.flush();
+    }
+  else if(this.rightDrawer){
+    var resizerTag = document.createElement('fc-resizer-tag');
+    var rndmNum = new Date().getMilliseconds();
+    //fixed for unique instances
+    Polymer.dom(resizerTag).setAttribute("name","rightDrawer");
+    Polymer.dom(this.root).appendChild(resizerTag);  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: 0px; top: 0px; background: pink; width: 18px; height: 100%;")  
+    Polymer.dom.flush();
+    }
+  else {return 'blue';}
 
-  
-
-_selectResizable(staticwidth,staticheight){
-    (staticheight)?this.set('currentHeight.readOnly', true): this.set('currentHeight.readOnly', false);console.log(staticheight);
-    (staticwidth)?this.set('currentWidth.readOnly', true): this.set('currentWidth.readOnly', false);
-},
-
-
-  _focusedRootResize: function(e){
-      var self = this;
-          e.preventDefault();
-          console.log(self.parentNode);
-              switch(e.detail.state) {
-                case 'start':
-                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
-                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
-                 break;
-                case 'track':
-                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
-                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
-                  var trueWidth = nwidth.toString()+'px';
-                  var trueHeight = newheight.toString()+'px';
-                 // console.log(self.parentNode);
-                  self.parentNode.currentWidth=trueWidth;
-                  self.parentNode.currentHeight=trueHeight;
-                  self.parentNode.style.width= trueWidth;
-                  self.parentNode.style.height= trueHeight;
-                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
-                
-                  break;
-                case 'end':
-                  Polymer.dom.flush();
-                  break;
-          }
-        }
+  }
 
 };
 

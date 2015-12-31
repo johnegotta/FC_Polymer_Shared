@@ -1,44 +1,140 @@
 
-<link rel="import" href="fc-resizable-root-behavior.html">
 <script>
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.ResizerTagBehaviorImpl = {
 
 	properties: {
-		draggable: true,
+		          currentWidth:{
+              type: Number, 
+              notify: true
+            },
+            stupidCounter:{
+              type: Number,
+              value: 0,
+              notify: true
+            },
 
-	},
+            isRightDrawerPanel:{
+              type: Boolean,
+              value: function(){
+                return false;
+              },
+              notify: true,
+              reflectToAttribute: true
+            },
+            
+            currentHeight:{
+              type: Number,
+              notify: true
+            },
+            _notifyingDescendant: {
+                  type: Boolean,
+                  value: true, 
+                  notify: true
+              }
+          },
+     
 	listeners:{
-		'track': '_focusedRootResize'},
+		track: '_focusedRootResize'},         
 
-_focusedRootResize: function(e){
-		  var self = this;
+ _focusedRootResize: function(e){
+      var self = this;
           e.preventDefault();
+      switch(self.name){
+        case 'resizer':
               switch(e.detail.state) {
                 case 'start':
-                  console.log(e.detail);
-                  break;
+                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                 break;
                 case 'track':
-                  var newheight = parseInt(self.root.currentHeight) + e.detail.ddy;
-                  var nwidth = parseInt(self.root.currentWidth) + e.detail.ddx;
+                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
                   var trueWidth = nwidth.toString()+'px';
                   var trueHeight = newheight.toString()+'px';
-                  console.log(self.root);
-                  self.root.currentWidth=trueWidth;
-                  self.root.currentHeight=trueHeight
-                  self.root.style.width= trueWidth;
-                  self.root.style.height= trueHeight;
-                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+             
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.currentHeight=trueHeight;
+                  self.parentNode.style.width= trueWidth;
+                  self.parentNode.style.height= trueHeight;
                 
                   break;
                 case 'end':
-               		self.notifyResize();
+                  self.parentNode.notifyResize();
+                  Polymer.dom.flush();
                   break;
-          }
+              }
+            break;
+        case 'widthResizer':
+            switch(e.detail.state) {
+                case 'start':
+                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                  break;
+                case 'track':
+                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.style.width= trueWidth;
+
+                  break;
+                case 'end':
+                  self.parentNode.notifyResize();
+                  Polymer.dom.flush();
+                  break;
+              }
+            break;
+        case 'heightResizer':
+            switch(e.detail.state) {
+                case 'start':
+                      self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+                      break;
+                case 'track':
+                      var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+                      var trueHeight = newheight.toString()+'px';
+                      self.parentNode.currentHeight=trueHeight;
+                      self.parentNode.style.height= trueHeight;
+                      break;
+                case 'end':
+                      self.parentNode.notifyResize();
+                      Polymer.dom.flush();
+                      break;     
+                }
+            break;
+        case 'rightDrawer': 
+            switch(e.detail.state) {
+                case 'start':
+                // if(self.stupidCounter < 1){
+                //  self.parentNode.style.position = "absolute";
+                self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                //   console.log(screen.width - e.detail.x - parseInt(self.parentNode.currentWidth));
+                //   var newRight = (screen.width-(e.detail.x+ parseInt(self.parentNode.currentWidth))).toString() + 'px';
+                //   console.log(newRight);
+                //   self.parentNode.style.right = '0px';
+                //   self.parentNode.style.right = newRight;
+                //    self.stupidCounter++;
+                //    }
+
+                  break;
+                case 'track':
+                  var nwidth = parseInt(self.parentNode.currentWidth) - e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  self.parentNode.currentWidth=trueWidth;
+                  self.parentNode.style.width= trueWidth;
+
+                  break;
+                case 'end':
+                  self.parentNode.notifyResize();
+                  self.parentNode.parentNode.notifyResize();
+                  self.parentNode.parentNode.parentNode.notifyResize();
+                  Polymer.dom.flush();
+                  break;      
+              }
+          break;
         }
+      }
+
     };
 FCBehaviors.ResizerTagBehavior = [
   Polymer.IronResizableBehavior,
-  FCBehaviors.ResizableRootBehaviorImpl,
   FCBehaviors.ResizerTagBehaviorImpl];
 </script>
