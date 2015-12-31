@@ -1,0 +1,105 @@
+<dom-module id="fc-router-left-drawer">
+<template>
+<style>
+
+:host {position:relative;
+      min-width: 145px;
+      overflow-x: scroll;
+     }
+  .longest{width: 72px; height: 42px; border: 1px solid #aedefe;} 
+   .link{   
+    color: white;
+    font-family: 'Merriweather', 'Times', sans-serif;
+    font-size: 14px;
+    font-weight: 700;}
+</style>
+<template is="dom-repeat" items="{{leftDrawerTabArray}}" filter='{{userFilter(fcid, usertype)}}'>
+     <paper-tab link class= "menubuttons longest">
+          <a
+               data-route="home" 
+               href="/" 
+               class="link horizontal layout center center-justified menuItem-dark">
+              Home
+          </a>
+      
+     </paper-tab>
+</template>
+</template>
+<script>
+FcRouter = Polymer({
+	is:'fc-router',
+	behaviors: [
+		Polymer.IronResizableBehavior,
+		Polymer.NeonAnimationBehavior,
+		Polymer.IronSelectableBehavior,
+		Polymer.NeonAnimationRunnerBehavior,
+		Polymer.IronMenubarBehavior,
+		Polymer.IronRangeBehavior],
+	properties: {
+          	class: {
+                type: String,
+                value: function(){
+                    return 'horizontal layout'
+                }, 
+                notify: true,
+                reflectToAttribute: true
+               },
+              
+              
+                
+              hostAttributes: {
+                role: 'tabList'
+              },
+              listeners: {
+                'iron-resize': '_onResize',
+                'iron-select': '_onIronSelect',
+                'iron-deselect': '_onIronDeselect'
+              },
+              hostAttributes: {
+                'role': 'menubar'
+              },
+              keyBindings: {
+                'left': '_onLeftKey',
+                'right': '_onRightKey'
+              }, 
+              route: {}
+          },
+    _menuLaunch: function(){
+      this.pressed=!this.pressed;
+    },
+    created: function() {
+      this._holdJob = null;
+    },
+    ready: function() {
+      this.setScrollDirection('y', this.$.tabsContainer);
+    },
+    attached: function(){
+    },
+  
+    	_toggleRightDrawer: function(){
+			var drawer = document.querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = document.querySelector('#drawerPrimed');
+          var dashboard = document.querySelector("#dashboardPrime");	
+		if(drawer.forceNarrow!==true)
+          {
+               drawer.forceNarrow = true;
+               drawer.responsiveWidth='90000px';
+               dashboard.leftHidden=true;
+          }
+          else
+          {
+               drawer.forceNarrow = false;
+               drawer.responsiveWidth ='1080px';
+               dashboard.leftHidden=false;
+          }
+     },
+
+});
+  </script>
+</dom-module>
