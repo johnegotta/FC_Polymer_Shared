@@ -60,8 +60,14 @@ properties: {
         notify: true,
         reflectToAttribute:true
       },
+      resizeType:{
+        type: String, 
+        computed: 'computeResizeType(resizing,resizeWidth, resizeHeight,rightDrawer)',
+        notify: true,
+        reflectToAttribute: true 
+      }
   },
-    listeners: {
+    listeners: {'tap':'_removeResizer'
 
 
       
@@ -86,7 +92,7 @@ properties: {
     //fixed for unique instances
     Polymer.dom(resizerTag).setAttribute("name","widthResizer");
     Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: blue; width: 18px; height: 100%;")  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: -12px; top: -8px; margin-right: -24px; opacity: 0; width: 36px; height: 100%; cursor: e-resize;" )  
     Polymer.dom.flush();
   }
   else if(this.resizeHeight){
@@ -104,12 +110,18 @@ properties: {
     //fixed for unique instances
     Polymer.dom(resizerTag).setAttribute("name","rightDrawer");
     Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: 0px; top: 0px; background: pink; width: 18px; height: 100%;")  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: -12px; top: -8px; margin-left:6px; width: 42px; height: 100%; opacity: 0; cursor: w-resize;")  
     Polymer.dom.flush();
     }
-  else {return 'blue';}
 
+  },
+  computeResizeType: function(resizing, resizeWidth, resizeHeight, rightDrawer){
+      var resizeType = (resizing)?'resizing':(resizeWidth)?'resizeWidth':(resizeHeight)?'resizeHeight': (rightDrawer)?'rightDrawer':'';
+      console.log(resizeType);
+      return resizeType;
   }
+  
+
 
 };
 
@@ -117,4 +129,29 @@ properties: {
   Polymer.IronResizableBehavior,
   FCBehaviors.ResizableRootBehaviorImpl];
   </script>
+
+
+
+<!-- _removeResizer: function(){
+        Polymer.dom(this).removeAttribute(this.resizeType);
+        var resizeTypeToRemove = this.$$([name|this.resizeType]);
+        Polymer.dom(this).removeChild(resizeTypeToRemove);
+        alert(resizeTypeToRemove);
+      },
+  attached: function(){
+    
+
+  }
+var remover = document.createElement('BUTTON');
+  
+    Polymer.dom(remover).innerHTML='remove';
+      Polymer.dom(remover).setAttribute('tap','_removeResizer');
+      Polymer.dom(remover).setAttribute('style',"height: 200px; width: 100px; margin-top:-24px;")
+      var insertBefore = Polymer.dom(this.root).lastElementChild;
+    Polymer.dom(this.root).insertBefore(remover, insertBefore);
+    console.log(this, remover);
+
+ position: absolute; right: 2px; top: -8px; margin-right: -64px; background: snow; border-radius: 2px; width: 54px; height: 64px; border: 2px solid black; border-left:0px;" ) 
+
+ -->
 
