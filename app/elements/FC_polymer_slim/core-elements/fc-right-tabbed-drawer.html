@@ -1,0 +1,411 @@
+<dom-module id="fc-right-tabbed-drawer">
+	<template>
+		<style>
+		:host{
+			background:snow;
+			display: flex-stretch;
+			box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);
+
+			--paper-tab-content: { font-size: 36px;
+									font-family: Merriweather;
+									margin: 0 12%;
+									color: #f7cb4d;
+									font-weight: 700;
+									/*background: #7baaf7;*/
+									border-left: 3px solid #f7cb4d;
+									border-right: 3px solid #f7cb4d;
+									};
+			@apply(--paper-tab-content);
+					}
+	
+		.biggerBetter{
+				width: 100%
+				font-weight: 700;
+				font-size: 1.5em;
+				font-family: times;
+				font-color: brown;
+				border-bottom: 6px ridge silver;
+				}
+
+		.menu {
+			display: block;
+			background: snow;
+			margin: 2%;
+			padding: 8px;
+			border: 1px dashed green;
+			z-index: 1;
+			text-align: center;
+    		cursor: crosshair;
+    		box-shadow: 0px  -5px 15px #d9d9d9 inset;
+    		align-items: flex-start;
+			}
+.right-header{
+	background: #f7cb4d;			
+	}
+neon-pages{
+	overflow: hidden;
+}
+					
+		.gradBackground{		
+		background: linear-gradient(to Top, #1e5799 34%,#1e5799 43%,#2989d8 58%,#207cca 63%,#7db9e8 98%); 
+	}
+
+		.btn-class{
+			 display: inline-block;
+			 border:2px solid #4DB6EB;
+			 color: #FFF;
+			 border-radius: 210px;
+			 -webkit-border-radius: 210px;
+			 -moz-border-radius: 210px;
+			 font-family: merriweather;
+			 width: auto;
+			 height: auto;
+			 font-size: 16px;
+			 padding: 20px 28px;
+			 margin: 16px;
+			 box-shadow: inset 6px 8px 18px 4px #90Aaa2,0px 5px 0px 0 #223955,5px 8px 5px 4px #B3B3B3,7px 12px 13px 7px #a4a4a4;
+			 -moz-box-shadow: inset 6px 8px 18px 4px #90Aaa2,0px 5px 0px 0 #223955,5px 8px 5px 4px #B3B3B3,7px 12px 13px 7px #a4a4a4;
+			 -webkit-box-shadow: inset 6px 8px 18px 4px #90Aaa2,0px 5px 0px 0 #223955,5px 8px 5px 4px #B3B3B3,7px 12px 13px 7px #a4a4a4;
+			 text-shadow: 0 1px 0 #48576D;
+			 background-image: linear-gradient(to right, #5156FC, #395efc);
+			 background-color: #555AA9;
+		}
+		.btn-class:hover, .btn-class:active{
+			 border:1px solid none;
+			 color: #FFF;
+			 box-shadow: inset 0px 1px 0px 0 #90AFC2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+			 -moz-box-shadow: inset 0px 1px 0px 0 #90AFC2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+			 -webkit-box-shadow: inset 0px 1px 0px 0 #90AFC2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+			 background-color: #395e8d;
+		}
+	</style>
+		<paper-header-panel 
+			class="center right-header" 
+			mode="waterfall-tall" 
+			style="border:1px dashed black; width: 100%; min-height: 1100px;"
+			>
+        	<div class="paper-header right-header">
+				<div 
+					class="layout vertical nowrap justified" 
+					style="width: 100%; min-height: 280px; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);">
+				</div>
+						<!-- <paper-menu
+				  			dragmenu="false"
+							id="leftPanelRouterMenu"
+							class="scrollable vertical layout"
+							style="width: 100%; position: static;">
+							<paper-tabs 
+								id="tabRouterLeftPanel" 
+								hide-scroll-buttons="true" 
+								draggable="false" 
+								scrollable="true" 
+								style="max-height: 96px; min-height: 48px; ; left-margin: -48px; background: #000066; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);" 
+								on-tap="clickHandler"> 
+								<fc-router>
+									</fc-router>
+							</paper-tabs>
+						</paper-menu> -->
+				<paper-tabs 
+          			hideScrollButtons="false" 
+          			class="layout horizontal biggerBetter flex nowrap center-justified" 
+          			scrollable="true"
+          			selected="{{selectedTab}}"
+          			style="padding: 0 50px; width: 100%; background: #006; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);" 
+								on-tap="clickHandler"> "
+          			>
+	               	<template is="dom-repeat" items="{{Tab_Names}}">
+	          	    	<paper-tab fc-pages="{{index}}" name="{{item}}">
+	                         [[item]]
+	                	</paper-tab>
+	               	</template>
+	             	<paper-tab
+		                 class="horrizontal layout flex nowrap scroll" 
+		                 id$="{{item}}_{{item.Tab_Number}}" 
+		                 name="{{item}}"
+		                 fc-pages={{selected}}
+		                 style$="width: 103%;"
+		                 >
+		                 
+	                    <span>{{item}}</span>
+	                    <span>{{item.Tab_Notification_subHeading}}</span>
+	                </paper-tab>
+    			</paper-tabs>
+			</div>
+					<!-- Here we put the second set of tabs 3/4 like you-tube-->
+				 <!--HEADER AREA ENDS-->
+				<!--Content and Menu Area Begins-->						
+				<div id="myNext" class="content full-bleed vertical layout flex">
+
+					<neon-animated-pages id="myNext2"class="flexgradBackground" selected="[[selected]]" on-tap="next">
+        					<fc-main-drawer-page></fc-main-drawer-page>
+        					<fc-animated-drawer-page id='firePadId'>
+        						<fc-reading-firepad>
+        						</fc-reading-firepad>
+        					</fc-animated-drawer-page>
+					 </neon-animated-pages>		
+			 	</div>
+				<div>
+					 	<paper-material style="height: 6px; background: green; width: 100%; z-index: 4; margin-top: 24 px; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);"></paper-material>
+				</div>					
+	</paper-header-panel>							
+	</template>
+	<script>
+		FcRightTabbedDrawer=Polymer({
+		  is:"fc-right-tabbed-drawer",
+			behaviors: [FCBehaviors.ResizableRootBehavior],			
+			properties: {
+				measured: {
+					type: String,
+					value: '1000s',
+					notify: true,
+					reflectToAttributes: true
+				}, 
+				responsiveWidth: {
+					type: String,
+					value: '0px',
+					notify: true,
+					reflectToAttributes: true
+				},
+				staticwidth:{
+					type:Boolean,
+					value: false,
+					reflectToAttribute: true,
+					notify: true
+				},
+				
+				route:{
+					type: String,
+				 	notify: true,
+				 	reflectToAttribute: true
+				}, 
+				leftHidden: {
+					type: Boolean,
+					value: false,
+					notify: true
+				},
+				mwidth: {
+					type: String,
+					value: function(){
+						return this.style.width;
+					},
+					notify: true
+				},
+				
+				notRouter:{
+					type: Boolean,
+					value: function(){
+						return true;
+					},
+					notify: true
+					
+				},
+				selectedTab:{
+	                  type: String,
+	                  value: "0",
+	                  notify: true,
+	                  reflectToAttribute: true
+	             },
+	             Tab_Group_Id:{ 
+	                  type: String, 
+	                  value: `Tab_Group_Number + Tab_Group_Name`,
+	                  notify: true
+	               },                
+	             Tab_Group_Name: { 
+	                  type: String, 
+	                  value: "MyNewTabGroup",
+	                  notify: true
+	             },
+	             Tab_Group_Number:{
+	                  type: String,
+	                  value:'000001',//increasing [five lead zeroes for mistakes]
+	                  notify: true
+	             },
+	             Number_Of_Tabs: {
+	                  type: Number, 
+	                  value: function(){return 8;}, //1-10 plus the 0 meta tab usually lead tab(tab[0] will carry metadata
+	                  reflectToAttribute: true,
+	                  notify: true
+	             },
+	             Tab_Names: {
+	                  type: Array, //array of all the junk in a tabGroup
+	                  value: function(){  
+	                       return [
+	                       		'To-Do-List',  
+	                            'Making Tools',
+	                            'Prototyping',
+	                            'Data-Dialog',
+	                            'Scheduling', 
+	                            'Experiments',
+	                            'Administration' 
+	                            ];
+	                 },
+	                  notify: true
+	             },
+	             styleObject: {
+	                  type: Object,
+	                  value: function(){
+	                       var styleObject = {
+	                            "height": "100%",
+	                            "overflow-y": "scroll",
+	                            "border": "4px #000066 double",
+	                            "resize": "vertical"
+	                       }
+	                       return this.styleObject;
+	                       },
+	                  notify: true,
+	                  reflectToAttribute: true
+	             },
+	             foundHeight: {
+	                  type: String,
+	                  value: function(){
+	                     //  var currentHeight=this.clientHeight;
+	                       return "900px";
+	                  },
+	                  notify: true,
+	                  reflectToAttribute: true
+	             },
+	             foundWidth: {
+	                  type: String,
+	                  value: function(){
+	                       return "103%";
+	                  },
+	                  notify: true,
+	                  reflectToAttribute: true
+	             },
+	             userType: {
+	                  type: String, 
+	                  value: "admin",
+	                  notify: true
+	             },
+	             headerAdded: {
+	                  type: Boolean,
+	                  value: false, 
+	                  notify: true,
+	                  reflectToAttribute: true 
+	             },
+	             header:{
+	                       type: String,
+	                       value:'My Header',
+	                       notify: true
+	             },
+	             profileAdded:{ 
+	                  type: Boolean,
+	                  value: false, 
+	                  notify: true,
+	                  reflectToAttribute: true 
+	             },
+	             profileObject: {
+	                  type: Object, 
+	                  value: function(){
+	                  return {
+	                       "stuff": "value", 
+	                       "stuff": "value",  
+	                       "stuff": "value", 
+	                       "stuff": "value",                                   
+	                       "stuff": "value"
+	                       }
+	                  },
+	                  notify: true
+	             },
+	             imageAdded:{ 
+	                  type: Boolean,
+	                  value: false, 
+	                  notify: true,
+	                  reflectToAttribute: true 
+	             },
+	             srcImg: {
+	                  type: String, 
+	                  value: "../../../images/icon_menu/sail-icons/silver_sail_small.png", 
+	                  notify: true
+	             }, 
+	             rows:{
+	                  type: Boolean,
+	                  value: true,
+	                  notify: true
+	             },
+	             dataDensity: {
+	                  type: Number,
+	                  value: 1,
+	                  //1-4 shpuld read device
+	                  notify: true
+	             },
+	             numberOfRowsOrColumns: {
+	                  type: Number,
+	                  value: 5,
+	                  //value: '_computed(foundHeight, foundWidth, dataDensity)',
+	                  notify: true
+	             },
+	             firebaseLocation: {
+	                  type: String, 
+	                  value: "admin",
+	                  notify: true
+	             }
+			},
+
+				computedStyle: function(determine){
+						return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  "
+
+
+				}, 
+
+
+				_toggleRightDrawer: function(){
+						var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+						if(drawer.forceNarrow!==true)
+						{
+							drawer.forceNarrow = true;
+						}
+						else{
+							drawer.forceNarrow = false;
+						}
+				},
+				_toggleLeftDrawer: function(){
+					var drawer = document.querySelector('#drawerPrimed');	
+					if (drawer.forceNarrow!==true)
+					{
+						drawer.forceNarrow = true;
+				    	drawer.responsiveWidth='90000px';
+				    	this.leftHidden=true;
+				    }
+					else
+					{
+						drawer.forceNarrow = false;
+				    	drawer.responsiveWidth ='1080px';
+				    	this.leftHidden=false;
+					}
+				},
+				swapMenu: function(){
+					this.notRouter = !this.notRouter;
+				},
+
+				clickHandler: function(e) {
+					console.log(e);
+				  var button = e.target;
+				  while (!button.hasAttribute('data-dialog') && button!==document.body) {
+				    button = button.parentElement;
+				  }
+				  if (!button.hasAttribute('data-dialog')) {
+				    return;
+				  }
+				  var id = button.getAttribute('data-dialog');
+				  var dialog = document.getElementById(id);
+				  console.log(document.getElementById(id), id);
+				  if (dialog) {
+				    dialog.open();
+				  }
+				},
+
+		next: function(){
+      		var myNext = this.$.myNext;
+       		myNext.selected = 0;
+   
+        	if(myNext.selected === 0) {
+          		myNext.selected = 1;
+        	}
+     	}
+	});
+	</script>
+</dom-module>
+<!-- style="margin: auto; background: #066666; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);" 
+								on-tap="clickHandler"
+								tab stuff-->

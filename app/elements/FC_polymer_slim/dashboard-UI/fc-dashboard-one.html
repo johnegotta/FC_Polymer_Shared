@@ -30,7 +30,10 @@
 	width: 620px;
 	height: 480px
 }
-
+.left-drawer{ 
+	min-width: 480px;
+	width: calc(100% - 64px);
+	 }
 .bordered{
 	margin: 4px;
 	border: 6px ridge #aedefe;
@@ -142,27 +145,16 @@
             </fc-dialog-proto>
 </div>
 		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap blue" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="[[rightDrawerWidth]]">
-			<fc-resizing-drag-panel
+
+			<fc-right-tabbed-drawer
 						id="rightDrawer" 
-						header-mode="seamed"  
+						header-mode="waterfall-tall"  
 						drawer 
-						right-drawer='true'
+						right-drawer
 						current-width="{{rightDrawerWidth}}" 
 						style="position: absolute; right: 0px; top: 0px; bottom: 0px; width: 500px;"
 						>
-						<div 
-							class="paper-header" 
-							style="height: 240px; background: yellow;">
-							<section 
-							style="height: 240px: background: yellow;" 
-							onclick="alert('I am a drawer');">
-							<paper-toggle-button class="green">Toggle</paper-toggle-button>
-							</section>
-						</div>
-						
-							<fc-tabbed-drawer class="main-content">
-							</fc-tabbed-drawer>
-			</fc-resizing-drag-panel>
+			</fc-right-tabbed-drawer>
 		<div main style="height:100%">
 		
 				<content>
@@ -312,8 +304,12 @@ FcDashboardOne=Polymer({
 		_toggleRightDrawer: function(){
 				var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
 				if(drawer.forceNarrow!==true)
-				{drawer.forceNarrow = true;}
+				{drawer.forceNarrow = true;
+				drawer.responsiveWidth='90000px';
+		    	this.rightHidden=false;}
 				else{drawer.forceNarrow = false;
+					drawer.responsiveWidth ='1080px';
+		    		this.rightHidden=true;
 				}
 		},
 		_toggleLeftDrawer: function(){
@@ -322,13 +318,13 @@ FcDashboardOne=Polymer({
 			{
 				drawer.forceNarrow = true;
 		    	drawer.responsiveWidth='90000px';
-		    	this.leftHidden=true;
+		    	this.leftHidden=false;
 		    }
 			else
 			{
 				drawer.forceNarrow = false;
 		    	drawer.responsiveWidth ='1080px';
-		    	this.leftHidden=false;
+		    	this.leftHidden=true;
 			}
 		},
 		swapMenu: function(){
