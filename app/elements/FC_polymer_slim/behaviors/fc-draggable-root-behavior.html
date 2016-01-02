@@ -35,9 +35,9 @@ FCBehaviors.DraggableRootBehavior = {
   },
 
 
-  ready: function(){
+  attached: function(){
     if(this.drags){
-      if(!this.$.headerPanel){
+      if(this!=='paper-header-panel' || this.root !=='paper-header-panel' || this.root !=='fc-resizing-drag-panel' || this !== 'fc-resizing-drag-panel'){
           var dragger = document.createElement('fc-iron-icon-drag');
           var rndmNum = new Date().getMilliseconds();
           var theDragId=(this.id)?this.id+'_dragger': rndmNum.toString() + '_dragger';
@@ -48,10 +48,8 @@ FCBehaviors.DraggableRootBehavior = {
           this.updateStyles();
           Polymer.dom.flush();
       } 
-      else{
-          this.$.headerPanel.style.cursor='move';
-      }
-    }
+    (this.$.headerPanel)?this.$.headerPanel.style.cursor='move': this.firstElementChild.style.cursor='move';
+   } 
   },
 
   _focusedDraggable:function(e){
