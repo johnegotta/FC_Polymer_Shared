@@ -2,17 +2,12 @@
 <template>
 <style>
 :host {
-      padding: 0px 12px 64px 12px;
-      margin: 0px 6px 0px 6px;
-      position: relative;
-      top: 0px;
-      bottom: 0px;
-      height: 99vh;
-      right: 0px;
-      left: 0px;
-      display: flex;
+      padding-right: 8px;
+      padding-left: 8px;
+      margin: 0px 6px;
+      position: absolute;
+      height: 1400px;
       min-width: 96%;
-      max-width: 99vw;
     }
     div.line-number {
       width: 28px;
@@ -23,9 +18,8 @@
       font-family: merriweather;
       font-weight: 500;
       font-style: italic;
-      padding: 2px 4px;
-      margin: 2px;
-
+      padding: 6px 0px 6px 0px;
+      margin: 6px 0px 6px 0px;
 
     }
     div.columnContainer{
@@ -42,11 +36,11 @@
       font-size: 1.25em;
       font-family: merriweather;
       font-weight: 500;
-      padding: 2px 8px 28px 0px;
-      margin: opx 0px 6px 0px;
-      min-height: 2000px !important;
+      padding: 6px;
+      margin: 6px 0px 6px 0px;
+      min-height: 720px !important;
       display: flex;
-      min-width: 300px !important;
+      min-width: 260px !important;
       max-width: 720px !important;
     }
 </style>            
@@ -56,25 +50,23 @@
           on-click="popdetails">
           details</paper-button>    -->
 
-          
-                      
+           <array-selector id="selector" items="{{passagesWordArrays}}" selected="{{selected}}" multi toggle>
+           </array-selector>
 
-            <fc-resizing-drag-panel class="vertical layout flex wrap text" header-mode="waterfall-tall" style="margin: 12px; padding: 12px 84px 12px 36px; border: 3px ridge silver; line-height: .9; position: absolute;">
-                     <div class="paper-header header-panel" id="headerPanel" style="margin-bottom: 12px; border-bottom: 2px solid black;"> 
-                      <array-selector id="selector" items="{{passagesWordArrays}}" selected="{{selected}}" multi toggle>
-                      </array-selector>
-
-          <fc-dropdown-menu style="min-width: 360px;" on-select="toggleSelection" id="passagesList" data-source="{{passagesWordArrays}}" selected="{{selected}}">
+          <fc-dropdown-menu style="min-width: 330px;" on-select="toggleSelection" id="passagesList" data-source="{{passagesWordArrays}}" selected="{{selected}}">
           
 
           </fc-dropdown-menu>
-                         
+                      
+
+            <fc-resizing-drag-panel class="flex" header-mode="waterfall-tall" style="margin: 2px; padding: 9px; border: 3px ridge silver; line-height: .9; position: absolute;">
+                     <div class="paper-header header-panel" id="headerPanel" style="max-width: 660px; margin-bottom: 12px;"> 
+                          <code>[[selected.0.passageBlurb]]</code>
+
                       
                           </div>
 
-          <div class="layout vertical flex main-content content">
-           <code style="max-width: 720px; padding: 12px 0px 12px 8px; line-height: 1.05;">[[selected.0.passageBlurb]]</code>
-            <div class="layout horizontal flex nowrap container" style="max-width: 1350px; min-height: 10000px; padding: 2px 4px 12px 8px;">
+          <div class="layout horizontal main-content content">
             <div id="line-numbers" class="layout vertical line-number">
               <div class="line-numbers" id="linesA1">Lines</div>
                 <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lastRowIndex)}}">
@@ -84,7 +76,7 @@
               </div>
                     <!--passage-1-column-1 container-->
           <div id="firstColumn" class="layout horizontal flex wrap text">
-            <article id="textColumnOne" style="margin: 2px 2px 8px 2px; padding: 0ps 3px 18px 16px;">
+            <article id="textColumnOne" style="margin: 2px 2px 8px 2px; padding: 0ps 3px 8px 6px;">
               <template is="dom-repeat" items="{{selected}}"  filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
                   <template is="dom-if" if="{{item.newPara}}">
                     <br><span>&nbsp&nbsp&nbsp&nbsp</span>
@@ -98,7 +90,6 @@
               <div class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
             </article>
             <code>[[passageOneWordArray.0.passageType]]</code>
-          </div>
           </div>
         </div>                    
     </fc-resizing-drag-panel>
@@ -125,7 +116,10 @@
           estimatedHeight: {
             type: Number,
             value: function(){
-              var estimatedHeight=Math.ceil(screen.height*.895);
+              var estimatedHeight=Math.ceil(screen.height*.85);
+
+            
+             console.log(this.root.scrollHeight);
              return estimatedHeight;
             },
             notify: true,
@@ -138,7 +132,15 @@
           },
           lineNumberArray: {
               type: Array,
-              computed: '_computeLineNumberArray(passageOneWordArray, lastRowNode)',
+              value: function(){
+              var lineNumberArray = [];
+              for(var i=1; i <= 180; i++)
+                 {
+                  var showLine =  i % 5 ? false: true;
+                   lineNumberArray.push({'number': i, 'show': showLine});
+                  }
+                  return lineNumberArray;
+                  },
               notify: true
               },
         
@@ -412,8 +414,8 @@
             self.orderIndex=0;
             self.paragraphArray = truePassageContent.split(/\n/);
               self.passageArray = [];
-              var i = self.paragraphArray.length-1;
-              for(; i>= 0; i--)
+              var i = self.paragraphArray.length;
+              for(; i> 0; i--)
                 {
                     //console.log(i + " " + self.paragraphArray[i]);
                   var wordCounter = 0;
@@ -503,7 +505,7 @@
                               'lowerbound': firstPickle,
                               'upperbound': secondPickle
                               });
-                (q<=22)?self.push('minTarra', {'word':self.passageArray[upperbound].word, 'passageIndex':pickle, 'isMinTarra': true}):// console.log(`array forming: measuring next <p>no way</p>`);
+                (q<=22)?self.push('minTarra', {'word':self.passageArray[upperbound].word, 'passageIndex':pickle, 'isMinTarra': true}): console.log(`array forming: measuring next <p>no way</p>`);
                     q++;
                     lowerbound++;
                   }  
@@ -542,7 +544,7 @@
             }
             z++;
         }
-// console.log(`transition array in zero ${JSON.stringify(self.passageWordArrayOrdered)}`);
+console.log(`transition array in zero ${JSON.stringify(self.passageWordArrayOrdered)}`);
          self.push('passagesWordArrays', self.passageWordArrayOrdered);
       
           self.set('passageArray', null);
@@ -572,15 +574,6 @@
         _computeDoublePassageWordArray(passagesTestOne){
             return passagesTestOne[4].passage, passagesTestOne[4].passageTwo;
         }
-
-        _computeLineNumberArray(passageOneWordArray, lastRowNode){
-              for(var i=1; i <= 180; i++)
-                 {
-                  var showLine =  i % 5 ? false: true;
-                   lineNumberArray.push({'number': i, 'show': showLine});
-                  }
-                  return lineNumberArray;
-                  }
 
         setMeasureParams(){
           var elm= this.$.firstColumn;
@@ -620,7 +613,7 @@
   wordsOffBottom() {
       var lwId =  '#A' + this.lastWordIndex;
       var lastWordNode = document.querySelector(lwId);
-      // console.log(lastWordNode);
+      console.log(lastWordNode);
       var lastWordNodeBottom = lastWordNode.getBoundingClientRect().bottom;
 
       var previousWordNode = lastWordNode;
@@ -635,7 +628,7 @@
         }
       }
 
-      // console.log(this, "IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
+      console.log(this, "IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
       return numberOfWordsToCut;
   }
 
@@ -655,7 +648,7 @@
           numberOfWordsToCut++;
         }
       }
-      // console.log(this, "IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
+      console.log(this, "IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
       return numberOfWordsToCut;
   }
   
@@ -676,7 +669,7 @@
 
 
   getLastWordNode(nodeId) {
-    //console.log(this.lastWordIndex);
+    console.log(this.lastWordIndex);
     let theID ='#A' + this.lastWordIndex;
     var lastNode = Polymer.dom(this.$.textColumnOne).querySelector(theID);
   
@@ -736,7 +729,7 @@ _theContentFilter(firstWordIndex, lastWordIndex) {
                   self.currentWidth = self.currentWidth> 18? parseInt(self.currentWidth) + e.detail.ddx: self.currentWidth=23;
                   break;
                 case 'end':
-                 // console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
+                  console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
                   //self.currentWidth = parseInt(self.currentWidth) + e.detail.ddx;
                   self.notifyResize();
                   break;

@@ -1,19 +1,28 @@
 <dom-module id="fc-dropdown-menu">
 <template>
 <style>
+:host{
+	height: 65px;
+	max-width: 680px;
+	min-width: 480px;
+	padding: 1px;}
 .inputclass{
 	height: 65px;
-	max-width: 450px;
-	margin: 4px 40px 4px 40px;
-	padding: 6px;
-
+	max-width: 420px;
+	margin: 2px 10px 2px 10px;
+	padding: 4px;
 }
+paper-menu{
+	border: 4px double black;
+	z-index: 200px;
+}
+paper-dropdown-menu{width: 95%;}
 </style>
 
 					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{menuLabel}}">
-						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" style="width: 100%;" selected="{{selected}}">
-							<template is="dom-repeat" items="{{dataSource}}">
-								<paper-item  value="{{item}}">{{item.0.passageTitle}}</paper-item>
+						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" class="inputclass" selected="[[_computeSelected(menuSelection)]]">
+							<template id="fcDropDownMenuRepeater" is="dom-repeat" items="{{dataSource}}">
+								<paper-item  class="inputclass" value="{{item}}">{{item.0.menuItem}}</paper-item>
 							</template>
 						</paper-menu>
 					</paper-dropdown-menu>
@@ -37,6 +46,7 @@ Polymer({
 		},
 		selected: {
 			type: Array,
+			computed: '_computeSelected(menuSelection)',
 			notify: true,
 			reflectToAttribute: true
 		},
@@ -47,6 +57,15 @@ Polymer({
 			reflectToAttribute: true
 
 		},
+		menuSelection: {
+			type: Array, 
+			value: function(){
+				return 0;
+			},
+			notify: true,
+			reflectToAttribute: true
+		},
+
 		dataSource: {
 			type: Array,
 			notify: true,
@@ -60,7 +79,7 @@ Polymer({
 		}
 	},
 
-_computeMenuSelected(dataSource){
+_computeMenuSelected: function(dataSource){
 	return this.dataSource.item;
 
 },
@@ -68,8 +87,11 @@ created: function(){
 
 
 
-},
 
+},
+_computeSelected: function(menuSelection){
+	return menuSelection;
+},
 ready: function(){
 
 
@@ -86,9 +108,7 @@ attached: function(){
 
 toggleSelection: function(e) {
         var item = e.detail.item.value;
-        this.$.passageListMenu.select(item);
-      this.set('selected', item);
-        this.fire('passageSelected', item);
+     	this.set("menuSelection", item);
       },
         
 

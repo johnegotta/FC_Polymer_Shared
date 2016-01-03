@@ -2,16 +2,28 @@
   <style>
     :host {
       display: block;
-      overflow-y: scroll;
+      /*overflow-y: scroll;*/
       position: absolute;
       top: 0px;
       bottom: 0px;
       left: 0px;
       right: 0px;
+      background: white;
+      border: 1px solid black;
+      font-size: 1.0em;
+      font-size: 16px;
+      font-weight: 500;
+      font-color: black;
     }
     #headerPanel {
-      min-height: 250px;
+      min-height: 100px;
       background: blue;
+    }
+    paper-header-panel {
+      --paper-header-panel-seamed-container: {
+          overflow-y: visible;
+          overflow-x: visible;
+      };
     }
     .container {
       background: white;
@@ -25,30 +37,30 @@
       font-size: 48px;
     }
     p {
-      font-size: 20px;
+      font-size: 16px;
     }
-    .row {
-      margin: 56px 0;
-    }
+
   </style>
 
   <template>
-    <paper-header-panel mode="waterfall-tall">
-      <div id="headerPanel" mode="waterfall-tall" class="paper-header">
-        <content class="paper-header" select=".paper-header">
+    <paper-header-panel mode="seamed" class="flex">
+      <div id="headerPanel" class="paper-header horizontal layout">
+      <paper-icon-button icon="arrow-back" on-tap="closeMe"></paper-icon-button>
+      <paper-icon-button icon="arrow-forward" on-tap="closeMe"></paper-icon-button>
+        <content select=".head">
 
 
 
         </content>
       </div>
-      <div class="container">
-        <div class="content">
-        <content class="content main-content">
+      <div class="container" style="background:red;">
+        <paper-material>
+            <content class="content main-content" select=".main">
 
 
 
-        </content>
-        </div>
+            </content>
+            </paper-material>
       </div>
     </paper-header-panel>
 </template>
@@ -68,10 +80,14 @@
                 name: 'fade-in-animation',
                 node: this
               }],
-              'exit': {
+              'exit': [{
+                  name: 'hero-animation',
+                  id: 'hero',
+                  fromPage: this
+                }, {
                 name: 'fade-out-animation',
                 node: this
-              }
+              }]
             }
           }
         },
@@ -82,6 +98,9 @@
             }
           }
         }
+      },
+      closeMe: function(e){
+        this.fire('close-me', e.target);
       }
     });
   </script>
