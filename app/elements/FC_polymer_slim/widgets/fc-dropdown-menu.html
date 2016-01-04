@@ -19,7 +19,7 @@ paper-menu{
 paper-dropdown-menu{width: 95%;}
 </style>
 
-					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{menuLabel}}">
+					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{selected.0.menuLabel}}">
 						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" class="inputclass" selected="[[_computeSelected(menuSelection)]]">
 							<template id="fcDropDownMenuRepeater" is="dom-repeat" items="{{dataSource}}">
 								<paper-item  class="inputclass" value="{{item}}">{{item.0.menuItem}}</paper-item>
@@ -34,13 +34,13 @@ Polymer({
 	properties: {
 		menuName: {
 			type: String,
-			value: "newMenu",
+			value: function(){return "Your Menu Selections: ";},
 			notify: true,
 			reflectToAttribute: true
 		},
 		menuLabel: {
 			type: String,
-			value: "newMenu",
+			value: function(){return "Your Selections: " ;},
 			notify: true,
 			reflectToAttribute: true
 		},
@@ -76,26 +76,33 @@ Polymer({
 			value: "newMenu",
 			notify: true,
 			reflectToAttribute: true
-		}
+		} 
+
 	},
 
-_computeMenuSelected: function(dataSource){
+_computeMenuSelected: function(dataSource, menuSelection){
+	console.log(this.dataSource.item);
 	return this.dataSource.item;
 
 },
 created: function(){
+}, 
 
-
-
-
-},
 _computeSelected: function(menuSelection){
 	return menuSelection;
 },
-ready: function(){
 
+toggleSelection: function(e) {
+        var item = e.detail.item.value;
+     	this.set("menuSelection", item);
+      },
+        
+passageFilter: function(filterId)
+	{
+				return true;
+		
 
-},
+	},
 factoryImpl: function(){
 	//do something
 
@@ -104,31 +111,7 @@ factoryImpl: function(){
 
 attached: function(){
 
-},
-
-toggleSelection: function(e) {
-        var item = e.detail.item.value;
-     	this.set("menuSelection", item);
-      },
-        
-
-
-notifyResize: function(){
-
-}, 
-passageFilter: function(filterId)
-	{
-				return true;
-			
-
-
-	}
-
-
-
-
-
-
+}
 });
 </script>
 </dom-module>
