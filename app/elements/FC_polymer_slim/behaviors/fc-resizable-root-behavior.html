@@ -26,6 +26,12 @@ properties: {
       reflectToAttribute: true,
       notify: true
     },
+    leftDrawer: {
+      type: Boolean,
+      value: false, //options are up, down and false
+      reflectToAttribute: true,
+      notify: true
+    },
 		currentWidth: {
           type: String, 
           value: function(){
@@ -85,12 +91,23 @@ properties: {
     Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: green; width: 18px; height: 18px;")  
     Polymer.dom.flush();
     }
-  else if(this.resizeWidth){
+  else if(this.leftDrawer){
     var resizerTag = document.createElement('fc-resizer-tag');
     var rndmNum = new Date().getMilliseconds();
     //fixed for unique instances
     Polymer.dom(resizerTag).setAttribute("name","widthResizer");
     Polymer.dom(this.root).appendChild(resizerTag);  
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: -12px; top: -8px; margin-left: 6px; opacity: 1; width: 22px; height: 100vh; cursor: e-resize; background: grey;" )  
+    Polymer.dom.flush();
+  }
+  else if(this.resizeWidth){
+    var resizerTag = document.createElement('fc-resizer-tag');
+    var rndmNum = new Date().getMilliseconds();
+    //fixed for unique instances
+    Polymer.dom(resizerTag).setAttribute("name","widthResizer");
+    var tagParent = this.$$('fc-resizing-drag-panel');
+    Polymer.dom(this).appendChild(resizerTag);  
+    Polymer.dom.flush();
     Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: -12px; top: -8px; margin-left: 6px; opacity: 1; width: 22px; height: 100vh; cursor: e-resize; background: grey;" )  
     Polymer.dom.flush();
   }

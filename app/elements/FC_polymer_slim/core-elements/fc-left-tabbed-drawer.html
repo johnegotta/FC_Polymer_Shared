@@ -127,8 +127,8 @@ paper-tab{
 					<div class="horizontal layout flex wrap" style="margin: 3% 6%; min-height: 480px;"> 
 						<div class="horizontal layout flex wrap" style="margin: 3% 6%; "on-tap="clickHandler"> 
 							<template is='dom-repeat' class="horizontal layout flex wrap center center-justified" items="{{iconArray}}">
-								<section class$="[[item.sectionClass]]" style="$[[computedStyle(determine)]]" data-dialog$="[[item.dDialogTwo]]">
-					        `
+								<section class$="[[item.sectionClass]]" style$="[[_computedStyle(determine)]]" data-dialog$="[[item.dDialogTwo]]">
+					        
 					        		<iron-icon 
 					            		icon$="[[item.iconUsed]]"  
 					            		class$="[[item.sectionClass]]"
@@ -173,18 +173,13 @@ paper-tab{
 					notify: true,
 					reflectToAttributes: true
 				},
-				staticwidth:{
-					type:Boolean,
-					value: false,
-					reflectToAttribute: true,
-					notify: true
-				},
-				
-				route:{
+
+				determine: {
 					type: String,
-				 	notify: true,
-				 	reflectToAttribute: true
-				}, 
+					value: function(){return '.gradBackground';}
+
+				},
+			
 				leftHidden: {
 					type: Boolean,
 					value: false,
@@ -303,6 +298,11 @@ paper-tab{
 					},
 					notify: true
 				},
+				leftDrawer: {
+					type: Boolean,
+					value: true,
+					notify: true
+				},
 				notRouter:{
 					type: Boolean,
 					value: function(){
@@ -310,16 +310,17 @@ paper-tab{
 					},
 					notify: true
 					
-				}, 
+				}
+			},
 
-				computedStyle: function(determine){
+
+
+				_computedStyle: function(determine){
 						return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  "
 
 
 				}, 
 
-
-			},
 				_toggleRightDrawer: function(){
 						var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
 						if(drawer.forceNarrow!==true)

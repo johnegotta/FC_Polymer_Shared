@@ -1,0 +1,116 @@
+<dom-module id="fc-display-controller">
+<template>
+<style>
+
+	:host{}
+	.super-content{min-height: 3900px !important;
+		overflow-y: scroll;
+	}
+
+		
+</style>
+<fc-resizing-drag-panel resizeWidth class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 12px; padding: 12px 24px; border: 3px ridge silver; width:95%;">
+                     <div class="paper-header" id="headerPanel" style="margin-bottom: 12px; border-bottom: 2px solid black;"> 
+                     <paper-button on-tap="toggleSwap"> Toggle Columns</paper-button>
+	
+					 </div>
+		
+		<fc-splitter-jc id="swapSplitter" orientation="{{_computeOrientation(swap)}}" style="min-height: 3200px;">
+			<content id="leftContent" class="layout vertical flex main-content left super-content" select=".left .super-content">
+			</content>
+
+			
+			<content id="rightContent" class$="[[_computeRightContentClassList(showSecond)]]" select$="[[_computeRightContent(showSecond)]]">
+			</content>
+		</fc-splitter-jc>
+
+
+
+</fc-resizing-drag-panel>
+</template>
+<script>
+Polymer({
+	is:'fc-display-controller',
+	behaviors: [Polymer.IronResizableBehavior],
+	listeners: {'iron-resize':'setUp'},
+	properties: {
+		rightContent: {
+			type: String,
+			computed: '_computeRightContent(showSecond)',
+			notify: true,
+			reflectToAttribute: true
+		},
+		swap:{
+			type: String,
+			value: 'horizontal',
+			notify: true,
+			reflectToAttribute: true
+		},
+		showSecond: {
+			type: Boolean,
+			value: function(){return false;},
+			observer: 'splitPassageForColumns',
+			notify: true,
+			reflectToAttribute: true
+		}
+	   
+	},
+
+	ready: function(){
+		this.splitPassageForColumns();
+		this.setUp();
+		
+	},
+
+	setUp: function()
+	{
+		this.screenTrueHeight =  (window.innerHeight-240);
+		var distributed = this.getContentChildren('#rightContent');
+        console.log(distributed.length, this.screenTrueHeight, `here are my content elements`);
+        
+
+		
+	},
+	
+	_computeRightContent: function(showSecond){
+		var returnClasses=(showSecond)?"right super-content": "nope";
+		console.log(this.rightContent);
+		return returnClasses;
+	},
+
+	splitPassageForColumns: function(){
+		console.log(this.id, "IN splitPassageForColumns")
+		
+	},
+	toggleShowSecond: function(){
+	
+        console.log(distributed.length,  `here are my distributed children`);
+		this.showSecond=!this.showSecond;
+		this.distributeContent();
+		console.log(this.showSecond, `showSecond`, this.$.rightContent.select);
+		console.log(this.rightContent);
+
+	},
+	toggleSwap: function(){
+		var swapreturn = (this.swap=='horizontal')? 'showLeft': 'horizontal';
+		console.log(this.swap);
+		this.set('swap', swapreturn);
+		
+	},
+
+	_computeOrientation: function(swap){
+		console.log(swap);
+		this.async(function() {
+      		this.$.swapSplitter.attached();
+      		}, 300);
+		this.async(function(){var insertionPoint = Polymer.dom(this.root).querySelector('content');
+		var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[0];
+		distributed.style.width='10000px'; 
+	},700);
+		console.log(Polymer.dom(Polymer.dom(this).querySelector('content')).getDistributedNodes()[0]);
+		return swap;
+	}
+
+});
+</script>
+</dom-module>
