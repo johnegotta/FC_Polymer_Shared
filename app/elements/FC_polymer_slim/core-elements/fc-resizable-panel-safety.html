@@ -1,10 +1,11 @@
-<dom-module id="fc-resizable-panel">
+<dom-module id="fc-resizable-panel-safety">
 	<template>
 	<style> 
 	:host{	width: 1190px;
-			height: 1200px;
-			background: #fff;
+			height: 48vh;
+			background: silver;
 			display: block;
+			overflow: hidden;
 
 		}
 		.inputClass {
@@ -69,18 +70,14 @@
 		>
 		
 		<content></content>
-		<paper-icon-button 
-			icon="fc-editor-icons:stretch-horizontal" 
-            name="fc-editor-icons:stretch-horizontal"
+		<paper-material 
             on-track="resetWidth" 
             draggable="true"
-         
-            
             description="the dragable edge of the card"
             class="menuItems-light"
-            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  z-index: 50; width: 12px; height: 12px;"
+            style="position: absolute; [[_computeRightLeft(rightLeftPanel)]]  bottom: 0px; top: 0px; z-index: 24; width: 32px; height: 50vh; background: green;"
           >
-    </paper-icon-button>
+    </paper-material>
 	</div>
 		
 		
@@ -88,7 +85,7 @@
 	<script>
 		'use strict';
 		(function() {
-			class fcResizablePanel {
+			class fcResizablePanelSafety {
 				 get behaviors() { 
 				 	return [
 				 	Polymer.IronResizableBehavior,
@@ -96,7 +93,7 @@
 				 }
     			 beforeRegister() {
 
-    				this.is = 'fc-resizable-panel';
+    				this.is = 'fc-resizable-panel-safety';
 					this.properties = {
 						spanData: {
 							type: Object,
@@ -105,7 +102,7 @@
 						currentBackground:{
 							type: String, 
 							value: function(){
-								return '#aedefe';
+								return 'goldenrod';
 							},
 							notify: true
 						},
@@ -183,6 +180,35 @@
 			           
 					}
 				}
+				resetHeight(e){
+					var self=this;
+					self.draggable=true;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            self._x = e.detail.x;
+			            self._y = e.detail.y;
+			            console.log('START');
+			            console.log(e);
+			            break;
+			          case 'track':
+			            self._ddx = e.detail.ddx; //last event x change
+			            self._ddy = e.detail.ddy; //last event y change
+			            self._dx = e.detail.dx; //from start x change 
+			            self._dy = e.detail.dy; // from start y change
+			            
+			            break;
+			          case 'end':
+			            console.log("ENDING", e.detail.x, e.detail.y, self.currentWidth, e.detail.dx, e.detail.dy);
+			            self.currentHeight = parseInt(self.currentHeight) + e.detail.dy;
+			            self.draggable=false;
+			            self.notifyResize();
+			           
+			            break;
+			           
+					}
+				}
 				_computeWidth(currentWidth){
 					return `width:${currentWidth}px;`;
 				}
@@ -197,7 +223,7 @@
 				}
 					
 			}
-			Polymer(fcResizablePanel);
+			Polymer(fcResizablePanelSafety);
 		})();
 	</script>
 </dom-module>

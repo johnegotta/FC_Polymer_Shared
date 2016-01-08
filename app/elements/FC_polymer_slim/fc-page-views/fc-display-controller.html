@@ -85,21 +85,33 @@
                   
 				</div>
 		
-		<fc-splitter-jc id="swapSplitter" orientation="[[_computeOrientation(swap, orientation)]]">
+	<fc-splitter-jc id="swapSplitter" orientation="[[_computeOrientation(swap, orientation)]]">
 			<content id="leftContent" class="layout vertical flex main-content left super-content" select=".left .super-content">
 			</content>
 
 			
-			<content id="rightContent" class="layout vertical flex main-content right super-content" select="right">
+			<content id="rightContent" class="layout vertical flex main-content right super-content" select=".right">
 			</content>
 		</fc-splitter-jc>
+<!-- <fc-splitter-four>
+					
+						<div style="height: 1400px; width: 600px; background: red;" class="area1"></div>
+				
+		
+						<div  class="area2" style="height: 1400px; width: 800px; background: blue;" ></div>
 
+						<div class="area3" style="height: 1400px; width: 600px; background: green;" ></div>
+
+				
+						<div  class="area4" style="height: 1400px; width: 900px; background: yellow;" ></div>
+					
+			</fc-splitter-four> -->
 
 
 </fc-resizing-drag-panel>
 </template>
 <script>
-Polymer({
+FcDisplayController = Polymer({
 	is:'fc-display-controller',
 	behaviors: [Polymer.IronResizableBehavior],
 	listeners: {'iron-resize':'setUp',				
@@ -133,7 +145,6 @@ Polymer({
 	   
 	},
 
-
 	ready: function(){
 		this.setUp();
 		
@@ -143,7 +154,7 @@ Polymer({
 	{
 		this.screenTrueHeight =  (window.innerHeight-240);
 		var distributed = this.getContentChildren('#rightContent');
-        console.log(distributed.length, this.screenTrueHeight, `here are my content elements`);
+        //console.log(distributed.length, this.screenTrueHeight, `here are my content elements`);
         
 
 		
@@ -163,7 +174,7 @@ Polymer({
 
 	
 	iconButtonTap: function(e){
-		console.log(e);
+		//console.log(e);
 				  var button = e.target;
 				  while (!button.hasAttribute('data-icon') && button!==document.body) {
 				    button = button.parentElement;
@@ -171,6 +182,11 @@ Polymer({
 				  if (!button.hasAttribute('data-icon')) {
 				    return;
 				  }
+
+				  var alreadyPressed = this.querySelector('.icon-button-pressed');
+				  if(alreadyPressed){alreadyPressed.classList.remove('icon-button-pressed')};
+				  button.classList.add('icon-button-pressed');
+
 				  var orientation = button.getAttribute('data-icon');
 				  orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
 				  	this.async(function() {
@@ -220,7 +236,7 @@ Polymer({
 		this.async(function() {
       		this.$.swapSplitter.attached();
       		}, 300);
-		console.log(swap, swap, swap, swap);
+		//console.log(swap, swap, swap, swap);
 		return swap;
 	}
 

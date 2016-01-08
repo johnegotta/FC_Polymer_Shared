@@ -1,4 +1,4 @@
-<dom-module id="fc-central-display">
+<dom-module id="fc-center-display">
 	<template>
 	<style> 
 	:host{	
@@ -29,29 +29,53 @@
 			font-weight: 700;
 
 		}
-		.quadrantTwo{
-			position: absolute; top:0px; right: 0px; height: 32px; background:red; width: 48%;  height: 48%; cursor: move;
+		.quadrant.one{
+			position: absolute; top:0px; right: 0px; height: 48%; width: 48%;/* For Safari 3.1 to 6.0 */
+    		transition: width 5s height 3s;}
+    	
+		.quadrant.two{
+			position: absolute; left: 0px; top: 0px; height: 48%; width: 48%;
+			-webkit-transition: width 5s height 3s; /* For Safari 3.1 to 6.0 */
+    		transition: width 5s height 3s;}
+    	
+		.quadrant.three{
+			position: absolute; left: 0px; bottom: 0px; /*height: 48%; width: 48%*/;
+		 	-webkit-transition: width 5s height 3s;}
+		
+		.quadrant.four{
+			position: absolute; right: 0px; bottom: 0px; /*height: 48%; width: 48%;*/}
+		
 
-		},
-		.quadrantOne{
+		/*.quadrant.one  {height: 98%; width: 25%; position: absolute; right: 0px;top: 0px;}
+		.quadrant.two {width: 74%; height:71%;}
+		.quadrant.four {display: none;}
+		.quadrant.three {width:73%; height: 25%;} ;*/
+   
 
+div:hover {
+    width: 300px;
+}
 
-		},
+		/*/*.threePanel.one{height: 98%; width: 25%; position: absolute; right: 0px;top: 0px;}/*listright*/
+		/*.threePanel.two{width: 74%; height:71%;}
+		.threePanel.three{width: 74%; height: 27%;}
+		.threePanel.four{display: none;}*/
 	</style>
-<paper-material style="background: blue; border: 7px ridge gold;" class$="{{_computeClassOne}}" on-track="resetHeight">
-	</paper-material>
+	<fc-display-panel right-drawer height-resizer style="background: blue;" quadrant="1" class="quadrant one flex">
+	</fc-display-panel>
 	
+<!-- {{_computeClassOne(timer)}}[[_computeClassTwo(timer)]] // -->
 
-
-	<paper-material style="position: absolute; left: 0px; top: 0px; right: 47%; height: 48%; width: 48%; background: blue; cursor: move;" class="flex layout horizontal wrap" on-track="resetWidth">
+	<fc-display-panel height-resizer left-drawer style="border-bottom:: 3px solid magenta; border-right:3px solid magenta; " quadrant="2"  class="quadrant two flex" >
 		
-	</paper-material>
-	<paper-material style="height: 47%; width: 48%; position: absolute; left: 0px; bottom: 0px; height: 50%; width: 100%; background: green; cursor: move;" on-track="resetWidth">
-		
-	</paper-material>
+	</fc-display-panel>
 
-	<paper-material style=" height: 98%; width: 25%; border: 4px ridge silverl; position: absolute; right; 0px;">
-	</paper-material>
+	<fc-display-panel class="quadrant three" height-resizer left-drawer quadrant="3" style="border-top: 3px solid green; border-right: 3x solid green;">
+		
+	</fc-display-panel>
+
+	<fc-display-panel quadrant="4" right-drawer height-resizer class="quadrant four" style="border-top: 3px ridge gold; border-left: 3px solid gold;">
+	</fc-display-panel>
 	
 		
 		
@@ -99,7 +123,7 @@
 	<script>
 		'use strict';
 		(function() {
-			class fcCentralDisplay {
+			class fcCenterDisplay {
 				 get behaviors() { 
 				 	return [
 				 	Polymer.IronResizableBehavior,
@@ -107,7 +131,7 @@
 				 }
     			 beforeRegister() {
 
-    				this.is = 'fc-central-display';
+    				this.is = 'fc-center-display';
 					this.properties = {
 						spanData: {
 							type: Object,
@@ -204,8 +228,8 @@
 					console.log(ht + 'this is the window height');
 					var wt = window.screen.width;
 					console.log(wt + 'this is the window Width');
-					var rect = this.getBoundingClientRectangle();
-					console.log(rect + 'this is the rectangle'); 
+					var rect = this.getBoundingClientRect();
+					
 				}
 
 				openDialog(){
@@ -225,18 +249,18 @@
 			          case 'track':
 			            self.currentWidth = self.currentWidth> 18? parseInt(self.currentWidth) + e.detail.ddx: self.currentWidth=23;
 			            var returnWidth = self.currentWidth;
-			            self.root.style.width = returnWidth.toString()+'px';
+			            self.style.width = returnWidth.toString()+'px';
 			            break;
 			          case 'end':
 			            var returnWidth = self.currentWidth;
-			            self.root.style.width = returnWidth.toString()+'px';
+			            self.style.width = returnWidth.toString()+'px';
 			            self.notifyResize();
 			            break;
 			           
 					}
 				}
 
-				_resizeHeight(e){
+				resetHeight(e){
 					var self=this;
 					e.preventDefault();
 					
@@ -245,7 +269,7 @@
 			            break;
 			          case 'track':
 			            self.currentHeight = parseInt(self.currentHeight) + e.detail.ddy;
-			            self.root.style.height= self.currentHeight;
+			            self.style.height= self.currentHeight;
 			            break;
 			          case 'end':
 			            self.draggable=false;
@@ -257,6 +281,7 @@
 				
 				_computedHostBackground(currentBackground, initialBackground){
 					let bg = this.currentBackground !==this.initialBackground? this.currentBackground: this.initialBackground; 
+					console.log(Polymer.dom(this).getComputedStyles());
 					return bg;
 				}
 				_computedHostHeight(currentHeigh, initialHeight){
@@ -298,7 +323,7 @@
 
 
 			}
-			Polymer(fcCentralDisplay);
+			Polymer(fcCenterDisplay);
 		})();
 	</script>
 </dom-module>

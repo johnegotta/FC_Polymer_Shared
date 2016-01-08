@@ -26,7 +26,8 @@
 	
 
 	</style>
-		<paper-header-panel class="vertical layout fullbleed flex stretch" style="overflow-x: hidden;" mode="seamed">
+	<fc-data-element id="marvin" hidden></fc-data-element>
+		<paper-header-panel class="vertical layout fullbleed flex stretch" style="overflow-x: hidden;" mode="waterfall-tall">
 	
 		<div class="paper-header" style="width: 100%;font-size: 14px; color: #006; margin: auto; background: blue;">
 			<paper-icon-button icon="arrow-back" style="position: absolute; right: 10px; top: 10px; z-index: 4; border-radius: 200px; opacity: 1; background: red;" on-tap="_onCloseMe">
@@ -39,26 +40,28 @@
         						on-button-click="_onButtonClick" 
         						data-transition="default">
         					</fc-main-drawer-page>
-        					
-        					<fc-animated-drawer-page on-close-me="_onCloseMe" data-transition="firePadPrime" id="firePadId">
-        							<div class="head">tabs here</div>
-        						    <fc-reading-firepad class="main fit">
-        							</fc-reading-firepad>
-					
-	        					</fc-animated-drawer-page>
-
-        					<fc-animated-drawer-page on-close-me="_onCloseMe" data-transition="dragAdmin" id='firePadId'>
-        						<div class="head">HEY 2</div>
-        						<fc-dialog class="main"></fc-dialog>
-        					</fc-animated-drawer-page>
-
-        					<fc-animated-drawer-page on-close-me="_onCloseMe" data-transition="starRated" id='firePadId'>
-        						<div class="head">HEY 2</div>
-        						<fc-dialog class="main"></fc-dialog>
-        					</fc-animated-drawer-page>
-					 </neon-animated-pages>		
-			 	</div>
-							
+        		<template is="dom-repeat" items="{{dataSourceFive}}">
+        			<fc-animated-drawer-page class="vertical layout flex" data-transition$="{{item.dDialogTwo}}" id$="{{item.contentAreaIdType}}">
+        					<div class="head horizontal layout flex">
+        						
+        							<fc-inputs-repeater data-source="{{dataSourceTwo}}">
+	        						</fc-inputs-repeater>
+	        							<fc-inputs-repeater data-source="{{dataSourceOne}}">
+	        							</fc-inputs-repeater>
+	        			
+	        				</div>
+	        			<!--MAIN CONTENT-->	
+        				
+ 						<!-- <fc-display-panel 
+ 							data-source-three={{items}}
+ 							style="border-bottom: 3px ridge blue; border-left: 3px ridge blue;" quadrant="1" class="threePanel one flex">
+						</fc-display-panel> -->
+						
+	        		</fc-animated-drawer-page>	
+			 	</template>
+			 </neon-animated-pages>		
+		</div>
+		<fc-data-element id="marvin"></fc-data-element>	
 	</paper-header-panel>							
 	</template>
 	<script>
@@ -110,27 +113,19 @@
 					},
 					notify: true
 				},
+				invisible: {
+					type: Boolean,
+					value: function(){
+						return false;
+					}
+				},
 				selectedTab:{
-	                  type: String,
+	                  type: Number,
 	                  value: "0",
 	                  notify: true,
 	                  reflectToAttribute: true
 	             },
-	             Tab_Group_Id:{ 
-	                  type: String, 
-	                  value: `Tab_Group_Number + Tab_Group_Name`,
-	                  notify: true
-	               },                
-	             Tab_Group_Name: { 
-	                  type: String, 
-	                  value: "MyNewTabGroup",
-	                  notify: true
-	             },
-	             Tab_Group_Number:{
-	                  type: String,
-	                  value:'000001',//increasing [five lead zeroes for mistakes]
-	                  notify: true
-	             },
+	            
 	             Number_Of_Tabs: {
 	                  type: Number, 
 	                  value: function(){return 8;}, //1-10 plus the 0 meta tab usually lead tab(tab[0] will carry metadata
@@ -143,10 +138,14 @@
 	                       return [
 	                       		'Save',  
 	                            'Review',
-	                            'DBSv',
-	                            'Review',
+	                            'DATA',
+	                            'Mapping',
 	                            'Preview', 
-	                            'Test',
+	                            'Order',
+	                            'Design',
+	                            'Unit Test',
+	                            'PreView Two',
+	                            'Launch'
 	                            ];
 	                 },
 	                  notify: true
@@ -247,9 +246,14 @@
 	                  type: String, 
 	                  value: "admin",
 	                  notify: true
-	             }
-			},
+	             },
 
+			},
+			ready: function(){
+				this.set('dataSourceOne', this.$.marvin.dataSourceOne);
+    			this.set('dataSourceTwo', this.$.marvin.dataSourceTwo);
+    			this.set('dataSourceFive', this.$.marvin.dataSourceFive);
+			},
 				computedStyle: function(determine){
 						return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  "
 

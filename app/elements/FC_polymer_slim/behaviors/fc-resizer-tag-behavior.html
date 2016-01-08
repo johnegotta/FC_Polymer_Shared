@@ -31,11 +31,21 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                   type: Boolean,
                   value: true, 
                   notify: true
-              }
+              },
+            screenWidth: {
+              type: Number,
+              notify: true,
+              reflectToAttribute: true
+            }
           },
      
 	listeners:{
-		track: '_focusedRootResize'},         
+		track: '_focusedRootResize'}, 
+
+  ready: function(){
+    console.log(window.screen.width);
+    this.set('screenWidth', window.screen.width);
+  },       
 
  _focusedRootResize: function(e){
       var self = this;
@@ -46,13 +56,15 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                 case 'start':
                   self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
                   self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+                  console.log(self.parentNode.currentHeight, self.parentNode.currentWidth, 'pay attention to this one');
                  break;
                 case 'track':
                   var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
                   var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
                   var trueWidth = nwidth.toString()+'px';
                   var trueHeight = newheight.toString()+'px';
-             
+                  
+           
                   self.parentNode.currentWidth=trueWidth;
                   self.parentNode.currentHeight=trueHeight;
                   self.parentNode.style.width= trueWidth;
@@ -73,6 +85,7 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                   break;
                 case 'track':
                   var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  nwidth=(nwidth>self.screenWidth)? self.screenWidth: nwidth;
                   var trueWidth = nwidth.toString()+'px';
                   self.parentNode.currentWidth=trueWidth;
                   self.parentNode.style.width= trueWidth;
