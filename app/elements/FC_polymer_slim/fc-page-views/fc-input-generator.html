@@ -5,6 +5,7 @@
   width: 320px;
   background: gold;
   border: 4px sold silver;
+  box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
 } 
   .icon-button{
      display: inline-block;
@@ -38,27 +39,36 @@
  background-color: #5DD7FC;
 } 
 
-  .tab-buttons{
- display: inline-block;
- border: none;
- color: #FFF;
- border-radius: 4px;
- -webkit-border-radius: 4px;
- -moz-border-radius: 4px;
- font-family: Times New Roman;
- width: auto;
- height: auto;
- font-size: 20px;
- margin: 12px;
- padding: 6px 16px;
- box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
- -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
- -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
- text-shadow: 0 1px 0 #48576D;
- background-image: linear-gradient(to top, #4771FC, #79FCF8);
- background-color: #3F45FC;
-}
-  .tab-buttons:hover, .tab-buttons:active{
+.tab-buttons{
+     display: inline-block;
+     border: none;
+     color: #FFF;
+     border-radius: 4px;
+     -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+     font-family: Times New Roman;
+     width: 120px;
+     height: 32px;
+     font-size:14px;
+     margin: 12px;
+     padding: 40px 20px 0px 20px;
+     box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     text-shadow: 0 1px 0 #48576D;
+     background-image: linear-gradient(to top, #4771FC, #79FCF8);
+     background-color: #3F45FC;
+    --paper-input-container:{font-family: Merriweather; font-size: 64px; padding: 0px 25px 3px 25px; width: 120px; margin-top: -21px;};
+    --paper-input-container-label:{font-family: merriweather; font-size: 28px; color: white; font-weight: 700;};
+    @apply(--paper-input-container);
+      
+      @apply(--paper-input-container);
+    }
+    Use @apply to apply a mixin:
+
+    @apply(--mixin-name);
+    }
+  .tab-buttons-pressed, .tab-buttons:hover, .tab-buttons:active{
  border: none;
  color: #FFF;
  box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
@@ -89,29 +99,32 @@
       </section>
   </template>
 
-  
-
+  <!-- 
+    on-tap="onTabTap()" -->
             
       <section
-            id="{{buttonTabContextId}}" 
-      
+            id="{{tabButtonsContextId}}" 
             scrollable="true" 
             class="head flex nowrap horizontal layout left-justified tab-class"
             style="float: left; margin-left: 24px; overflow-x: scroll;"
             >   
             <template 
-            is="dom-repeat" 
-           class="horizontal layout flex nowrap" items="{{dataSourceButtonTabs}}">   
-            <button
-               
-                data-inputname$="{{item.tabName}}"
-                id$='[[item.pageLinkId]_buttonTab'
-                meta="[[item.meta]]"
-                class$="[[item.buttonTabClass]] tab-buttons"
-                on-tap="onTabClick"
-                >
-                  [[item.tabName]]
-            </button> 
+              is="dom-repeat" 
+              class="horizontal layout flex nowrap" items="{{dataSourceButtonTabs}}">   
+              <paper-input
+                  type="button"
+
+                  place-holder="{{item.tabName}}"
+                  data-inputname$="{{item.tabName}}"
+                  id$='[[item.pageLinkId]_buttonTab'
+                  always-float-label="false"
+                  meta="[[item.meta]]"
+                  class$="[[item.tabButtonClass]] tab-buttons"
+              
+                  label="{{item.tabName}}"
+                  scrollable=="{{tab.Scroll}}"
+                  >             
+            </paper-input> 
   </template>
 </section>
 <paper-material
@@ -134,7 +147,7 @@
             id$='[[item.contextLinkId]_paperInput'
             meta="[[item.otherInfo]]"
             class$="[[item.inputClass]] paperInput"
-            on-tap="">
+           > <!-- on-tap="onTabTap()" -->
         </paper-input> 
 </template>
 </paper-material>
@@ -187,12 +200,48 @@
               type: Number,
               notify: true
 
+            }, 
+
+            tabGroupIndex: {
+              type: Number,
+              notify: true,
+              computed: 'computeTabGroupIndex(tabGroup)'
+
+
 
             }
 
           };
           //end properties
-        }//end before register
+        }
+    //     onTabTap(e){
+    // //console.log(e);
+    //       var button = e.target;
+    //       while (!button.hasAttribute('data-tabPage') && button!==document.body) {
+    //         button = button.parentElement;
+    //       }
+    //       if (!button.hasAttribute('data-tabPage')) {
+    //         return;
+    //       }
+
+    //       var alreadyPressed = this.querySelector('.tab-buttons-pressed');
+    //       if(alreadyPressed){alreadyPressed.classList.remove('tab-buttons-pressed')};
+    //       button.classList.add('tab-buttons-pressed');
+
+    //       var orientation = button.getAttribute('data-icon');
+    //       orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
+    //         this.async(function() {
+    //           this.$.swapSplitter.attached();
+    //               }, 300);;
+    //          Polymer.dom.flush();
+    //       this.set('orientation',orientation); 
+    //        this.set('swap',orientation);
+            
+    //       }
+
+
+
+        //end before register
         //note: should have observers in before register?
         //note: no commas in functions
         //note no word function in functions??

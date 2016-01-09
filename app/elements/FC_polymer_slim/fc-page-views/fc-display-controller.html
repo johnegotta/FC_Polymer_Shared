@@ -20,7 +20,8 @@
  width: auto;
  height: auto;
  max-width: 64px;
- max-height: 64px;
+ max-height: 65px;
+ overflow-y: hidden;
  margin: 8px;
  font-size: 11px;
  padding: 7px 8px;
@@ -171,7 +172,30 @@ FcDisplayController = Polymer({
 
 	},
 	
+	tabButtonTap: function(e){
+		//console.log(e);
+				  var button = e.target;
+				  while (!button.hasAttribute('data-icon') && button!==document.body) {
+				    button = button.parentElement;
+				  }
+				  if (!button.hasAttribute('data-icon')) {
+				    return;
+				  }
 
+				  var alreadyPressed = this.querySelector('.icon-button-pressed');
+				  if(alreadyPressed){alreadyPressed.classList.remove('icon-button-pressed')};
+				  button.classList.add('icon-button-pressed');
+
+				  var orientation = button.getAttribute('data-icon');
+				  orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
+				  	this.async(function() {
+       				this.$.swapSplitter.attached();
+       						}, 300);;
+		         Polymer.dom.flush();
+				  this.set('orientation',orientation); 
+				   this.set('swap',orientation);
+				 		
+				  },
 	
 	iconButtonTap: function(e){
 		//console.log(e);
