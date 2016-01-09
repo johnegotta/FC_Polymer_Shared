@@ -1,3 +1,5 @@
+
+
 <dom-module id="fc-right-tabbed-drawer">
 <template>
 	<style>
@@ -26,66 +28,72 @@
 	
 
 	</style>
-	<fc-data-element id="marvin" hidden></fc-data-element>
-	<paper-header-panel 
-		class="vertical layout fullbleed flex stretch" 
-		style="overflow-x: hidden;" 
-		mode="waterfall-tall">
-		<div 
-			class="paper-header" 
-			style="width: 100%;font-size: 14px; color: #006; margin: auto;">
-			<paper-icon-button 
-				icon="arrow-back" 
-				style="position: absolute; right: 10px; top: 10px; z-index: 4; border-radius: 200px; opacity: 1; background: red;" 
-				on-tap="_onCloseMe">
+		<paper-header-panel class="vertical layout fullbleed flex stretch" style="overflow-x: hidden;" mode="seamed">
+	
+		<div class="paper-header" style="width: 100%;font-size: 14px; color: #006; margin: auto; background: blue;">
+			<paper-icon-button icon="arrow-back" style="position: absolute; right: 10px; top: 10px; z-index: 4; border-radius: 200px; opacity: 1; background: red;" on-tap="_onCloseMe">
 			</paper-icon-button>
 		</div>
 				 <!--HEADER AREA ENDS-->					
-		<div 
-			id="myNext" 
-			class="content vertical layout">
-		<neon-animated-pages
-		 	id="myNext2"class="flex gradBackground" attr-for-selected='data-transition' selected="[[mySelected]]">
-			<fc-main-drawer-page  style="padding-top: 150px;"
-					on-button-click="_onButtonClick"
-					data-transition="default">
-					
-					<template 
-						is='dom-repeat' 
-						class="horizontal layout flex wrap center center-justified" 
-						items="{{iconArray}}">
-						<section 
-							style$="[[computedStyle(determine)]]" 
-							data-transition$="[[item.dDialogTwo]]">
-							<iron-icon 
-								id$="[[item.dDialogTwo]]"
-				        		icon$="[[item.iconUsed]]"  
-				        		class$="[[item.sectionClass]] [[item.splitterClass]]"
-				        		data-transition$="[[item.dDialogTwo]]"
-				      			>
-							</iron-icon>
-						</section>
-					</template>
-				</fc-main-drawer-page>
-			<template is="dom-repeat" items={{iconArray}}>
-        					<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]"> 
-        					<fc-value-holder div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>
-        						<div class="head">
-									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails]]">
-									</fc-input-generator>
-        						</div>
-								<div class="main">
-									
-										<fc-input-generator data-source-paper-inputs="{{item.titlingInputs}}">
-										</fc-input-generator>
-								 
-									
-									
+				<div id="myNext" class="content vertical layout">
+					<neon-animated-pages id="myNext2"class="flex gradBackground" attr-for-selected='data-transition' selected="[[mySelected]]">
+        					<fc-main-drawer-page  style="padding-top: 150px;"
+        						on-button-click="_onButtonClick" 
+        						data-transition="default">
+
+        						<template is='dom-repeat' class="horizontal layout flex wrap center center-justified" items="{{iconArray}}">
+									<section style="$[[computedStyle(determine)]]" data-transition$="[[item.dDialogTwo]]">
+										<iron-icon 
+											id$="[[item.dDialogTwo]]"
+							        		icon$="[[item.iconUsed]]"  
+							        		class$="[[item.sectionClass]]"
+							        		data-transition$="[[item.dDialogTwo]]"
+							      			>
+										</iron-icon>
+									</section>
+								</template>
+        					</fc-main-drawer-page>
+        					<template is="dom-repeat" items={{iconArray}}>
+        					<fc-animated-drawer-page fire-pad-element="true" data-transition$="[[item.dDialogTwo]]"> 
+        							<div class="head">
+        								<section style="$[[computedStyle(determine)]]">
+									<iron-icon 
+											
+							        		icon$="[[item.iconUsed]]"  
+							        		class$="[[item.sectionClass]] left"
+							        		
+							      			>
+										</iron-icon>
+									</section>
+
+
+
+
+
+        							</div>
+									<div class="main" fire-pad-element="{{item.isFirepad}}">
+										<div class="main right" id$="{{item.idF}}">
+									</div>
+								<section class="main left" style="$[[computedStyle(determine)]]">
+									<iron-icon 
+											
+							        		icon$="[[item.iconUsed]]"  
+							        		class$="[[item.sectionClass]] main"	
+							      			>
+										</iron-icon>
+									</section>
 								</div>
-									</fc-splitter-jc>
-	        					
+	        					</fc-animated-drawer-page>
 	        				</template>
-        					
+        					<!-- <fc-animated-drawer-page on-close-me="_onCloseMe" data-transition="dragAdmin" id='firePadId'>
+        						<div class="head">HEY 2</div>
+        						<fc-dialog class="main"></fc-dialog>
+        					</fc-animated-drawer-page>
+
+        					<fc-animated-drawer-page on-close-me="_onCloseMe" data-transition="starRated" id='firePadId'>
+        						<div class="head">HEY 2</div>
+        						<fc-dialog class="main"></fc-dialog> -->
+        				<!-- 	</fc-animated-drawer-page> -->
 					 </neon-animated-pages>		
 			 	</div>
 							
@@ -94,9 +102,7 @@
 	<script>
 		FcRightTabbedDrawer=Polymer({
 		  is:"fc-right-tabbed-drawer",
-			behaviors: [FCBehaviors.ResizableRootBehavior,
-						 FCBehaviors.FCFirepadBehavior
-						],			
+			behaviors: [FCBehaviors.ResizableRootBehavior],			
 			properties: {
 				mySelected: {
 					type: String,
@@ -169,22 +175,21 @@
 	                  reflectToAttribute: true,
 	                  notify: true
 	             },
-	            Tab_Names: {
+	             Tab_Names: {
 	                  type: Array, //array of all the junk in a tabGroup
 	                  value: function(){  
 	                       return [
-	                       		'Titling',
-	                       		'Content',
-	                       		'Preview',
-	                       		'Data',
-	                       		'Revision',
-	                       		'Fullpage',
-	                       		'Publish'
+	                       		'Save',  
+	                            'Review',
+	                            'DBSv',
+	                            'Review',
+	                            'Preview', 
+	                            'Test',
 	                            ];
 	                 },
 	                  notify: true
 	             },
-	            styleObject: {
+	             styleObject: {
 	                  type: Object,
 	                  value: function(){
 	                       var styleObject = {
@@ -281,7 +286,7 @@
 	                  value: "admin",
 	                  notify: true
 	             },
-	        iconArray:{
+	             iconArray:{
 				type: Array,
 				value: function(){
 					return [
@@ -294,100 +299,8 @@
  							"dialogClass":"dialogClass",
  							"indexNum": "005",
  							"isFirepad": true,
- 							"divId":'firepad', 
- 							"tabDetails": [
-								            { "tabName": "Titling",
-											  "pageLinkId": "contentSavingPage",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area1",
-											},
-											{ "tabName": "Content",
-											  "pageLinkId": "firePadPrime",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area2"
-											},
-											{ "tabName": "Preview",
-											  "pageLinkId": "passagePreview",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area3"
-											  },
-											{ "tabName": "Data",
-											  "pageLinkId": "dataMapper",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area4"
-											},
-											 {"tabName": "Revision",
-											  "pageLinkId": "dataSaver",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  //"pageClass": "area4"
-											},
-											{"tabName": "Publish",
-											  "pageLinkId": "dataSaver",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick"
-											},
-
-			                            ],
-	                        "tabDataRef": "firePadPrime",
-	                        "secondaryControls": true,
-	                        "titlingInputs": [
-								            { "tabName": "Titling",
-											  "pageLinkId": "contentSavingPage",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area1",
-											},
-											{ "tabName": "Content",
-											  "pageLinkId": "firePadPrime",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area2"
-											},
-											{ "tabName": "Preview",
-											  "pageLinkId": "passagePreview",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area3"
-											  },
-											{ "tabName": "Data",
-											  "pageLinkId": "dataMapper",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area4"
-											},
-											 {"tabName": "Revision",
-											  "pageLinkId": "dataSaver",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  //"pageClass": "area4"
-											},
-											{"tabName": "Publish",
-											  "pageLinkId": "dataSaver",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick"
-											}
-
-			                            ]
-			                        },
-
- 					
+ 							"idF":"firepad"
+ 						},
  						{
 							"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "loginMenu",
@@ -397,7 +310,7 @@
  							"dialogClass":"dialogClass",
  							"indexNum": "000",
  							"isFirepad": false,
- 							"divId":""
+ 							"idF":"sfirepad"
  						},
  						{
 							"sectionClass": " normal buttons blue-btn-class",
@@ -407,8 +320,7 @@
  							"dDialogTwo": "dragAdmin",
  							"dialogClass":"dialogClass",
  							"indexNum": "001",
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						},
  						
  						{	"sectionClass": " normal buttons blue-btn-class",
@@ -418,8 +330,7 @@
  							"dDialogTwo": "toDoList",
  							"dialogClass":"dialogClass",
  							"indexNum": "002",
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "completedTasks",
@@ -428,8 +339,7 @@
  							"dDialogTwo": "completedTasks",
  							"dialogClass":"dialogClass",
  							"indexNum": "003",
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "clockTimer",
@@ -437,9 +347,7 @@
  							"iconClass": "menuItems-dark", 
  							"dDialogTwo": "clockTimer",
  							"dialogClass":"dialogClass",
- 							"indexNum": "004",
- 							"isFirepad": false,
- 							"divId":''
+ 							"indexNum": "004"
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "firePadPrime",
@@ -448,8 +356,7 @@
  							"dDialogTwo": "firePadPrime",
  							"dialogClass":"dialogClass",
  							"indexNum": "005",
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "geoCalculator",
@@ -457,9 +364,7 @@
  							"iconClass": "menuItems-dark", 
  							"dDialogTwo": "geoCalculator",
  							"dialogClass":"dialogClass",
- 							"indexNum" : "006",
- 							"isFirepad": false,
- 							"divId":''
+ 							"indexNum" : "006" 
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "calendar",
@@ -468,8 +373,7 @@
  							"dDialogTwo": "calendar",
  							"dialogClass":"dialogClass",
  							"indexNum" : "007",
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false 
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "readView",
@@ -478,8 +382,7 @@
  							"dDialogTwo": "readView",
  							"dialogClass":"dialogClass",
  							'indexNum': '008',
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "howWeDoin",
@@ -488,8 +391,7 @@
  							"dDialogTwo": "howWeDoin",
  							"dialogClass":"dialogClass",
  							'indexNum': '009',
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false 
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "whatToSee",
@@ -498,8 +400,7 @@
  							"dDialogTwo": "whatToSee",
  							"dialogClass":"dialogClass",
  							'indexNum': '010',
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false 
  						},
  						{	"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "starRated",
@@ -508,31 +409,12 @@
  							"dDialogTwo": "starRated",
  							"dialogClass":"dialogClass",
  							"indexNum": '010',
- 							"isFirepad": false,
- 							"divId":''
+ 							"isFirepad": false
  						}
 				];
 			},
 			notify: true
-			},
-			  	firepad: {
-			type:Object,
-			value:{},
-			notify: true,	
-		},
-		firepadRef: {
-			type:Object,
-			value:{},
-			notify: true,
-			reflectToAttributes: true	
-		}, 
-		codeMirror: {
-			type: Object,
-			value: {},
-			notify: true
-		}, 
-		
-
+			}
 			},
 
 				computedStyle: function(determine){
@@ -550,11 +432,53 @@ _onButtonClick: function(e) {
 _onCloseMe: function(e) {
 				console.log("ON CLOSE ME", e.detail);
 				this.set('mySelected', 'default');
-			},
-ready: function(){
-	// (this.firepadElement)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue in drawer', this.firepadElement);
-	},
-});
+			}
+	});
 
 	</script>
 </dom-module>
+<!-- style="margin: auto; background: #066666; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);" 
+								on-tap="clickHandler"
+								tab stuff-->
+
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FCFirePadBehavior = {
+
+    properties: {
+    	firepad: {
+			type:Object,
+			value:{},
+			notify: true,	
+		},
+		firepadRef: {
+			type:Object,
+			value:{},
+			notify: true,
+			reflectToAttributes: true	
+		}, 
+		codeMirror: {
+			type: Object,
+			value: {},
+			notify: true
+		}, 
+		firePadElement:{
+			type: Boolean,
+			value: false,
+			relfectToAttribute: true,
+			notify: true
+		}
+    },
+
+ready: function(){ 
+	(this.firePadElement)?this.loadFirePad():console.log('I checked if the firePadElementWereTrue');
+},
+loadFirepad: function(){
+		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
+		this.passage_width = 400;
+	}
+};
+</script>

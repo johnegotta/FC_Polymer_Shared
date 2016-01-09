@@ -12,7 +12,7 @@
       border: 1px solid black;
       font-size: 1.0em;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 700;
       font-color: #000066;
       bg: magenta;
     }
@@ -35,6 +35,23 @@
       max-width: 700px;
       margin: 0 auto;
     }
+
+      #firepad{
+      border: 8px ridge silver; 
+      overflow: auto; 
+      resize: both;  
+      height: 55vh; 
+      width: 520px; 
+      margin: 12px;
+    }
+    #firepadControls{
+      z-index: 3; 
+      max-width: 580px; 
+      margin: 6px 6px;
+
+          @apply(--layout-horizontal center nowrap);
+    }
+
     h1 {
       font-size: 48px;
     }
@@ -45,32 +62,38 @@
     }
 
   </style>
-
   <template>
     <paper-header-panel mode="seamed" class="flex">
       <div id="headerPanel" class="paper-header horizontal layout">
-    
+         <content id="valueHolder" select="fc-value-holder">
+      </content>
             
         <content select=".head">
 
         </content>
         </div>
       <div class="container" style="background:white;">
-        
-            <content class="content main-content" select=".main">
+        <fc-splitter-jc orientation="horizontal">
+            <content id="contentMain" left class="left content main-content" select=".main">
 
 
 
             </content>
-            
-      </div>
+            <div id="firepad" class="right" hidden$="[[_computeFirepadHidden(isFirepad)]]">
+            </div>
+        </div>
     </paper-header-panel>
 </template>
   <script>
    FcAnimatedDrawerPage=Polymer({
       is: 'fc-animated-drawer-page',
-      behaviors: [Polymer.NeonSharedElementAnimatableBehavior],
-      properties: {
+      behaviors: 
+      [
+        Polymer.NeonSharedElementAnimatableBehavior,
+        FCBehaviors.FCFirepadBehavior
+      ],
+      properties: 
+      {
         animationConfig: {
           value: function() {
             return {
@@ -99,12 +122,68 @@
               'hero': this.$.headerPanel
             }
           }
-        }
-      },
-      closeMe: function(e){
-        this.fire('close-me', e.target);
-      }
-    });
-  </script>
+        },
+        
+            firepad: {
+      type:Object,
+      value:{},
+      notify: true, 
+    },
+    firepadRef: {
+      type:Object,
+      value:{},
+      notify: true,
+      
+    }, 
+    codeMirror: {
+      type: Object,
+      value: {},
+      notify: true
+    }, 
+    divId: {
+      type: String,
+      notify: true,
+      reflectToAttribute: true
+    },
+    isFirepad:{
+      type: Boolean,
+      notify: true,
+      reflectToAttribute: true
+    }
 
+      },
+      
+      created: function()
+        { },
+
+      ready: function(){
+        
+          
+        },
+
+   
+      attached: function(){
+       var insertionPoint = Polymer.dom(this.root).querySelector('content');
+           var transferEl = Polymer.dom(insertionPoint).getDistributedNodes()[0].isFirepad;
+           (transferEl)?this.set("isFirepad",true): this.set('isFirepad',transferEl);  
+           console.log(this.isFirepad, transferEl);
+          this.async((this.isFirepad)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue om animated', this.isFirepad), 1040);
+
+
+        },
+
+        _computeFirepadHidden: function(isFirepad){
+          
+          console.log(this.divId);
+         var insertionPoint = Polymer.dom(this.root).querySelector('content');
+           var transferEl = Polymer.dom(insertionPoint).getDistributedNodes()[0].isFirepad;
+           console.log(transferEl, "this should be the real value");
+          return !this.isFirepad;
+
+        }
+
+
+     
+});
+</script>
 </dom-module>

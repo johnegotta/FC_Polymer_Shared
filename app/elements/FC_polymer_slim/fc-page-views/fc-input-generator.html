@@ -1,5 +1,11 @@
-<dom-module id="fc-inputs-repeater"> 
+<dom-module id="fc-input-generator"> 
 <style>
+:host{
+  height: 230px;
+  width: 320px;
+  background: gold;
+  border: 4px sold silver;
+} 
   .icon-button{
      display: inline-block;
      border:3px solid #2435C9;
@@ -83,29 +89,40 @@
       </section>
   </template>
 
-  <template 
-            is="dom-repeat" 
-            hidden="{{!dataSourceButtonTabs}}" class="horizontal layout flex nowrap" items="{{dataSourceButtonTabs}}">
+  
+
+            
       <section
             id="{{buttonTabContextId}}" 
-            hidden="{{!dataSourceButtonTabs}}" 
+      
             scrollable="true" 
             class="head flex nowrap horizontal layout left-justified tab-class"
-            style="float: right; margin-right: 48px; overflow-x: scroll;"
-            >     
+            style="float: left; margin-left: 24px; overflow-x: scroll;"
+            >   
+            <template 
+            is="dom-repeat" 
+           class="horizontal layout flex nowrap" items="{{dataSourceButtonTabs}}">   
             <button
-                hidden$="{{!item.hiddenButton}}"
-                data-inputname$="{{item.inputName}}"
-                id$='[[item.contextLinkId]_buttonTab'
+               
+                data-inputname$="{{item.tabName}}"
+                id$='[[item.pageLinkId]_buttonTab'
                 meta="[[item.meta]]"
                 class$="[[item.buttonTabClass]] tab-buttons"
                 on-tap="onTabClick"
                 >
                   [[item.tabName]]
             </button> 
-      </section>
   </template>
-
+</section>
+<paper-material
+            elevation="3"
+            id="{{paperInputsSection}}" 
+            scrollable="true"
+            draggable="true" 
+            class="main flex nowrap horizontal layout left-justified tab-class"
+            style="float: left; margin-left: 24px; overflow-x: scroll;"
+            >   
+          
  <template 
       is="dom-repeat" 
       hidden="{{!dataSourcePaperInputs}}" 
@@ -120,6 +137,7 @@
             on-tap="">
         </paper-input> 
 </template>
+</paper-material>
  <template is="dom-repeat" hidden="!{{dataSourceDropDownMenu}}" class="horizontal layout flex nowrap" items="{{dataSourceDropDownMenu}}">
   <fc-dropdown-menu
         hidden=$"{{!item.hiddenDropDownMenu}}"
@@ -132,17 +150,18 @@
         selected="{{selected}}">
   </fc-dropdown-menu> 
 </template>
+</template>
   <script>
     (function() {
           'use strict';
-      class FCInputsRepeater {
+      class FCInputGenerator {
         get behaviors() {
           return [Polymer.IronResizableBehavior
           //add databehavior?
           ];
         }
         beforeRegister() {
-          this.is ="fc-inputs-repeater";
+          this.is ="fc-input-generator";
           this.listeners = {};//not sure on semi-colon
           this.observeres={};
           this.properties = {
@@ -152,10 +171,25 @@
                 reflectToAttribute: true
             },
             dataSourceButtonTabs:{
-              value: Array,
+              type: Array,
               notify: true,
               reflectToAttribute: true
             },
+            tabGroupName:{
+              type: String,
+              notify: true
+            },
+            tabGroupType: {
+              type: String,
+              notify: true
+            },
+            tabGroupContext: {
+              type: Number,
+              notify: true
+
+
+            }
+
           };
           //end properties
         }//end before register
@@ -170,7 +204,7 @@
 
         }
       }//end of Class
-      Polymer(FCInputsRepeater);
+      Polymer(FCInputGenerator);
     })();
   </script>
 </dom-module>
