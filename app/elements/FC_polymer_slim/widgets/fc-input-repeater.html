@@ -9,6 +9,44 @@
 		z-index: 7;
 
 	}
+	.radio {
+	/*--paper-input-container-underline-focus:{
+		width: 0px; height: 0px; opacity: 0; display: none;
+	};*/
+	/*--paper-input-container-underline:{
+		width: 0px; height: 0px; opacity: 0; display: none;
+	};*/
+	--paper-input-container-label:{height: 0px; width: 0px; display: none; position: absolute; right: 0px;};
+	--paper-input-suffix:{font-weight: 700;};
+	--paper-input-container:{
+		min-width: 120px;
+		border: 2px solid gold;
+	
+		flex-wrap: nowrap;
+		
+		padding:6px 12px 2px 0px;
+		margin: 4px;
+		max-width: 310px;};
+	@apply(--paper-input-container-label):
+	@apply(--paper-input-container);
+	@apply(--paper-font-caption);
+
+	@apply(--horizontal-layout-nowrap);
+	};
+	.checkboxes{
+
+
+
+
+	}
+
+	
+
+
+
+
+
+	
 		.icon-button{
 		     display: inline-block;
 		     border:3px solid #2435C9;
@@ -32,6 +70,7 @@
 		     text-shadow: 0 1px 0 #FFFFFF;
 		     background-color: #5DD7FC;
 		    }
+	}
   .icon-button-pressed  {
 		 border:7px solid #2435C9;
 		 color: #FFD410;
@@ -87,33 +126,37 @@
 }
 
 
+
+
 	</style>
 <!--hidden$="{{item.!dataSourcePaperInputs}}" -->
 	<!-- hidden$="{{item.!dataSourcePaperInputs}}"  -->
 	<template>
 
-<div class="vertical flex layout wrap column" style="max-height: 92vh; max-width: 360px;">
+<paper-material elevation="4" class="vertical flex layout wrap column checkboxes" style="max-height: 92vh; min-height: 600px; max-width: 900px; min-width: 345px;">
+
+<h3> Select Your Input Type</h3>
+<paper-material style="width:100%; height: 3px; border-top: 3px solid gold; border-bottom: 3px solid silver;"></paper-material>
 <template 
       is="dom-repeat" 
       
       class$="{{inputTemplateClass}}vertical layout flex wrap" 
       items="{{dataSourcePaperInputs}}">
     <section 
-    	class="vertical layout container flex wrap" style="margin: auto; padding: 24px;"
+    	class$="vertical layout container flex wrap" 
     	>
     	<span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowSubHeader}}</span>
-    	<paper-material style="background: green; width: 93%; height: 3px; border-top: 3px ridged gold; border-bottom: 3px ridged silver;"></paper-material>
-    	<section 
-    	class="horizontal layout container" style="margin: auto; padding: auto; width: auto;"
-    	>
- 		<paper-input
+    	<paper-material style="[[_computeRowBorderTop(RBheight, RBwidth, RBcolor)]] border-top: 3px ridged gold; border-bottom: 3px ridged silver;"></paper-material>
+    	<section class="horizontal layout">
+ 		<fc-paper-input
+ 			hidden="true"
  		 	id$="{{item.inputIdA}}"
- 		 	class$="{{item.inputClassA}}" 
- 		 	name='{{item.inputNameA}}' 
+ 		 	class$="{{item.inputTypeA}}" 
+ 		 	name$='{{item.inputNameA}}' 
  		 	tab-index='{{item.tabIndexA}}' 
- 		 	label="{{item.inputLabelA}}"  
+ 		 	label$="{{item.inputLabelA}}"  
  		 	value='{{item.inputValueA}}'
- 		 	always-float-lavel="{{item.floatLabel}}"
+ 		 	always-float-label="{{item.floatLabel}}"
  		 	auto-complete="true"
  		 	on-tap="{{item.inputTapA}}"
  		 	data-inputname$="{{item.item.inputName}}_inputA"
@@ -121,7 +164,7 @@
  		 	aria-labelledby$="[[item._ariaLabelledBy]]"
     		aria-describedby$="[[item._ariaDescribedBy]]"
     		disabled$="[[item.disabled]]"
-    		invalid="{{item.invalid}}"
+    		
     		prevent-invalid-input="[[item.preventInvalidInput]]"
     		allowed-pattern="[[item.allowedPattern]]"
     		validator="[[item.validator]]"
@@ -147,60 +190,75 @@
     		results$="[[item.results]]"
     		accept$="[[item.accept]]"
     		multiple$="[[item.multiple]]"
-    		meta="{{item.inputMetaA}}">
+    		meta="{{item.inputMetaA}}"
+    		is-suffix="[[item.isSuffixA]]"
+    		secondary-label="[[item.secondaryLabelA]]">
+    		 <div "[[item.suffixA]]">[[item.secondaryLabelA]]</div>
+    
  		 	
-    </paper-input>
+    </fc-paper-input>
+ 
+ 
    <!--  hidden$="{{item.!dataSourcePaperInputs}}"   -->
-    <paper-input
-  		hidden$="[[_computeHiddenInputsB(oneColumn)]]" 
-  		id$="{{item.inputIdB}}" 
-  		class$="{{item.inputClassA}}" 
-  		name$='{{item.inputNameB}}' 
-  		label='{{item.inputLabelB}}'  
-  		value='{{item.inputValueB}}'
-  		always-float-label="{{item.floatLabel}}"
-  		auto-complete="true"
-  		on-tap="{{item.inputTapB}}"
-  		data-inputname$="{{item.item.inputNameB}}"
-  		type$="{{item.inputTypeB}}"
-  		aria-labelledby$="[[item._ariaLabelledBy]]"
-		aria-describedby$="[[item._ariaDescribedBy]]"
-		disabled$="[[item.disabled]]"
-		invalid="{{item.invalid}}"
-		prevent-invalid-input="[[item.preventInvalidInput]]"
-		allowed-pattern="[[item.allowedPattern]]"
-		validator="[[item.validator]]"
-		pattern$="[[item.pattern]]"
-		required$="[[item.required]]"
-		autocomplete$="[[item.autocomplete]]"
-		autofocus$="[[item.autofocus]]"
-		inputmode$="[[item.inputmode]]"
-		minlength$="[[item.minlength]]"
-		maxlength$="[[item.maxlength]]"
-		min$="[[item.min]]"
-		max$="[[item.max]]"
-		step$="[[item.step]]"
-		placeholder$="[[item.placeholder]]"
-		readonly$="[[item.readonly]]"
-		list$="[[item.list]]"
-		size$="[[item.size]]"
-		autocapitalize$="[[item.autocapitalize]]"
-		autocorrect$="[[item.autocorrect]]"
-		on-change="_onChange"
-		tabindex$="[[item.tabindex]]"
-		autosave$="[[item.autosave]]"
-		results$="[[item.results]]"
-		accept$="[[item.accept]]"
-		multiple$="[[item.multiple]]"
-		meta="{{item.inputMetaB}}"
-		style="[[_computeMyBInputStyle(stylePreferenceString)]]"
-        >
-    </paper-input>
+  
+    <fc-paper-input
+  		id$="{{item.inputIdB}}"
+ 		 	class$="{{item.inputClassB}} horizontal layout nowrap" 
+ 		 	name$='{{item.inputNameB}}' 
+ 		 	tab-index='{{item.tabIndexB}}' 
+ 		 	label$="{{item.inputLabelB}}"  
+ 		 	value='{{item.inputValueB}}'
+ 		 	always-float-label$={{item.alwaysFloatLabelB}}
+ 		 	auto-complete=true
+ 		 	on-tap="{{item.inputTapB}}"
+ 		 	data-inputname$="{{item.item.inputName}}_inputB"
+ 		 	type$="{{item.inputTypeB}}"
+ 		 	aria-labelledby$="[[item._ariaLabelledBy]]"
+    		aria-describedby$="[[item._ariaDescribedBy]]"
+    		disabled$="[[item.disabled]]"
+    		no-label-float$=[[item.noLabelFloatB]]
+    		invalid$=[[item.invalid]]
+    		prevent-invalid-input=[[item.preventInvalidInput]]
+    		allowed-pattern="[[item.allowedPattern]]"
+    		validator="[[item.validator]]"
+    		pattern$="[[item.pattern]]"
+    		required$=[[item.required]]
+    		autocomplete=true
+    		autofocus$="[[item.autofocus]]"
+    		inputmode$="[[item.inputmode]]"
+    		minlength$="[[item.minlength]]"
+    		maxlength$="[[item.maxlength]]"
+    		min$="[[item.min]]"
+    		max$="[[item.max]]"
+    		step$="[[item.step]]"
+    		placeholder$="[[item.placeholderB]]"
+    		readonly$=[[item.readonly]]
+    		list$="[[item.list]]"
+    		size$="[[item.size]]"
+    		autocapitalize=true
+    		autocorrect=true
+    		autosave=true
+    		results$="[[item.results]]"
+    		accept$="[[item.accept]]"
+    		multiple$="[[item.multiple]]"
+    		meta="{{item.inputMetaB}}"
+    		secondary-label-b="[[item.secondaryLabelB]]"
+    		>
+    		 <div hidden$="[[item.notBox]]" style="margin-top: -20%; padding-left: 20%; margin-left: 5px;" suffix>[[item.secondaryLabelB]]</div>
+    
+  		
+    </fc-paper-input>
+   <span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowFooterHeader}}</span>
 </section> 
 </section>
 
- </template>         
-</div>
+ </template>  
+<div style="width: 100%; border-top: 1px solid black;">
+<section style="margin: auto; padding: auto;"> 
+ <paper-button > go-back</paper-button><paper-button> next</paper-button>  
+ </section>
+ </div>    
+</paper-material>
 	</template>
 	<script>
 		'use strict';
@@ -216,90 +274,181 @@
 					this.listeners = {};//not sure on semi-colon
 					this.observeres={};
 					this.properties = {
+						inputTypeA: {
+							type:Array,
+							notify: true
+						},
+						inputTypeB: {
+							type:Array,
+							notify: true
+						},
 						dataSourcePaperInputs:{
 							type: Array,
 							computed:'_computeDataSourcePaperInputs(dataDouble)',
 							notify: true,
 							reflectToAttribute: true 
 						},
+						aDataSource: {
+							type: Array,
+							// computed: "_computeMeAnAwesomeDataSource(dataDouble)",
+
+
+						},
+						displaySize: {
+
+
+
+
+						},
+						displayArea: {
+							type: String,
+							value: function(){
+								console.log(this.root)
+							},
+
+
+
+
+						},
+						deviseType:{
+
+
+
+
+						},
+						notBox: {
+
+						},
+						oneColumn:{
+							type: Boolean,
+							computed: '_computeOneColumnWidthDisplay(displaySize)',
+						},
 						dataDouble: {
 							type: Object,
 							notify: true,
-							reflectToAttribute: true,
-						}
-
-					
-				}; 
-
-			//end properties
-				}//end before register
-				//note: should have observers in before register?
-				//note: no commas in functions
-				//note no word function in functions??
+							reflectToAttribute: true 
+						},
+						
+						secondaryLabelA: {
+							type: String,
+							notify: true,
+						},
+						
+						secondaryLabelB: {
+							type: String,
+							notify: true,
+						},
+						inputProperties: {
+							type: Array,
+							value:function(){
+								return [
+				                    {
+				                      "dataSource": "dataSourcePaperInputs", /*this has no item in front of it*/
+				                      "inputIdA": "thedynamically generated I",
+				                      "inputClassA": `{this.classList.add(this.myClass);}`,
+				                      "inputNameA":'computeThisValue',
+				                      "tabIndexA": 0,
+				                      "inputLabelA": "UserChoice",
+				                      "inputValueA": "userChocie",
+				                      "floatlabel": false,
+				                      "autoComplet": true,
+				                      // "inputTapA":`${this.innerHtml='something';}`,
+				                      "inputNameA":"userChoice || dynamic",
+				                      "inputTypeA": 'radio',
+				                      "inputTypeB": "focusedDiv",
+				                      "autoComplete": true,
+				                      "required": false,
+				                      "disabled":false,
+				                      "invalid": false,
+				                      "preventInvalidInput": true,
+				                      "allowedPattern":"COMPUTEThisValueTWO",
+				                      "validator": "SOME CODE FOR A VALIDATOR",
+				                      "pattern": "some RedEx",
+				                      "required": false,
+				                      "autofocus": true,
+				                      "inputmode": ["latin", 
+				                                "latin-prose", 
+				                                "fullwidth-latin", 
+				                                "tel", 
+				                                "email", 
+				                                "url"], 
+				                      "minlength": Number,
+				                      "maxlength": Number,//chars in a string
+				                      "min": Number, 
+				                      "max": Number,
+				                      "step": 10,
+				                      "placeholder": false,
+				                      "readonly": false,
+				                      "list": "should restrict options to only the preselected to force menu-like behavior",
+				                      "size": 18, //width in characters visible
+				                      "autocapitalize": true,
+				                      "autocorrect": true,
+				                      "onChange": "itemMethodOnChange",//need to do something on this
+				                      "tabindex": true,
+				                      "autosave": true, 
+				                      "results": 10,
+				                      // "accept": "json" wasted prop
+				                      "multiple": false,
+				                      "meta":"String of stuff"
+				                  	}
+                				];
+                			},//function in value closes
+              				notify: true, 
+              				reflectToAttribute: true
+            			}//inputProperties Closes
+					}; //This properties closes 
+				}	//end before register
+						//note: should have observers in before register?
+						//note: no commas in functions
+						//note no word function in functions??
 				ready(){
 					this.dataDouble=[];
-					var i=41;
+					var i=11;
 					while(i>0){
+						
 						i--;									
 						var typeArray= [
-						"date",
-						"datetime",
-						"datetime-local",
-						"email",
-						"month",
-						"number",
-						"range",
-						"search",
-						"tel",
-						"time",
 						"url",
-						"week",
-						"button",
-						"button",
-						"range",
-						"button",
-						"range",
-						"radio", 
-						"checkbox", 
-						"range",
-						"date",
-						"datetime",
-						"datetime-local",
-						"email",
-						"month",
-						"number",
-						"range",
 						"search",
-						"tel",
-						"time",
-						"url",
-						"week",
+						"range",
+						"number",
+						"datetime-local",
+						"date",
+						"radio",
+						"checkbox",
 						"button",
-						"button",
-						"button",
-						"text", 
-						"radio", 
-						"checkbox", 
-						"range"
+						"textarea",
+						"paper-input"
 						];
-						var rndLimit=typeArray.length;
-						let j=Math.floor(Math.random()*rndLimit);
-						let p=Math.floor(Math.random()*7);
-						let q=Math.floor(Math.random()*7);
+						// var rndLimit=typeArray.length;
+						// let j=Math.floor(Math.random()*rndLimit);
+						// let p=Math.floor(Math.random()*7);
+						// let q=Math.floor(Math.random()*7);
 						var classArray=['tab-buttons-pressed', 'tab-buttons', 'icon-buttons', 'icon-buttons-pressed','fire-class','fire-class-pressed','fire-class' ];
-						this.push('dataDouble', {
-									"inputLabelB":typeArray[j],
+						this.inputTypeA = [];
+						this.inputTypeB = [];
+						this.push("inputTypeA", typeArray[i]);
+						this.push("inputTypeB", "checkbox");
+						this.push('dataDouble', 
+							{
+									"inputLabelB":'',
 									"inputLabelA": typeArray[i], 
-									"inputTypeB":typeArray[j],
+									"inputTypeB":"checkbox",
 									"inputTypeA": typeArray[i],
 								"autocomplete": true,
 								"autofocus": true,		
 								"autocapitalize":true,
 								"autocorrect": true,
-								"inputClassA": "simple",
-								"inputClassB": "simple"
+								"inputClassA": "tab-buttons",
+								"inputClassB": "radio",
+								"noLabelFloatB": true,
+								"isSuffixB": true,
+								"suffixB":"suffix",
+								"secondaryLabelB": typeArray[i], 
+								"notBox": false
 							}
 						);
+						
 					}
 
 			}
@@ -307,8 +456,12 @@
 						return dataDouble;
 				}
 				_computeMyBInputStyle(stylePreferenceString){
+					return "tab-buttons";
 
-					
+				}
+				_computeSuffixB(isSuffixB, secondaryLabelB){
+					var suffix = (isSuffixB)?`suffix`: "";
+					return `$(suffix)`;
 				}
 				
 			}//end of Class

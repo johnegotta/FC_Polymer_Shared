@@ -1,0 +1,486 @@
+<dom-module id="fc-input-set-generator">
+	<style>
+	:host: {
+		width: calc(100%-64px);
+		min-width: 87%;
+		height: 96%;
+		border: 6px ridge #000066;
+		outline: gold;
+		z-index: 7;
+
+	}
+	.radio{
+
+	--paper-input-container-label:{height: 0px; width: 0px; display: none; position: absolute; right: 0px;};
+	--paper-input-suffix:{font-weight: 700;};
+	--paper-input-container:{
+		min-width: 120px;
+		border: 2px solid gold;
+	
+		flex-wrap: nowrap;
+		
+		padding:6px 12px 2px 0px;
+		margin: 4px;
+		max-width: 310px;};
+	@apply(--paper-input-container-label):
+	@apply(--paper-input-container);
+	@apply(--paper-font-caption);
+
+	@apply(--horizontal-layout-nowrap);
+	};
+	.checkboxes{
+
+
+
+
+	}
+
+	
+
+
+
+
+
+	
+		.icon-button{
+		     display: inline-block;
+		     border:3px solid #2435C9;
+		     color: #FFFFFF;
+		     border-radius: 180px 180px 180px 180px;
+		     -webkit-border-radius: 180px 180px 180px 180px;
+		     -moz-border-radius: 180px 180px 180px 180px;
+		     font-family: Merriweather;
+		     min-width: 24px;
+		     min-height: 24px;
+		     width: auto;
+		     height: auto;
+		     max-width: 48px;
+		     max-height: 48px;
+		     margin: 12px;
+		     font-size: 11px;
+		     padding: 7px 8px;
+		     box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+		     -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+		     -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+		     text-shadow: 0 1px 0 #FFFFFF;
+		     background-color: #5DD7FC;
+		    }
+	}
+  .icon-button-pressed  {
+		 border:7px solid #2435C9;
+		 color: #FFD410;
+		 box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+		 -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+		 -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+		 background-color: #5DD7FC;
+} 
+
+.tab-button{
+     display: inline-block;
+     border: none;
+     color: #FFF;
+     border-radius: 4px;
+     -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+     font-family: Times New Roman;
+     width: 120px;
+     height: 32px;
+     font-size:14px;
+     margin: 12px;
+     padding: 40px 20px 0px 20px;
+     box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     text-shadow: 0 1px 0 #48576D;
+     background-image: linear-gradient(to top, #4771FC, #79FCF8);
+     background-color: #3F45FC;
+    --paper-input-container:{font-family: Merriweather; font-size: 14px; padding: 0px 25px 3px 25px; width: 120px; margin-top: -21px;};
+    --paper-input-container-label:{font-family: merriweather; font-size: 18px; color: white; font-weight: 700;};
+    @apply(--paper-input-container);
+      
+      @apply(--paper-input-container);
+  
+    Use @apply to apply a mixin:
+
+    @apply(--mixin-name);
+    }
+
+.tab-button-pressed{
+	padding: 18px;
+	margin:16 18px;
+	font-size: 14pt;
+	width: 80px;
+	height: 80px;
+	border: 2px dashed green;
+	border-radius: 180px;
+	box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+
+
+}
+	</style>
+<!--hidden$="{{item.!dataSourcePaperInputs}}" -->
+	<!-- hidden$="{{item.!dataSourcePaperInputs}}"  -->
+	<template>
+
+<paper-material elevation="4" class="vertical flex layout wrap column checkboxes" style="max-height:2000px; min-width: 345px;">
+
+<h3> Select Your Input Type</h3>
+<paper-material style="width:100%; height: 3px; border-top: 3px solid gold; border-bottom: 3px solid silver;"></paper-material>
+<iron-form action="">
+<template 
+      is="dom-repeat" 
+      
+      class$="{{inputTemplateClass}}vertical layout flex wrap" 
+      items="{{dataSourcePaperInputs}}">
+    <section 
+    	class$="vertical layout container flex wrap" 
+    	>
+    	<span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowSubHeader}}</span>
+    	<paper-material style="[[_computeRowBorderTop(RBheight, RBwidth, RBcolor)]] border-top: 3px ridged gold; border-bottom: 3px ridged silver;"></paper-material>
+    	<section class="horizontal layout">
+ 		<fc-paper-input
+ 			hidden$="{{item.isOneColumn}}"
+ 		 	id$="{{item.inputIdA}}"
+ 		 	class$="{{item.inputClassA}}" 
+ 		 	name$='{{item.inputNameA}}' 
+ 		 	tab-index='{{item.tabIndexA}}' 
+ 		 	label$="{{item.inputLabelA}}"  
+ 		 	value='{{bind-value}}'
+ 		 	always-float-label$="[[item.alwaysFloatLabelA]]"
+ 		 	auto-complete="true"
+ 		 	on-tap="{{item.inputTapA}}"
+ 		 	data-inputname$="{{item.item.inputName}}_inputA"
+ 		 	type$="{{item.inputTypeA}}"
+ 		 	aria-labelledby$="[[item._ariaLabelledBy]]"
+    		aria-describedby$="[[item._ariaDescribedBy]]"
+    		disabled$="[[item.disabled]]"
+    		no-label-float$=[[item.noLabelFloatA]]
+    		prevent-invalid-input="[[item.preventInvalidInput]]"
+    		allowed-pattern="[[item.allowedPattern]]"
+    		validator="[[item.validator]]"
+    		pattern$="[[item.pattern]]"
+    		required$="[[item.required]]"
+    		autocomplete$="[[item.autocomplete]]"
+    		autofocus$="[[item.autofocus]]"
+    		inputmode$="[[item.inputmode]]"
+    		minlength$="[[item.minlength]]"
+    		maxlength$="[[item.maxlength]]"
+    		min$="[[item.min]]"
+    		max$="[[item.max]]"
+    		step$="[[item.step]]"
+    		placeholder$="[[item.placeholder]]"
+    		readonly$="[[item.readonly]]"
+    		list$="[[item.list]]"
+    		size$="[[item.size]]"
+    		autocapitalize$="[[item.autocapitalize]]"
+    		autocorrect$="[[item.autocorrect]]"
+    		on-change="_onChange"
+    		tabindex$="[[item.tabindex]]"
+    		autosave$="[[item.autosave]]"
+    		results$="[[item.results]]"
+    		accept$="[[item.accept]]"
+    		multiple$="[[item.multiple]]"
+    		meta="{{item.inputMetaA}}"
+    		fc-secondary-label="[[item.fcSecondaryLabelA]]"
+    		box$="[[item.boxA]]">
+    		
+    
+ 		 	
+    </fc-paper-input>
+ 
+
+    <fc-paper-input
+  		id$="{{item.inputTypeB}}"
+ 		 	name='radio' 
+ 		 	tab-index='{{item.tabIndexB}}' 
+ 		 	label$="{{item.inputLabelB}}"  
+ 		 	value$='[[bind-value]]'
+ 		 	always-float-label$={{item.alwaysFloatLabelB}}
+ 		 	auto-complete=on
+
+ 		 	data-inputname$="{{item.item.inputName}}_inputB"
+ 		 	type$="{{item.inputTypeB}}"
+ 		 	aria-labelledby$="[[item._ariaLabelledBy]]"
+    		aria-describedby$="[[item._ariaDescribedBy]]"
+    		disabled$="[[item.disabled]]"
+    		no-label-float$=[[item.noLabelFloatB]]
+    		invalid$={{item.nothing}}
+    		prevent-invalid-input=[[item.preventInvalidInput]]
+    		allowed-pattern="[[item.allowedPattern]]"
+    		validator="[[item.validator]]"
+    		pattern$="[[item.pattern]]"
+    		required$=[[item.required]]
+    		autocomplete=true
+    		autofocus$="[[item.autofocus]]"
+    		inputmode$="[[item.inputmode]]"
+    		minlength$="[[item.minlength]]"
+    		maxlength$="[[item.maxlength]]"
+    		min$="[[item.min]]"
+    		max$="[[item.max]]"
+    		step$="[[item.step]]"
+    		placeholder$="[[item.placeholderB]]"
+    		readonly$=[[item.readonly]]
+    		list$="[[item.list]]"
+    		size$="[[item.size]]"
+    		autocapitalize=true
+    		autocorrect=on
+    		autosave=true
+    		on-change="_onChange"
+    		results$="[[item.results]]"
+    		accept$="[[item.accept]]"
+    		multiple$="[[item.multiple]]"
+    		meta="{{item.inputMetaB}}"
+    		fc-secondary-label$="[[item.fcSecondaryLabelB]]"
+    		box$="[[item.boxB]]"
+    		>
+    		
+    
+  		
+    </fc-paper-input>
+   <span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowFooterHeader}}</span>
+</section> 
+</section>
+
+ </template> 
+ </iron-form> 
+<div style="width: 100%; border-top: 1px solid black;">
+<section style="margin: auto; padding: auto;"> 
+ <paper-button > go-back</paper-button><paper-button> next</paper-button>  
+ </section>
+ </div>    
+</paper-material>
+	</template>
+	<script>
+		'use strict';
+		(function() {
+			class FCInputSetGenerator {
+				get behaviors() {
+					return [Polymer.IronResizableBehavior,
+					Polymer.IronFormElementBehavior,
+      				Polymer.PaperInputBehavior,
+      				Polymer.IronControlState
+					//add databehavior?
+					];
+				}
+				
+				beforeRegister() {
+					this.is ="fc-input-set-generator";
+					this.listeners = {"on-change": "_onChange"};//not sure on semi-colon
+					this.observeres={};
+					this.properties = {
+						inputTypeA: {
+							type:Array,
+							notify: true
+						},
+						inputTypeB: {
+							type:Array,
+							notify: true
+						},
+						dataSourcePaperInputs:{
+							type: Array,
+							computed:'_computeDataSourcePaperInputs(dataDouble)',
+							notify: true,
+							reflectToAttribute: true 
+						},
+						aDataSource: {
+							type: Array,
+							// computed: "_computeMeAnAwesomeDataSource(dataDouble)",
+
+
+						},
+						displaySize: {
+
+
+
+
+						},
+						displayArea: {
+							type: String,
+							value: function(){
+								console.log(this.root)
+							},
+
+
+
+
+						},
+						deviceType:{
+
+
+
+
+						},
+						formArray:{
+							type: Array, 
+							notify: true
+						},
+						notBox: {
+							type: Boolean,
+							value: false,
+							notify: true
+						},
+						oneColumn:{
+							type: Boolean,
+							computed: '_computeOneColumnWidthDisplay(displaySize)',
+						},
+						dataDouble: {
+							type: Object,
+							notify: true,
+							reflectToAttribute: true 
+						},
+						
+						secondaryLabelA: {
+							type: String,
+							notify: true,
+						},
+						
+						secondaryLabelB: {
+							type: String,
+							notify: true,
+						},
+						inputProperties: {
+							type: Array,
+							value:function(){
+								return [
+				                    {
+				                      "dataSource": "dataSourcePaperInputs", /*this has no item in front of it*/
+				                      "inputIdA": "thedynamically generated I",
+				                      "inputClassA": `{this.classList.add(this.myClass);}`,
+				                      "inputNameA":'computeThisValue',
+				                      "tabIndexA": 0,
+				                      "inputLabelA": "UserChoice",
+				                      "inputValueA": "userChocie",
+				                      "floatlabel": false,
+				                      "autoComplet": true,
+				                      // "inputTapA":`${this.innerHtml='something';}`,
+				                      "inputNameA":"userChoice || dynamic",
+				                      "inputTypeA": 'radio',
+				                      "inputTypeB": "focusedDiv",
+				                      "autoComplete": true,
+				                      "required": false,
+				                      "disabled":false,
+				                      "invalid": false,
+				                      "preventInvalidInput": true,
+				                      "allowedPattern":"COMPUTEThisValueTWO",
+				                      "validator": "SOME CODE FOR A VALIDATOR",
+				                      "pattern": "some RedEx",
+				                      "required": false,
+				                      "autofocus": true,
+				                      "inputmode": ["latin", 
+				                                "latin-prose", 
+				                                "fullwidth-latin", 
+				                                "tel", 
+				                                "email", 
+				                                "url"], 
+				                      "minlength": Number,
+				                      "maxlength": Number,//chars in a string
+				                      "min": Number, 
+				                      "max": Number,
+				                      "step": 10,
+				                      "placeholder": false,
+				                      "readonly": false,
+				                      "list": "should restrict options to only the preselected to force menu-like behavior",
+				                      "size": 18, //width in characters visible
+				                      "autocapitalize": true,
+				                      "autocorrect": true,
+				                      "onChange": "_itemMethodOnChange",//need to do something on this
+				                      "tabindex": true,
+				                      "autosave": true, 
+				                      "results": 10,
+				                      // "accept": "json" wasted prop
+				                      "multiple": false,
+				                      "meta":"String of stuff"
+				                  	}
+                				];
+                			},//function in value closes
+              				notify: true, 
+              				reflectToAttribute: true
+            			}//inputProperties Closes
+					}; //This properties closes 
+				}	//end before register
+						//note: should have observers in before register?
+						//note: no commas in functions
+						//note no word function in functions??
+				ready(){
+					this.dataDouble=[];
+					var i=17;
+					while(i>0){
+						
+						i--;									
+						var formArray= [
+						"checkbox",
+						"submit",
+						"number",
+						"number",
+						"number",
+						"radio",
+						"radio",
+						"radio",
+						"checkbox",
+						"checkbox",
+						"checkbox",
+						"button",
+						"button",
+						"button",
+						"button",
+						"paper-input",
+						"paper-input"
+						];
+						this.set('formArray', formArray);
+						// var rndLimit=typeArray.length;
+						// let j=Math.floor(Math.random()*rndLimit);
+						// let p=Math.floor(Math.random()*7);
+						// let q=Math.floor(Math.random()*7);
+						var classArray=['tab-button-pressed', 'tab-button', 'icon-buttons', 'icon-buttons-pressed','fire-class','fire-class-pressed','fire-class' ];
+						this.inputTypeA = [];
+						this.inputTypeB = [];
+
+						this.set("inputTypeA", "checkbox");
+						this.set("inputTypeB", this.formArray[i]);
+						this.push('dataDouble', 
+							{
+								
+									"fcSecondaryLabelA":this.formArray[i]  , 
+									"inputTypeB":this.formArray[i],
+									"inputTypeA": "checkbox",
+								"autocomplete": true,
+								"autofocus": true,		
+								"autocapitalize":true,
+								"autocorrect": true,
+								"inputClassA": "tab-button",
+								"noLabelFloatB": true,
+								"noLabelFloatA": false,
+								"alwaysFloatLabelB": false,
+								"alwaysFloatLabelA": true,
+								"inputValueB":formArray[i],
+								"fcSecondaryLabelB": formArray[i],
+								"boxA":false, 
+
+								"boxB": true,
+								"invalid": false
+							}
+						);
+					console.log(this.inputLabelA);	
+					}
+
+			}
+				_computeDataSourcePaperInputs(dataDouble){
+						return dataDouble;
+				}
+				_computeMyBInputStyle(stylePreferenceString){
+					return "tab-button";
+
+				}
+				_computeSuffixB(isSuffixB, secondaryLabelB){
+					var suffix = (isSuffixB)?`suffix`: "";
+					return `$(suffix)`;
+				}
+
+				
+			}//end of Class
+			Polymer(FCInputSetGenerator);
+		})();
+	</script>
+</dom-module>
