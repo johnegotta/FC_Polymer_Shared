@@ -1,5 +1,4 @@
-<dom-module id="fc-input-proto">
-<template>
+<dom-module id="fc-input-prime">
 <style>
 :host{
 	display: block;
@@ -16,12 +15,6 @@ span.radio: {
 	left: 8px;
 	left-margin: 3px;
 }
-input{
-	
-	float: left;
-	margin-right: 5px;
-}
-
 
 
 section[name=section1].text {
@@ -36,18 +29,15 @@ section[name=section1].text {
 
 }
 
-
-iron-icon{display: none;}
+iron-icon{
+	display: block;
+}
 input.text, input.datetime-local, input.date,  input.range,  .number, input.tel,  input.email{
 
   border: 0px solid #999;
   border-bottom: 2px solid #008;
   font-family: merriweather;
   font-size: 14pt;
-
-
- 
-
 }
 section: {
 	min-width: 147px;
@@ -96,7 +86,6 @@ iron-icon[name=icon]{display: block;}
 /*icon3 moves to right of inputs*/
 
 input.number{ border: 0px solid #999;
-  border-bottom: .5px solid #008;
   font-family: merriweather;
   font-size: 24px;
   color: #008;
@@ -110,7 +99,7 @@ iron-icon[name=icon5].checkbox{display: inline-block;}
 label.checkbox {
     display: inline-block;
     background: white;
-   
+   float: right;
     padding:2px;
     margin: 2px;
    }
@@ -146,10 +135,12 @@ label.checkbox{
 input[type=radio]:checked {outline: 3px ridge green;}
 label.radio{
 	font-size: 22px;
+	float: right;
 }
 label.radio.test{
 font-size: 14pt;
 }
+
 input[type=radio]{
 	outline: 0px;
 	width: 24px;
@@ -162,119 +153,210 @@ input[type=radio]:checked+ label:checked, input[type=radio]:checked, {
 	color: green;
 
 }
+iron-icon{
+	--iron-icon-fill-color:magenta;
+	@apply(--iron-icon-fill-color);
+}
+
+span.icon-button{}
 </style>
-	<section name="section0" class$="[[inputType]] [[_computeHorizontal(inputType)]] [[_computeLayout0(inputType,isIcon)]] [[horizontal]]">
-[[value]]
-		<iron-icon 
-			name="icon0"
-			
-			class$="[[inputType]]"
-			icon="[[icon0]]">
-<!-- 			class$="[[computeStyles0(icon0)]]"  -->
-		</iron-icon>
-		<!-- 	[[inputType]] Section 0 -->
-		<span 
-			name="span1"
-			class$="[[inputType]]" 
-			hidden$="[[!_computeLayout1(inputType, icon1)]]"
-			>
-	<!-- 	span 1 [[inputType]]   -->
-			<iron-icon 
-				name="icon1"
-				icon="[[icon1]]"
-				class$="[[inputType]]" 
-				hidden$="[[!icon1]]"
-				>
-			</iron-icon>
-		
-					</span>
-			<!-- after span 1 before section 1 [[myInputName]]  -->
+<template>
+
+<section 
+	name="section0" on-tap="{{eventsOneThroughFive}}" class$="horizontal [[inputType]] [[_computeHorizontal(inputType)]] [[_computeLayout0(inputType,isIcon)]] [[horizontal]]">
+	<!--icon button one-->		<span
+									hidden$="[[span0hide]]"
+									name$="[[span0]]"
+									class$="[[_computeSpan0Class(inputType)]]">[[value]]
+									<iron-icon
+										hidden$="[[icon0hide]]"
+										name$="[[icon0]]"
+										class$="[[_computeIcon0Class(inputType)]]"
+										>
+									</iron-icon>
+								</span>
+	<!--end icon button one-->
 	<section 
 		name="section1"
 		class$="[[inputType]] [[_computeLayout2(icon2)]] [[horizontal]][[_computeHorizontal(inputType)]]">
-			<!-- inside section 2 [[myInputName]] 2  -->
 
+<!--begin icon-button two-->			
+	<span name="span1" class$="[[inputType]]" hidden$="[[!_computeLayout3(inputType, icon1)]]" for="[[myInputName]]"><!-- [[inputType]] 3A -->
 		<iron-icon 
-			icon="[[icon2]]"
-			class$="[[inputType]]"  
-			hidden$="[[!icon2]]"
-			name="icon2"
-			> 
-
-		</iron-icon>
-		
-	<span name="span2" class$="[[inputType]]" hidden$="[[!_computeLayout3(inputType, icon3)]]" for="[[myInputName]]"><!-- [[inputType]] 3A -->
-		<iron-icon 
-			name="icon3"
-			icon="[[icon3]]" 
+			name="icon1"
+			icon="[[icon1]]" 
 			class$="[[inputType]]" 
-			hidden$="[[!icon3]]">
-		<!-- 	class="[[_computeStyles3(icon3)]]" -->
+			hidden$="[[!icon1]]">
 		</iron-icon>
 	</span>
-<label 
+<!--end icon button two-->
+<label
+	name$="[[labelName]]"
+	hidden$="[[labelHidden]]" 
 	id$="[[labelId]]" 
 	for$="[[inputId]]" 
-	class$="[[inputType]][[isTest]]">
+	class$="[[inputType]][[isTest]]"
+	>
 	[[label]] 
 </label>
+<!--Note removed their value attribute... was binding without;
+will return if must-->
 <input 
 	is="iron-input" 
-	id$="[[inputId]]" 
+	id$="[[inputId]]"
+	bind-value$="{{value}}"
+
+	on-change="_onChange"
 	on-focus="doAnimation" 
-	on-blur="unDoAnimation" 
+	on-blur="unDoAnimation"
+	multiple$="[[item.multiple]]"
+
 	name$="[[_computeInputName(inputType, radioGroupNameFC, localName)]]" 
-	class$="[[inputType]]"  
-	checked$="{{checked::inputChecked}}" 
-	default-value="[[defaultValue::currentTime]]" 
-	type$="{{inputType}}" 
-	bind-value="{{value}}"
+	class$="[[inputType]]"
+	label$="{{item.inputLabelB}}"
+	 type$="{{inputType}}" 
+	list$="[[item.list]]"  
+	checked$="{{inputChecked::change}}" 
+	default-value$="[[currentTime::defaultValue]]" 
+	
+	required$=[[item.required]]  
+	multiple$="[[item.multiple]]"
+	
+	meta="{{item.inputMetaB}}"
+	data-input-type$=[[]]
+	$=[[]]
+	data-source$=[[]]
 
-
-
-
+	disabled$="[[item.disabled]]"
+	readonly$="[[item.readonly]]"		
+		invalid$={{item.nothing}}
+		prevent-invalid-input=[[item.preventInvalidInput]]
+		allowed-pattern="[[item.allowedPattern]]"
+		validator="[[item.validator]]"
+		pattern$="[[item.pattern]]"
+		accept$="[[item.accept]]"
+				
+	autocomplete=true
+	autofocus=true
+	autocapitalize=true
+	autocorrect=on
+	autosave=true
+	
+	
+	
+	size$="[[item.size]]"
+	
+	
+	results$="[[item.results]]"
+	tab-index='{{item.tabIndexB}}' 
+	
+	
 	>
-	<span 
-		name="span4"
-		class$="[[inputType]]" 
-		>
-	<!-- [[inputType]] --> 
-		<iron-icon 
-			name="icon4"
-			icon="[[icon4]]"
-			class$="[[inputType]]">
-		</iron-icon>
-	</span>
-
+<!--icon-button-three-->
+			<span 
+				name="span2"
+				class$="[[inputType]]" 
+				>
+			<!-- [[inputType]] --> 
+					<iron-icon 
+						name="icon2"
+						icon="[[icon2]]"
+						class$="[[inputType]]"
+						hidden$="[[hideIcon2]]">
+					</iron-icon>
+			</span>
+<!--end Icon button 3-->
+		</section>
 	<!-- [[myInputName]] 4.5 -->
 	</section>
-	<!-- [[myInputName]] 4.8 -->
-	<span 
-		name="span5"
-		class$="[[inputType]]" 
-		hidden$="[[!_computeLayout5(inputType, icon5)]]"
-		>
-		<!-- [[myInputName]] 5 -->
-		<iron-icon 
-			hidden$="[[!isIcon5]]" 
-			icon="[[icon5]]"><!--class$="[[_computeStyles5(icon5)]]"-->
-			
-		</iron-icon>
-	</span>
-<!-- 	[[myInputName]] 6 -->
-	<iron-icon 
-			hidden$="[[!isIcon6]]" 
-			icon="[[icon6]]">
-			<!-- class$="[[_computeStyles6(icon6)]]" -->
-			>
-	</iron-icon>
-</section>
 </template>
 <script>
-Polymer({
-	is: 'fc-input-proto',
-	// listeners: {'change': '_removeColor'},
+FcInputPrime=Polymer({
+	is: 'fc-input-prime',
 	properties: {
+		buttonName: {
+			type: String,
+			value: function(){
+				return "Titling";
+			},
+			notify: true,
+			reflectToAttribute: true
+		},
+		currentTime:{
+			type: Date,
+			computed: '_computeCurrentTime(isTimeStamp)',
+			notify: true,
+			reflectToAttribute: true
+
+		},
+		horizontal:{
+			type: String,
+			computed: '_computeHorizontal(inputType)',
+			notify: true,
+			reflectToAttribute: true
+		},
+		hostAttribute: {
+				value: {
+					notify: true,
+					reflectToAttribute: true,
+				}
+		},
+		icon0:{
+			type:String,
+			value:function(){
+				return "icons:today";},
+			notify: true
+		},
+		icon1:{
+			type:String,
+			notify: true,
+			value:function(){
+				return "icons:dashboard";},
+			reflectToAttribute: true
+		},
+		icon2:{
+			type:String,
+			value:function(){
+		 	return "icons:alarm-on";},
+			notify: true
+		},
+		icon3:{
+			type:String,
+			value:function(){
+		 	return "icons:dashboard";},
+			notify: true
+		},
+		icon0hide:{
+			type:Boolean,
+			value:function(){
+				return false;},
+			notify: true
+		},
+		icon1hide:{
+			type:Boolean,
+			notify: true,
+			value:function(){
+				return false;},
+			reflectToAttribute: true
+		},
+		icon2hide:{
+			type:String,
+			value:function(){
+		 	return false;},
+			reflectToAttribute: true
+		},
+		icon3hide:{
+			type:String,
+			value:function(){return false;},
+			reflectToAttribute: true
+		},
+
+		inputName:{
+			type: String,
+			computed: "_computeInputName(inputType, radioGroupNameFC, localName)",//localName Could be replaced with inputId
+			notify: true,
+			reflectToAttribute: true
+		},
 		inputId: {
 			type: String,
 			value: function(){
@@ -285,6 +367,46 @@ Polymer({
 			notify: true,
 			reflectToAttribute: true
 			},
+		
+		inputType:{
+			type: String,
+			// observer: '_triggerInputTransformation',
+			notify: true
+		},
+		isIcon0: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		 isIcon1: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		 isIcon2: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		 isIcon3: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		 isTimeStamp: {
+			type: Boolean,
+			notify: true
+		},
+		 
+		isTest: {
+			type: String,
+			notify: true
+						//if is test, enter "test", will change font-size on radio buttons
+		},
+		label: {
+		 	type: String,
+		 	notify: true
+		},
 		labelId: {
 			type: String,
 			value: function(){
@@ -295,26 +417,6 @@ Polymer({
 			notify: true,
 			reflectToAttribute: true
 			},
-		isIcon5: {
-			type: Boolean,
-		 	value: true,
-			notify: true
-		 },
-		 isIcon6: {
-			type: Boolean,
-		 	value: true,
-			notify: true
-		 },
-		isTest: {
-			type: String,
-			notify: true
-						//if is test, enter "test", will change font-size on radio buttons
-		},
-		inputType:{
-			type: String,
-			// observer: '_triggerInputTransformation',
-			notify: true
-		},
 		localName:{
 			type: String,
 			value: function(){
@@ -324,68 +426,12 @@ Polymer({
 			},
 			notify: true
 		},
-		label: {
-		 	type: String,
-		 	notify: true
-		},
-		horizontal:{
-			type: String,
-			computed: '_computeHorizontal(inputType)',
-			notify: true,
-			reflectToAttribute: true
-	},
-		buttonName: {
-			type: String,
-			value: function(){
-				return "Titling";
-			},
-			notify: true,
-			reflectToAttribute: true
-		},
-		icon0:{
-			type:String,
-			value: function(){
-				return "icons:chrome-reader-mode";},
-			notify: true
-		},
-		icon1:{
-			type:String,
-			value:function(){
-				return "icons:today";},
-			notify: true
-		},
-		icon2:{
-			type:String,
-			value:function(){
-				return "icons:today";},
-			notify: true
-		},
-		icon3:{
-			type:String,
-			notify: true,
-			value:function(){
-				return "icons:dashboard";},
-			reflectToAttribute: true
-		},
-		icon4:{
-			type:String,
-			value:function(){
-		 	return "icons:alarm-on";},
-			notify: true
-		},
-		icon5:{
-			type:String,
-			value:function(){
-				return "icons:spellcheck";},
-			notify: true
-		},
-		icon6:{
-			type:String,
-			value:function(){
-				return "icons:assessment";},
-			notify: true
-		},
 		
+		labelHidden: {
+			type: Boolean,
+			value: true,
+			notify: true,
+		},
 		radioGroupNameFC: {
 			type: String,
 			value: function(){
@@ -396,52 +442,9 @@ Polymer({
 			},//move up to the controller
 			notify: true	
 
-		},
-		hostAttribute: {
-				value: {
-					notify: true,
-					reflectToAttribute: true,
-				}
-		},
-		inputName:{
-			type: String,
-			computed: "_computeInputName(inputType, radioGroupNameFC, localName)",//localName Could be replaced with inputId
-			notify: true,
-			reflectToAttribute: true
-		},
-		
-		isTimeStamp: {
-			type: Boolean,
-			notify: true
-		},
-		currentTime:{
-			type: Date,
-			computed: '_computeCurrentTime(isTimeStamp)',
-			notify: true,
-			reflectToAttribute: true
-
-		}
-		
-		// inputObject: {
-		// 	type: Object,
-		// 	value: {
-		// 				"formGroupName": "this.formGroup"
-		// 				"isInThisRadioGroup": input.onValue,
-		// 				"radioGroupName":this.radioGroupName,
-		// 				"hasOtherFormSets":boolean
-		// 				otherFormSets: Array
-		// 				"hasUserId":boolean
-		// 				userId:
-		// 				hasFcId: boolean
-		// 				fcid: 
-		// 				userType: string,
-
-		// 	}
-
-
-		
-
+		},	
 	},
+		
 
 	ready: function(){
 		if(this.inputType=="datetime-local"){
@@ -477,10 +480,7 @@ Polymer({
 		return returnClass; 
 	},
 
-	_computeLayout1: function(inputType, icon1){
-		var returnClass = (icon1)? inputType.toString() + " icon": inputType.toString();
-		return returnClass; 
-	},
+
 	_computeLayout2: function(inputType, icon2){
 		var returnClass = (icon2)? inputType.toString() + " icon": inputType.toString();
 		return returnClass; 
@@ -538,7 +538,7 @@ Polymer({
 	unDoAnimation: function(){
 		var wrapperId=this.labelId;
 		var wrapper=document.getElementById(this.labelId);
-		Polymer.dom(wrapper).classList.add("wrapper-text-focus");
+	Polymer.dom(wrapper).classList.remove("wrapper-text-focus");
 	},
 
 	_computeInputName: function(inputType, radioGroupNameFC, localName){
@@ -554,3 +554,55 @@ Polymer({
 });
 </script>
 </dom-module>
+
+
+
+<!-- <fc-paper-input
+  		id$="{{item.inputTypeB}}"
+  			hidden="true"
+ 		 	name='radio' 
+ 		 	tab-index='{{item.tabIndexB}}' 
+ 		 	label$="{{item.inputLabelB}}"  
+ 		 	value$='[[bind-value]]'
+ 		 	always-float-label$={{item.alwaysFloatLabelB}}
+ 		 	auto-complete=on
+
+ 		 	data-inputname$="{{item.item.inputName}}_inputB"
+ 		 	type$="{{item.inputTypeB}}"
+ 		 	aria-labelledby$="[[item._ariaLabelledBy]]"
+    		aria-describedby$="[[item._ariaDescribedBy]]"
+    		disabled$="[[item.disabled]]"
+    		no-label-float$=[[item.noLabelFloatB]]
+    		invalid$={{item.nothing}}
+    		prevent-invalid-input=[[item.preventInvalidInput]]
+    		allowed-pattern="[[item.allowedPattern]]"
+    		validator="[[item.validator]]"
+    		pattern$="[[item.pattern]]"
+    		required$=[[item.required]]
+    		autocomplete=true
+    		autofocus$="[[item.autofocus]]"
+    		inputmode$="[[item.inputmode]]"
+    		minlength$="[[item.minlength]]"
+    		maxlength$="[[item.maxlength]]"
+    		min$="[[item.min]]"
+    		max$="[[item.max]]"
+    		step$="[[item.step]]"
+    		placeholder$="[[item.placeholderB]]"
+    		readonly$=[[item.readonly]]
+    		list$="[[item.list]]"
+    		size$="[[item.size]]"
+    		autocapitalize=true
+    		autocorrect=on
+    		autosave=true
+    		on-change="_onChange"
+    		results$="[[item.results]]"
+    		accept$="[[item.accept]]"
+    		multiple$="[[item.multiple]]"
+    		meta="{{item.inputMetaB}}"
+    		fc-secondary-label$="[[item.fcSecondaryLabelB]]"
+    		box$="[[item.boxB]]"
+    		>
+    		 -->
+    
+  		
+    </fc-paper-input>
