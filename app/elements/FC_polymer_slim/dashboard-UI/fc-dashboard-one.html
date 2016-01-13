@@ -11,7 +11,7 @@
 		
 		height: calc(99.96%-64px);
 		width: calc(99.96% -64px);
-		overflow-y: hidden;
+		overflow-y: scroll;
 		margin: auto;
 	}
 		img{
@@ -35,7 +35,7 @@
 	height: 480px
 }
 .left-drawer{ 
-	width: 480px;
+	width: 250px;
 	 }
 /*.bordered{
 	margin: 4px;
@@ -76,14 +76,15 @@
 	<fc-left-tabbed-drawer 
 		id="drawerPrime" 
 		drawer 
-		class="left-drawer layout vertical container wrap fit" 
+		class="left-drawer layout vertical container wrap" 
 		resize-width="true" 
 		current-width="{{leftDrawerWidth}}" 
+		left-drawer="true"
 		>
 	</fc-left-tabbed-drawer>
 	<!--drawer wrapper end-->
 		
-	<div main style="height: 100vh;"> 
+	<div main class="fullbleed vertical layout flex"> 
 	<div>
 	<fc-drag-menu-proto
 					drag-menu='true'	
@@ -167,7 +168,9 @@
 				</content>
 				
 
-	</div>			
+	</div>	
+	</fc-rt-panel-dashboard>
+	</div>		
 </fc-lt-panel-dashboard>
 </template>
 <script>
@@ -176,27 +179,23 @@ FcDashBoardOne=Polymer({
 	properties: {
 		rightDrawerWidth:{
 			type: String,
-			value: function(){
-				return '450px';
-			},
 			notify: true
 		},
 		leftDrawerWidth:{
-				type: String,
-				value: function(){
-				return '450px';
+			type: String,
+			value: function(){
+				return "255px";
 			},
 			notify: true
 		},
 		measured: {
-			type: String,
-			value: '1000s',
+			type: String, //NEEDS A WHOLE API
 			notify: true,
 			reflectToAttributes: true
 		}, 
 		responsiveWidth: {
 			type: String,
-			value: '0px',
+			value: '1200px',
 			notify: true,
 			reflectToAttributes: true
 		},
@@ -301,6 +300,14 @@ FcDashBoardOne=Polymer({
 			
 		}
 	},
+
+		ready: function(){
+			(window.screen.width<2000)? this.set('rightDrawerWidth', "110px"): this.set('rightDrawerWidth', "120px");
+
+		},
+
+
+		_computeRightDrawerWidth: function(){},
 		_toggleRightDrawer: function(){
 				var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
 				if(drawer.forceNarrow!==true)
