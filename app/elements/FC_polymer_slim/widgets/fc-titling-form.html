@@ -42,7 +42,7 @@
       @apply(--layout-vertical);
         @apply(--layout-center);
     };
-    };
+
 
   
 
@@ -65,7 +65,7 @@
 	</style>
 	<template>
 
-<iron-form>
+<form is="iron-form" class="form" id="formGet" method="get" action="/">
  <paper-card 
     heading="The Focused Form Generator" 
     image="../../../images/FC_frontpage_logo.png" 
@@ -78,14 +78,16 @@
 <content>
 </content>
       <div class="card-actions horizontal layout container center-justified">
-              <paper-button class="flex-1">BACK</paper-button>
-              <paper-button class="flex-1">CONTINUE</paper-button>
+          <paper-button raised
+              onclick="submitHandler(event)" class="flex=1">Record and Continue</paper-button>
+          <paper-button raised
+              class="flex-1"
+              onclick="resetHandler(event)">Clear</paper-button>
       </div>
 
 </paper-card>
-</iron-form>
 
-
+</form>
 	</template>
 	<script>
 		'use strict';
@@ -98,7 +100,8 @@
 				}
 				beforeRegister() {
 					this.is ="fc-titling-form";
-					this.listeners = {};//not sure on semi-colon
+					this.listeners = {
+            "radio-checked-changed": "handleRadioChecked", "onclick": "display"};
 					this.observeres={};
 					this.properties = {
             generalCategory: {
@@ -175,17 +178,42 @@
             }
             
 					}; //end properties
-				}//end before register
-				//note: should have observers in before register?
-				//note: no commas in functions
-				//note no word function in functions??
-				ready(){
+			}
+           ready(){
 
-				}
-				attached(){
+        }
+        attached(){
 
+        }
+       submitHandler(event){
+          document.getElementById('formGet').addEventListener('iron-form-submit', display);
+        }
+        handleRadioChecked(event){
+          event.stopPropagation();
+          var generator = this.queryEffectiveChildren('fc-input-set-generator');
+          var inputs = generator.querySelectorAll('fc-input-prime[input-name=' + event.detail.name + ']');
+          var labels = generator.querySelectorAll('label');
+          console.log("In handleRadioChecked", labels);
+          for(var i=0; i < inputs.length; i++){
+            if(inputs[i].inputId !== event.detail.id){
+              inputs[i].checkedProp = false;
+              inputs[i].classList.remove('wrapper-checkbox-checked');
+            } else {
+              inputs[i].checkedProp = true;
+              inputs[i].classList.add('wrapper-checkbox-checked');
+            }
+          }
+        }
+        display(event) {
+          var output = document.getElementById('output');
+            output.innerHTML = JSON.stringify(event.detail);
+        }
 
-				}
+    
+        resetHandler(event) {
+          Polymer.dom(event).localTarget.parentElement.reset();
+        }
+
 			}//end of Class
 			Polymer(FCTitlingForm);
 		})();
