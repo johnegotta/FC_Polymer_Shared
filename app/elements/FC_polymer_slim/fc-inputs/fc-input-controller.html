@@ -1,36 +1,66 @@
 <dom-module id="fc-input-controller">
 	<template>
 	<style>
+		.header {
+			background: blue;
+			color: white;
+		}
+		paper-icon-button {
+			background: blue;
+			color: white;
+			border-radius: 200px;
+		}
+		paper-icon-button[icon=add] {
+			background: green;
+		}
+		paper-icon-button[icon=clear] {
+			background: red;
+		}
+		iron-icon {
+			background: gray;
+			color: white;
+		}
+		#singleInputSettings :not(span){
+			margin: 0px 5px 0px 5px;
+		}
 	</style>
 
 		<fc-display-controller>
-			<paper-header-panel class="left">
-				<div class="paper-header">
-					Choose Your Inputs
+			<paper-material id="singleInputSettings" class="right vertical layout">
+				<div class="header horizontal layout centered">
+					<span class="flex">Add Inputs</span>
+					<paper-icon-button raised icon="add" on-tap="addInput"></paper-icon-button>
 				</div>
-				<iron-list id="listOfInputs" items="{{inputTypes}}">
-					<template>
-						<fc-input-prime 
-						input-type$="[[item.inputTypeB]]" 
-						label="[[item.inputTypeB]]" 
-						button-name="Button" 
-						type$="[[item.inputTypeB]]">
-					</fc-input-prime>
-					</template>
-				</iron-list>
-			</div>
-			<paper-header-panel class="right">
-				<div class="paper-header">
-					Chosen Inputs
-				</div>
-				<div id="inputDisplayArea">
+				<template is="dom-repeat" id="addedInputs" items="{{addedInputs}}" as="input">
+					<paper-item class="horizontal layout">
+						<span on-tap="moveInputUp"><iron-icon icon="expand-less"></iron-icon></span>
+						<span on-tap="moveInputDown"><iron-icon icon="expand-more"></iron-icon></span>
 
-				</div>
-			</paper-header-panel>
+						<paper-dropdown-menu always-float-label label="Input Type" class="flex">
+							<paper-menu class="dropdown-content" selected="{{input.inputType}}" attr-for-selected="value">
+								<template is="dom-repeat" items="{{inputTypes}}" as="type">
+									<paper-item value="{{type}}">
+										{{type}}
+									</paper-item>
+								</template>
+							</paper-menu>
+						</paper-dropdown-menu>
+
+						<paper-input label="Input Name" value="{{input.name}}" class="flex"></paper-input>
+						<paper-input label="Input Label" value="{{input.label}}" class="flex"></paper-input>
+						<paper-input label="Input Button Name" value="{{input.buttonName}}" class="flex"></paper-input>
+						<paper-icon-button icon="clear" on-tap="removeInput"></paper-icon-button>
+					</paper-item>
+				</template>
+			</paper-material>
+			<fc-titling-form class="left">
+				<fc-input-set-generator-test data-source-inputs="{{addedInputs}}"></fc-input-set-generator-test>
+			</fc-titling-form>
 		</fc-display-controller>
 	</template>
 	<script>
-		(function()	'use strict';	
+		(function() {	
+			'use strict';	
 			class FCInputController{
 				get behaviors() {
 					return [];
@@ -38,12 +68,71 @@
 
 				beforeregister() {
 					this.is = "fc-input-controller";
-					this.properties = {};
+					this.properties = {
+						inputTypes: {
+							type: Array,
+							value: [
+									'checkbox',
+									'datetime-local',
+									'number',
+									'radio',
+									'select',
+									'text'
+							],
+							notify: true
+						},
+						addedInputs: {
+							type: Array,
+							value: function(){
+								return [];
+							},
+							notify: true
+						}
+					};
+				}
+
+				ready() {
+					this.addedInputs = [];
+					this.inputTypes = [
+									'checkbox',
+									'datetime-local',
+									'number',
+									'radio',
+									'select',
+									'text'
+									];
+				}
+
+				addInput() {
+					var newOne = {
+					};
+
+					this.push('addedInputs',newOne);
+				}
+
+				removeInput(event) {
+					this.splice('addedInputs', event.model.index, 1);
+				}
+
+				moveInputUp(event) {
+					var originalIndex = event.model.index;
+					if(event.model.index != 0 && this.addedInputs.length > 1){
+						var oneToMoveUp = this.splice('addedInputs', originalIndex, 1);
+						this.splice('addedInputs', originalIndex - 1, 0, oneToMoveUp[0]); 
+					}
+				}
+
+				moveInputDown(event) {
+					var originalIndex = event.model.index;
+					if(event.model.index < this.addedInputs.length - 1 && this.addedInputs.length > 1){
+						var oneToMoveDown = this.splice('addedInputs', originalIndex, 1);
+						this.splice('addedInputs', originalIndex + 1, 0, oneToMoveDown[0]); 
+					}
 				}
 			}
 
 			Polymer(FCInputController);
 
 		})();
-
+	</script>
 </dom-module>

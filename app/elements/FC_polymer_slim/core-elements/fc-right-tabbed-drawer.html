@@ -120,20 +120,20 @@ neon-pages{
 					</template>
 				</fc-main-drawer-page>
 			<template is="dom-repeat" items={{iconArray}}>
-        					<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]"> 
+        				<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]" inside-selection="{{secondarySelected}}">
         					<fc-value-holder div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>
         						<div class="head" >
 									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails]]">
 									</fc-input-generator>
         						</div>
 								<div class="main left">
-									
-										<fc-dialog class="left">
-									
-										</fc-dialog>
-										
-									
-									
+									<iron-pages attr-for-selected="data-trans" selected="[[secondarySelected]]">
+										<template id="secondPages" is="dom-repeat" items="[[item.tabDetails]]" as="second">
+										<div data-trans$="{{second.tabName}}">
+											<span>{{second.tabName}}</span>
+										</div>
+										</template>
+									</iron-pages>
 								</div>
 								
 	        					
@@ -159,7 +159,13 @@ neon-pages{
 					value: 'default',
 					notify: true,
 					reflectToAttributes: true
-				}, 
+				},
+				secondarySelected: {
+					type: String,
+					value: 'Titling',
+					notify: true,
+					observer: "secondarySelectedChanged"
+				},
 				responsiveWidth: {
 					type: String,
 					value: '0px',
@@ -603,6 +609,9 @@ _onButtonClick: function(e) {
 		  console.log("SELECTED PAGE", selectedPage);
 		  this.set('mySelected', selectedPage);
 		},
+secondarySelectedChanged: function(e){
+	console.log(this.secondarySelected);
+},
 _onCloseMe: function(e) {
 				console.log("ON CLOSE ME", e.detail);
 				this.set('mySelected', 'default');

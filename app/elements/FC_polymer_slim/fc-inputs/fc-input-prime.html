@@ -15,7 +15,7 @@ span.radio: {
 	left: 8px;
 	left-margin: 3px;
 }
-
+input{ padding: 4px;}
 
 section[name=section1].text {
  border: 0px solid #999;
@@ -26,7 +26,13 @@ section[name=section1].text {
   font-weight: 700;
  
   padding: 8px;
-
+}
+label.datetime-local{
+font-family: merriweather;
+ font-size: 14pt;
+ font-weight: 600;
+	padding-left: 6px;
+	color: #008;
 }
 
 iron-icon{display: none;}
@@ -62,7 +68,7 @@ background: #efefef;
 	height: 64px;
 	color: black;
 	outline: 0px;
-	font-size: 22px;
+	font-size: 14pt;
 	font-family: merriweather;
 	font-weight: 500;
 
@@ -88,6 +94,15 @@ input.number{ border: 0px solid #999;
   font-size: 24px;
   color: #008;
 padding: 4px;}
+label.datetime-local{
+font-family: merriweather;
+ font-size: 14pt;
+ font-weight: 600;
+	padding-left: 6px;
+	color: #008;
+
+
+}
 .twocolumn{
 
 }
@@ -165,12 +180,12 @@ input[type=radio]:checked {
 	<!--icon button one-->		<span
 									hidden$="[[span0hide]]"
 									name$="[[span0]]"
-									class$="[[_computeSpan0Class(inputType)]]">[[checkedProp]]
+									class$="[[_computeSpan0Class(inputType)]]">
 									<iron-icon
 										hidden$="[[icon0hide]]"
 										name$="[[icon0]]"
-										class$="[[_computeIcon0Class(inputType)]]"
 										>
+										<!-- class$="[[_computeIcon0Class(inputType)]]" -->
 									</iron-icon>
 								</span>
 	<!--end icon button one-->
@@ -187,7 +202,7 @@ input[type=radio]:checked {
 				hidden$="[[!icon1]]">
 			</iron-icon>
 		</span>
-<!--end icon button two-->
+<!--end icon button two--><!-- [[isTimeStamp]] -->[[value]]
 		<label
 			name$="[[labelName]]"
 			hidden$="[[labelHidden]]" 
@@ -202,10 +217,10 @@ will return if must-->
 		<input 
 			is="iron-input" 
 			id$="[[inputId]]"
-			bind-value$="{{value}}"
-
+			bind-value="{{value}}"
+			default-value="[[isTimeStamp]]"
 			checked="{{checkedProp::change}}"
-
+			
 			on-change="_onChange"
 			on-focus="doAnimation" 
 			on-blur="unDoAnimation"
@@ -217,7 +232,7 @@ will return if must-->
 			 type$="{{inputType}}" 
 			list$="[[item.list]]"  
 			
-			default-value$="[[currentTime::defaultValue]]" 
+			 
 			
 			required$=[[item.required]]  
 			multiple$="[[item.multiple]]"
@@ -230,24 +245,26 @@ will return if must-->
 			disabled$="[[item.disabled]]"
 			readonly$="[[item.readonly]]"
 
-			invalid$={{item.nothing}}
-			prevent-invalid-input=[[item.preventInvalidInput]]
-			allowed-pattern="[[item.allowedPattern]]"
-			validator="[[item.validator]]"
-			pattern$="[[item.pattern]]"
-			accept$="[[item.accept]]"
+			
 						
-			autocomplete=true
-			autofocus=true
-			autocapitalize=true
-			autocorrect=on
-			autosave=true
+			
 			
 			size$="[[item.size]]"
 			
 			results$="[[item.results]]"
 			tab-index='{{item.tabIndexB}}' 
 			>
+			<!-- invalid$={{item.nothing}}
+			prevent-invalid-input=[[item.preventInvalidInput]] 
+			allowed-pattern="[[item.allowedPattern]]"
+			validator="[[item.validator]]"
+			pattern$="[[item.pattern]]"
+			accept$="[[item.accept]]"
+			autocomplete=true
+			autofocus=true
+			autocapitalize=true
+			autocorrect=on
+			autosave=true-->
 <!--icon-button-three-->
 		<span 
 			name="span2"
@@ -272,7 +289,6 @@ FcInputPrime=Polymer({
 	is: 'fc-input-prime',
 	listeners:{
 		'uncheck':"_radioUncheck",
-		'gotChecked': 'getunchecked',
 		'tap': "eventsOneThroughFive"
 	},
 	properties: {
@@ -357,6 +373,15 @@ FcInputPrime=Polymer({
 			notify: true //local name is the type the use and the count in the page element--we are going to map the mother f-er
 
 		},
+		doAgain:{
+			type: Number,
+			value: function(){
+				// var self=this;
+				// setInterval(function(){self.updateTime(); }, 999);
+				return 1;
+			},
+			notify: true
+		},
 		checkedProp: {
 			type: Boolean,
 			observer: "checkObserver",
@@ -405,28 +430,32 @@ FcInputPrime=Polymer({
 			notify: true,
 			reflectToAttribute: true
 		},
+		inputDefaultValue: {
+			value: String,
+			notify: true
+		},
 		
 		isTimeStamp: {
-			type: Boolean,
+			type: String,
+			computed: "_computeIsTimeStamp(inputType, inputId, currentTime)",
 			notify: true
 		},
 		currentTime:{
-			type: Date,
-			computed: '_computeCurrentTime(isTimeStamp)',
+			type: Object,
+			computed: '_computeCurrentTime(inputType, doAgain)',
 			notify: true,
 			reflectToAttribute: true
 
-		},
-		checked:{
-			type:Function,
-			notify: true,
 		}
 	},
 
 	checkObserver: function(){
-		this.set('value',this.checkedProp);
-		if(this.checkedProp == true && this.inputType == "radio"){
-			this.fire('radio-checked-changed',{'name': this.inputName, 'id':this.inputId});
+		if(this.inputType=="radio" || this.inputType=="checkbox"){
+			this.set('value',this.checkedProp);
+			if(this.checkedProp == true && this.inputType=="radio"){
+				this.fire('radio-checked-changed',{'name': this.inputName, 'id':this.inputId});
+				console.log("IN CHECKOBSERVER", this);
+			}
 		}
 	},
 	_computeSpan0Class: function(inputType){return inputType},
@@ -454,27 +483,89 @@ FcInputPrime=Polymer({
 	},
 	ready: function(){
 		
-		if(this.inputType=="datetime-local"){
-			{ var timestamp=new Date(); this.set("value",timestamp);
-			this.value=timestamp;}
+		
+	},
+	_computeCurrentTime: function(inputType, doAgain){
+		if(inputType=="datetime-local"){
+			var theDate = new Date();	
+			var yearNjs = theDate.getYear();
+			var yearN = (yearNjs + 1900)
+			var year = yearN.toString();
+			var monthN = theDate.getMonth() + 1;
+			var month = (monthN<10)? "0" + monthN.toString(): monthN.toString();
+			var dateN = theDate.getDate();
+			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
+			var hoursN = theDate.getHours();
+			var ampm = hoursN >= 12? "PM": "AM"; 
+			//done her for convenience comparison: do right way later//
+			var minutesN = theDate.getMinutes();
+			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
+			var secondsN = theDate.getSeconds();
+			var seconds =secondsN<10 && secondsN>0? "0" + secondsN.toString():secondsN==0? "0" +"0": secondsN.toString();
+			var millisecondsN = theDate.getMilliseconds();
+			var milliseconds = millisecondsN ==0? "0" + "0" + "0":millisecondsN >0 && millisecondsN<10? "0" +"0" + millisecondsN.toString(): millisecondsN >=10 && millisecondsN<100? "0" + millisecondsN.toString(): millisecondsN.toString(); 
+			var milliseconds = millisecondsN.toString();
+			var hoursNUS= hoursN>0 && hoursN>12? (hoursN-12): hoursN == 0? 12: hoursN;
+			var hours = hoursNUS <10? "0" + hoursNUS.toString(): hoursNUS.toString();
+			var hours24 = hoursN == 0? "0" + "0": hoursN<10 && hoursN>0?"0" + hoursN.toString(): hoursN.toString();
+console.log(
+				year,
+				month,
+				date,
+				hours,
+				minutes,
+				seconds,
+				milliseconds
+	);
+	
+			
+			var timeNow = year+"-"+month+"-"+date+" "+hours+":"+minutes+" "+ampm;
+			var timeNowTwo = "Date: " + month + "/"+date+"/"+year+" Time: "+hours+":" + minutes+":"+ seconds+" " + ampm;
+			var toInputDateTimeLocal = year+"-"+month+"-"+date+"T"+hours24+":"+minutes;
+			var holderObject={
+				"year":year, 
+				"month":month, 
+				"date":date, 
+				"hours":hours, 
+				"minutes":minutes, 
+				"seconds":seconds, 
+				"milliseconds":milliseconds,
+				"yearN": yearN,
+				"monthN": monthN,
+				"dateN": dateN,
+				"hoursN": hoursN,
+				"minutesN": minutesN,
+				"secondsN": secondsN,
+				"millisecondsN": millisecondsN, 
+				"yearNjs": yearNjs, 
+				"timeNow": timeNow,
+				"timeNowTwo":timeNowTwo,
+				"toInputDateTimeLocal":toInputDateTimeLocal
 
-		}
-		if(this.inputType==""){}
-	},
-	_computeCurrentTime: function(isTimeStamp){
-		if(isTimeStamp==true){
-			var timestamp=new Date();
-			return timestamp;
+									};
+				// this.set("label", timeNowTwo);
+				
+			
+			return holderObject;
 		}
 	},
+
+	updateTime: function(){
+		this.doAgain++;
+	},
+
+	_computeIsTimeStamp: function(inputType, inputId, currentTime)
+		{
+			if(inputType=="datetime-local" && this.doAgain==1){
+			 var returnVal=currentTime.toInputDateTimeLocal;
+			  return returnVal;
+			}
+		},
+	//Date(year, month, day, hours, minutes, seconds, milliseconds)//
 
 	attached: function(){
 		if(this.inputType=="button"){this.set("value",this.buttonName); this.set('icon4', false); this.set('label',"");}
-		if(this.inputType=="radio")
-			{
-				this.set("value","unchecked");
-				// console.log("I am a radio " + this.value);
-			}
+		
 
 	},
 	_computeHorizontal: function (inputType){
@@ -512,14 +603,7 @@ FcInputPrime=Polymer({
 		var returnClass = (icon6)? inputType.toString() + " icon": inputType.toString();
 		return returnClass; 
 	},
-	_removeColor: function(e){
-		var elTarg = e.target;
-		var labelId=this.labelId;
-		(e.target.checked==false)?
-				(Polymer.dom(labelId).classList.remove("wrapper-checkbox-checked") 
-				 && elTarg.removeEventListener("change", this._removeColor, false)): console.log("we did a lot");
-				
-	},
+
 			
 
 	doAnimation: function(e){
@@ -533,7 +617,6 @@ FcInputPrime=Polymer({
 		}
 		
 	},
-	getunchecked:function(){ this.set("value", this.checked)},
 	
 	
 
@@ -541,23 +624,19 @@ FcInputPrime=Polymer({
 		var wrapper=document.getElementById(this.labelId);
 		Polymer.dom(wrapper).classList.remove("wrapper-text-focus");
 	},
-	// checked: function(bindVal){
-	// 	alert("inchecked");
-	// },
+	
 	_onChange: function(e){
-		//alert("this is the change function" + " " + this.inputType + " " + this.inputId);
-		if(this.inputType=="radio"&& e.target.name==this.inputName){
+		
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
 			console.log(e.target.checked, e.target.name, this.inputName);
-			this.set('value', e.target.checked);
+			//this.set('value', e.target.checked);
 			console.log(this.value);
-			Polymer.dom(e.target.bindValue);
+			//Polymer.dom(e.target.bindValue);
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
 			 Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");
 				  	console.log("I am changing the color");
-		} 
 	},
 
 	_computeInputName: function(inputType, localName){
