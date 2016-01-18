@@ -1,0 +1,473 @@
+<dom-module id="fc-input-layout-test">
+<template>
+<style>
+:host{
+	display: block;
+	padding: 3px;
+	margin: 3px;
+	background: white;
+	position: relative;
+	@apply(--horizontal-layout-flex-wrap);
+
+}
+
+section.buttons,
+#twoOne.viewbuttons,
+#twoTwo.viewbuttons,
+#icontwoTwo.viewbuttons,
+#icontwoTwoTwo.viewbuttons,
+#inputtwoTwo.viewbuttons,
+#labeltwoTwo.viewbuttons,
+#twoThree.viewbuttons,
+#threeOne.viewbuttons,
+#threeTwo.viewbuttons,
+#threeThree.viewbuttons
+{display: inline-block;
+ border:7px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+ max-width: 48px;
+  max-height: 48px;
+ width: auto;
+ height: auto;
+ margin: auto;
+ font-size: 11px;
+ padding: 7px 8px;
+ box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ text-shadow: 0 1px 0 #FFFFFF;
+ background-color: #5DD7FC;
+}/*
+.buttons:hover, .viewbuttons:hover, .buttons:active, .viewbuttons:active{
+ border:7px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}
+*/
+div[name=outerdiv]{/*
+horizontal layout flex*/
+/*	@apply(--horizontal-layout-flex-wrap); doesnt work the same*/
+	/*no classes vertical line
+	section[name=twoOne], section[name=twoTwo], section[name=twoThree]div[name=columnOne]
+div[name=columnThree]*/
+}
+
+.hidden{
+	display: none;
+}
+
+</style>
+
+
+
+	<div name$="[[columnPair.name]]" id$="[[columnPair.name]]" class$="[[columnPair]]">
+		<template is="dom-repeat" items="{{columns}}" as="{{column}">
+			<div name$="[[column.name]]_[[column.counter]]" id$="[[column.id]]_[[column.idCounter]]" class$="[[column.layoutClasses]]">
+				<template is="dom-repeat" items="{{columnSections}}" as="{{section}}">
+					<section id$="[[section.id]]_[[section.IDcounter]]" name$="[[section.name]]_[[section.nameCounter]]" class$="[[section.layoutClasses]]">
+						<content select$={{section.content}}>
+						</content>
+						<fc-input-prime type="checkbox" input-type="checkbox">
+						</fc-input-prime>
+					</section>
+				</template>
+			</div>
+		</template>
+	</div>
+
+
+	
+	
+<paper-material elevation="2">
+
+<paper-button on-tap="apply" style="background: #efefef">apply</paper-button>
+<paper-input type="text" value="{{layoutClasses}}" on-change="_onChangedList" list="thisList" id="myLayoutChanger">
+</paper-input>
+<datalist id="thisList">
+  <option value="twoPanel flex">
+  <option value="fourPanel buttons">
+  <option value="fourPanel vertical buttons">
+  <option value="ninePanel flex">
+  <option value="fourPanel twoPanel switch flex">
+  <option value="fourPanel twoPanel flex">
+  <option value="flex-9 twoPanel switch fourPanel buttons vertical layout">
+</datalist>
+</paper-material>
+</template>
+<script>
+Polymer({
+	is: 'fc-input-layout-test',
+	// listeners: {'change': '_removeColor'},
+	properties: {
+		containerDiv:{
+			type:String,
+			value: function(){
+				return "horizontal layout wrap flex center center-justified " + "flex";
+			},
+			notify: true
+		},
+		containerDivLayoutClasses:{
+			type: Object,
+			value: 
+			{	"phone": "vertical layout flex",
+				"ninePanel": "horizontal layout flex wrap",
+				"fourPanel": "horizontal layout flex wrap", 
+				"linear": "horizontal layout"
+			},
+			notify: true
+		},
+		oneDivLayoutClasses: {
+			type: Object,
+			value: 
+			{	"phone": "vertical layout",
+				"ninePanel": "vertical layout flex nowrap flex-3",
+				"fourPanel": "vertical layout flex nowrap flex-6", 
+				"linear": "horizontal layout"
+			},
+			notify: true
+		},	
+		// beginDiv:{
+		// 	type: String,
+		// 	value: function(){
+		// 		return "<!--";
+
+
+		// 	},
+		// 	notify: true
+		// },
+		// endDiv: {
+		// 	type: String,
+		// 	value: function(){
+		// 		return "-->";
+		// 	},
+		// 	notify: true
+		// },
+		twoDivLayoutClasses:{
+			type: Object,
+			value:   
+			{	"phone": "vertical layout",
+				"ninePanel": "vertical layout flex nowrap flex-3",
+				"fourPanel": "vertical layout flex nowrap flex-1",//.hidden option
+				"linear": "horizontal layout"
+			},
+			notify: true
+		},
+		threeDivLayoutClasses:{
+			type: Object,
+			value: 
+			{	"phone": "vertical layout", 
+				//all pages 100%wide or 98vw
+				"ninePanel":  "vertical layout flex wrap flex-3",
+				"fourPanel": "vertical layout flex nowrap flex-6",
+				"linear": "horizontal layout flex wrap"
+			},
+			notify: true
+			}, 
+
+		inputId: {
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var inputId = "inputId_" + rndNum.getTime().toString();
+				return inputId;
+				},
+			notify: true,
+			reflectToAttribute: true
+			},
+		labelId: {
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var inputId = "labelId_" + rndNum.getTime().toString();
+				return inputId;
+				},
+			notify: true,
+			reflectToAttribute: true
+			},
+		isIcon5: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		 isIcon6: {
+			type: Boolean,
+		 	value: true,
+			notify: true
+		 },
+		isTest: {
+			type: String,
+			notify: true
+						//if is test, enter "test", will change font-size on radio buttons
+		},
+		inputType:{
+			type: String,
+			// observer: '_triggerInputTransformation',
+			notify: true
+		},
+		layoutClasses: {
+			type: String,
+			value: function(){return "ninePanel flex";},
+			observer: 'setLayoutClasses',
+			notify: true,
+		},
+		localName:{
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var localName="localName_" + rndNum.getTime().toString();
+				return localName;
+			},
+			notify: true
+		},
+		label: {
+		 	type: String,
+		 	notify: true
+		},
+		horizontal:{
+			type: String,
+			computed: '_computeHorizontal(inputType)',
+			notify: true,
+			reflectToAttribute: true
+	},
+		buttonName: {
+			type: String,
+			value: function(){
+				return "Titling";
+			},
+			notify: true,
+			reflectToAttribute: true
+		},
+		icon0:{
+			type:String,
+			value: function(){
+				return "icons:chrome-reader-mode";},
+			notify: true
+		},
+		icon1:{
+			type:String,
+			value:function(){
+				return "icons:today";},
+			notify: true
+		},
+		icon2:{
+			type:String,
+			value:function(){
+				return "icons:today";},
+			notify: true
+		},
+		icon3:{
+			type:String,
+			notify: true,
+			value:function(){
+				return "icons:dashboard";},
+			reflectToAttribute: true
+		},
+		icon4:{
+			type:String,
+			value:function(){
+		 	return "icons:alarm-on";},
+			notify: true
+		},
+		icon5:{
+			type:String,
+			value:function(){
+				return "icons:spellcheck";},
+			notify: true
+		},
+		icon6:{
+			type:String,
+			value:function(){
+				return "icons:assessment";},
+			notify: true
+		},
+		
+		radioGroupNameFC: {
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var radioGroupNameFC="thisRadioGroupName" + rndNum.getTime().toString();
+				return radioGroupNameFC;
+			},//move up to the controller
+			notify: true	
+
+		},
+		hostAttribute: {
+				value: {
+					notify: true,
+					reflectToAttribute: true,
+				}
+		},
+		inputName:{
+			type: String,
+			computed: "_computeInputName(inputType, radioGroupNameFC, localName)",//localName Could be replaced with inputId
+			notify: true,
+			reflectToAttribute: true
+		},
+		
+		isTimeStamp: {
+			type: Boolean,
+			notify: true
+		},
+		currentTime:{
+			type: Date,
+			computed: '_computeCurrentTime(isTimeStamp)',
+			notify: true,
+			reflectToAttribute: true
+
+		}
+		
+		// inputObject: {
+		// 	type: Object,
+		// 	value: {
+		// 				"formGroupName": "this.formGroup"
+		// 				"isInThisRadioGroup": input.onValue,
+		// 				"radioGroupName":this.radioGroupName,
+		// 				"hasOtherFormSets":boolean
+		// 				otherFormSets: Array
+		// 				"hasUserId":boolean
+		// 				userId:
+		// 				hasFcId: boolean
+		// 				fcid: 
+		// 				userType: string,
+
+		// 	}
+
+
+		
+
+	},
+	computeEndOfDiv: function(beginDiv, endDiv){
+		
+	},
+	apply: function(){
+		this.set('layoutClasses',  'twpPanel layout reverse flex');
+	},
+	setLayoutClasses: function(oldvalue, newvalue){
+		console.log(oldvalue, newvalue);
+	},
+
+	onChangedList: function(e){ 
+		console.log(e.target.value);
+
+	},
+	ready: function(){
+		if(this.inputType=="datetime-local"){
+			{ var timestamp=new Date(); this.set("value",timestamp);
+			this.value=timestamp;}
+
+		}
+		if(this.inputType==""){}
+	},
+	_computeCurrentTime: function(isTimeStamp){
+		if(isTimeStamp==true){
+		var timestamp=new Date();
+		return timestamp;
+		}
+	},
+	attached: function(){
+		if(this.inputType=="button"){this.set("value",this.buttonName); this.set('icon4', false); this.set('label',"");}
+
+			var myIcons=Polymer.dom(this).querySelectorAll("span>iron-icon");
+
+	},
+	_computeHorizontal: function (inputType){
+		var layoutCheck = (inputType!=="radio"&&inputType!=="checkbox")?
+			"layout vertical flex": "layout horizontal-layout";
+		return layoutCheck;
+	},
+	
+
+	_focusedValueChanged: function(){
+		this.fire();
+
+	},
+	_computeLayout0: function(inputType, icon0){
+		var returnClass = (icon0)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+
+	_computeLayout1: function(inputType, icon1){
+		var returnClass = (icon1)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout2: function(inputType, icon2){
+		var returnClass = (icon2)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout3: function(inputType, icon3){
+		var returnClass = (icon3)? inputType.toString() + " icon": inputType.toString();
+		this.classList.add("icon");
+		return returnClass; 
+	},
+	_computeLayout4: function(inputType, icon4){
+		var returnClass = (icon4)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout5: function(inputType, icon5){
+		var returnClass = (icon5)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout6: function(inputType, icon6){
+		var returnClass = (icon6)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_removeColor: function(e){
+		var elTarg = e.target;
+		var labelId=this.labelId;
+		(e.target.checked==false)?
+				(Polymer.dom(label).classList.remove("wrapper-checkbox-checked") 
+				 && elTarg.removeEventListener("change", this._removeColor, false)): console.log("we did a lot");
+				
+			},
+		_computeIcon0Class: function(){
+
+
+		},
+			
+	doAnimation: function(e){
+		var wrapperId=this.labelId;
+		var wrapper=document.getElementById(this.labelId);
+		if(e.target.type=="text"|| e.target.type=="datetime-local"|| e.target.type== "date" || e.target.type== "range" || e.target.type== "number" || e.target.type=="tel" || e.target.type=="email"){
+			Polymer.dom(wrapper).classList.add("wrapper-text-focus");
+		}
+		else if(e.target.type=="checkbox"){
+			if(e.target.checked){Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");}
+			else if(!e.target.checked){Polymer.dom(wrapper).classList.remove("wrapper-checkbox-checked");}
+		}
+		else if(e.target.type=="radio"){
+			 // if(e.target.checked==true){
+			 // 	Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");
+			 // 	console.log("I am changing the color")
+			 // 	var el = e.target;
+			 // 	// this.async(el.addEventListener("change", this._removeColor, false), 450);
+				
+			}
+		
+	},
+	
+	
+
+	unDoAnimation: function(){
+	  var labelId=this.labelId;
+	  var label=document.getElementById(wrapperId);
+	  Polymer.dom(label).classList.remove("wrapper-text-focus");
+	},
+
+	_computeInputName: function(inputType, radioGroupNameFC, localName){
+		var inputNameReturnValue = (inputType=="radio")?"frank": localName;
+		return inputNameReturnValue;
+	}
+
+
+
+
+});
+</script>
+</dom-module>
