@@ -138,7 +138,7 @@ input[type=checkbox]:checked{
 	margin-right: 10px;
 }*/
 
-:host.wrapper-checkbox-checked label{
+:host.wrapper-checkbox-checked label.wrapper-checkbox-checked{
 	color: green;
 	font-weight: 700;
 	padding-right: 10px;
@@ -172,12 +172,24 @@ input[type=radio]:checked {
 	color: green;
 
 }
+section.range{ 
+
+@apply(--horizontal-layout);
+@apply(--flex-layout);
+@apply(--layout-center);
+}
+input.range{
+	@apply(--horizontal-layout);
+@apply(--flex-layout);
+@apply(--flex-stretch-self);
+width: 120%;
+}
 </style>
 <template>
 
 <section 
 	name="section0" class$="horizontal [[inputType]] [[_computeHorizontal(inputType)]] [[_computeLayout0(inputType,isIcon)]] [[horizontal]]">
-	<!--icon button one-->		<span
+	<!--icon button one-->		<span id="span0"
 									hidden$="[[span0hide]]"
 									name$="[[span0]]"
 									class$="[[_computeSpan0Class(inputType)]]">
@@ -190,11 +202,12 @@ input[type=radio]:checked {
 								</span>
 	<!--end icon button one-->
 	<section 
+		id="section1"
 		name="section1"
 		class$="[[inputType]] [[_computeLayout2(icon2)]] [[horizontal]][[_computeHorizontal(inputType)]]">
 
 <!--begin icon-button two-->			
-		<span name="span1" class$="[[inputType]]" hidden$="[[!_computeLayout3(inputType, icon1)]]" for="[[myInputName]]"><!-- [[inputType]] 3A -->
+		<span name="span1" id="span1" class$="[[inputType]]" hidden$="[[!_computeLayout3(inputType, icon1)]]" for="[[myInputName]]"><!-- [[inputType]] 3A -->
 			<iron-icon 
 				name="icon1"
 				icon="[[icon1]]" 
@@ -202,7 +215,7 @@ input[type=radio]:checked {
 				hidden$="[[!icon1]]">
 			</iron-icon>
 		</span>
-<!--end icon button two--><!-- [[isTimeStamp]] -->[[value]]
+<!--end icon button two--><!-- [[isTimeStamp]] -->
 		<label
 			name$="[[labelName]]"
 			hidden$="[[labelHidden]]" 
@@ -225,25 +238,52 @@ will return if must-->
 			on-focus="doAnimation" 
 			on-blur="unDoAnimation"
 			multiple$="[[item.multiple]]"
-
+			disabled$="[[disabled]]"
+       		title$="[[title]]"
+       
+        	invalid="{{invalid}}"
+        	prevent-invalid-input="[[preventInvalidInput]]"
+        	allowed-pattern="[[allowedPattern]]"
+        	validator="[[validator]]"
+        	pattern$="[[pattern]]"
+        	
+        	autocomplete$="[[autocomplete]]"
+        	autofocus$="[[autofocus]]"
+        	inputmode$="[[inputmode]]"
+        	minlength$="[[minlength]]"
+        	maxlength$="[[maxlength]]"
+        	min$="[[min]]"
+        	max$="[[max]]"
+        	step$="[[step]]"
+        
+        	placeholder$="[[placeholder]]"
+        	readonly$="[[readonly]]"
+        	range$="{{inputRange}}"
+        	size$="[[size]]"
+        	autocapitalize$="[[autocapitalize]]"
+        	autocorrect$="[[autocorrect]]"
+        	on-change="_onChange"
+        	tabindex$="[[tabindex]]"
+        	autosave$="[[autosave]]"
+        	results$="[[results]]"
+        	accept$="[[accept]]"
+        	
 			name$="[[_computeInputName(inputType, radioGroupNameFC, localName)]]" 
 			class$="[[inputType]]"
 			label$="{{item.inputLabelB}}"
 			 type$="{{inputType}}" 
-			list$="[[item.list]]"  
+			list$="[[list]]"  
 			
 			 
+			on-track="trackRanger"
+			required$="[[required]]"  
+			multiple$="[[multiple]]"
 			
-			required$=[[item.required]]  
-			multiple$="[[item.multiple]]"
+			meta="{{inputMeta}}"
 			
-			meta="{{item.inputMetaB}}"
-			data-input-type$=[[]]
-			data-layout$=[[]]
-			data-source$=[[]]
 
-			disabled$="[[item.disabled]]"
-			readonly$="[[item.readonly]]"
+			disabled$="[[disabled]]"
+			readonly$="[[readonly]]"
 
 			
 						
@@ -254,6 +294,9 @@ will return if must-->
 			results$="[[item.results]]"
 			tab-index='{{item.tabIndexB}}' 
 			>
+			<!-- data-input-type$=[[]]
+			data-layout$=[[]]
+			data-source$=[[]] -->
 			<!-- invalid$={{item.nothing}}
 			prevent-invalid-input=[[item.preventInvalidInput]] 
 			allowed-pattern="[[item.allowedPattern]]"
@@ -267,6 +310,7 @@ will return if must-->
 			autosave=true-->
 <!--icon-button-three-->
 		<span 
+			id="span2"
 			name="span2"
 			class$="[[inputType]]" 
 			>
@@ -297,6 +341,17 @@ FcInputPrime=Polymer({
 				return "icons:today";},
 			notify: true
 		},
+
+		min: {
+			type: Number,
+			value: function(){return 5;},
+			notify: true
+		},
+		max: {
+			type: Number,
+			value: function(){return 5;},
+			notify: true
+		},
 		icon1:{
 			type:String,
 			notify: true,
@@ -319,7 +374,7 @@ FcInputPrime=Polymer({
 		
 		inputType:{
 			type: String,
-			// observer: '_triggerInputTransformation',
+			observer: '_triggerInputTransformation',
 			notify: true
 		},
 		isIcon: {
@@ -356,8 +411,8 @@ FcInputPrime=Polymer({
 			type: String,
 			value: function(){
 				var rndNum = new Date();
-				var inputId = "labelId_" + rndNum.getTime().toString();
-				return inputId;
+				var labelId = "labelId_" + (rndNum.getTime() + Math.floor((Math.random() * 10000) + 1)).toString();
+				return labelId;
 				},
 			notify: true,
 			reflectToAttribute: true
@@ -447,6 +502,11 @@ FcInputPrime=Polymer({
 			computed: "_computeIsTimeStamp(inputType, inputId, currentTime)",
 			notify: true
 		},
+		inputRange:{
+			type: Number,
+			observer: "rangerOberser",
+			notify: true
+		},
 		currentTime:{
 			type: Object,
 			computed: '_computeCurrentTime(inputType, doAgain)',
@@ -462,9 +522,31 @@ FcInputPrime=Polymer({
 			if(this.checkedProp == true && this.inputType=="radio"){
 				this.fire('radio-checked-changed',{'name': this.inputName, 'id':this.inputId});
 				console.log("IN CHECKOBSERVER", this);
-			}
+				}
 		}
 	},
+	trackRanger: function(e){
+		this.$.span1.styles="float: right; right: 2px; margin-left: 80%;"
+        switch(e.detail.state) {
+          case 'start':
+           this.$.span2.innerHTML=this.value;
+            break;
+          case 'track':
+            this.$.span2.innerHTML=this.value;
+          
+            break;
+          case 'end':
+            this.$.span2.innerHTML=this.value;
+            break;
+        }
+     },
+     _triggerInputTransformation:function(){
+     	if(this.inputType=="range" && (this.value==NaN ||this.value==undefined ||this.value ==null)){
+     		this.$.span2.innerHTML=5;}
+     	else if(this.inputType == "range"){this.$.span2.innerHTML=this.value}
+     	},
+
+
 	_computeSpan0Class: function(inputType){return inputType},
 	_computeSpan0Class: function(inputType){return inputType},
 	eventsOneThroughFive: function(e){
@@ -615,7 +697,7 @@ console.log(
 
 	doAnimation: function(e){
 		var wrapper=document.getElementById(this.labelId);
-		if(e.target.type=="text"|| e.target.type=="datetime-local"|| e.target.type== "date" || e.target.type== "range" || e.target.type== "number" || e.target.type=="tel" || e.target.type=="email"){
+		if(e.target.type=="text"|| e.target.type=="datetime-local"|| e.target.type== "date" || e.target.type== "number" || e.target.type=="tel" || e.target.type=="email"){
 			Polymer.dom(wrapper).classList.add("wrapper-text-focus");
 		}
 		else if(e.target.type=="checkbox"){
@@ -628,8 +710,18 @@ console.log(
 	
 
 	unDoAnimation: function(){
-		var wrapper=document.getElementById(this.labelId);
-		Polymer.dom(wrapper).classList.remove("wrapper-text-focus");
+		if (this.inputType=="checkbox")
+		{	
+			var wrapper = '#' + this.labelId;
+			var labelElm=this.$$(wrapper);
+			Polymer.dom(labelElm).classList.remove("wrapper-checkbox-checked");
+		}
+		else
+		{
+			var wrapper = '#' + this.labelId;
+			var labelElm=this.$$(wrapper);
+			Polymer.dom(labelElm).classList.remove("wrapper-text-focus");
+		}
 	},
 	
 	_onChange: function(e){
@@ -637,7 +729,7 @@ console.log(
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
 			console.log(e.target.checked, e.target.name, this.inputName);
-			this.set("myChecked", e.target.checked);
+			// this.set("myChecked", e.target.checked);
 			console.log(this.value);
 			//Polymer.dom(e.target.bindValue);
 			var wrapperId=this.labelId;

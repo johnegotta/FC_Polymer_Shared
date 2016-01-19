@@ -1,0 +1,194 @@
+<dom-module id="fc-animated-generator-set">
+<template>
+	<style>
+		:host{
+			position: relative;
+			top: 0px;
+			bottom: 0px;
+			right: 0px;
+			width: 100%;
+			min-height: 100vh;
+			height: 100%;
+			background:white;
+			max-width: 98vw;
+			display: flex;
+
+			box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);
+neon-pages{
+
+}
+					
+		.gradBackground{		
+		background: linear-gradient(to Top, #1e5799 34%,#1e5799 43%,#2989d8 58%,#207cca 63%,#7db9e8 98%); 
+	}
+
+
+.blue-btn-class{
+ display: inline-block;
+ border:7px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+ max-width: 32px;
+ max-height: 32px;
+ width: auto;
+ height: auto;
+ margin: 8px;
+ font-size: 11px;
+ padding: 7px 8px;
+ box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ text-shadow: 0 1px 0 #FFFFFF;
+ background-color: #5DD7FC;
+}
+.blue-btn-class:hover, .blue-btn-class:active{
+ border:7px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}
+</style>
+
+
+<neon-animated-pages
+		 	id="myNext2"class="flex gradBackground" attr-for-selected='data-transition' selected="[[mySelected]]">
+			<fc-passage-saver> 
+				<section on-button-click="_onButtonClick" data-transition="default">
+				</section>
+					
+					<template 
+						is='dom-repeat' 
+						class="horizontal layout flex wrap center center-justified" 
+						items="{{iconArray}}">
+						<section 
+							style$="[[computedStyle(determine)]]" 
+							data-transition$="[[item.dDialogTwo]]">
+							<iron-icon 
+								id$="[[item.dDialogTwo]]"
+				        		icon$="[[item.iconUsed]]"  
+				        		class$="[[item.sectionClass]] [[item.splitterClass]]"
+				        		data-transition$="[[item.dDialogTwo]]"
+				      			>
+							</iron-icon>
+						</section>
+					</template>
+				</fc-main-drawer-page>
+			<template is="dom-repeat" items={{iconArray}}>
+        				<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]" inside-selection="{{secondarySelected}}">
+        					<fc-value-holder div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>
+        						<div class="head" >
+									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails]]">
+									</fc-input-generator>
+        						</div>
+								<div class="main left">
+								<iron-pages attr-for-selected="data-trans" selected="[[secondarySelected]]">
+										<template id="secondPages" is="dom-repeat" items="[[item.tabDetails]]" as="second">
+										<div mode="seamed" data-trans$="{{second.tabName}}">
+
+											<div paper-header class="flex self-stretch" style="min-height: 50px; background: magenta; width:50vw-64px;height: 100%; padding: 25px;">{{second.tabName}}</div>
+											<fc-input-layout-test class$="[[second.pageClass]]" layout-classes$="[[second.layoutClass]]">
+											</fc-input-layout-test>
+										</div>
+										</template>
+									</iron-pages>
+								</div>
+        				</fc-animated-drawer-page>	
+        				</template>
+
+					 </neon-animated-pages>	
+			                  type: String, 
+	                  value: "admin",
+	                  notify: true
+	             },
+	        iconArray:{
+				type: Array,
+				value: function(){
+					return [
+					            { "tabName": "Titling",
+								  "pageLinkId": "contentSavingPage",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "buttons layout stretch center",
+								},
+								{ "tabName": "Content",
+								  "pageLinkId": "firePadPrime",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "flex"
+								},
+								{ "tabName": "Preview",
+								  "pageLinkId": "passagePreview",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "fourPanel flex"
+								  },
+								{ "tabName": "Data",
+								  "pageLinkId": "dataMapper",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "twoPanel flex"
+								},
+								 {"tabName": "Revision",
+								  "pageLinkId": "dataSaver",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "hidden"
+								},
+								{"tabName": "Publish",
+								  "pageLinkId": "dataSaver",
+								  "otherInfo": "OtherInfo",
+								  "tabButtonsClass": "tab-buttons",
+								  "onTabClick": "onTabClick",
+								  "layoutClass": "twoPanel flex"
+								},
+
+			                ];
+			           	},
+						notify: true
+								},
+								firepad: {
+									type:Object,
+									value:{},
+									notify: true,	
+								},
+								firepadRef: {
+									type:Object,
+									value:{},
+									notify: true,
+									reflectToAttributes: true	
+								}, 
+								codeMirror: {
+									type: Object,
+									value: {},
+									notify: true
+								}, 
+	
+							},
+
+							computedStyle: function(determine){
+								return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:24px;"
+							}, 
+							_onButtonClick: function(e) {
+								  console.log(e);
+								  var button = e.detail;
+								  var selectedPage = button.getAttribute('data-transition');
+								  console.log("SELECTED PAGE", selectedPage);
+								  this.set('mySelected', selectedPage);
+								},
+							secondarySelectedChanged: function(e){
+								console.log(this.secondarySelected);
+							},
+							_onCloseMe: function(e) {
+											console.log("ON CLOSE ME", e.detail);
+											this.set('mySelected', 'default');
+							},
