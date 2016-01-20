@@ -1,0 +1,142 @@
+<dom-module id="fc-cells">
+<template>
+<style is="custom-style">
+:root {  font-weight: 900;
+    font-family: Times;
+        opacity: 1.00;
+       
+      }
+ :host{  font-weight: 900;
+    font-family: Times;
+        opacity: 1.00;
+        display: flex;
+       
+      } 
+   
+.cell-outline{
+  min-width: 36px;
+  max-width: 198px;
+  padding: 3px;
+  padding-left: 6px;
+  margin: 3px 3px;
+  min-height: 18px;
+  max-height: 66px;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  font-size: 1em;
+  font-weight: 900;
+  font-family: merriweather;
+  color: #000066;
+  background: white;
+  //box-shadow: 0px -5px 20px #d8d8d8 inset;
+}
+ .labelsClass {
+        padding: 0px 3px;
+        font-weight: 900;
+        opacity: .93;
+  
+      --paper-input-container-label:{
+        font-family: Merriweather;
+        font-weight: 700;
+        color: brown;
+        font-size: 1.08em;
+      
+    };
+    --paper-input-container-underline: {
+        color: white;
+        height: 0px;
+        width: 0px;
+      };
+--paper-input-container-input: {
+        color: #000066;
+        font-family: merriweather;
+        font-size: 1.08em;
+        font-weight: 700;
+        
+};
+    --paper-input-container-label-focus:{
+       
+        font-size: 1.00em;
+    };
+   
+  }
+ .phone-label-offset{
+       min-width: 105px;
+       max-width: 230px; 
+       max-height: 75px;
+       min-height: 20px; 
+       padding: 0px 15px;
+      --paper-input-container-label:{
+        font-family: Merriweather;
+        font-weight: 700;
+        font-size: 21px;
+        color: navy;
+        margin-left: calc(-width/6);
+    };
+    
+  }
+  paper-input.input { 
+          max-width: 230px;
+          min-width: 109px; 
+          max-height: 105px;
+          min-height: 20px; 
+          padding: 0px 4px;
+        }
+  paper-material {padding: 6px;}
+</style>
+<div class="horizontal layout wrap center center-justified container cell-outline" on-dblclick="toggleDisabled" on-swipe="toggleDisabled">
+      <content select="span">
+          
+      </content>
+      <paper-input label="{{fclabel}}" id="disabled" draggable="true" class="labelsClass input" alway-float-label="true" elevation="1" on-drag-start="handleDragStart" on-drop="allowDrop" value="{{input}}" readonly="{{disabled}}">
+      </paper-input>
+</div>
+</template>
+<script>
+Polymer({
+	is:"fc-cells",
+	properties: {
+	disabled: {
+		type: Boolean, 
+		value: true,
+		notify: true,
+		reflectToAttributes: true
+		},
+  holder: {
+      type: Array,
+      notify: true, 
+      reflectToAttributes: true
+    },
+  fclabel: {
+      type: String,
+      notify: true, 
+      reflectToAttributes: true
+    },
+  input: {
+      type: String,
+      notify: true, 
+      reflectToAttributes: true
+    }
+	},
+  ready: function(){
+    //console.log(this.value + ' the value at ready in the cell');
+    //console.log(this.label + ' the label at ready in the cell');
+  },
+	toggleDisabled: function(){
+		this.disabled = ! this.disabled;
+	},
+  attached: function (){
+    //console.log(this.value + ' the value at attached in the cell');
+    //console.log(this.label + ' the label at attached in the cell');
+  },
+  handleDragStart: function(e) {
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.item));
+    },
+  allowDrop: function (e) {
+      e.preventDefault();
+     // console.log("drag over");
+    }
+});
+</script>
+</dom-module>
