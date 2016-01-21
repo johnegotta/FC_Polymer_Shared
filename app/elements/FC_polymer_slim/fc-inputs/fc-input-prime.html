@@ -225,11 +225,11 @@ width: 120%;
 		</label>
 <!--Note removed their value attribute... was binding without;
 will return if must-->
+[[value]]
 		<input 
 			is="iron-input" 
 			id$="[[inputId]]"
 			bind-value="{{value}}"
-			default-value="[[isTimeStamp]]"
 			checked="{{checkedProp::change}}"
 			
 			on-change="_onChange"
@@ -329,6 +329,8 @@ will return if must-->
 <script>
 FcInputPrime=Polymer({
 	is: 'fc-input-prime',
+	behaviors:[Polymer.PaperInputBehavior,
+			 Polymer.IronFormElementBehavior],
 	listeners:{
 		'uncheck':"_radioUncheck"
 	},
@@ -439,6 +441,24 @@ FcInputPrime=Polymer({
 			observer: "checkObserver",
 			notify: true
 		},
+		inputValue:{
+			type: String,
+			notify: true,
+			reflectToAttribute: true
+
+
+		},
+		hostAttribute:{
+			value:{
+				notify: true,
+				reflectToAttribute: true
+
+			},
+			notify: true,
+			reflectToAttribute: true
+
+
+		},
 		
 		
 		horizontal:{
@@ -477,12 +497,6 @@ FcInputPrime=Polymer({
 			},//move up to the controller
 			notify: true	
 
-		},
-		hostAttribute: {
-				value: {
-					notify: true,
-					reflectToAttribute: true,
-				}
 		},
 		inputName:{
 			type: String,
@@ -726,14 +740,14 @@ console.log(
 		
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
-			console.log(e.target.checked, e.target.name, this.inputName);
+			//console.log(e.target.checked, e.target.name, this.inputName);
 			// this.set("myChecked", e.target.checked);
-			console.log(this.value);
+			//console.log(this.value);
 			//Polymer.dom(e.target.bindValue);
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
 			 Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");
-				  	console.log("I am changing the color");
+				  	// console.log("I am changing the color");
 	},
 
 	_computeInputName: function(inputType, localName){
