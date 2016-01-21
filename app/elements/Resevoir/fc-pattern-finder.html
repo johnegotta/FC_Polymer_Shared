@@ -1,0 +1,566 @@
+<dom-module id="fc-pattern-finder">
+<template>
+<style>
+
+</style>
+<paper-header-panel mode="waterfall" class="blue" style="background:white; height:40000px; padding:20px">
+<div class="paper-header" style="height:60px; background:gold">
+PATTERNS
+</div>
+<paper-button style="background:green" role="button" raised on-tap="loadAllQuestionsAndAnswers">Load Questions From File</paper-button>
+
+<paper-button style="background:red" role="button" raised on-tap="findPatterns">Patterns</paper-button>
+<paper-button style="background:blue" role="button" raised on-tap="persistQuestions">Save to Firebase</paper-button>
+
+<div class="horizontal layout">
+	<div>
+	<template is="dom-repeat" items={{questionArray}}>
+		<div id="{{item.questionId}}">{{computeQuestionNum(index)}}. {{item.stem}}</div>
+	    &nbsp<span>--</span> <span>XX</span>
+
+		<template is="dom-repeat" items = "{{item.answerChoices}}" as="choice">
+			<div class="layout horizontal"><input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}"><input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}"><div id="{{choice.fcid}}"><a>{{choice.letter}}.&nbsp {{choice.choiceContent}}</a></div></div>
+		</template>
+		<br>
+	</template>
+	</div>
+	<div>
+	 <template is="dom-repeat" items={{patternArray}} sort="sortMatches">
+		<div on-tap="highlightPatterns"><b>{{item.pattern}}:</b> {{item.matches.questions}}</div>
+	</template> 
+	</div>
+</div>
+	
+</paper-header-panel>
+
+</template>
+<script>
+
+function FcQuestion(argQuestionId, argStem, argAnswerChoices, argRightAnswer, argType)
+{
+	this.fcid = argQuestionId;
+	this.stem = argStem;
+	this.stemWordArray = this.stem.split(" ");
+	this.answerChoices = argAnswerChoices;
+	this.rightAnswer = argRightAnswer;
+	this.questionType = argType || "";
+}
+function FcAnswerChoice(argQuestionId, argLetter, argCorrectLetter, argContent, argType)
+{
+	this.fcid = argQuestionId + argLetter;
+	this.letter = argLetter;
+	this.correctLetter = argCorrectLetter;
+	this.choiceContent = argContent;
+	this.choiceType = argType;
+}
+
+FcPatternFinder=Polymer({
+	is: 'fc-pattern-finder',
+	behaviors: [],
+	listeners: {},
+	properties: {
+		questionList: {
+			type: Object,
+			notify: true
+		},
+		questionArray: {
+			type: Array,
+			notify: true
+		},
+		qList: {
+			type: Array,
+			notify: true
+		},
+		matches: {
+			type: Object,
+			value: {},
+			notify: true
+		},
+		patternArray: {
+			type: Array,
+			notify: true,
+			value: []
+		},
+		prepositionList: {
+			type: String,
+			value: "aboard about above across after against along amid among anti around as at before behind below beneath beside besides between beyond but by concerning considering despite down during except excepting excluding following for from in inside into like minus near of off on onto opposite outside over past per plus regarding round save since than through to toward towards under underneath unlike until up upon versus via with within without",
+			notify: true
+		},
+		shortPrepList: {
+			type: String,
+			value: "aboard about above across after against along amid among anti around at before behind below beneath beside besides between beyond by concerning considering despite during excluding following from in inside into like minus near of off on onto opposite outside over past per plus regarding round since than through to toward towards under underneath unlike until upon versus via with within without"
+		},
+		rawQuestionsData : {
+			type: Array,
+			value: ["1. Which choice best describes what happens in the passage? A) One character argues with another character who intrudes on her home. B) One character receives a surprising request from another character. C) One character reminisces about choices she has made over the years. D) One character criticizes another character for pursuing an unexpected course of action. 2. Which choice best describes the developmental pattern of the passage? A) A careful analysis of a traditional practice B) A detailed depiction of a meaningful encounter C) A definitive response to a series of questions D) A cheerful recounting of an amusing anecdote 3. As used in line 1 and line 65, “directly” most nearly means A) frankly. B) confidently. C) without mediation. D) with precision. 4. Which reaction does Akira most fear from Chie? A) She will consider his proposal inappropriate. B) She will mistake his earnestness for immaturity. C) She will consider his unscheduled visit an imposition. D) She will underestimate the sincerity of his emotions. 5. Which choice provides the best evidence for the answer to the previous question? A) Line 33 (“His voice... refined”) B) Lines 49-51 (“You... mind”) C) Lines 63-64 (“Please... proposal”) D) Lines 71-72 (“Eager... face”) 6. In the passage, Akira addresses Chie with A) affection but not genuine love. B) objectivity but not complete impartiality. C) amusement but not mocking disparagement. D) respect but not utter deference. 7. The main purpose of the first paragraph is to A) describe a culture. B) criticize a tradition. C) question a suggestion. D) analyze a reaction. 8. As used in line 2, “form” most nearly means A) appearance. B) custom. C) structure. D) nature. 9. Why does Akira say his meeting with Chie is “a matter of urgency” (line 32)? A) He fears that his own parents will disapprove of Naomi. B) He worries that Naomi will reject him and marry someone else. C) He has been offered an attractive job in another country. D) He knows that Chie is unaware of his feelings for Naomi. 10. Which choice provides the best evidence for the answer to the previous question? A) Line 39 (“I don’t... you”) B) Lines 39-42 (“Normally... community”) C) Lines 58-59 (“Depending... Japan”) D) Lines 72-73 (“I see... you”) [PASSAGE2] 11. The authors most likely use the examples in lines 1-9 of the passage (“Every... showers”) to highlight the A) regularity with which people shop for gifts. B) recent increase in the amount of money spent on gifts. C) anxiety gift shopping causes for consumers. D) number of special occasions involving gift-giving. 12. In line 10, the word “ambivalent” most nearly means A) unrealistic. B) conflicted. C) apprehensive. D) supportive. 13. The authors indicate that people value gift-giving because they feel it A) functions as a form of self-expression. B) is an inexpensive way to show appreciation. C) requires the gift-recipient to reciprocate. D) can serve to strengthen a relationship. 14. Which choice provides the best evidence for the answer to the previous question? A) Lines 10-13 (“Many... peers”) B) Lines 22-23 (“People... own”) C) Lines 31-32 (“Research... perspectives”) D) Lines 44-47 (“Although... unfounded”) 15. The “social psychologists” mentioned in paragraph 2 (lines 17-34) would likely describe the “deadweight loss” phenomenon as A) predictable. B) questionable. C) disturbing. D) unprecedented. 16. The passage indicates that the assumption made by gift-givers in lines 41-44 may be A) insincere. B) unreasonable. C) incorrect. D) substantiated. 17. Which choice provides the best evidence for the answer to the previous question? A) Lines 53-55 (“Perhaps... consideration”) B) Lines 55-60 (“According... relationship”) C) Lines 63-65 (“As... consideration”) D) Lines 75-78 (“In... relations”) 18. As it is used in line 54, “convey” most nearly means A) transport. B) counteract. C) exchange. D) communicate. 19. The authors refer to work by Camerer and others (line 56) in order to A) offer an explanation. B) introduce an argument. C) question a motive. D) support a conclusion. 20. The graph following the passage offers evidence that gift-givers base their predictions of how much a gift will be appreciated on A) the appreciation level of the gift-recipients. B) the monetary value of the gift. C) their own desires for the gifts they purchase. D) their relationship with the gift-recipients. 21. The authors would likely attribute the differences in gift-giver and recipient mean appreciation as represented in the graph to A) an inability to shift perspective. B) an increasingly materialistic culture. C) a growing opposition to gift-giving. D) a misunderstanding of intentions. 22. The authors use the word “backbone” in lines 3 and 39 to indicate that A) only very long chains of DNA can be taken from an organism with a spinal column. B) the main structure of a chain in a DNA molecule is composed of repeating units. C) a chain in a DNA molecule consists entirely of phosphate groups or of sugars. D) nitrogenous bases form the main structural unit of DNA. 23. A student claims that nitrogenous bases pair randomly with one another. Which of the following statements in the passage contradicts the student’s claim? A) Lines 5-6 (“To each... types”) B) Lines 9-10 (“So far... irregular”) C) Lines 23-25 (“The bases... other”) D) Lines 27-29 (“One member... chains”) 24. In the second paragraph (lines 12-19), what do the authors claim to be a feature of biological interest? A) The chemical formula of DNA B) The common fiber axis C) The X-ray evidence D) DNA consisting of two chains 25. The authors’ main purpose of including the information about X-ray evidence and density is to A) establish that DNA is the molecule that carries the genetic information. B) present an alternate hypothesis about the composition of a nucleotide. C) provide support for the authors’ claim about the number of chains in a molecule of DNA. D) confirm the relationship between the density of DNA and the known chemical formula of DNA. 26. Based on the passage, the authors’ statement “If a pair consisted of two purines, for example, there would not be room for it” (lines 29-30) implies that a pair A) of purines would be larger than the space between a sugar and a phosphate group. B) of purines would be larger than a pair consisting of a purine and a pyrimidine. C) of pyrimidines would be larger than a pair of purines. D) consisting of a purine and a pyrimidine would be larger than a pair of pyrimidines. 27. The authors’ use of the words “exact,” “specific,” and “complement” in lines 47-49 in the final paragraph functions mainly to A) confirm that the nucleotide sequences are known for most molecules of DNA. B) counter the claim that the sequences of bases along a chain can occur in any order. C) support the claim that the phosphate-sugar backbone of the authors’ model is completely regular. D) emphasize how one chain of DNA may serve as a template to be copied during DNA replication. 28. Based on the table and passage, which choice gives the correct percentages of the purines in yeast DNA? A) 17 .1% and 18 .7% B) 17 .1% and 32 .9% C) 18 .7% and 31 .3% D) 31 .3% and 32 .9% 29. Do the data in the table support the authors’ proposed pairing of bases in DNA? A) Yes, because for each given organism, the percentage of adenine is closest to the percentage of thymine, and the percentage of guanine is closest to the percentage of cytosine. B) Yes, because for each given organism, the percentage of adenine is closest to the percentage of guanine, and the percentage of cytosine is closest to the percentage of thymine. C) No, because for each given organism, the percentage of adenine is closest to the percentage of thymine, and the percentage of guanine is closest to the percentage of cytosine. D) No, because for each given organism, the percentage of adenine is closest to the percentage of guanine, and the percentage of cytosine is closest to the percentage of thymine. 30. According to the table, which of the following pairs of base percentages in sea urchin DNA provides evidence in support of the answer to the previous question? A) 17 .3% and 17 .7% B) 17 .3% and 32 .1% C) 17 .3% and 32 .8% D) 17 .7% and 32 .8% 31. Based on the table, is the percentage of adenine in each organism’s DNA the same or does it vary, and which statement made by the authors is most consistent with that data? A) The same; “Two of... pyrimidines” (lines 6-8) B) The same; “The important... structure” (lines 25-26) C) It varies; “Adenine... thymine” (lines 36-38) D) It varies; “It follows... information” (lines 41-45) 32. The main purpose of the passage is to A) emphasize the value of a tradition. B) stress the urgency of an issue. C) highlight the severity of social divisions. D) question the feasibility of an undertaking.  33. The central claim of the passage is that A) educated women face a decision about how to engage with existing institutions. B) women can have positions of influence in English society only if they give up some of their traditional roles. C) the male monopoly on power in English society has had grave and continuing effects. D) the entry of educated women into positions of power traditionally held by men will transform those positions. 34. Woolf uses the word “we” throughout the passage mainly to A) reflect the growing friendliness among a group of people. B) advance the need for candor among a group of people. C) establish a sense of solidarity among a group of people. D) reinforce the need for respect among a group of people. 35. According to the passage, Woolf chooses the setting of the bridge because it A) is conducive to a mood of fanciful reflection. B) provides a good view of the procession of the sons of educated men. C) is within sight of historic episodes to which she alludes. D) is symbolic of the legacy of past and present sons of educated men. 36. Woolf indicates that the procession she describes in the passage A) has come to have more practical influence in recent years. B) has become a celebrated feature of English public life. C) includes all of the richest and most powerful men in England. D) has become less exclusionary in its membership in recent years. 37. Which choice provides the best evidence for the answer to the previous question? A) Lines 12-17 (“There... money”) B) Lines 17-19 (“It... desert”) C) Lines 23-24 (“For... ourselves”) D) Lines 30-34 (“We... pulpit”) 38. Woolf characterizes the questions in lines 53-57 (“For we... men”) as both A) controversial and threatening. B) weighty and unanswerable. C) momentous and pressing. D) provocative and mysterious. 39. Which choice provides the best evidence for the answer to the previous question? A) Lines 46-47 (“We... questions”) B) Lines 48-49 (“And... them”) C) Line 57 (“The moment... short”) D) Line 62 (“That... Madam”) 40. Which choice most closely captures the meaning of the figurative “sixpence” referred to in lines 70 and 71? A) Tolerance B) Knowledge C) Opportunity D) Perspective 41. The range of places and occasions listed in lines 72-76 (“Let us... funerals”) mainly serves to emphasize how A) novel the challenge faced by women is. B) pervasive the need for critical reflection is. C) complex the political and social issues of the day are. D) enjoyable the career possibilities for women are. 42. In lines 9-17, the author of Passage 1 mentions several companies primarily to A) note the technological advances that make space mining possible. B) provide evidence of the growing interest in space mining. C) emphasize the large profits to be made from space mining. D) highlight the diverse ways to carry out space mining operations. 43. The author of Passage 1 indicates that space mining could have which positive effect? A) It could yield materials important to Earth’s economy. B) It could raise the value of some precious metals on Earth. C) It could create unanticipated technological innovations. D) It could change scientists’ understanding of space resources. 44. Which choice provides the best evidence for the answer to the previous question? A) Lines 18-22 (“Within... lanthanum”) B) Lines 24-28 (“They... projects”) C) Lines 29-30 (“In this... commodity”) D) Lines 41-44 (“Companies... machinery”) 45. As used in line 19, “demands” most nearly means A) offers. B) claims. C) inquiries. D) desires. 46. What function does the discussion of water in lines 35-40 serve in Passage 1? A) It continues an extended comparison that begins in the previous paragraph. B) It provides an unexpected answer to a question raised in the previous paragraph. C) It offers hypothetical examples supporting a claim made in the previous paragraph. D) It examines possible outcomes of a proposal put forth in the previous paragraph. 47. The central claim of Passage 2 is that space mining has positive potential but A) it will end up encouraging humanity’s reckless treatment of the environment. B) its effects should be thoughtfully considered before it becomes a reality. C) such potential may not include replenishing key resources that are disappearing on Earth. D) experts disagree about the commercial viability of the discoveries it could yield. 48. As used in line 68, “hold” most nearly means A) maintain. B) grip. C) restrain. D) withstand. 49. Which statement best describes the relationship between the passages? A) Passage 2 refutes the central claim advanced in Passage 1  B) Passage 2 illustrates the phenomenon described in more general terms in Passage 1 . C) Passage 2 argues against the practicality of the proposals put forth in Passage 1 . D) Passage 2 expresses reservations about developments discussed in Passage 1 . 50. The author of Passage 2 would most likely respond to the discussion of the future of space mining in lines 18-28, Passage 1, by claiming that such a future A) is inconsistent with the sustainable use of space resources. B) will be difficult to bring about in the absence of regulations. C) cannot be attained without technologies that do not yet exist. D) seems certain to affect Earth’s economy in a negative way. 51. Which choice provides the best evidence for the answer to the previous question? A) Lines 60-63 (“Some... pristine”) B) Lines 74-76 (“The resources... Earth”) C) Lines 81-83 (“One... avoided”) D) Lines 85-87 (“Without... insecure”) 52. Which point about the resources that will be highly valued in space is implicit in Passage 1 and explicit in Passage 2? A) They may be different resources from those that are valuable on Earth. B) They will be valuable only if they can be harvested cheaply. C) They are likely to be primarily precious metals and rare earth elements. D) They may increase in value as those same resources become rare on Earth.",
+
+ " 1. Which choice best summarizes the passage? A) A character describes his dislike for his new job and considers the reasons why. B) Two characters employed in the same office become increasingly competitive. C) A young man regrets privately a choice that he defends publicly. D) A new employee experiences optimism, then frustration, and finally despair. 2. The main purpose of the opening sentence of the passage is to A) establish the narrator’s perspective on a controversy. B) provide context useful in understanding the narrator’s emotional state. C) offer a symbolic representation of Edward Crimsworth’s plight. D) contrast the narrator’s good intentions with his malicious conduct."]// 3. During the course of the first paragraph, the narrator’s focus shifts from A) recollection of past confidence to acknowledgment of present self-doubt. B) reflection on his expectations of life as a tradesman to his desire for another job. C) generalization about job dissatisfaction to the specifics of his own situation. D) evaluation of factors making him unhappy to identification of alternatives. 4. The references to “shade” and “darkness” at the end of the first paragraph mainly have which effect? A) They evoke the narrator’s sense of dismay. B) They reflect the narrator’s sinister thoughts. C) They capture the narrator’s fear of confinement. D) They reveal the narrator’s longing for rest. 5. The passage indicates that Edward Crimsworth’s behavior was mainly caused by his A) impatience with the narrator’s high spirits. B) scorn of the narrator’s humble background. C) indignation at the narrator’s rash actions. D) jealousy of the narrator’s apparent superiority. 6. The passage indicates that when the narrator began working for Edward Crimsworth, he viewed Crimsworth as a A) harmless rival. B) sympathetic ally. C) perceptive judge. D) demanding mentor 7. Which choice provides the best evidence for the answer to the previous question? A) Lines 28-31 (“the antipathy... life”) B) Lines 38-40 (“My southern... irritated him”) C) Lines 54-56 (“Day... slumber”) D) Lines 61-62 (“I had... brother”) 8. At the end of the second paragraph, the comparisons of abstract qualities to a lynx and a snake mainly have the effect of A) contrasting two hypothetical courses of action. B) conveying the ferocity of a resolution. C) suggesting the likelihood of an altercation. D) illustrating the nature of an adversarial relationship. 9. The passage indicates that, after a long day of work, the narrator sometimes found his living quarters to be A) treacherous. B) dreary. C) predictable. D) intolerable. 10. Which choice provides the best evidence for the answer to the previous question? A) Lines 17-21 (“I should... scenes”) B) Lines 21-23 (“I should... lodgings”) C) Lines 64-67 (“Thoughts... phrases”) D) Lines 68-74 (“I walked... gleam”) 11. The main purpose of the passage is to A) consider an ethical dilemma posed by cost-benefit analysis. B) describe a psychology study of ethical economic behavior. C) argue that the free market prohibits ethical economics. D) examine ways of evaluating the ethics of economics. 12. In the passage, the author anticipates which of the following objections to criticizing the ethics of free markets? A) Smith’s association of free markets with ethical behavior still applies today. B) Free markets are the best way to generate high profits, so ethics are a secondary consideration. C) Free markets are ethical because they are made possible by devalued currency. D) Free markets are ethical because they enable individuals to make choices. 13. Which choice provides the best evidence for the answer to the previous question? A) Lines 4-5 (“Some... ethical”) B) Lines 7-10 (“But... about”) C) Lines 21-22 (“Smith... outcome”) D) Lines 52-54 (“When... way”) 14. As used in line 6, “embraced” most nearly means A) lovingly held. B) readily adopted. C) eagerly hugged. D) reluctantly used. 15. The main purpose of the fifth paragraph (lines 45-56) is to A) develop a counterargument to the claim that greed is good. B) provide support for the idea that ethics is about character. C) describe a third approach to defining ethical economics. D) illustrate that one’s actions are a result of one’s character. 16. As used in line 58, “clashes” most nearly means A) conflicts. B) mismatches. C) collisions. D) brawls. 17. Which choice best supports the author’s claim that there is common ground shared by the different approaches to ethics described in the passage? A) Lines 11-12 (“There... decision”) B) Lines 47-50 (“From... advertisements”) C) Lines 59-64 (“Take... market”) D) Lines 75-77 (“We... facts”) 18. The main idea of the final paragraph is that A) human quirks make it difficult to predict people’s ethical decisions accurately. B) people universally react with disgust when faced with economic injustice. C) understanding human psychology may help to define ethics in economics. D) economists themselves will be responsible for reforming the free market. 19. Data in the graph about per-pound coffee profits in Tanzania most strongly support which of the following statements? A) Fair trade coffee consistently earned greater profits than regular coffee earned. B) The profits earned from regular coffee did not fluctuate. C) Fair trade coffee profits increased between 2004 and 2006 . D) Fair trade and regular coffee were earning equal profits by 2008 . 20. Data in the graph indicate that the greatest difference between per-pound profits from fair trade coffee and those from regular coffee occurred during which period? A) 2000 to 2002 B) 2002 to 2004 C) 2004 to 2006 D) 2006 to 2008 21. Data in the graph provide most direct support for which idea in the passage? A) Acting on empathy can be counterproductive. B) Ethical economics is defined by character. C) Ethical economics is still possible. D) People fear losses more than they hope for gains. 22. The author of Passage 1 indicates which of the following about the use of screen-based technologies? A) It should be thoroughly studied. B) It makes the brain increasingly rigid. C) It has some positive effects. D) It should be widely encouraged. 23. Which choice provides the best evidence for the answer to the previous question? A) Lines 3-4 (“Certain... Net”) B) Lines 23-25 (“But... smarter”) C) Lines 25-29 (“Ina... ability”) D) Lines 29-31 (“She... others”) 24. The author of Passage 1 indicates that becoming adept at using the Internet can A) make people complacent about their health. B) undermine the ability to think deeply. C) increase people’s social contacts. D) improve people’s self-confidence. 25. As used in line 40, “plastic” most nearly means A) creative. B) artificial. C) malleable. D) sculptural. 26. The author of Passage 2 refers to the novel War and Peace primarily to suggest that Woody Allen A) did not like Tolstoy’s writing style. B) could not comprehend the novel by speed-reading it. C) had become quite skilled at multitasking. D) regretted having read such a long novel. 27. According to the author of Passage 2, what do novelists and scientists have in common? A) They take risks when they pursue knowledge. B) They are eager to improve their minds. C) They are curious about other subjects. D) They become absorbed in their own fields. 28. The analogy in the final sentence of Passage 2 has primarily which effect? A) It uses ornate language to illustrate a difficult concept. B) It employs humor to soften a severe opinion of human behavior. C) It alludes to the past to evoke a nostalgic response. D) It criticizes the view of a particular group. 29. The main purpose of each passage is to A) compare brain function in those who play games on the Internet and those who browse on it. B) report on the problem-solving skills of individuals with varying levels of Internet experience. C) take a position on increasing financial support for studies related to technology and intelligence. D) make an argument about the effects of electronic media use on the brain. 30. Which choice best describes the relationship between the two passages? A) Passage 2 relates first-hand experiences that contrast with the clinical approach in Passage 1 . B) Passage 2 critiques the conclusions drawn from the research discussed in Passage 1 . C) Passage 2 takes a high-level view of a result that Passage 1 examines in depth. D) Passage 2 predicts the negative reactions that the findings discussed in Passage 1 might produce. 31. On which of the following points would the authors of both passages most likely agree? A) Computer-savvy children tend to demonstrate better hand-eye coordination than do their parents. B) Those who criticize consumers of electronic media tend to overreact in their criticism. C) Improved visual-spatial skills do not generalize to improved skills in other areas. D) Internet users are unlikely to prefer reading onscreen text to reading actual books. 32. Which choice provides the best evidence that the author of Passage 2 would agree to some extent with the claim attributed to Michael Merzenich in lines 41-43, Passage 1? A) Lines 51-53 (“Critics... brain”) B) Lines 54-56 (“Yes... changes”) C) Lines 57-59 (“But... experience”) D) Lines 83-84 (“Media... consumes”) 33. The central problem that Stanton describes in the passage is that women have been A) denied equal educational opportunities, which has kept them from reaching their potential. B) prevented from exerting their positive influence on men, which has led to societal breakdown. C) prevented from voting, which has resulted in poor candidates winning important elections. D) blocked by men from serving as legislators, which has allowed the creation of unjust laws. 34. Stanton uses the phrase “high carnival” (line 15) mainly to emphasize what she sees as the A) utter domination of women by men. B) freewheeling spirit of the age. C) scandalous decline in moral values. D) growing power of women in society. 35. Stanton claims that which of the following was a relatively recent historical development? A) The control of society by men B) The spread of war and injustice C) The domination of domestic life by men D) The acknowledgment of women’s true character 36. Which choice provides the best evidence for the answer to the previous question? A) Lines 3-7 (“The male... death”) B) Lines 15-22 (“The male... century”) C) Lines 22-25 (“Society... home”) D) Lines 48-52 (“[M]an... repression”) 37. As used in line 24, “rule” most nearly refers to A) a general guideline. B) a controlling force. C) an established habit. D) a procedural method. 38. It can reasonably be inferred that “the strong-minded” (line 32) was a term generally intended to A) praise women who fight for their long-denied rights. B) identify women who demonstrate intellectual skill. C) criticize women who enter male-dominated professions. D) condemn women who agitate for the vote for their sex. 39. As used in line 36, “best” most nearly means A) superior. B) excellent. C) genuine. D) rarest. 40. Stanton contends that the situation she describes in the passage has become so dire that even men have begun to A) lament the problems they have created. B) join the call for woman suffrage. C) consider women their social equals. D) ask women how to improve civic life. 41. Which choice provides the best evidence for the answer to the previous question? A) Lines 25-30 (“No one... matters”) B) Lines 53-55 (“And now... life”) C) Lines 56-60 (“The need... action”) D) Lines 61-64 (“We ask... nation”) 42. The sixth paragraph (lines 67-78) is primarily concerned with establishing a contrast between A) men and women. B) the spiritual world and the material world. C) bad men and good men. D) men and masculine traits. 43. The first paragraph serves mainly to A) explain how a scientific device is used. B) note a common misconception about an event. C) describe a natural phenomenon and address its importance. D) present a recent study and summarize its findings. 44. As used in line 19, “capture” is closest in meaning to A) control. B) record. C) secure. D) absorb. 45. According to Peacock, the ability to monitor internal waves is significant primarily because A) it will allow scientists to verify the maximum height of such waves. B) it will allow researchers to shift their focus to improving the quality of satellite images. C) the study of wave patterns will enable regions to predict and prevent coastal damage. D) the study of such waves will inform the development of key scientific models. 46. Which choice provides the best evidence for the answer to the previous question? A) Lines 1-2 (“Some... see”) B) Lines 4-6 (“they... equipment”) C) Lines 17-19 (“If... this”) D) Lines 24-26 (“Internal... high”) 47. As used in line 65, “devise” most nearly means A) create. B) solve. C) imagine. D) begin. 48. Based on information in the passage, it can reasonably be inferred that all internal waves A) reach approximately the same height even though the locations and depths of continental shelves vary. B) may be caused by similar factors but are influenced by the distinct topographies of different regions. C) can be traced to inconsistencies in the tidal patterns of deep ocean water located near islands. D) are generated by the movement of dense water over a relatively flat section of the ocean floor. 49. Which choice provides the best evidence for the answer to the previous question? A) Lines 29-31 (“Although... formed”) B) Lines 56-58 (“As the... it”) C) Lines 61-64 (“As these... shelf”) D) Lines 67-70 (“Whereas... world”) 50. In the graph, which isotherm displays an increase in depth below the surface during the period 19:12 to 20:24? A) 9°C B) 10°C C) 11°C D) 13°C 51. Which concept is supported by the passage and by the information in the graph? A) Internal waves cause water of varying salinity to mix. B) Internal waves push denser water above layers of less dense water. C) Internal waves push bands of cold water above bands of warmer water. D) Internal waves do not rise to break the ocean’s surface. 52. How does the graph support the author’s point that internal waves affect ocean water dynamics? A) It demonstrates that wave movement forces warmer water down to depths that typically are colder. B) It reveals the degree to which an internal wave affects the density of deep layers of cold water. C) It illustrates the change in surface temperature that takes place during an isolated series of deep waves. D) It shows that multiple waves rising near the surface of the ocean disrupt the flow of normal tides.",
+
+ //	"1. Which choice best summarizes the passage? A) A woman weighs the positive and negative aspects of accepting a new job. B) A woman does not correct a stranger who mistakes her for someone else. C) A woman impersonates someone else to seek revenge on an acquaintance. D) A woman takes an immediate dislike to her new employer. 2. In line 2, “turn” most nearly means A) slight movement. B) change in rotation. C) short walk. D) course correction. 3. The passage most clearly implies that other people regarded Lady Carlotta as A) outspoken. B) tactful. C) ambitious. D) unfriendly. 4. Which choice provides the best evidence for the answer to the previous question? A) Lines 10-14 (“Certain... business”) B) Lines 22-23 (“It is... lady”) C) Lines 23-26 (“On this... her”) D) Lines 30-32 (“She... train”) 5. The description of how Lady Carlotta “put the doctrine of non-interference into practice” (lines 14-15) mainly serves to A) foreshadow her capacity for deception. B) illustrate the subtle cruelty in her nature. C) provide a humorous insight into her character. D) explain a surprising change in her behavior. 6. In line 55, “charge” most nearly means A) responsibility. B) attack. C) fee. D) expense. 7. The narrator indicates that Claude, Wilfrid, Irene, and Viola are A) similar to many of their peers. B) unusually creative and intelligent. C) hostile to the idea of a governess. D) more educated than others of their age. 8. The narrator implies that Mrs. Quabarl favors a form of education that emphasizes A) traditional values. B) active engagement. C) artistic experimentation. D) factual retention. 9. As presented in the passage, Mrs. Quabarl is best described as A) superficially kind but actually selfish. B) outwardly imposing but easily defied. C) socially successful but irrationally bitter. D) naturally generous but frequently imprudent. 10. Which choice provides the best evidence for the answer to the previous question? A) Lines 49-50 (“How... careless”) B) Lines 62-68 (“I wish... memory”) C) Lines 70-73 (“I shall... Russian”) D) Lines 77-82 (“She was... apologetic”) 11. What function does the third paragraph (lines 20-34) serve in the passage as a whole? A) It acknowledges that a practice favored by the author of the passage has some limitations. B) It illustrates with detail the arguments made in the first two paragraphs of the passage. C) It gives an overview of a problem that has not been sufficiently addressed by the experts mentioned in the passage. D) It advocates for abandoning a practice for which the passage as a whole provides mostly favorable data. 12. Which choice does the author explicitly cite as an advantage of automobile travel in North America? A) Environmental impact B) Convenience C) Speed D) Cost 13. Which choice provides the best evidence for the answer to the previous question? A) Lines 5-9 (“In... automobile”) B) Lines 20-24 (“And... car”) C) Lines 24-26 (“In... experience”) D) Lines 32-34 (“Hopping... quickly”) 14. The central idea of the fourth paragraph (lines 35-57) is that A) European countries excel at public transportation. B) some public transportation systems are superior to travel by private automobile. C) Americans should mimic foreign public transportation systems when possible. D) much international public transportation is engineered for passengers to work while on board. 15. Which choice provides the best evidence for the answer to the previous question? A) Line 35 (“It... this”) B) Lines 35-37 (“Done... automobile”) C) Lines 37-40 (“In... sound”) D) Lines 44-48 (“From... cities”) 16. As used in line 58, “credit” most nearly means A) endow. B) attribute. C) believe. D) honor. 17. As used in line 61, “favor” most nearly means A) indulge. B) prefer. C) resemble. D) serve. 18. Which choice best supports the conclusion that public transportation is compatible with the use of personal electronic devices? A) Lines 59-63 (“The... subways”) B) Lines 63-67 (“Part... annoyances”) C) Lines 68-70 (“Even... ago”) D) Lines 77-81 (“Already... homes”) 19. Which choice is supported by the data in the first figure? A) The number of students using public transportation is greater than the number of retirees using public transportation. B) The number of employed people using public transportation and the number of unemployed people using public transportation is roughly the same. C) People employed outside the home are less likely to use public transportation than are homemakers. D) Unemployed people use public transportation less often than do people employed outside the home. 20. Taken together, the two figures suggest that most people who use public transportation A) are employed outside the home and take public transportation to work. B) are employed outside the home but take public transportation primarily in order to run errands. C) use public transportation during the week but use their private cars on weekends. D) use public transportation only until they are able to afford to buy a car. 21. Which choice best reflects the overall sequence of events in the passage? A) An experiment is proposed but proves unworkable; a less ambitious experiment is attempted, and it yields data that give rise to a new set of questions. B) A new discovery leads to reconsideration of a theory; a classic study is adapted, and the results are summarized. C) An anomaly is observed and simulated experimentally; the results are compared with previous findings, and a novel hypothesis is proposed. D) An unexpected finding arises during the early phase of a study; the study is modified in response to this finding, and the results are interpreted and evaluated. 22. As used in line 7, “challenged” most nearly means A) dared. B) required. C) disputed with. D) competed with. 23. Which statement best captures Ken Dial’s central assumption in setting up his research? A) The acquisition of flight in young birds sheds light on the acquisition of flight in their evolutionary ancestors. B) The tendency of certain young birds to jump erratically is a somewhat recent evolved behavior. C) Young birds in a controlled research setting are less likely than birds in the wild to require perches when at rest. D) Ground-dwelling and tree-climbing predecessors to birds evolved in parallel. 24. Which choice provides the best evidence for the answer to the previous question? A) Lines 1-4 (“At field... parents”) B) Lines 6-11 (“So when... fly”) C) Lines 16-19 (“When... measured”) D) Lines 23-24 (“At first . . . the ground”) 25. In the second paragraph (lines 12-32), the incident involving the local rancher mainly serves to A) reveal Ken Dial’s motivation for undertaking his project. B) underscore certain differences between laboratory and field research. C) show how an unanticipated piece of information influenced Ken Dial’s research. D) introduce a key contributor to the tree-down theory. 26. After Ken Dial had his “‘aha’ moment” (line 41), he A) tried to train the birds to fly to their perches. B) studied videos to determine why the birds no longer hopped. C) observed how the birds dealt with gradually steeper inclines. D) consulted with other researchers who had studied Chukar Partridges. 27. The passage identifies which of the following as a factor that facilitated the baby Chukars’ traction on steep ramps? A) The speed with which they climbed B) The position of their flapping wings C) The alternation of wing and foot movement D) Their continual hopping motions 28. As used in line 61, “document” most nearly means A) portray. B) record. C) publish. D) process. 29. What can reasonably be inferred about gliding animals from the passage? A) Their young tend to hop along beside their parents instead of flying beside them. B) Their method of locomotion is similar to that of ground birds. C) They use the ground for feeding more often than for perching. D) They do not use a flapping stroke to aid in climbing slopes. 30. Which choice provides the best evidence for the answer to the previous question? A) Lines 4-6 (“They jumped... air”) B) Lines 28-29 (“They really... traveling”) C) Lines 57-59 (“The birds... slopes”) D) Lines 72-74 (“something... theory”) 31. As used in line 21, “common” most nearly means A) average. B) shared. C) coarse. D) similar. 32. It can be inferred that the authors of Passage 1 believe that running a household and raising children A) are rewarding for men as well as for women. B) yield less value for society than do the roles performed by men. C) entail very few activities that are difficult or unpleasant. D) require skills similar to those needed to run a country or a business. 33. Which choice provides the best evidence for the answer to the previous question? A) Lines 4-6 (“they are... representation”) B) Lines 13-17 (“If the... sanction”) C) Lines 25-30 (“Is it... home”) D) Lines 30-35 (“And... manner”) 34. According to the author of Passage 2, in order for society to progress, women must A) enjoy personal happiness and financial security. B) follow all currently prescribed social rules. C) replace men as figures of power and authority. D) receive an education comparable to that of men. 35. As used in line 50, “reason” most nearly means A) motive. B) sanity. C) intellect. D) explanation. 36. In Passage 2, the author claims that freedoms granted by society’s leaders have A) privileged one gender over the other. B) resulted in a general reduction in individual virtue. C) caused arguments about the nature of happiness. D) ensured equality for all people. 37. Which choice provides the best evidence for the answer to the previous question? A) Lines 41-45 (“Contending... virtue”) B) Lines 45-47 (“truth... practice”) C) Lines 65-66 (“If so... rest”) D) Lines 72-75 (“Consider... happiness”) 38. In lines 61-65, the author of Passage 2 refers to a statement made in Passage 1 in order to A) call into question the qualifications of the authors of Passage 1 regarding gender issues. B) dispute the assertion made about women in the first sentence of Passage 1 . C) develop her argument by highlighting what she sees as flawed reasoning in Passage 1 . D) validate the concluding declarations made by the authors of Passage 1 about gender roles. 39. Which best describes the overall relationship between Passage 1 and Passage 2 ? A) Passage 2 strongly challenges the point of view in Passage 1 . B) Passage 2 draws alternative conclusions from the evidence presented in Passage 1 . C) Passage 2 elaborates on the proposal presented in Passage 1 . D) Passage 2 restates in different terms the argument presented in Passage 1 . 40. The authors of both passages would most likely agree with which of the following statements about women in the eighteenth century? A) Their natural preferences were the same as those of men. B) They needed a good education to be successful in society. C) They were just as happy in life as men were. D) They generally enjoyed fewer rights than men did. 41. How would the authors of Passage 1 most likely respond to the points made in the final paragraph of Passage 2? A) Women are not naturally suited for the exercise of civil and political rights. B) Men and women possess similar degrees of reasoning ability. C) Women do not need to remain confined to their traditional family duties. D) The principles of natural law should not be invoked when considering gender roles. 42. How do the words “can,” “may,” and “could” in the third paragraph (lines 19-41) help establish the tone of the paragraph? A) They create an optimistic tone that makes clear the authors are hopeful about the effects of their research on colony collapse disorder. B) They create a dubious tone that makes clear the authors do not have confidence in the usefulness of the research described. C) They create a tentative tone that makes clear the authors suspect but do not know that their hypothesis is correct. D) They create a critical tone that makes clear the authors are skeptical of claims that pyrethrums are inherent in mono-crops. 43. In line 42, the authors state that a certain hypothesis “can best be tested by a trial.” Based on the passage, which of the following is a hypothesis the authors suggest be tested in a trial? A) Honeybees that are exposed to both pyrethrums and mites are likely to develop a secondary infection by a virus, a bacterium, or a fungus. B) Beekeepers who feed their honeybee colonies a diet of a single crop need to increase the use of insecticides to prevent mite infestations. C) A honeybee diet that includes pyrethrums results in honeybee colonies that are more resistant to mite infestations. D) Humans are more susceptible to varroa mites as a result of consuming nutritionally deficient food crops. 44. Which choice provides the best evidence for the answer to the previous question? A) Lines 3-5 (“These mites... viruses”) B) Lines 16-18 (“In fact... cream”) C) Lines 19-21 (“We suspect... deficient”) D) Lines 24-28 (“Without... bees”) 45. The passage most strongly suggests that beekeepers’ attempts to fight mite infestations with commercially produced insecticides have what unintentional effect? A) They increase certain mite populations. B) They kill some beneficial forms of bacteria. C) They destroy bees’ primary food source. D) They further harm the health of some bees. 46. Which choice provides the best evidence for the answer to the previous question? A) Lines 1-2 (“Honey bees... mites”) B) Lines 6-7 (“Little... control”) C) Lines 31-35 (“In addition... infestation”) D) Lines 47-50 (“Mites... control colonies”) 47. As used in line 35, “postulate” most nearly means to A) make an unfounded assumption. B) put forth an idea or claim. C) question a belief or theory. D) conclude based on firm evidence. 48. The main purpose of the fourth paragraph (lines 42-50) is to A) summarize the results of an experiment that confirmed the authors’ hypothesis about the role of clover in the diets of wild-type honeybees. B) propose an experiment to investigate how different diets affect commercial honeybee colonies’ susceptibility to mite infestations. C) provide a comparative nutritional analysis of the honey produced by the experimental colonies and by the control colonies. D) predict the most likely outcome of an unfinished experiment summarized in the third paragraph (lines 19-41).49. An unstated assumption made by the authors about clover is that the plants A) do not produce pyrethrums. B) are members of the Chrysanthemum genus. C) are usually located near wild-type honeybee colonies. D) will not be a good food source for honeybees in the control colonies. 50. Based on data in the table, in what percent of colonies with colony collapse disorder were the honeybees infected by all four pathogens? A) 0 percent B) 77 percent C) 83 percent D) 100 percent 51. Based on data in the table, which of the four pathogens infected the highest percentage of honeybee colonies without colony collapse disorder? A) IAPV B) KBV C) Nosema apis D) Nosema ceranae 52. Do the data in the table provide support for the authors’ claim that infection with varroa mites increases a honeybee’s susceptibility to secondary infections? A) Yes, because the data provide evidence that infection with a pathogen caused the colonies to undergo colony collapse disorder. B) Yes, because for each pathogen, the percent of colonies infected is greater for colonies with colony collapse disorder than for colonies without colony collapse disorder. C) No, because the data do not provide evidence about bacteria as a cause of colony collapse disorder. D) No, because the data do not indicate whether the honeybees had been infected with mites.",
+
+ //"1. Over the course of the passage, the narrator’s attitude shifts from A) fear about the expedition to excitement about it. B) doubt about his abilities to confidence in them. C) uncertainty of his motives to recognition of them. D) disdain for the North Pole to appreciation of it. 2. Which choice provides the best evidence for the answer to the previous question? A) Lines 10-12 (“For... moment”) B) Lines 21-25 (“Yet... will”) C) Lines 42-44 (“And... stand on”) D) Lines 56-57 (“What... myself”) 3. As used in lines 1-2, “not readily verifiable” most nearly means A) unable to be authenticated. B) likely to be contradicted. C) without empirical support. D) not completely understood. 4. The sentence in lines 10-13 (“For years... other”) mainly serves to A) expose a side of the narrator that he prefers to keep hidden. B) demonstrate that the narrator thinks in a methodical and scientific manner. C) show that the narrator feels himself to be influenced by powerful and independent forces. D) emphasize the length of time during which the narrator has prepared for his expedition. 5. The narrator indicates that many previous explorers seeking the North Pole have A) perished in the attempt. B) made surprising discoveries. C) failed to determine its exact location. D) had different motivations than his own. 6. Which choice provides the best evidence for the answer to the previous question? A) Lines 20-21 (“Nobody... died”) B) Lines 25-27 (“All... out”) C) Lines 31-34 (“The... newspaper”) D) Lines 51-53 (“Behind... bedsteads”) 7. Which choice best describes the narrator’s view of his expedition to the North Pole? A) Immoral but inevitable B) Absurd but necessary C) Socially beneficial but misunderstood D) Scientifically important but hazardous 8. The question the narrator asks in lines 30-31 (“Will it... railway”) most nearly implies that A) balloons will never replace other modes of transportation. B) the North Pole is farther away than the cities usually reached by train. C) people often travel from one city to another without considering the implications. D) reaching the North Pole has no foreseeable benefit to humanity. 9. As used in line 49, “take the slightest interest in” most nearly means A) accept responsibility for. B) possess little regard for. C) pay no attention to. D) have curiosity about. 10. As used in line 50, “bearing” most nearly means A) carrying. B) affecting. C) yielding. D) enduring.11. Which choice best summarizes the first paragraph of the passage (lines 1-35)? A) The 2010 census demonstrated a sizeable growth in the number of middle-class families moving into inner cities. B) The 2010 census is not a reliable instrument for measuring population trends in American cities. C) Population growth and demographic inversion are distinct phenomena, and demographic inversion is evident in many American cities. D) Population growth in American cities has been increasing since roughly 2000, while suburban populations have decreased. 12. According to the passage, members of which group moved away from central-city areas in large numbers in the early 2000s? A) The unemployed B) Immigrants C) Young professionals D) African Americans 13. In line 34, “flat” is closest in meaning to A) static. B) deflated. C) featureless. D) obscure. 14. According to the passage, which choice best describes the current financial situation in many major American cities? A) Expected tax increases due to demand for public works B) Economic hardship due to promises made in past years C) Greater overall prosperity due to an increased inner-city tax base D) Insufficient revenues due to a decrease in manufacturing 15. Which choice provides the best evidence for the answer to the previous question? A) Lines 36-39 (“America’s... decades”) B) Lines 43-44 (“How . . . not know”) C) Lines 44-46 (“What... now”) D) Lines 48-51 (“The truth... end”) 16. The passage implies that American cities in 1974 A) were witnessing the flight of minority populations to the suburbs. B) had begun to lose their manufacturing sectors. C) had a traditional four-zone structure. D) were already experiencing demographic inversion. 17. Which choice provides the best evidence for the answer to the previous question? A) Lines 54-57 (“Much... Ernest W. Burgess”) B) Lines 58-59 (“It was... settlement”) C) Lines 66-71 (“Virtually... continuum”) D) Lines 72-75 (“As... home”) 18. As used in line 68, “conducted” is closest in meaning to A) carried out. B) supervised. C) regulated. D) inhibited. 19. The author of the passage would most likely consider the information in chart 1 to be A) excellent evidence for the arguments made in the passage. B) possibly accurate but too crude to be truly informative. C) compelling but lacking in historical information. D) representative of a perspective with which the author disagrees. 20. According to chart 2, the years 2000–2010 were characterized by A) less growth in metropolitan areas of all sizes than had taken place in the 1990s. B) more growth in small metropolitan areas than in large metropolitan areas. C) a significant decline in the population of small metropolitan areas compared to the 1980s. D) roughly equal growth in large metropolitan areas and nonmetropolitan areas. 21. Chart 2 suggests which of the following about population change in the 1990s? A) Large numbers of people moved from suburban areas to urban areas in the 1990s. B) Growth rates fell in smaller metropolitan areas in the 1990s. C) Large numbers of people moved from metropolitan areas to nonmetropolitan areas in the 1990s. D) The US population as a whole grew more in the 1990s than in the 1980s. 22. The primary purpose of the passage is to A) present the background of a medical breakthrough. B) evaluate the research that led to a scientific discovery. C) summarize the findings of a long-term research project. D) explain the development of a branch of scientific study. 23. The author’s attitude toward pharming is best described as one of A) apprehension. B) ambivalence. C) appreciation. D) astonishment. 24. As used in line 20, “expert” most nearly means A) knowledgeable. B) professional. C) capable. D) trained. 25. What does the author suggest about the transgenic studies done in the 1980s and 1990s? A) They were limited by the expensive nature of animal research. B) They were not expected to yield products ready for human use. C) They were completed when an anticoagulant compound was identified. D) They focused only on the molecular properties of cows, goats, and sheep. 26. Which choice provides the best evidence for the answer to the previous question? A) Lines 16-19 (“The trouble... need”) B) Lines 25-29 (“If they... milk”) C) Lines 35-36 (“At first... true”) D) Lines 37-40 (“That all... clots”) 27. According to the passage, which of the following is true of antithrombin? A) It reduces compounds that lead to blood clots. B) It stems from a genetic mutation that is rare in humans. C) It is a sequence of DNA known as a promoter. D) It occurs naturally in goats’ mammary glands. 28. Which choice provides the best evidence for the answer to the previous question? A) Lines 12-16 (“Many... more”) B) Lines 42-44 (“It acts... bloodstream”) C) Lines 44-46 (“But as... antithrombin”) D) Lines 62-65 (“The researchers... production”) 29. Which of the following does the author suggest about the “female goats” mentioned in line 59? A) They secreted antithrombin in their milk after giving birth. B) Some of their kids were not born with the antithrombin gene. C) They were the first animals to receive microinjections. D) Their cells already contained genes usually found in humans. 30. The most likely purpose of the parenthetical information in lines 63-64 is to A) illustrate an abstract concept. B) describe a new hypothesis. C) clarify a claim. D) define a term. 31. The phrase “liquid gold” (line 71) most directly suggests that A) GTC has invested a great deal of money in the microinjection technique. B) GTC’s milking parlors have significantly increased milk production. C) transgenic goats will soon be a valuable asset for dairy farmers. D) ATryn has proved to be a financially beneficial product for GTC 32. In Passage 1, Burke indicates that a contract between a person and society differs from other contracts mainly in its A) brevity and prominence. B) complexity and rigidity. C) precision and usefulness. D) seriousness and permanence. 33. As used in line 4, “state” most nearly refers to a A) style of living. B) position in life. C) temporary condition. D) political entity. 34. As used in line 22, “low” most nearly means A) petty. B) weak. C) inadequate. D) depleted. 35. It can most reasonably be inferred from Passage 2 that Paine views historical precedents as A) generally helpful to those who want to change society. B) surprisingly difficult for many people to comprehend. C) frequently responsible for human progress. D) largely irrelevant to current political decisions. 36. How would Paine most likely respond to Burke’s statement in lines 30-34, Passage 1 (“As the... born”)? A) He would assert that the notion of a partnership across generations is less plausible to people of his era than it was to people in the past. B) He would argue that there are no politically meaningful links between the dead, the living, and the unborn. C) He would question the possibility that significant changes to a political system could be accomplished within a single generation. D) He would point out that we cannot know what judgments the dead would make about contemporary issues. 37. Which choice provides the best evidence for the answer to the previous question? A) Lines 41-43 (“Every... it”) B) Lines 43-45 (“The vanity... tyrannies”) C) Lines 56-58 (“It is... accommodated”) D) Lines 67-72 (“What... time”) 38. Which choice best describes how Burke would most likely have reacted to Paine’s remarks in the final paragraph of Passage 2? A) With approval, because adapting to new events may enhance existing partnerships. B) With resignation, because changing circumstances are an inevitable aspect of life. C) With skepticism, because Paine does not substantiate his claim with examples of governments changed for the better. D) With disapproval, because changing conditions are insufficient justification for changing the form of government. 39. Which choice provides the best evidence for the answer to the previous question? A) Lines 1-4 (“To avoid... state”) B) Lines 7-9 (“he should... solicitude”) C) Lines 27-29 (“It is... perfection”) D) Lines 34-38 (“The municipal... community”) 40. Which choice best states the relationship between the two passages? A) Passage 2 challenges the primary argument of Passage 1 . B) Passage 2 advocates an alternative approach to a problem discussed in Passage 1 . C) Passage 2 provides further evidence to support an idea introduced in Passage 1 . D) Passage 2 exemplifies an attitude promoted in Passage 1 . 41. The main purpose of both passages is to A) suggest a way to resolve a particular political struggle. B) discuss the relationship between people and their government. C) evaluate the consequences of rapid political change. D) describe the duties that governments have to their citizens. 42. The main purpose of the passage is to A) describe periods in Earth’s recent geologic history. B) explain the methods scientists use in radiocarbon analysis. C) describe evidence linking the volcano Samalas to the Little Ice Age. D) explain how volcanic glass forms during volcanic eruptions. 43. Over the course of the passage, the focus shifts from A) a criticism of a scientific model to a new theory. B) a description of a recorded event to its likely cause. C) the use of ice core samples to a new method of measuring sulfates. D) the use of radiocarbon dating to an examination of volcanic glass. 44. Which choice provides the best evidence for the answer to the previous question? A) Lines 17-25 (“In 2012... 1455 C.E.”) B) Lines 43-46 (“The researchers... atop the volcano”) C) Lines 46-48 (“They examined... material”) D) Lines 55-60 (“The team... 13th century”) 45. The author uses the phrase “is written in” (line 6) most likely to A) demonstrate the concept of the hands-on nature of the work done by scientists. B) highlight the fact that scientists often write about their discoveries. C) underscore the sense of importance that scientists have regarding their work. D) reinforce the idea that the evidence is there and can be interpreted by scientists. 46. Where does the author indicate the medieval volcanic eruption most probably was located? A) Near the equator, in Indonesia B) In the Arctic region C) In the Antarctic region D) Near the equator, in Ecuador 47. Which choice provides the best evidence for the answer to the previous question? A) Lines 1-3 (“About 750 . . . Ice Age”) B) Lines 26-28 (“Such a . . . the cooling”) C) Lines 49-54 (“The volume . . . the Holocene”) D) Lines 61-64 (“It’s not... climate impacts”) 48. As used in line 68, the phrase “Another possible candidate” implies that A) powerful volcanic eruptions occur frequently. B) the effects of volcanic eruptions can last for centuries. C) scientists know of other volcanoes that erupted during the Middle Ages. D) other volcanoes have calderas that are very large. 49. Which choice best supports the claim that Quilotoa was not responsible for the Little Ice Age? A) Lines 3-4 (“Identifying... tricky”) B) Lines 26-28 (“Sucha... cooling”) C) Lines 43-46 (“The researchers... atop the volcano”) D) Lines 71-75 (“But... closer match”) 50. According to the data in the figure, the greatest below-average temperature variation occurred around what year? A) 1200 CE B) 1375 CE C) 1675 CE D) 1750 CE 51. The passage and the figure are in agreement that the onset of the Little Ice Age began A) around 1150 CE. B) just before 1300 CE. C) just before 1500 CE. D) around 1650 CE. 52. What statement is best supported by the data presented in the figure? A) The greatest cooling during the Little Ice Age occurred hundreds of years after the temperature peaks of the Medieval Warm Period. B) The sharp decline in temperature supports the hypothesis of an equatorial volcanic eruption in the Middle Ages. C) Pyroclastic flows from volcanic eruptions continued for hundreds of years after the eruptions had ended. D) Radiocarbon analysis is the best tool scientists have to determine the temperature variations after volcanic eruptions."]
+		}
+	},
+
+
+computeQuestionNum: function(argIndex)
+{
+	return (argIndex % 52) + 1;
+},
+
+highlightPatterns: function(e)
+{
+	var item = e.model.item;
+	//console.log(item);
+	var matches = item.matches.questions.split(" ");
+	var numMatches = matches.length;
+	for(i = 0; i < numMatches; i++)
+	{
+		var q = document.querySelector("#" + matches[i]);
+		//console.log(q);
+		this.toggleHighlight(q);
+	}
+},
+
+toggleHighlight: function(argElem)
+{
+	var color = argElem.style.background;
+	if(color == "yellow")
+	{
+		argElem.style.background = "white";
+	}
+	else
+	{
+		argElem.style.background = "yellow";
+	}
+},
+		
+	
+created: function()
+{
+
+},
+
+ready: function()
+{
+	this.qList = ["As used in line 2, “form” most nearly means", "Which choice best describes what happens in the passage?", "Which choice best describes the developmental pattern of the passage?", "The authors’ use of the words “exact,” “specific,” and “complement” in lines 47-49 in the final paragraph functions mainly to", "As used in line 19, “demands” most nearly means"];
+	this.questionList = {};
+	this.matches = {};
+	this.questionArray = [];
+},
+
+sortMatches: function(argOne, argTwo)
+{
+	//console.log(argOne);
+	//console.log(argTwo);
+	var lenOne = argOne.matches.endWord - argOne.matches.startWord;
+	var lenTwo = argTwo.matches.endWord - argTwo.matches.startWord;
+	//console.log("lenOne = " + lenOne + " and lenTwo = " + lenTwo);
+	if(lenOne == lenTwo)
+	{
+		if(argOne.pattern == argTwo.pattern)
+		{
+			return 0;
+		}
+		else
+		{
+			return (argOne.pattern > argTwo.pattern? 1: -1);
+		}
+	}
+	else
+	{
+		return (lenOne > lenTwo? -1 : 1);
+	}
+},
+
+persistQuestions: function()
+{
+	var fanoutObj = {};
+	var numQuestions = this.questionList.length;
+	var keys = Object.keys(this.questionList);
+	for(i =0; i < 3; i++)
+	{
+		fanoutObj['/questions/' + keys[i]] = this.questionList[keys[i]];
+		if(this.questionList[keys[i]].questionType == "main_point")
+		{
+			fanoutObj['/mainpoint_questions/' + keys[i]] = this.questionList[keys[i]];
+		}
+		else if(this.questionList[keys[i]].questionType == "definition")
+		{
+			fanoutObj['/definition_questions/' + keys[i]] = this.questionList[keys[i]];
+		}
+	}
+	//console.log(fanoutObj);
+	var fb = new Firebase("https://focusedstaging1.firebaseio.com/");
+	fb.update(fanoutObj);
+},
+
+loadQuestion: function(argQuestionId, argStem, argChoices)
+{
+	////console.log("argStem = " + argStem);
+	var type = argStem.indexOf("most nearly means") > -1 ? "definition": "main_point";
+	var q = new FcQuestion(argQuestionId, argStem, argChoices, "A", type); //"unknownType");
+	this.questionList[argQuestionId] = q;
+	//{questionId: argQuestionId, stem: argStem};
+	this.push("questionArray", q);
+//		{questionId: argQuestionId, stem: argStem});
+},
+
+loadAnswerChoices: function(argQuestionId, argChoiceString)
+{
+	var resultArray = [];
+	var choices = argChoiceString.split(/[A-D]\)/);
+	//console.log(choices);
+	var numChoices = choices.length;
+	var letter = "A";
+	for(i = 0; i < numChoices; i++)
+	{
+		var choice = new FcAnswerChoice(argQuestionId, letter, "A", choices[i], "unknownType");
+		resultArray.push(choice);
+		letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+	}
+	return resultArray;
+},
+
+loadQuestionAndAnswers: function(argTestNum, argSectionNum, argQuestionNum, argText)
+{
+	argQuestionNum = ("00" + argQuestionNum).slice(-2);
+	var questionId = "T" + argTestNum + "S1Q" + argQuestionNum;
+	var parts = argText.split(/ A\)/);
+	var stem = parts[0];
+	var choiceString = parts[1];
+	var choices = this.loadAnswerChoices(questionId, choiceString);
+	this.loadQuestion(questionId, stem, choices);
+},
+
+loadAllQuestionsAndAnswers: function()
+{
+	this.questionList = {};
+	var numTests = this.rawQuestionsData.length;
+	var i = 0;
+	for(i = 0; i < numTests; i++)
+	{	
+		var passageQuestionsString = this.rawQuestionsData[i];
+		var testNum = i + 1;
+		var sectionNum = 1;
+		var questions = passageQuestionsString.split(/[1-9][0-9]*\. /g);
+		questions.shift(); //remove blank before first question
+		//console.log(questions);
+		var j = 0;
+		var numQuestions = questions.length; // don't count pre
+		for(j = 0; j < numQuestions; j++)
+		{
+			this.loadQuestionAndAnswers(testNum, sectionNum, j+1, questions[j]);
+		}
+	}
+	//console.log(this.questionList);
+},
+
+
+stripQuotes: function(argString)
+{
+	var quote = argString;
+	var matches = quote.match( /\“.+?\”/g ); 
+	if(matches == null) return argString;
+
+	////console.log("found quote = " + matches);
+	var numMatches = matches.length;
+	var location = 0;
+	for(i = 0; i < numMatches; i++)
+	{
+		var quoteStart = quote.indexOf("\“", location);
+		var quoteEnd = quote.indexOf("\”", location);
+		quote = quote.replace(matches[i], "QUOTE"+i);
+		location = quoteEnd;
+	}
+	////console.log(argString);
+	return quote;
+},
+
+stripPrepositions: function(argString)
+{
+	var preps = this.shortPrepList.split(" ");
+	var numPreps = preps.length;
+	for(i = 0; i < numPreps; i++)
+	{
+		var prepStr = "/[,\[\]\(\)\:\;\!\. ]+" + preps[i] + "[,\[\]\(\)\:\;\!\. ]+/g";
+		var rez = argString.match(prepStr);
+		//console.log(rez);
+		//argString = argString.replace(prepStr, "PREPOSITION");
+		argString = argString.replace(/ (aboard|about|above|across|after|against|along|amid|among|anti|around|at|before|behind|below|beneath|beside|besides|between|beyond|by|concerning|considering|despite|during|excluding|following|from|in|inside|into|like|minus|near|of|off|on|onto|opposite|outside|over|past|per|plus|regarding|round|since|than|through|to|toward|towards|under|underneath|unlike|until|upon|versus|via|with|within|without) /g, " PREPOSITION ");
+	}
+	return argString;
+},
+
+stripLineNum: function(argString)
+{
+	var quoteStart = argString;
+	var matches = argString.match( /\(?line [0-9]+\)?/g ); 
+	if(matches != null)
+	{
+		////console.log("found line num string = " + matches);
+		var numMatches = matches.length;
+		var location = 0;
+		for(i = 0; i < numMatches; i++)
+		{
+			argString = argString.replace(matches[i], "LINENUM"+i);
+			location = argString.indexOf("line", location) + 1;
+		}
+		////console.log(argString);
+	}
+	matches = argString.match(/\(?lines [0-9]+-[0-9]+\)?/g);
+	if(matches != null)
+	{
+		////console.log("found line num string = " + matches);
+		var numMatches = matches.length;
+		var location = 0;
+		for(i = 0; i < numMatches; i++)
+		{
+			location = argString.indexOf("lines", location) + 1;
+			argString = argString.replace(matches[i], "LINENUM"+i);
+		}
+		////console.log(argString);
+	}
+	matches = argString.match(/LINENUM[0-9]( and LINENUM[0-9])*/);
+	if(matches != null)
+	{
+		var numMatches = matches.length;
+		var location = 0;
+		for(i = 0; i < numMatches; i++)
+		{
+			argString = argString.replace(matches[i], "LINENUMS");
+		}
+	}
+	matches = argString.match(/the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last|final|penultimate) paragraph/g);
+	if(matches != null)
+	{
+		////console.log("found paragraph string = " + matches);
+		var numMatches = matches.length;
+		var location = 0;
+		for(i = 0; i < numMatches; i++)
+		{
+			argString = argString.replace(matches[i], "PARAGRAPH"+i);
+			location = argString.indexOf("paragraph", location) + 1;
+		}
+		////console.log(argString);
+	}
+	return argString;
+},
+
+isDupe: function(argMatchObj)
+{
+	var keys = Object.keys(this.matches);
+	//console.log(keys.length);
+	var result = false;
+
+	var numKeys = keys.length;
+
+	var i = 0;
+	for(i = 0; i < numKeys; i++)
+	{
+		//check argument pattern match object against existing matches
+		var match = this.matches[keys[i]];
+		if(argMatchObj.pattern == keys[i])
+		{
+			//exact pattern already in the match list; duplicate
+			result = true;
+			break;
+		}
+		else if( (keys[i].indexOf(argMatchObj.pattern) > -1)
+			//&& match.startWord == argMatchObj.startWord
+			//&& match.endWord >= argMatchObj.endWord
+			&& (match.questions.indexOf(argMatchObj.questions) > -1) )
+		{
+			result = true;
+			break;
+		}
+	}
+	return result;
+},
+stripCommonPatterns: function(argString)
+{
+	var result = argString.replace("as it is used", "AS USED");
+	result = result.replace("as used", "AS USED");
+	//console.log(result);
+	return result;
+},
+
+stripAuthor: function(argString)
+{
+	var result = argString.replace("authors", "AUTHOR");
+	result = result.replace("author", "AUTHOR");
+	return result;
+},
+
+findPatterns: function()
+{	
+	this.matches = {};
+	//this.loadAllQuestionsAndAnswers();
+
+	var i = 0;
+	var j = 0;
+	var keys = Object.keys(this.questionList);
+
+	var numQ = keys.length;
+
+	for(i = 0; i < numQ; i++)
+	{
+		var stem = this.questionList[keys[i]].stem;
+		stem = stem.toLowerCase();
+		//console.log(stem + "*");
+
+		stem = this.stripQuotes(stem);
+		//console.log(stem + "*");
+		stem = this.stripLineNum(stem);
+		//console.log(stem + "*");
+		stem = this.stripNonAlpha(stem);
+		//console.log(stem + "*");
+		stem = this.stripAuthor(stem);
+		//console.log(stem + "*");
+		stem = this.stripCommonPatterns(stem);
+		//stem = this.stripPrepositions(stem);
+		this.questionList[keys[i]].stem = stem;
+	}
+
+	for(i = 0; i < numQ; i++)
+	{
+		var wordArray = this.questionList[keys[i]].stem.split(" ");
+		var numWords = wordArray.length;
+		//this.stripNonAlpha(wordArray);
+		//console.log(this.matches);
+
+		for(startWord = 0; startWord < numWords; startWord++)
+		{
+			for(endWord = numWords-1; endWord > startWord; endWord--)
+				//j=numWords -1; j > 0; j--)
+			{
+				var k = startWord+1;
+				var patt = wordArray[startWord];
+				while(k <= endWord)
+				{
+					patt += " ";
+					patt += wordArray[k];
+					k++;
+				}
+				//console.log("Question " + (i+1) + " pattern to search for = " + patt);
+				var m = i+1;
+				var matchObj = {"pattern": patt, "questions": "", "startWord": startWord, "endWord":endWord};
+				////console.log(this.matches);
+				for(m=i+1;m<numQ;m++)
+				{
+					var matches = this.questionList[keys[m]].stem.match(patt);
+					if(matches != null)
+					{
+						//console.log("found match for question " + (i+1) + " pattern(" + patt + ") in question " + (m+1));
+						//if(!this.matches[patt])
+						if(matchObj.questions == "")
+						{
+							//this.matches[patt] = {questions: i.toString(), startWord:0, endWord:j};
+							var qNum = "00" + ((i%52)+1);
+							var qId = "T" + (Math.floor(i / 52) + 1) + "S1Q" + qNum.slice(-2);
+							matchObj.questions = qId; //(i+1).toString();
+						}
+						matchObj.questions += " ";
+						var newQNum = "00" + ((m%52)+1);
+						var newQID = "T" + (Math.floor(m/52) + 1) + "S1Q" + newQNum.slice(-2);
+						matchObj.questions += newQID; //(m+1).toString();
+						//this.matches[patt].questions += " ";
+						//this.matches[patt].questions += m.toString();
+					}
+				}
+				//console.log(this.matches);
+				//console.log(matchObj.questions);
+				if(matchObj.questions == "")
+				{
+				}
+				else if(this.isDupe(matchObj))
+				{
+					//console.log("did not insert match for pattern (" + patt + ") " + matchObj.questions);
+				}
+				else
+				{
+					this.matches[patt] = matchObj;
+					var keyz = Object.keys(this.matches);
+					for(z = 0; z < keyz.length; z++)
+					{
+						//console.log(keyz[z]);
+						//console.log(this.matches[keyz[z]]);
+					}
+				}
+			}
+		}
+/*
+		for(j = 0; j < (numWords - 1); j++)
+		{
+			var m = 1;
+			var patt = wordArray[j];
+			while(m < numWords)
+			{
+				patt = patt + " " + wordArray[j+m];
+				m++;
+			}
+			//alert("testing pattern = " + patt);
+			var pattFound = patterns.indexOf(patt);
+			if(pattFound == -1)
+			{
+				patterns.push(patt);
+				//alert("adding pattern '" + patt + "' to the list");
+				var where = patterns.indexOf(patt);
+				patternCounts[where] = 1;
+				patternOccurences[where] = i + 1;
+				//alert("just added an occurence of " + patt + ". Occurences = " + patternOccurences[where]);
+			}
+			else
+			{
+				//alert("incrementing the count for pattern '" + patt + "'");
+				patternCounts[pattFound]++;
+				var questionNum = i + 1;
+				patternOccurences[pattFound] = patternOccurences[pattFound] + ", " + keys[i];
+				//alert("just added an occurence of " + patt + ". Occurences = " + patternOccurences[pattFound]);
+			}
+		}
+		*/
+	}
+	var keyz = Object.keys(this.matches);
+	for(z = 0; z < keyz.length; z++)
+	{
+		//console.log(keyz[z]);
+		//console.log(this.matches[keyz[z]]);
+		this.push("patternArray", {"pattern": keyz[z], "matches": this.matches[keyz[z]] });
+		Polymer.dom.flush();
+	}
+	////console.log(this.matches);
+
+},
+
+stripNonAlpha: function(argString)
+{
+		argString = argString.replace(/\,/g, "");
+		argString = argString.replace(/\./g, "");
+		argString = argString.replace(/\!/g, "");
+		argString = argString.replace(/\?/g, "");	
+		argString = argString.replace(/\;/g, "");
+		argString = argString.replace(/\:/g, "");
+		argString = argString.replace(/\-/g, "");
+		argString = argString.replace(/\—/g, "");
+		argString = argString.replace(/\”/g, "");
+		argString = argString.replace(/\“/g, "");
+		return argString;
+},
+
+factoryImpl: function(){
+
+},
+
+attached: function(){
+	//console.log(this.questionList);
+},
+
+detached: function(){
+
+}
+
+});
+
+</script>
+</dom-module>
