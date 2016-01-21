@@ -1,0 +1,304 @@
+<dom-module id="fc-central-display">
+	<template>
+	<style> 
+	:host{	
+			display: flex;
+			@apply(vertical layout container flex)
+		}
+		.inputClass {
+			height: 65px;
+			width: 150px;
+			margin: 4px 40px 4px 40px;
+			padding: 3px;
+		}
+		.buttonone {
+			height: 24px;
+			width: 24px;
+
+		}
+		.controlpanel {
+			color: #000066;
+			background: #fafafa;
+			border: 6px ridge silver;
+
+		}
+		.header{
+			text-align: center;
+			font-size: 16px;
+			color: #000066;
+			font-weight: 700;
+
+		}
+		.quadrantTwo{
+			position: absolute; top:0px; right: 0px; height: 32px; background:red; width: 48%;  height: 48%; cursor: move;
+
+		},
+		.quadrantOne{
+
+
+		},
+	</style>
+<paper-material style="background: blue; border: 7px ridge gold;" class$="{{_computeClassOne}}" on-track="resetHeight">
+	</paper-material>
+	
+
+
+	<paper-material style="position: absolute; left: 0px; top: 0px; right: 47%; height: 48%; width: 48%; background: blue; cursor: move;" class="flex layout horizontal wrap" on-track="resetWidth">
+		
+	</paper-material>
+	<paper-material style="height: 47%; width: 48%; position: absolute; left: 0px; bottom: 0px; height: 50%; width: 100%; background: green; cursor: move;" on-track="resetWidth">
+		
+	</paper-material>
+
+	<paper-material style=" height: 98%; width: 25%; border: 4px ridge silverl; position: absolute; right; 0px;">
+	</paper-material>
+	
+		
+		
+		<paper-dialog id="controlpanel" class="layout vertical flex wrap controlpanel">
+			<span class="header"> Enter Values to Change Display Properties</span>
+	<div class="horizontal layout flex wrap">
+		<paper-input 
+			id="widthInput"
+			step="10" 
+			label="Change My Width" 
+			type="number"
+			class="inputClass"
+			always-float-label 
+			value={{currentWidth}}>
+		</paper-input>
+		<paper-input 
+			name="backgroundInput"
+			id="backgroundInput" 
+			label="Change My Background Color" 
+			class="inputClass"
+			always-float-label 
+			value={{currentBackground}}>
+		</paper-input>
+		<paper-input 
+			step="10"
+			id="heightInput" 
+			label="Change My height" 
+			type="number"
+			class="inputClass" 
+			always-float-label
+			value={{currentHeight}}>
+		</paper-input>
+		
+	</div>
+	<div class="horizontal layout flex wrap">
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+	</div>
+	</paper-dialog>
+	</template>
+	<script>
+		'use strict';
+		(function() {
+			class fcCentralDisplay {
+				 get behaviors() { 
+				 	return [
+				 	Polymer.IronResizableBehavior,
+      				Polymer.IronRangeBehavior];
+				 }
+    			 beforeRegister() {
+
+    				this.is = 'fc-central-display';
+					this.properties = {
+						spanData: {
+							type: Object,
+							value: function(){return {};}
+						}, 
+						currentBackground:{
+							type: String, 
+							value: function(){
+								return 'white';
+							},
+							notify: true
+						},
+						initialWidth: {
+							type: String,
+							notify: true
+						},
+
+						currentWidth:{
+							type: Number, 
+							notify: true
+						},
+
+						rightLeftRight:{
+							type: String,
+							value: function(){
+								return 'right';
+							},
+							notify: true,
+							reflectToAttribute: true
+						},
+						timer: {
+							type: String,
+							value: "yes",
+							notify: true
+						},
+						hostAttributes: {
+							style:{
+								height: {
+									type: String,
+									computed: '_computeHostHeight(currentHeight, initialHeight)',
+									notify: true,
+									reflectToAttribute: true
+								},
+								width: {
+									type: String,
+									computed: '_computeHostHeight(currentWidth, initialWidth)',
+									notify: true,
+									reflectToAttribute: true,
+								},
+								background: {
+								type: String, 
+								computed: '_computedHostBackground(currentBackground, initialBackground)',
+								notify: true,
+								reflectToAttribute: true
+								},
+								borderRadius: {
+									type: String,
+									computed:'_computedBorderRadius(timer)',
+									notify: true,
+									reflectToAttribute: true
+								}
+							}
+						},
+						initialHeight: {
+							type: Number,
+							notify: true
+						},
+						initialBackground:{
+							type: String,
+							value: "white",
+							notify: true, 
+							reflectToAttribute: true
+						},
+						currentHeight:{
+							type: Number,
+							notify: true
+						},
+						_notifyingDescendant: {
+        					type: Boolean,
+        					value: true, 
+        					notify: true
+        				
+    					}
+				};
+
+				this.listeners = {
+                		'iron-resize': '_onIronResize'
+    	
+					};
+				}
+
+				attached(){
+					var ht = window.screen.height;
+					console.log(ht + 'this is the window height');
+					var wt = window.screen.width;
+					console.log(wt + 'this is the window Width');
+					var rect = this.getBoundingClientRectangle();
+					console.log(rect + 'this is the rectangle'); 
+				}
+
+				openDialog(){
+					this.$.controlpanel.open();
+				}
+				_onIronResize(){
+					
+				}
+				resetWidth(e){
+					var self=this;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            
+			            break;
+			          case 'track':
+			            self.currentWidth = self.currentWidth> 18? parseInt(self.currentWidth) + e.detail.ddx: self.currentWidth=23;
+			            var returnWidth = self.currentWidth;
+			            self.root.style.width = returnWidth.toString()+'px';
+			            break;
+			          case 'end':
+			            var returnWidth = self.currentWidth;
+			            self.root.style.width = returnWidth.toString()+'px';
+			            self.notifyResize();
+			            break;
+			           
+					}
+				}
+
+				_resizeHeight(e){
+					var self=this;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            break;
+			          case 'track':
+			            self.currentHeight = parseInt(self.currentHeight) + e.detail.ddy;
+			            self.root.style.height= self.currentHeight;
+			            break;
+			          case 'end':
+			            self.draggable=false;
+			            self.notifyResize();
+			            break;
+			           
+					}
+				}
+				
+				_computedHostBackground(currentBackground, initialBackground){
+					let bg = this.currentBackground !==this.initialBackground? this.currentBackground: this.initialBackground; 
+					return bg;
+				}
+				_computedHostHeight(currentHeigh, initialHeight){
+					let ht = this.currentHeight !==this.initialHeight? this.currentHeight: this.initialHeight; 
+					return ht;
+				}
+				_computedHostWidth(currentWidth, initialWidth){
+					let wt = this.currentWidth !==this.initialWidth? this.currentWidth: this.initialWidth; 
+					return wt;
+				}
+				_computedBorderRadius(timer){
+					let br = (timer=="yes")? '180px': "0px";
+					return ht;
+				}
+
+
+
+
+
+
+				// _computeFirstQuadrant(baseButton){
+				// 	return `firstQuadrant`;
+				// }
+				// _computeSecondQuadrant(baseButton){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeThirdQuadrant
+				// _computeFirstQuadrantExtended(extendedbutton){
+				// 	return `firstQuadrantExtended`;
+				// }
+				// _computeSecondQuadrant(button){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeSecondQuadrantExtended(extendedbutton){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeThirdQuadrantExtended{extendedbutton}
+				// _computeDoubleColumn(Exbutton)
+
+
+			}
+			Polymer(fcCentralDisplay);
+		})();
+	</script>
+</dom-module>

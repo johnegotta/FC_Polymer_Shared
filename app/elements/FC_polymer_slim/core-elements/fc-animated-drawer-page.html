@@ -2,16 +2,30 @@
   <style>
     :host {
       display: block;
-      overflow-y: scroll;
+      /*overflow-y: scroll;*/
       position: absolute;
       top: 0px;
       bottom: 0px;
       left: 0px;
       right: 0px;
+      background: white;
+      border: 1px solid black;
+      font-size: 1.0em;
+      font-size: 16px;
+      font-weight: 700;
+      font-color: #000066;
+      bg: magenta;
     }
     #headerPanel {
-      min-height: 250px;
-      background: blue;
+      min-height: 64px;
+      background: white;
+      border-bottom: 2px solid black;
+    }
+    paper-header-panel {
+      --paper-header-panel-seamed-container: {
+          overflow-y: visible;
+          overflow-x: visible;
+      };
     }
     .container {
       background: white;
@@ -20,43 +34,69 @@
       padding: 56px;
       max-width: 700px;
       margin: 0 auto;
+      box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
     }
+
+      #firepad{
+      border: 8px ridge silver; 
+      overflow: auto; 
+      resize: both;  
+      height: 55vh; 
+      width: 520px; 
+      margin: 12px;
+    }
+    #firepadControls{
+      z-index: 3; 
+      max-width: 580px; 
+      margin: 6px 6px;
+
+          @apply(--layout-horizontal center nowrap);
+    }
+
     h1 {
       font-size: 48px;
     }
     p {
-      font-size: 20px;
+      font-size: 16px;
     }
-    .row {
-      margin: 56px 0;
+    .tab-class{margin: auto; background: #c6dafc; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);
     }
+
   </style>
-
   <template>
-    <paper-header-panel mode="waterfall-tall">
-      <div id="headerPanel" mode="waterfall-tall" class="paper-header">
-        <content class="paper-header" select=".paper-header">
-
-
-
-        </content>
-      </div>
-      <div class="container">
-        <div class="content">
-        <content class="content main-content">
-
-
+    <paper-header-panel mode="seamed" class="flex">
+      <div id="headerPanel" class="paper-header horizontal layout">
+         <content id="valueHolder" select="fc-value-holder">
+      </content>
+            
+        <content select=".head">
 
         </content>
         </div>
-      </div>
+      <div class="horizontal layout flex" style="background:white;">
+        
+            <content id="contentMain" class="vertical layout flex content main-content self-stretch" select=".main">
+            </content>
+            <content id="contentSecondary" "vertical layout flex content main-content" select=".secondary">
+            </content>
+            <div id="firepad" class="right" hidden$="[[_computeFirepadHidden(isFirepad)]]">
+            </div>
+        </div>
     </paper-header-panel>
 </template>
   <script>
    FcAnimatedDrawerPage=Polymer({
       is: 'fc-animated-drawer-page',
-      behaviors: [Polymer.NeonSharedElementAnimatableBehavior],
-      properties: {
+      listeners: {
+        'tab-clicked':'tabClicked'
+      },
+      behaviors: 
+      [
+        Polymer.NeonSharedElementAnimatableBehavior,
+        FCBehaviors.FCFirepadBehavior
+      ],
+      properties: 
+      {
         animationConfig: {
           value: function() {
             return {
@@ -68,10 +108,14 @@
                 name: 'fade-in-animation',
                 node: this
               }],
-              'exit': {
+              'exit': [{
+                  name: 'hero-animation',
+                  id: 'hero',
+                  fromPage: this
+                }, {
                 name: 'fade-out-animation',
                 node: this
-              }
+              }]
             }
           }
         },
@@ -81,9 +125,78 @@
               'hero': this.$.headerPanel
             }
           }
-        }
-      }
-    });
-  </script>
+        },
+        
+    firepad: {
+      type:Object,
+      value:{},
+      notify: true, 
+    },
+    firepadRef: {
+      type:Object,
+      value:{},
+      notify: true,
+      
+    }, 
+    codeMirror: {
+      type: Object,
+      value: {},
+      notify: true
+    }, 
+    divId: {
+      type: String,
+      notify: true,
+      reflectToAttribute: true
+    },
+    isFirepad:{
+      type: Boolean,
+      notify: true,
+      reflectToAttribute: true
+    },
+    insideSelection: {
+      type: String,
+      notify: true,
+      reflectToAttribute: true
+    }
 
+      },
+      
+      created: function()
+        { },
+
+      ready: function(){
+        
+          
+        },
+
+   
+      attached: function(){
+       var insertionPoint = Polymer.dom(this.root).querySelector('content');
+           var transferEl = Polymer.dom(insertionPoint).getDistributedNodes()[0].isFirepad;
+           (transferEl)?this.set("isFirepad",true): this.set('isFirepad',transferEl);  
+           //console.log(this.isFirepad, transferEl);
+          this.async(function(){ if(this.isFirepad==true) {this.loadFirepad();}}, 1040);
+
+
+        },
+
+        _computeFirepadHidden: function(isFirepad){
+          
+         // console.log(this.divId);
+         var insertionPoint = Polymer.dom(this.root).querySelector('content');
+           var transferEl = Polymer.dom(insertionPoint).getDistributedNodes()[0].isFirepad;
+          // console.log(transferEl, "this should be the real value");
+          return !this.isFirepad;
+
+        },
+
+        tabClicked: function(event){
+          //console.log("IN ANIMATED DRAWER PAGE tabClicked", event.detail.tabName);
+          this.insideSelection = event.detail.tabName;
+        }
+
+
+     
+});
+</script>
 </dom-module>

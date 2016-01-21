@@ -1,0 +1,269 @@
+<dom-module id="fc-display-controller">
+<template>
+<style is="custom-style" this.shared-style>
+
+	:host{}
+	.super-content{min-height: 3900px !important;
+		overflow-y: scroll;
+	}
+
+	.icon-button{
+ display: inline-block;
+ border:7px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+ min-width: 12px;
+ min-height: 12px;
+ width: auto;
+ height: auto;
+ max-width: 64px;
+ max-height: 65px;
+ overflow-y: hidden;
+ margin: 8px;
+ font-size: 11px;
+ padding: 7px 8px;
+ box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ text-shadow: 0 1px 0 #FFFFFF;
+ background-color: #5DD7FC;
+}
+.icon-button-pressed{
+ border:7px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}	
+</style>
+<fc-resizing-drag-panel resizeWidth class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 12px; padding: 12px 24px; border: 3px ridge silver; width:95%;">
+          		
+          		<div class="paper-header" id="headerPanel" style="display: inline-block; margin-bottom: 12px; border-bottom: 2px solid black;"> 
+                   <paper-icon-button 
+                   		on-click="iconButtonTap"
+                   		id="verticalbutton" 
+                   		icon="editor:border-vertical"
+                   		class="icon-button"
+                   		data-icon="horizontal">
+                   	</paper-icon-button>
+                    <paper-icon-button 
+                    	on-click="iconButtonTap"
+                    	id="horizontalButton" 
+                    	icon="editor:border-horizontal"
+                    	data-icon="vertical"
+                    	class="icon-button"
+                    	>
+                    </paper-icon-button>
+                    <paper-icon-button 
+                    	id="buttondashboard" 
+                    	icon="icons:dashboard" 
+                    	data-icon="dashboard"
+                    	class="icon-button"
+                    	on-click="iconButtonTap"
+                    >
+                    </paper-icon-button>
+                    <paper-icon-button 
+                    	on-click="iconButtonTap"
+                    	id="showRight" 
+                    	icon="editor:border-right"
+                    	data-icon="showLeft"
+                    	class="icon-button"
+                    	>
+                    </paper-icon-button>
+                     <paper-icon-button 
+                    	on-click="iconButtonTap"
+                    	id="showBottom" 
+                    	icon="editor:border-style"
+                    	data-icon="showRight"
+                    	class="icon-button"
+                    	>
+                    </paper-icon-button>
+                    
+                  
+				</div>
+		
+	<fc-splitter-jc id="swapSplitter" orientation="[[_computeOrientation(swap, orientation)]]">
+			<content id="leftContent" class="layout vertical flex main-content left super-content" select=".left">
+			</content>
+
+			
+			<content id="rightContent" class="layout vertical flex main-content right super-content" select=".right">
+			</content>
+		</fc-splitter-jc>
+<!-- <fc-splitter-four>
+					
+						<div style="height: 1400px; width: 600px; background: red;" class="area1"></div>
+				
+		
+						<div  class="area2" style="height: 1400px; width: 800px; background: blue;" ></div>
+
+						<div class="area3" style="height: 1400px; width: 600px; background: green;" ></div>
+
+				
+						<div  class="area4" style="height: 1400px; width: 900px; background: yellow;" ></div>
+					
+			</fc-splitter-four> -->
+
+
+</fc-resizing-drag-panel>
+</template>
+<script>
+FcDisplayController = Polymer({
+	is:'fc-display-controller',
+	behaviors: [Polymer.IronResizableBehavior],
+	listeners: {'iron-resize':'setUp',				
+				},
+	properties: {
+		orientation: {
+			type: String,
+			value: 'horizontal',
+			notify: true,
+			reflectToAttribute: true
+		},
+		swap:{
+			type: String,
+			value: 'horizontal',
+			notify: true,
+			reflectToAttribute: true
+		},
+		myboolean:{
+			type: Number,
+			computed: '_computemyBoolean(swap)',
+			notify: true
+
+		},
+		myCounter:{
+				type: Number,
+				value: 1,
+				notify: true
+
+
+		}
+	   
+	},
+
+	ready: function(){
+		this.setUp();
+		
+	},
+
+	setUp: function()
+	{
+		this.screenTrueHeight =  (window.innerHeight-240);
+		var distributed = this.getContentChildren('#rightContent');
+        //console.log(distributed.length, this.screenTrueHeight, `here are my content elements`);
+        
+
+		
+	},
+
+	_computemyBoolean:function(swap){
+
+		var counter = swap=="horizontal"?1: swap=="vertical"? 2: swap=="dashboard"?3: "showLeft";
+		var returnCounter =counter==this.myboolean? 'showLeft': swap;
+		this.set("myCounter", counter);
+		this.set('orientation', swap);
+		return counter;
+		 
+
+	},
+	
+	tabButtonTap: function(e){
+		//console.log(e);
+				  var button = e.target;
+				  while (!button.hasAttribute('data-icon') && button!==document.body) {
+				    button = button.parentElement;
+				  }
+				  if (!button.hasAttribute('data-icon')) {
+				    return;
+				  }
+
+				  var alreadyPressed = this.querySelector('.icon-button-pressed');
+				  if(alreadyPressed){alreadyPressed.classList.remove('icon-button-pressed')};
+				  button.classList.add('icon-button-pressed');
+
+				  var orientation = button.getAttribute('data-icon');
+				  orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
+				  	this.async(function() {
+       				this.$.swapSplitter.attached();
+       						}, 300);;
+		         Polymer.dom.flush();
+				  this.set('orientation',orientation); 
+				   this.set('swap',orientation);
+				 		
+				  },
+	
+	iconButtonTap: function(e){
+		//console.log(e);
+				  var button = e.target;
+				  while (!button.hasAttribute('data-icon') && button!==document.body) {
+				    button = button.parentElement;
+				  }
+				  if (!button.hasAttribute('data-icon')) {
+				    return;
+				  }
+
+				  var alreadyPressed = this.querySelector('.icon-button-pressed');
+				  if(alreadyPressed){alreadyPressed.classList.remove('icon-button-pressed')};
+				  button.classList.add('icon-button-pressed');
+
+				  var orientation = button.getAttribute('data-icon');
+				  orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
+				  	this.async(function() {
+       				this.$.swapSplitter.attached();
+       						}, 300);;
+		         Polymer.dom.flush();
+				  this.set('orientation',orientation); 
+				   this.set('swap',orientation);
+				 		
+				  },
+				
+		// var self = this;
+		// var target= e.target;
+		// console.log(target);
+		
+		// 	var iconName = target.getAttribute('data-icon');
+		// 	console.log(iconName);
+		// 		switch(iconName) {
+		//     case "vertical":
+		//     			this.set("orientation", "vertical");
+		//     			this.async(function() {
+  //     				this.$.swapSplitter.attached();
+  //     						}, 300);;
+		// 			Polymer.updateStyles();
+		//         break;
+		//     case "horizontal":
+		//         this.set("orientation", 'horizontal');
+		//         this.async(function() {
+  //     				this.$.swapSplitter.attached();
+  //     						}, 300);;
+		//         Polymer.dom.flush();
+		//         break;
+		//     case "dashboard":
+		//     		this.set("orientation", 'dashboard');
+		//         	this.async(function() {
+  //     				this.$.swapSplitter.attached();
+  //     						}, 300);;
+		//         Polymer.dom.flush();
+
+			
+	
+	
+	_computeOnOff: function(swap){},
+
+
+	_computeOrientation: function(swap){
+		this.async(function() {
+      		this.$.swapSplitter.attached();
+      		}, 300);
+		console.log(swap + "I am the swap", swap + "I am the swap", swap + "I am the swap", swap + "I am the swap");
+		return swap;
+	}
+
+});
+</script>
+</dom-module>

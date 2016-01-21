@@ -1,0 +1,177 @@
+<dom-module id="fc-inputs-repeater"> 
+<style>
+  .icon-button{
+     display: inline-block;
+     border:3px solid #2435C9;
+     color: #FFFFFF;
+     border-radius: 180px 180px 180px 180px;
+     -webkit-border-radius: 180px 180px 180px 180px;
+     -moz-border-radius: 180px 180px 180px 180px;
+     font-family: Merriweather;
+     min-width: 24px;
+     min-height: 24px;
+     width: auto;
+     height: auto;
+     max-width: 48px;
+     max-height: 48px;
+     margin: 12px;
+     font-size: 11px;
+     padding: 7px 8px;
+     box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+     -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+     -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+     text-shadow: 0 1px 0 #FFFFFF;
+     background-color: #5DD7FC;
+    }
+  .icon-button:hover  {
+ border:7px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+} 
+
+  .tab-buttons{
+ display: inline-block;
+ border: none;
+ color: #FFF;
+ border-radius: 4px;
+ -webkit-border-radius: 4px;
+ -moz-border-radius: 4px;
+ font-family: Times New Roman;
+ width: auto;
+ height: auto;
+ font-size: 20px;
+ margin: 12px;
+ padding: 6px 16px;
+ box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ text-shadow: 0 1px 0 #48576D;
+ background-image: linear-gradient(to top, #4771FC, #79FCF8);
+ background-color: #3F45FC;
+}
+  .tab-buttons:hover, .tab-buttons:active{
+ border: none;
+ color: #FFF;
+ box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -moz-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -webkit-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ background-color: #395e8d;
+}
+</style>
+  <template>  
+    <template 
+            is="dom-repeat" 
+            hidden="{{!dataSourceIconButtons}}"class="horizontal layout flex nowrap" items="{{dataSourceIconButton}}">
+      <section
+            id="tabsFirepadViewControls" 
+            scrollable="true" 
+            class="head flex nowrap horizontal layout left-justified tab-class"
+            style="float: left; margin-right: 48px; overflow-x: scroll;"
+            > 
+               <paper-icon-button
+                  hidden$="{{item.hidden}}"
+                  id$="[[item.contextLinkId]]_icon" 
+                  icon$="[[item.icon]]"
+                  class$="{{item.iconClass}}"
+                  data-inputname$="[[item.inputName]]"
+                  on-tap$="[[item.iconButtonTap]]"
+                  >
+                </paper-icon-button> 
+      </section>
+  </template>
+
+  <template 
+            is="dom-repeat" 
+            hidden="{{!dataSourceButtonTabs}}" class="horizontal layout flex nowrap" items="{{dataSourceButtonTabs}}">
+      <section
+            id="{{buttonTabContextId}}" 
+            hidden="{{!dataSourceButtonTabs}}" 
+            scrollable="true" 
+            class="head flex nowrap horizontal layout left-justified tab-class"
+            style="float: right; margin-right: 48px; overflow-x: scroll;"
+            >     
+            <button
+                hidden$="{{!item.hiddenButton}}"
+                data-inputname$="{{item.inputName}}"
+                id$='[[item.contextLinkId]_buttonTab'
+                meta="[[item.meta]]"
+                class$="[[item.buttonTabClass]] tab-buttons"
+                on-tap="onTabClick"
+                >
+                  [[item.tabName]]
+            </button> 
+      </section>
+  </template>
+
+ <template 
+      is="dom-repeat" 
+      hidden="{{!dataSourcePaperInputs}}" 
+      class="horizontal layout flex nowrap" 
+      items="{{dataSourcePaperInputs}}">
+        <paper-input
+            hidden$="{{!item.hiddenPaperInput}}"
+            data-inputname$="{{item.inputName}}_input"
+            id$='[[item.contextLinkId]_paperInput'
+            meta="[[item.otherInfo]]"
+            class$="[[item.inputClass]] paperInput"
+            on-tap="">
+        </paper-input> 
+</template>
+ <template is="dom-repeat" hidden="!{{dataSourceDropDownMenu}}" class="horizontal layout flex nowrap" items="{{dataSourceDropDownMenu}}">
+  <fc-dropdown-menu
+        hidden=$"{{!item.hiddenDropDownMenu}}"
+        data-inputname$="{{item.inputName}}_dropDownMenu"
+        id$='[[item.contextLinkId]_dropDownMenu'
+        meta="[[item.meta]]"
+        class$="[[item.inputClass]] dropDownMenu min-width: 360px;" 
+        on-select="{{toggleSelection}}"
+        data-source="{{contentArrays}}" 
+        selected="{{selected}}">
+  </fc-dropdown-menu> 
+</template>
+  <script>
+    (function() {
+          'use strict';
+      class FCInputsRepeater {
+        get behaviors() {
+          return [Polymer.IronResizableBehavior
+          //add databehavior?
+          ];
+        }
+        beforeRegister() {
+          this.is ="fc-inputs-repeater";
+          this.listeners = {};//not sure on semi-colon
+          this.observeres={};
+          this.properties = {
+            dataSource: {
+                value: Array,
+                notify: true,
+                reflectToAttribute: true
+            },
+            dataSourceButtonTabs:{
+              value: Array,
+              notify: true,
+              reflectToAttribute: true
+            },
+          };
+          //end properties
+        }//end before register
+        //note: should have observers in before register?
+        //note: no commas in functions
+        //note no word function in functions??
+        ready(){
+
+        }
+        attached(){
+
+
+        }
+      }//end of Class
+      Polymer(FCInputsRepeater);
+    })();
+  </script>
+</dom-module>
+

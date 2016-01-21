@@ -1,0 +1,220 @@
+<dom-module id="fc-splitter-four">
+	<template>
+		<style>
+			:host {
+			    position: absolute;
+			    top: 0;
+			    left: 0;
+			    bottom: 0;
+			    right: 0;
+			    overflow-y: scroll;
+			    margin: 20px;
+			    visibility: hidden;
+			}
+			.verticalSplitBar {
+				/*position: absolute;
+				top: 0;
+				bottom: 0;*/
+				height: auto;
+				width: 10px;
+				background: silver;
+			}
+			.horizontalSplitBar {
+				height: 10px;
+				width: 100%;
+				background: silver;
+			}
+			
+		</style>
+		<!-- <div id="allHolder" style="position: relative;"> -->
+		<div class$="{{mainLayout}}">
+			<div id="areas1and2" class="[[computeSecondaryLayout(mainLayout)]] ">
+				<div id="area1" class="areabox flex"style="background: red;">
+					<content select=".area1"></content>
+				</div>
+				
+				<paper-material id="splitBar1and2" class$="[[computeSecondarySplitBarOrientation(mainLayout)]]" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
+				</paper-material>
+
+				<div id="area2" class="areabox flex" style="background: blue;">
+					<content select=".area2"></content>
+				</div>
+			</div>
+			
+			<paper-material 
+				id="splitBarMain" 
+				class$="[[computeMainSplitBarOrientation(mainLayout)]]" 
+				on-mouseover="useSplitCursor" 
+				on-mouseleave="useAutoCursor" 
+				on-dragstart="startDragging"
+				>
+			</paper-material>
+
+			<div id="areas3and4" class$="[[computeSecondaryLayout(mainLayout)]] ">
+				<div id="area3" class="areabox flex" style="background: yellow;">
+					<content select=".area3"></content>
+				</div>
+				
+				<paper-material id="splitBar3and4" class$="{{computeSecondarySplitBarOrientation(mainLayout)}}" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
+				</paper-material>
+
+				<div id="area4" class="areabox flex" style="background: green;">
+					<content select=".area4"></content>
+				</div>
+			</div>
+		</div>
+
+	</template>
+	<script>		
+		(function(){
+			'use strict';
+
+			class FCSplitterFour {
+
+				get behaviors() {
+					return [
+						Polymer.IronResizableBehavior,
+						Polymer.NeonAnimatableBehavior,
+						Polymer.NeonAnimationRunnerBehavior
+					];
+				}
+
+				beforeRegister() {
+					this.is ='fc-splitter-four';
+					//this.listeners = {'iron-resize':'_onIronResize'};
+					this.properties = {
+						mainLayout: {
+							type: String,
+							value: 'horizontal layout',
+							notify: true
+						},
+						secondaryLayout: {
+							type: String,
+							computed: 'computeSecondaryLayout(mainLayout)',
+							notify: true
+						},
+						mainSplitBarOrientation: {
+							type: String,
+							computed: 'computeMainSplitBarOrientation(mainLayout)',
+							notify: true
+						},
+						secondarySplitBarOrientation: {
+							type: String,
+							computed: 'computeSecondarySplitBarOrientation(mainLayout)',
+							notify: true
+						},
+						animationConfig: {
+							value: function(){
+								return {
+									'entry': [{
+										name: 'fade-in-animation',
+										animation: 'fade-in-animation'
+									}]
+								};
+							}
+						}
+					};
+				}
+
+				attached() {
+					this.async(function(){
+						var nodeList = Polymer.dom(this.root).querySelectorAll('.areabox');
+						//this.animationConfig['entry'][0].nodes = Array.prototype.slice.call(nodeList);
+						//console.log(this.animationConfig);
+						//this.show();
+					});
+				}
+
+				show() {
+					//console.log("IN 4SPLITTER SHOW");
+					this.style.visibility = 'visible';
+					this.playAnimation('entry');
+				}
+
+				startDragging(event) {
+					//console.log("IN STARTDRAGGING", event.target, event.target.style);
+					event.target.style.left="400px";
+				}
+
+				computeSecondaryLayout(mainLayout) {
+					//console.log("Called compute secondary");
+					let returnLayout = (mainLayout == 'horizontal layout') ? 'vertical layout' : 'horizontal layout';
+					//console.log(`Called compute secondary ${returnLayout}`);
+					return returnLayout;
+				}
+
+				computeMainSplitBarOrientation(mainLayout) {
+					let returnLayout = (mainLayout == 'horizontal layout')? 'verticalSplitBar' : 'horizontalSplitBar';
+					//console.log(`Called main Bar ${returnLayout}`);
+					return returnLayout;
+				}
+
+				computeSecondarySplitBarOrientation(mainLayout) {
+					let returnLayout = (mainLayout == 'horizontal layout') ? 'horizontalSplitBar' : 'verticalSplitBar';
+					//console.log(`called secondary Bar ${returnLayout}`);
+					return returnLayout;
+				}
+
+				useSplitCursor(e) {
+					//console.log("IN USE SPLIT CURSOR", e);			
+					this.style.cursor = e.target.classList.contains('horizontalSplitBar') ? "ns-resize" : "ew-resize";
+			    }
+
+			    useAutoCursor(e){
+			        if(!this.dragging)
+			        {
+			            this.style.cursor = "auto";
+			        }
+			    }
+
+			}
+			
+			Polymer(FCSplitterFour);	
+		})();
+	</script>
+</dom-module>
+
+<!-- 		/*#allHolder {
+				width: 100%;
+				height: 50%;
+			}
+			#allHolder > ::content .areabox {
+				background: red;
+				overflow-y: scroll;
+			}
+			#allHolder > ::content div:not(.areabox) {
+				display: none;
+			}
+			#allHolder > ::content .area1 {
+				position: absolute;
+				top: 0;
+				left: 0;
+				background: blue;
+			}
+			#allHolder > ::content .area2 {
+				position: absolute;
+				top: 0;
+				right: 0;
+				background: yellow;
+			}
+			#allHolder > ::content .area3 {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				background: red;
+			}
+			#allHolder > ::content .area4 {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				background: green;
+			}
+			.verticalSplitBar {
+				position: absolute;
+				background: silver;
+			}
+			.horizontalSplitBar {
+				height: 10px;
+				width: 100%;
+				background: silver;
+			}*/ -->

@@ -31,48 +31,61 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                   type: Boolean,
                   value: true, 
                   notify: true
-              }
+              },
+            screenWidth: {
+              type: Number,
+              notify: true,
+              reflectToAttribute: true
+            }
           },
      
 	listeners:{
-		track: '_focusedRootResize'},         
+		track: '_focusedRootResize'}, 
+
+  ready: function(){
+    console.log(window.screen.width);
+    this.set('screenWidth', window.screen.width);
+  },       
 
  _focusedRootResize: function(e){
       var self = this;
           e.preventDefault();
       switch(self.name){
-        case 'resizer':
-              switch(e.detail.state) {
-                case 'start':
-                  self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
-                  self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
-                 break;
-                case 'track':
-                  var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
-                  var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
-                  var trueWidth = nwidth.toString()+'px';
-                  var trueHeight = newheight.toString()+'px';
-             
-                  self.parentNode.currentWidth=trueWidth;
-                  self.parentNode.currentHeight=trueHeight;
-                  self.parentNode.style.width= trueWidth;
-                  self.parentNode.style.height= trueHeight;
+        // case 'resizer':
+        //       switch(e.detail.state) {
+        //         case 'start':
+        //           self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+        //           self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
+        //           console.log(self.parentNode.currentHeight, self.parentNode.currentWidth, 'pay attention to this one');
+        //          break;
+        //         case 'track':
+        //           var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+        //           var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+        //           var trueWidth = nwidth.toString()+'px';
+        //           var trueHeight = newheight.toString()+'px';
+                  
+           
+        //           self.parentNode.currentWidth=trueWidth;
+        //           self.parentNode.currentHeight=trueHeight;
+        //           self.parentNode.style.width= trueWidth;
+        //           self.parentNode.style.height= trueHeight;
                 
-                  break;
-                case 'end':
-                  self.parentNode.notifyResize();
-                  self.root.ironResize;
-                  Polymer.dom.flush();
-                  break;
-              }
-            break;
-        case 'widthResizer':
+        //           break;
+        //         case 'end':
+        //           self.parentNode.notifyResize();
+        //           self.root.ironResize;
+        //           Polymer.dom.flush();
+        //           break;
+        //       }
+        //     break;
+        case 'leftDrawer':
             switch(e.detail.state) {
                 case 'start':
                   self.set('parentNode.currentWidth', window.getComputedStyle(self.parentNode, null).getPropertyValue("width"));
                   break;
                 case 'track':
                   var nwidth = parseInt(self.parentNode.currentWidth) + e.detail.ddx;
+                  nwidth=(self.screenWidth> 1600 && nwidth>self.screenWidth-200)? self.screenWidth-200: nwidth;
                   var trueWidth = nwidth.toString()+'px';
                   self.parentNode.currentWidth=trueWidth;
                   self.parentNode.style.width= trueWidth;
@@ -80,27 +93,26 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                   break;
                 case 'end':
                   self.parentNode.notifyResize();
-                  Polymer.dom.flush();
                   break;
               }
             break;
-        case 'heightResizer':
-            switch(e.detail.state) {
-                case 'start':
-                      self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
-                      break;
-                case 'track':
-                      var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
-                      var trueHeight = newheight.toString()+'px';
-                      self.parentNode.currentHeight=trueHeight;
-                      self.parentNode.style.height= trueHeight;
-                      break;
-                case 'end':
-                      self.parentNode.notifyResize();
-                      Polymer.dom.flush();
-                      break;     
-                }
-            break;
+        // case 'heightResizer':
+        //     switch(e.detail.state) {
+        //         case 'start':
+        //               self.set('parentNode.currentHeight', window.getComputedStyle(self.parentNode, null).getPropertyValue("height"));
+        //               break;
+        //         case 'track':
+        //               var newheight = parseInt(self.parentNode.currentHeight) + e.detail.ddy;
+        //               var trueHeight = newheight.toString()+'px';
+        //               self.parentNode.currentHeight=trueHeight;
+        //               self.parentNode.style.height= trueHeight;
+        //               break;
+        //         case 'end':
+        //               self.parentNode.notifyResize();
+        //               Polymer.dom.flush();
+        //               break;     
+        //         }
+        //     break;
         case 'rightDrawer': 
             switch(e.detail.state) {
                 case 'start':
@@ -116,7 +128,6 @@ FCBehaviors.ResizerTagBehaviorImpl = {
                 case 'end':
                   self.parentNode.notifyResize();
                   self.parentNode.notifyResize();
-                  Polymer.dom.flush();
                   break;      
               }
           break;

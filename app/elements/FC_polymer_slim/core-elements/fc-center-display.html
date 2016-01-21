@@ -1,0 +1,326 @@
+<dom-module id="fc-center-display">
+	<template>
+	<style> 
+	:host{	
+			display: flex;
+			@apply(vertical layout container flex)
+		}
+		.inputClass {
+			height: 65px;
+			width: 150px;
+			margin: 4px 40px 4px 40px;
+			padding: 3px;
+		}
+		.buttonone {
+			height: 24px;
+			width: 24px;
+
+		}
+		.controlpanel {
+			color: #000066;
+			background: #fafafa;
+			border: 6px ridge silver;
+
+		}
+		.header{
+			text-align: center;
+			font-size: 16px;
+			color: #000066;
+			font-weight: 700;
+
+		}
+		.quadrant.one{
+			position: absolute; top:0px; right: 0px; height: 48%; width: 48%;/* For Safari 3.1 to 6.0 */
+    		transition: width 5s height 3s;}
+    	
+		.quadrant.two{
+			position: absolute; left: 0px; top: 0px; height: 48%; width: 48%;
+			-webkit-transition: width 5s height 3s; /* For Safari 3.1 to 6.0 */
+    		transition: width 5s height 3s;}
+    	
+		.quadrant.three{
+			position: absolute; left: 0px; bottom: 0px; height: 48%; width: 48%;
+		 	-webkit-transition: width 5s height 3s;}
+		
+		.quadrant.four{
+			position: absolute; right: 0px; bottom: 0px; height: 48%; width: 48%;}
+		
+
+		/*.quadrant.one  {height: 98%; width: 25%; position: absolute; right: 0px;top: 0px;}
+		.quadrant.two {width: 74%; height:71%;}
+		.quadrant.four {display: none;}
+		.quadrant.three {width:73%; height: 25%;} ;*/
+   
+
+div:hover {
+    width: 300px;
+}
+
+		/*/*.threePanel.one{height: 98%; width: 25%; position: absolute; right: 0px;top: 0px;}/*listright*/
+		/*.threePanel.two{width: 74%; height:71%;}
+		.threePanel.three{width: 74%; height: 27%;}
+		.threePanel.four{display: none;}*/
+	</style>
+	<fc-display-panel style="background: blue;" quadrant="1" class="quadrant one flex">
+	1
+	</fc-display-panel>
+	
+<!-- {{_computeClassOne(timer)}}[[_computeClassTwo(timer)]] // -->
+
+
+	<fc-display-panel class="quadrant three"  quadrant="3" style="border-top: 3px solid green; border-right: 3x solid green;">
+		3
+	</fc-display-panel>
+
+
+	
+		
+		
+		<paper-dialog id="controlpanel" class="layout vertical flex wrap controlpanel">
+			<span class="header"> Enter Values to Change Display Properties</span>
+	<div class="horizontal layout flex wrap">
+		<paper-input 
+			id="widthInput"
+			step="10" 
+			label="Change My Width" 
+			type="number"
+			class="inputClass"
+			always-float-label 
+			value={{currentWidth}}>
+		</paper-input>
+		<paper-input 
+			name="backgroundInput"
+			id="backgroundInput" 
+			label="Change My Background Color" 
+			class="inputClass"
+			always-float-label 
+			value={{currentBackground}}>
+		</paper-input>
+		<paper-input 
+			step="10"
+			id="heightInput" 
+			label="Change My height" 
+			type="number"
+			class="inputClass" 
+			always-float-label
+			value={{currentHeight}}>
+		</paper-input>
+		
+	</div>
+	<div class="horizontal layout flex wrap">
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+		<fc-dropdown-menu>
+		</fc-dropdown-menu>
+	</div>
+	</paper-dialog>
+	</template>
+	<script>
+		'use strict';
+		(function() {
+			class fcCenterDisplay {
+				 get behaviors() { 
+				 	return [
+				 	Polymer.IronResizableBehavior,
+      				Polymer.IronRangeBehavior];
+				 }
+    			 beforeRegister() {
+
+    				this.is = 'fc-center-display';
+					this.properties = {
+						spanData: {
+							type: Object,
+							value: function(){return {};}
+						}, 
+						currentBackground:{
+							type: String, 
+							value: function(){
+								return 'white';
+							},
+							notify: true
+						},
+						initialWidth: {
+							type: String,
+							notify: true
+						},
+
+						currentWidth:{
+							type: Number, 
+							notify: true
+						},
+
+						rightLeftRight:{
+							type: String,
+							value: function(){
+								return 'right';
+							},
+							notify: true,
+							reflectToAttribute: true
+						},
+						timer: {
+							type: String,
+							value: "yes",
+							notify: true
+						},
+						hostAttributes: {
+							style:{
+								height: {
+									type: String,
+									computed: '_computeHostHeight(currentHeight, initialHeight)',
+									notify: true,
+									reflectToAttribute: true
+								},
+								width: {
+									type: String,
+									computed: '_computeHostHeight(currentWidth, initialWidth)',
+									notify: true,
+									reflectToAttribute: true,
+								},
+								background: {
+								type: String, 
+								computed: '_computedHostBackground(currentBackground, initialBackground)',
+								notify: true,
+								reflectToAttribute: true
+								},
+								borderRadius: {
+									type: String,
+									computed:'_computedBorderRadius(timer)',
+									notify: true,
+									reflectToAttribute: true
+								}
+							}
+						},
+						initialHeight: {
+							type: Number,
+							notify: true
+						},
+						initialBackground:{
+							type: String,
+							value: "white",
+							notify: true, 
+							reflectToAttribute: true
+						},
+						currentHeight:{
+							type: Number,
+							notify: true
+						},
+						_notifyingDescendant: {
+        					type: Boolean,
+        					value: true, 
+        					notify: true
+        				
+    					}
+				};
+
+				this.listeners = {
+                		'iron-resize': '_onIronResize'
+    	
+					};
+				}
+
+				attached(){
+					var ht = window.screen.height;
+					console.log(ht + 'this is the window height');
+					var wt = window.screen.width;
+					console.log(wt + 'this is the window Width');
+					var rect = this.getBoundingClientRect();
+					
+				}
+
+				openDialog(){
+					this.$.controlpanel.open();
+				}
+				_onIronResize(){
+					
+				}
+				resetWidth(e){
+					var self=this;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            
+			            break;
+			          case 'track':
+			            self.currentWidth = self.currentWidth> 18? parseInt(self.currentWidth) + e.detail.ddx: self.currentWidth=23;
+			            var returnWidth = self.currentWidth;
+			            self.style.width = returnWidth.toString()+'px';
+			            break;
+			          case 'end':
+			            var returnWidth = self.currentWidth;
+			            self.style.width = returnWidth.toString()+'px';
+			            self.notifyResize();
+			            break;
+			           
+					}
+				}
+
+				resetHeight(e){
+					var self=this;
+					e.preventDefault();
+					
+			        switch(e.detail.state) {
+			          case 'start':
+			            break;
+			          case 'track':
+			            self.currentHeight = parseInt(self.currentHeight) + e.detail.ddy;
+			            self.style.height= self.currentHeight;
+			            break;
+			          case 'end':
+			            self.draggable=false;
+			            self.notifyResize();
+			            break;
+			           
+					}
+				}
+				
+				_computedHostBackground(currentBackground, initialBackground){
+					let bg = this.currentBackground !==this.initialBackground? this.currentBackground: this.initialBackground; 
+					console.log(Polymer.dom(this).getComputedStyles());
+					return bg;
+				}
+				_computedHostHeight(currentHeigh, initialHeight){
+					let ht = this.currentHeight !==this.initialHeight? this.currentHeight: this.initialHeight; 
+					return ht;
+				}
+				_computedHostWidth(currentWidth, initialWidth){
+					let wt = this.currentWidth !==this.initialWidth? this.currentWidth: this.initialWidth; 
+					return wt;
+				}
+				_computedBorderRadius(timer){
+					let br = (timer=="yes")? '180px': "0px";
+					return ht;
+				}
+
+
+
+
+
+
+				// _computeFirstQuadrant(baseButton){
+				// 	return `firstQuadrant`;
+				// }
+				// _computeSecondQuadrant(baseButton){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeThirdQuadrant
+				// _computeFirstQuadrantExtended(extendedbutton){
+				// 	return `firstQuadrantExtended`;
+				// }
+				// _computeSecondQuadrant(button){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeSecondQuadrantExtended(extendedbutton){
+				// 	return `secondQuadrant`;
+				// }
+				// _computeThirdQuadrantExtended{extendedbutton}
+				// _computeDoubleColumn(Exbutton)
+
+
+			}
+			Polymer(fcCenterDisplay);
+		})();
+	</script>
+</dom-module>

@@ -8,19 +8,32 @@ properties: {
           value: false,
           notify: true
         }, 
-    resizeWidth: { 
+    widthResizer: { 
         type: Boolean, //options are up, down and false
         value: false,
         notify: true,
         reflectToAttribute: true
       },
-    resizeHeight: {
+    heightResizer: {
       type: Boolean,
       value: false, //options are up, down and false
       reflectToAttribute: true,
       notify: true
     },
     rightDrawer: {
+      type: Boolean,
+      value: false, //options are up, down and false
+      reflectToAttribute: true,
+      notify: true
+    },
+    leftDrawer: {
+      type: Boolean,
+      value: false, //options are up, down and false
+      reflectToAttribute: true,
+      notify: true
+    },
+    verticalBar:
+    {
       type: Boolean,
       value: false, //options are up, down and false
       reflectToAttribute: true,
@@ -62,7 +75,7 @@ properties: {
       },
       resizeType:{
         type: String, 
-        computed: 'computeResizeType(resizing,resizeWidth, resizeHeight,rightDrawer)',
+        computed: 'computeResizeType(leftDrawer, rightDrawer)',
         notify: true,
         reflectToAttribute: true 
       }
@@ -77,44 +90,84 @@ properties: {
     // ],
 
  ready: function(){
-  if(this.resizing){
+  // if(this.resizing){
+  //   var resizerTag = document.createElement('fc-resizer-tag');
+  //   var rndmNum = new Date().getMilliseconds();
+  //   var theId = "theResizer" + rndmNum;
+  //   Polymer.dom(resizerTag).setAttribute("id",theId);
+  //   Polymer.dom(resizerTag).setAttribute("name","resizer");
+  //   Polymer.dom(this.root).appendChild(resizerTag);  
+  //   Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: gold; width: 64px; height: 100vh;"); 
+  //  // Polymer.dom.flush();
+  //   }
+  // else if(this.widthResizer){
+  //   var resizerTag = document.createElement('fc-resizer-tag');
+  //   var rndmNum = new Date().getMilliseconds();
+  //   //fixed for unique instances
+  //   // Polymer.dom(resizerTag).setAttribute("id",theId);
+  //   Polymer.dom(resizerTag).setAttribute("name","widthResizer");
+  //   var tagParent = this.$$('fc-resizing-drag-panel');
+  //   Polymer.dom(this).appendChild(resizerTag);  
+  //   Polymer.dom.flush();
+  //   Polymer.dom(resizerTag).setAttribute("style", "position: absolute; margin-right: 24px;top: -12px; margin-left: 6px; opacity: 1; width: 22px; height: 103%; cursor: e-resize; background: grey;" );
+  //   //Polymer.dom.flush();
+  // }
+  // if(this.heightResizer){
+  //   var resizerTag = document.createElement('fc-resizer-tag');
+  //   var rndmNum = new Date().getMilliseconds();
+  //   //fixed for unique instances
+  //   Polymer.dom(resizerTag).setAttribute("id",theId);
+  //   Polymer.dom(resizerTag).setAttribute("name","heightResizer");
+  //   Polymer.dom(this.root).appendChild(resizerTag);  
+  //   Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: 0px; bottom: 0px; background: gold; width: 100%; height: 64px;"); 
+  //   //Polymer.dom.flush();
+  //   }
+  // if(this.verticalBarRight){
+  //   var resizerTag = document.createElement('fc-resizer-tag');
+  //   var rndmNum = new Date().getMilliseconds();
+  //   var theId = "theVerticalBarRight" + rndmNum;
+  //   Polymer.dom(resizerTag).setAttribute("name","verticalBarRight");
+  //   Polymer.dom(resizerTag).setAttribute("id",theId);
+  //   Polymer.dom(this.root).appendChild(resizerTag);  
+  //   Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: gold; width: 64px; height: 100%;");  
+  //  // Polymer.dom.flush();
+  //   }
+  if(this.leftDrawer){
     var resizerTag = document.createElement('fc-resizer-tag');
     var rndmNum = new Date().getMilliseconds();
-    Polymer.dom(resizerTag).setAttribute("name","resizer");
+    var theId="leftDrawerTag_" + rndmNum.toString();
+    Polymer.dom(resizerTag).setAttribute("id","leftTrueDrawer");
+    Polymer.dom(resizerTag).setAttribute("name","leftDrawer");
     Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: green; width: 18px; height: 18px;")  
-    Polymer.dom.flush();
-    }
-  else if(this.resizeWidth){
-    var resizerTag = document.createElement('fc-resizer-tag');
-    var rndmNum = new Date().getMilliseconds();
-    //fixed for unique instances
-    Polymer.dom(resizerTag).setAttribute("name","widthResizer");
-    Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: -12px; top: -8px; margin-right: -24px; opacity: 0; width: 36px; height: 100%; cursor: e-resize;" )  
-    Polymer.dom.flush();
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: -4px; top: -3px; bottom: -2px; margin-left:-4px; margin-right: -4px; opacity: 0; background: #008; z-index: 5990; width: 32px; height: 105%; cursor: e-resize;" );  
+
   }
-  else if(this.resizeHeight){
+  
+  if(this.rightDrawer){
     var resizerTag = document.createElement('fc-resizer-tag');
     var rndmNum = new Date().getMilliseconds();
     //fixed for unique instances
-    Polymer.dom(resizerTag).setAttribute("name","heightResizer");
-    Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; right: 0px; bottom: 0px; background: yellow; width: 100%; height: 18px;")  
-    Polymer.dom.flush();
-    }
-  else if(this.rightDrawer){
-    var resizerTag = document.createElement('fc-resizer-tag');
-    var rndmNum = new Date().getMilliseconds();
-    //fixed for unique instances
+    // Polymer.dom(resizerTag).setAttribute("id",theId);
     Polymer.dom(resizerTag).setAttribute("name","rightDrawer");
     Polymer.dom(this.root).appendChild(resizerTag);  
-    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: -12px; top: -8px; margin-left:6px; width: 42px; height: 100%; opacity: 0; cursor: w-resize;")  
-    Polymer.dom.flush();
+    Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: -4px; top: -3px; bottom: -2px; margin-right:-4px; width: 22px; height: 105%; z-index:6000; opacity: 1; cursor: w-resize; background: #008;"); 
+
     }
   },
-  computeResizeType: function(resizing, resizeWidth, resizeHeight, rightDrawer){
-      var resizeType = (resizing)?'resizing':(resizeWidth)?'resizeWidth':(resizeHeight)?'resizeHeight': (rightDrawer)?'rightDrawer':'';
+  // if(this.rightPanelVertical){
+  //   var resizerTag = document.createElement('fc-resizer-tag');
+  //   var rndmNum = new Date().getMilliseconds();
+  //   //fixed for unique instances
+  //   Polymer.dom(resizerTag).setAttribute("id",theId);
+  //   Polymer.dom(resizerTag).setAttribute("name","rightDrawer");
+  //   Polymer.dom(this.root).appendChild(resizerTag);  
+  //   Polymer.dom(resizerTag).setAttribute("style", "position: absolute; left: -12px; top: -8px; margin-right:6px; width: 22px; height: 100%; z-index:6000; opacity: 1; cursor: w-resize; background: grey;");  
+   // Polymer.dom.flush();
+    // }
+    
+
+  computeResizeType: function(rightDrawer, leftDrawer){
+      var resizeType = (rightDrawer)?'rightDrawer':(leftDrawer)?"leftDrawer":"";
       console.log(resizeType);
       return resizeType;
   }
@@ -130,7 +183,7 @@ properties: {
 
 <!-- _removeResizer: function(){
         Polymer.dom(this).removeAttribute(this.resizeType);
-        var resizeTypeToRemove = this.$$([name|this.resizeType]);
+        var resizeTypeToRemove = this.$$([id|this.resizeType]);
         Polymer.dom(this).removeChild(resizeTypeToRemove);
         alert(resizeTypeToRemove);
       },

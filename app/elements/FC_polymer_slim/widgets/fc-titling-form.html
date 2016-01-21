@@ -1,0 +1,223 @@
+<dom-module id="fc-titling-form">
+	<style>
+  :host{
+      max-height: 3500px;
+    min-width: 600px;
+    max-width: 900px;
+     overflow-y: scroll;
+     margin:auto;
+     padding: auto;
+  }
+	
+
+  paper-card.form {padding: 16px;
+  	border: 4px double #008;
+  	margin: auto;
+  	min-height: 1080px;
+    max-height:9000px;
+    max-width: 840px !important;
+  	padding: auto;
+    overflow-y: scroll;
+    outline: 8px solid white;
+ --paper-card-header: {
+    border-bottom: 4px solid #efefef;
+
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+    };
+    --paper-card-header-image: {
+        width: 144px;
+        height: 108px;
+        margin-top: 22px;
+        position: absolute: 
+        left: 25px: top: 25px;
+    };
+   
+    --paper-card-header-text: {
+      color: #008;
+      margin-right: 50px;
+      line-height: 1.2;
+      font-size: 34px;
+      font-weight: 600;
+      @apply(--layout-vertical);
+        @apply(--layout-center);
+    };
+
+
+  
+
+@apply(--paper-card);
+@apply(--paper-card-header-text);
+@apply(--paper-card-header-image);
+}
+
+  .headSeparator{
+                  width: 100%;
+                  background: #006;
+                  border-top: 4px solid #006; 
+                  border-bottom: 6px solid #c6dafc;
+                  height: 4px;
+
+
+                            }
+
+
+	</style>
+	<template>
+
+
+ <paper-card 
+    heading="The Focused Form Generator" 
+    image="../../../images/FC_frontpage_logo.png" 
+    style="border-bottom: 6px edged gold; overflow-y: scroll; margin: auto; padding: auto;" 
+    elevation="5" 
+    class="form vertical flex wrap layout" 
+    animated-shadow="true">
+ <paper-material class="headSeparator"></paper-material>
+ <form is="iron-form" class="form" id="formGet" method="get" action="/">
+<content>
+</content>
+      <div class="card-actions horizontal layout container center-justified">
+          <paper-button raised
+              on-tap="submitHandler" class="flex=1">Record and Continue</paper-button>
+          <paper-button raised
+              class="flex-1"
+              onclick="resetHandler(event)">Clear</paper-button>
+      </div>
+</form>
+</paper-card>
+
+
+	</template>
+	<script>
+		'use strict';
+		(function() {
+			class FCTitlingForm {
+				get behaviors() {
+					return [Polymer.IronResizableBehavior
+					//add databehavior?
+					];
+				}
+				beforeRegister() {
+					this.is ="fc-titling-form";
+					this.listeners = {
+            "radio-checked-changed": "handleRadioChecked", "onclick": "display"};
+					this.observeres={};
+					this.properties = {
+            generalCategory: {
+              type: Object, 
+              value: 
+              {  "paperInputType": "list",
+                 "bestInput": "selectable and tiered list",
+                 "categories": 
+                    [
+                    "Math", 
+                    "Reading", 
+                    "Grammar", 
+                    "Vocabulary", 
+                    "Writing Structure", 
+                    "Rhetoric", 
+                    "Learning Strategies", 
+                    "Focused Efficiency",
+                    "A Focused To-Do"
+                    ],
+                 "paperInputProperties":[
+                    {
+                      "dataSource": "dataSourcePaperInputs", /*this has no item in front of it*/
+                      "inputIdA": "thedynamically generated I",
+                      "inputClassA": `{this.classList.add(this.myClass);}`,
+                      "inputNameA":'computeThisValue',
+                      "tabIndexA": 0,
+                      "inputLabelA": "UserChoice",
+                      "inputValueB": "userChocie",
+                      "floatlabel": false,
+                      "autoComplet": true,
+                      // "inputTapA":`${this.innerHtml='something';}`,
+                      "inputNameA":"userChoice || dynamic",
+                      "inputTypeA": 'radio',
+                      "inputTypeB": "focusedDiv",
+                      "autoComplete": true,
+                      "required": false,
+                      "disabled":false,
+                      "invalid": false,
+                      "preventInvalidInput": true,
+                      "allowedPattern":"COMPUTEThisValueTWO",
+                      "validator": "SOME CODE FOR A VALIDATOR",
+                      "pattern": "some RedEx",
+                      "required": false,
+                      "autofocus": true,
+                      "inputmode": ["latin", 
+                                "latin-prose", 
+                                "fullwidth-latin", 
+                                "tel", 
+                                "email", 
+                                "url"], 
+                      "minlength": Number,
+                      "maxlength": Number,//chars in a string
+                      "min": Number, 
+                      "max": Number,
+                      "step": 10,
+                      "placeholder": false,
+                      "readonly": false,
+                      "list": "should restrict options to only the preselected to force menu-like behavior",
+                      "size": 18, //width in characters visible
+                      "autocapitalize": true,
+                      "autocorrect": true,
+                      "onChange": "itemMethodOnChange",//need to do something on this
+                      "tabindex": true,
+                      "autosave": true, 
+                      "results": 10,
+                      // "accept": "json" wasted prop
+                      "multiple": false,
+                      "meta":"String of stuff"
+                  }
+                ]
+              },
+              notify: true, 
+              reflectToAttribute: true
+            }
+            
+					}; //end properties
+			}
+           ready(){
+
+        }
+        attached(){
+
+        }
+       submitHandler(event){
+          var formResults = this.$.formGet.serialize();
+          console.log(formResults);
+
+        }
+        handleRadioChecked(event){
+          event.stopPropagation();
+          var generator = this.queryEffectiveChildren('fc-input-set-generator');
+          var inputs = generator.querySelectorAll('fc-input-prime[input-name=' + event.detail.name + ']');
+          var labels = generator.querySelectorAll('label');
+          console.log("In handleRadioChecked", labels);
+          for(var i=0; i < inputs.length; i++){
+            if(inputs[i].inputId !== event.detail.id){
+              inputs[i].checkedProp = false;
+              inputs[i].classList.remove('wrapper-checkbox-checked');
+            } else {
+              inputs[i].checkedProp = true;
+              inputs[i].classList.add('wrapper-checkbox-checked');
+            }
+          }
+        }
+        display(event) {
+          var output = document.getElementById('output');
+            output.innerHTML = JSON.stringify(event.detail);
+        }
+
+    
+        resetHandler(event) {
+          Polymer.dom(event).localTarget.parentElement.reset();
+        }
+
+			}//end of Class
+			Polymer(FCTitlingForm);
+		})();
+	</script>
+</dom-module>

@@ -1,0 +1,83 @@
+<dom-module id="fc-input-set-generator-test">
+	<style>
+	:host: {
+		width: calc(100%-64px);
+		min-width: 87%;
+		height: 96%;
+		border: 6px ridge #000066;
+		outline: gold;
+		@apply(--horizontal-layout-flex);
+	}
+
+	</style>
+	<template>
+
+
+
+<section>
+    <!-- <span 
+    	style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">
+    	{{item.inputRowSubHeader}}
+    </span> -->
+    <paper-material style="[[_computeRowBorderTop(RBheight, RBwidth, RBcolor)]] border-top: 3px ridged gold; border-bottom: 3px ridged silver;">
+    </paper-material>
+    <article class="horizontal layout flex no-wrap">
+		<section class="vertical layout flex-1">
+			<template is="dom-repeat" 
+      			class$="{{inputTemplateClass}}vertical layout flex wrap" 
+      			items="{{dataSourceInputs}}" as="input">
+					<fc-input-prime 
+						input-type="{{input.inputType}}"
+						input-name="{{input.name}}"
+						label="{{input.label}}" 
+						button-name="{{input.buttonName}}" 
+						type="{{input.inputType}}"
+						>
+					</fc-input-prime>
+    		</template>
+    	</section>
+    </article>
+   <!-- <span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowFooterHeader}}</span> -->
+</section> 
+
+	</template>
+	<script>
+	(function() {
+	'use strict';
+
+		class FCInputSetGeneratorTest {
+			get behaviors() {
+				return [
+					Polymer.IronResizableBehavior
+				];
+			}
+			
+			beforeRegister() {
+				this.is ="fc-input-set-generator-test";
+				//this.listeners = {"on-change": "_onChange"};
+				this.observers={};
+				this.properties = {
+					dataSourceInputs: {
+						type: Array,
+						value: function() {
+							return [];
+						},
+						notify: true
+					},
+					defaults:{
+						type: Object,
+						value:  {	
+						},
+						notify: true
+					}
+
+				}; //This properties closes 
+			}	//end before register
+
+			ready(){
+			}
+		}//end of Class
+		Polymer(FCInputSetGeneratorTest);
+	})();
+	</script>
+</dom-module>

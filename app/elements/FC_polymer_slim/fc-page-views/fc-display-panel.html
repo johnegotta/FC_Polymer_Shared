@@ -1,0 +1,332 @@
+<dom-module id="fc-display-panel">
+<template>
+<style>
+
+	:host{
+    min-height: 120vh;
+    height: 3500px;
+    background: white;
+    overflow-y: scroll;
+  
+}
+
+      paper-header-panel {
+        background: white; 
+        padding: 12px; 
+        border: 3px ridge silver;
+        min-height: 3500px;
+        overflow-y: scroll;
+       
+        @apply(--shadow-elevation-2dp);
+      }
+      .paper-header {
+        font-size: 16px;
+        background: white;
+        margin-bottom: 4px; 
+        border-bottom: 2px solid black; 
+        transition: height 0.2s;
+        min-height: 65px;
+      }
+      
+
+	.super-content{
+		overflow-y: scroll;
+	}
+  paper-icon-button {
+    visibility: visible;
+
+  }
+  * {visibility: visibile;}
+
+	.icon-button{
+ display: inline-block;
+ border:3px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+ min-width: 24px;
+ min-height: 24px;
+ width: auto;
+ height: auto;
+ max-width: 48px;
+ max-height: 48px;
+ margin: 12px;
+ font-size: 11px;
+ padding: 7px 8px;
+ box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -moz-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ -webkit-box-shadow: 12px 9px 11px 0 #41398A,8px 7px 15px 3px #D5DDE3,inset 0 0 0 1px #FCE88D,0 2px 4px 0 #D4D4D4;
+ text-shadow: 0 1px 0 #FFFFFF;
+ background-color: #5DD7FC;
+}
+::--webkit-scrollbar {
+                    display: none;
+}
+host::-webkit-scrollbar {
+                    display: none;
+               
+}
+nobar.div::-webkit-scrollbar {
+                    display: none;
+                    @apply;
+}
+paper-material::-webkit-scrollbar {
+                    display: none;
+}
+content::-webkit-scrollbar {
+                    width:0;
+}
+
+.icon-button:hover  {
+ border:7px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}	
+
+.tab-buttons{
+ display: inline-block;
+ border: none;
+ color: #FFF;
+ border-radius: 4px;
+ -webkit-border-radius: 4px;
+ -moz-border-radius: 4px;
+ font-family: Times New Roman;
+ width: auto;
+ height: auto;
+ font-size: 20px;
+ margin: 12px;
+ padding: 6px 16px;
+ box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+ text-shadow: 0 1px 0 #48576D;
+ background-image: linear-gradient(to top, #4771FC, #79FCF8);
+ background-color: #3F45FC;
+}
+.tab-buttons:hover, .tab-buttons:active{
+ border: none;
+ color: #FFF;
+ box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -moz-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -webkit-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ background-color: #395e8d;
+}
+
+</style>
+<fc-data-element id="marvin"></fc-data-element>
+<paper-header-panel class="vertical layout flex wrap text" header-mode="scroller" style="background: white; padding: 12px; border: 3px ridge silver;">
+  <div class="paper-header horizontal layout" style=''>
+      
+      
+      <fc-inputs-repeater data-source="{{dataSourceTwo}}"></fc-inputs-repeater>
+      <fc-inputs-repeater data-source='{{dataSourceOne}}'></fc-inputs-repeater>
+      <section
+        class="horizontal layout tab-class"
+        >
+            <template 
+                is="dom-repeat" 
+                class="horizontal layout flex nowrap" 
+                items="{{dataSourceOne}}">
+                    <button
+                          data-tabname$="{{item.tabName}}"
+                          id$='[[item.pageLinkId]'
+                          meta="[[item.otherInfo]]"
+                          class$="[[item.tabButtonsClass]]"
+                          on-tap="onTabClick"
+                          >
+                          [[item.tabName]]
+                    </button>
+            </template>
+    </section>
+  </div> 
+               
+                
+		
+		<div class="content" style="min-height: 3000px; height: 100%; width: 100%; overflow-y: scroll;">
+      <fc-splitter-four id="myPages" class="flex-2 vertical layout" orientation="horizontal">
+        <template
+          is="dom-repeat"
+          id="actualPages"
+          items="{{dataSourceOne}}"
+          observe="pageClass">
+            <div data-transition$="[[item.tabName]]" class$="{{item.pageClass}} flex">
+              <h2 class="main"><span>{{item.tabName}}</span> <span>{{index}}</span></h2>
+              <paper-button raised on-tap="testComm">Test Comm</paper-button>
+            </div>
+        </template>
+      </fc-splitter-four>
+		
+
+
+
+  <div style="height: 1200px; width: 1200px;align: center">
+    <div class="horizontal layout flex">
+      <div class="vertical layout flex">
+        <div class="flex-1 layout" on-tap='toThisRegion' style="background: blue;">1</div>
+        <div class="flex-1 layout" on-tap='toThisRegion' style="background: red;">3</div>
+      </div>
+      <div class="vertical layout flex">
+        <div class="flex-1 layout self-stretch" on-tap='toThisRegion' style="background: yellow;">2</div>
+        <div class="flex-1 layout self-stretch" on-tap='toThisRegion' style="background: green;">4</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</paper-header-panel>
+</template>
+<script>
+Polymer({
+	is:'fc-display-panel',
+	behaviors: [Polymer.IronResizableBehavior,
+              Polymer.NeonAnimatableBehavior
+              ],
+	listeners: {'iron-resize':'setUp',
+               'tap': 'onTabClick'
+      },				
+	properties: {
+    mySelected: {
+          type: String,
+          value: 'default',
+          notify: true,
+          reflectToAttributes: true
+        }, 
+		panelSelected:{
+			type: String,
+			value: function(){
+				return "left";
+			},
+			notify: true,
+			reflectToAttribute: true
+		}, 
+		orientation: {
+			type: String,
+			value: 'horizontal',
+			notify: true,
+			reflectToAttribute: true
+		},
+		swap:{
+			type: String,
+			value: 'horizontal',
+			notify: true,
+			reflectToAttribute: true
+		},
+		myboolean:{
+			type: Number,
+			computed: '_computemyBoolean(swap)',
+			notify: true
+
+		},
+		myCounter:{
+				type: Number,
+				value: 1,
+				notify: true
+		},
+    dataSourceOne: {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true
+
+    },
+    dataSourceTwo: {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true
+
+    },
+    boxSwitcher: {
+      type: Number,
+      value: 1,
+      notify: true
+    }
+     
+  },
+	   
+
+
+	ready: function(){
+		this.set('dataSourceOne', this.$.marvin.dataSourceOne);
+    this.set('dataSourceTwo', this.$.marvin.dataSourceTwo);
+    this.set('dataSourceThree', this.$.marvin.dataSourceThree);
+		
+	},
+  attached: function(){
+    this.set('dataSourceTwo', this.$.marvin.dataSourceTwo);
+    console.log(this.$.marvin.dataSourceTwo);
+    // this.style.height=(this.resizeHeight)?(Math.floor(.5(window.screen.height))).toString() + 'px':'700px';
+  },
+
+	setUp: function()
+	{
+		this.screenTrueHeight =  (window.innerHeight-240);
+		var distributed = this.getContentChildren('#rightContent');
+        //console.log(distributed.length, this.screenTrueHeight, `here are my content elements`);
+	},
+
+	_computemyBoolean:function(swap){
+
+		var counter = swap=="horizontal"?1: swap=="vertical"? 2: swap=="dashboard"?3: "showLeft";
+		var returnCounter =counter==this.myboolean? 'showLeft': swap;
+		this.set("myCounter", counter);
+		this.set('orientation', swap);
+		return counter;
+	},
+	
+
+	
+	iconButtonTap: function(e){
+				  var button = e.target;
+				  while (!button.hasAttribute('data-icon') && button!==document.body) {
+				    button = button.parentElement;
+				  }
+				  if (!button.hasAttribute('data-icon')) {
+				    return;
+				  }
+				  var orientation = button.getAttribute('data-icon');
+				  orientation = (orientation && orientation != this.orientation)?orientation: "showRight";
+				  	this.async(function() {
+       				this.$.swapSplitter.attached();
+       						}, 300);;
+		         Polymer.dom.flush();
+				  this.set('orientation',orientation); 
+				   this.set('swap',orientation);
+				 		
+				  },
+
+  onTabClick: function(event) {
+    var model = event.model;
+    this.boxSwitcher = (this.boxSwitcher)%4 + 1;
+    console.log("IN ON TAB CLICK", this.dataSourceOne);
+    model.set('item.pageClass', "areabox area" + this.boxSwitcher.toString());
+    this.$.myPages.distributeContent(true);
+  },
+  testComm: function(event) {
+    console.log(event);
+    console.log(this.$.myPages.getEffectiveChildren());
+    var oneToMove = this.$.myPages.queryEffectiveChildren('.area1');
+    oneToMove.classList.remove('area1');
+    oneToMove.classList.add('area2');
+    this.$.myPages.distributeContent(true);
+  },
+			
+	
+	
+	_computeOnOff: function(swap){},
+
+
+	_computeOrientation: function(swap){
+		this.async(function() {
+      		this.$.swapSplitter.attached();
+      		}, 300);
+		//console.log(swap, swap, swap, swap);
+		return swap;
+	}
+
+});
+</script>
+</dom-module>

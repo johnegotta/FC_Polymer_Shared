@@ -1,0 +1,260 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.KnowOwnLocationBehaviorImpl = {
+    properties: {
+	    topLeftX: {
+	        type: Number,
+	        reflectToAttribute: true,
+	        readOnly: true
+	    },
+	    topLeftY: {
+	    	type: Number,
+	    	reflectToAttribute: true,
+	    	readOnly: true
+	    },
+	    centerX: {
+	    	type: Number,
+	    	reflectToAttribute: true,
+	    	readOnly: true
+	    },
+	    centerY: {
+	    	type: Number,
+	    	reflectToAttribute: true,
+	    	readOnly: true
+	    },
+	 	width: {
+			type: Number,
+	    	reflectToAttribute: true,
+	    	readOnly: true
+	 	},
+	 	height: {
+	 		type: Number,
+	    	reflectToAttribute: true,
+	    	readOnly: true
+	 	}
+    }
+};
+FCBehaviors.KnowOwnLocationBehavior = [
+	Polymer.IronControlState,
+	Polymer.IronResizableBehavior,
+	FCBehaviors.KnowOwnLocationBehaviorImpl];
+</script>
+
+<!-- window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.MeasuringBehavior = {
+	
+	FocusedBehaviors.CentralDisplayMappingBehavior= {
+		properties: {
+			activeScreenAreaX: 
+			activeScreenAreaY:
+			numberOfChildDivisions: 
+			childNodes: 
+			descendentNodes: 
+			mobileNodes: 
+			mobileNodesRangeOfMotionY: 
+			mobileNodesRangeOfMotionX: 
+		}
+	}
+	scrollBehavior: 
+		properties: {
+			didScroll: {
+			type: Boolean,
+			value: function()
+			{
+				return true;
+			},
+			notify: true
+		},
+	function(){
+			didScroll = false;
+			var self=this;
+		    if (document.body.scrollTop > 150 || document.documentElement.scrollTop > 150 || didScroll == true)
+				{ 
+					document.querySelector('fc-passage-display').setUp;
+		   		 } 
+		   	else {
+		    		setInterval(function(didScroll){
+		   				 if(didScroll) {
+       				 didScroll = false;
+       				console.log('You scrolled');
+   		 		}
+   		 	},1300);
+    	}
+}
+	anyScroll: function(e) {
+        alert("Thank you for tapping");
+      },
+      specialTap: function(e) {
+        alert("It was special tapping");
+      }
+
+} -->
+
+
+<!-- <script>
+  /** @polymerBehavior Polymer.PaperButtonBehavior */
+  Polymer.PaperButtonBehaviorImpl = {
+    properties: {
+      /**
+       * The z-depth of this element, from 0-5. Setting to 0 will remove the
+       * shadow, and each increasing number greater than 0 will be "deeper"
+       * than the last.
+       *
+       * @attribute elevation
+       * @type number
+       * @default 1
+       */
+      elevation: {
+        type: Number,
+        reflectToAttribute: true,
+        readOnly: true
+      }
+    },
+    observers: [
+      '_calculateElevation(focused, disabled, active, pressed, receivedFocusFromKeyboard)',
+      '_computeKeyboardClass(receivedFocusFromKeyboard)'
+    ],
+    hostAttributes: {
+      role: 'button',
+      tabindex: '0',
+      animated: true
+    },
+    _calculateElevation: function() {
+      var e = 1;
+      if (this.disabled) {
+        e = 0;
+      } else if (this.active || this.pressed) {
+        e = 4;
+      } else if (this.receivedFocusFromKeyboard) {
+        e = 3;
+      }
+      this._setElevation(e);
+    },
+    _computeKeyboardClass: function(receivedFocusFromKeyboard) {
+      this.classList.toggle('keyboard-focus', receivedFocusFromKeyboard);
+    },
+    /**
+     * In addition to `IronButtonState` behavior, when space key goes down,
+     * create a ripple down effect.
+     *
+     * @param {!KeyboardEvent} event .
+     */
+    _spaceKeyDownHandler: function(event) {
+      Polymer.IronButtonStateImpl._spaceKeyDownHandler.call(this, event);
+      if (this.hasRipple()) {
+        this._ripple.uiDownAction();
+      }
+    },
+    /**
+     * In addition to `IronButtonState` behavior, when space key goes up,
+     * create a ripple up effect.
+     *
+     * @param {!KeyboardEvent} event .
+     */
+    _spaceKeyUpHandler: function(event) {
+      Polymer.IronButtonStateImpl._spaceKeyUpHandler.call(this, event);
+      if (this.hasRipple()) {
+        this._ripple.uiUpAction();
+      }
+    }
+  };
+  /** @polymerBehavior */
+  Polymer.PaperButtonBehavior = [
+    Polymer.IronButtonState,
+    Polymer.IronControlState,
+    Polymer.PaperRippleBehavior,
+    Polymer.PaperButtonBehaviorImpl
+  ];
+</script>-->
+<!-- measureFont: function(){
+		var lines = this.$.textColumnOne;		
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext("2d");
+		this.context = context;
+		var calcFontSize = window.getComputedStyle(lines, null).getPropertyValue('font-size');
+		var calcFontFam = window.getComputedStyle(lines, null).getPropertyValue('font-family');
+		this.context.font = context.font = calcFontSize + " " + calcFontFam;
+		return this.context;			
+	 }, -->
+<!-- <script>
+
+:	function (argPassageId)
+{
+	var passageMeasuredWordArrays = [];
+	var paragraphMeasuredWordArrays = [];
+	var lineMeasuredWordArrays = [];
+	var canvas = document.createElement('canvas');
+	var context = canvas.getContext("2d");
+	context.font = "12pt Roboto";
+	var truePassageContent = fc_passages[argPassageId].text.replace(/[\—]/g, " — ");
+	var paragraphArray = truePassageContent.split(/\n/);
+	var numParagraphs = paragraphArray.length;
+	var currentRow = 0;
+	for(i=0; i< numParagraphs; i++)
+	{
+		var widths = [312, 360, 400, 420, 520, 600, 620, 640];
+		var wordArray = paragraphArray[i].split(/\s/g);
+		console.log("here measure each word, separate it, save it, define it, characterize it, and then `objectify it`" + wordArray);
+		var numWords = wordArray.length;
+		var wordCount = 0;
+		
+		while(wordCount < numWords)
+		{
+			var currentLine = "";
+			var testLine = "";
+			var currentWidth = 0;
+			var space="&nbsp&nbsp&nbsp&nbsp";
+			var spaceOffset = "";
+			var j=0;
+			while(currentWidth < widths[j] && wordCount <= numWords)
+			{
+				currentLine = testLine;
+				if (testLine != "")
+				{
+					testLine += " "; //add a space if not beginning
+      				}
+      				else if(wordCount == 0)
+      				{
+      					//new paragraph
+      					testLine += space;
+      					spaceOffset = "aaaaaaaaaaaa";
+      				}
+      			var oldWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
+				testLine += wordArray[wordCount]; //add a word
+				currentWidth = context.measureText(testLine).width - context.measureText(spaceOffset).width;
+				var currentWord = wordArray[wordCount];
+				var wordWidth = currentWidth - oldWidth;
+				if(currentWidth<=widths[j]){
+					lineMeasuredWordArrays[currentRow].push({line:currentRow, order: wordCount, word: currentWord, pixels: wordWidth, "current line width": currentWidthm, definition: 'meaning', "part of speech": "part of speech"});
+				console.log(JSON.stringify(lineMeasuredWordArrays));
+				}
+				wordCount++;
+
+
+			}
+			j++;
+			if(wordCount != numWords)
+			{
+				//ended while loop b/c of line width, so undo one word
+				wordCount--;
+			}
+			//no line numbers on preface
+			if(i > 0)
+			{
+				paragraphMeasuredWordArrays[i]= lineMeasuredWordArrays[currentRow];
+				currentRow++; 
+			}
+
+			currentWidth = 0;
+			//newParaGRAPH
+		}
+		passageMeasuredWordArrays.push({paragraph: i,paragraphMeasuredWordArrays[i]};
+	}
+	var storethis = window.localStorage;
+	storethis.setItem(1,JSON.stringify(passageMeasuredWordArrays));
+				alert("stored passage 1");
+				
+};
+</script> -->

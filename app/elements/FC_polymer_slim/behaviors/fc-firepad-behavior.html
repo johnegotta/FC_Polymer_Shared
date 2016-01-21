@@ -1,0 +1,39 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FCFirepadBehavior = {
+
+    properties: {
+    	firepad: {
+			type:Object,
+			value:{},
+			notify: true,	
+		},
+		firepadRef: {
+			type:Object,
+			value:{},
+			notify: true,
+			reflectToAttributes: true	
+		}, 
+		codeMirror: {
+			type: Object,
+			value: {},
+			notify: true
+		}, 
+		firepadElement:{
+			type: Boolean,
+			relfectToAttribute: true,
+			notify: true
+		}
+    },
+
+ready: function(){ 
+	// (this.firepadElement)?this.loadFirepad():console.log('I checked if the firepadElementWereTrue, in behavior', this.firepadElement);
+},
+loadFirepad: function(){
+		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
+	}
+};
+</script>

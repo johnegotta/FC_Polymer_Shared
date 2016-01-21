@@ -1,0 +1,450 @@
+<dom-module id="fc-drag-router">
+<style>
+.edged{
+  outline-width: 0px;
+}
+
+.menuItems-light{
+  color: #aedafd;
+}
+.menubuttons{
+  display: inline-block; 
+  width:78px; 
+  height: 48px;
+}
+</style>
+<template>
+  
+<div id="dragMenu" draggable dragging="true" track style="max-height: 96px; min-height: 24px; min-width: 350px; background: #000066; border: 4px ridge #000066;"> 
+        
+
+<paper-tabs style$="width:{{basePlusDelta}}px; max-height: 92px; min-height: 24px; background: #aecdfe; whitespace: nowrap" class$="{{class}}" hide-scroll-buttons="true" scrollable="true" selected="{{route}}">
+  
+
+
+    <iron-icon class="dragTag"
+            name="fcdragtag"
+            id="dragtag{{dragtagid}}"
+            on-track="dragmeplease" 
+            draggable 
+            dragging
+            icon="icons:label-outline"  
+            track
+            description="the dragable edge of the card"
+            class="menuItems-light"
+            on-mousedown="_startDrag"
+          >
+    </iron-icon>
+
+     <paper-tab link>
+          <button class="menubuttons"> 
+          <a
+               data-route="home" 
+               href="/" 
+               class="horizontal layout center center-justified">
+               <span>HOME</span>
+          </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='users' 
+                    class="horizontal layout center center-justified" 
+                    href='/users'>
+               <span>Users</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='user-info' 
+                    class="horizontal layout center center-justified" 
+                    href='/user-info'>
+                    <span>User-Info</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons"> 
+               <a
+                    data-route='reading' 
+                    class="horizontal layout center center-justified" 
+                    href='/reading'>
+                     <span>Reading</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab 
+          link 
+          hidden$="[[!user]]">
+          <button class="menubuttons"> 
+               <a data-route='johntest' 
+                    class="horizontal layout center center-justified" 
+                    href='/johntest'>
+               <span>John Test</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab 
+          link>
+          <button class="menubuttons">
+               <a 
+                    data-route='testarea1' 
+                    class="horizontal layout center center-justified" 
+                    href='/testarea1'>
+                    <span>Test 1</span>
+               </a>
+          </button>
+     </paper-tab>
+     <paper-tab link>
+          <button class="menubuttons">
+               <a   
+                    data-route='testarea2' 
+                    class="horizontal layout center center-justified" 
+                    href='/testarea2'>
+                    <span>Test 2</span>
+               </a>
+          </button>
+     </paper-tab>       
+</paper-tabs>
+</div>
+</template>
+<script>
+FcDragMenuProto = Polymer({
+	is:'fc-drag-menu-two',
+	behaviors: [
+		Polymer.IronResizableBehavior,
+		Polymer.NeonAnimationBehavior,
+		Polymer.IronSelectableBehavior,
+		Polymer.NeonAnimationRunnerBehavior,
+		Polymer.IronMenubarBehavior,
+		Polymer.IronRangeBehavior],
+	properties: {
+          	class: {
+                type: String,
+                value: function(){
+                    return 'horizontal layout'
+                }, 
+                notify: true,
+                reflectToAttribute: true
+               },
+               basePlusDelta:{
+                  type: Number,
+                  computed: 'computebasePlusDelta(base, delta)',
+                  notify: true
+              },
+                base:{
+                  type: Number,
+                  value: function(){return 620;},
+                  notify: true
+                },
+                slide:{
+                        type: Boolean,
+                        value: false,
+                        notify: true
+                },
+                delta: {
+                  type: Number, 
+                 animationcomputed: 'computedAnimation(base)',
+                  notify: true
+                },
+
+                pressed: {
+                  type: Boolean, 
+                  value: false,
+                  notify: true
+
+                },
+
+
+
+
+      
+          	     selected: {
+                  type: String,
+                  notify: true
+                },
+                selectable: {
+                  type: String,
+                  value: 'fc-pages'
+                },
+                _step: {
+                  type: Number,
+                  value: 10
+                },
+                lockMenu:{
+                    type: Boolean,
+                    value: true,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                _holdDelay: {
+                  type: Number,
+                  value: 1
+                },
+                _leftHidden: {
+                  type: Boolean,
+                  value: false
+                },
+                _rightHidden: {
+                  type: Boolean,
+                  value: false
+                },
+                _previousButton: {
+                  type: Object
+              },
+              hostAttributes: {
+                role: 'tabList'
+              },
+              listeners: {
+                'iron-resize': '_onResize',
+                'iron-select': '_onIronSelect',
+                'iron-deselect': '_onIronDeselect'
+              },
+              hostAttributes: {
+                'role': 'menubar'
+              },
+              keyBindings: {
+                'left': '_onLeftKey',
+                'right': '_onRightKey'
+              }, 
+              route: {}
+          },
+    _menuLaunch: function(){
+      this.pressed=!this.pressed;
+    },
+    created: function() {
+      this._holdJob = null;
+    },
+    ready: function() {
+      this.setScrollDirection('y', this.$.tabsContainer);
+    },
+    attached: function(){
+    },
+  _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
+      if (!scrollable || hideScrollButtons) {
+        return 'hidden';
+      }
+      if (hideThisButton) {
+        return 'not-visible';
+      }
+      return '';
+    },
+    _computeTabsContentClass: function(scrollable) {
+      return scrollable ? 'scrollable' : 'horizontal';
+    },
+    _computeSelectionBarClass: function(noBar, alignBottom) {
+      if (noBar) {
+        return 'hidden';
+      } else if (alignBottom) {
+        return 'align-bottom';
+      }
+    },
+    opened: function(){
+      
+    },
+     _onResize: function() {
+      this.debounce('_onResize', function() {
+        this._scroll();
+        this._tabChanged(this.selectedItem);
+      }, 10);
+    },
+    _onIronSelect: function(event) {
+      this._tabChanged(event.detail.item, this._previousTab);
+      this._previousTab = event.detail.item;
+      this.cancelDebouncer('tab-changed');
+    },
+    _onIronDeselect: function(event) {
+      this.debounce('tab-changed', function() {
+        this._tabChanged(null, this._previousTab);
+      // See polymer/polymer#1305
+      }, 1);
+    },
+    get _tabContainerScrollSize() {
+      return Math.max(
+        0,
+        this.$.tabsContainer.scrollWidth -
+          this.$.tabsContainer.offsetWidth
+      );
+    },
+    _scroll: function(e, detail) {
+      if (!this.scrollable) {
+        return;
+      }
+      var ddx = (detail && -detail.ddx) || 0;
+      this._affectScroll(ddx);
+    },
+    _down: function(e) {
+      // go one beat async to defeat IronMenuBehavior
+      // autorefocus-on-no-selection timeout
+      this.async(function() {
+        if (this._defaultFocusAsync) {
+          this.cancelAsync(this._defaultFocusAsync);
+          this._defaultFocusAsync = null;
+        }
+      }, 1);
+    },
+    _affectScroll: function(dx) {
+      this.$.tabsContainer.scrollLeft += dx;
+      var scrollLeft = this.$.tabsContainer.scrollLeft;
+      this._leftHidden = scrollLeft === 0;
+      this._rightHidden = scrollLeft === this._tabContainerScrollSize;
+    },
+    _onLeftScrollButtonDown: function() {
+      this._scrollToLeft();
+      this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
+    },
+    _onRightScrollButtonDown: function() {
+      this._scrollToRight();
+      this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
+    },
+    _onScrollButtonUp: function() {
+      clearInterval(this._holdJob);
+      this._holdJob = null;
+    },
+    _scrollToLeft: function() {
+      this._affectScroll(-this._step);
+    },
+    _scrollToRight: function() {
+      this._affectScroll(this._step);
+    },
+    _tabChanged: function(tab, old) {
+      if (!tab) {
+        this._positionBar(0, 0);
+        return;
+      }
+    },
+    _slideTab: function(){
+      var r = this.$.tabsContent.getBoundingClientRect();
+      var w = r.width;
+      var tabRect = tab.getBoundingClientRect();
+      var tabOffsetLeft = tabRect.left - r.left;
+      this._pos = {
+        width: this._calcPercent(tabRect.width, w),
+        left: this._calcPercent(tabOffsetLeft, w)
+      };
+      if (this.noSlide || old == null) {
+        // position bar directly without animation
+        this._positionBar(this._pos.width, this._pos.left);
+        return;
+      }
+      var oldRect = old.getBoundingClientRect();
+      var oldIndex = this.items.indexOf(old);
+      var index = this.items.indexOf(tab);
+      var m = 5;
+      // bar animation: expand
+      this.$.selectionBar.classList.add('expand');
+      if (oldIndex < index) {
+        this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
+            this._left);
+      } else {
+        this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
+            this._calcPercent(tabOffsetLeft, w) + m);
+      }
+      if (this.scrollable) {
+        this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
+      }
+    },
+    _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
+      var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
+      if (l < 0) {
+        this.$.tabsContainer.scrollLeft += l;
+      } else {
+        l += (tabWidth - this.$.tabsContainer.offsetWidth);
+        if (l > 0) {
+          this.$.tabsContainer.scrollLeft += l;
+        }
+      }
+    },
+    _calcPercent: function(w, w0) {
+      return 100 * w / w0;
+    },
+    _positionBar: function(width, left) {
+      width = width || 0;
+      left = left || 0;
+      this._width = width;
+      this._left = left;
+      this.transform(
+          'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+          this.$.selectionBar);
+    },
+    _onBarTransitionEnd: function(e) {
+      var cl = this.$.selectionBar.classList;
+      // bar animation: expand -> contract
+      if (cl.contains('expand')) {
+        cl.remove('expand');
+        cl.add('contract');
+        this._positionBar(this._pos.width, this._pos.left);
+      // bar animation done
+      } else if (cl.contains('contract')) {
+        cl.remove('contract');
+      }
+    },
+    	_toggleRightDrawer: function(){
+			var drawer = document.querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = document.querySelector('#drawerPrimed');
+          var dashboard = document.querySelector("#dashboardPrime");	
+		if(drawer.forceNarrow!==true)
+          {
+               drawer.forceNarrow = true;
+               drawer.responsiveWidth='90000px';
+               dashboard.leftHidden=true;
+          }
+          else
+          {
+               drawer.forceNarrow = false;
+               drawer.responsiveWidth ='1080px';
+               dashboard.leftHidden=false;
+          }
+     },
+	
+  computebasePlusDelta: function(e, base){
+            return (base + e);
+  },
+
+	dragmeplease: function(e) {
+     this.dragging=true;
+        var self=this;
+       // var dragbox = this.$.dragMenu.getBoundingClientRect();
+      e.preventDefault();
+        switch(e.detail.state) {
+          case 'start':
+            self._x = e.detail.x;
+            self._y = e.detail.y;
+            console.log('START');
+            console.log(e);
+            break;
+          case 'track':
+            self._ddx = e.detail.ddx; //last event x change
+            self._ddy = e.detail.ddy; //last event y change
+            self._dx = e.detail.dx; //from start x change 
+            self._dy = e.detail.dy; // from start y change
+            self.translate3d(self._dx.toString() + 'px', self._dy.toString() + 'px', 0);
+            break;
+          case 'end':
+            console.log("ENDING", e.detail.x, e.detail.y, e.detail.dx, e.detail.dy);
+            self.translate3d(0, 0, 0);
+            self.style.left = e.detail.x.toString() + 'px';
+            self.style.top = e.detail.y.toString() + 'px';
+            self.dragging=false;
+            break;
+        }
+     },
+ 
+ _lockMenu: function(){
+     this.lockMenu=!this.lockMenu;
+ },
+ onLocked: function(){
+  Polymer.dom(this).setAttribute('');
+ }
+});
+  </script>
+</dom-module>

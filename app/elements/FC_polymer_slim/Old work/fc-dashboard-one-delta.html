@@ -1,0 +1,177 @@
+<dom-module id="fc-dashboard-one">
+<template id="fc-dashboard-one-template">
+<style>
+:host { 
+		padding: 10px 0px 36px 10px;
+		height: 100vh;
+		width: calc(99.46vw -64px);
+		overflow-y: scroll;
+}
+#div { 
+		height: calc(99.67vh+164px);
+		width: 100%;
+		overflow: scroll;
+}
+.fc-div-class{
+	height: 300px;
+	width: calc(99.62%/10);
+	background-color: goldenrod;
+	display: flex;
+	border: 2px solid black;
+}
+.boardered{
+	border: 4px ridge #000066;
+}
+</style>
+<fc-lt-panel-dashboard id="drawerPrimed" left-drawer drawer-width="460px">
+	
+<!--this is the left drawer.  It-like the right drawer is now- will eventually be its own element, so that it can be added or removed at will-->
+	<div id="drawerPrime" drawer class="left-drawer layout vertical container wrap boardered">
+		<div class="vertical layout left left-justified" style="box-shadow: 0px  -5px 15px #d9d9d9 inset;">
+	<!--FC logo, image and branding-->
+			<div class="layout vertical nowrap" style="width: 100%; height: 150px;">
+				<image style="margin: 24px 199px 24px 8px; width:200px; height: 100px;" src="../../../images/FC_frontpage_logo.png">
+				</image>
+			</div>
+			<div class="layout vertical">
+
+				<br>	
+				<hr style="color: navyblue; background: #000066; height: 4px; max-width: 600px; min-width: 300px; basis: 370px;">
+		
+		
+				
+				
+			<fc-data-administrator 
+              class="data-admin draggable scrollable on-tracking"
+              id="dataAdminPrime"
+
+
+
+              >
+        	</fc-data-administrator>
+				
+			</div>
+			<fc-drag-router
+					id="dragRouter" 
+					selected="{{route}}" 
+					class="draggable scrollable on-tracking" 
+					style=""
+				>	
+				</fc-drag-router>
+<!-- This is the device area end-->
+		</div><!--drawer wrapper end-->
+		
+
+	</div><!--drawer end-->
+	<div main style="height: 100%;"> 
+	<fc-drag-menu-proto
+					id="dragMenuDrawer"
+					class="draggable scrollable on-tracking"
+					style="z-index:50000; position: absolute; top: 0; left: 0;"
+					on-tap="clickHandler"
+				>
+		
+
+
+
+
+	</fc-drag-menu-proto>
+				<fc-login-dialog id="loginDialog">
+				</fc-login-dialog>
+
+		<fc-rt-panel-dashboard id="drawer-2" class="vertical layout center-justified flex container wrap" right-drawer drawer-toggle-attribute="paper-drawer-right" drawer-width="{{slideWidth}}px;">
+		
+
+			<div drawer id="rtToggle" draggable="true" style="width: 550px;" class="right-drawer dragging vertical layout container wrap boardered"><!--drawer holder; tabbed drawer element below-->
+				<fc-tabbed-drawer>
+				</fc-tabbed-drawer>
+				
+			</div><!--end of tabbed drawer holder area-->
+		<div main style="height:100%">
+		<paper-menu-button icon="menu" on-tap="_toggleLeftDrawer" class="layout horizontal" hidden="{{!leftHidden}}" style="display: inline; opacity:.65;">
+		<iron-icon icon="stars">
+			
+			</iron-icon>
+			</paper-menu-button>
+				<content>
+
+
+				</content>
+		<!--</fc-splitter-jc>-->
+			</div>		
+		</fc-rt-panel-dashboard>
+	</div>			
+</fc-lt-panel-dashboard>
+</template>
+<script>
+FcDashboardOne=Polymer({
+	is:'fc-dashboard-one',
+	listeners: {
+		'tap': 'clickHandler'
+	},
+	properties: {
+		measured: {
+			type: String,
+			value: '1000s',
+			notify: true,
+			reflectToAttributes: true
+		}, 
+		responsiveWidth: {
+			type: String,
+			value: '0px',
+			notify: true,
+			reflectToAttributes: true
+		},
+		route:{
+			type: String,
+		 	notify: true,
+		 	reflectToAttribute: true
+		}, 
+		leftHidden: {
+			type: Boolean,
+			value: false,
+			notify: true
+		}
+	},
+	_toggleRightDrawer: function(){
+			var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	},
+	_toggleLeftDrawer: function(){
+		var drawer = document.querySelector('#drawerPrimed');	
+		if (drawer.forceNarrow!==true)
+		{
+			drawer.forceNarrow = true;
+        	drawer.responsiveWidth='90000px';
+        	this.leftHidden=true;
+        }
+		else
+		{
+			drawer.forceNarrow = false;
+        	drawer.responsiveWidth ='1080px';
+        	this.leftHidden=false;
+		}
+	},
+
+    clickHandler: function(e) {
+    	console.log(e);
+      var button = e.target;
+      while (!button.hasAttribute('data-dialog') && button!==document.body) {
+        button = button.parentElement;
+      }
+      if (!button.hasAttribute('data-dialog')) {
+        return;
+      }
+      var id = button.getAttribute('data-dialog');
+      var dialog = this.$.id;
+      if (dialog) {
+        dialog.open();
+      }
+    }
+
+});
+</script>
+</dom-module>

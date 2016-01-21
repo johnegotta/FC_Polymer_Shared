@@ -20,21 +20,22 @@ content::-webkit-scrollbar {
 }
 :host{
     width: 100%;
-    height: calc(97.5vh-64px);
+    position: absolute;
+    right: 0px;
+    height: calc(99.5vh-64px);
     margin-bottom: 64px;
-    overflow-y: scroll;
 }
 </style>
 
 
     <div id="splitHolder" class="layout" style="width:100%; height:100%;">
-        <div id="left" class="nobar" style="background:white;overflow:scroll">
-            <content select=".left"></content>
+        <div id="left"  style="background:white;overflow:scroll">
+            <content class="nobar" select=".left"></content>
         </div>
         <paper-material id="draggy" draggable="true" style="background:silver;" on-mouseover="useSplitCursor" on-mouseleave="useAutoCursor" on-dragstart="startDragging">
         </paper-material>
         <div id="right" style="background:white;overflow:scroll">
-            <content select=".right"></content>
+            <content id="splitterRightContent" select=".right"></content>
         </div>
     </div>
 </template>
@@ -59,19 +60,19 @@ content::-webkit-scrollbar {
       minSideWidth: Number,
       gutterWidth: {
         type: String,
-        value: "4px"
+        value: "6px"
       },
       dragging: Boolean,
       borderType: String,
       x: Number,
       y: Number,
-      reflectToAttributes: true,
-      notify: true,
       _notifyingDescendant: {
         type: Boolean,
         value: true, 
         notify: true
-        }
+        },
+      reflectToAttribute: true,
+      notify: true
     },
     _onIronResize: function(){
         //debounce(this.startDragging(), this.stopDragging(), 1800).
@@ -81,28 +82,44 @@ content::-webkit-scrollbar {
       this.right = this.$.right; 
       this.dragging = false;
       this.minSideWidth = ".15";
-      this.$.splitHolder.style.border = this.borderType == "" ? "2px ridge #E5E4E2" : this.borderType;
+      this.$.splitHolder.style.border = this.borderType == "" ? "6px ridge #E5E4E2" : this.borderType;
+     
       if(this.orientation == "")
       {
         this.orientation = "horizontal";
       }
+      
+      if (this.orientation == "showLeft"){
+        this.$.right.hidden=true;
+        this.$.draggy.hidden=true;
+        // this.orientation='horizontal';
+        this.$.left.style.width=(parseInt(this.$.left.style.width)>750)?this.$.left.style.width: "1200px";
+        this.$.left.style.height='3900px';
+        this.notifyResize();
+        console.log(this.$.left.style.width);
+        this.async(function(){this.notifyResize();},200);
+      }
       if(this.orientation == "vertical")
-      {
+      { this.$.right.hidden=false;
+        this.$.draggy.hidden=false;
         this.$.splitHolder.className = "layout vertical";
         this.$.draggy.style.width = "100%";
         this.$.draggy.style.height = this.gutterWidth;
-        this.$.draggy.style.borderTop = "1px solid #E5E4E2";
-        this.$.draggy.style.borderBottom = "1px solid #E5E4E2";
-        this.$.left.style.height = "50%";
+        this.$.draggy.style.borderTop = "5px solid #E5E4E2";
+        this.$.draggy.style.borderBottom = "5px solid #E5E4E2";
+        this.$.left.style.height = '50vh';
         this.$.left.style.width = "100%";
-        this.$.right.style.height = "50%";
+        this.$.right.style.height = "50vh";
         this.$.right.style.width = "100%";
       }
       else if(this.orientation == "horizontal")
       {
+        this.$.draggy.hidden=false;
+        this.$.right.hidden=false;
         this.$.splitHolder.className = 'layout horizontal';
         this.$.draggy.style.width = this.gutterWidth;
         this.$.draggy.style.borderLeft = "5px solid #E5E4E2";
+        this.$.draggy.style.height = (Polymer.dom(this.parentNode).scrollHeight>2000)?Polymer.dom(this.parentNode).scrollHeight: '5000px';
         this.$.draggy.style.borderRight = "5px solid #E5E4E2";
         this.$.left.style.height = "100%";
         this.$.left.style.width = "50%";
@@ -177,6 +194,7 @@ content::-webkit-scrollbar {
             console.log("child-node: " + i + childrenNodes[i].toString());
         };
         this.notifyResize();
+
             
     },
     drag: function(e){
@@ -195,6 +213,8 @@ content::-webkit-scrollbar {
                 this.right.style.width = newRightWidthString; 
                  Polymer.dom(this).children.notifyResize;
                  Polymer.dom(this).children._notifyResize;
+                 this.notifyResize();
+                 Polymer.dom.flush()
         
             }
             else if(this.orientation == "vertical")
@@ -207,6 +227,8 @@ content::-webkit-scrollbar {
                 var newRightHeightString = newRightHeight.toString() + "px";
                 this.right.style.height = newRightHeightString;
                  Polymer.dom(this).children.notifyResize;
+                 this.notifyResize();
+                 Polymer.dom.flush();
             }
     
     },
