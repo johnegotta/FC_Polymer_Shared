@@ -15,7 +15,7 @@ padding: 24px;
 <paper-icon-button icons="icons:dashboard" on-tap="_saveFB_Test_1Qs" style="border-radius: 180px; width: 48px; height: 48px; border: 6px solid #008; background: #aedefe; color: gold;"></paper-icon-button>
 <paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
 <paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
-<paper-input label="Question Filter III" style="max-width: 190px; padding: 5px;" value="{{looseSearch}} penn {{three}}"></paper-input>
+<paper-input label="Question Filter III" style="max-width: 190px; padding: 5px;" value="{{three}}"></paper-input>
 
 <paper-input label="Answer Filter I" style="max-width: 190px; padding: 5px;" value="{{oneAA}}"></paper-input>
 <paper-input label="Answer Filter II" style="max-width: 190px; padding: 5px;" value="{{twoAA}}"></paper-input>
@@ -1772,8 +1772,8 @@ var i=0
 	console.log(self.objectArray, "ps in function");
  		}
  		var self=this;
- 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo");
- 		ref.child("Test_1Qs").set(self.objectArray);
+ 		// var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo");
+ 		// ref.child("Test_1Qs").set(self.objectArray);
 
  },
 
@@ -1783,38 +1783,72 @@ _computePatterns: function(one,two,three,oneAA,twoAA,threeAA){
 },
 
 _matchWords:function(patterns){
-  if (!patterns) {
-          // set filter to null to disable filtering
-          return null;
-        } else {
-          var one = patterns[0];
-          var two = patterns[1];
-          var three = patterns[2];
-          var oneAA = patterns[3];
-          var twoAA = patterns[4];
-          var threeAA = patterns[5];
-          one = one.toLowerCase();
-          two = two.toLowerCase();
-          three=three.toLowerCase();
-          oneAA = oneAA.toLowerCase();
-          twoAA = twoAA.toLowerCase();
-          threeAA=threeAA.toLowerCase();
-          return function(item) {
+   if (!patterns)
+   {
+          return null; // set filter to null to disable filtering
+    }
+    else
+    {
+     var numFilters = patterns.length;
+        for(i = 0; i < numFilters; i++)
+        {
+         patterns[i] = patterns[i].toLowerCase();
+        }
+        return function(item) {
             var question = item.QT.toLowerCase();
+            var filterOn = false;
+            var filterResults = false;
+            for(i = 0; i < numFilters; i++)
+            {
+             filterOn |= (patterns[i] != "");
+             if(patterns[i] != "")
+             {
+              filterResults |= (question.indexOf(patterns[i]) > -1);
+             }
+            }
+            console.log(patterns);
+            console.log("filterOn = " + filterOn + " and filterResults = " + filterResults);
+            return (filterOn==false) ? true : filterResults;
+        }
+    }
+}
+
+
+          // set filter to null to disable filtering
+        //   return null;
+        // } else {
+        //   var one = patterns[0];
+        //   var two = patterns[1];
+        //   var three = patterns[2];
+        //   var oneAA = patterns[3];
+        //   var twoAA = patterns[4];
+        //   var threeAA = patterns[5];
+        //   one = one.toLowerCase();
+        //   two = two.toLowerCase();
+        //   three=three.toLowerCase();
+        //   oneAA = oneAA.toLowerCase();
+        //   twoAA = twoAA.toLowerCase();
+        //   threeAA=threeAA.toLowerCase();
+        //   return function(item) {
+        //     var question = item.QT.toLowerCase();
             // var last = employee.lastname.toLowerCase();
             // if(this.looseSearch=="true"){
-            return (question.indexOf(one) != -1 || question.indexOf(two)!=-1 || question.indexOf(three)!=-1 || question.indexOf(three)!=-1|| question.indexOf(oneAA) !=-1||question.indexOf(twoAA)!=-1|| question.indexOf(threeAA)!=-1);
+            // return (question.indexOf(one) != -1 || question.indexOf(two)!=-1 || question.indexOf(three)!=-1 || question.indexOf(three)!=-1|| question.indexOf(oneAA) !=-1||question.indexOf(twoAA)!=-1|| question.indexOf(threeAA)!=-1);
             // }
             // else{
             // var resultOne = (one == "")?false: question.indexof(one)!=-1;
             // return (resultOne || resultTwo || resultThree);
 
-            // }
+//   var oneResult = false || question.indexOf(one)!=-1
+// oneResult = (one != “”) || question.indexOf(one)!=-1
+// [1/21/2016 12:07:43 PM] bigmc10a: if(one == “”){resultOne = false;}
+// else { resultOne = question.indexOf(one) != -1}
+// [1/21/2016 12:07:45 PM] bigmc10a: …
+// [1/21/2016 12:08:24 PM] bigmc10a: return (resultOne || resultTwo || resultThree)
+// [1/21/2016 12:09:19 PM] bigmc10a: resultOne = (one == “”)?false: question.indexof(one)!=-1
+// [1/21/2016 12:09:43 PM] bigmc10a: last was ternary alternative syntax
 
-        }
-    }
-}
-
+        
 });
 </script>
 </dom-module>

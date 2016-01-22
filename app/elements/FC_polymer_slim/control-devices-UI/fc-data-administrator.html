@@ -70,9 +70,11 @@
 				min-height:460px;
 				overflow: hidden;
 				overflow-y: scroll;
+				visibility: visible;
 				border: 0px 3px 0px 3px inset #fffffe;
 				border-top: 1px solid #000066;
 				border-bottom: 1px solid #000066;
+				visibility: visible;
 			}
 			/*iron-icon{
 				height: 32px;
@@ -153,19 +155,30 @@
 	</div>
 	<div class="scroll-master flex-7 layout vertical">
 		<iron-pages id="administratorPages" class="flex layout horizontal" style=" height: 100%; position: relative;" selected="0">
-<section class="vertical layout flex-4">
-			<firebase-collection location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection>
+
+
+		<section class="vertial layout flex">
+			<!-- <firebase-collection limit-to-first="30" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection> -->
 				<h3> Building The Future</h3>
-				<section class="horizontal layout flex">
-				<paper-textarea value="{{holder}}" class="flex-5 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
-				value="{{fileData.item}}   {{fileData.item.BB}}" >
+			<section class="horizontal layout flex">
+				<paper-textarea value="{{holder}}" class="flex-9 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
+				value="   " 
 
 				></paper-textarea>
-				<neon-animated-pages class="flex-2 layout vertical" style="max-height:450px;" id="pages" selected="0">
-      			<fc-list-view data="{{fileData}}" on-item-click="_onItemClick"></fc-list-view>
-      			<fc-list-full-view data-layoutclass$="{{layoutClass}}" on-close="_onClose"></fc-list-full-view>
-    			</neon-animated-pages>
-				</section>
+				<neon-animated-pages class="flex-4 layout vertical" style="height:450px;" id="pages" selected="0">
+      		<!-- <fc-list-view data="{{items}}" on-item-click="_onItemClick"></fc-list-view>
+      			<fc-list-full-view on-close="_onClose"></fc-list-full-view>
+    			</neon-animated-pages> <!-- data-layoutclass$="{{layoutClass}}" --> 
+			</section>
+		</section>
+
+
+
+
+
+
+
+
 
 				<section>
 				<b>Welcome to the Focused Data Administrator!</b><br>
@@ -176,13 +189,11 @@
 
 				</section>
 
-			<section>
+		
 				<!--<fc-cell-creator>
 				</fc-cell-creator>-->
-				<div class="vertical layout flex-box">
-				
-				<fc-holder class="horizontal layout flex-box container top left-justified">
-					
+				<section>
+					<div>
 					<paper-input value='{{sectionType}}' style="max-width: 340px; flex-basis: 110px;" list="SectionType" always-float-label='true' label='Section Type'></paper-input>
 					<datalist name="Test Number" list="Test Number" id="SectionType">
 						<option> Math 55 Questions</option>
@@ -200,8 +211,7 @@
 						<option> Soft-Science/Business Focused</option>
 					</datalist>
 
-				</fc-holder>
-				<fc-holder>
+				
 					<paper-dropdown-menu name="selectedPassage" always-float-label label="Select A Passage" on-iron-select="">
 						<paper-menu id="passageListMenu" class="dropdown-content" attr-for-selected="value" selected="{{selectedPassage}}">
 							<template is="dom-repeat" items="{{passageDestinations}}" filter="passageFilter(testId)">
@@ -210,11 +220,10 @@
 						</paper-menu>
 					</paper-dropdown-menu>
 						<paper-input value='{{passageTitle}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Passage Type'></paper-input>
-				</fc-holder>
-				<fc-holder "horizontal layout no-wrap container">
+				</div>
+				<div "horizontal layout no-wrap container">
 					<paper-input value='{{passageSubType}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Your Name'></paper-input>
 					<paper-textarea value='{{passageBlurb}}' style="max-width: 340px; flex-basis: 110px;" always-float-label='true' label='Passage Blurb'></paper-textarea>
-				</fc-holder>
 				</div>
 			</section>
 			<section class="vertical layout flex container">
@@ -228,13 +237,22 @@
 
 			</section>
 			
+			
+
+		<section class="vertial layout flex">
+			<!-- <firebase-collection limit-to-first="29" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection> -->
+				<h3> Building The Future</h3>
+			<section class="horizontal layout flex">
+				<paper-textarea value="{{holder}}" class="flex-9 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
+				value="{{item}}   {{item.4.BB}}" 
+
+				></paper-textarea>
+				<neon-animated-pages class="flex-4 layout vertical" style="height:450px;" id="pages" selected="0">
+      			<!-- <fc-list-view data="" on-item-click="_onItemClick"></fc-list-view>
+      			<fc-list-full-view on-close="_onClose"></fc-list-full-view> -->
+    			</neon-animated-pages> <!-- data-layoutclass$="{{layoutClass}}" -->
 			</section>
-<section>
-
-
-
-
-</section>
+		</section>
 
 
 
@@ -863,13 +881,13 @@
 		
 		},
 	attached: function() { 
-		this.loadFirepad();
-      var self=this;
-      var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs");
-      ref.on('child_added', function(childSnapshot, prevChildKey) {
-          self.set('dataFile',childSnapshot);
-          });
-    },
+		// this.loadFirepad();
+  //     var self=this;     THIS WAS THE OFFENDER PRETTY SURE OF IT
+  //     var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs");
+  //     ref.on('child_added', function(childSnapshot, prevChildKey) {
+  //         self.set('dataFile',childSnapshot);
+  //         });
+},
 
 		
 
@@ -897,9 +915,9 @@
 	},
 
 	_saveBoolMeth: function(){
-			this.set("savebutton", true);
-			var self=this;
-			this.setTimeout(function(){self.set("savebutton", false)}, 3800);
+			// this.set("savebutton", true);
+			// var self=this;
+			// this.setTimeout(function(){self.set("savebutton", false)}, 3800);
 
 
 

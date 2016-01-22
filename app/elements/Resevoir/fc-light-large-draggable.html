@@ -2,28 +2,37 @@
 <template>
 <style>
 :host {
-	position: relative;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: white;
+	resize: both;
+	z-index: 2;
+	margin: auto;
+	padding: auto;
 
     }
 div.line-number {
 	width: 18px;
 	height: 20px;
-	line-height: 1.0;
-	font-size: 1em;
+	line-height: 1..25;
+	font-size: 1.25em;
 	/*font-size: 1.25em;*/
 	font-family: merriweather;
 	font-weight: 500;
 	font-style: italic;
-	padding: 2px 2px;
-	margin: 2px;
-
-
+	padding: 4px 4px;
+	margin: 4px;
     }
+
+   fc-dropdown-menu:hover{opacity: 1;} 
     .blurb-class{
-    	max-width: 420px; 
-    	padding: 2px 0px 2px 3px; 
-    	font-size: .8em; 
-    	line-height: 1.00;
+    	padding: 4px;
+    /*	padding: auto;*/
+    	margin: 2px;
+    	/*margin: auto; */
+    	font-size: 1.1em; 
+    	line-height: 1.10;
     	font-style: oblique;
 
     }
@@ -31,25 +40,25 @@ div.line-number {
     .highlighted {
 	background: yellow;
     }
-paper-header-panel{
-	position: absolute;
-}
+
     div.text {
-	line-height: 1.0;
-	font-size: 1em;
+	line-height: 1..25;
+	font-size: 1.25em;
      /* font-size: 1.25em;*/
 	font-family: merriweather;
 	font-weight: 500;
-	padding: 2px 0px 2px 2px;
+	padding: 4px 0px 4px 4px;
 	margin: 0px 0px 0px 0px;
-	min-height: 1800px !important;
+	min-height: 2800px !important;
 	display: flex;
 	min-width: 300px !important;
 	max-width: 620px !important;
-    }	
+    }
+    paper-header-panel.medium{margin: 4px; padding:6px; border: 1px ridge silver; width: 650px; height: 1200px}
+    paper-header-panel.regular{}	
 
 </style>
-	<paper-header-panel class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 4px; padding:6px; border: 1px ridge silver; width: 380px; height: 620px">
+	<paper-header-panel class="medium vertical layout flex wrap text" mode="waterfall-tall" style="">
 		<div 
 			class="paper-header" 
 			id="headerPanel" 
@@ -63,8 +72,9 @@ paper-header-panel{
 				toggle>
 			</array-selector>
 
+
 	    	<fc-dropdown-menu 
-		  		style="min-width: 360px;" 
+		  		class="nosee" 
 		  		on-select="toggleSelection" 
 		  		id="passagesList" 
 		  		data-source="{{passagesWordArrays}}" 
@@ -81,7 +91,7 @@ paper-header-panel{
 	     			>
 	     			[[selected.0.passageBlurb]]
 	     		</section>
-		<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
+		<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 12px 8px;">
 		<div id="line-numbers" class="layout vertical line-number">
 		  <div class="line-numbers" id="linesA1">Lines</div>
 		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
@@ -123,7 +133,8 @@ paper-header-panel{
 		  Polymer.IronResizableBehavior, 
 		  FCBehaviors.FCFirepadBehavior,
 		  FCBehaviors.PassageDataBehavior,
-		  FCBehaviors.DraggableBehavior
+		  FCBehaviors.DraggableBehavior,
+		  FCBehaviors.ResizableRootBehavior	
 		  ];
 	   }
 	   beforeRegister() {
