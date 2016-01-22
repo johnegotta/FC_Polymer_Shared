@@ -1,7 +1,7 @@
 <dom-module id="fc-rqtversionc">
 <template>
 <style>
-:host {height: 1099200px; width: 100%;
+:host {height: 99200px; width: 100%;
 	
 background: white;
 padding: 24px;
@@ -12,6 +12,7 @@ padding: 24px;
 
 <paper-header-panel mode="waterfall" class="vertical layout flex wrap" style="max-width: 100vw; background: white; border: 3px solid blue; min-height: 25500px;max-height: 99800px;">
 <div style="background: cyan;" class="paper-header layout horizontal">
+<paper-icon-button icons="icons:dashboard" on-tap="_saveFB_Test_1Qs" style="border-radius: 180px; width: 48px; height: 48px; border: 6px solid #008; background: #aedefe; color: gold;"></paper-icon-button>
 <paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
 <paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
 <paper-input label="Question Filter III" style="max-width: 190px; padding: 5px;" value="{{looseSearch}} penn {{three}}"></paper-input>
@@ -48,13 +49,13 @@ padding: 24px;
 </template>
 </section>
 <section class="vertical flex layout" >
-<template is="dom-repeat" items="{{testone}}" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" style="border:2px solid #008; padding: 24px; margin: 10px;" label="Questions T1" value='{{item.QT}}
+<template is="dom-repeat" items="{{testone}}" as="one" filter="{{_matchWords(patterns)}}">
+<paper-textarea always-float-label="true" style="border:2px solid #008; padding: 24px; margin: 10px;" label="Questions T1" value='{{one.QT}}
 
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}  
-{{item.DD}}  
+{{one.AA}}    
+{{one.BB}}  
+{{one.CC}}  
+{{one.DD}}  
 	    		'></paper-textarea>   
 </template>
 </section>
@@ -154,6 +155,13 @@ FcRqtversionc=Polymer({
 				},
 			notify: true	
 			},
+		objectArray: {
+			type: Array,
+			value: function(){
+				return [];
+			},
+			notify: true
+		},
 		
 		testone: {
 			type: Array,
@@ -1747,11 +1755,27 @@ testthree: {
 	}
 },
 
-// _saveFB{
-// 	var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestions");
-// 		ref.child().set(self.passageWordArrayOrdered);
+  _saveFB_Test_1Qs: function(key, value){
+  	var self=this;
+ 		var counter = this.testone.length;
+var i=0
+ 		console.log(counter);
+ 		for( i=0; i<counter; i++){
 
-// },
+ 			this.push("objectArray",{
+ 				"Question" : this.testone[i].QT,
+ 				"Answer_A": this.testone[i].AA,
+ 				"Answer_B": this.testone[i].BB,
+ 				"Answer_C": this.testone[i].CC,
+ 				"Answer_D": this.testone[i].DD
+ 			});
+	console.log(self.objectArray, "ps in function");
+ 		}
+ 		var self=this;
+ 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo");
+ 		ref.child("Test_1Qs").set(self.objectArray);
+
+ },
 
 _computePatterns: function(one,two,three,oneAA,twoAA,threeAA){
 
