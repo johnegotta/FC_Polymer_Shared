@@ -3,6 +3,7 @@
 <style>
 :host {
 	position: relative;
+	max-height: 750px important!;
 
     }
 div.line-number {
@@ -49,11 +50,12 @@ paper-header-panel{
     }	
 
 </style>
-	<paper-header-panel class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 4px; padding:6px; border: 1px ridge silver; width: 380px; height: 620px">
+	<paper-header-panel class="vertical layout flex wrap text" mode="waterfall" style="margin: 4px; padding:6px; border: 1px ridge silver; max-width: 620px; min-height: 360px; max-height: 750px !important;">
+	<!--passage header and content select menu-->
 		<div 
 			class="paper-header" 
 			id="headerPanel" 
-			style="margin-bottom:4px; border: 1px solid #3f51b5; height 46px; background: #ff4081"
+			style="margin-bottom:4px; border: 1px solid #3f51b5; min-height: 60px; max-height 120px; background: #ff4081"
 			> 
 			<array-selector 
 				id="selector" 
@@ -64,7 +66,7 @@ paper-header-panel{
 			</array-selector>
 
 	    	<fc-dropdown-menu 
-		  		style="min-width: 360px;" 
+		  		style="min-width: 240px;" 
 		  		on-select="toggleSelection" 
 		  		id="passagesList" 
 		  		data-source="{{passagesWordArrays}}" 
@@ -72,46 +74,42 @@ paper-header-panel{
 		  		>
 		  	</fc-dropdown-menu>
 		</div>
-
-	    	 
-	    	<div class="layout horizontal flex main-content super-content">
-	    	<div class="layout vertical flex-3">
-	     		<section 
-	     			class="blurb-class"
-	     			>
-	     			[[selected.0.passageBlurb]]
-	     		</section>
-		<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
-		<div id="line-numbers" class="layout vertical line-number">
-		  <div class="line-numbers" id="linesA1">Lines</div>
-		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
-			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
-			  <span hidden="{{item.show}}">&nbsp</span>
-		    </template> 
-		  </div>
-			  <!--passage-1-column-1 container-->
-	    <div id="firstColumn" class="layout horizontal flex wrap text">
-		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 4px; max-width: 620px;">
-		  <template is="dom-repeat" items="{{selected}}"  filter="">
-			<template is="dom-if" if="{{item.newPara}}">
-			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
-			</template>
-			<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
-		     <a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
-		  
-		  </template>
-
-		  <br class="line-numbers">
-		  <hr>
-		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
-		</article>
-		<!-- <code style="opacity: 0;">[[passageOneWordArray.0.passageType]]</code> -->
-	    </div>
-	    </div>
-	       </div>
-      
-		</div>   
-    </paper-header-panel>		 
+	<!--end of passage header and content select menu-->
+	<!--sgl/dble column content&line number horiz sec.-->
+	<div 
+		class="layout horizontal flex content super-content" style="min-height: 300px; max-height: 675px;">
+		<!--blurb and passage-->
+		<div class="layout vertical flex">
+			<section class="blurb-class">[[selected.0.passageBlurb]]</section>
+			<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
+				<div id="line-numbers" class="layout vertical line-number">
+				  <div class="line-numbers" id="linesA1">Lines</div>
+				    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+					  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+					  <span hidden="{{item.show}}">&nbsp</span>
+				    </template> 
+				</div>
+					  <!--passage-1-column-1 container-->
+			    <div id="firstColumn" class="layout horizontal flex wrap text">
+					<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 4px; max-width: 620px;">
+					  	<template is="dom-repeat" items="{{selected}}"  filter="">
+							<template is="dom-if" if="{{item.newPara}}">
+						  	<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+							</template>
+							<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
+					     	<a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
+					  </template>
+					  <br class="line-numbers">
+					  <hr>
+					  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+					</article>
+			    </div>
+			</div>
+		</div>
+		<!--region for a second passage column-->
+	</div>
+	<!--end content sect; this was single column ONLY!-->
+</paper-header-panel>		 
 </template>
 <script>
 'use strict';
@@ -122,8 +120,7 @@ paper-header-panel{
 	    return [
 		  Polymer.IronResizableBehavior, 
 		  FCBehaviors.FCFirepadBehavior,
-		  FCBehaviors.PassageDataBehavior,
-		  FCBehaviors.DraggableBehavior
+		  FCBehaviors.PassageDataBehavior
 		  ];
 	   }
 	   beforeRegister() {

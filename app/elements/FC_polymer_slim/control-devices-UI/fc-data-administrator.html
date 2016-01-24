@@ -161,12 +161,14 @@
 			<!-- <firebase-collection limit-to-first="30" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection> -->
 				<h3> Building The Future</h3>
 			<section class="horizontal layout flex">
-				<paper-textarea value="{{holder}}" class="flex-9 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
+				<paper-textarea value="{{holder}}" class="flex-5 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 580px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
 				value="   " 
 
 				></paper-textarea>
-				<neon-animated-pages class="flex-4 layout vertical" style="height:450px;" id="pages" selected="0">
-      		<!-- <fc-list-view data="{{items}}" on-item-click="_onItemClick"></fc-list-view>
+				<fc-light-display class="flex-5 layout self-stretch vertical" >
+				</fc-light-display>
+				<neon-animated-pages class="flex-3 layout vertical" draggable="false" style="height:450px;" id="pages" selected="0">
+      		<fc-list-view data="{{items}}" on-item-click="_onItemClick"></fc-list-view>
       			<fc-list-full-view on-close="_onClose"></fc-list-full-view>
     			</neon-animated-pages> <!-- data-layoutclass$="{{layoutClass}}" --> 
 			</section>
@@ -240,7 +242,7 @@
 			
 
 		<section class="vertial layout flex">
-			<!-- <firebase-collection limit-to-first="29" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection> -->
+			<!-- <firebase-collection limit-to-first="29" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs" data={{items}}></firebase-collection>
 				<h3> Building The Future</h3>
 			<section class="horizontal layout flex">
 				<paper-textarea value="{{holder}}" class="flex-9 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"
@@ -248,10 +250,10 @@
 
 				></paper-textarea>
 				<neon-animated-pages class="flex-4 layout vertical" style="height:450px;" id="pages" selected="0">
-      			<!-- <fc-list-view data="" on-item-click="_onItemClick"></fc-list-view>
-      			<fc-list-full-view on-close="_onClose"></fc-list-full-view> -->
-    			</neon-animated-pages> <!-- data-layoutclass$="{{layoutClass}}" -->
-			</section>
+      			<fc-list-view data="" on-item-click="_onItemClick"></fc-list-view>
+      			<fc-list-full-view on-close="_onClose"></fc-list-full-view> 
+    			</neon-animated-pages>
+			</section> -->
 		</section>
 
 
@@ -261,9 +263,10 @@
 </div>
 			
 <div style="width: 60%; margin: auto; padding: 8px;" class="horizontal flex-1layout center-justified">
-				<paper-icon-button icon="icons:dashboard" on-tap="saveBoolMeth" style="color: gold; border: 4px solid #008; background: #aecefe; border-radius: 180px; height: 64px; width: 64px; padding: 10px; margin: auto;" label="SAVE"></paper-icon-button>
+				<paper-icon-button icon="icons:dashboard" on-tap="saveBoolMeth" class="flex-1" style="color: gold; border: 4px solid #008; background: #aecefe; border-radius: 180px; height: 64px; width: 64px; padding: 10px; margin: auto;" label="SAVE" on-tap="saveTestTwo">Save</paper-icon-button>
 				<paper-button class="flex-1" on-tap="_lastAdminPage">Back</paper-button>
 				<paper-button class="flex-1" on-tap="_nextAdminPage">Next</paper-button>
+				<paper-button class="flex-1" on-tap="_clearDB"> Clear Database</paper-button>
 </div>
 	
 </paper-dialog>
@@ -272,7 +275,7 @@
 	Polymer({
 		is: 'fc-data-administrator',
 		
-		properties: {
+	properties: {
       layoutClasses:{},
       fileData: {
         type: Array,
@@ -682,7 +685,7 @@
 
 
         notify: true
-      },
+      		},
    
 		offsetX: {
 				type: Number,
@@ -724,8 +727,6 @@
 		}, 
 
 
-//end of the movement section 
-//test sections. Actual content
 		yourName: {
 			type: String,
 			value: "use your name",
@@ -758,10 +759,7 @@
 			value: [],
 			notify: true
 		},
-//last array will hold all passages--so fast
-//Test Input and  Storage 
-//firebase and firepad input
-//key to use unique ids so we dont work on each others test creation
+
 		firepad: {
 			type:Object,
 			value:{},
@@ -774,8 +772,7 @@
 			notify: true,
 			reflectToAttributes: true	
 		},
-//test key and firebase location creation
-//These are inputs
+
 		fcid:{
 			type: String,
 			value: '20_digit_Letter_underscore_spaced_unique_semantic_id',
@@ -849,15 +846,6 @@
 			notify: true
 		},
 
-
-
-
-
-	
-
-	//necessary technical reference arrays
-	//we should use these in the testing phase... although rapid integration of the above is needed.
-
 	newPassageRef: {
 			type: Number,
 			value: 0,
@@ -881,12 +869,17 @@
 		
 		},
 	attached: function() { 
-		// this.loadFirepad();
-  //     var self=this;     THIS WAS THE OFFENDER PRETTY SURE OF IT
-  //     var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs");
-  //     ref.on('child_added', function(childSnapshot, prevChildKey) {
-  //         self.set('dataFile',childSnapshot);
-  //         });
+		this.loadFirepad();
+
+	},
+	
+
+	saveTestTwo: function(){
+      var self=this;
+      var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs");
+      ref.on('child_added', function(childSnapshot, prevChildKey) {
+          self.set('dataFile',childSnapshot);
+          });
 },
 
 		
@@ -915,11 +908,18 @@
 	},
 
 	_saveBoolMeth: function(){
-			// this.set("savebutton", true);
-			// var self=this;
-			// this.setTimeout(function(){self.set("savebutton", false)}, 3800);
+		this.set("savebutton", true);
+			var self=this;
+			this.setTimeout(function(){self.set("savebutton", false)}, 3800);
 
 
+
+	},
+
+	_clearDB: function(){
+		var self=this;
+	 var ref= new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo/Test_1Qs");
+	 	 ref.set(null);
 
 	},
 
