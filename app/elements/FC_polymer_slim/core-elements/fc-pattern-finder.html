@@ -59,6 +59,10 @@ FcPatternFinder=Polymer({
 	behaviors: [],
 	listeners: {},
 	properties: {
+		autoMode: {
+			type: Boolean,
+			value: false
+		},
 		questionList: {
 			type: Object,
 			notify: true
@@ -141,12 +145,19 @@ created: function()
 
 },
 
-ready: function()
+attached: function()
 {
 	this.qList = ["As used in line 2, “form” most nearly means", "Which choice best describes what happens in the passage?", "Which choice best describes the developmental pattern of the passage?", "The authors’ use of the words “exact,” “specific,” and “complement” in lines 47-49 in the final paragraph functions mainly to", "As used in line 19, “demands” most nearly means"];
 	this.questionList = {};
 	this.matches = {};
 	this.questionArray = [];
+	if(this.autoMode == true)
+	{
+		this.loadAllQuestionsAndAnswers();
+		console.log("loaded questions");
+		this.findPatterns();
+		console.log("found patterns");
+	}
 },
 
 sortMatches: function(argOne, argTwo)
@@ -190,7 +201,7 @@ persistQuestions: function()
 			fanoutObj['/definition_questions/' + keys[i]] = this.questionList[keys[i]];
 		}
 	}
-	console.log(fanoutObj);
+	//console.log(fanoutObj);
 	var fb = new Firebase("https://focusedstaging1.firebaseio.com/");
 	fb.update(fanoutObj);
 },
@@ -210,7 +221,7 @@ loadAnswerChoices: function(argQuestionId, argChoiceString)
 {
 	var resultArray = [];
 	var choices = argChoiceString.split(/[A-D]\)/);
-	console.log(choices);
+	//console.log(choices);
 	var numChoices = choices.length;
 	var letter = "A";
 	for(i = 0; i < numChoices; i++)
@@ -285,7 +296,7 @@ stripPrepositions: function(argString)
 	{
 		var prepStr = "/[,\[\]\(\)\:\;\!\. ]+" + preps[i] + "[,\[\]\(\)\:\;\!\. ]+/g";
 		var rez = argString.match(prepStr);
-		console.log(rez);
+		//console.log(rez);
 		//argString = argString.replace(prepStr, "PREPOSITION");
 		argString = argString.replace(/ (aboard|about|above|across|after|against|along|amid|among|anti|around|at|before|behind|below|beneath|beside|besides|between|beyond|by|concerning|considering|despite|during|excluding|following|from|in|inside|into|like|minus|near|of|off|on|onto|opposite|outside|over|past|per|plus|regarding|round|since|than|through|to|toward|towards|under|underneath|unlike|until|upon|versus|via|with|within|without) /g, " PREPOSITION ");
 	}
@@ -350,7 +361,7 @@ stripLineNum: function(argString)
 isDupe: function(argMatchObj)
 {
 	var keys = Object.keys(this.matches);
-	console.log(keys.length);
+	//console.log(keys.length);
 	var result = false;
 
 	var numKeys = keys.length;
@@ -381,7 +392,7 @@ stripCommonPatterns: function(argString)
 {
 	var result = argString.replace("as it is used", "AS USED");
 	result = result.replace("as used", "AS USED");
-	console.log(result);
+	//console.log(result);
 	return result;
 },
 
@@ -407,16 +418,16 @@ findPatterns: function()
 	{
 		var stem = this.questionList[keys[i]].stem;
 		stem = stem.toLowerCase();
-		console.log(stem + "*");
+		//console.log(stem + "*");
 
 		stem = this.stripQuotes(stem);
-		console.log(stem + "*");
+		//console.log(stem + "*");
 		stem = this.stripLineNum(stem);
-		console.log(stem + "*");
+		//console.log(stem + "*");
 		stem = this.stripNonAlpha(stem);
-		console.log(stem + "*");
+		//console.log(stem + "*");
 		stem = this.stripAuthor(stem);
-		console.log(stem + "*");
+		//console.log(stem + "*");
 		stem = this.stripCommonPatterns(stem);
 		//stem = this.stripPrepositions(stem);
 		this.questionList[keys[i]].stem = stem;
@@ -427,7 +438,7 @@ findPatterns: function()
 		var wordArray = this.questionList[keys[i]].stem.split(" ");
 		var numWords = wordArray.length;
 		//this.stripNonAlpha(wordArray);
-		console.log(this.matches);
+		//console.log(this.matches);
 
 		for(startWord = 0; startWord < numWords; startWord++)
 		{
@@ -442,7 +453,7 @@ findPatterns: function()
 					patt += wordArray[k];
 					k++;
 				}
-				console.log("Question " + (i+1) + " pattern to search for = " + patt);
+				//console.log("Question " + (i+1) + " pattern to search for = " + patt);
 				var m = i+1;
 				var matchObj = {"pattern": patt, "questions": "", "startWord": startWord, "endWord":endWord};
 				//console.log(this.matches);
@@ -451,7 +462,7 @@ findPatterns: function()
 					var matches = this.questionList[keys[m]].stem.match(patt);
 					if(matches != null)
 					{
-						console.log("found match for question " + (i+1) + " pattern(" + patt + ") in question " + (m+1));
+						//console.log("found match for question " + (i+1) + " pattern(" + patt + ") in question " + (m+1));
 						//if(!this.matches[patt])
 						if(matchObj.questions == "")
 						{
@@ -468,14 +479,14 @@ findPatterns: function()
 						//this.matches[patt].questions += m.toString();
 					}
 				}
-				console.log(this.matches);
-				console.log(matchObj.questions);
+				//console.log(this.matches);
+				//console.log(matchObj.questions);
 				if(matchObj.questions == "")
 				{
 				}
 				else if(this.isDupe(matchObj))
 				{
-					console.log("did not insert match for pattern (" + patt + ") " + matchObj.questions);
+					//console.log("did not insert match for pattern (" + patt + ") " + matchObj.questions);
 				}
 				else
 				{
@@ -483,8 +494,8 @@ findPatterns: function()
 					var keyz = Object.keys(this.matches);
 					for(z = 0; z < keyz.length; z++)
 					{
-						console.log(keyz[z]);
-						console.log(this.matches[keyz[z]]);
+						//console.log(keyz[z]);
+						//console.log(this.matches[keyz[z]]);
 					}
 				}
 			}
@@ -524,12 +535,12 @@ findPatterns: function()
 	var keyz = Object.keys(this.matches);
 	for(z = 0; z < keyz.length; z++)
 	{
-		console.log(keyz[z]);
-		console.log(this.matches[keyz[z]]);
+		//console.log(keyz[z]);
+		//console.log(this.matches[keyz[z]]);
 		this.push("patternArray", {"pattern": keyz[z], "matches": this.matches[keyz[z]] });
 		Polymer.dom.flush();
 	}
-	//console.log(this.matches);
+	console.log(this.matches);
 
 },
 
@@ -552,7 +563,7 @@ factoryImpl: function(){
 
 },
 
-attached: function(){
+ready: function(){
 	console.log(this.questionList);
 },
 

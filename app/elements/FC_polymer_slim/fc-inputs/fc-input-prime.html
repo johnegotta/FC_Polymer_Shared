@@ -60,7 +60,6 @@ input.text:focus, input.datetime-local:focus, input.date:focus,  input.range:foc
 	box-shadow:0px;
 	border-bottom:2px solid #00b33c;
 	color:  #brown;
-	font-size: 14pt;
 }
 input[type=button]{
 background: #efefef;
@@ -75,7 +74,6 @@ background: #efefef;
 }
 input[type=button]:hover, input[type=button]:active,{
 	color: gold;
-	font-weight: 700;
 	outline: 2px solid silver;
 
 	}
@@ -227,11 +225,11 @@ width: 120%;
 		</label>
 <!--Note removed their value attribute... was binding without;
 will return if must-->
+[[value]]
 		<input 
 			is="iron-input" 
 			id$="[[inputId]]"
 			bind-value="{{value}}"
-			default-value="[[isTimeStamp]]"
 			checked="{{checkedProp::change}}"
 			
 			on-change="_onChange"
@@ -331,6 +329,8 @@ will return if must-->
 <script>
 FcInputPrime=Polymer({
 	is: 'fc-input-prime',
+	behaviors:[Polymer.PaperInputBehavior,
+			 Polymer.IronFormElementBehavior],
 	listeners:{
 		'uncheck':"_radioUncheck"
 	},
@@ -344,12 +344,12 @@ FcInputPrime=Polymer({
 
 		min: {
 			type: Number,
-			value: function(){return 5;},
+			value: function(){return 0;},
 			notify: true
 		},
 		max: {
 			type: Number,
-			value: function(){return 5;},
+			value: function(){return 1000000;},
 			notify: true
 		},
 		icon1:{
@@ -441,8 +441,19 @@ FcInputPrime=Polymer({
 			observer: "checkObserver",
 			notify: true
 		},
-		
-		
+		inputValue:{
+			type: String,
+			notify: true,
+			reflectToAttribute: true
+
+
+		},
+		hostAttribute:{
+			value:{
+				notify: true,
+				reflectToAttribute: true
+			}
+		},
 		horizontal:{
 			type: String,
 			computed: '_computeHorizontal(inputType)',
@@ -452,7 +463,7 @@ FcInputPrime=Polymer({
 		buttonName: {
 			type: String,
 			value: function(){
-				return "Titling";
+				return "";
 			},
 			notify: true,
 			reflectToAttribute: true
@@ -479,12 +490,6 @@ FcInputPrime=Polymer({
 			},//move up to the controller
 			notify: true	
 
-		},
-		hostAttribute: {
-				value: {
-					notify: true,
-					reflectToAttribute: true,
-				}
 		},
 		inputName:{
 			type: String,
@@ -728,14 +733,14 @@ console.log(
 		
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
-			console.log(e.target.checked, e.target.name, this.inputName);
+			//console.log(e.target.checked, e.target.name, this.inputName);
 			// this.set("myChecked", e.target.checked);
-			console.log(this.value);
+			//console.log(this.value);
 			//Polymer.dom(e.target.bindValue);
 			var wrapperId=this.labelId;
 			var wrapper=document.getElementById(this.labelId);
 			 Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");
-				  	console.log("I am changing the color");
+				  	// console.log("I am changing the color");
 	},
 
 	_computeInputName: function(inputType, localName){

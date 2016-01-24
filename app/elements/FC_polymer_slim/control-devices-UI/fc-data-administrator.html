@@ -2,14 +2,8 @@
 	
 	<template>
 <style>
-	 	#div1 {
-	 		min-width:340px;
-	 		height:480 px;
-	 		padding:10px;
-	 		border:1px solid #aaaaaa;
-	 		resize: both;
-	 	}
-	 	article { display: block;}
+	 
+	 	
 	  	
 		div.assistView::--webkit-scrollbar {
 					display: none;
@@ -23,8 +17,8 @@
 			  	font-size: 1.05em;
 				display: block;
 				min-width: 270px;
-				max-width: 1080px;
-				min-height: 280px;
+				max-width: 2280px;
+				min-height: 480px;
 				flex-basis: 370px;
 				overflow: hidden;
 				border: 2px ridge #002c90;
@@ -52,12 +46,6 @@
 				font-size: 26px;
 				color: #000066;
 				}
-			fc-holder{
-				margin: 2px 6px 4px 6px;
-				border: 2px dashed green;
-				padding: 3px;
-				max-width: 380px;
-			}
 			
 			h3, h4 {
 				color: #000066;
@@ -76,18 +64,10 @@
 				margin-top: 0px;
 				padding-top: 4px;
 			}
-			p.assistant{
 			
-				font-family: Times;
-				font-size: 14px;
-				font-weight: 500px;
-				color: goldenrod;
-				overflow-y: scroll;
-			}
 			div.scroll-master{
 				height: 98%;
 				min-height:460px;
-				flex-basis: 340px;
 				overflow: hidden;
 				overflow-y: scroll;
 				border: 0px 3px 0px 3px inset #fffffe;
@@ -129,7 +109,7 @@
 								
 <paper-dialog 
 	id="dragAdmin" 
-	class="layout vertical container" 
+	class="layout vertical flex container" 
 	style="display: block; overflow: auto; resize: both; position:fixed;"  
 	draggable="true" 
 	no-cancel-on-outside-click="true"
@@ -148,6 +128,7 @@
 			
 				>
 		</iron-icon>
+		</button>
 								<span 
 										class="center-justified" 
 										style="width: 100%; padding: 8px; margin: 4px; font-weight: 700; font-family: merriweather; font-size: 26px; color: #002c90;"
@@ -170,8 +151,8 @@
 
 
 	</div>
-	<div class="scroll-master">
-		<iron-pages id="administratorPages" style="position: relative;" selected="0">
+	<div class="scroll-master flex-7 layout vertical">
+		<iron-pages id="administratorPages" class="flex layout horizontal" style=" height: 100%; position: relative;" selected="0">
 				<section>
 				<b>Welcome to the Focused Data Administrator!</b><br>
 				<p>Use the Data Admin to view pages on the Focused website, in a Focused app, or in your personal area at focused.  The Admin is like your own personal "second" view into everything Focused.  You can view or do anything on the admin which you could do on a normal Focused Dashboard, or webpage, so in one sense the Admin acts as a second "tab" or "window" for your Focused experience.  The Admin window, however, is "always on top" and will travel with you across different pages and interfaces.</p>
@@ -223,7 +204,7 @@
 				</div>
 			</section>
 			<section class="vertical layout flex container">
-				<div id="firepad" style="border: 6px ridge silver; overflow: auto;resize: auto; min-height: 420px; flex-basis: 620px;" class="fit">
+				<div id="firepad" style="border: 6px ridge silver; overflow: auto;resize: auto; min-height: 420px; flex-basis: 900px;" class="fit">
 					
 				</div>
 				
@@ -232,9 +213,16 @@
 
 
 			</section>
-			<section>
-				<h3> Building Cells</h3>
-				<h5> Cell Builder One</h5>
+			<section class="vertical layout flex-4">
+			<firebase-collection></firebase-collection>
+				<h3> Building The Future</h3>
+				<section class="horizontal layout flex">
+				<paper-textarea value="{{holder}}" class="flex-5 layout self-stretch vertical" label="This Area is Where the Magic Happens" always-float-label style="height:100%; max-height: 9000px; min-height: 450px; overflow-y: scroll; max-width: 100%; border: 1px solid gold;"></paper-textarea>
+				<neon-animated-pages class="flex-2 layout vertical" style="max-height:450px;" id="pages" selected="0">
+      			<fc-list-view data="[[fileData]]" on-item-click="_onItemClick"></fc-list-view>
+      			<fc-list-full-view data-layoutclass$="{{layoutClass}}" on-close="_onClose"></fc-list-full-view>
+    			</neon-animated-pages>
+				</section>
 			</section>
 <section>
 
@@ -249,7 +237,8 @@
 	</iron-pages>
 </div>
 			
-<div style="width: 100%; margin: 0px auto; padding: 8px;" class="horizontal layout center-justified">	
+<div style="width: 60%; margin: auto; padding: 8px;" class="horizontal flex-1layout center-justified">
+				<paper-icon-button icon="icons:dashboard" on-tap="saveBoolMeth" style="color: gold; border: 4px solid #008; background: #aecefe; border-radius: 180px; height: 64px; width: 64px; padding: 10px; margin: auto;" label="SAVE"></paper-icon-button>
 				<paper-button class="flex-1" on-tap="_lastAdminPage">Back</paper-button>
 				<paper-button class="flex-1" on-tap="_nextAdminPage">Next</paper-button>
 </div>
@@ -259,7 +248,57 @@
 <script>  
 	Polymer({
 		is: 'fc-data-administrator',
-		properties:{
+		properties: {
+      layoutClasses:{},
+      fileData: {
+        type: Array,
+        value: function() {
+          return [
+            {fileName: 'IMG_4130.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4131.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4132.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4133.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4134.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4135.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4136.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4137.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4138.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4139.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4140.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4141.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4142.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4143.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4144.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4145.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4146.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4147.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4148.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4149.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4150.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4151.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4152.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4153.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4154.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4155.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4156.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4157.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4158.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4159.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4160.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4161.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4162.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4163.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4164.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4165.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4166.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4167.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4168.jpg', modifiedDate: 'May 12 2015'},
+            {fileName: 'IMG_4169.jpg', modifiedDate: 'May 12 2015'}
+          ]
+        },
+        notify: true
+      },
+   
 		offsetX: {
 				type: Number,
 				notify: true,
@@ -402,6 +441,35 @@
 			reflectToAttribute: true
 		},
 
+		holder: {
+			type: String,
+			notify: true,
+		},
+
+		holders: {
+			type:Array, 
+			computed: "_computeHolders(holder, savebutton)",
+			notify: true
+		},
+		savebutton:{
+			type: Boolean,
+			value: function(){
+				return false;
+			},
+			notify: true
+		},
+		save: {
+			type: Function,
+			computed: '_computeSave(saveButton, holder)',
+			notify: true
+		},
+
+
+
+
+
+	
+
 	//necessary technical reference arrays
 	//we should use these in the testing phase... although rapid integration of the above is needed.
 
@@ -432,6 +500,7 @@
 		//this.loadPassages();
 			
 			},
+
 	_openAdmin: function() {
   			console.log(this.passageDestinations + "sandles");
 			this.$.dragAdmin.open();
@@ -455,7 +524,14 @@
     			pages.selectPrevious();
 	},
 
+	_saveBoolMeth: function(){
+			this.set("savebutton", true);
+			var self=this;
+			this.setTimeout(function(){self.set("savebutton", false)}, 3800);
 
+
+
+	},
 
 
 	_startDrag: function(e){
@@ -489,7 +565,12 @@
 	
 	}
 },
-
+    _onItemClick: function() {
+      this.$.pages.selected = 1;
+    },
+    _onClose: function() {
+      this.$.pages.selected = 0;
+    },
 
 // 			console.log(e);
 // 			this.dragging=true;

@@ -1,0 +1,1908 @@
+<dom-module id="fc-rqtversionc">
+<template>
+<style>
+:host {height: 1099200px; width: 100%;
+	
+background: white;
+padding: 24px;
+
+	}
+</style>
+
+
+<paper-header-panel mode="waterfall" class="vertical layout flex wrap" style="max-width: 100vw; background: white; border: 3px solid blue; min-height: 25500px;max-height: 99800px;">
+<div style="background: cyan;" class="paper-header layout horizontal">
+<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
+<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
+<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
+<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
+<select style="width:200px">
+  <template is="dom-repeat" items="[[regexMatchResults]]">
+    <option value={{item}}>{{item}}</option>
+  </template>
+</select>
+<select style="width:200px" on-change="setSelectedPattern">
+  <template is="dom-repeat" items="[[commonPatterns]]">
+    <option value={{item.pattern}}>{{item.pattern}}</option>
+  </template>
+</select>
+<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
+<paper-input label="Answer Filter I" style="max-width: 190px; padding: 5px;" value="{{oneAA}}"></paper-input>
+<paper-input label="Answer Filter II" style="max-width: 190px; padding: 5px;" value="{{twoAA}}"></paper-input>
+<paper-input label="Answer Filter III" style="max-width: 190px; padding: 5px;" value="{{threeAA}}"></paper-input>
+
+<fc-input-prime type="checkbox" input-type="checkbox" label="Add Answer Filter" value="{{addAnswers}}"></fc-input-prime>
+<fc-input-prime type="checkbox" input-type="checkbox" label="Fill All Inputs To Get Results" value="{{looseSearch}}"></fc-input-prime>
+</div>
+<div class="horizontal layout flex self-stretch" style="height: 50000px; padding: 0px; 24px;">
+<!-- <section class="vertical flex layout"
+<template is="dom-repeat" items="{{testone}}">
+
+<paper-input value="{{item.QT}}"></paper-input>
+	 <paper-input value="{{item.AA}}"></paper-input>   
+	 <paper-input value="{{item.BB}}"></paper-input>
+	 <paper-input value="{{item.CC}}"></paper-input>
+	 <paper-input value="{{item.DD}}"></paper-input>
+
+</template>
+</section> -->
+<firebase-collection location="https://focusedstaging1.firebaseio.com/questions" data="{{fbquestions}}"></firebase-collection>
+<section class="vertical flex layout" style="max-width: 440px; padding: auto; margins: auto;">
+<template is="dom-repeat" items="{{fbquestions}}" filter="{{_matchWords(patterns)}}">
+ <!-- filter="{{_matchWords(patterns)}}"--> 
+<paper-material always-float-label="true" label="Questions" style="border:2px solid #008;  padding: 24px; margin: 10px;">
+<!-- 	<div id="{{item.questionId}}"> {{_computeQuestionNumber(index)}}. {{item.stem}}</div><br>
+ -->
+ 		<div id="{{item.fcid}}"> {{item.fcid}}. {{item.stem}} </div>
+ 	<template is="dom-repeat" items="{{item.answerChoices}}" as="choice">
+		<div class="layout horizontal">
+			<input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}">
+			<input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}">
+			<div id="{{choice.fcid}}"><a>{{choice.letter}}.&nbsp {{choice.choiceContent}}</a>
+			</div>
+		</div>
+	</template>
+</template>
+</paper-material>
+<!--
+<paper-textarea always-float-label="true" label="Questions T2" style="border:2px solid #008;  padding: 24px; margin: 10px;" value='{{item.QT}}
+
+{{item.AA}}    {{looseSearch}}
+{{item.BB}}  
+{{item.CC}}  
+{{item.DD}}  
+	    		'</paper-textarea>   
+</template>
+</section>
+<section class="vertical flex layout" >
+<template is="dom-repeat" items="{{testone}}" filter="{{_matchWords(patterns)}}">
+<paper-textarea always-float-label="true" style="border:2px solid #008; padding: 24px; margin: 10px;" label="Questions T1" value='{{item.QT}}
+
+{{item.AA}}    
+{{item.BB}}  
+{{item.CC}}  
+{{item.DD}}  
+	    		'></paper-textarea>   
+</template>
+</section>
+<section class="vertical flex layout">
+<template is="dom-repeat" items="{{testthree}}" filter="{{_matchWords(patterns)}}">
+<paper-textarea always-float-label="true" label="Questions T3" style="border:2px solid #008; padding: 24px; margin: 10px;" value='{{item.QT}}
+
+{{item.AA}}    
+{{item.BB}}  
+{{item.CC}}
+{{item.DD}}  
+	    		'></paper-textarea>   
+</template>
+</section>
+<section class="vertical flex layout">
+<template is="dom-repeat" items="{{testfour}}" as="item" filter="{{_matchWords(patterns)}}">
+<paper-textarea always-float-label="true" label="Questions T4" style="border:2px solid #008; padding: 24px; margin: 10px;" value='
+{{item.QT}}
+
+{{item.AA}}    
+{{item.BB}}  
+{{item.CC}}
+{{item.DD}}  
+  				'></paper-card>   
+</template>
+
+-->
+</section> 
+</div>
+</paper-header-panel>
+
+
+
+
+</template>
+
+<script>
+FcRqtversionc=Polymer({
+	is: 'fc-rqtversionc',
+	properties: {
+		patterns: {
+			type: Array,
+			computed: "_computePatterns(one, two, regexFilter, selectedPattern, oneAA, twoAA, threeAA)",
+			notify: true
+			},
+		one:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		two: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		regexFilter: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		oneAA:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		twoAA: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		threeAA: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		regexMatchResults: {
+			type: Array,
+			value: [],
+			notify: true
+		}, 
+		commonPatterns: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		selectedPattern: {
+			type: String,
+			value: "",
+			notify: true
+		},
+		looseSearch:{
+			type: String, 
+			value: function(){
+				return "looseSearch";
+			},
+			notify: true
+		},
+		addAnwers: {
+			type: String, 
+			value: function(){
+				return "true";
+				},
+			notify: true	
+			},
+		/*
+		testone: {
+			type: Array,
+			value: function(){
+			return [{ "QT": "1. Which choice best describes what happens in the passage?",
+				 "AA": "(A) One character argues with another character who intrudes on her home.",
+				 "BB": "(B)  One character receives a surprising request from another character.",
+				 "CC": "(C) One character reminisces about choices she has made over the years.",
+				 "DD" : "(D) One character criticizes another character for pursuing an unexpected course of action."
+				 },
+				 {"QT": "2. Which choice best describes the developmental pattern of the passage?",
+				 "AA": "(A) A careful analysis of a traditional practice",
+				 "BB": "(B)  A detailed depiction of a meaningful encounter",
+				 "CC": "(C) A definitive response to a series of questions",
+				 "DD" : "(D) A cheerful recounting of an amusing anecdote"
+				 }, 
+
+				 {"QT": "3. As used in line 1 and line 65, “directly” most nearly means",
+				 "AA": "(A) frankly.",
+				 "BB": "(B)  confidently.",
+				 "CC": "(C) without mediation.",
+				 "DD" : "(D) with precision." 
+				},
+				{"QT": "4. Which reaction does Akira most fear from Chie?",
+				 "AA": "(A) She will consider his proposal inappropriate.",
+				 "BB": "(B)  She will mistake his earnestness for immaturity.",
+				 "CC": "(C) She will consider his unscheduled visit an imposition.",
+				 "DD" : "(D) She will underestimate the sincerity of his emotions." 
+				},
+				{"QT": "5. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Line 33 (“His voice... refined”)",
+				 "BB": "(B)  Lines 49-51 (“You... mind”)",
+				 "CC": "(C) Lines 63-64 (“Please... proposal”)",
+				 "DD" : "(D) Lines 71-72 (“Eager... face”)"
+					},
+				 {"QT":"6. In the passage, Akira addresses Chie with",
+				 
+				 "AA": "(A) affection but not genuine love.",
+				 "BB": "(B)  objectivity but not complete impartiality.",
+				 "CC": "(C) amusement but not mocking disparagement.",
+				 "DD" : "(D) respect but not utter deference."
+				},
+				{"QT": "7. The main purpose of the first paragraph is to",
+				 
+				 "AA": "(A) describe a culture.",
+				 "BB": "(B)  criticize a tradition.",
+				 "CC": "(C) question a suggestion.",
+				 "DD" : "(D) analyze a reaction."
+				},
+			
+				 {"QT": "8. As used in line 2, “form” most nearly means",
+				 
+				 "AA": "(A) appearance.",
+				 "BB": "(B)  custom.",
+				 "CC": "(C) structure.",
+				 "DD" : "(D) nature."
+},
+				{"QT": "9. Why does Akira say his meeting with Chie is “a matter of urgency” (line 32)?",
+				 
+				 "AA": "(A) He fears that his own parents will disapprove of Naomi.",
+				 "BB": "(B)  He worries that Naomi will reject him and marry someone else.",
+				 "CC": "(C) He has been offered an attractive job in another country.",
+				 "DD" : "(D) He knows that Chie is unaware of his feelings for Naomi."
+				 },
+				{"QT": "10. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Line 39 (“I don’t... you”)",
+				 "BB": "(B)  Lines 39-42 (“Normally... community”)",
+				 "CC": "(C) Lines 58-59 (“Depending... Japan”)",
+				 "DD" : "(D) Lines 72-73 (“I see... you”) [PASSAGE2]"
+				},
+				{"QT": "11. The authors most likely use the examples in lines 1-9 of the passage (“Every... showers”) to highlight the",
+				 
+				 "AA": "(A) regularity with which people shop for gifts.",
+				 "BB": "(B)  recent increase in the amount of money spent on gifts.",
+				 "CC": "(C) anxiety gift shopping causes for consumers.",
+				 "DD" : "(D) number of special occasions involving gift-giving."
+				 }, 
+
+				{"QT": "12. In line 10, the word “ambivalent” most nearly means",
+				 "AA": "(A) unrealistic.",
+				 "BB": "(B)  conflicted.",
+				 "CC": "(C) apprehensive.",
+				 "DD" : "(D) supportive. "
+				 }, 
+
+				{"QT": "13. The authors indicate that people value gift-giving because they feel it",
+				 "AA": "(A) functions as a form of self-expression.",
+				 "BB": "(B)  is an inexpensive way to show appreciation.",
+				 "CC": "(C) requires the gift-recipient to reciprocate.",
+				 "DD" : "(D) can serve to strengthen a relationship."
+				},
+
+				{"QT": "14. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 10-13 (“Many... peers”)",
+				 "BB": "(B)  Lines 22-23 (“People... own”)",
+				 "CC": "(C) Lines 31-32 (“Research... perspectives”)",
+				 "DD" : "(D) Lines 44-47 (“Although... unfounded”)"
+				 }, 
+
+				{"QT": "15. The “social psychologists” mentioned in paragraph 2 (lines 17-34) would likely describe the “deadweight loss” phenomenon as",
+				 
+				 "AA": "(A) predictable.",
+				 "BB": "(B)  questionable.",
+				 "CC": "(C) disturbing.",
+				 "DD" : "(D) unprecedented."
+				 }, 
+
+				{"QT": "16. The passage indicates that the assumption made by gift-givers in lines 41-44 may be",
+				 
+				 "AA": "(A) insincere.",
+				 "BB": "(B)  unreasonable.",
+				 "CC": "(C) incorrect.",
+				 "DD" : "(D) substantiated."
+				 }, 
+
+				{"QT": "17. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 53-55 (“Perhaps... consideration”)",
+				 "BB": "(B)  Lines 55-60 (“According... relationship”)",
+				 "CC": "(C) Lines 63-65 (“As... consideration”)",
+				 "DD": "(D) Lines 75-78 (“In... relations”)"
+				 },
+
+				{"QT": "18. As it is used in line 54, “convey” most nearly means",
+				 
+				 "AA": "(A) transport.",
+				 "BB": "(B)  counteract.",
+				 "CC": "(C) exchange.",
+				 "DD" : "(D) communicate."
+				 }, 
+
+				{"QT": "19. The authors refer to work by Camerer and others (line 56) in order to",
+				 
+				 "AA": "(A) offer an explanation.",
+				 "BB": "(B)  introduce an argument.",
+				 "CC": "(C) question a motive.",
+				 "DD" : "(D) support a conclusion."
+				},
+
+				 {"QT": "20. The graph following the passage offers evidence that gift-givers base their predictions of how much a gift will be appreciated on",
+				 
+				 "AA": "(A) the appreciation level of the gift-recipients.",
+				 "BB": "(B)  the monetary value of the gift.",
+				 "CC": "(C) their own desires for the gifts they purchase.",
+				 "DD" : "(D) their relationship with the gift-recipients."
+				 }, 
+
+				 {"QT": "21. The authors would likely attribute the differences in gift-giver and recipient mean appreciation as represented in the graph to",
+				 
+				 "AA": "(A) an inability to shift perspective.",
+				 "BB": "(B)  an increasingly materialistic culture.",
+				 "CC": "(C) a growing opposition to gift-giving.",
+				 "DD" : "(D) a misunderstanding of intentions."
+				}, 
+
+				 {"QT": "22. The authors use the word “backbone” in lines 3 and 39 to indicate that",
+	
+				 "AA": "(A) only very long chains of DNA can be taken from an organism with a spinal column.",
+				 "BB": "(B)  the main structure of a chain in a DNA molecule is composed of repeating units.",
+				 "CC": "(C) a chain in a DNA molecule consists entirely of phosphate groups or of sugars.",
+				 "DD" : "(D) nitrogenous bases form the main structural unit of DNA. "
+				 }, 
+
+				 {"QT": "23. A student claims that nitrogenous bases pair randomly with one another. Which of the following statements in the passage contradicts the student’s claim?",
+				 
+				 "AA": "(A) Lines 5-6 (“To each... types”)",
+				 "BB": "(B)  Lines 9-10 (“So far... irregular”)",
+				 "CC": "(C) Lines 23-25 (“The bases... other”)",
+				 "DD" : "(D) Lines 27-29 (“One member... chains”)"}, 
+
+				 {"QT": "24. In the second paragraph (lines 12-19), what do the authors claim to be a feature of biological interest?",
+				 
+				 "AA": "(A) The chemical formula of DNA",
+				 "BB": "(B)  The common fiber axis",
+				 "CC": "(C) The X-ray evidence",
+				 "DD" : "(D) DNA consisting of two chains"}, 
+
+				 {"QT": "25. The authors’ main purpose of including the information about X-ray evidence and density is to",
+				 
+				 "AA": "(A) establish that DNA is the molecule that carries the genetic information.",
+				 "BB": "(B)  present an alternate hypothesis about the composition of a nucleotide.",
+				 "CC": "(C) provide support for the authors’ claim about the number of chains in a molecule of DNA.",
+				 "DD" : "(D) confirm the relationship between the density of DNA and the known chemical formula of DNA."}, 
+
+				 {"QT": "26. Based on the passage, the authors’ statement “If a pair consisted of two purines, for example, there would not be room for it” (lines 29-30) implies that a pair",
+				 
+				 "AA": "(A) of purines would be larger than the space between a sugar and a phosphate group.",
+				 "BB": "(B)  of purines would be larger than a pair consisting of a purine and a pyrimidine.",
+				 "CC": "(C) of pyrimidines would be larger than a pair of purines.",
+				 "DD" : "(D) consisting of a purine and a pyrimidine would be larger than a pair of pyrimidines."}, 
+
+				 {"QT": "27. The authors’ use of the words “exact,” “specific,” and “complement” in lines 47-49 in the final paragraph functions mainly to",
+				 
+				 "AA": "(A) confirm that the nucleotide sequences are known for most molecules of DNA.",
+				 "BB": "(B)  counter the claim that the sequences of bases along a chain can occur in any order.",
+				 "CC": "(C) support the claim that the phosphate-sugar backbone of the authors’ model is completely regular.",
+				 "DD" : "(D) emphasize how one chain of DNA may serve as a template to be copied during DNA replication. "},
+
+				 {"QT": "28. Based on the table and passage, which choice gives the correct percentages of the purines in yeast DNA?",
+				 
+				 "AA": "(A) 17 .1% and 18 .7%",
+				 "BB": "(B)  17 .1% and 32 .9%",
+				 "CC": "(C) 18 .7% and 31 .3%",
+				 "DD" : "(D) 31 .3% and 32 .9%"}, 
+
+				 {"QT": "29. Do the data in the table support the authors’ proposed pairing of bases in DNA?",
+				 
+				 "AA": "(A) Yes, because for each given organism, the percentage of adenine is closest to the percentage of thymine, and the percentage of guanine is closest to the percentage of cytosine.",
+				 "BB": "(B)  Yes, because for each given organism, the percentage of adenine is closest to the percentage of guanine, and the percentage of cytosine is closest to the percentage of thymine.",
+				 "CC": "(C) No, because for each given organism, the percentage of adenine is closest to the percentage of thymine, and the percentage of guanine is closest to the percentage of cytosine.",
+				 "DD" : "(D) No, because for each given organism, the percentage of adenine is closest to the percentage of guanine, and the percentage of cytosine is closest to the percentage of thymine."},
+
+				 {"QT": "30. According to the table, which of the following pairs of base percentages in sea urchin DNA provides evidence in support of the answer to the previous question?",
+				 
+				 "AA": "(A) 17 .3% and 17 .7%",
+				 "BB": "(B)  17 .3% and 32 .1%",
+				 "CC": "(C) 17 .3% and 32 .8%",
+				 "DD" : "(D) 17 .7% and 32 .8%"
+				 }, 
+
+				 {"QT": "31. Based on the table, is the percentage of adenine in each organism’s DNA the same or does it vary, and which statement made by the authors is most consistent with that data?",
+				 
+				 "AA": "(A) The same; “Two of... pyrimidines” (lines 6-8)",
+				 "BB": "(B)  The same; “The important... structure” (lines 25-26)",
+				 "CC": "(C) It varies; “Adenine... thymine” (lines 36-38)",
+				 "DD" : "(D) It varies; “It follows... information” (lines 41-45)"
+				}, 
+
+				 {"QT": "32. The main purpose of the passage is to",
+	
+				 "AA": "(A) emphasize the value of a tradition.",
+				 "BB": "(B)  stress the urgency of an issue.",
+				 "CC": "(C) highlight the severity of social divisions.",
+				 "DD" : "(D) question the feasibility of an undertaking. "
+				}, 
+
+				 {"QT": "33. The central claim of the passage is that",
+				 
+				 "AA": "(A) educated women face a decision about how to engage with existing institutions.",
+				 "BB": "(B)  women can have positions of influence in English society only if they give up some of their traditional roles.",
+				 "CC": "(C) the male monopoly on power in English society has had grave and continuing effects.",
+				 "DD" : "(D) the entry of educated women into positions of power traditionally held by men will transform those positions."
+				}, 
+
+				 {"QT": "34. Woolf uses the word “we” throughout the passage mainly to",
+				 
+				 "AA": "(A) reflect the growing friendliness among a group of people.",
+				 "BB": "(B)  advance the need for candor among a group of people.",
+				 "CC": "(C) establish a sense of solidarity among a group of people.",
+				 "DD" : "(D) reinforce the need for respect among a group of people."}, 
+
+				 {"QT": "35. According to the passage, Woolf chooses the setting of the bridge because it",
+				 
+				 "AA": "(A) is conducive to a mood of fanciful reflection.",
+				 "BB": "(B)  provides a good view of the procession of the sons of educated men.",
+				 "CC": "(C) is within sight of historic episodes to which she alludes.",
+				 "DD" : "(D) is symbolic of the legacy of past and present sons of educated men."
+				}, 
+
+				 {"QT": "36. Woolf indicates that the procession she describes in the passage",
+				 
+				 "AA": "(A) has come to have more practical influence in recent years.",
+				 "BB": "(B)  has become a celebrated feature of English public life.",
+				 "CC": "(C) includes all of the richest and most powerful men in England.",
+				 "DD" : "(D) has become less exclusionary in its membership in recent years."
+				}, 
+
+				 {"QT": "37. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 12-17 (“There... money”)",
+				 "BB": "(B)  Lines 17-19 (“It... desert”)",
+				 "CC": "(C) Lines 23-24 (“For... ourselves”)",
+				 "DD" : "(D) Lines 30-34 (“We... pulpit”) "},
+
+				 {"QT": "38. Woolf characterizes the questions in lines 53-57 (“For we... men”) as both",
+				 
+				 "AA": "(A) controversial and threatening.",
+				 "BB": "(B)  weighty and unanswerable.",
+				 "CC": "(C) momentous and pressing.",
+				 "DD" : "(D) provocative and mysterious."}, 
+
+				 {"QT": "39. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 46-47 (“We... questions”)",
+				 "BB": "(B)  Lines 48-49 (“And... them”)",
+				 "CC": "(C) Line 57 (“The moment... short”)",
+				 "DD" : "(D) Line 62 (“That... Madam”)"},
+
+				 {"QT": "40. Which choice most closely captures the meaning of the figurative “sixpence” referred to in lines 70 and 71?",
+				 
+				 "AA": "(A) Tolerance",
+				 "BB": "(B)  Knowledge",
+				 "CC": "(C) Opportunity",
+				 "DD" : "(D) Perspective"
+				 },
+
+				 {"QT": "41. The range of places and occasions listed in lines 72-76 (“Let us... funerals”) mainly serves to emphasize how",
+				 
+				 "AA": "(A) novel the challenge faced by women is.",
+				 "BB": "(B)  pervasive the need for critical reflection is.",
+				 "CC": "(C) complex the political and social issues of the day are.",
+				 "DD" : "(D) enjoyable the career possibilities for women are."
+				}, 
+
+				 {"QT": "42. In lines 9-17, the author of Passage 1 mentions several companies primarily to",
+	
+				 "AA": "(A) note the technological advances that make space mining possible.",
+				 "BB": "(B)  provide evidence of the growing interest in space mining.",
+				 "CC": "(C) emphasize the large profits to be made from space mining.",
+				 "DD" : "(D) highlight the diverse ways to carry out space mining operations. "}, 
+
+				 {"QT": "43. The author of Passage 1 indicates that space mining could have which positive effect?",
+				 
+				 "AA": "(A) It could yield materials important to Earth’s economy.",
+				 "BB": "(B)  It could raise the value of some precious metals on Earth.",
+				 "CC": "(C) It could create unanticipated technological innovations.",
+				 "DD" : "(D) It could change scientists’ understanding of space resources."}, 
+
+				 {"QT": "44. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 18-22 (“Within... lanthanum”)",
+				 "BB": "(B)  Lines 24-28 (“They... projects”)",
+				 "CC": "(C) Lines 29-30 (“In this... commodity”)",
+				 "DD" : "(D) Lines 41-44 (“Companies... machinery”)"}, 
+
+				 {"QT": "45. As used in line 19, “demands” most nearly means",
+				 
+				 "AA": "(A) offers.",
+				 "BB": "(B)  claims.",
+				 "CC": "(C) inquiries.",
+				 "DD" : "(D) desires."}, 
+
+				 {"QT": "46. What function does the discussion of water in lines 35-40 serve in Passage 1?",
+				 
+				 "AA": "(A) It continues an extended comparison that begins in the previous paragraph.",
+				 "BB": "(B)  It provides an unexpected answer to a question raised in the previous paragraph.",
+				 "CC": "(C) It offers hypothetical examples supporting a claim made in the previous paragraph.",
+				 "DD" : "(D) It examines possible outcomes of a proposal put forth in the previous paragraph."}, 
+
+				 {"QT": "47. The central claim of Passage 2 is that space mining has positive potential but",
+				 
+				 "AA": "(A) it will end up encouraging humanity’s reckless treatment of the environment.",
+				 "BB": "(B)  its effects should be thoughtfully considered before it becomes a reality.",
+				 "CC": "(C) such potential may not include replenishing key resources that are disappearing on Earth.",
+				 "DD" : "(D) experts disagree about the commercial viability of the discoveries it could yield. "},
+
+				 {"QT": "48. As used in line 68, “hold” most nearly means",
+				 
+				 "AA": "(A) maintain.",
+				 "BB": "(B)  grip.",
+				 "CC": "(C) restrain.",
+				 "DD" : "(D) withstand."
+				}, 
+				 {"QT": "49. Which statement best describes the relationship between the passages?",
+				 
+				 "AA": "(A) Passage 2 refutes the central claim advanced in Passage 1 ",
+				 "BB": "(B)  Passage 2 illustrates the phenomenon described in more general terms in Passage 1 .",
+				 "CC": "(C) Passage 2 argues against the practicality of the proposals put forth in Passage 1 .",
+				 "DD" : "(D) Passage 2 expresses reservations about developments discussed in Passage 1 ."},
+
+				 {"QT": "50. The author of Passage 2 would most likely respond to the discussion of the future of space mining in lines 18-28, Passage 1, by claiming that such a future",
+				 
+				 "AA": "(A) is inconsistent with the sustainable use of space resources.",
+				 "BB": "(B)  will be difficult to bring about in the absence of regulations.",
+				 "CC": "(C) cannot be attained without technologies that do not yet exist.",
+				 "DD" : "(D) seems certain to affect Earth’s economy in a negative way."}, 
+
+				 {"QT": "51. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 60-63 (“Some... pristine”)",
+				 "BB": "(B)  Lines 74-76 (“The resources... Earth”)",
+				 "CC": "(C) Lines 81-83 (“One... avoided”)",
+				 "DD" : "(D) Lines 85-87 (“Without... insecure”)"
+				 },
+
+				 {"QT": "52. Which point about the resources that will be highly valued in space is implicit in Passage 1 and explicit in Passage 2?",
+				 "AA": "(A) They may be different resources from those that are valuable on Earth.",
+				 "BB": "(B)  They will be valuable only if they can be harvested cheaply.",
+				 "CC": "(C) They are likely to be primarily precious metals and rare earth elements.",
+				 "DD" : "(D) They may increase in value as those same resources become rare on Earth."
+				}];
+			},
+		notify: true
+		},
+
+
+testtwo: {
+					type: Array,
+					value: function(){
+					return [{"QT": "1. Which choice best summarizes the passage?",
+				 "AA": "(A) A character describes his dislike for his new job and considers the reasons why.",
+				 "BB": "(B)  Two characters employed in the same office become increasingly competitive.",
+				 "CC": "(C) A young man regrets privately a choice that he defends publicly.",
+				 "DD" : "(D) A new employee experiences optimism, then frustration, and finally despair."
+				 },
+				 {"QT": "2. The main purpose of the opening sentence of the passage is to",
+	
+				 "AA": "(A) establish the narrator’s perspective on a controversy.",
+				 "BB": "(B)  provide context useful in understanding the narrator’s emotional state.",
+				 "CC": "(C) offer a symbolic representation of Edward Crimsworth’s plight.",
+				 "DD" : "(D) contrast the narrator’s good intentions with his malicious conduct."
+				 }, 
+
+				 {"QT": "3. During the course of the first paragraph, the narrator’s focus shifts from",
+				 
+				 "AA": "(A) recollection of past confidence to acknowledgment of present self-doubt.",
+				 "BB": "(B)  reflection on his expectations of life as a tradesman to his desire for another job.",
+				 "CC": "(C) generalization about job dissatisfaction to the specifics of his own situation.",
+				 "DD" : "(D) evaluation of factors making him unhappy to identification of alternatives."
+				 },
+
+				 {"QT": "4. The references to “shade” and “darkness” at the end of the first paragraph mainly have which effect?",
+				 
+				 "AA": "(A) They evoke the narrator’s sense of dismay.",
+				 "BB": "(B)  They reflect the narrator’s sinister thoughts.",
+				 "CC": "(C) They capture the narrator’s fear of confinement.",
+				 "DD" : "(D) They reveal the narrator’s longing for rest."
+},
+				{ "QT":"5. The passage indicates that Edward Crimsworth’s behavior was mainly caused by his",
+				 
+				 "AA": "(A) impatience with the narrator’s high spirits.",
+				 "BB": "(B)  scorn of the narrator’s humble background.",
+				 "CC": "(C) indignation at the narrator’s rash actions.",
+				 "DD" : "(D) jealousy of the narrator’s apparent superiority."
+},
+					{ "QT":"6. The passage indicates that when the narrator began working for Edward Crimsworth, he viewed Crimsworth as a",
+				 
+				 "AA": "(A) harmless rival.",
+				 "BB": "(B)  sympathetic ally.",
+				 "CC": "(C) perceptive judge.",
+				 "DD" : "(D) demanding mentor"
+				 },
+
+				 	{ "QT":"7. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 28-31 (“the antipathy... life”)",
+				 "BB": "(B)  Lines 38-40 (“My southern... irritated him”)",
+				 "CC": "(C) Lines 54-56 (“Day... slumber”)",
+				 "DD" : "(D) Lines 61-62 (“I had... brother”)"
+				 },
+	{ "QT": "8. At the end of the second paragraph, the comparisons of abstract qualities to a lynx and a snake mainly have the effect of",
+				 
+				 "AA": "(A) contrasting two hypothetical courses of action.",
+				 "BB": "(B)  conveying the ferocity of a resolution.",
+				 "CC": "(C) suggesting the likelihood of an altercation.",
+				 "DD" : "(D) illustrating the nature of an adversarial relationship."
+},
+				{"QT": "9. The passage indicates that, after a long day of work, the narrator sometimes found his living quarters to be",
+				 
+				 "AA": "(A) treacherous.",
+				 "BB": "(B)  dreary.",
+				 "CC": "(C) predictable.",
+				 "DD" : "(D) intolerable."
+				 },
+
+				{"QT": "10. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 17-21 (“I should... scenes”)",
+				 "BB": "(B)  Lines 21-23 (“I should... lodgings”)",
+				 "CC": "(C) Lines 64-67 (“Thoughts... phrases”)",
+				 "DD" : "(D) Lines 68-74 (“I walked... gleam”)" 
+					},
+
+					{"QT": "11. The main purpose of the passage is to",
+				 
+				 "AA": "(A) consider an ethical dilemma posed by cost-benefit analysis.",
+				 "BB": "(B)  describe a psychology study of ethical economic behavior.",
+				 "CC": "(C) argue that the free market prohibits ethical economics.",
+				 "DD" : "(D) examine ways of evaluating the ethics of economics." 
+					},
+				{"QT": "12. In the passage, the author anticipates which of the following objections to criticizing the ethics of free markets?",
+	
+				 "AA": "(A) Smith’s association of free markets with ethical behavior still applies today.",
+				 "BB": "(B)  Free markets are the best way to generate high profits, so ethics are a secondary consideration.",
+				 "CC": "(C) Free markets are ethical because they are made possible by devalued currency.",
+				 "DD" : "(D) Free markets are ethical because they enable individuals to make choices. "
+				 }, 
+
+				{"QT": "13. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 4-5 (“Some... ethical”)",
+				 "BB": "(B)  Lines 7-10 (“But... about”)",
+				 "CC": "(C) Lines 21-22 (“Smith... outcome”)",
+				 "DD" : "(D) Lines 52-54 (“When... way”)"
+				 }, 
+
+				{"QT": "14. As used in line 6, “embraced” most nearly means",
+				 
+				 "AA": "(A) lovingly held.",
+				 "BB": "(B)  readily adopted.",
+				 "CC": "(C) eagerly hugged.",
+				 "DD" : "(D) reluctantly used."
+				 }, 
+
+				{"QT": "15. The main purpose of the fifth paragraph (lines 45-56) is to",
+				 
+				 "AA": "(A) develop a counterargument to the claim that greed is good.",
+				 "BB": "(B)  provide support for the idea that ethics is about character.",
+				 "CC": "(C) describe a third approach to defining ethical economics.",
+				 "DD" : "(D) illustrate that one’s actions are a result of one’s character."
+				 }, 
+
+				{ "QT": "16. As used in line 58, “clashes” most nearly means",
+				 
+				 "AA": "(A) conflicts.",
+				 "BB": "(B)  mismatches.",
+				 "CC": "(C) collisions.",
+				 "DD" : "(D) brawls."
+				 }, 
+
+				{"QT": "17. Which choice best supports the author’s claim that there is common ground shared by the different approaches to ethics described in the passage?",
+				 
+				 "AA": "(A) Lines 11-12 (“There... decision”)",
+				 "BB": "(B)  Lines 47-50 (“From... advertisements”)",
+				 "CC": "(C) Lines 59-64 (“Take... market”)",
+				 "DD" : "(D) Lines 75-77 (“We... facts”) "
+				 },
+
+				{"QT": "18. The main idea of the final paragraph is that",
+				 
+				 "AA": "(A) human quirks make it difficult to predict people’s ethical decisions accurately.",
+				 "BB": "(B)  people universally react with disgust when faced with economic injustice.",
+				 "CC": "(C) understanding human psychology may help to define ethics in economics.",
+				 "DD" : "(D) economists themselves will be responsible for reforming the free market."
+				 }, 
+
+				{"QT": "19. Data in the graph about per-pound coffee profits in Tanzania most strongly support which of the following statements?",
+				 
+				 "AA": "(A) Fair trade coffee consistently earned greater profits than regular coffee earned.",
+				 "BB": "(B)  The profits earned from regular coffee did not fluctuate.",
+				 "CC": "(C) Fair trade coffee profits increased between 2004 and 2006.",
+				 "DD" : "(D) Fair trade and regular coffee were earning equal profits by 2008."
+				 },
+
+				 {"QT": "20. Data in the graph indicate that the greatest difference between per-pound profits from fair trade coffee and those from regular coffee occurred during which period?",
+				 
+				 "AA": "(A) 2000 to 2002",
+				 "BB": "(B)  2002 to 2004",
+				 "CC": "(C) 2004 to 2006",
+				 "DD" : "(D) 2006 to 2008"
+				 }, 
+
+				 {"QT": "21. Data in the graph provide most direct support for which idea in the passage?",
+				 
+				 "AA": "(A) Acting on empathy can be counterproductive.",
+				 "BB": "(B)  Ethical economics is defined by character.",
+				 "CC": "(C) Ethical economics is still possible.",
+				 "DD" : "(D) People fear losses more than they hope for gains."
+				}, 
+
+				 {"QT": "22. The author of Passage 1 indicates which of the following about the use of screen-based technologies?",
+	
+				 "AA": "(A) It should be thoroughly studied.",
+				 "BB": "(B)  It makes the brain increasingly rigid.",
+				 "CC": "(C) It has some positive effects.",
+				 "DD" : "(D) It should be widely encouraged. "}, 
+
+				 {"QT": "23. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 3-4 (“Certain... Net”)",
+				 "BB": "(B)  Lines 23-25 (“But... smarter”)",
+				 "CC": "(C) Lines 25-29 (“Ina... ability”)",
+				 "DD" : "(D) Lines 29-31 (“She... others”)"}, 
+
+				 {"QT": "24. The author of Passage 1 indicates that becoming adept at using the Internet can",
+				 
+				 "AA": "(A) make people complacent about their health.",
+				 "BB": "(B)  undermine the ability to think deeply.",
+				 "CC": "(C) increase people’s social contacts.",
+				 "DD" : "(D) improve people’s self-confidence."}, 
+
+				 {"QT": "25. As used in line 40, “plastic” most nearly means",
+				 
+				 "AA": "(A) creative.",
+				 "BB": "(B)  artificial.",
+				 "CC": "(C) malleable.",
+				 "DD" : "(D) sculptural."}, 
+
+				 {"QT": "26. The author of Passage 2 refers to the novel War and Peace primarily to suggest that Woody Allen",
+				 
+				 "AA": "(A) did not like Tolstoy’s writing style.",
+				 "BB": "(B)  could not comprehend the novel by speed-reading it.",
+				 "CC": "(C) had become quite skilled at multitasking.",
+				 "DD" : "(D) regretted having read such a long novel."}, 
+
+				 {"QT": "27. According to the author of Passage 2, what do novelists and scientists have in common?",
+				 
+				 "AA": "(A) They take risks when they pursue knowledge.",
+				 "BB": "(B)  They are eager to improve their minds.",
+				 "CC": "(C) They are curious about other subjects.",
+				 "DD" : "(D) They become absorbed in their own fields. "},
+
+				 {"QT": "28. The analogy in the final sentence of Passage 2 has primarily which effect?",
+				 
+				 "AA": "(A) It uses ornate language to illustrate a difficult concept.",
+				 "BB": "(B)  It employs humor to soften a severe opinion of human behavior.",
+				 "CC": "(C) It alludes to the past to evoke a nostalgic response.",
+				 "DD" : "(D) It criticizes the view of a particular group."}, 
+
+				 {"QT": "29. The main purpose of each passage is to",
+				 
+				 "AA": "(A) compare brain function in those who play games on the Internet and those who browse on it.",
+				 "BB": "(B)  report on the problem-solving skills of individuals with varying levels of Internet experience.",
+				 "CC": "(C) take a position on increasing financial support for studies related to technology and intelligence.",
+				 "DD" : "(D) make an argument about the effects of electronic media use on the brain."},
+
+				 {"QT": "30. Which choice best describes the relationship between the two passages?",
+				 
+				 "AA": "(A) Passage 2 relates first-hand experiences that contrast with the clinical approach in Passage 1 .",
+				 "BB": "(B)  Passage 2 critiques the conclusions drawn from the research discussed in Passage 1 .",
+				 "CC": "(C) Passage 2 takes a high-level view of a result that Passage 1 examines in depth.",
+				 "DD" : "(D) Passage 2 predicts the negative reactions that the findings discussed in Passage 1 might produce."
+				 }, 
+
+				 {"QT": "31. On which of the following points would the authors of both passages most likely agree?",
+				 
+				 "AA": "(A) Computer-savvy children tend to demonstrate better hand-eye coordination than do their parents.",
+				 "BB": "(B)  Those who criticize consumers of electronic media tend to overreact in their criticism.",
+				 "CC": "(C) Improved visual-spatial skills do not generalize to improved skills in other areas.",
+				 "DD" : "(D) Internet users are unlikely to prefer reading onscreen text to reading actual books."
+				}, 
+
+				 {"QT": "32. Which choice provides the best evidence that the author of Passage 2 would agree to some extent with the claim attributed to Michael Merzenich in lines 41-43, Passage 1?",
+	
+				 "AA": "(A) Lines 51-53 (“Critics... brain”)",
+				 "BB": "(B)  Lines 54-56 (“Yes... changes”)",
+				 "CC": "(C) Lines 57-59 (“But... experience”)",
+				 "DD" : "(D) Lines 83-84 (“Media... consumes”)"
+				}, 
+
+				 {"QT": "33. The central problem that Stanton describes in the passage is that women have been",
+				 
+				 "AA": "(A) denied equal educational opportunities, which has kept them from reaching their potential.",
+				 "BB": "(B)  prevented from exerting their positive influence on men, which has led to societal breakdown.",
+				 "CC": "(C) prevented from voting, which has resulted in poor candidates winning important elections.",
+				 "DD" : "(D) blocked by men from serving as legislators, which has allowed the creation of unjust laws."}, 
+
+				 {"QT": "34. Stanton uses the phrase “high carnival” (line 15) mainly to emphasize what she sees as the",
+				 
+				 "AA": "(A) utter domination of women by men.",
+				 "BB": "(B)  freewheeling spirit of the age.",
+				 "CC": "(C) scandalous decline in moral values.",
+				 "DD" : "(D) growing power of women in society."}, 
+
+				 {"QT": "35. Stanton claims that which of the following was a relatively recent historical development?",
+				 
+				 "AA": "(A) The control of society by men",
+				 "BB": "(B)  The spread of war and injustice",
+				 "CC": "(C) The domination of domestic life by men",
+				 "DD" : "(D) The acknowledgment of women’s true character"}, 
+
+				 {"QT": "36. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 3-7 (“The male... death”)",
+				 "BB": "(B)  Lines 15-22 (“The male... century”)",
+				 "CC": "(C) Lines 22-25 (“Society... home”)",
+				 "DD" : "(D) Lines 48-52 (“[M]an... repression”)"}, 
+
+				 {"QT": "37. As used in line 24, “rule” most nearly refers to",
+				 
+				 "AA": "(A) a general guideline.",
+				 "BB": "(B)  a controlling force.",
+				 "CC": "(C) an established habit.",
+				 "DD" : "(D) a procedural method. "},
+
+				 {"QT": "38. It can reasonably be inferred that “the strong-minded” (line 32) was a term generally intended to",
+				 
+				 "AA": "(A) praise women who fight for their long-denied rights.",
+				 "BB": "(B)  identify women who demonstrate intellectual skill.",
+				 "CC": "(C) criticize women who enter male-dominated professions.",
+				 "DD" : "(D) condemn women who agitate for the vote for their sex."}, 
+
+				 {"QT": "39. As used in line 36, “best” most nearly means",
+				 
+				 "AA": "(A) superior.",
+				 "BB": "(B)  excellent.",
+				 "CC": "(C) genuine.",
+				 "DD" : "(D) rarest."},
+
+				 {"QT": "40. Stanton contends that the situation she describes in the passage has become so dire that even men have begun to",
+				 
+				 "AA": "(A) lament the problems they have created.",
+				 "BB": "(B)  join the call for woman suffrage.",
+				 "CC": "(C) consider women their social equals.",
+				 "DD" : "(D) ask women how to improve civic life."
+				}, 
+
+				 {"QT": "41. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 25-30 (“No one... matters”)",
+				 "BB": "(B)  Lines 53-55 (“And now... life”)",
+				 "CC": "(C) Lines 56-60 (“The need... action”)",
+				 "DD" : "(D) Lines 61-64 (“We ask... nation”)"
+				}, 
+
+				 {"QT": "42. The sixth paragraph (lines 67-78) is primarily concerned with establishing a contrast between",
+	
+				 "AA": "(A) men and women.",
+				 "BB": "(B)  the spiritual world and the material world.",
+				 "CC": "(C) bad men and good men.",
+				 "DD" : "(D) men and masculine traits. "}, 
+
+				 {"QT": "43. The first paragraph serves mainly to",
+				 
+				 "AA": "(A) explain how a scientific device is used.",
+				 "BB": "(B)  note a common misconception about an event.",
+				 "CC": "(C) describe a natural phenomenon and address its importance.",
+				 "DD" : "(D) present a recent study and summarize its findings."}, 
+
+				 {"QT": "44. As used in line 19, “capture” is closest in meaning to",
+				 
+				 "AA": "(A) control.",
+				 "BB": "(B)  record.",
+				 "CC": "(C) secure.",
+				 "DD" : "(D) absorb."}, 
+
+				 {"QT": "45. According to Peacock, the ability to monitor internal waves is significant primarily because",
+				 
+				 "AA": "(A) it will allow scientists to verify the maximum height of such waves.",
+				 "BB": "(B)  it will allow researchers to shift their focus to improving the quality of satellite images.",
+				 "CC": "(C) the study of wave patterns will enable regions to predict and prevent coastal damage.",
+				 "DD" : "(D) the study of such waves will inform the development of key scientific models."}, 
+
+				 {"QT": "46. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 1-2 (“Some... see”)",
+				 "BB": "(B)  Lines 4-6 (“they... equipment”)",
+				 "CC": "(C) Lines 17-19 (“If... this”)",
+				 "DD" : "(D) Lines 24-26 (“Internal... high”)"
+				 }, 
+
+				 {"QT": "47. As used in line 65, “devise” most nearly means",
+				 
+				 "AA": "(A) create.",
+				 "BB": "(B)  solve.",
+				 "CC": "(C) imagine.",
+				 "DD" : "(D) begin. "
+				 },
+
+				 {"QT": "48. Based on information in the passage, it can reasonably be inferred that all internal waves",
+				 
+				 "AA": "(A) reach approximately the same height even though the locations and depths of continental shelves vary.",
+				 "BB": "(B)  may be caused by similar factors but are influenced by the distinct topographies of different regions.",
+				 "CC": "(C) can be traced to inconsistencies in the tidal patterns of deep ocean water located near islands.",
+				 "DD" : "(D) are generated by the movement of dense water over a relatively flat section of the ocean floor."
+				 }, 
+
+				 {"QT": "49. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "AA": "(A) Lines 29-31 (“Although... formed”)",
+				 "BB": "(B)  Lines 56-58 (“As the... it”)",
+				 "CC": "(C) Lines 61-64 (“As these... shelf”)",
+				 "DD" : "(D) Lines 67-70 (“Whereas... world”)"},
+
+				 {"QT": "50. In the graph, which isotherm displays an increase in depth below the surface during the period 19:12 to 20:24?",
+				 
+				 "AA": "(A) 9°C",
+				 "BB": "(B)  10°C",
+				 "CC": "(C) 11°C",
+				 "DD" : "(D) 13°C"
+				 }, 
+
+				 {"QT":"51. Which concept is supported by the passage and by the information in the graph?",
+				 
+				 "AA": "(A) Internal waves cause water of varying salinity to mix.",
+				 "BB": "(B)  Internal waves push denser water above layers of less dense water.",
+				 "CC": "(C) Internal waves push bands of cold water above bands of warmer water.",
+				 "DD" : "(D) Internal waves do not rise to break the ocean’s surface."
+				 }, 
+
+				 {"QT": "52. How does the graph support the author’s point that internal waves affect ocean water dynamics?",
+	
+				 "AA": "(A) It demonstrates that wave movement forces warmer water down to depths that typically are colder.",
+				 "BB": "(B)  It reveals the degree to which an internal wave affects the density of deep layers of cold water.",
+				 "CC": "(C) It illustrates the change in surface temperature that takes place during an isolated series of deep waves.",
+				 "DD" : "(D) It shows that multiple waves rising near the surface of the ocean disrupt the flow of normal tides."
+				 }
+				 ];
+				 },
+				notify: true
+				},
+testthree: {
+	type: Array,
+		value: function(){
+		return [{"QT": "1. Which choice best summarizes the passage?",
+					 
+					 "AA": "(A) A woman weighs the positive and negative aspects of accepting a new job.",
+					 "BB": "(B)  A woman does not correct a stranger who mistakes her for someone else.",
+					 "CC": "(C) A woman impersonates someone else to seek revenge on an acquaintance.",
+					 "DD" : "(D) A woman takes an immediate dislike to her new employer."
+},
+				{"QT": "2. In line 2, “turn” most nearly means",
+		
+					 "AA": "(A) slight movement.",
+					 "BB": "(B)  change in rotation.",
+					 "CC": "(C) short walk.",
+					 "DD" : "(D) course correction."},
+				{"QT": "3. The passage most clearly implies that other people regarded Lady Carlotta as",
+					 
+					 "AA": "(A) outspoken.",
+					 "BB": "(B)  tactful.",
+					 "CC": "(C) ambitious.",
+					 "DD" : "(D) unfriendly."},
+				
+				{"QT": "4. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 10-14 (“Certain... business”)",
+					 "BB": "(B)  Lines 22-23 (“It is... lady”)",
+					 "CC": "(C) Lines 23-26 (“On this... her”)",
+					 "DD" : "(D) Lines 30-32 (“She... train”)"
+					 },
+
+					 {"QT": "5. The description of how Lady Carlotta “put the doctrine of non-interference into practice” (lines 14-15) mainly serves to",
+					 
+					 "AA": "(A) foreshadow her capacity for deception.",
+					 "BB": "(B)  illustrate the subtle cruelty in her nature.",
+					 "CC": "(C) provide a humorous insight into her character.",
+					 "DD" : "(D) explain a surprising change in her behavior."
+					 },
+					 {"QT": "6. In line 55, “charge” most nearly means",
+					 
+					 "AA": "(A) responsibility.",
+					 "BB": "(B)  attack.",
+					 "CC": "(C) fee.",
+					 "DD" : "(D) expense."
+					 },
+
+					 {"QT": "7. The narrator indicates that Claude, Wilfrid, Irene, and Viola are",
+					 
+					 "AA": "(A) similar to many of their peers.",
+					 "BB": "(B)  unusually creative and intelligent.",
+					 "CC": "(C) hostile to the idea of a governess.",
+					 "DD" : "(D) more educated than others of their age."
+					 },
+					 {"QT" :"8. The narrator implies that Mrs. Quabarl favors a form of education that emphasizes",
+					 
+					 "AA": "(A) traditional values.",
+					 "BB": "(B)  active engagement.",
+					 "CC": "(C) artistic experimentation.",
+					 "DD" : "(D) factual retention."
+					 },
+
+					 {"QT":"9. As presented in the passage, Mrs. Quabarl is best described as",
+					 
+					 "AA": "(A) superficially kind but actually selfish.",
+					 "BB": "(B)  outwardly imposing but easily defied.",
+					 "CC": "(C) socially successful but irrationally bitter.",
+					 "DD" : "(D) naturally generous but frequently imprudent."
+					 },
+
+					{"QT": "10. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 49-50 (“How... careless”)",
+					 "BB": "(B)  Lines 62-68 (“I wish... memory”)",
+					 "CC": "(C) Lines 70-73 (“I shall... Russian”)",
+					 "DD" : "(D) Lines 77-82 (“She was... apologetic”)"
+					 }, 
+					{ 
+
+					 "QT": "11. What function does the third paragraph (lines 20-34) serve in the passage as a whole?",
+					 
+					 "AA": "(A) It acknowledges that a practice favored by the author of the passage has some limitations.",
+						"BB": "(B)  It illustrates with detail the arguments made in the first two paragraphs of the passage.",
+					 "CC": "(C) It gives an overview of a problem that has not been sufficiently addressed by the experts mentioned in the passage.",
+					 "DD": "(D) It advocates for abandoning a practice for which the passage as a whole provides mostly favorable data."
+					 }, 
+
+					{
+					"QT": "12. Which choice does the author explicitly cite as an advantage of automobile travel in North America?",
+					 "AA": "(A) Environmental impact",
+					 "BB": "(B)  Convenience",
+					 "CC": "(C) Speed",
+					 "DD" : "(D) Cost "
+					 }, 
+					{  
+
+						"QT": "13. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 5-9 (“In... automobile”)",
+					 "BB": "(B)  Lines 20-24 (“And... car”)",
+					 "CC": "(C) Lines 24-26 (“In... experience”)",
+					 "DD" : "(D) Lines 32-34 (“Hopping... quickly”)"
+					 }, 
+
+					{"QT": "14. The central idea of the fourth paragraph (lines 35-57) is that",
+					 
+					 "AA": "(A) European countries excel at public transportation.",
+					 "BB": "(B)  some public transportation systems are superior to travel by private automobile.",
+					 "CC": "(C) Americans should mimic foreign public transportation systems when possible.",
+					 "DD" : "(D) much international public transportation is engineered for passengers to work while on board."
+					 }, 
+
+					{"QT": "15. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Line 35 (“It... this”)",
+					 "BB": "(B)  Lines 35-37 (“Done... automobile”)",
+					 "CC": "(C) Lines 37-40 (“In... sound”)",
+					 "DD" : "(D) Lines 44-48 (“From... cities”)"
+					 }, 
+
+					{"QT": "16. As used in line 58, “credit” most nearly means",
+					 
+					 "AA": "(A) endow.",
+					 "BB": "(B)  attribute.",
+					 "CC": "(C) believe.",
+					 "DD" : "(D) honor."
+					},
+
+					{"QT": "17. As used in line 61, “favor” most nearly means",
+					 
+					 "AA": "(A) indulge.",
+					 "BB": "(B)  prefer.",
+					 "CC": "(C) resemble.",
+					 "DD" : "(D) serve. "
+					},
+
+					{"QT": "18. Which choice best supports the conclusion that public transportation is compatible with the use of personal electronic devices?",
+					 
+					 "AA": "(A) Lines 59-63 (“The... subways”)",
+					 "BB": "(B)  Lines 63-67 (“Part... annoyances”)",
+					 "CC": "(C) Lines 68-70 (“Even... ago”)",
+					 "DD" : "(D) Lines 77-81 (“Already... homes”)"
+					 }, 
+
+					{"QT": "19. Which choice is supported by the data in the first figure?",
+					 
+					 "AA": "(A) The number of students using public transportation is greater than the number of retirees using public transportation.",
+					 "BB": "(B)  The number of employed people using public transportation and the number of unemployed people using public transportation is roughly the same.",
+					 "CC": "(C) People employed outside the home are less likely to use public transportation than are homemakers.",
+					 "DD" : "(D) Unemployed people use public transportation less often than do people employed outside the home."
+					 },
+
+				{"QT": "20. Taken together, the two figures suggest that most people who use public transportation",
+					 
+					 "AA": "(A) are employed outside the home and take public transportation to work.",
+					 "BB": "(B)  are employed outside the home but take public transportation primarily in order to run errands.",
+					 "CC": "(C) use public transportation during the week but use their private cars on weekends.",
+					 "DD" : "(D) use public transportation only until they are able to afford to buy a car."
+
+					},
+
+					 {"QT": "21. Which choice best reflects the overall sequence of events in the passage?",
+					 
+					 "AA": "(A) An experiment is proposed but proves unworkable; a less ambitious experiment is attempted, and it yields data that give rise to a new set of questions.",
+					 "BB": "(B)  A new discovery leads to reconsideration of a theory; a classic study is adapted, and the results are summarized.",
+					 "CC": "(C) An anomaly is observed and simulated experimentally; the results are compared with previous findings, and a novel hypothesis is proposed.",
+					 "DD" : "(D) An unexpected finding arises during the early phase of a study; the study is modified in response to this finding, and the results are interpreted and evaluated." 
+					},
+				{"QT"	: "22. As used in line 7, “challenged” most nearly means",
+		
+					 "AA": "(A) dared.",
+					 "BB": "(B)  required.",
+					 "CC": "(C) disputed with.",
+					 "DD" : "(D) competed with. "
+					 },
+				{"QT": "23. Which statement best captures Ken Dial’s central assumption in setting up his research?",
+					 
+					 "AA": "(A) The acquisition of flight in young birds sheds light on the acquisition of flight in their evolutionary ancestors.",
+					 "BB": "(B)  The tendency of certain young birds to jump erratically is a somewhat recent evolved behavior.",
+					 "CC": "(C) Young birds in a controlled research setting are less likely than birds in the wild to require perches when at rest.",
+					 "DD" : "(D) Ground-dwelling and tree-climbing predecessors to birds evolved in parallel."
+					 },
+				
+
+				{"QT": "24. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 1-4 (“At field... parents”)",
+					 "BB": "(B)  Lines 6-11 (“So when... fly”)",
+					 "CC": "(C) Lines 16-19 (“When... measured”)",
+					 "DD" : "(D) Lines 23-24 (“At first . . . the ground”)"
+					 },
+
+				{"QT": "25. In the second paragraph (lines 12-32), the incident involving the local rancher mainly serves to",
+					 
+					 "AA": "(A) reveal Ken Dial’s motivation for undertaking his project.",
+					 "BB": "(B)  underscore certain differences between laboratory and field research.",
+					 "CC": "(C) show how an unanticipated piece of information influenced Ken Dial’s research.",
+					 "DD" : "(D) introduce a key contributor to the tree-down theory."
+					 },
+
+				{"QT": "26. After Ken Dial had his “‘aha’ moment” (line 41), he",
+					 
+					 "AA": "(A) tried to train the birds to fly to their perches.",
+					 "BB": "(B)  studied videos to determine why the birds no longer hopped.",
+					 "CC": "(C) observed how the birds dealt with gradually steeper inclines.",
+					 "DD" : "(D) consulted with other researchers who had studied Chukar Partridges."
+					 },
+
+				{"QT": "27. The passage identifies which of the following as a factor that facilitated the baby Chukars’ traction on steep ramps?",
+					 
+					 "AA": "(A) The speed with which they climbed",
+					 "BB": "(B)  The position of their flapping wings",
+					 "CC": "(C) The alternation of wing and foot movement",
+					 "DD" : "(D) Their continual hopping motions "
+					 },
+
+				{"QT": "28. As used in line 61, “document” most nearly means",
+					 
+					 "AA": "(A) portray.",
+					 "BB": "(B)  record.",
+					 "CC": "(C) publish.",
+					 "DD" : "(D) process."
+					 },
+
+				{"QT": "29. What can reasonably be inferred about gliding animals from the passage?",
+					 
+					 "AA": "(A) Their young tend to hop along beside their parents instead of flying beside them.",
+					 "BB": "(B)  Their method of locomotion is similar to that of ground birds.",
+					 "CC": "(C) They use the ground for feeding more often than for perching.",
+					 "DD" : "(D) They do not use a flapping stroke to aid in climbing slopes."
+					 },
+
+				{"QT": "30. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 4-6 (“They jumped... air”)",
+					 "BB": "(B)  Lines 28-29 (“They really... traveling”)",
+					 "CC": "(C) Lines 57-59 (“The birds... slopes”)",
+					 "DD" : "(D) Lines 72-74 (“something... theory”)"
+					 },
+
+					 {"QT": "31. As used in line 21, “common” most nearly means",
+					 
+					 "AA": "(A) average.",
+					 "BB": "(B)  shared.",
+					 "CC": "(C) coarse.",
+					 "DD" : "(D) similar."
+},
+				{"QT": "32. It can be inferred that the authors of Passage 1 believe that running a household and raising children",
+		
+					 "AA": "(A) are rewarding for men as well as for women.",
+					 "BB": "(B)  yield less value for society than do the roles performed by men.",
+					 "CC": "(C) entail very few activities that are difficult or unpleasant.",
+					 "DD" : "(D) require skills similar to those needed to run a country or a business. "},
+
+				{"QT": "33. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 4-6 (“they are... representation”)",
+					 "BB": "(B)  Lines 13-17 (“If the... sanction”)",
+					 "CC": "(C) Lines 25-30 (“Is it... home”)",
+					 "DD" : "(D) Lines 30-35 (“And... manner”)"
+					 },
+				{"QT": "34. According to the author of Passage 2, in order for society to progress, women must",
+					 
+					 "AA": "(A) enjoy personal happiness and financial security.",
+					 "BB": "(B)  follow all currently prescribed social rules.",
+					 "CC": "(C) replace men as figures of power and authority.",
+					 "DD" : "(D) receive an education comparable to that of men."},
+
+				{"QT": "35. As used in line 50, “reason” most nearly means",
+					 
+					 "AA": "(A) motive.",
+					 "BB": "(B)  sanity.",
+					 "CC": "(C) intellect.",
+					 "DD" : "(D) explanation."},
+				{"QT": "36. In Passage 2, the author claims that freedoms granted by society’s leaders have",
+					 
+					 "AA": "(A) privileged one gender over the other.",
+					 "BB": "(B)  resulted in a general reduction in individual virtue.",
+					 "CC": "(C) caused arguments about the nature of happiness.",
+					 "DD" : "(D) ensured equality for all people."
+					 },
+
+				{"QT": "37. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 41-45 (“Contending... virtue”)",
+					 "BB": "(B)  Lines 45-47 (“truth... practice”)",
+					 "CC": "(C) Lines 65-66 (“If so... rest”)",
+					 "DD" : "(D) Lines 72-75 (“Consider... happiness”) "
+					 },
+
+				{"QT": "38. In lines 61-65, the author of Passage 2 refers to a statement made in Passage 1 in order to",
+					 
+					 "AA": "(A) call into question the qualifications of the authors of Passage 1 regarding gender issues.",
+					 "BB": "(B)  dispute the assertion made about women in the first sentence of Passage 1 .",
+					 "CC": "(C) develop her argument by highlighting what she sees as flawed reasoning in Passage 1 .",
+					 "DD" : "(D) validate the concluding declarations made by the authors of Passage 1 about gender roles."
+					 },
+				
+				{"QT": "39. Which best describes the overall relationship between Passage 1 and Passage 2 ?",
+					 
+					 "AA": "(A) Passage 2 strongly challenges the point of view in Passage 1 .",
+					 "BB": "(B)  Passage 2 draws alternative conclusions from the evidence presented in Passage 1 .",
+					 "CC": "(C) Passage 2 elaborates on the proposal presented in Passage 1 .",
+					 "DD" : "(D) Passage 2 restates in different terms the argument presented in Passage 1 .",
+						},
+						
+						{"QT": "40. The authors of both passages would most likely agree with which of the following statements about women in the eighteenth century?",
+					 
+					 "AA": "(A) Their natural preferences were the same as those of men.",
+					 "BB": "(B)  They needed a good education to be successful in society.",
+					 "CC": "(C) They were just as happy in life as men were.",
+					 "DD" : "(D) They generally enjoyed fewer rights than men did." 
+						},
+					 
+					 {"QT": "41. How would the authors of Passage 1 most likely respond to the points made in the final paragraph of Passage 2?",
+					 
+					 "AA": "(A) Women are not naturally suited for the exercise of civil and political rights.",
+					 "BB": "(B)  Men and women possess similar degrees of reasoning ability.",
+					 "CC": "(C) Women do not need to remain confined to their traditional family duties.",
+					 "DD": "(D) The principles of natural law should not be invoked when considering gender roles."
+					 }, 
+
+					 {"QT": "42. How do the words “can,” “may,” and “could” in the third paragraph (lines 19-41) help establish the tone of the paragraph?",
+		
+					 "AA": "(A) They create an optimistic tone that makes clear the authors are hopeful about the effects of their research on colony collapse disorder.",
+					 "BB": "(B)  They create a dubious tone that makes clear the authors do not have confidence in the usefulness of the research described.",
+					 "CC": "(C) They create a tentative tone that makes clear the authors suspect but do not know that their hypothesis is correct.",
+					 "DD" : "(D) They create a critical tone that makes clear the authors are skeptical of claims that pyrethrums are inherent in mono-crops. "
+					 },
+				
+				{"QT": "43. In line 42, the authors state that a certain hypothesis “can best be tested by a trial.” Based on the passage, which of the following is a hypothesis the authors suggest be tested in a trial?",
+					 
+					 "AA": "(A) Honeybees that are exposed to both pyrethrums and mites are likely to develop a secondary infection by a virus, a bacterium, or a fungus.",
+					 "BB": "(B)  Beekeepers who feed their honeybee colonies a diet of a single crop need to increase the use of insecticides to prevent mite infestations.",
+					 "CC": "(C) A honeybee diet that includes pyrethrums results in honeybee colonies that are more resistant to mite infestations.",
+					 "DD" : "(D) Humans are more susceptible to varroa mites as a result of consuming nutritionally deficient food crops."
+					 },
+				{"QT": "44. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 3-5 (“These mites... viruses”)",
+					 "BB": "(B)  Lines 16-18 (“In fact... cream”)",
+					 "CC": "(C) Lines 19-21 (“We suspect... deficient”)",
+					 "DD" : "(D) Lines 24-28 (“Without... bees”)"
+					 },
+				{"QT": "45. The passage most strongly suggests that beekeepers’ attempts to fight mite infestations with commercially produced insecticides have what unintentional effect?",
+					 
+					 "AA": "(A) They increase certain mite populations.",
+					 "BB": "(B)  They kill some beneficial forms of bacteria.",
+					 "CC": "(C) They destroy bees’ primary food source.",
+					 "DD" : "(D) They further harm the health of some bees."
+					 },
+				{"QT": "46. Which choice provides the best evidence for the answer to the previous question?",
+					 
+					 "AA": "(A) Lines 1-2 (“Honey bees... mites”)",
+					 "BB": "(B)  Lines 6-7 (“Little... control”)",
+					 "CC": "(C) Lines 31-35 (“In addition... infestation”)",
+					 "DD" : "(D) Lines 47-50 (“Mites... control colonies”)"
+					 },
+				{"QT": "47. As used in line 35, “postulate” most nearly means to",
+					 
+					 "AA": "(A) make an unfounded assumption.",
+					 "BB": "(B)  put forth an idea or claim.",
+					 "CC": "(C) question a belief or theory.",
+					 "DD" : "(D) conclude based on firm evidence. "
+					 },
+				{"QT": "48. The main purpose of the fourth paragraph (lines 42-50) is to",
+					 
+					 "AA": "(A) summarize the results of an experiment that confirmed the authors’ hypothesis about the role of clover in the diets of wild-type honeybees.",
+					 "BB": "(B)  propose an experiment to investigate how different diets affect commercial honeybee colonies’ susceptibility to mite infestations.",
+					 "CC": "(C) provide a comparative nutritional analysis of the honey produced by the experimental colonies and by the control colonies.",
+					 "DD" : "(D) predict the most likely outcome of an unfinished experiment summarized in the third paragraph (lines 19-41)."
+					 },
+
+					 {"QT": "49. An unstated assumption made by the authors about clover is that the plants",
+					 
+					 "AA": "(A) do not produce pyrethrums.",
+					 "BB": "(B)  are members of the Chrysanthemum genus.",
+					 "CC": "(C) are usually located near wild-type honeybee colonies.",
+					 "DD" : "(D) will not be a good food source for honeybees in the control colonies."
+					 },
+
+					 {"QT":"50. Based on data in the table, in what percent of colonies with colony collapse disorder were the honeybees infected by all four pathogens?",
+					 
+					 "AA": "(A) 0 percent",
+					 "BB": "(B)  77 percent",
+					 "CC": "(C) 83 percent",
+					 "DD" : "(D) 100 percent"
+					 }, 
+
+					 {"QT":"51. Based on data in the table, which of the four pathogens infected the highest percentage of honeybee colonies without colony collapse disorder?",
+					 
+					 "AA": "(A) IAPV",
+					 "BB": "(B)  KBV",
+					 "CC": "(C) Nosema apis",
+					 "DD" : "(D) Nosema ceranae"
+					 }, 
+
+				  {"QT": "52. Do the data in the table provide support for the authors’ claim that infection with varroa mites increases a honeybee’s susceptibility to secondary infections?",
+		
+					 "AA": "(A) Yes, because the data provide evidence that infection with a pathogen caused the colonies to undergo colony collapse disorder.",
+					 "BB": "(B)  Yes, because for each pathogen, the percent of colonies infected is greater for colonies with colony collapse disorder than for colonies without colony collapse disorder.",
+					 "CC": "(C) No, because the data do not provide evidence about bacteria as a cause of colony collapse disorder.",
+					 "DD" : "(D) No, because the data do not indicate whether the honeybees had been infected with mites."
+				}
+				];
+				},
+				notify: true
+				},
+
+			testfour: {
+					type: Array,
+					value: function(){
+					return [{"QT": "1. Over the course of the passage, the narrator’s attitude shifts from",
+							 "AA": "(A) fear about the expedition to excitement about it.",
+							 "BB": "(B)  doubt about his abilities to confidence in them.",
+							 "CC": "(C) uncertainty of his motives to recognition of them.",
+							 "DD" : "(D) disdain for the North Pole to appreciation of it."
+							 },
+
+							 {"QT": "2. Which choice provides the best evidence for the answer to the previous question?",
+				
+							 "AA": "(A) Lines 10-12 (“For... moment”)",
+							 "BB": "(B)  Lines 21-25 (“Yet... will”)",
+							 "CC": "(C) Lines 42-44 (“And... stand on”)",
+							 "DD" : "(D) Lines 56-57 (“What... myself”)"
+							 }, 
+
+							 {"QT": "3. As used in lines 1-2, “not readily verifiable” most nearly means",
+							 
+							 "AA": "(A) unable to be authenticated.",
+							 "BB": "(B)  likely to be contradicted.",
+							 "CC": "(C) without empirical support.",
+							 "DD" : "(D) not completely understood."
+			},
+							{"QT": "4. The sentence in lines 10-13 (“For years... other”) mainly serves to",
+							 
+							 "AA": "(A) expose a side of the narrator that he prefers to keep hidden.",
+							 "BB": "(B)  demonstrate that the narrator thinks in a methodical and scientific manner.",
+							 "CC": "(C) show that the narrator feels himself to be influenced by powerful and independent forces.",
+							 "DD" : "(D) emphasize the length of time during which the narrator has prepared for his expedition."
+			},
+							{"QT": "5. The narrator indicates that many previous explorers seeking the North Pole have",
+							 
+							 "AA": "(A) perished in the attempt.",
+							 "BB": "(B)  made surprising discoveries.",
+							 "CC": "(C) failed to determine its exact location.",
+							 "DD" : "(D) had different motivations than his own."
+			},
+							{"QT": "6. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 20-21 (“Nobody... died”)",
+							 "BB": "(B)  Lines 25-27 (“All... out”)",
+							 "CC": "(C) Lines 31-34 (“The... newspaper”)",
+							 "DD" : "(D) Lines 51-53 (“Behind... bedsteads”)"
+							 },
+
+							 {"QT": "7. Which choice best describes the narrator’s view of his expedition to the North Pole?",
+							 
+							 "AA": "(A) Immoral but inevitable",
+							 "BB": "(B)  Absurd but necessary",
+							 "CC": "(C) Socially beneficial but misunderstood",
+							 "DD" : "(D) Scientifically important but hazardous"
+							 },
+
+							 {"QT": "8. The question the narrator asks in lines 30-31 (“Will it... railway”) most nearly implies that",
+							 
+							 "AA": "(A) balloons will never replace other modes of transportation.",
+							 "BB": "(B)  the North Pole is farther away than the cities usually reached by train.",
+							 "CC": "(C) people often travel from one city to another without considering the implications.",
+							 "DD" : "(D) reaching the North Pole has no foreseeable benefit to humanity."
+			},
+							{"QT": "9. As used in line 49, “take the slightest interest in” most nearly means",
+							 
+							 "AA": "(A) accept responsibility for.",
+							 "BB": "(B)  possess little regard for.",
+							 "CC": "(C) pay no attention to.",
+							 "DD" : "(D) have curiosity about."
+							 },
+
+							{"QT": "10. As used in line 50, “bearing” most nearly means", 
+							 "AA": "(A) carrying.",
+							 "BB": "(B)  affecting.",
+							 "CC": "(C) yielding.",
+							 "DD" : "(D) enduring."
+							},
+							 {
+							 "QT": "11. Which choice best summarizes the first paragraph of the passage (lines 1-35)?",
+							 "AA": "(A) The 2010 census demonstrated a sizeable growth in the number of middle-class families moving into inner cities.",
+							 "BB": "(B)  The 2010 census is not a reliable instrument for measuring population trends in American cities.",
+							 "CC": "(C) Population growth and demographic inversion are distinct phenomena, and demographic inversion is evident in many American cities.",
+							 "DD" : "(D) Population growth in American cities has been increasing since roughly 2000, while suburban populations have decreased." 
+							},
+							{"QT": "12. According to the passage, members of which group moved away from central-city areas in large numbers in the early 2000s?",
+							 "AA": "(A) The unemployed",
+							 "BB": "(B)  Immigrants",
+							 "CC": "(C) Young professionals",
+							 "DD" : "(D) African Americans "
+							 },
+							 { "QT": "13. In line 34, “flat” is closest in meaning to",				 
+							 "AA": "(A) static.",
+							 "BB": "(B)  deflated.",
+							 "CC": "(C) featureless.",
+							 "DD" : "(D) obscure.", 
+								},
+							{
+							"QT": "14. According to the passage, which choice best describes the current financial situation in many major American cities?", 
+							 "AA": "(A) Expected tax increases due to demand for public works",
+							 "BB": "(B)  Economic hardship due to promises made in past years",
+							 "CC": "(C) Greater overall prosperity due to an increased inner-city tax base",
+							 "DD" : "(D) Insufficient revenues due to a decrease in manufacturing"
+							 }, 
+
+							{
+								"QT": "15. Which choice provides the best evidence for the answer to the previous question?",
+							 "AA": "(A) Lines 36-39 (“America’s... decades”)",
+							 "BB": "(B)  Lines 43-44 (“How . . . not know”)",
+							 "CC": "(C) Lines 44-46 (“What... now”)",
+							 "DD" : "(D) Lines 48-51 (“The truth... end”)"
+							 }, 
+
+							{"QT": "16. The passage implies that American cities in 1974",
+							 
+							 "AA": "(A) were witnessing the flight of minority populations to the suburbs.",
+							 "BB": "(B)  had begun to lose their manufacturing sectors.",
+							 "CC": "(C) had a traditional four-zone structure.",
+							 "DD" : "(D) were already experiencing demographic inversion."
+							 },
+
+
+							{"QT": "17. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 54-57 (“Much... Ernest W. Burgess”)",
+							 "BB": "(B)  Lines 58-59 (“It was... settlement”)",
+							 "CC": "(C) Lines 66-71 (“Virtually... continuum”)",
+							 "DD" : "(D) Lines 72-75 (“As... home”) "
+							 },
+
+							{"QT": "18. As used in line 68, “conducted” is closest in meaning to",
+							 "AA": "(A) carried out.",
+							 "BB": "(B)  supervised.",
+							 "CC": "(C) regulated.",
+							 "DD" : "(D) inhibited."
+							 }, 
+
+							{"QT": "19. The author of the passage would most likely consider the information in chart 1 to be",
+							 
+							 "AA": "(A) excellent evidence for the arguments made in the passage.",
+							 "BB": "(B)  possibly accurate but too crude to be truly informative.",
+							 "CC": "(C) compelling but lacking in historical information.",
+							 "DD" : "(D) representative of a perspective with which the author disagrees."
+							 },
+
+							 {
+							 "QT": "20. According to chart 2, the years 2000–2010 were characterized by",
+							 
+							 "AA": "(A) less growth in metropolitan areas of all sizes than had taken place in the 1990s.",
+							 "BB": "(B)  more growth in small metropolitan areas than in large metropolitan areas.",
+							 "CC": "(C) a significant decline in the population of small metropolitan areas compared to the 1980s.",
+							 "DD" : "(D) roughly equal growth in large metropolitan areas and nonmetropolitan areas."
+								}, 
+
+							 {"QT": "21. Chart 2 suggests which of the following about population change in the 1990s?",
+							 
+							 "AA": "(A) Large numbers of people moved from suburban areas to urban areas in the 1990s.",
+							 "BB": "(B)  Growth rates fell in smaller metropolitan areas in the 1990s.",
+							 "CC": "(C) Large numbers of people moved from metropolitan areas to nonmetropolitan areas in the 1990s.",
+							 "DD" : "(D) The US population as a whole grew more in the 1990s than in the 1980s."
+							 },
+
+							 {"QT": "22. The primary purpose of the passage is to",
+				
+							 "AA": "(A) present the background of a medical breakthrough.",
+							 "BB": "(B)  evaluate the research that led to a scientific discovery.",
+							 "CC": "(C) summarize the findings of a long-term research project.",
+							 "DD" : "(D) explain the development of a branch of scientific study. "
+							 },
+							 { 
+							 "QT": "23. The author’s attitude toward pharming is best described as one of",
+							 
+							 "AA": "(A) apprehension.",
+							 "BB": "(B)  ambivalence.",
+							 "CC": "(C) appreciation.",
+							 "DD" : "(D) astonishment."
+							 }, 
+
+							 {
+							 "QT": "24. As used in line 20, “expert” most nearly means",
+							 
+							 "AA": "(A) knowledgeable.",
+							 "BB": "(B)  professional.",
+							 "CC": "(C) capable.",
+							 "DD" : "(D) trained."
+							 },
+							 { 
+							 "QT": "25. What does the author suggest about the transgenic studies done in the 1980s and 1990s?",
+							 
+							 "AA": "(A) They were limited by the expensive nature of animal research.",
+							 "BB": "(B)  They were not expected to yield products ready for human use.",
+							 "CC": "(C) They were completed when an anticoagulant compound was identified.",
+							 "DD" : "(D) They focused only on the molecular properties of cows, goats, and sheep."
+							 },
+							 { 
+							 "QT": "26. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 16-19 (“The trouble... need”)",
+							 "BB": "(B)  Lines 25-29 (“If they... milk”)",
+							 "CC": "(C) Lines 35-36 (“At first... true”)",
+							 "DD" : "(D) Lines 37-40 (“That all... clots”)"}, 
+
+							 {"QT": "27. According to the passage, which of the following is true of antithrombin?",
+							 
+							 "AA": "(A) It reduces compounds that lead to blood clots.",
+							 "BB": "(B)  It stems from a genetic mutation that is rare in humans.",
+							 "CC": "(C) It is a sequence of DNA known as a promoter.",
+							 "DD" : "(D) It occurs naturally in goats’ mammary glands. "},
+
+							 {"QT": "28. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 12-16 (“Many... more”)",
+							 "BB": "(B)  Lines 42-44 (“It acts... bloodstream”)",
+							 "CC": "(C) Lines 44-46 (“But as... antithrombin”)",
+							 "DD" : "(D) Lines 62-65 (“The researchers... production”)"}, 
+
+							 {"QT": "29. Which of the following does the author suggest about the “female goats” mentioned in line 59?",
+							 
+							 "AA": "(A) They secreted antithrombin in their milk after giving birth.",
+							 "BB": "(B)  Some of their kids were not born with the antithrombin gene.",
+							 "CC": "(C) They were the first animals to receive microinjections.",
+							 "DD" : "(D) Their cells already contained genes usually found in humans."},
+
+							 {"QT": "30. The most likely purpose of the parenthetical information in lines 63-64 is to",
+							 
+							 "AA": "(A) illustrate an abstract concept.",
+							 "BB": "(B)  describe a new hypothesis.",
+							 "CC": "(C) clarify a claim.",
+							 "DD" : "(D) define a term."
+							 }, 
+
+							 {"QT": "31. The phrase “liquid gold” (line 71) most directly suggests that",
+							 
+							 "AA": "(A) GTC has invested a great deal of money in the microinjection technique.",
+							 "BB": "(B)  GTC’s milking parlors have significantly increased milk production.",
+							 "CC": "(C) transgenic goats will soon be a valuable asset for dairy farmers.",
+							 "DD" : "(D) ATryn has proved to be a financially beneficial product for GTC."
+							 }, 
+
+							 {"QT": "32. In Passage 1, Burke indicates that a contract between a person and society differs from other contracts mainly in its",
+				
+							 "AA": "(A) brevity and prominence.",
+							 "BB": "(B)  complexity and rigidity.",
+							 "CC": "(C) precision and usefulness.",
+							 "DD" : "(D) seriousness and permanence."
+							 }, 
+
+							 {"QT": "33. As used in line 4, “state” most nearly refers to a",
+							 
+							 "AA": "(A) style of living.",
+							 "BB": "(B)  position in life.",
+							 "CC": "(C) temporary condition.",
+							 "DD" : "(D) political entity."
+							 }, 
+
+							 {"QT": "34. As used in line 22, “low” most nearly means",
+							 
+							 "AA": "(A) petty.",
+							 "BB": "(B)  weak.",
+							 "CC": "(C) inadequate.",
+							 "DD" : "(D) depleted."
+							 }, 
+
+							 {"QT": "35. It can most reasonably be inferred from Passage 2 that Paine views historical precedents as",
+							 
+							 "AA": "(A) generally helpful to those who want to change society.",
+							 "BB": "(B)  surprisingly difficult for many people to comprehend.",
+							 "CC": "(C) frequently responsible for human progress.",
+							 "DD" : "(D) largely irrelevant to current political decisions."}, 
+
+							 {"QT": "36. How would Paine most likely respond to Burke’s statement in lines 30-34, Passage 1 (“As the... born”)?",
+							 
+							 "AA": "(A) He would assert that the notion of a partnership across generations is less plausible to people of his era than it was to people in the past.",
+							 "BB": "(B)  He would argue that there are no politically meaningful links between the dead, the living, and the unborn.",
+							 "CC": "(C) He would question the possibility that significant changes to a political system could be accomplished within a single generation.",
+							 "DD" : "(D) He would point out that we cannot know what judgments the dead would make about contemporary issues."}, 
+
+							 {"QT": "37. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 41-43 (“Every... it”)",
+							 "BB": "(B)  Lines 43-45 (“The vanity... tyrannies”)",
+							 "CC": "(C) Lines 56-58 (“It is... accommodated”)",
+							 "DD" : "(D) Lines 67-72 (“What... time”)"},
+
+							 {"QT": "38. Which choice best describes how Burke would most likely have reacted to Paine’s remarks in the final paragraph of Passage 2?",
+							 
+							 "AA": "(A) With approval, because adapting to new events may enhance existing partnerships.",
+							 "BB": "(B)  With resignation, because changing circumstances are an inevitable aspect of life.",
+							 "CC": "(C) With skepticism, because Paine does not substantiate his claim with examples of governments changed for the better.",
+							 "DD" : "(D) With disapproval, because changing conditions are insufficient justification for changing the form of government."}, 
+
+							 {"QT": "39. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 1-4 (“To avoid... state”)",
+							 "BB": "(B)  Lines 7-9 (“he should... solicitude”)",
+							 "CC": "(C) Lines 27-29 (“It is... perfection”)",
+							 "DD" : "(D) Lines 34-38 (“The municipal... community”)"},
+
+							 {"QT": "40. Which choice best states the relationship between the two passages?",
+							 
+							 "AA": "(A) Passage 2 challenges the primary argument of Passage 1 .",
+							 "BB": "(B)  Passage 2 advocates an alternative approach to a problem discussed in Passage 1 .",
+							 "CC": "(C) Passage 2 provides further evidence to support an idea introduced in Passage 1 .",
+							 "DD" : "(D) Passage 2 exemplifies an attitude promoted in Passage 1."
+							 }, 
+							 {"QT": "41. The main purpose of both passages is to",
+							 
+							 "AA": "(A) suggest a way to resolve a particular political struggle.",
+							 "BB": "(B)  discuss the relationship between people and their government.",
+							 "CC": "(C) evaluate the consequences of rapid political change.",
+							 "DD" : "(D) describe the duties that governments have to their citizens."
+							 }, 
+
+							 {"QT": "42. The main purpose of the passage is to",
+				
+							 "AA": "(A) describe periods in Earth’s recent geologic history.",
+							 "BB": "(B)  explain the methods scientists use in radiocarbon analysis.",
+							 "CC": "(C) describe evidence linking the volcano Samalas to the Little Ice Age.",
+							 "DD" : "(D) explain how volcanic glass forms during volcanic eruptions. "
+							 }, 
+
+							 {"QT": "43. Over the course of the passage, the focus shifts from",
+							 
+							 "AA": "(A) a criticism of a scientific model to a new theory.",
+							 "BB": "(B)  a description of a recorded event to its likely cause.",
+							 "CC": "(C) the use of ice core samples to a new method of measuring sulfates.",
+							 "DD" : "(D) the use of radiocarbon dating to an examination of volcanic glass."
+							 }, 
+
+							 {"QT": "44. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 17-25 (“In 2012... 1455 C.E.”)",
+							 "BB": "(B)  Lines 43-46 (“The researchers... atop the volcano”)",
+							 "CC": "(C) Lines 46-48 (“They examined... material”)",
+							 "DD" : "(D) Lines 55-60 (“The team... 13th century”)"
+							 }, 
+
+							 {"QT": "45. The author uses the phrase “is written in” (line 6) most likely to",
+							 
+							 "AA": "(A) demonstrate the concept of the hands-on nature of the work done by scientists.",
+							 "BB": "(B)  highlight the fact that scientists often write about their discoveries.",
+							 "CC": "(C) underscore the sense of importance that scientists have regarding their work.",
+							 "DD" : "(D) reinforce the idea that the evidence is there and can be interpreted by scientists."
+							 }, 
+
+							 {"QT": "46. Where does the author indicate the medieval volcanic eruption most probably was located?",
+							 
+							 "AA": "(A) Near the equator, in Indonesia",
+							 "BB": "(B)  In the Arctic region",
+							 "CC": "(C) In the Antarctic region",
+							 "DD" : "(D) Near the equator, in Ecuador"
+							 }, 
+
+							 {"QT": "47. Which choice provides the best evidence for the answer to the previous question?",
+							 
+							 "AA": "(A) Lines 1-3 (“About 750 . . . Ice Age”)",
+							 "BB": "(B)  Lines 26-28 (“Such a . . . the cooling”)",
+							 "CC": "(C) Lines 49-54 (“The volume . . . the Holocene”)",
+							 "DD" : "(D) Lines 61-64 (“It’s not... climate impacts”) "},
+
+							 {"QT": "48. As used in line 68, the phrase “Another possible candidate” implies that",
+							 
+							 "AA": "(A) powerful volcanic eruptions occur frequently.",
+							 "BB": "(B)  the effects of volcanic eruptions can last for centuries.",
+							 "CC": "(C) scientists know of other volcanoes that erupted during the Middle Ages.",
+							 "DD" : "(D) other volcanoes have calderas that are very large."}, 
+
+							 {"QT": "49. Which choice best supports the claim that Quilotoa was not responsible for the Little Ice Age?",
+							 
+							 "AA": "(A) Lines 3-4 (“Identifying... tricky”)",
+							 "BB": "(B)  Lines 26-28 (“Sucha... cooling”)",
+							 "CC": "(C) Lines 43-46 (“The researchers... atop the volcano”)",
+							 "DD" : "(D) Lines 71-75 (“But... closer match”)"},
+
+							 {"QT": "50. According to the data in the figure, the greatest below-average temperature variation occurred around what year?",
+							 
+							 "AA": "(A) 1200 CE",
+							 "BB": "(B)  1375 CE",
+							 "CC": "(C) 1675 CE",
+							 "DD" : "(D) 1750 CE"
+							 }, 
+
+							 {"QT": "51. The passage and the figure are in agreement that the onset of the Little Ice Age began",
+							 
+							 "AA": "(A) around 1150 CE.",
+							 "BB": "(B)  just before 1300 CE.",
+							 "CC": "(C) just before 1500 CE.",
+							 "DD" : "(D) around 1650 CE."
+							 }, 
+							{
+							 "QT": "52. What statement is best supported by the data presented in the figure?",
+				
+							 "AA": "(A) The greatest cooling during the Little Ice Age occurred hundreds of years after the temperature peaks of the Medieval Warm Period.",
+							 "BB": "(B)  The sharp decline in temperature supports the hypothesis of an equatorial volcanic eruption in the Middle Ages.",
+							 "CC": "(C) Pyroclastic flows from volcanic eruptions continued for hundreds of years after the eruptions had ended.",
+							 "DD" : "(D) Radiocarbon analysis is the best tool scientists have to determine the temperature variations after volcanic eruptions."
+								}
+			];
+		},
+		notify: true
+	}
+	*/
+},
+
+_computeQuestionNumber: function(argIndex)
+{
+	return (argIndex % 52) + 1;
+},
+
+// _saveFB{
+// 	var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestions");
+// 		ref.child().set(self.passageWordArrayOrdered);
+
+// },
+attached: function()
+{
+	this.regexMatchResults = [];
+	this.selectedPattern = "";
+	console.log(this.regexMatchResults);
+},
+
+setSelectedPattern: function(e)
+{
+	console.log(e);
+	this.selectedPattern = e.target.value;
+},
+
+loadPatternsSelect: function()
+{
+//	var pat = document.querySelector("#fcpatternmatcher");
+	var pat = this.$.fcpatternmatcher;
+	console.log(pat.matches);
+	var keys = Object.keys(pat.matches);
+	var numKeys = keys.length;
+	var resultArray = [];
+	for(i=0; i<numKeys;i++)
+	{
+		resultArray.push(pat.matches[keys[i]]);
+	}
+	this.set("commonPatterns", resultArray);
+	console.log(this.commonPatterns);
+},
+
+clearMatches: function()
+{
+	this.set("regexMatchResults", []);
+	//console.log(this.regexMatchResults);
+	this.regexFilter = this.regexFilterTwo;
+},
+
+_computePatterns: function(one,two,regexFilter, selectedPattern, oneAA,twoAA,threeAA){
+
+	return [one,two, regexFilter, selectedPattern, oneAA, twoAA, threeAA];
+},
+
+_matchWords:function(patterns){
+  	if (!patterns)
+  	{
+          return null; // set filter to null to disable filtering
+    }
+    else
+    {
+    	var numFilters = patterns.length;
+       	for(i = 0; i < numFilters; i++)
+        {
+        	patterns[i] = patterns[i].toLowerCase();
+        }
+        var self = this;
+        //console.log(this.regexMatchResults);
+        return function(item) {
+            //var question = item.QT.toLowerCase();
+            console.log(item);
+            var question = item.stem.toLowerCase();
+            var filterOn = false;
+            var filterResults = false;
+            for(i = 0; i < numFilters; i++)
+            {
+            	filterOn |= (patterns[i] != "");
+            	if(patterns[i] != "")
+            	{
+            		if(i == 2) //regex filter. hack!! fix this!!
+            		{
+            			var pat = patterns[i];
+            			//console.log(pat);
+            			var rez = question.match(RegExp(pat));
+            			if(rez != null)
+            			{
+            				var numMatches = rez.length;
+            				var old = self.regexMatchResults;
+            				//console.log(rez[0]);
+            				//console.log(self.regexMatchResults);
+            				for(j=0; j<numMatches; j++)
+            				{
+            					self.push("regexMatchResults", rez[j]);
+            				}
+            				//self.set("regexMatchResults", old);
+						}
+						//console.log("about to update filterResults, and regexMatchResults = ");
+						//console.log(self.regexMatchResults.length);
+
+            			filterResults |= (rez != null);
+            		}
+            		else
+            		{
+            			filterResults |= (question.indexOf(patterns[i]) > -1);
+            		}
+            	}
+            }
+            //console.log(filterResults);
+            return (filterOn==false) ? true : filterResults;
+        }
+    }
+}
+
+});
+</script>
+</dom-module>
+
