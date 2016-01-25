@@ -1,0 +1,67 @@
+<dom-module id="fc-new-list">
+<template>
+
+ <iron-ajax id="get_filltext_ajax" auto
+      url="//www.filltext.com/"
+      params='{"rows": "1000", "fname":"{firstName}", "lname": "{lastName}", "address": "{streetAddress}",
+       "city": "{city}", "state": "{usState|abb}", "zip": "{zip}", "integer": "{number|100}",
+       "business": "{business}", "index": "{index}"}'
+      handle-as="json"
+      loading="{{loading}}"
+      last-response="{{people}}">
+  </iron-ajax>
+    <paper-scroll-header-panel condenses keep-condensed-header style="height: 960px; width: 500px;">
+      <paper-toolbar class="tall">
+        <paper-icon-button icon="arrow-back"></paper-icon-button>
+        <div class="spacer"></div>
+        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-button icon="refresh" on-tap="refreshData"></paper-icon-button>
+        <paper-icon-button icon="more-vert"></paper-icon-button>
+
+        <div class="middle middle-container">
+          <div class="title">iron-list &amp; filltext.com</div>
+        </div>
+        <div class="bottom bottom-container">
+          <div class="bottom-title">
+            <span class="length">Rows: <span>{{people.length}}</span></span>
+            <paper-spinner active="{{loading}}"></paper-spinner>
+          </div>
+        </div>
+      </paper-toolbar>
+      <iron-list items="[[people]]" as="item">
+        <template>
+          <div>
+            <div class="item">
+              <div class="primary dim">[[item.index]]</div>
+              <div class="pad">
+                <div class="primary"><span>[[item.fname]]</span> <span>[[item.lname]]</span></div>
+                <div class="secondary"><span>[[item.address]]</span> <span>[[item.city]]</span></div>
+                <div class="secondary"><span>[[item.city]]</span>, <span>[[item.state]]</span>  <span>[[item.zip]]</span></div>
+                <div class="secondary dim">[[item.business]]</div>
+              </div>
+              <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
+            </div>
+          </div>
+        </template>
+      </iron-list>
+    </paper-scroll-header-panel>
+  </template>
+
+  <script>
+    Polymer({
+    is: "fc-new-list",
+    properties: {
+      select:{
+        notify: true,
+        type: String, 
+        }
+      },
+  });
+</script>
+</dom-module>
+
+
+    // },var app = document.querySelector('#app');
+    // document.querySelector('template[is=dom-bind]').iconForItem = function(item) {
+    //   return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
+    // };

@@ -1,4 +1,4 @@
-<dom-module id="fc-light-display">
+<dom-module id="fc-light-large-draggable">
 <template>
 <style>
 :host {
@@ -110,7 +110,7 @@ div.line-number {
 		     <a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
 		  
 		  </template>
-
+		  [[_computeMyString(lineNumberArray)]]
 		  <br class="line-numbers">
 		  <hr>
 		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
@@ -127,7 +127,7 @@ div.line-number {
 'use strict';
 
     (function() {
-	class fcLightDisplay {
+	class fcLightLargeDraggable {
 	   get behaviors() { 
 	    return [
 		  Polymer.IronResizableBehavior, 
@@ -139,7 +139,7 @@ div.line-number {
 	   }
 	   beforeRegister() {
 
-		this.is = 'fc-light-display';
+		this.is = 'fc-light-large-draggable';
 	    this.properties = {
 	  
 	    estimatedHeight: {
@@ -165,7 +165,11 @@ div.line-number {
 		  	},
 		  	notify: true
 		  },
-
+	myString:{
+		type: String,
+		computed: "_computeMyString(lineNumberArray)",
+		notify: true
+		},
 	doublePassage: {
 	  type: Boolean,
 	  value: false,
@@ -234,7 +238,7 @@ div.line-number {
 
 	 _onIronResize(){
 	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
-	     console.log(ht);
+	    // console.log(ht);
 	     if(!isNaN(ht)){this.set("lineNumbers", ht);}
 
 	 }
@@ -242,12 +246,15 @@ div.line-number {
 	  this._computeLineNumberArray();
 
 	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
-	     console.log(ht);
+	    // console.log(ht);
 	     if(!isNaN(ht)){this.set("lineNumbers", ht) && this.this.removeEventListener("mouseover", this._onIronResize);}
 
 	  }
 
-	
+	_computeMyString(lineNumberArray){			
+			var pickle=`This is a formatted multi-line string,`;
+			return pickle;
+				}
 
 _theContentFilter(firstWordIndex, lastWordIndex) {
 	// if(!isNaN(lastWordIndex)){
@@ -269,7 +276,7 @@ _theContentFilter(firstWordIndex, lastWordIndex) {
 	  } 
 	
 	}
-    Polymer(fcLightDisplay);
+    Polymer(fcLightLargeDraggable);
  
   })();
 </script>
