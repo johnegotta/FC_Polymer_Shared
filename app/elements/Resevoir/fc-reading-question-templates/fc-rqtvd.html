@@ -11,201 +11,126 @@ background: white;
 
 
 <paper-header-panel mode="waterfall" class="vertical layout flex wrap" style="max-width: 100vw; margin: 5px; background: white; border: 1px solid black; max-height: 900px;">
-<div style="background: cyan;" class="paper-header layout horizontal">
+	<div style="background: cyan;" class="paper-header layout horizontal">
+		<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
+			<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
+			<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
+			<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
+			<select style="width:200px">
+ 				 	<template is="dom-repeat" items="[[regexMatchResults]]">
+    					<option value={{item}}>{{item}}</option>
+  					</template>
+			</select>
+			<select style="width:200px" on-change="setSelectedPattern">
+  				<template is="dom-repeat" items="[[commonPatterns]]">
+    				<option value={{item.pattern}}>{{item.pattern}}</option>
+  				</template>
+			</select>
+			<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
+	</div>
+	<div class="horizontal layout flex" style="height: 5000px; padding: 0px; 24px;">
 
-<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
-<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
-<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
-<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
-<select style="width:200px">
-  <template is="dom-repeat" items="[[regexMatchResults]]">
-    <option value={{item}}>{{item}}</option>
-  </template>
-</select>
-<select style="width:200px" on-change="setSelectedPattern">
-  <template is="dom-repeat" items="[[commonPatterns]]">
-    <option value={{item.pattern}}>{{item.pattern}}</option>
-  </template>
-</select>
-<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
-<!-- <paper-input label="Answer Filter I" style="max-width: 190px; padding: 5px;" value="{{oneAA}}"></paper-input>
-<paper-input label="Answer Filter II" style="max-width: 190px; padding: 5px;" value="{{twoAA}}"></paper-input>
-<paper-input label="Answer Filter III" style="max-width: 190px; padding: 5px;" value="{{threeAA}}"></paper-input> -->
-<!-- 
-<fc-input-prime type="checkbox" input-type="checkbox" label="Add Answer Filter" value="{{addAnswers}}"></fc-input-prime>
-<fc-input-prime type="checkbox" input-type="checkbox" label="Fill All Inputs To Get Results" value="{{looseSearch}}"></fc-input-prime> -->
-</div>
-<div class="horizontal layout flex self-stretch" style="height: 50000px; padding: 0px; 24px;">
-<!-- <section class="vertical flex layout"
-<template is="dom-repeat" items="{{testone}}">
-
-<paper-input value="{{item.QT}}"></paper-input>
-	 <paper-input value="{{item.AA}}"></paper-input>   
-	 <paper-input value="{{item.BB}}"></paper-input>
-	 <paper-input value="{{item.CC}}"></paper-input>
-	 <paper-input value="{{item.DD}}"></paper-input>
-
-</template>
-</section> -->
-<firebase-collection limit-to-first="52" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/testone" data="{{questions}}"></firebase-collection>
-<paper-material class="vertical flex layout" style="border: 1px solid black; max-width: 1200px; padding: auto; margins: 5px;">
-<template is="dom-repeat" items="{{questions}}" filter="{{_matchWords(patterns)}}">
- <!-- filter="{{_matchWords(patterns)}}"--> 
-
-<!-- 	<div id="{{item.questionId}}"> {{_computeQuestionNumber(index)}}. {{item.stem}}</div><br>
- --><div style="border: 1px solid black;  margins: 5px; padding: 5px;">
- 			<section class=" horizontal layout wrap"> 
-					<paper-input always-float-label label="Q. Num." style="max-width: 70px;" value="{{item._q}}.">
+		<firebase-collection limit-to-first="52" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/testone" data="{{questions}}"></firebase-collection>
+		<paper-material class="vertical flex layout" style="border: 1px solid black; max-width: 1200px; padding: auto; margins: 5px;">
+			<template is="dom-repeat" items="{{questions}}" filter="{{_matchWords(patterns)}}">
+ 				<section class=" horizontal layout wrap"> 
+					<paper-input always-float-label label="Q. Num." style="max-width: 70px;" value="{{item._n}}.">
 					</paper-input> 
 					<paper-input value="{{item.Qa}}" always-float-label label="Q. Part A"></paper-input> 
 					<paper-input value="{{item.Qb}}" always-float-label label="Q. Part B">
 					</paper-input>
-					<paper-input value="{{item.Qc}" always-float-label label="Q. Part C">
+					<paper-input value="{{item.Qc}}" always-float-label label="Q. Part C">
 					</paper-input>
 					<paper-input value="{{item.Qd}}" always-float-label label="Q. Part D">
 					</paper-input>
+					<paper-input always-float-label label="Q. Part E" value="{{item.Qe}}">
+							</paper-input>
 				</section>
- 		
  	
-			
-			<!-- <input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}"> -->
-			<div id="{{item._q}}" class="vertical layout flex wrap">
-				
-				<section class=" horizontal layout wrap">
-				<section class="horizontal layout wrap">
-						<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Aa}}{{item.Ab}}{{item.Ac}}">
-						</fc-input-prime>
-				</section>
-				<section class="horizontal layout flex">
-					<paper-input always-float-label label="Letter"style="max-width: 40px;" value="(A)"></paper-input>
-					<paper-input label="Ans. Part A" always-float-label value="{{item.Aa}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part B" value="{{item.Ab}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part C" value="{{item.Ac}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part D" value="{{item.Ad}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part E" value="{{item.Ae}}">
-					</paper-input>
-				</section>
-				</section>
-				<section class=" horizontal layout wrap">
-				<section class="horizontal layout wrap">
-						<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Aa}}{{item.Ab}}{{item.Ac}}">
-						</fc-input-prime>
-				</section>
-				<section class="horizontal layout flex">
-					<paper-input always-float-label label="Letter"style="max-width: 40px;" value="(B)"></paper-input>
-					<paper-input label="Ans. Part A" always-float-label value="{{item.Ba}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part B" value="{{item.Bb}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part C" value="{{item.Bc}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part D" value="{{item.Bd}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part E" value="{{item.Be}}">
-					</paper-input>
-				</section>
-				</section>
-				<section class=" horizontal layout wrap">
-				<section class="horizontal layout wrap">
-						<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Ca}}{{item.Cb}}{{item.Cc}}">
-						</fc-input-prime>
-				</section>
-				<section class="horizontal layout flex">
-					<paper-input always-float-label label="Letter"style="max-width: 40px;" value="(C)"></paper-input>
-					<paper-input label="Ans. Part A" always-float-label value="{{item.Ca}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part B" value="{{item.Cb}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part C" value="{{item.Cc}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part D" value="{{item.Cd}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part E" value="{{item.Ce}}">
-					</paper-input>
-				</section>
-				</section>
-				<section class=" horizontal layout wrap">
-				<section class="horizontal layout wrap">
-						<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Da}}{{item.Db}}{{item.Dc}}">
-						</fc-input-prime>
-				</section>
-				<section class="horizontal layout flex">
-					<paper-input always-float-label label="Letter"style="max-width: 40px;" value="(D)"></paper-input>
-					<paper-input label="Ans. Part A" always-float-label value="{{item.Da}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part B" value="{{item.Db}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part C" value="{{item.Dc}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part D" value="{{item.Dd}}">
-					</paper-input> 
-					<paper-input always-float-label label="Ans. Part E" value="{{item.De}}">
-					</paper-input>
-				</section>
-				</section>
-			</div>  
-	</template>
-	</div>
+					<div id="{{item._q}}" class="vertical layout flex wrap">
+						
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.al}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Aa}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Ab}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Ac}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Ad}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Ae}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Aa}}{{item.Ab}}{{item.Ac}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.bl}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Ba}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Bb}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Bc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Bd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Be}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Ca}}{{item.Cb}}{{item.Cc}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.cl}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Ca}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Cb}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Cc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Cd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Ce}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Da}}{{item.Db}}{{item.Dc}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.dl}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Da}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Db}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Dc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Dd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.De}}">
+							</paper-input>
+						</section>
+						</section>
+					</div>  
+				</template>
+			</paper-material>
+		</div>
+	</paper-header-panel>
 </template>
-</paper-material>
-<!--
-<paper-textarea always-float-label="true" label="Questions T2" style="border:2px solid #008;  padding: 24px; margin: 10px;" value='{{item.QT}}
-
-{{item.AA}}    {{looseSearch}}
-{{item.BB}}  
-{{item.CC}}  
-{{item.DD}}  
-	    		'</paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout" >
-<template is="dom-repeat" items="{{testone}}" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" style="border:2px solid #008; padding: 24px; margin: 10px;" label="Questions T1" value='{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}  
-{{item.DD}}  
-	    		'></paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout">
-<template is="dom-repeat" items="{{testthree}}" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" label="Questions T3" style="border:2px solid #008; padding: 24px; margin: 10px;" value='{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}
-{{item.DD}}  
-	    		'></paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout">
-<template is="dom-repeat" items="{{testfour}}" as="item" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" label="Questions T4" style="border:2px solid #008; padding: 24px; margin: 10px;" value='
-{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}
-{{item.DD}}  
-  				'></paper-card>   
-</template>
-
--->
-</section> 
-</div>
-</paper-header-panel>
-
-
-
-
-</template>
-
 <script>
 FcRqtvd=Polymer({
 	is: 'fc-rqtvd',
@@ -1074,10 +999,10 @@ testtwo: {
 				 },
 				notify: true
 				},
-testthree: {
-	type: Array,
-		value: function(){
-		return [{"QT": "1. Which choice best summarizes the passage?",
+	testthree: {
+		type: Array,
+			value: function(){
+			return [{"QT": "1. Which choice best summarizes the passage?",
 					 
 					 "AA": "(A) A woman weighs the positive and negative aspects of accepting a new job.",
 					 "BB": "(B)  A woman does not correct a stranger who mistakes her for someone else.",
