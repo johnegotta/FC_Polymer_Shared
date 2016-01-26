@@ -1,7 +1,6 @@
 <script>
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FCFirepadBehavior = {
-
     properties: {
     	firepad: {
 			type:Object,
@@ -23,17 +22,40 @@ FCBehaviors.FCFirepadBehavior = {
 			type: Boolean,
 			relfectToAttribute: true,
 			notify: true
+		},
+		isFirepad:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		nameOfPad:{
+			type: String,
+			value: function(){
+				var rndm= Math.floor((Math.random() * 1000) + 1);
+					rndm = "myNewFirepad" + rndm.toString();
+					return rndm;
+			},
+			notify: true
 		}
     },
 
-ready: function(){ 
-	// (this.firepadElement)?this.loadFirepad():console.log('I checked if the firepadElementWereTrue, in behavior', this.firepadElement);
+extraRandomPads: function(){ 
+	this.set('nameOfPad', this.nameOfPad + "a");
 },
 loadFirepad: function(){
 		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
   		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
   		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
-	}
+	},
+loadQuestionsFirepad: function()
+{
+	this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/questionsFirepad');
+  		this.codeMirror = CodeMirror(this.$.firepad2, { lineWrapping: true });
+  		this.firepad2 = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: false, defaultText: 'Welcome to the Focused Data Administrator' });
+  		this.set('isFirepad', true);
+  		return true;
+	},
 };
 </script>

@@ -261,6 +261,11 @@ passagesWordArrays:{
 
 
 	},
+	myMenu:{
+		type: Array,
+		notify: true,
+		reflectToAttribute: true
+	},
 
 	question_1_1_3_B:{
 		type: String,
@@ -341,6 +346,21 @@ passagesTestOne: {
 		  },
 		  notify: true
 		}
+	},
+
+	getPassages: function(){
+		var ref=new Firebase("https//:focusedstaging1.firebaseio.com/readingPassages/");
+		var self=this;
+		ref.once("value", function(snapshot) {
+  			// The callback function will get called twice, once for "fred" and once for "barney"
+  			snapshot.forEach(function(childSnapshot) {
+    		var pickle=childSnapshot.key()[0].menuLabel.val();
+    		console.log(pickle, childSnapshot.key()[0].menuLabel);
+    self.push("myMenu",pickle);
+    // childData will be the actual contents of the child
+  				});
+		});
+
 	},
 
 	

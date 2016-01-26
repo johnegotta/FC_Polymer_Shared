@@ -1,157 +1,6 @@
-<dom-module id="fc-passage-saver">
-<template>
-<style>
-:host {
-	padding-left: 12px;
-	margin-left: 6px;
-	position: relative;
-	top: 0px;
-	font-size: 16pt;
-	bottom: 0px;
-	height: 99vh;
-	right: 0px;
-	left: 0px;
-	display: flex;
-	min-width: 96%;
-	max-width: 99vw;
-    }
-    div.line-number {
-	width: 28px;
-	height: 20px;
-	line-height: 1.2;
-	font-size: 16pt;
-	/*font-size: 1.25em;*/
-	font-family: merriweather;
-	font-weight: 500;
-	font-style: italic;
-	padding: 2px 4px;
-	margin: 2px;
-
-
-    }
-
-    paper-textarea, paper-input{
-    	padding: 12px;
-
-    }
-    .blurb-class{
-    	max-width: 670px; 
-    	padding: 4px 0px 4px 8px; 
-    	font-size: 12pt; 
-    	line-height: 1.05;
-    	font-style: oblique;
-
-    }
-
-    .highlighted {
-	background: yellow;
-    }
-
-    div.text {
-	line-height: 1.2;
-	font-size: 16pt;
-     /* font-size: 1.25em;*/
-	font-family: merriweather;
-	font-weight: 500;
-	padding: 2px 0px 8px 4px;
-	margin: opx 0px 6px 0px;
-	min-height: 900px !important;
-	display: flex;
-	min-width: 300px !important;
-	max-width: 660px !important;
-    }
-
-
-    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; max-width: 480px;}
-</style>            
-
-    <paper-header-panel class="layout flex nowrap text" mode="waterfall" style="margin: 12px; padding: 12px 36px 12px 36px; border: 3px ridge silver;">
-		<div 
-			class="paper-header self-stretch nowrap horizontal layout flex" 
-			id="headerPanel" 
-			style="margin-bottom: 12px; max-height: 75px; border-bottom: 1px solid #efefef;"
-			> 
-		<section class="horizontal layout flex-2 nowrap">	
-			<array-selector 
-				id="selector" 
-				items="{{passagesWordArrays}}" 
-				selected="{{selected}}" 
-				multi 
-				toggle>
-			</array-selector>
-
-	    	<fc-dropdown-menu 							
-		  		style="min-width: 360px;" 
-		  		on-select="toggleSelection" 
-		  		id="passagesList" 
-		  		data-source="{{passagesWordArrays}}" 
-		  		selected="{{selected}}"
-		  		>
-		  	</fc-dropdown-menu>
-		  		<paper-button on-tap="getPassagesTwo">get passages</paper-button>
-		</section>
-		<section style="horizontal layout flex-2 nowrap">
-		
-			
-		<array-selector 
-				id="selector" 
-				items="{{passagesWordArrays}}" 
-				selected="{{selected}}" 
-				multi 
-				toggle>
-			</array-selector>
-
-	    	<fc-dropdown-menu 							
-		  		style="min-width: 360px;" 
-		  		on-select="toggleSelection" 
-		  		id="onlinePassagesList" 
-		  		data-source="{{menuArray}}" 
-		  		selected="{{menuItem}}"
-		  		>
-		  		<firebase-document on-child-added data=[[onlineTests]] location="https://focusedstaging1.firebaseio.com/readingPassages"></firebase-document>
-		  	</fc-dropdown-menu>
-		  
-		  	</section>
-		</div>
-		<div class="horizontal layout flex">
-	    	<div class="layout vertical flex-3" >
-	     		<section 
-	     			class="blurb-class"
-	     			>
-	     			[[selected.0.passageBlurb]]
-	     		</section>
-
-		<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
-		<div id="lineNumbers" class="layout vertical line-number">
-		  <div class="line-numbers" id="linesA1">Lines</div>
-		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
-			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
-			  <span hidden="{{item.show}}">&nbsp</span>
-		    </template> 
-		  </div>
-			  <!--passage-1-column-1 container-->
-	    <div id="firstColumn" class="layout horizontal flex wrap text">
-		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 8px; max-width: 600px;">
-	
-		  <template is="dom-repeat" items="{{selected}}" id="aDarnedTemplate" filter="">
-			<template is="dom-if" if="{{item.newPara}}">
-			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
-			</template>
-			<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
-		     <a id$="A[[item.wordIndex]]_transition" style="" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a>
-		  
-		  </template>
-		  <br class="line-numbers">
-		  <hr>
-		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
-		</article>
-		<code id="code" style="opacity: 0;">[[passageOneWordArray.0.passageType]]</code>
-	    </div>
-	    
-	    </div>
-
-	  </div>
-	  <div class="vertical layout flex-7">
+ <dom-module id="fc-passage-saver-prime">
+ <template>
+ <div class="vertical layout flex-7">
 	  <div style="padding: 4px; margin:0px 14px;" class="flex horizontal layout justify"> 
 	  
 	  <paper-material class="flex-2 layout" style="max-width: 500px; min-width: 340px; margin:0px 10px; max-hieght: 680px; padding: 0px 6px 24px 6px; font-weight: 600; background: #fff; font-size: 20pt; color: #000088;">
@@ -210,35 +59,24 @@ If you note, the passage to your right has the portions of cited in this questio
 	     <paper-button on-tap="saveDatabase" style="max-height: 75px; color: gray;  width: 100%; border: 2px solid #efefef;">Retrieve Save</paper-button>
 	    </paper-material>
 	  </div>
-
-
-
-	  </div>  
-	 
-	  
-	               
-
-    </div>
-    </paper-header-panel>
-			 
-</template>
-<script>
+</div>
+	  <script>
+	  </template>
 'use strict';
 
     (
 	function() {
-	class fcPassageSaver {
+	class fcPassageSaverPrime {
 	   get behaviors() { 
 	    return [
 		  Polymer.IronResizableBehavior, 
-		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.FCFirepadBehavior, 
 		  FCBehaviors.PassageDataBehavior
-
 		  ];
 	   }
 	   beforeRegister() {
 
-	this.is = 'fc-passage-saver';
+		this.is = 'fc-passage-saver-prime';
 	    this.properties = {
 	  
 	    estimatedHeight: {
@@ -324,12 +162,6 @@ If you note, the passage to your right has the portions of cited in this questio
 			notify: true,
 			reflectToAttribute: true
 	    },
-	    fillAMenu:{
-	    	type: Array,
-	    	computed: "_computeFillAMenu(firepadPassageWordArraysTwo)",
-	    	notify: true,
-	    	reflectToAttribute: true
-	    	},
 	    passagesTestOne: {
 		  type: Array,
 		  value: function(){
@@ -379,10 +211,6 @@ If you note, the passage to your right has the portions of cited in this questio
 		  ];
 		},
 		notify: true
-	    },
-	    myMenu: {
-	     	type: Array,
-	     	notify: true
 	    },
 	
 		myValue: {
@@ -658,23 +486,11 @@ If you note, the passage to your right has the portions of cited in this questio
 		},
 		notify: true
 	}, 
-	firepadPassageWordArraysTwo:{
-		type: Array,
-		notify: true
-	}, 
 	hitSaveOne:{
 		type: Boolean,
 		value: function(){
 			return false;
 		},
-		notify: true
-	},
-	menuArray:{
-		type: Array, 
-		notify: true
-	}, 
-	menuItem: {
-		type: Array,
 		notify: true
 	}
 	
@@ -684,8 +500,7 @@ If you note, the passage to your right has the portions of cited in this questio
 		
     };
 
-	  this.listeners = {'iron-resize': '_onIronResize',
-	  			
+	  this.listeners = {'iron-resize': '_onIronResize'
 
 	
 	    };
@@ -693,7 +508,6 @@ If you note, the passage to your right has the portions of cited in this questio
 	
 	 attached(){
 	 	this.loadFirepad();
-	 	this.getPassagesTwo();
 	 
 	     }
 	 _computeStructuredPassageArray(hitSaveOne, inputPassageBlurb,  inputPassageTitle, inputPassageType, inputTestId, inputFcid){
@@ -701,30 +515,6 @@ If you note, the passage to your right has the portions of cited in this questio
 
 
 	 }
-	 getPassagesTwo(){
-		var self=this;
-		var ref=new Firebase("https//:focusedstaging1.firebaseio.com/readingPassages");
-
-			ref.orderByKey().startAt("__T2S1P1").on("value", function(snapshot) {
-  				console.log(snapshot); 
-  				var counter=snapshot.key().length;
-  				var i=0;
-  				while(i<=counter){i++
-				this.push("firepadPassageWordArraysTwo", snapshot[i].val)
-  					}
-  				});
-			}
-	_computeFillAMenu(firepadPassageWordArraysTwo){
-		var OA=[];
-		OA= firepadPassageWordArraysTwo;
-		let counter = OA.length;
-		while(counter>=0){counter--;
-			this.push("menuArray", OA[counter]);
-			this.push("menuItem",OA[counter][0].menuLabel);
-			console.log(this.menuItem);
-		}
-		return OA;
-		}
 	 saveLocal(){
 	 	this.set('passageBlurb', this.inputPassageBlurb);
 		this.set('passageType', this.inputPassageType);
@@ -750,14 +540,7 @@ If you note, the passage to your right has the portions of cited in this questio
 	 }
 
 	 getText(){
-	 	var passageContent = this.firepad.getText();
-	 	
-
-	 	this.set("hitSaveOne", true);
-
-	 console.log(passageContent);
- 	console.log("I am in hitSaveOne");
-    	
+	 
     	var self=this;
     	var passageContent = self.firepad.getText();
 		// self.set('passageBlurb', self.inputPassageBlurb);
@@ -1199,7 +982,7 @@ _theContentFilter(firstWordIndex, lastWordIndex) {
 	  } 
 	
 	}
-    Polymer(fcPassageSaver);
+    Polymer(fcPassageSaverPrime);
  
   })();
 </script>
