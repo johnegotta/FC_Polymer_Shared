@@ -1,0 +1,334 @@
+<dom-module id="fc-rqtvd">
+<template>
+<style>
+:host {height: 1099200px; width: 100%;
+	
+background: white;
+
+	}
+	paper-input{ margin:0px 5px;}
+</style>
+
+
+<paper-header-panel mode="waterfall" class="vertical layout flex wrap" style="max-width: 100vw; margin: 5px; background: white; border: 1px solid black; max-height: 900px;">
+	<div style="background: cyan;" class="paper-header layout horizontal">
+		<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
+			<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
+			<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
+			<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
+			<select style="width:200px">
+ 				 	<template is="dom-repeat" items="[[regexMatchResults]]">
+    					<option value={{item}}>{{item}}</option>
+  					</template>
+			</select>
+			<select style="width:200px" on-change="setSelectedPattern">
+  				<template is="dom-repeat" items="[[commonPatterns]]">
+    				<option value={{item.pattern}}>{{item.pattern}}</option>
+  				</template>
+			</select>
+			<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
+	</div>
+	<div class="horizontal layout flex" style="height: 5000px; padding: 0px; 24px;">
+
+		<firebase-collection limit-to-first="52" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/testone" data="{{questions}}"></firebase-collection>
+		<paper-material class="vertical flex layout" style="border: 1px solid black; max-width: 1200px; padding: auto; margins: 5px;">
+			<template is="dom-repeat" items="{{questions}}" filter="{{_matchWords(patterns)}}">
+ 				<section class=" horizontal layout wrap"> 
+					<paper-input always-float-label label="Q. Num." style="max-width: 70px;" value="{{item.Qn}}">
+					</paper-input> 
+					<paper-input value="{{item.Qa}}" always-float-label label="Q. Part A"></paper-input> 
+					<paper-input value="{{item.Qb}}" always-float-label label="Q. Part B">
+					</paper-input>
+					<paper-input value="{{item.Qc}}" always-float-label label="Q. Part C">
+					</paper-input>
+					<paper-input value="{{item.Qd}}" always-float-label label="Q. Part D">
+					</paper-input>
+					<paper-input always-float-label label="Q. Part E" value="{{item.Qe}}">
+							</paper-input>
+				</section>
+ 	
+					<div id="{{item._q}}" class="vertical layout flex wrap">
+						
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.An}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Aa}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Ab}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Ac}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Ad}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Ae}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Aa}}{{item.Ab}}{{item.Ac}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.Bn}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Ba}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Bb}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Bc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Bd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Be}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Ca}}{{item.Cb}}{{item.Cc}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.Cn}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Ca}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Cb}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Cc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Cd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.Ce}}">
+							</paper-input>
+						</section>
+						</section>
+						<section class=" horizontal layout wrap">
+						<section class="horizontal layout wrap">
+								<fc-input-prime type="radio" input-type="radio" style="margin-top: 24px;" name="flat{{item.Da}}{{item.Db}}{{item.Dc}}">
+								</fc-input-prime>
+						</section>
+						<section class="horizontal layout flex">
+							<paper-input always-float-label label="Letter"style="max-width: 40px;" value="{{item.Dn}}"></paper-input>
+							<paper-input label="Ans. Part A" always-float-label value="{{item.Da}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part B" value="{{item.Db}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part C" value="{{item.Dc}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part D" value="{{item.Dd}}">
+							</paper-input> 
+							<paper-input always-float-label label="Ans. Part E" value="{{item.De}}">
+							</paper-input>
+						</section>
+						</section>
+					</div>  
+				</template>
+			</paper-material>
+		</div>
+	</paper-header-panel>
+</template>
+<script>
+FcRqtvd=Polymer({
+	is: 'fc-rqtvd',
+	properties: {
+		patterns: {
+			type: Array,
+			computed: "_computePatterns(one, two, regexFilter, selectedPattern, oneAA, twoAA, threeAA)",
+			notify: true
+			},
+		one:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		fbquestions:{
+			type: Array,
+			notify: true
+		},
+		two: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		regexFilter: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		oneAA:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		twoAA: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		threeAA: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		regexMatchResults: {
+			type: Array,
+			value: [],
+			notify: true
+		}, 
+		commonPatterns: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		selectedPattern: {
+			type: String,
+			value: "",
+			notify: true
+		},
+		looseSearch:{
+			type: String, 
+			value: function(){
+				return "looseSearch";
+			},
+			notify: true
+		},
+		addAnwers: {
+			type: String, 
+			value: function(){
+				return "true";
+				},
+			notify: true	
+			},
+
+},
+
+_computeQuestionNumber: function(argIndex)
+{
+	return (argIndex % 52) + 1;
+},
+
+// _saveFB{
+// 	var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestions");
+// 		ref.child().set(self.passageWordArrayOrdered);
+
+// },
+attached: function()
+{
+	this.regexMatchResults = [];
+	this.selectedPattern = "";
+	//console.log(this.regexMatchResults);
+},
+
+setSelectedPattern: function(e)
+{
+	console.log(e);
+	this.selectedPattern = e.target.value;
+},
+
+loadPatternsSelect: function()
+{
+//	var pat = document.querySelector("#fcpatternmatcher");
+	var pat = this.$.fcpatternmatcher;
+	//console.log(pat.matches);
+	var keys = Object.keys(pat.matches);
+	var numKeys = keys.length;
+	var resultArray = [];
+	for(i=0; i<numKeys;i++)
+	{
+		resultArray.push(pat.matches[keys[i]]);
+	}
+	this.set("commonPatterns", resultArray);
+	//console.log(this.commonPatterns);
+},
+
+clearMatches: function()
+{
+	this.set("regexMatchResults", []);
+	//console.log(this.regexMatchResults);
+	this.regexFilter = this.regexFilterTwo;
+},
+
+_computePatterns: function(one,two,regexFilter, selectedPattern, oneAA,twoAA,threeAA){
+
+	return [one,two, regexFilter, selectedPattern, oneAA, twoAA, threeAA];
+},
+
+_matchWords:function(patterns){
+  	if (!patterns)
+  	{
+          return null; // set filter to null to disable filtering
+    }
+    else
+    {
+    	var numFilters = patterns.length;
+       	for(i = 0; i < numFilters; i++)
+        {
+        	patterns[i] = patterns[i].toLowerCase();
+        }
+        var self = this;
+        //console.log(this.regexMatchResults);
+        return function(item) {
+            //var question = item.QT.toLowerCase();
+            //console.log(item);
+            var question = item._q.toLowerCase();
+            var filterOn = false;
+            var filterResults = false;
+            for(i = 0; i < numFilters; i++)
+            {
+            	filterOn |= (patterns[i] != "");
+            	if(patterns[i] != "")
+            	{
+            		if(i == 2) //regex filter. hack!! fix this!!
+            		{
+            			var pat = patterns[i];
+            			//console.log(pat);
+            			var rez = question.match(RegExp(pat));
+            			if(rez != null)
+            			{
+            				var numMatches = rez.length;
+            				var old = self.regexMatchResults;
+            				//console.log(rez[0]);
+            				//console.log(self.regexMatchResults);
+            				for(j=0; j<numMatches; j++)
+            				{
+            					self.push("regexMatchResults", rez[j]);
+            				}
+            				//self.set("regexMatchResults", old);
+						}
+						//console.log("about to update filterResults, and regexMatchResults = ");
+						//console.log(self.regexMatchResults.length);
+
+            			filterResults |= (rez != null);
+            		}
+            		else
+            		{
+            			filterResults |= (question.indexOf(patterns[i]) > -1);
+            		}
+            	}
+            }
+            //console.log(filterResults);
+            return (filterOn==false) ? true : filterResults;
+        }
+    }
+}
+
+});
+</script>
+</dom-module>
+

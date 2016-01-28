@@ -1,0 +1,301 @@
+<dom-module id="fc-basic-layout">
+<style>
+paper-input {
+
+	@apply(--flex-layout);
+	@apply(--flex-shrink);
+	paper-container-line:{opacity: 0; color: white;};
+	@apply(--paper-container-focused-line-white);
+}
+</style>
+<template>
+	<div class="header-panel header paper-header" style="height: 100px; background:#aecefe;">
+	<paper-button style="height:50px; width: 75px; background: pink; color: green;" value={{quotes}} on-tap="findLineNumbers"> Citations</paper-button>
+	<paper-button style="border:2px solid black;" on-tap="switchLayouts">See Data From Database</paper-button>
+ 		<paper-button style="background:cyan; color: white; border: 4px white solid; outline: 2px solid green; font-size: 14pt; border-radius: 6px;" on-tap="_saveFB_Test_1Qs">SAVE TO FIREBASE</paper-button>
+	</div>
+<div name="divSubPrimeA" class="content main main-content horizontal layout flex-2">
+<div name="divA" class="vertical layout flex-2" style="height:4500px; width: 100%; background:white;">
+		<section class="vertical layout flex-2 self-stretch"style="height: 100%; min-height: 900px;padding: 0px 20px 20px 20px;" name="Ab">
+				<fc-light-large-draggable draggable="false"></fc-light-large-draggable>	
+		</section>
+</div>
+<div name="divB" class="vertical layout wrap flex-5" style="height:89vh; width: 100%; background: gold; overflow: hidden; overflow-y: scroll;">
+<section hidden="{{!database}}" class="vertical layout wrap" style="height: 1900px; width: 980px !important;" name="Bb">
+		<template is="dom-repeat" items="{{testonePassageOne}}">
+			<paper-material style="border: 1px solid black; margin: 3px; padding: 2px; background: white;">
+				<paper-input label="T1_S1_PassageNum Q. Part 1" value="{{item._q}}"></paper-input>
+				<paper-input label="Ans. A Part 1" value="{{item._a}}"></paper-input>  <paper-input label="Ans. B Part 1" value="{{item._b}}"></paper-input>
+				<paper-input label="Ans. C Part 1" value="{{item._c}}"></paper-input>
+				<paper-input label="Ans. D Part 1" value="{{item._d}}"></paper-input>
+			</paper-material>
+		</template>
+</section>
+<section hidden="{{database}}" class="vertical layout wrap" style="height: 88vh;" name="Bc">
+<firebase-collection data="{{fcquestions}}" limit-to-first="10" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/testone"></firebase-collection>
+	<template is="dom-repeat" items="{{fcquestions}}" as="item">
+
+<paper-material style="background: white; height: 300px; width: 360px; border: 1px solid black; margin: 3px; padding: 2px; border-top: 60px blue solid;">
+<paper-textarea value="{{item.Qn}} {{item.Qa}} {{item.Qb}} {{item.Qc}} {{item.Qd}} {{item.Qe}}
+{{item.An}} {{item.Aa}} {{item.Ab}} {{item.Ac}} {{item.Ad}} {{item.Ae}}
+{{item.Bn}} {{item.Ba}} {{item.Bb}} {{item.Bc}} {{item.Bd}} {{item.Be}}  
+{{item.Cn}} {{item.Ca}} {{item.Cb}} {{item.Cc}} {{item.Cd}} {{item.Ce}}			
+{{item.Dn}} {{item.Da}} {{item.Db}} {{item.Dc}} {{item.Dd}} {{item.De}}">
+</paper-textarea>
+</paper-material>
+		</template>
+	</section> 
+</div>
+<fc-light-display style="background: white;" class="flex-1 layout self-stretch vertical" >
+				</fc-light-display>
+</div>
+</template>
+<script>
+Polymer({
+	is: "fc-basic-layout",
+	properties: {
+		database: {
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		// layoutClasses:{
+		// 	type: Array,
+		// 	value: function(){
+		// 		return [{
+
+
+
+
+
+		// 				},
+
+		// 				{
+
+
+		// 				},
+		// 				{
+
+
+
+		// 				}					
+		// 			];
+
+		// 	},
+		// 	notify: true
+		// }, 
+		testonePassageOne:{
+			type: Array,
+			value: function()
+			{ return [  
+				{ "_q": "1. Which choice best describes what happens in the passage?",
+				 "_a": "(A) One character argues with another character who intrudes on her home.",
+				 "_b": "(B)  One character receives a surprising request from another character.",
+				 "_c": "(C) One character reminisces about choices she has made over the years.",
+				 "_d" : "(D) One character criticizes another character for pursuing an unexpected course of action."
+				 },
+				 {"_q": "2. Which choice best describes the developmental pattern of the passage?",
+				 "_a": "(A) A careful analysis of a traditional practice",
+				 "_b": "(B)  A detailed depiction of a meaningful encounter",
+				 "_c": "(C) A definitive response to a series of questions",
+				 "_d" : "(D) A cheerful recounting of an amusing anecdote"
+				 }, 
+
+				 {"_q": "3. As used in line 1 and line 65, “directly” most nearly means",
+				 "_a": "(A) frankly.",
+				 "_b": "(B)  confidently.",
+				 "_c": "(C) without mediation.",
+				 "_d" : "(D) with precision." 
+				},
+				{"_q": "4. Which reaction does Akira most fear from Chie?",
+				 "_a": "(A) She will consider his proposal inappropriate.",
+				 "_b": "(B)  She will mistake his earnestness for immaturity.",
+				 "_c": "(C) She will consider his unscheduled visit an imposition.",
+				 "_d" : "(D) She will underestimate the sincerity of his emotions." 
+				},
+				{"_q": "5. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "_a": "(A) Line 33 (“His voice... refined”)",
+				 "_b": "(B)  Lines 49-51 (“You... mind”)",
+				 "_c": "(C) Lines 63-64 (“Please... proposal”)",
+				 "_d" : "(D) Lines 71-72 (“Eager... face”)"
+					},
+				 {"_q":"6. In the passage, Akira addresses Chie with",
+				 
+				 "_a": "(A) affection but not genuine love.",
+				 "_b": "(B)  objectivity but not complete impartiality.",
+				 "_c": "(C) amusement but not mocking disparagement.",
+				 "_d" : "(D) respect but not utter deference."
+				},
+				{"_q": "7. The main purpose of the first paragraph is to",
+				 
+				 "_a": "(A) describe a culture.",
+				 "_b": "(B)  criticize a tradition.",
+				 "_c": "(C) question a suggestion.",
+				 "_d" : "(D) analyze a reaction."
+				},
+			
+				 {"_q": "8. As used in line 2, “form” most nearly means",
+				 
+				 "_a": "(A) appearance.",
+				 "_b": "(B)  custom.",
+				 "_c": "(C) structure.",
+				 "_d": "(D) nature."
+				},
+				{"_q": "9. Why does Akira say his meeting with Chie is “a matter of urgency” (line 32)?",
+				 
+				 "_a": "(A) He fears that his own parents will disapprove of Naomi.",
+				 "_b": "(B)  He worries that Naomi will reject him and marry someone else.",
+				 "_c": "(C) He has been offered an attractive job in another country.",
+				 "_d" : "(D) He knows that Chie is unaware of his feelings for Naomi."
+				 },
+				{"_q": "10. Which choice provides the best evidence for the answer to the previous question?",
+				 
+				 "_a": "(A) Line 39 (“I don’t... you”)",
+				 "_b": "(B)  Lines 39-42 (“Normally... community”)",
+				 "_c": "(C) Lines 58-59 (“Depending... Japan”)",
+				 "_d" : "(D) Lines 72-73 (“I see... you”) [PASSAGE2]"
+				}  
+					];
+			},
+			notify: true
+		}, 
+		fcquestions: {
+			type: Array,
+			notify: true
+		}
+
+	},
+	switchLayouts: function(){
+		this.database=!this.database;
+	},
+	 _saveFB_Test_1Qs: function(key, value){
+  			var savingNameArray=['testone', 'testtwo', 'testthree', 'testfour'];
+  			var savingArray=[this.testone,this.testtwo,this.testthree,this.testfour];
+			var argString;
+			var _qabcd =["_q","_a","_b","_c","_d"];
+			var _QABCD=["Q","A","B","C","D"];
+			var qabcdefghijkl=["q","a","b","c","d","e", "f", "g", "h","i","j","k","l"];
+			for(var i=0; i<4; i++)
+			{
+				var test =savingArray[i];
+				for(var j=0;j<52;j++)
+				{
+					var question = test[j];
+		 			question._ptype=(j<11)?"fiction": "social science";
+		 			// question._qtype="gettoUndit";
+		 			question._p=(j<11)?"P1": (11<j && j<21)?"P2":(21<j && j<32)?"P3": (j>32 &&j<42)?"P4":"P5_P6";
+		 			question._t="T" + (i+1).toString();
+		 			question._sec="S1";
+		 			question._qindex=j.toString();
+		 			question._qfcid="_" + question._t+question._sec+question._p+"Q" + (j+1).toString();
+					for(var k=0; k<5; k++){
+					var part =question[_qabcd[k]];
+					var wordlist = part.split(" ");
+					question[_QABCD[k] + "n"]=wordlist.shift();
+		 				question[_QABCD[k]+"a"] = wordlist.slice(0,3).join(" "); 
+		 				question[_QABCD[k]+"b"]=wordlist.slice(3,5).join(" ");
+		 				question[_QABCD[k]+"c"]=(wordlist.slice(5,7)!==undefined && wordlist.slice(5,7)!==null)?(wordlist.slice(5,7).join(" ")):"";
+		 				question[_QABCD[k]+"d"]=(wordlist.slice(7,10)!==undefined && wordlist.slice(7,10)!==null)?(wordlist.slice(7,10).join(" ")):"";
+		 				question[_QABCD[k]+"e"]=(wordlist.slice(10,wordlist.length)!==undefined && wordlist.slice(10,wordlist.length)!==null)?(wordlist.slice(10,wordlist.length).join(" ")): "";
+		 				
+
+		 			console.log(question.Qf);
+		 				
+
+
+		 				this.push("objectArray",{
+
+		 				//"_qtype": question._qtype, //question type
+		 				"_p":  question._p,// passage number
+		 				"_t":  question._t, //test numberX
+		 				"Qn" : question.Qn, //question number
+		 				"_q":  question._q, //whole question
+		 				"_sec":question._sec,
+		 				"Qa":  question.Qa,
+		 				"Qb":  question.Qb,
+		 				"Qc":  question.Qc,
+		 				"Qd":  question.Qd,
+		 				"Qe":  question.Qe,
+		 				// "Qf":  question.Qf,
+		 				//"Qg":  question.Qg, // quotes
+		 				// "Qh":  question.Qh, //explanation
+		 				// "Qi":  question.Qi, //context 
+		 				// "Qj":  question.Qj, // source evidence for explanation link
+		 				// "Qk":  question.Qk,
+		 				"_qfcid": question._qfcid,
+		 				"_qindex":  question._qindex, // Comments[i+1]	
+
+
+		 				"_a" : question._a, //whole answer
+		 				"Aa":  question.Aa,
+		 				"Ab":  question.Ab,
+		 				"Ac":  question.Ac,
+		 				"Ad":  question.Ad,
+		 				"Ae":  question.Ae,
+		 				// "Af":  question.Af, //lineNumbers
+		 				// "Ag":  question.Ag, // quotes
+		 				// "Ah":  question.Ah, //explanation
+		 				// "Ai":  question.Ai, //context 
+		 				// "Aj":  question.Aj, // source evidence for explanation link
+		 				// "Ak":  question.Ak,
+		 				"An": "(A)",
+
+		 				"_b" :  question._b, //whole answer
+		 				 "Ba":  question.Ba,
+		 				 "Bb":  question.Bb,
+		 				 "Bc":  question.Bc,
+		 				 "Bd":  question.Bd,
+		 				 "Be":  question.Be,
+		 				 // "Bf":  question.Bf, //lineNumbers
+		 				// "Bg":  question.Bg, // quotes
+		 				// "Bh":  question.Bh, //explanation
+		 				// "Bi":  question.Bi, //context 
+		 				// "Bj":  question.Bj, // source evidence for explanation link
+		 				// "Bk":  question.Bk, // Comments
+		 				"Bn": "(B)",
+
+		 				 "_c" :  question._c, //whole answer
+		 				 "Ca":  question.Ca,
+		 				 "Cb":  question.Cb,
+		 				 "Cc":  question.Cc,
+		 				 "Cd":  question.Cd,
+		 				 "Ce":  question.Ce,
+		 				  // "Cf":  question.Cf, //lineNumbers
+		 				// "Cg":  question.Cg, // quotes
+		 				// "Ch":  question.Ch, //explanation
+		 				// "Ci":  question.Ci, //context 
+		 				// "Cj":  question.Cj, // source evidence for explanation link
+		 				// "Ck":  question.Ck, // Comments
+		 				"Cn": "(C)",
+
+		 				"_d" :  question._d, //whole answer
+		 				 "Da":  question.Da,
+		 				 "Db":  question.Db,
+		 				 "Dc":  question.Dc,
+		 				 "Dd":  question.Dd,
+		 				 "De":  question.De,
+		 				 // "Df":  question.Df, //lineNumbers
+		 				// "Dg":  question.Dg, // quotes
+		 				// "Dh":  question.Dh, //explanation
+		 				// "Di":  question.Di, //context 
+		 				// "Dj":  question.Dj, // source evidence for explanation link
+		 				// "Dk":  question.Dk, // Comments
+		 				"Dn": "(D)"	
+		 				});
+				}
+		 	}
+	
+
+ 		var selfie=this;
+ 		this.findLineNumbers();
+ 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo");
+ 		ref.child(savingNameArray[i]).set(savingArray[i]);
+ 	}
+ },
+
+
+
+});
+</script>
+</dom-module>

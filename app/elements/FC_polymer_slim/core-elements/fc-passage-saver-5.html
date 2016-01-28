@@ -1,4 +1,4 @@
-<dom-module id="fc-passage-saver">
+<dom-module id="fc-passage-holder">
 <template>
 <style>
 :host {
@@ -25,7 +25,7 @@
 	font-weight: 500;
 	font-style: italic;
 	padding: 2px 4px;
-	margin: 5px;
+	margin: 2px;
 
 
     }
@@ -54,24 +54,24 @@
 	font-family: merriweather;
 	font-weight: 500;
 	padding: 2px 0px 8px 4px;
-	margin: 5px;
+	margin: opx 0px 6px 0px;
 	min-height: 900px !important;
 	display: flex;
 	min-width: 300px !important;
-	max-width: 680px !important;
+	max-width: 660px !important;
     }
 
 
-    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; width: 96%;}
+    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; max-width: 480px;}
 </style>            
-<div class="horizontal layout flex nowrap">
-    <paper-header-panel class="layout flex-3 nowrap text" mode="waterfall" style="height: 93vh; margin: 12px; padding: 12px 36px 12px 36px; border: 3px ridge silver;">
+
+    <paper-header-panel class="vertical layout flex wrap text" mode="waterfall" style="margin: 12px; padding: 12px 36px 12px 36px; border: 3px ridge silver;">
 		<div 
-			class="paper-header self-stretch nowrap horizontal layout flex" 
+			class="paper-header inline horizontal layout flex" 
 			id="headerPanel" 
 			style="margin-bottom: 12px; max-height: 75px; border-bottom: 1px solid #efefef;"
 			> 
-		<section class="horizontal layout flex-2 nowrap">	
+			
 			<array-selector 
 				id="selector" 
 				items="{{passagesWordArrays}}" 
@@ -81,18 +81,20 @@
 			</array-selector>
 
 	    	<fc-dropdown-menu 
-	    		class="flex layout horizontal"							
-		  		style="min-width: 360px; max-width: 96%" 
+		  		style="min-width: 360px;" 
 		  		on-select="toggleSelection" 
 		  		id="passagesList" 
 		  		data-source="{{passagesWordArrays}}" 
 		  		selected="{{selected}}"
 		  		>
 		  	</fc-dropdown-menu>
-		</section>
+	
+			
 		
+					<section class="circle"></section>
 		</div>
-	    	<div class="layout vertical flex" style="height: 1900px;">
+		<div class="horizontal layout flex">
+	    	<div class="layout vertical flex-3" >
 	     		<section 
 	     			class="blurb-class"
 	     			>
@@ -129,103 +131,27 @@
 	    </div>
 
 	  </div>
-	</paper-header-panel>
-	<div class="layout flex-2">
-	<paper-header-panel class="vertical layout"  mode="seamed" style="height: 93vh; padding: 0px 6px 24px 6px; font-weight: 600; margin-top: 12px; background: #fff; border: 3px ridge silver; font-size: 20pt; color: #000088;">
-  		<paper-material class="paper-header header-panel head layout horizontal justified" style="min-height: 65px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">Setting Passage Details
-  		</paper-material>
-  		<div class="layout vertical">
-    			<paper-textarea value="{{inputPassageTitle}}" label="Passage Title"></paper-textarea>
-    			<paper-textarea value="{{inputPassageBlurb}}" label="Passage Blurb"></paper-textarea>
-    			<section class="layout vertical flex wrap">
-    			<section class="horizontal layout flex nowrap">
-    			<fc-selector input-label="Passage Type" only for passages></fc-selector>
-    			<fc-input-prime input-type="number" style="width: 100%; height: 100%;" max="14" min="8" class="flex layout horizontal nowrap" label="Number of Questions"></fc-input-prime>
-    			</section>
-    			<section class="horizontal layout flex nowrap">
-    			<fc-input-prime type="text" input-type="text" value="{{inputTestId}}" label="Test Id"></fc-input-prime>
-    			<fc-input-prime type="text" input-type="text" value="{{inputFcid_test}}" label="FCID"></fc-input-prime>
-    			</section>
-    	
-     			<section class="horizontal layout flex nowrap">
-    			<fc-input-prime type="checkbox" input-type="checkbox" label="Has Charts?" checked-prop="{{inputHasCharts}}"></fc-input-prime>
-    			<fc-input-prime type="checkbox" input-type="checkbox" label="Is Double?" checked-prop="{{inputIsDoublePassage}}"></fc-input-prime>
-      			<fc-input-prime type="checkbox" input-type="checkbox" label="Is Focused Test?" checked-prop="{{inputIsFocused}}"></fc-input-prime>
-      			</section>
-			</section>
-				<paper-material style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20pt; border-bottom: 1px solid #000088; color: #000088;">Enter The Passage
-  			</paper-material>
-   			<div class="flex vertical layout" id="firepad">
-    		</div> 
-			<section class="horizontal layout flex nowrap">
-				<fc-input-prime type="range" max="10" min="0" label="Passage Difficulty" style="border: 2px solid #efefef;" class="flex horizontal layout center" input-type="range"></fc-input-prime>
-    			<fc-input-prime type="range" max="6" min="0"  label="Vocabulary Focus" style="border: 2px solid #efefef;" class="flex horizontal layout center" input-type="range"></fc-input-prime>  
-			</section>
-			<section>
-    			<paper-button on-tap="saveLocal" style="width: 100%; color: green; max-height: 75px; border: 2px solid #efefef;">Enter Details</paper-button>
-    			<paper-button on-tap="getText" style="max-height:  90px; color: gray; width: 100%; border: 1px solid #efefef;">Load Text</paper-button>
-    			<paper-button on-tap="saveToDb" style="max-height: 90px; color: gray; width: 100%; border: 1px solid #efefef;">Save Data</paper-button>
-    			<paper-button on-tap="saveDatabase" style="max-height: 75px; color: gray;  width: 100%; border: 2px solid #efefef;">Retrieve Save</paper-button>
-    			<paper-button on-tap="clearInputs" style="width: 100%;color: gray; max-height: 75px; border: 2px solid #efefef; margin-bottom: 200px;"> Clear Data</paper-button>
-   	 		</section>	
-	  	</div>
-	</paper-header-panel>
-	</div>
-	<div class="layout flex-3 vertical">
-	<fc-passage-db-display>
-	</fc-passage-db-display>
-	</div>
-
-		
-<paper-header-panel class="flex-2 vertical layout" style="height: 93vh; margin:0px 10px; padding: 0px 6px 24px 6px; font-weight: 600; background: #fff; font-size: 20px; color: #000088;">
-	    <paper-material style="max-width: 483px; min-width: 320px; hieght: 190px; padding: 24px 6px 24px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">Saving Passage Details
-	  </paper-material>
-	  <div class="vertical layout flex">
-	    <paper-textarea value="{{passageTitle}}" label="Passage Title"></paper-textarea>
-	    <paper-input value="{{passageType}}" label="Passage Type"></paper-input>
-	    <paper-textarea value="{{passageBlurb}}" label="Real Passage Blurb"></paper-textarea>
-	    <paper-input value="{{testId}}" label="Test Id"></paper-input>
-	    <paper-input value="{{fcid_test}}" label="FCID"></paper-input>
-	    <paper-input value="{{testSource}}" label="Test Source"></paper-input>
-	    <fc-input-prime id="hasCharts" type="checkbox" input-type="checkbox" checked-prop="{{hasCharts}}" label="Passage Has Charts?" my-checked="{{hasCharts}}"></fc-input-prime>
-	    <fc-input-prime type="checkbox" id="isDoublePassage" input-type="checkbox" checked-prop="{{isDoublePassage}}" label="Is Double Passage?"  my-checked="{{isDoublePassage}}"></fc-input-prime>
-	    <fc-input-prime type="checkbox" checked-prop="{{isCollegeBoard}}" id="isCollegeBoard" input-type="checkbox" label="Is Offical Test?" my-checked="{{isCollegeBoard}}"></fc-input-prime>
-	    <fc-input-prime type="checkbox" input-type="checkbox" id="isFocused" label="Is Focused Test?" my-checked="{{isFocused}}" checked-prop="{{isFocused}}"></fc-input-prime>
-	   
-	
-	  </div>
-	  </paper-header-panel>
-	  </div>
-
-
-
-
+	  	 
 	  
-	 <!-- <div style="background: burntciena;">
-	  <template is="dom-repeat" items={{menuArray}}>
-	  [[item.word]] [[menuArrayl]]
-	  </template>             
-	  </div>
-    </div> -->
-			 
+	               
+    </paper-header-panel>			 
 </template>
 <script>
 'use strict';
 
     (
 	function() {
-	class fcPassageSaver {
+	class fcPassageHolder {
 	   get behaviors() { 
 	    return [
 		  Polymer.IronResizableBehavior, 
-		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.FCFirepadBehavior, 
 		  FCBehaviors.PassageDataBehavior
-
 		  ];
 	   }
 	   beforeRegister() {
 
-	this.is = 'fc-passage-saver';
+		this.is = 'fc-passage-holder';
 	    this.properties = {
 	  
 	    estimatedHeight: {
@@ -339,49 +265,28 @@
 		    { 'menuLabel': `Passages From College Board Test One: (C) 2016`,
 			    'passageType': `pop-econ, sociology.  poor version of freakanomics`,
 			'blurb': `This passage is adapted from Francis J. Flynn and Gabrielle S. Adams, “Money Cant Buy Love: Asymmetric Beliefs about Gift Price and Feelings of Appreciation. ©2008” by Elsevier Inc.\n\n`,
-			'passage':  `Every day, millions of shoppers hit the stores in full force—both online and on foot—searching frantically for the perfect gift. Last year, Americans spent over $30 billion at retail stores in the month of 5 December alone. Aside from purchasing holiday  gifts, most people regularly buy presents for other occasions throughout the year, including weddings, birthdays, anniversaries, graduations, and baby showers. This frequent experience of gift-giving can engender ambivalent feelings in gift-givers. Many relish the opportunity to buy presents because gift-giving offers a powerful means to build stronger bonds with one’s closest peers. At the same time, many dread the thought of buying gifts; they worry that their purchases will disappoint rather than delight the intended recipients.
-Anthropologists describe gift-giving as a positive social process, serving various political, religious, and psychological functions. Economists, however, offer a less favorable view. According to Waldfogel (1993), gift-giving represents an objective waste of resources. People buy gifts that recipients would not choose to buy on their own, or at least not spend as much money to purchase (a phenomenon referred to as ‘‘the deadweight loss of Christmas”). To wit, givers are likely to spend $100 to purchase a gift that receivers would spend only $80 to buy themselves. This ‘‘deadweight loss” suggests that gift-givers are not very good at predicting what gifts others will appreciate. That in itself is not surprising to social psychologists. Research has found that people often struggle to take account of others’ perspectives— their insights are subject to egocentrism, social projection, and multiple attribution errors.
-What is surprising is that gift-givers have considerable experience acting as both gift-givers and gift-recipients, but nevertheless tend to overspend each time they set out to purchase a meaningful gift. In the present research, we propose a unique psychological explanation for this overspending problem—i.e., that gift-givers equate how much they spend with how much recipients will appreciate the gift (the more expensive the gift, the stronger a gift-recipient’s feelings of appreciation). Although a link between gift price and feelings of appreciation might seem intuitive to gift-givers, such an assumption may be unfounded. Indeed, we propose that gift-recipients will be less inclined to base their feelings of appreciation on the magnitude of a gift than givers assume. 
- Why do gift-givers assume that gift price is closely linked to gift-recipients’ feelings of appreciation? Perhaps givers believe that bigger (i.e., more expensive) gifts convey stronger signals of thoughtfulness and consideration. According to Camerer (1988) and others, gift-giving represents a symbolic ritual, whereby gift-givers attempt to signal their positive attitudes toward the intended recipient and their willingness to invest resources in a future relationship. In this sense, gift-givers may be motivated to spend more money on a gift in order to send a “stronger signal” to their intended recipient. As for gift-recipients, they may not construe smaller and larger gifts as representing smaller and larger signals of thoughtfulness and consideration. 
-The notion of gift-givers and gift-recipients being unable to account for the other party’s perspective seems puzzling because people slip in and out of these roles every day, and, in some cases, multiple times in the course of the same day. Yet, despite the extensive experience that people have as both givers and receivers, they often struggle to transfer information gained from one role (e.g., as a giver) and apply it in another, complementary role (e.g., as a receiver). In theoretical terms, people fail to utilize information about their own preferences and experiences in order to produce more efficient outcomes in their exchange relations. In practical terms, people spend hundreds of dollars each year on gifts, but somehow never learn to calibrate their gift expenditures according to personal insight.`
+			'passage':  `Every day, millions of shoppers hit the stores in full force—both online and on foot—searching frantically for the perfect gift. Last year, Americans spent over $30 billion at retail stores in the month of 5 December alone. Aside from purchasing holiday  gifts, most people regularly buy presents for other occasions throughout the year, including weddings, birthdays, anniversaries, graduations, and baby showers. This frequent experience of gift-giving can engender ambivalent feelings in gift-givers. Many relish the opportunity to buy presents because gift-giving offers a powerful means to build stronger bonds with one’s closest peers. At the same time, many dread the thought of buying gifts; they worry that their purchases will disappoint rather than delight the intended recipients. Anthropologists describe gift-giving as a positive social process, serving various political, religious, and psychological functions. Economists, however, offer a less favorable view. According to Waldfogel (1993), gift-giving represents an objective waste of resources. People buy gifts that recipients would not choose to buy on their own, or at least not spend as much money to purchase (a phenomenon referred to as ‘‘the deadweight loss of Christmas”). To wit, givers are likely to spend $100 to purchase a gift that receivers would spend only $80 to buy themselves. This ‘‘deadweight loss” suggests that gift-givers are not very good at predicting what gifts others will appreciate. That in itself is not surprising to social psychologists. Research has found that people often struggle to take account of others’ perspectives— their insights are subject to egocentrism, social projection, and multiple attribution errors. What is surprising is that gift-givers have considerable experience acting as both gift-givers and gift-recipients, but nevertheless tend to overspend each time they set out to purchase a meaningful gift. In the present research, we propose a unique psychological explanation for this overspending problem—i.e., that gift-givers equate how much they spend with how much recipients will appreciate the gift (the more expensive the gift, the stronger a gift-recipient’s feelings of appreciation). Although a link between gift price and feelings of appreciation might seem intuitive to gift-givers, such an assumption may be unfounded. Indeed, we propose that gift-recipients will be less inclined to base their feelings of appreciation on the magnitude of a gift than givers assume. Why do gift-givers assume that gift price is closely linked to gift-recipients’ feelings of appreciation? Perhaps givers believe that bigger (i.e., more expensive) gifts convey stronger signals of thoughtfulness and consideration. According to Camerer (1988) and others, gift-giving represents a symbolic ritual, whereby gift-givers attempt to signal their positive attitudes toward the intended recipient and their willingness to invest resources in a future relationship. In this sense, gift-givers may be motivated to spend more money on a gift in order to send a “stronger signal” to their intended recipient. As for gift-recipients, they may not construe smaller and larger gifts as representing smaller and larger signals of thoughtfulness and consideration. The notion of gift-givers and gift-recipients being unable to account for the other party’s perspective seems puzzling because people slip in and out of these roles every day, and, in some cases, multiple times in the course of the same day. Yet, despite the extensive experience that people have as both givers and receivers, they often struggle to transfer information gained from one role (e.g., as a giver) and apply it in another, complementary role (e.g., as a receiver). In theoretical terms, people fail to utilize information about their own preferences and experiences in order to produce more efficient outcomes in their exchange relations. In practical terms, people spend hundreds of dollars each year on gifts, but somehow never learn to calibrate their gift expenditures according to personal insight.`
 		    },
 			{  'menuLabel': `Passages From College Board Test One: (C) 2016`,
 			    'passageType': `gender, science, history. Watson, Crick, Rosalind Franklin`,
 			  'blurb': `This passage is adapted from J. D. Watson and F. H. C. Crick, “Genetical Implications of the Structure of Deoxyribonucleic Acid. ©1953” by Nature Publishing Group. Watson and Crick deduced the structure of DNA using evidence from Rosalind Franklin and R. G. Gosling’s X-ray crystallography diagrams of DNA and from Erwin Chargaff’s data on the base composition of DNA.\n \n`,
-			'passage': `The chemical formula of deoxyribonucleic acid (DNA) is now well established. The molecule is a very long chain, the backbone of which consists of a regular alternation of sugar and phosphate groups. To each sugar is attached a nitrogenous base, which can be of four different types. Two of the possible bases—adenine and guanine—are purines, and the other two—thymine and cytosine—are pyrimidines. So far as is known, the sequence of bases along the chain is irregular. The monomer unit, consisting of phosphate, sugar and base, is known as a nucleotide. 
-The first feature of our structure which is of biological interest is that it consists not of one chain, but of two. These two chains are both coiled around a common fiber axis. It has often been assumed that since there was only one chain in the chemical formula there would only be one in the structural unit. However, the density, taken with the X-ray evidence, suggests very strongly that there are two. 
-The other biologically important feature is the manner in which the two chains are held together. This is done by hydrogen bonds between the bases. The bases are joined together in pairs, a single base from one chain being hydrogen-bonded to a single base from the other. The important point is that only certain pairs of bases will fit into the structure. One member of a pair must be a purine and the other a pyrimidine in order to bridge between the two chains. If a pair consisted of two purines, for example, there would not be room for it. 
-We believe that the bases will be present almost entirely in their most probable forms. If this is true, the conditions for forming hydrogen bonds are more restrictive, and the only pairs of bases possible are: adenine with thymine, and guanine with cytosine. Adenine, for example, can occur on either chain; but when it does, its partner on the other chain must always be thymine. 
-The phosphate-sugar backbone of our model is completely regular, but any sequence of the pairs of bases can fit into the structure. It follows that in a long molecule many different permutations are possible, and it therefore seems likely that the precise sequence of bases is the code which carries the genetical information. If the actual order of the bases on one of the pair of chains were given, one could write down the exact order of the bases on the other one, because of the specific pairing. Thus one chain is, as it were, the complement of the other, and it is this feature which suggests how the deoxyribonucleic acid molecule might duplicate itself.`
+			'passage': `The chemical formula of deoxyribonucleic acid (DNA) is now well established. The molecule is a very long chain, the backbone of which consists of a regular alternation of sugar and phosphate groups. To each sugar is attached a nitrogenous base, which can be of four different types. Two of the possible bases—adenine and guanine—are purines, and the other two—thymine and cytosine—are pyrimidines. So far as is known, the sequence of bases along the chain is irregular. The monomer unit, consisting of phosphate, sugar and base, is known as a nucleotide. The first feature of our structure which is of biological interest is that it consists not of one chain, but of two. These two chains are both coiled around a common fiber axis. It has often been assumed that since there was only one chain in the chemical formula there would only be one in the structural unit. However, the density, taken with the X-ray evidence, suggests very strongly that there are two. The other biologically important feature is the manner in which the two chains are held together. This is done by hydrogen bonds between the bases. The bases are joined together in pairs, a single base from one chain being hydrogen-bonded to a single base from the other. The important point is that only certain pairs of bases will fit into the structure. One member of a pair must be a purine and the other a pyrimidine in order to bridge between the two chains. If a pair consisted of two purines, for example, there would not be room for it. We believe that the bases will be present almost entirely in their most probable forms. If this is true, the conditions for forming hydrogen bonds are more restrictive, and the only pairs of bases possible are: adenine with thymine, and guanine with cytosine. Adenine, for example, can occur on either chain; but when it does, its partner on the other chain must always be thymine. The phosphate-sugar backbone of our model is completely regular, but any sequence of the pairs of bases can fit into the structure. It follows that in a long molecule many different permutations are possible, and it therefore seems likely that the precise sequence of bases is the code which carries the genetical information. If the actual order of the bases on one of the pair of chains were given, one could write down the exact order of the bases on the other one, because of the specific pairing. Thus one chain is, as it were, the complement of the other, and it is this feature which suggests how the deoxyribonucleic acid molecule might duplicate itself.`
 		    },
 			{ 'menuLabel': `Passages From College Board Test One: (C) 2016`,
 			    'passageType' :`fiction, Virginia Woolf. Modernist`,
 			  'blurb': `This passage is adapted from “Virginia Woolf, Three Guineas. ©1938 by Harcourt, Inc.” Here, Woolf considers the situation of women in English society. \n \n`,
-			'passage': `Close at hand is a bridge over the River Thames, an admirable vantage ground for us to make a survey. The river flows beneath; barges pass, laden with timber, bursting with corn; there on one side are the domes and spires of the city; on the other, Westminster and the Houses of Parliament. It is a place to stand on by the hour, dreaming. But not now. Now we are pressed for time. Now we are here to consider facts; now we must fix our eyes upon the procession—the procession of the sons of educated men. 
-There they go, our brothers who have been educated at public schools and universities, mounting those steps, passing in and out of those doors, ascending those pulpits, preaching, teaching, administering justice, practising medicine, transacting business, making money. It is a solemn sight always—a procession, like a caravanserai crossing a desert. . . . But now, for the past twenty years or so, it is no longer a sight merely, a photograph, or fresco scrawled upon the walls of time, at which we can look with merely an esthetic appreciation. For there, trapesing along at the tail end of the procession, we go ourselves. And that makes a difference. We who have looked so long at the pageant in books, or from a curtained window watched educated men leaving the house at about nine-thirty to go to an office, returning to the house at about six-thirty from an office, need look passively no longer. We too can leave the house, can mount those steps, pass in and out of those doors,... make money, administer justice. . . . We who now agitate these humble pens may in another century or two speak from a pulpit. Nobody will dare contradict us then; we shall be the mouthpieces of the divine spirit—a solemn thought, is it not? Who can say whether, as time goes on, we may not dress in military uniform, with gold lace on our breasts, swords at our sides, and something like the old family coal-scuttle on our heads, save that that venerable object was never decorated with plumes of white horsehair. You laugh—indeed the shadow of the private house still makes those dresses look a little queer. We have worn private clothes so long. . . . But we have not come here to laugh, or to talk of fashions—men’s and women’s. We are here, on the bridge, to ask ourselves certain questions. And they are very important questions; and we have very little time in which to answer them. The questions that we have to ask and to answer about that procession during this moment of transition are so important that they may well change the lives of all men and women for ever. For we have to ask ourselves, here and now, do we wish to join that procession, or don’t we? On what terms shall we join that procession? Above all, where is it leading us, the procession of educated men? The moment is short; it may last five years; ten years, or perhaps only a matter of a few months longer.... But, you will object, you have no time to think; you have your battles to fight, your rent to pay, your bazaars to organize. That excuse shall not serve you, Madam. As you know from your own experience, and there are facts that prove it, the daughters of educated men have always done their thinking from hand to mouth; not under green lamps at study tables in the cloisters of secluded colleges. They have thought while they stirred the pot, while they rocked the cradle. It was thus that they won us the right to our brand-new sixpence. It falls to us now to go on thinking; how are we to spend that sixpence? Think we must. Let us think in offices; in omnibuses; while we are standing in the crowd watching Coronations and Lord Mayor’s Shows; let us think . . . in the gallery of the House of Commons; in the Law Courts; let us think at baptisms and marriages and funerals. Let us never cease from thinking—what is this “civilization” in which we find ourselves? What are these ceremonies and why should we take part in them? What are these professions and why should we make money out of them? Where in short is it leading us, the procession of the sons of educated men?`
+			'passage': `Close at hand is a bridge over the River Thames, an admirable vantage ground for us to make a survey. The river flows beneath; barges pass, laden with timber, bursting with corn; there on one side are the domes and spires of the city; on the other, Westminster and the Houses of Parliament. It is a place to stand on by the hour, dreaming. But not now. Now we are pressed for time. Now we are here to consider facts; now we must fix our eyes upon the procession—the procession of the sons of educated men. There they go, our brothers who have been educated at public schools and universities, mounting those steps, passing in and out of those doors, ascending those pulpits, preaching, teaching, administering justice, practising medicine, transacting business, making money. It is a solemn sight always—a procession, like a caravanserai crossing a desert. . . . But now, for the past twenty years or so, it is no longer a sight merely, a photograph, or fresco scrawled upon the walls of time, at which we can look with merely an esthetic appreciation. For there, trapesing along at the tail end of the procession, we go ourselves. And that makes a difference. We who have looked so long at the pageant in books, or from a curtained window watched educated men leaving the house at about nine-thirty to go to an office, returning to the house at about six-thirty from an office, need look passively no longer. We too can leave the house, can mount those steps, pass in and out of those doors,... make money, administer justice. . . . We who now agitate these humble pens may in another century or two speak from a pulpit. Nobody will dare contradict us then; we shall be the mouthpieces of the divine spirit—a solemn thought, is it not? Who can say whether, as time goes on, we may not dress in military uniform, with gold lace on our breasts, swords at our sides, and something like the old family coal-scuttle on our heads, save that that venerable object was never decorated with plumes of white horsehair. You laugh—indeed the shadow of the private house still makes those dresses look a little queer. We have worn private clothes so long. . . . But we have not come here to laugh, or to talk of fashions—men’s and women’s. We are here, on the bridge, to ask ourselves certain questions. And they are very important questions; and we have very little time in which to answer them. The questions that we have to ask and to answer about that procession during this moment of transition are so important that they may well change the lives of all men and women for ever. For we have to ask ourselves, here and now, do we wish to join that procession, or don’t we? On what terms shall we join that procession? Above all, where is it leading us, the procession of educated men? The moment is short; it may last five years; ten years, or perhaps only a matter of a few months longer.... But, you will object, you have no time to think; you have your battles to fight, your rent to pay, your bazaars to organize. That excuse shall not serve you, Madam. As you know from your own experience, and there are facts that prove it, the daughters of educated men have always done their thinking from hand to mouth; not under green lamps at study tables in the cloisters of secluded colleges. They have thought while they stirred the pot, while they rocked the cradle. It was thus that they won us the right to our brand-new sixpence. It falls to us now to go on thinking; how are we to spend that sixpence? Think we must. Let us think in offices; in omnibuses; while we are standing in the crowd watching Coronations and Lord Mayor’s Shows; let us think . . . in the gallery of the House of Commons; in the Law Courts; let us think at baptisms and marriages and funerals. Let us never cease from thinking—what is this “civilization” in which we find ourselves? What are these ceremonies and why should we take part in them? What are these professions and why should we make money out of them? Where in short is it leading us, the procession of the sons of educated men?`
 		    },
 		    { 'menuLabel': `Passages From College Board Test One: (C) 2016`,
 			    'passageType': `double-passage, science, space-exploration`,
 			'blurb': `Passage 1 is adapted from Michael Slezak, “Space Mining: the Next Gold Rush? ©2013” by New Scientist. Passage 2 is from the editors of New Scientist, “Taming the Final Frontier. ©2013” by New Scientist.\n \n`,
-			'passage': `Follow the money and you will end up in space. That’s the message from a first-of-its-kind forum on mining beyond Earth. 
-Convened in Sydney by the Australian Centre for Space Engineering Research, the event brought together mining companies, robotics experts, lunar scientists, and government agencies that are all working to make space mining a reality. 
-The forum comes hot on the heels of the 2012 unveiling of two private asteroid-mining firms. Planetary Resources of Washington says it will launch its first prospecting telescopes in two years, while Deep Space Industries of Virginia hopes to be harvesting metals from asteroids by 2020. Another commercial venture that sprung up in 2012, Golden Spike of Colorado, will be offering trips to the moon, including to potential lunar miners. 
-Within a few decades, these firms may be meeting earthly demands for precious metals, such as platinum and gold, and the rare earth elements vital for personal electronics, such as yttrium and lanthanum. But like the gold rush pioneers who transformed the western United States, the first space miners won’t just enrich themselves. They also hope to build an off-planet economy free of any bonds with Earth, in which the materials extracted and processed from the moon and asteroids are delivered for space-based projects. 
-In this scenario, water mined from other worlds could become the most desired commodity. “In the desert, what’s worth more: a kilogram of gold or a kilogram of water?” asks Kris Zacny of HoneyBee Robotics in New York. “Gold is useless. Water will let you live.” 
-Water ice from the moon’s poles could be sent to astronauts on the International Space Station for drinking or as a radiation shield. Splitting water into oxygen and hydrogen makes spacecraft fuel, so ice-rich asteroids could become interplanetary refuelling stations. 
-Companies are eyeing the iron, silicon, and aluminium in lunar soil and asteroids, which could be used in 3D printers to make spare parts or machinery. Others want to turn space dirt into concrete for landing pads, shelters, and roads.`,
-			'passageTwo': `The motivation for deep-space travel is shifting from discovery to economics. The past year has seen a flurry of proposals aimed at bringing celestial riches down to Earth. No doubt this will make a few billionaires even wealthier, but we all stand to gain: the mineral bounty and spin-off technologies could enrich us all. 
-But before the miners start firing up their rockets, we should pause for thought. At first glance, space mining seems to sidestep most environmental concerns: there is (probably!) no life on asteroids, and thus no habitats to trash. But its consequences —both here on Earth and in space—merit careful consideration. 
-Part of this is about principles. Some will argue that space’s “magnificent desolation” is not ours to despoil, just as they argue that our own planet’s poles should remain pristine. Others will suggest that glutting ourselves on space’s riches is not an acceptable alternative to developing more sustainable ways of earthly life. 
-History suggests that those will be hard lines to hold, and it may be difficult to persuade the public that such barren environments are worth preserving. After all, they exist in vast abundance, and even fewer people will experience them than have walked through Antarctica’s icy landscapes. 
-There’s also the emerging off-world economy to consider. The resources that are valuable in orbit and beyond may be very different to those we prize on Earth. Questions of their stewardship have barely been broached—and the relevant legal and regulatory framework is fragmentary, to put it mildly. 
-Space miners, like their earthly counterparts, are often reluctant to engage with such questions. One speaker at last week’s space-mining forum in Sydney, Australia, concluded with a plea that regulation should be avoided. But miners have much to gain from a broad agreement on the for-profit exploitation of space. Without consensus, claims will be disputed, investments risky, and the gains made insecure. It is in all of our long-term interests to seek one out.`
+			'passage': `Follow the money and you will end up in space. That’s the message from a first-of-its-kind forum on mining beyond Earth. Convened in Sydney by the Australian Centre for Space Engineering Research, the event brought together mining companies, robotics experts, lunar scientists, and government agencies that are all working to make space mining a reality. The forum comes hot on the heels of the 2012 unveiling of two private asteroid-mining firms. Planetary Resources of Washington says it will launch its first prospecting telescopes in two years, while Deep Space Industries of Virginia hopes to be harvesting metals from asteroids by 2020. Another commercial venture that sprung up in 2012, Golden Spike of Colorado, will be offering trips to the moon, including to potential lunar miners. Within a few decades, these firms may be meeting earthly demands for precious metals, such as platinum and gold, and the rare earth elements vital for personal electronics, such as yttrium and lanthanum. But like the gold rush pioneers who transformed the western United States, the first space miners won’t just enrich themselves. They also hope to build an off-planet economy free of any bonds with Earth, in which the materials extracted and processed from the moon and asteroids are delivered for space-based projects. In this scenario, water mined from other worlds could become the most desired commodity. “In the desert, what’s worth more: a kilogram of gold or a kilogram of water?” asks Kris Zacny of HoneyBee Robotics in New York. “Gold is useless. Water will let you live.” Water ice from the moon’s poles could be sent to astronauts on the International Space Station for drinking or as a radiation shield. Splitting water into oxygen and hydrogen makes spacecraft fuel, so ice-rich asteroids could become interplanetary refuelling stations. Companies are eyeing the iron, silicon, and aluminium in lunar soil and asteroids, which could be used in 3D printers to make spare parts or machinery. Others want to turn space dirt into concrete for landing pads, shelters, and roads.`,
+			'passageTwo': `The motivation for deep-space travel is shifting from discovery to economics. The past year has seen a flurry of proposals aimed at bringing celestial riches down to Earth. No doubt this will make a few billionaires even wealthier, but we all stand to gain: the mineral bounty and spin-off technologies could enrich us all. But before the miners start firing up their rockets, we should pause for thought. At first glance, space mining seems to sidestep most environmental concerns: there is (probably!) no life on asteroids, and thus no habitats to trash. But its consequences —both here on Earth and in space—merit careful consideration. Part of this is about principles. Some will argue that space’s “magnificent desolation” is not ours to despoil, just as they argue that our own planet’s poles should remain pristine. Others will suggest that glutting ourselves on space’s riches is not an acceptable alternative to developing more sustainable ways of earthly life. History suggests that those will be hard lines to hold, and it may be difficult to persuade the public that such barren environments are worth preserving. After all, they exist in vast abundance, and even fewer people will experience them than have walked through Antarctica’s icy landscapes. There’s also the emerging off-world economy to consider. The resources that are valuable in orbit and beyond may be very different to those we prize on Earth. Questions of their stewardship have barely been broached—and the relevant legal and regulatory framework is fragmentary, to put it mildly. Space miners, like their earthly counterparts, are often reluctant to engage with such questions. One speaker at last week’s space-mining forum in Sydney, Australia, concluded with a plea that regulation should be avoided. But miners have much to gain from a broad agreement on the for-profit exploitation of space. Without consensus, claims will be disputed, investments risky, and the gains made insecure. It is in all of our long-term interests to seek one out.`
 		    }
 		  ];
 		},
 		notify: true
 	    },
-	 
 	
 		myValue: {
 		  type: String,
@@ -432,7 +337,9 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 		},
 	    inputFcid_test:{
 			type: String,
-			computed: "_computeInputFcid_test(inputTestId)",
+			value: function(){
+		    	return "";
+		    },
 			notify: true
 	    },
 	    fcid_test: {
@@ -573,7 +480,38 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 	    },
 	  notify: true,
 	},
-	
+	question_1_1_3: {
+		type: String,
+		value: function(){return "As used in line 1 and line 65, “directly” most nearly means:";},
+		notify: true
+	},
+	question_1_1_3_A:{
+		type: String,
+		value: function(){return "A) frankly.";},
+		notify: true
+
+
+	},
+
+	question_1_1_3_B:{
+		type: String,
+		value: function(){return "B) confidently.";},
+		notify: true
+
+	},
+
+	question_1_1_3_C:{
+		type: String,
+		value: function(){return "C) without mediation.";},
+		notify: true
+	},
+
+	question_1_1_3_D:{
+		type: String,
+		value: function(){return "D) with precision";},
+		notify: true
+	},
+
 	holderArray: {
 	  type: Array,
 	  value: function(){
@@ -623,21 +561,13 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 		},
 		notify: true
 	}, 
-	firepadPassageWordArraysTwo:{
-		type: Array,
-		value:function(){
-			return [];
-		},
-		notify: true
-	}, 
 	hitSaveOne:{
 		type: Boolean,
 		value: function(){
 			return false;
 		},
 		notify: true
-	}
-
+	},
 	
 
        	
@@ -645,28 +575,20 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 		
     };
 
-	  this.listeners = {'iron-resize': '_onIronResize',
-	  			
+	  this.listeners = {'iron-resize': '_onIronResize'
 
 	
 	    };
 	   }
 	
-	 attached(){
-	 	this.loadFirepad();
+	 attached(){this.loadFirepad();
 	 
-	     }
-	 _computeInputFcid_test(inputTestId){
-	 		var returnValue= inputTestId.toString();
-	 		return "_" + returnValue;
 	     }
 	 _computeStructuredPassageArray(hitSaveOne, inputPassageBlurb,  inputPassageTitle, inputPassageType, inputTestId, inputFcid){
 
 
 
 	 }
-	
-	
 	 saveLocal(){
 	 	this.set('passageBlurb', this.inputPassageBlurb);
 		this.set('passageType', this.inputPassageType);
@@ -1101,7 +1023,9 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 			}
 			return this.arrayNums;
 			}
-    
+     _computeValue(myValue){
+		return myValue;
+	  }
 
 	 _onIronResize(){
 	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
@@ -1139,7 +1063,7 @@ _theContentFilter(firstWordIndex, lastWordIndex) {
 	  } 
 	
 	}
-    Polymer(fcPassageSaver);
+    Polymer(fcPassageHolder);
  
   })();
 </script>

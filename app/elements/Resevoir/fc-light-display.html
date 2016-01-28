@@ -2,38 +2,29 @@
 <template>
 <style>
 :host {
-	padding-left: 12px;
-	margin-left: 6px;
 	position: relative;
-	top: 0px;
-	font-size: 16pt;
-	bottom: 0px;
-	height: 99vh;
-	right: 0px;
-	left: 0px;
-	display: flex;
-	min-width: 96%;
-	max-width: 99vw;
+	max-height: 750px important!;
+
     }
 div.line-number {
-	width: 28px;
+	width: 18px;
 	height: 20px;
-	line-height: 1.2;
-	font-size: 16pt;
+	line-height: 1.0;
+	font-size: 1em;
 	/*font-size: 1.25em;*/
 	font-family: merriweather;
 	font-weight: 500;
 	font-style: italic;
-	padding: 2px 4px;
+	padding: 2px 2px;
 	margin: 2px;
 
 
     }
     .blurb-class{
-    	max-width: 660px; 
-    	padding: 4px 0px 4px 8px; 
-    	font-size: 12pt; 
-    	line-height: 1.05;
+    	max-width: 420px; 
+    	padding: 2px 0px 2px 3px; 
+    	font-size: .8em; 
+    	line-height: 1.00;
     	font-style: oblique;
 
     }
@@ -41,15 +32,17 @@ div.line-number {
     .highlighted {
 	background: yellow;
     }
-
+paper-header-panel{
+	position: absolute;
+}
     div.text {
-	line-height: 1.2;
-	font-size: 16pt;
+	line-height: 1.0;
+	font-size: 1em;
      /* font-size: 1.25em;*/
 	font-family: merriweather;
 	font-weight: 500;
-	padding: 2px 0px 8px 4px;
-	margin: opx 0px 6px 0px;
+	padding: 2px 0px 2px 2px;
+	margin: 0px 0px 0px 0px;
 	min-height: 1800px !important;
 	display: flex;
 	min-width: 300px !important;
@@ -57,11 +50,12 @@ div.line-number {
     }	
 
 </style>
-	<paper-header-panel class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 12px; padding: 0px 20px 0px 20px; border: 3px ridge silver;">
+	<paper-header-panel class="vertical layout flex wrap text" mode="waterfall" style="margin: 4px; padding:6px; border: 1px ridge silver; max-width: 620px; min-height: 360px; max-height: 750px !important;">
+	<!--passage header and content select menu-->
 		<div 
 			class="paper-header" 
 			id="headerPanel" 
-			style="margin-bottom: 12px;"
+			style="margin-bottom:4px; border: 1px solid #3f51b5; min-height: 60px; max-height 120px; background: #ff4081"
 			> 
 			<array-selector 
 				id="selector" 
@@ -72,7 +66,7 @@ div.line-number {
 			</array-selector>
 
 	    	<fc-dropdown-menu 
-		  		style="min-width: 360px;" 
+		  		style="min-width: 240px;" 
 		  		on-select="toggleSelection" 
 		  		id="passagesList" 
 		  		data-source="{{passagesWordArrays}}" 
@@ -80,46 +74,42 @@ div.line-number {
 		  		>
 		  	</fc-dropdown-menu>
 		</div>
-
-	    	 
-	    	<div class="layout horizontal flex main-content super-content">
-	    	<div class="layout vertical flex-3">
-	     		<section 
-	     			class="blurb-class"
-	     			>
-	     			[[selected.0.passageBlurb]]
-	     		</section>
-		<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
-		<div id="line-numbers" class="layout vertical line-number">
-		  <div class="line-numbers" id="linesA1">Lines</div>
-		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
-			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
-			  <span hidden="{{item.show}}">&nbsp</span>
-		    </template> 
-		  </div>
-			  <!--passage-1-column-1 container-->
-	    <div id="firstColumn" class="layout horizontal flex wrap text">
-		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 4px; max-width: 620px;">
-		  <template is="dom-repeat" items="{{selected}}"  filter="">
-			<template is="dom-if" if="{{item.newPara}}">
-			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
-			</template>
-			<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
-		     <a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
-		  
-		  </template>
-
-		  <br class="line-numbers">
-		  <hr>
-		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
-		</article>
-		<!-- <code style="opacity: 0;">[[passageOneWordArray.0.passageType]]</code> -->
-	    </div>
-	    </div>
-	       </div>
-      
-		</div>   
-    </paper-header-panel>		 
+	<!--end of passage header and content select menu-->
+	<!--sgl/dble column content&line number horiz sec.-->
+	<div 
+		class="layout horizontal flex content super-content" style="min-height: 300px; max-height: 675px;">
+		<!--blurb and passage-->
+		<div class="layout vertical flex">
+			<section class="blurb-class">[[selected.0.passageBlurb]]</section>
+			<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
+				<div id="line-numbers" class="layout vertical line-number">
+				  <div class="line-numbers" id="linesA1">Lines</div>
+				    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+					  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+					  <span hidden="{{item.show}}">&nbsp</span>
+				    </template> 
+				</div>
+					  <!--passage-1-column-1 container-->
+			    <div id="firstColumn" class="layout horizontal flex wrap text">
+					<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 4px; max-width: 620px;">
+					  	<template is="dom-repeat" items="{{selected}}"  filter="">
+							<template is="dom-if" if="{{item.newPara}}">
+						  	<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+							</template>
+							<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
+					     	<a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
+					  </template>
+					  <br class="line-numbers">
+					  <hr>
+					  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+					</article>
+			    </div>
+			</div>
+		</div>
+		<!--region for a second passage column-->
+	</div>
+	<!--end content sect; this was single column ONLY!-->
+</paper-header-panel>		 
 </template>
 <script>
 'use strict';
@@ -130,7 +120,7 @@ div.line-number {
 	    return [
 		  Polymer.IronResizableBehavior, 
 		  FCBehaviors.FCFirepadBehavior,
-		  FCBehaviors.PassageDataBehavior	
+		  FCBehaviors.PassageDataBehavior
 		  ];
 	   }
 	   beforeRegister() {
@@ -239,7 +229,7 @@ div.line-number {
 
 	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
 	     console.log(ht);
-	     if(!isNaN(ht)){this.set("lineNumbers", ht) && this.this.removeEventListener("mouseover", this._onIronResize);}
+	     if(!isNaN(ht)){this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this._onIronResize);}
 
 	  }
 

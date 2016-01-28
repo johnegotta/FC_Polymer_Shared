@@ -1,0 +1,276 @@
+<dom-module id="fc-question-type-setter">
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+    div.line-number {
+	width: 28px;
+	height: 20px;
+	line-height: 1.2;
+	font-size: 16pt;
+	/*font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+	padding: 2px 4px;
+	margin: 5px;
+
+    }
+
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    .blurb-class{
+    	max-width: 670px; 
+    	padding: 4px 0px 4px 8px; 
+    	font-size: 12pt; 
+    	line-height: 1.05;
+    	font-style: oblique;
+
+    }
+
+    .highlighted {
+	background: yellow;
+    }
+
+    div.text {
+	line-height: 1.2;
+	font-size: 16pt;
+     /* font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	padding: 2px 0px 8px 4px;
+	margin: 5px;
+	min-height: 900px !important;
+	display: flex;
+	min-width: 300px !important;
+	max-width: 680px !important;
+    }
+
+</style>
+
+<template>
+
+<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+	    <paper-material class="paper-header header-panel head horizontal layout" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+	    <section>Saved Passages</section>
+	    <section class="horizontal layout flex-2 nowrap">	
+
+		  	<button on-tap="_computeSelectedQuestions()">++</button>
+		</section>
+	  </paper-material>
+	   <div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+	     		<section style="max-height: 350px;">
+	     	<array-selector 
+				id="selector" 
+				items="{{menuArray}}" 
+				selected="{{selected}}" 
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu
+	    		class="flex layout horizontal"							
+		  		style="min-width: 360px; max-width: 96%" 
+		  		on-select="toggleSelection" 
+		  		id="passagesListFromDB"
+		  		data-source="{{menuArray}}" 
+		  		selected="{{selected}}"
+		  		>
+		  	</fc-dropdown-menu>
+	     		</section>
+	     		<section>
+	     		<iron-list 
+
+
+	     		>
+
+
+		
+		
+	     		</iron-list>
+	     		</section>
+	  </div>
+	  </paper-header-panel> 
+	</template>
+<script>
+Polymer({
+	is: "fc-question-type-setter",
+	behaviors: [Polymer.IronResizableBehavior],
+	listeners: {'iron-resize': '_onIronResize'},
+	properties: {
+		menuArray: {
+			type: Array,
+			notify: true
+		},
+	selected: {
+		type: Array,
+		notify: true
+
+	},
+	passageSet:{
+		type: Object,
+		notify: true
+
+	},
+	selectedQuestions: {
+		type: String,
+		computed: "_computeSelectedQuestions(selected, menuArray, passageSet)",
+		notify: true
+	},
+	searchValue:{
+		type: String,
+		notify: true
+
+	},
+	searchArray: {
+		type: Array,
+		computed: "_computeSearchArray(searchValuem,menuArray)",
+		notify: true
+	},
+
+	lineNumbers: {
+		type: Number,
+		value: function(){
+		return 180;
+		},
+		notify: true
+	},
+	lineNumberArray: {
+		  type: Array,
+		  computed: '_computeLineNumberArray(selected, menuArray)',
+		  notify: true
+		  }, 
+
+
+	}, //end of properties
+
+
+
+attached: function() { 
+	this.getPassagesTwo(); 
+	 this.addEventListener("mouseover", this.setMeasureParams);
+},
+	_computeSelectedQuestions: function(selected, menuArray, passageSet) {var returnValue;
+		var keys = Object.keys(passageSet);
+		if (selected ==keys[1])
+			{
+			returnValue= "testone";
+			}
+		else if (selected==keys[6])
+		{
+			returnValue= "testtwo";
+		}
+		else if (selected ==keys[11])
+		{
+			returnValue= "testthree";
+		}
+		else if (selected == keys[12])
+		{
+			returnValue= "testfour";
+		}
+		console.log(returnValue);
+		alert(returnValue);
+		return returnValue;
+		
+	
+
+
+
+	},
+	_computeSearchArray: function (searchValue, menuArray){ 
+
+
+
+
+		},
+ getPassagesTwo: function()
+ {
+		var self=this;
+		self.passageSet={};
+		self.menuArray=[];
+		var ref=new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
+			ref.on("value", function(snapshot){
+				var pset = snapshot.val();
+				self.set("passageSet", snapshot.val());
+				var keys = Object.keys(pset);
+				console.log(keys, self.passageSet);
+				var counter = keys.length;
+				while(counter >0){ 
+					counter--;
+					
+					self.push("menuArray", pset[keys[counter]]);
+					
+				}
+				
+  				});
+		},
+_computeLineNumberArray: function(selected, menuArray){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			
+     		// this.notifyResize();
+			return this.arrayNums;
+		},
+    
+
+	 _onIronResize: function(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     console.log(ht);
+	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams):this._computeLineNumberArray();
+
+	 },
+	  setMeasureParams: function(){
+	  
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     console.log(ht);
+	      if(!isNaN(ht) && ht>20)
+	      	{
+	      	this.set("lineNumbers", ht);
+	      	 this.removeEventListener("mouseover",this.setMeasureParams);
+	      	 this.notifyResize;}
+
+	  },
+
+	
+
+_theContentFilter: function(firstWordIndex, lastWordIndex) {
+	// if(!isNaN(lastWordIndex)){
+	//   return (item) =>{
+	// 	return (item.wordIndex >= firstWordIndex && item.wordIndex <= lastWordIndex);
+	//   };
+	// } else {
+	//   return (item) =>{
+		return true;
+	//   };
+	// }
+  },
+
+
+  _numberFilter: function(lineNumbers) {
+	return (item) =>{
+	  return (item.number <= lineNumbers);
+	    };
+	  } 
+	
+	
+					
+});
+</script>
+</dom-module>

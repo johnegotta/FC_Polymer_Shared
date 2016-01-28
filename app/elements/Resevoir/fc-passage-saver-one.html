@@ -1,0 +1,883 @@
+<dom-module id="fc-passage-saver-one">
+<template>
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+    div.line-number {
+	width: 28px;
+	height: 20px;
+	line-height: 1.2;
+	font-size: 16pt;
+	/*font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+	padding: 2px 4px;
+	margin: 5px;
+
+
+    }
+    .paper-material-header{
+    	min-height: 65px; 
+    	padding: 12px 6px 4px 6px; 
+    	font-weight: 600; 
+    	background: aliceblue; 
+    	font-size: 20pt; 
+    	border-bottom: 1px solid #000088; 
+    	color: #000088;
+    	
+    }
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    .blurb-class{
+    	max-width: 670px; 
+    	padding: 4px 0px 4px 8px; 
+    	font-size: 12pt; 
+    	line-height: 1.05;
+    	font-style: oblique;
+
+    }
+
+    .highlighted {
+	background: yellow;
+    }
+
+    div.text {
+	line-height: 1.2;
+	font-size: 16pt;
+     /* font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	padding: 2px 0px 8px 4px;
+	margin: 5px;
+	min-height: 900px !important;
+	display: flex;
+	min-width: 300px !important;
+	max-width: 680px !important;
+    }
+    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; width: 96%;}
+</style>            
+<div class="horizontal layout flex nowrap">
+	<div class="layout flex-2">
+    	<paper-header-panel class="layout flex nowrap text" mode="waterfall" style="height: 93vh; margin: 12px; padding: 12px 36px 12px 36px; border: 3px ridge silver;">
+		<div 
+			class="paper-header self-stretch nowrap horizontal layout flex" 
+			id="headerPanel" 
+			style="margin-bottom: 12px; max-height: 75px; border-bottom: 1px solid #efefef;"
+			> 
+		<section class="horizontal layout flex-2 nowrap">	
+			<array-selector 
+				id="selector" 
+				items="{{passagesWordArrays}}" 
+				selected="{{selected}}" 
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+	    		class="flex layout horizontal"							
+		  		style="min-width: 360px; max-width: 96%" 
+		  		on-select="toggleSelection" 
+		  		id="passagesList" 
+		  		data-source="{{passagesWordArrays}}" 
+		  		selected="{{selected}}"
+		  		>
+		  	</fc-dropdown-menu>
+		</section>
+		
+		</div>
+	    	<div class="layout vertical flex" style="height: 1900px;">
+	     		<section 
+	     			class="blurb-class"
+	     			>
+	     			[[selected.0.passageBlurb]]
+	     		</section>
+
+		<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+		<div id="lineNumbers" class="layout vertical line-number">
+		  <div class="line-numbers" id="linesA1">Lines</div>
+		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+			  <span hidden="{{item.show}}">&nbsp</span>
+		    </template> 
+		  </div>
+			  <!--passage-1-column-1 container-->
+	    <div id="firstColumn" class="layout horizontal flex wrap text">
+		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 8px; max-width: 600px;">
+	
+		  <template is="dom-repeat" items="{{selected}}" id="aDarnedTemplate" filter="">
+			<template is="dom-if" if="{{item.newPara}}">
+			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+			</template>
+			<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
+		     <a id$="A[[item.wordIndex]]_transition" style="" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a>
+		  
+		  </template>
+		  <br class="line-numbers">
+		  <hr>
+		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+		</article>
+		<code id="code" style="opacity: 0;">[[passageOneWordArray.0.passageType]]</code>
+	    </div>
+	    
+	    </div>
+
+	  </div>
+		</paper-header-panel>
+	</div>
+	<div class="layout flex-3">
+		<paper-header-panel class="vertical layout"  mode="waterfall" style="height: 93vh; padding: 6px 6px 24px 6px; font-weight: 600; margin-top: 12px; background: #fff; border: 3px ridge silver; font-size: 20pt; color: #000088;">
+  			<paper-material class="paper-header layout horizontal paper-material-header">
+  			<section style="font-size: 20px;">Passage Details:</section>
+  			<section class="horizontal layout flex self-stretch">
+  				<paper-input 
+  					label="New Save Destination" 
+  					class="layout horizontal flex"
+  					style="width: 100%;"
+  					value="{{newDatabasePath}}">
+  				</paper-input>
+  				<paper-input
+  			  		label="Current Save Destination"
+  			  		class="layout horizontal flex"
+  					style="width: 100%;" 
+  			  		value="{{currentDatabasePath}}">
+  			 	</paper-input>
+  			 </section>
+  			</paper-material>
+  			<div class="layout vertical">
+    				<section class="layout horizontal flex nowrap">
+    					<paper-textarea style="width: 50%;" value="{{inputPassageTitle}}" label="Passage Title"></paper-textarea>
+    					<paper-textarea style="width: 50%;" value="{{inputPassageBlurb}}" label="Passage Blurb"></paper-textarea>
+    				</section>
+    			
+					<section class="horizontal layout flex nowrap">
+						<fc-input-prime 
+		    				input-type="text" 
+		    				value="{{inputTestNumber}}"
+		    				class="flex horizontal layout" 
+		    				label="Test Number">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				value="{{inputSectionNumber}}"
+		    				class="flex horizontal layout" 
+		    				label="Section Number">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				value="{{inputPassageNumber}}" 
+		    				label="Passage Number">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				value="{{inputTestId}}"
+		    				class="flex horizontal layout" 
+		    				label="Test Id">
+		    			</fc-input-prime>
+		    			<fc-passage-type-selector 
+							input-label="Passage Type" 
+							input-value="{{inputPassageType}}"
+							class="flex horizontal layout"
+							>
+						</fc-passage-type-selector>
+					</section>
+					<section class="horizontal layout flex nowrap">
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				class="flex horizontal layout"
+		    				value="{{inputPassageSubtype}}" 
+		    				label="Passage Sub-Type">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				class="flex horizontal layout"
+		    				value="{{inputPassageComments}}" 
+		    				label="Additional Comments">
+		    			</fc-input-prime>
+
+		    			<fc-input-prime 
+		    				input-type="number" 
+		    				max="14" 
+		    				min="8" 
+		    				class="flex horizontal layout"
+		    				style="padding-top: 9px;"
+		    				label="Nos. Questions">
+
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="number"
+		    				max="12"
+		    				min="0"
+		    				class="flex horizontal layout"
+		    				style="padding-top:9px;"
+		    				label="Nos. Citation Questions">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="number"
+		    				max="12"
+		    				min="0"
+		    				class="flex horizontal layout"
+		    				style="padding-top:9px;"
+		    				label="Nos. Citations">
+		    			</fc-input-prime>
+		    			</section>
+		    			<section class="horizontal layout flex nowrap">
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Insert Citations">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		    				value="{{inputTestId}}" 
+		    				label="Test Id">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		    				value="{{inputFcid_test}}" 
+		    				label="FCID REDUNDANT">
+		    			</fc-input-prime>
+		    		</section>
+		
+		     		<section class="horizontal layout flex nowrap">
+		    				<fc-input-prime type="checkbox" 
+		    					input-type="checkbox" 
+		    					label="Charts" 
+		    					checked-prop="{{inputHasCharts}}">
+		    				</fc-input-prime>
+			    			<fc-input-prime 
+			    				type="checkbox" 
+			    				input-type="checkbox" 
+			    				label="Double Passage" 
+			    				checked-prop="{{inputIsDoublePassage}}">
+			    			</fc-input-prime>
+	  						<fc-input-prime 
+	  							type="checkbox" 
+	  							input-type="checkbox" 
+	  							label="Is Focused Test?" 
+	  							checked-prop="{{inputIsFocused}}">
+	  						</fc-input-prime>
+
+	  						<fc-input-prime type="checkbox" 
+		    					input-type="checkbox" 
+		    					label="Charts" 
+		    					checked-prop="{{inputHasCharts}}">
+		    				</fc-input-prime>
+			    			<fc-input-prime 
+			    				type="checkbox" 
+			    				input-type="checkbox" 
+			    				label="Double Passage" 
+			    				checked-prop="{{inputIsDoublePassage}}">
+			    			</fc-input-prime>
+	  						<fc-input-prime 
+	  							type="checkbox" 
+	  							input-type="checkbox" 
+	  							label="Is Focused Test?" 
+	  							checked-prop="{{inputIsFocused}}">
+	  						</fc-input-prime>
+	  				</section>
+		
+			<paper-material class="paper-material-header horizontal layout"><paper-button on-tap="saveLocal" style="width: 100%; color: green; max-height: 75px; border: 2px solid #eaeaea;">Enter Details</paper-button>
+    			<paper-button on-tap="getText" style="max-height:  90px; color: gray; width: 100%; border: 1px solid #efefef;">Load Text</paper-button>
+  			</paper-material>
+   			<div class="flex vertical layout" id="firepad">
+    		</div> 
+			<section class="horizontal layout flex nowrap">
+			<paper-button on-tap="saveToDb" style="max-height: 90px; color: gray; width: 100%; border: 1px solid #efefef;">Save Data</paper-button>
+    		<paper-button on-tap="saveDatabase" style="max-height: 75px; color: gray;  width: 100%; border: 2px solid #efefef;">Retrieve Save</paper-button>
+			</section>
+			<section>
+    			<paper-button on-tap="clearInputs" style="width: 100%;color: gray; max-height: 75px; border: 2px solid #efefef; margin-bottom: 200px;"> Clear Data</paper-button>
+
+			<!-- 	<fc-input-prime type="range" max="10" min="0" label="Passage Difficulty" style="border: 2px solid #efefef;" class="flex horizontal layout center" input-type="range"></fc-input-prime>
+    			<fc-input-prime type="range" max="6" min="0"  label="Vocabulary Focus" style="border: 2px solid #efefef;" class="flex horizontal layout center" input-type="range"></fc-input-prime>   -->
+   	 		</section>	
+	  	</div>
+	</paper-header-panel>
+	</div>
+	<div class="layout flex-2 vertical">
+	<fc-passage-db-display>
+	</fc-passage-db-display>
+	</div>
+
+	  </div>
+
+</template>
+<script>
+'use strict';
+    (
+	function() {
+	class fcPassageSaverOne {
+	   get behaviors() { 
+	    return [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.PassageDataBehavior
+		  ];
+	   }
+	   beforeRegister() {
+
+	this.is = 'fc-passage-saver-one';
+	    this.properties = {
+	  
+	    estimatedHeight: {
+			type: Number,
+			value: function(){
+			  var estimatedHeight=Math.ceil(screen.height*.895);
+		 	return estimatedHeight;
+			},
+			notify: true,
+			reflectToAttribute: true 
+	    }, 
+	    passagesWordArrays:{
+			type: Array,
+			value: function(){return []},
+			notify: true
+	    },
+	    lineNumberArray: {
+		  	type: Array,
+		  	computed: '_computeLineNumberArray(passageOneWordArray)',
+		  	notify: true
+		  },
+		isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+		  },
+	    hasCharts:{
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+
+	    },
+	    inputHasCharts: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+	    passageType: {
+	    	type: String,
+	    	value: function(){
+	    		return "";
+	    	},
+	    	notify: true
+	    	},
+
+		inputPassageTitle:{
+			type: String,
+			value: function(){
+		    return "";},
+			notify: true
+		},
+		inputPassageType:{
+			type: String,
+			value: function(){
+		    	return "";
+		    },
+			notify: true
+		},
+	    inputPassageBlurb:{
+	    	type: String,
+			value: function(){
+		    	return "";
+		    },
+			notify: true
+	    },
+	    inputTestId:{
+			type: String,
+			value: function(){
+		    	return "";
+		    },
+			notify: true
+	    },
+	    testId:{
+	    	type: String,
+	    	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	    inputFcid_test:{
+			type: String,
+			computed: "_computeInputFcid_test(inputTestId)",
+			notify: true
+	    },
+	    fcid_test: {
+	    	type: String,
+			value: function(){
+		    	return "";
+		    },
+			notify: true
+	    },
+	    inputIsDoublePassage: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+	    isDoublePassage: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+
+	    },
+	    inputIsFocused: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+	    isFocused: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+
+	    inputIsDoublePassage: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+	    isDoublePassage: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+		currentHeight:{
+		  type: Number,
+		  value: function(){
+		    return 920;
+		  },
+		  notify: true
+		}, 
+		currentZ:{
+		  type: Number,
+		  value: function(){
+		    return 1;
+		  },
+		  notify: true
+		},
+	    yourName: {
+		  	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	
+	    passageTitle: {
+			value: function(){
+		    return "";},
+			notify: true
+	    },
+	    passageBlurb:{
+			value: function(){
+		    return "";},
+			notify: true
+		},
+	
+	    transitionArray: {
+			type: Array,
+			value: [],
+			notify: true
+	    },
+	    paragraphArray: {
+			type: Array,
+			value: [],
+			notify: true
+	    },
+
+	    truePassageArray:{
+			type: Array,
+			value: [],
+			notify: true
+	    },
+	    passageWordArrayOrdered:{
+			type:Array,
+			value: [],
+			notify: true
+	    },
+	    passageArray:{
+		type:Array,
+		value: [],
+		notify: true
+	    }, 
+	   
+	    orderIndex: {
+		type: Number, 
+		value: 0,
+		notify: true
+	    },
+	    columnOne: {
+		type: Boolean,
+		value: false,
+		notify: true,
+		reflectToAttribute: true
+	    },
+
+	minTarra: {        
+	  type: Array,
+	  value: function(){
+	    return  [];
+	    },
+	  notify: true,
+	},
+	
+	holderArray: {
+	  type: Array,
+	  value: function(){
+	    return  this.passageThreeWordArray;
+	    },
+	  notify: true,
+	  reflectToAttribute: true
+	},
+
+	minTranArray:{
+	  type: Array,
+	  notify: true,
+	}, 
+
+	secondPassage: {
+	  type: Boolean,
+	  value: false,
+	  notify: true,
+	  reflectToAttribute: true
+	},
+
+	lineNumbers: {
+		type: Number,
+		value: function(){
+		return 180;
+		},
+		notify: true
+	}, 
+	firepadPassageWordArrays:{
+		type: Array,
+		value: function(){
+			return [];
+		},
+		notify: true
+	}, 
+
+	hitSaveOne:{
+		type: Boolean,
+		value: function(){
+			return false;
+		},
+		notify: true
+	}  
+		
+    };
+
+	  this.listeners = {'iron-resize': '_onIronResize',
+	    };
+	   }
+	
+	 attached(){
+	 	this.loadFirepad();
+	     }
+	 _computeInputFcid_test(inputTestId){
+	 		var returnValue= inputTestId.toString();
+	 		return "_" + returnValue;
+	     }
+		
+	 saveLocal(){
+	 	this.set('passageBlurb', this.inputPassageBlurb);
+		this.set('passageType', this.inputPassageType);
+		this.set('hasCharts', this.inputHasCharts);
+		this.set('isFocused', this.inputIsFocused);
+		console.log(this.inputHasCharts, this.inputIsCollegeBoard, this.inputIsDoublePassage, this.inputIsFocused, this.hasCharts, this.isCollegeBoard, this.isFocused, this.isDoublePassage);
+		this.set('isDoublePassage', this.inputIsDoublePassage);
+		this.set('testId', this.inputTestId);
+		this.set('isCollegeBoard', this.inputIsCollegeBoard);
+	    this.set("fcid_test", this.inputFcid_test);//change these values
+	    this.set("testSource", this.inputTestSource);
+		(this.inputPassageTitle=="" && this.inputPassageBlurb!=="" && this.inputIsCollegeBoard == true)?  this.set("passageTitle", this.inputPassageBlurb.match(/“[^”]*”/g)) && console.log(this.inputPassageBlurb.match(/“[^”]*”/g)): this.inputPassageTitle!==""? this.set("passageTitle", this.inputPassageTitle): alert("A title is Required for Drop Down Menus"); 
+	
+	
+		this.set("testId", this.inputTestId);
+	    this.set("fcid_test", this.inputFcid_test);//change these values
+	    this.set("testSource", this.inputTestSource); //drop down of sources needed!!!
+	    this.$.isFocused.checked=this.isFocused;
+	    this.$.isCollegeBoard.checked=this.isCollegeBoard;
+	    this.$.isDoublePassage.checked=this.isDoublePassage;
+	    this.$.hasCharts.checked=this.hasCharts;
+	    	console.log(this.inputIsFocused, this.$.isFocused.checkedProp, this.$.isFocused.myChecked, this.$.isFocused.checked, this.isFocused);
+	 }
+
+	 getText(){
+	 	var passageContent = this.firepad.getText();
+	 	
+
+	 	this.set("hitSaveOne", true);
+
+	 console.log(passageContent);
+ 	console.log("I am in hitSaveOne");
+    	
+    	var self=this;
+    	var passageContent = self.firepad.getText();
+		// self.set('passageBlurb', self.inputPassageBlurb);
+		// self.set('passageType', self.inputPassageType);
+		// self.set("passageTitle", self.inputPassageTitle);
+		// var matches = self.passageBlurb.match(/“[^”]*”/g);
+		// console.log(matches, "see if we have a title");
+
+		var truePassageContent = passageContent.replace(/[\—]/g, " — ");
+		var arrayPassed=truePassageContent.split(/\s/g);
+		var order =arrayPassed.length;
+		self.orderIndex=0;
+		self.paragraphArray = truePassageContent.split(/\n/);
+		  self.passageArray = [];
+		  var i = self.paragraphArray.length-1;
+		  var blurb = this.passageBlurb;
+		var passageTitle = this.passageTitle;
+		var passageType = this.passageType;
+		var test = this.testId;
+		var fcid = this.fcid;
+		  for(; i>= 0; i--)
+		    {
+			  //console.log(i + " " + self.paragraphArray[i]);
+			var wordCounter = 0;
+			var newPara = false;
+			var wordArray = self.paragraphArray[i].split(/\s/g);
+			var paraWordRemaining = wordArray.length-1;
+			var paragraph_number = Math.ceil(i/2);
+			var isLastWordOfPara =false;
+			var currentWord;
+			var orderIndex = self.orderIndex;
+
+			while(paraWordRemaining>=0)
+			// para word loop
+			{       
+			    self.orderIndex++;
+			    order--;
+			    self.wordCounter--;
+			    if (paraWordRemaining==0){
+				newPara = true;
+				
+				
+			    }
+			    else if(wordCounter==0)
+			    { 
+		  
+				isLastWordOfPara = true;
+			    }
+			    else{
+				newPara=false;
+				isLastWordOfPara=false;
+			    
+			    }
+				
+				currentWord = wordArray[paraWordRemaining];               
+				self.push("passageArray",
+				  { 
+				    "passageTitle": this.passageTitle,
+				    "passageBlurb": this.passageBlurb,
+				    "indexPrime":orderIndex,
+				    'order': order,
+				    'word' : currentWord, 
+				    'newPara': newPara,
+				    'paragraph_number': paragraph_number,
+				    'isLastWordOfPara':isLastWordOfPara,
+				    'paragraphsRemaining': i
+				  });
+				wordCounter++;
+				paraWordRemaining--;
+			    } //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
+			  }//SINGLE line loop
+	    //this is the paragraph for loop
+	    
+	  var qtip= self.passageArray.length;
+	    var z=0;
+		  var upperbound= Math.floor(qtip*(1-.578));
+		  var upperboundholder=upperbound;
+		  var lowerbound = Math.ceil(qtip*(1-.675));
+		  var lowerboundholder=lowerbound;
+		  var numTWords = upperbound-lowerbound;
+	   
+	    // console.log(self.passageArray);
+	    self.minTarra=[];
+	    self.transitionArray=[];
+	    self.passageWordArrayOrdered=[];
+	    for(let passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
+	    {
+	
+		if(z==0){
+		  var upperbound= Math.floor(passageArrayLength*(1-.578));
+		  var upperboundholder=upperbound;
+		  var lowerbound = Math.ceil(passageArrayLength*(1-.675));
+		  var lowerboundholder=lowerbound;
+		  let numTWords = upperbound-lowerbound;
+		  let q=1;
+		  for(;upperbound>=lowerbound; upperbound--){
+
+		    let pickle= passageArrayLength-upperbound;
+		    var firstPickle=passageArrayLength-upperboundholder;
+		    var secondPickle=passageArrayLength-lowerboundholder;
+		    self.push('transitionArray', { 
+					'indextransitionArray':pickle ,
+					'word': self.passageArray[upperbound].word,
+					'numberOrder': q,
+					'transition_total':numTWords,
+					'L8ofFst': ((q<=22)?true:false),
+					'happy': true,
+					'lowerbound': firstPickle,
+					'upperbound': secondPickle
+					});
+		    if(q<=22){self.push('minTarra', {'word':self.passageArray[upperbound].word, 'passageIndex':pickle, 'isMinTarra': true});}
+			  q++;
+			  lowerbound++;
+			}  
+
+
+		   
+	     
+		 self.push('passageWordArrayOrdered',
+				   {  'wordIndex': z,
+					"passageType": this.passageType,
+					"passageTitle": this.passageTitle,
+					"menuLabel": this.passageTitle,
+					"menuItem": this.passageTitle,
+					"passageBlurb": this.passageBlurb,
+					"total_word_count": passageArrayLength, 
+					"number_transition_words": numTWords,                   
+					"transitionArray":self.transitionArray,
+					"has_charts": this.hasCharts,
+					"is_double_passage": this.isDoublePassage,
+					"Focused Test": this.isFocused
+						 });
+	    
+	    }
+	    else{
+
+		var miniUpper=secondPickle-21;
+		self.push('passageWordArrayOrdered', 
+		    {       'wordIndex': z,
+				    'word' : self.passageArray[passageArrayLength].word, 
+				    'newPara': self.passageArray[passageArrayLength].newPara,
+				    'paragraph_number': self.passageArray[passageArrayLength].paragraph_number,
+				    'isLastWordOfPara':self.passageArray[passageArrayLength].isLastWordOfPara,
+				    'is_transitionWord': (z>=firstPickle&&z<=secondPickle)?true:false,
+				    'is_miniTarra': ((z>=miniUpper && z<=secondPickle)?true: false),
+
+
+			});
+		}
+		z++;
+	  }
+	  	console.log(self.passageWordArrayOrdered);
+	   	self.push('passagesWordArrays', self.passageWordArrayOrdered);
+		self.push('firepadPassageWordArrays', self.passageWordArrayOrdered);
+		    order=0;
+	}
+	saveToDb(){
+		if(this.passageTitle!==""){ 
+		var self=this;
+		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
+		ref.child("passage_" + self.fcid_test).set(self.passageWordArrayOrdered);
+					
+		console.log(`transition array in zero ${JSON.stringify(self.firepadPassageWordArrays)}`);
+	    self.set('passageArray', null);
+	    self.set('passageWordArrayOrdered',null);
+	
+	    self.passageWordArrayOrdered=[];
+	    self.passageArray=[];
+	    self.set('transitionArray', null);
+	    self.set("passageType", null);
+	    self.set("passageBlurb", null);
+	    self.set('hitSaveOne', false);   
+	  }
+	  else {
+	  	this.openDialog();
+	  }
+	}
+	clearInputs(){
+		this.set("passageType", null);
+	    this.set("passageBlurb", null);
+		this.set('hasCharts', false);
+		this.set('isFocused', false);
+		this.set('isCollegeBoard', false);
+		this.set('isDoublePassage', false);
+		this.set("testSource", null);
+		this.set('testId', null);
+		this.set("fcid_test",null);
+		this.set("passageTitle", null);
+	
+
+		this.set('inputHasCharts', false); 
+		this.set('inputIsCollegeBoard', false); 
+		this.set('inputIsDoublePassage', false); 
+		this.set('inputIsFocused', false);
+		this.set('inputPassageType', null);
+		this.set('inputPassageBlurb', null);
+		this.set('inputFcid_test', null);
+		this.set('inputTestId', null);
+		this.set('inputTestSource', null);
+		this.set("inputPassageTitle", null);
+	}
+
+
+	  _computeLineNumberArray(passageOneWordArray){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			return this.arrayNums;
+			}
+    
+
+	 _onIronResize(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     console.log(ht);
+	     (!isNaN(ht))?this.set("lineNumbers", ht):this._computeLineNumberArray();
+
+	 }
+	  setMeasureParams(){
+	  
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     console.log(ht);
+	     (!isNaN(ht))?this.set("lineNumbers", ht):this._onIronResize();
+
+	  }
+
+	
+
+_theContentFilter(firstWordIndex, lastWordIndex) {
+	// if(!isNaN(lastWordIndex)){
+	//   return (item) =>{
+	// 	return (item.wordIndex >= firstWordIndex && item.wordIndex <= lastWordIndex);
+	//   };
+	// } else {
+	//   return (item) =>{
+		return true;
+	//   };
+	// }
+  }
+
+
+  _numberFilter(lineNumbers) {
+	return (item) =>{
+	  return (item.number <= lineNumbers);
+	    };
+	  } 
+	
+	}
+    Polymer(fcPassageSaverOne);
+  })();
+</script>
+</dom-module>

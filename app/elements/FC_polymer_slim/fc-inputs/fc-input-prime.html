@@ -4,7 +4,7 @@
 	display: block;
 	padding: 3px;
 	margin: 3px;
-	background: white;
+	background: inherit;
 	@apply(--vertical-layout-flex);
 
 }
@@ -15,51 +15,57 @@ span.radio: {
 	left: 8px;
 	left-margin: 3px;
 }
-input{ padding: 4px;}
+input{ padding: 4px;
+margin: 4px;
+@apply(--horizontal-layout-flex);}
 
 section[name=section1].text {
  border: 0px solid #999;
 
   font-family: merriweather;
-  font-size: 18px;
+  font-size: 14px;
   color: #008;
-  font-weight: 700;
+  font-weight: 600;
  
   padding: 8px;
 }
 label.datetime-local{
 font-family: merriweather;
- font-size: 14pt;
+ font-size: 14px;
  font-weight: 600;
 	padding-left: 6px;
 	color: #008;
 }
 
 iron-icon{display: none;}
-input.text, input.datetime-local, input.date,  input.range,  .number, input.tel,  input.email{
+input.text, input.datetime-local, input.date,  input.range, input.tel,  input.email{
 
   border: 0px solid #999;
   border-bottom: 2px solid #008;
   font-family: merriweather;
-  font-size: 14pt;
+  font-size: 14px;
+  background: inherit;
 }
 section: {
 	min-width: 147px;
-	max-width: 420px;
+	max-width: 620px;
 	margin: auto;
 	padding: auto;}
-.wrapper{max-width: 360px;}
+.wrapper{max-width: 660px;}
 .wrapper-text-focus{
 
-	color:  #00b33c;
+	color: blue;
+	font-weight: 700;
 
 }
 input.text:focus, input.datetime-local:focus, input.date:focus,  input.range:focus,  .number:focus, input.tel:focus,  input.email:focus {
 	border: 0px dashed #fff;
 	outline: 0px;
 	box-shadow:0px;
-	border-bottom:2px solid #00b33c;
-	color:  #brown;
+	border-bottom:2px solid blue;
+	color:  brown;
+	font-weight: 700;
+
 }
 input[type=button]{
 background: #efefef;
@@ -67,7 +73,7 @@ background: #efefef;
 	height: 64px;
 	color: black;
 	outline: 0px;
-	font-size: 14pt;
+	font-size: 14px;
 	font-family: merriweather;
 	font-weight: 500;
 
@@ -88,18 +94,29 @@ iron-icon[name=icon]{display: block;}
 /*icon3 moves to right of inputs*/
 
 input.number{ border: 0px solid #999;
+	border-bottom:2px solid #008;
   font-family: merriweather;
-  font-size: 24px;
+  font-size: 14px;
   color: #008;
-padding: 4px;}
+padding:4px;
+margin: 4px;
+line-height: .5;}
+
 label.datetime-local{
 font-family: merriweather;
- font-size: 14pt;
+ font-size: 14px;
  font-weight: 600;
 	padding-left: 6px;
 	color: #008;
 
 
+}
+label.number {
+	margin-left: 4px;
+	padding: 2px 2px 0px 2px;
+	margin: 0px; height: 16px;
+
+	font-size: 14px;}}
 }
 .twocolumn{
 
@@ -109,7 +126,7 @@ font-family: merriweather;
 iron-icon[name=icon5].checkbox{display: inline-block;}
 label.checkbox {
     display: inline-block;
-    background: white;
+    background: inherit;
 	float: right;
     padding:2px;
     margin: 2px;
@@ -125,9 +142,15 @@ input[type=checkbox]{
     
 
 }
+label.range{
+	font-size: 14px;
+}
+span.range{
+	font-size: 14px;
+}
 input[type=checkbox]:checked{
    outline: 3px solid green;
-   background: green;
+   background: inherit;
 }
 /*.wrapper-checkbox-checked{
 	color: green;
@@ -138,12 +161,12 @@ input[type=checkbox]:checked{
 
 :host.wrapper-checkbox-checked label.wrapper-checkbox-checked{
 	color: green;
-	font-weight: 700;
+	font-weight: 600;
 	padding-right: 10px;
 	margin-right: 10px;
 }
 label.checkbox{
-	font-size: 22px;
+	font-size: 14px;
 	padding-right: 4px;
 	margin-right: 4px;
 	@apply(--horizontal-layout)
@@ -151,11 +174,11 @@ label.checkbox{
 /*radio buttons*/
 input[type=radio]:checked {outline: 3px ridge green;}
 label.radio{
-	font-size: 22px;
+	font-size: 14px;
 	float: right;
 }
 label.radio.test{
-font-size: 14pt;
+font-size: 12pt;
 }
 
 input[type=radio]{
@@ -182,6 +205,7 @@ input.range{
 @apply(--flex-stretch-self);
 width: 120%;
 }
+label{padding-left: 4px;}
 </style>
 <template>
 
@@ -225,7 +249,6 @@ width: 120%;
 		</label>
 <!--Note removed their value attribute... was binding without;
 will return if must-->
-[[value]]
 		<input 
 			is="iron-input" 
 			id$="[[inputId]]"
@@ -356,8 +379,8 @@ FcInputPrime=Polymer({
 			type:String,
 			notify: true,
 			value:function(){
-				return "icons:dashboard";},
-			reflectToAttribute: true
+				return "icons:dashboard";}
+			
 		},
 		icon2:{
 			type:String,
@@ -369,12 +392,13 @@ FcInputPrime=Polymer({
 			type: String,
 			computed: "_computeInputId(inputType, inputName)", /*this should be hostId, hostContextpartially or mostly for mapping and avoiding weak key maps*/
 			notify: true,
-			reflectToAttribute: true
+			
 		},
 		
 		inputType:{
 			type: String,
 			observer: '_triggerInputTransformation',
+			value: function(){return "text";},
 			notify: true
 		},
 		isIcon: {
@@ -414,8 +438,7 @@ FcInputPrime=Polymer({
 				var labelId = "labelId_" + (rndNum.getTime() + Math.floor((Math.random() * 10000) + 1)).toString();
 				return labelId;
 				},
-			notify: true,
-			reflectToAttribute: true
+			notify: true
 			},
 		localName:{
 			type: String,
@@ -444,21 +467,18 @@ FcInputPrime=Polymer({
 		inputValue:{
 			type: String,
 			notify: true,
-			reflectToAttribute: true
-
-
 		},
 		hostAttribute:{
 			value:{
 				notify: true,
-				reflectToAttribute: true
+	
 			}
 		},
 		horizontal:{
 			type: String,
 			computed: '_computeHorizontal(inputType)',
 			notify: true,
-			reflectToAttribute: true
+		
 		},
 		buttonName: {
 			type: String,
@@ -466,7 +486,7 @@ FcInputPrime=Polymer({
 				return "";
 			},
 			notify: true,
-			reflectToAttribute: true
+		
 		},
 		myChecked: {
 			type: Boolean,
@@ -474,7 +494,7 @@ FcInputPrime=Polymer({
 				return false;
 			},
 			notify: true,
-			reflectToAttribute: true
+
 		},
 		eventsOneThroughFive:{
 			type: Function,

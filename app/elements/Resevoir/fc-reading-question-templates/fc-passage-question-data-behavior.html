@@ -1,249 +1,55 @@
-<dom-module id="fc-rqtversionc">
-<template>
-<style>
-:host {height: 99200px; width: 100%;
-background: white;
-	}
-	a {
-		height: 50px;
-		max-width: 150px;
-	}
-</style>
-
-
-<paper-header-panel mode="waterfall" class="vertical layout flex wrap" style="max-width: 100vw; background: white; border: 3px solid blue; min-height: 25500px;max-height: 99800px;">
-<div style="background: cyan;" class="paper-header layout horizontal">
-<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
-<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
-<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
-<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
-<select style="width:200px" label="Regex">
-  <template is="dom-repeat" items="[[regexMatchResults]]">
-    <option value={{item}}>{{item}}</option>
-  </template>
-</select>
-<select style="width:200px" on-change="setSelectedPattern" label="Q Pattern">
-	<option value="NONE"></option>
-  <template is="dom-repeat" items="[[commonPatterns]]" sort="sortPatterns">
-    <option value={{item.pattern}}>{{item.pattern}}</option>
-  </template>
-</select>
-<select style="width:200px" on-change="setSelectedACPattern" label="A Pattern">
-	<option value="NONE"></option>
-  <template is="dom-repeat" items="[[commonACPatterns]]" sort="sortPatterns">
-    <option value={{item.pattern}}>{{item.pattern}}</option>
-  </template>
-</select>
-<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
-<paper-input label="Answer Filter I" style="max-width: 190px; padding: 5px;" value="{{oneAA}}"></paper-input>
-<paper-input label="Answer Filter II" style="max-width: 190px; padding: 5px;" value="{{twoAA}}"></paper-input>
-<paper-input label="Answer Filter III" style="max-width: 190px; padding: 5px;" value="{{threeAA}}"></paper-input>
-
-<fc-input-prime type="checkbox" input-type="checkbox" label="Add Answer Filter" value="{{addAnswers}}"></fc-input-prime>
-<fc-input-prime type="checkbox" input-type="checkbox" label="Fill All Inputs To Get Results" value="{{looseSearch}}"></fc-input-prime>
-</div>
-<div class="horizontal layout flex self-stretch" style="height: 50000px; padding: 0px; 24px;">
-<!--
- <section class="vertical flex layout"
-<template is="dom-repeat" items="{{testone}}">
-
-<div style="background: cyan; height: 100px;" class="paper-header head header panel layout horizontal">
-<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
-		
-
-</template>
-</section> -->
-<fc-dictionary></fc-dictionary>
-
-<a>ecstatic</a>
-<br><br>
-<a>Belligerent</a>
-<br><br>
-<paper-textarea value="{{currentDefinition}}" style="max-width:300px">
-</paper-textarea>
-<paper-tooltip for="{{currentId}}">{{currentDefinition}}</paper-tooltip>
-<paper-button style="background:green" on-tap="logDictionary">Check Dictionary</paper-button>
-<firebase-collection location="https://focusedstaging1.firebaseio.com/questions" data="{{fbquestions}}"></firebase-collection>
-<section class="vertical flex layout" style="max-width: 440px; padding: auto; margins: auto;">
-<template is="dom-repeat" items="{{fbquestions}}" filter="{{_matchWords(patterns)}}">
- <!-- filter="{{_matchWords(patterns)}}"--> 
-<paper-material always-float-label="true" label="Questions" style="border:2px solid #008;  padding: 24px; margin: 10px;">
-<!-- 	<div id="{{item.questionId}}"> {{_computeQuestionNumber(index)}}. {{item.stem}}</div><br>
- -->
- 		<div id="{{item.fcid}}"> {{item.fcid}}. {{item.stem}} </div>
- 	<template is="dom-repeat" items="{{item.answerChoices}}" as="choice">
-		<div class="layout horizontal">
-			<input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}">
-			<input type="radio" name="flat{{item.fcid}}{{choice.index}}{{choice.letter}}">
-			<div id="{{choice.fcid}}"><a>{{choice.letter}}.&nbsp {{choice.choiceContent}}</a>
-			</div>
-		</div>
-	</template>
-</template>
-</paper-material>
-<!--
-<paper-textarea always-float-label="true" label="Questions T2" style="border:2px solid #008;  padding: 24px; margin: 10px;" value='{{item.QT}}
-
-{{item.AA}}    {{looseSearch}}
-{{item.BB}}  
-{{item.CC}}  
-{{item.DD}}  
-	    		'</paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout" >
-<template is="dom-repeat" items="{{testone}}" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" style="border:2px solid #008; padding: 24px; margin: 10px;" label="Questions T1" value='{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}  
-{{item.DD}}  
-	    		'></paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout">
-<template is="dom-repeat" items="{{testthree}}" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" label="Questions T3" style="border:2px solid #008; padding: 24px; margin: 10px;" value='{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}
-{{item.DD}}  
-	    		'></paper-textarea>   
-</template>
-</section>
-<section class="vertical flex layout">
-<template is="dom-repeat" items="{{testfour}}" as="item" filter="{{_matchWords(patterns)}}">
-<paper-textarea always-float-label="true" label="Questions T4" style="border:2px solid #008; padding: 24px; margin: 10px;" value='
-{{item.QT}}
-
-{{item.AA}}    
-{{item.BB}}  
-{{item.CC}}
-{{item.DD}}  
-  				'></paper-card>   
-</template>
-
--->
-</section> 
-
-</div>
-</paper-header-panel>
-</paper-material>
-
-
-
-</template>
-
 <script>
-FcRqtversionc=Polymer({
-	is: 'fc-rqtversionc',
-	behaviors: [FCBehaviors.dictionaryBehavior],
-	properties: {
-		patterns: {
-			type: Array,
-			computed: "_computePatterns(one, two, regexFilter, selectedPattern, oneAA, twoAA, threeAA)",
-			notify: true
-			},
-		fcquestions:{
-			type: Array,
-			computed: "_computeFcQuestions(isFirepad, Jason)"
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.PassageQuestionDataBehavior = {
+properties:{
+	T1S1P1properties: {
+		type: Array,
+		computed: "_myPropertiesFunction(questionsPassageOne)",
+		notify: true
+	},
+	questionsPassageOne: {
+		type: Number,
+		value: function(){
+			return 10;
 		},
-		selected: {
-			type: String,
-			computed: "_onMySelected(mySelected)",
-			notify: true
+		notify: true
+	},
+	T1S1P2properties: {
+		type: Array,
+		computed: "_myPropertiesFunction(qP2)",
+		notify: true
+	},
+	qP2: {
+		type: Array,
+		value: function(){
+			return [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 		},
-		one:{
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
+		notify: true
+	},
+	T1S1P3properties: {
+		type: Array,
+		computed: "_myPropertiesFunction(qP3)",
+		notify: true
+	},
+	qP3: {
+		type: Array,
+		value: function(){
+			return [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33];
 		},
-		fbquestionsone:{
-			type: Array,
-			notify: true
-		},
-		two: {
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
-		},
-		regexFilter: {
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
-		},
-		one_a:{
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
-		},
-		two_a: {
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
-		},
-		three_a: {
-			type: String,
-			value: function(){
-				return "";
-			},
-			notify: true
-		},
-		regexMatchResults: {
-			type: Array,
-			value: [],
-			notify: true
-		}, 
-		commonPatterns: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		commonACPatterns: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		selectedPattern: {
-			type: String,
-			value: "",
-			notify: true
-		},
-		looseSearch:{
-			type: String, 
-			value: function(){
-				return "looseSearch";
-			},
-			notify: true
-		},
-		jason:{
-			type: String,
-			notify: true
+		notify: true
+	},
 
-		},
-		
-		addAnwers: {
-			type: String, 
-			value: function(){
-				return "true";
-				},
-			notify: true	
-			},
-		/*
 
-		testone: {
+
+	},
+
+
+
+
+
+	},
+
+	testone: {
 			type: Array,
 			value: function(){
 			return [{ "_q": "1. Which choice best describes what happens in the passage?",
@@ -299,7 +105,7 @@ FcRqtversionc=Polymer({
 				 "_b": "(B)  custom.",
 				 "_c": "(C) structure.",
 				 "_d" : "(D) nature."
-},
+				},
 				{"_q": "9. Why does Akira say his meeting with Chie is “a matter of urgency” (line 32)?",
 				 
 				 "_a": "(A) He fears that his own parents will disapprove of Naomi.",
@@ -629,8 +435,6 @@ FcRqtversionc=Polymer({
 			},
 		notify: true
 		},
-
-
 		testtwo: {
 			type: Array,
 			value: function(){
@@ -1836,398 +1640,3 @@ FcRqtversionc=Polymer({
 		},
 		notify: true
 	}
-	*/
-},
-
-_computeQuestionNumber: function(argIndex)
-{
-	return (argIndex % 52) + 1;
-},
-
-ready: function(){
-	this.loadQuestionsFirepad();
-},
-// },
-attached: function()
-{
-	this.regexMatchResults = [];
-	this.selectedPattern = "";
-	console.log(this.regexMatchResults);
-},
-
-logDictionary: function(e)
-{
-	console.log(this.dictionary);
-},
-
-setSelectedPattern: function(e)
-{
-	console.log(e);
-	this.selectedPattern = e.target.value;
-
-},
-	setIsFirepad: function(firepadfunction){
-		if(firepadfunction==true){
-			this.set("isFirepad", true);
-		}
-	},
-
-setSelectedACPattern: function(e)
-{
-	this.setSelectedACPattern = e.target.value;
-},
-
-loadPatternsSelect: function()
-{
-//	var pat = document.querySelector("#fcpatternmatcher");
-	var pat = this.$.fcpatternmatcher;
-	console.log(pat.matches);
-	var keys = Object.keys(pat.matches);
-	var numKeys = keys.length;
-	var resultArray = [];
-	for(i=0; i<numKeys;i++)
-	{
-		resultArray.push(pat.matches[keys[i]]);
-	}
-	this.set("commonPatterns", resultArray);
-	console.log(this.commonPatterns);
-	keys = Object.keys(pat.answerMatches);
-	numKeys = keys.length;
-	var acArray = [];
-	for(i=0; i<numKeys;i++)
-	{
-		acArray.push(pat.answerMatches[keys[i]]);
-	}
-	this.set("commonACPatterns", acArray);
-},
-
-clearMatches: function()
-{
-	this.set("regexMatchResults", []);
-	//console.log(this.regexMatchResults);
-	this.regexFilter = this.regexFilterTwo;
-},
-
-_computePatterns: function(one,two,regexFilter, selectedPattern, oneAA,twoAA,threeAA){
-
-	return [one,two, regexFilter, selectedPattern, oneAA, twoAA, threeAA];
-},
-
-sortPatterns: function(argOne, argTwo)
-{
-	if(!argOne || !argTwo)
-	{
-		return 0;
-	}
-	//console.log(argOne);
-	var lenOne = argOne.pattern.split(" ").length;
-	var lenTwo = argTwo.pattern.split(" ").length;
-	//console.log("lenOne = " + lenOne + " and lenTwo = " + lenTwo);
-	if(lenOne == lenTwo)
-	{
-		if(argOne.pattern == argTwo.pattern)
-		{
-			return 0;
-		}
-		else
-		{
-			return (argOne.pattern > argTwo.pattern ? 1: -1);
-		}
-	}
-	else
-	{
-		return (lenOne > lenTwo? -1 : 1);
-	}
-},
-
-_matchWords:function(patterns)
-{
-  	if (!patterns)
-  	{
-          return null; // set filter to null to disable filtering
-    }
-    else
-    {
-    	var numFilters = patterns.length;
-       	for(i = 0; i < numFilters; i++)
-        {
-        	patterns[i] = patterns[i].toLowerCase();
-        }
-        var self = this;
-        //console.log(this.regexMatchResults);
-        return function(item) {
-            //var question = item.QT.toLowerCase();
-            //console.log(item);
-            var question = item.stem.toLowerCase();
-            var filterOn = false;
-            var filterResults = false;
-            for(i = 0; i < numFilters; i++)
-            {
-            	filterOn |= (patterns[i] != "");
-            	if(patterns[i] != "")
-            	{
-            		if(i == 2) //regex filter. hack!! fix this!!
-            		{
-            			var pat = patterns[i];
-            			//console.log(pat);
-            			var rez = question.match(RegExp(pat));
-            			if(rez != null)
-            			{
-            				var numMatches = rez.length;
-            				var old = self.regexMatchResults;
-            				//console.log(rez[0]);
-            				//console.log(self.regexMatchResults);
-            				for(j=0; j<numMatches; j++)
-            				{
-            					self.push("regexMatchResults", rez[j]);
-            				}
-            				//self.set("regexMatchResults", old);
-						}
-						//console.log("about to update filterResults, and regexMatchResults = ");
-						//console.log(self.regexMatchResults.length);
-
-            			filterResults |= (rez != null);
-            		}
-            		else
-            		{
-            			filterResults |= (question.indexOf(patterns[i]) > -1);
-            		}
-            	}
-            }
-            //console.log(filterResults);
-            return (filterOn==false) ? true : filterResults;
-        }
-    }
-},
-
-
-findLineNumbers: function()
-{
-	var savingArray=[this.testone,this.testtwo,this.testthree,this.testfour];
-	var argString;
-	var qabcd =["_q","_a","_b","_c","_d"];
-	var qarray=["Qf","Af","Bf","Cf", "Df"];
-	for(var i=0; i<4; i++){
-		for(var j=0;j<52;j++){
-			for(var pi=0; pi<5; pi++){
-			
-			argString =savingArray[i][j][qabcd[pi]];
-				
-				var matches = argString.match(/\(?lines [0-9]+-[0-9]+\)?/g);
-				if(matches != null)
-				{
-					//console.log("found line num string = " + matches);
-					var numMatches = matches.length;
-					for(var k = 0; k < numMatches; k++)
-					{	
-						var lineNum;
-						if(k>0){lineNum+=" ";}
-					 	lineNum=matches[k];
-				
-					savingArray[i][j][qarray[pi]]+=lineNum;
-					console.log(lineNum);
-					}
-				
-				}
-				var matches = argString.match( /\(?line [0-9]+\)?/g ); 
-				if(matches != null)
-				{
-				
-					var numMatches = matches.length;
-					for(var k = 0; k < numMatches; k++)
-					{	
-						var lineNum;
-						if(k>0){lineNum+=" ";}
-					 	lineNum=matches[k];
-				
-					savingArray[i][j][qarray[pi]]+=lineNum;
-					}
-
-				}
-				
-				matches = argString.match(/the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last|final|penultimate) paragraph/g);
-				if(matches != null)
-				{
-					var numMatches = matches.length;
-					for(var k = 0; k < numMatches; k++)
-					{	
-						var lineNum;
-						if(k>0){lineNum+=" ";}
-					 	lineNum=matches[k];
-				
-					savingArray[i][j][qarray[pi]]+=lineNum;
-					}
-				}
-				}
-			}
-		}
-				// return argString;
-	},
-
-  _saveFB_Test_1Qs: function(key, value){
-  			var savingNameArray=['testone', 'testtwo', 'testthree', 'testfour'];
-  			var savingArray=[this.testone,this.testtwo,this.testthree,this.testfour];
-			var argString;
-			var _qabcd =["_q","_a","_b","_c","_d"];
-			var _QABCD=["Q","A","B","C","D"];
-			var qabcdefghijkl=["q","a","b","c","d","e", "f", "g", "h","i","j","k","l"];
-			for(var i=0; i<4; i++)
-			{
-				var test =savingArray[i];
-				for(var j=0;j<52;j++)
-				{
-					var question = test[j];
-					if(i==0)
-					{
-		 			question._ptype=(j<11)?"fiction; japan; 1920; class;": (j>10 && j<22)? "social science, journalism, pop-economics, the economics of giving; has chart;":(j>21 && j<32)? "Rosalind Gosling: Watson and Crick Fraud; Women in Science; Past injustice; Science; Genetics; HAS CHART;": (j>31&&j<42)? "Virginia Wolf, Three Gineas; Women's Rights; Family; Nauseating Boredom;":"Double Space Mining; Economics; Science; Future;";
-		 			// question._qtype="gettoUndit";
-		 			question._p=(j<11)?"P1": (10<j && j<22)?"P2":(21<j && j<32)?"P3": (j>31 &&j<42)?"P4":"P5_P6";
-		 			(question._p=="P3" || question._p =="P2")? question[_QABCD[k]+"l"]=true:question[_QABCD[k]+"l"]=false;
-		 					(question._p=="P5_P6")?question[_QABCD[k]+"m"]=true: question[_QABCD[k]+"m"]=false;
-		 			}
-		 			else if(i==1)
-		 				{	question._ptype=(j<11)?"fiction; fiction; the Professor, Charlotte Bronte, 724 words; 4 sentences; Voice Narrative; narrative is by a man; Off putting, she does not hit the mark;": (j>10 && j<22)? "social science, journalism, pop-economics, sort-of ethics and philosophy; Adam Smith; Econ Fluff; the economics of giving; HAS CHARTS;":(j>21 && j<33)? "DOUBLE PASSAGE WEB about the web; vague science about the web; NO charts;": (j>32&&j<43)? "Libby Cady Stanton, long passage, 1869; suffrage; civil rights history; NO CHART": "Natural science; undersea waves; Undersea waves; natural science; HAS CHARTS: map of waves; topography";
-		 					question._p=(j<11)?"P1": (10<j && j<22)?"P2":(21<j && j<33)?"P3": (j>32 &&j<43)?"P4_P5":"P6";
-		 					(question._p=="P6" || question._p =="P2")? question[_QABCD[k]+"l"]=true:question[_QABCD[k]+"l"]=false;
-		 					(question._p=="P4_P5")?question[_QABCD[k]+"m"]=true: question[_QABCD[k]+"m"]=false;
-		 				}
-		 			else if(i==2)
-		 				{	question._ptype=(j<11)?"fiction;Mrs. Quabarl, 1911 SAKI; Woman Greets a Governess at the train station: again a piece on manners; social position; and 'coming up'": (j>10 && j<21)? "social science, urban planning, population dynamics, polution, sort-of ethics and philosophy;Fluff piece again; modern; HAS CHARTS;":(j>20 && j<31)? "Thor Handson: Biology; Evolotion. Birds flying; Natural Science;": (j>30&&j<42)? "DOUBLE PASSAGE; SOCIAL SCIENCE EDUCATION WOMEN`s Rights; report on public instruction, education for women; Second Passage: Mary Wolstencraft: rights of women; life of women; both from 1790s; dirrect response; She slams the first side;": "Natural science; the bees... colony collapse disorder; HAS CHARTS;";
-		 				question._p=(j<11)?"P1": (10<j && j<21)?"P2":(20<j && j<31)?"P3": (j>30 &&j<42)?"P4_P5":"P6";
-		 				(question._p=="P6" || question._p =="P2")? question[_QABCD[k]+"l"]=true:question[_QABCD[k]+"l"]=false;
-		 					(question._p=="P4_P5")?question[_QABCD[k]+"m"]=true: question[_QABCD[k]+"m"]=false;
-		 				}
-		 			else if(i==3)
-		 				{	question._ptype=(j<11)?"fiction; Set in 1897; Modern Writer; Swedish Scientists set out for the north pole in a hydrogen-think Hindenburg here kids-baloon. Adventure in the world before time;": (j>10 && j<22)? "social science, low brow economics; Cities & Demographics; Suburbs Cities;Fluff piece again; migration; modern; HAS CHARTS;":(j>21 && j<32)? "Natural Science: Emily Anthes: frankenstein's cat; genetic manipulation; cloning; engineered medicine; positive take, although slow to acknowledge the frankenstein nature of her actual descriptions. No chart;": (j>30&&j<42)? "DOUBLE PASSAGE; SOCIAL CONTRACT: 1890 Edmund Burke French Revolution; Thomas Paine 1791 Rights of Man; Social Contract; No charts;": "Natural science; atmospheric science; geology; radio carbon dating; cause of a medieval erruption different distant volcanos caused a cooling period in Europe; HAS CHARTS;";
-		 					question._p=(j<11)?"P1": (10<j && j<21)?"P2":(20<j && j<31)?"P3": (j>30 &&j<42)?"P4_P5":"P6";
-		 					(question._p=="P6" || question._p =="P2")? question[_QABCD[k]+"l"]=true:question[_QABCD[k]+"l"]=false;
-		 					(question._p=="P4_P5")?question[_QABCD[k]+"m"]=true: question[_QABCD[k]+"m"]=false;
-		 				}
-		 			question._t="T" + (i+1).toString();
-		 			question._sec="S1";
-		 			question._qindex=j.toString();
-		 			question._qfcid="_" + question._t+question._sec+question._p+"Q" + (j+1).toString();
-					for(var k=0; k<5; k++){
-					var part =question[_qabcd[k]];
-					var wordlist = part.split(" ");
-					question[_QABCD[k] + "n"]=wordlist.shift();
-		 				question[_QABCD[k]+"a"] = wordlist.slice(0,3).join(" "); 
-		 				question[_QABCD[k]+"b"]=wordlist.slice(3,5).join(" ");
-		 				question[_QABCD[k]+"c"]=(wordlist.slice(5,7)!==undefined && wordlist.slice(5,7)!==null)?(wordlist.slice(5,7).join(" ")):"";
-		 				question[_QABCD[k]+"d"]=(wordlist.slice(7,10)!==undefined && wordlist.slice(7,10)!==null)?(wordlist.slice(7,10).join(" ")):"";
-		 				question[_QABCD[k]+"e"]=(wordlist.slice(10,wordlist.length)!==undefined && wordlist.slice(10,wordlist.length)!==null)?(wordlist.slice(10,wordlist.length).join(" ")): "";
-		 				
-
-		 			console.log(question.Qf);
-		 				
-
-
-		 				this.push("objectArray",{
-
-		 				//"_qtype": question._qtype, //question type
-		 				"_p":  question._p,// passage number
-		 				"_t":  question._t, //test numberX
-		 				"Qn" : question.Qn, //question number
-		 				"_q":  question._q, //whole question
-		 				"_sec":question._sec,
-		 				"Qa":  question.Qa,
-		 				"Qb":  question.Qb,
-		 				"Qc":  question.Qc,
-		 				"Qd":  question.Qd,
-		 				"Qe":  question.Qe,
-		 				// "Qf":  question.Qf, //Line
-		 				//"Qg":  question.Qg, // quotes
-		 				// "Qh":  question.Qh, //explanation
-		 				// "Qi":  question.Qi, //context 
-		 				// "Qj":  question.Qj, // source evidence for explanation link
-		 				// "Qk":  question.Qk,
-		 				"Ql": question.Ql, 	//passage has charts
-		 				"Qm": question.Qm, //passage is double 
-		 				"_qfcid": question._qfcid,
-		 				"_qindex":  question._qindex, // Comments[i+1]	
-
-
-		 				"_a" : question._a, //whole answer
-		 				"Aa":  question.Aa,
-		 				"Ab":  question.Ab,
-		 				"Ac":  question.Ac,
-		 				"Ad":  question.Ad,
-		 				"Ae":  question.Ae,
-		 				// "Af":  question.Af, //lineNumbers
-		 				// "Ag":  question.Ag, // quotes
-		 				// "Ah":  question.Ah, //explanation
-		 				// "Ai":  question.Ai, //context 
-		 				// "Aj":  question.Aj, // source evidence for explanation link
-		 				// "Ak":  question.Ak,
-		 				"Al": question.Al, //has Charts
-		 				"Am": question.Am,// is double 
-		 				"An": "(A)",
-
-
-		 				"_b" :  question._b, //whole answer
-		 				 "Ba":  question.Ba,
-		 				 "Bb":  question.Bb,
-		 				 "Bc":  question.Bc,
-		 				 "Bd":  question.Bd,
-		 				 "Be":  question.Be,
-		 				 // "Bf":  question.Bf, //lineNumbers
-		 				// "Bg":  question.Bg, // quotes
-		 				// "Bh":  question.Bh, //explanation
-		 				// "Bi":  question.Bi, //context 
-		 				// "Bj":  question.Bj, // source evidence for explanation link
-		 				// "Bk":  question.Bk, // Comments
-		 				"Bl": question.Bl, //has Charts
-		 				"Bm": question.Bm,// is double		 				
-		 				"Bn": "(B)",
-
-		 				 "_c" : question._c, //whole answer
-		 				 "Ca":  question.Ca,
-		 				 "Cb":  question.Cb,
-		 				 "Cc":  question.Cc,
-		 				 "Cd":  question.Cd,
-		 				 "Ce":  question.Ce,
-		 				  // "Cf":  question.Cf, //lineNumbers
-		 				// "Cg":  question.Cg, // quotes
-		 				// "Ch":  question.Ch, //explanation
-		 				// "Ci":  question.Ci, //context 
-		 				// "Cj":  question.Cj, // source evidence for explanation link
-		 				// "Ck":  question.Ck, // Comments
-		 				"Cl": question.Cl, //has Charts
-		 				"Cm": question.Cm,
-						"Cn": "(C)",
-
-		 				"_d" :  question._d, //whole answer
-		 				 "Da":  question.Da,
-		 				 "Db":  question.Db,
-		 				 "Dc":  question.Dc,
-		 				 "Dd":  question.Dd,
-		 				 "De":  question.De,
-		 				 // "Df":  question.Df, //lineNumbers
-		 				// "Dg":  question.Dg, // quotes
-		 				// "Dh":  question.Dh, //explanation
-		 				// "Di":  question.Di, //context 
-		 				// "Dj":  question.Dj, // source evidence for explanation link
-		 				// "Dk":  question.Dk, // Comments
-		 				"Dl": question.Dl, //has Charts
-		 				"Dm": question.Dm, // is double		 				
-		 				"Dn": "(D)"	
-		 				});
-				}
-		 	}
-	
-
- 		var selfie=this;
- 		this.findLineNumbers();
- 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingQuestionsTwo");
- 		ref.child(savingNameArray[i]).set(savingArray[i]);
- 	}
- },
-
-_computePatterns: function(one,two,three,one_a,two_a,three_a){
-
- 	return [one, two, three, one_a, two_a, three_a];
- }
-        
-});
-</script>
-</dom-module>
