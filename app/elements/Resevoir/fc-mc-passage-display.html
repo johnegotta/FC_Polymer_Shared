@@ -1,0 +1,294 @@
+<dom-module id="fc-mc-passage-display">
+<template>
+<style>
+
+		div.columnContainer{
+			overflow-y: scroll;
+		}
+		div.passageContainer{
+			min-width: 310px;
+			max-width: 1450px !important;
+			margin: 48px;
+		}
+		.highlighted {
+			background: yellow;
+		}
+		div.blurb{
+			line-height: .9;
+			font-size: 1.00em;
+			font-family: merriweather;
+			font-weight: 500;
+			font-style: italic;
+			display: block;
+		}
+
+</style>
+<!--double-column line-number and passage vertical container-->
+<div id="fcmcpassagedisplay" style="width: 98%;">
+	<div>{{user}} logged in</div>
+	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
+		<select on-change="changePassage" style="width:400px">
+			<template is="dom-repeat" items="{{passageArray}}">
+				<option value="{{_computePassageId(index)}}">{{item.title}}</option>
+			</template>
+		</select>
+	<!--blurb full width container-->
+		<h2>{{passage.title}}</h2>
+		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+			{{passage.blurb}}
+		</div>
+		<br>
+		<div class="line-numbers" id="linesA1">Lines</div>
+
+	<!--single column container-->
+		<!-- <firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> -->
+		<div class="layout horizontal">
+		<div id="line-numbers" class="layout vertical line-number">
+		    <template is="dom-repeat" items="{{lineNumberArray}}"> <!--filter="{{_numberFilter(lineNumbers)}}"> -->
+			  <span hidden="{{_computeHidden(index)}}" id$="{{_computeLineNumber(index)}}">{{item}}</span>
+			  <span hidden="{{_computeHidden(index)}}">&nbsp</span>
+		    </template> 
+		</div>
+		<template is="dom-repeat" items="{{passage.wordArray}}">
+			<template is="dom-if" if="{{item.newPara}}">
+			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+			</template>
+			<!--<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>-->
+		     <a id$="A[[index]]_transition" >{{item.word}}</a>&nbsp<!--style="background:green;"-->
+		</template>
+		</div>
+		<br>
+		<br>
+		<paper-tooltip for="{{currentId}}">{{currentDefinition}}</paper-tooltip>
+		<div>{{currentDefinition}}</div>
+		<paper-button on-tap="exploreDom" style="background:red">Explore Dom</paper-button>
+		<!-- end-of-column-1 line number and text container-->
+
+	</div>
+<!--End of Vertical passage container-->
+</div>
+</template>
+<script>
+Polymer({
+	is:'fc-mc-passage-display',
+	behaviors: [Polymer.IronResizableBehavior, FCBehaviors.dictionaryBehavior],
+	properties: {
+		passagePath: {
+			type: String,
+			value: 'passage1',
+			notify: true,
+			reflectToAttributes: true
+		},
+		user: {
+			type: String,
+			value: ""
+		},
+		passage: {
+			type: Object,
+			value: {},
+		},
+		passages: {
+			type: Object,
+			value: {}
+		},
+		passageRootPath: {
+			type: String,
+			value: function(){
+				return 'https://focusedstaging1.firebaseio.com/mcpassageDestinations/';
+			},
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageFullPath: {
+			type: String,
+			value: '',
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageArray:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		lineNumberArray: {
+			type: Array,
+			value: [],
+			notify: true
+		}
+		 /*,
+		}
+		passageTitle: {
+			type: String,
+			notify: true,
+			reflectToAttributes: true
+		},
+		passageBlurb:{
+			type: String,
+			notify: true
+		},
+		lastWordIndexOfFirst: {
+			type: Number,
+			notify: true
+		},
+		firstWordIndexOfSecond: {
+			type: Number,
+			notify: true
+		},
+		finalWordIndex: {
+			type: Number,
+			notify: true
+		},
+		lastRowIndexOfFirst: {
+			type: Number,
+			notify: true
+		},
+		firstRowIndexOfSecond: {
+			type: Number,
+			computed: 'computeFirstRowIndexOfSecond(lastRowIndexOfFirst)',
+			notify: true
+		},
+		showingSecondColumn: {
+			type: Boolean,
+			value: false,
+			observer: 'splitPassageForColumns',
+			notify: true,
+			reflectToAttributes: true
+		},
+	    growingFirstColumn: {
+	      type: Boolean,
+	      value: false,
+	      notify: true
+	    }
+	    */
+	},
+
+	authDataCallback: function(authData) {
+		console.log(authData);
+		console.log(this);		
+  		if (authData) {
+    		console.log("User " + authData.uid + " is logged in with " + authData.provider);
+    		this.user = authData.password.email;
+  		}
+  	},
+
+	ready: function(){
+		var self=this;
+		self.passageArray = [];
+
+		for(j=0;j<50;j++)
+		{
+			this.push("lineNumberArray", j+1);
+		}
+
+		console.log(this.passageRootPath);
+		var ref = new Firebase(this.passageRootPath);
+		ref.onAuth(this.authDataCallback.bind(this));
+
+		ref.once("value", function(snap) {
+			//console.log("added", snap.key());
+			self.passages = snap.val();
+			console.log(self.passages);
+			self.passage = self.passages[self.passagePath];
+			var keys = Object.keys(self.passages);
+			var numP = keys.length;
+			for(i=0;i<numP;i++)
+			{
+				self.push("passageArray", self.passages[keys[i]]);
+			}
+			console.log(self.passageArray);
+			//self.passageBlurb=self.passageArray[1].passageBlurb;
+			//self.finalWordIndex=self.passageArray.length;
+			console.log(self.passage);
+			//self.splitPassageForColumns;
+			//ref.off();
+		});
+	},
+
+	changePassage: function(e)
+	{
+		console.log(e.target.value);
+		this.anchorsWired = false; //recalculate dictionary listeners for new passage
+		this.currentDefinition = "Word Not Found";
+		this.passage = this.passages[e.target.value];
+	},
+
+	_computePassageId: function(argIndex)
+	{
+		return "passage" + (argIndex+1).toString();
+	},
+
+	_computeHidden: function(argIndex)
+	{
+		var lineNum = argIndex + 1;
+		return (lineNum % 5 != 0);
+	},
+
+	_computeLineNumber: function(argIndex)
+	{
+		return "LN" + (argIndex+1).toString();
+	},
+
+	exploreDom: function(e)
+	{
+		console.log(e);
+		var anchors = this.querySelectorAll("a");
+		console.log(anchors);
+		var dom = this.querySelectorAll("*");
+		console.log(dom);
+	}
+	/*
+	altMethod: function(e){
+		
+		// USED IN CONJUNCTION WITH FIREBASE-COLLECTION
+		// THIS ONE ALLOWS IT TO GO TO MULTIPLE INSTANCES OF PASSAGE DISPLAY, 
+		// BUT THE PASSAGE DISPLAY ON THE LEFT SIDE STILL WON'T USE ITS SECOND COLUMN AT ALL
+		
+		//console.log(e);
+		this.passageBlurb=self.passageArray[1].passageBlurb;
+		this.finalWordIndex=self.passageArray.length;
+		console.log(this, "JUST GOT FIREBASE PASSAGE", this.passageArray, e);
+		//Line above always logs the second instance of passage display
+		this.splitPassageForColumns();
+	},
+	setUp: function()
+	{
+		this.screenTrueHeight =  (window.innerHeight-320);
+		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
+		if(this.$.noJudge4.clientWidth >= 640) {
+			this.showingSecondColumn = true;
+		} else {
+			this.showingSecondColumn = false;
+		}
+		this.splitPassageForColumns();
+	},
+
+	splitPassageForColumns: function(){
+		console.log(this.id, "IN splitPassageForColumns")
+		if(this.showingSecondColumn == true){
+			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
+			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+      		this.readjustWordSplit();
+		} else {
+			this.lastWordIndexOfFirst = this.finalWordIndex;
+		}
+	},
+
+	readjustWordSplit: function(){
+	    this.growingFirstColumn = !this.growingFirstColumn;
+	    if(this.growingFirstColumn == true) {
+	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst - this.querySelector('#firstColumn').wordsOffBottom();
+	      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+	    } else {
+	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst + this.querySelector('#secondColumn').wordsOffTop();
+	      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
+	      this.readjustWordSplit();
+	    }
+	},
+
+	computeFirstRowIndexOfSecond: function(lastRowIndexOfFirst){
+		return lastRowIndexOfFirst + 1;
+	}
+	*/
+});
+</script>
+</dom-module>

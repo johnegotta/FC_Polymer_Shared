@@ -7,6 +7,10 @@ background: white;
 padding: 24px;
 
 	}
+	a {
+		height: 50px;
+		max-width: 150px;
+	}
 </style>
 
 
@@ -16,13 +20,20 @@ padding: 24px;
 <paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
 <paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
 <paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
-<select style="width:200px">
+<select style="width:200px" label="Regex">
   <template is="dom-repeat" items="[[regexMatchResults]]">
     <option value={{item}}>{{item}}</option>
   </template>
 </select>
-<select style="width:200px" on-change="setSelectedPattern">
-  <template is="dom-repeat" items="[[commonPatterns]]">
+<select style="width:200px" on-change="setSelectedPattern" label="Q Pattern">
+	<option value="NONE"></option>
+  <template is="dom-repeat" items="[[commonPatterns]]" sort="sortPatterns">
+    <option value={{item.pattern}}>{{item.pattern}}</option>
+  </template>
+</select>
+<select style="width:200px" on-change="setSelectedACPattern" label="A Pattern">
+	<option value="NONE"></option>
+  <template is="dom-repeat" items="[[commonACPatterns]]" sort="sortPatterns">
     <option value={{item.pattern}}>{{item.pattern}}</option>
   </template>
 </select>
@@ -35,7 +46,8 @@ padding: 24px;
 <fc-input-prime type="checkbox" input-type="checkbox" label="Fill All Inputs To Get Results" value="{{looseSearch}}"></fc-input-prime>
 </div>
 <div class="horizontal layout flex self-stretch" style="height: 50000px; padding: 0px; 24px;">
-<!-- <section class="vertical flex layout"
+<!--
+ <section class="vertical flex layout"
 <template is="dom-repeat" items="{{testone}}">
 
 <paper-input value="{{item.QT}}"></paper-input>
@@ -46,6 +58,16 @@ padding: 24px;
 
 </template>
 </section> -->
+<fc-dictionary></fc-dictionary>
+
+<a>ecstatic</a>
+<br><br>
+<a>Belligerent</a>
+<br><br>
+<paper-textarea value="{{currentDefinition}}" style="max-width:300px">
+</paper-textarea>
+<paper-tooltip for="{{currentId}}">{{currentDefinition}}</paper-tooltip>
+<paper-button style="background:green" on-tap="logDictionary">Check Dictionary</paper-button>
 <firebase-collection location="https://focusedstaging1.firebaseio.com/questions" data="{{fbquestions}}"></firebase-collection>
 <section class="vertical flex layout" style="max-width: 440px; padding: auto; margins: auto;">
 <template is="dom-repeat" items="{{fbquestions}}" filter="{{_matchWords(patterns)}}">
@@ -121,6 +143,7 @@ padding: 24px;
 <script>
 FcRqtversionc=Polymer({
 	is: 'fc-rqtversionc',
+	behaviors: [FCBehaviors.dictionaryBehavior],
 	properties: {
 		patterns: {
 			type: Array,
@@ -175,6 +198,11 @@ FcRqtversionc=Polymer({
 			notify: true
 		}, 
 		commonPatterns: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		commonACPatterns: {
 			type: Array,
 			value: [],
 			notify: true
@@ -1809,10 +1837,20 @@ attached: function()
 	console.log(this.regexMatchResults);
 },
 
+logDictionary: function(e)
+{
+	console.log(this.dictionary);
+},
+
 setSelectedPattern: function(e)
 {
 	console.log(e);
 	this.selectedPattern = e.target.value;
+},
+
+setSelectedACPattern: function(e)
+{
+	this.setSelectedACPattern = e.target.value;
 },
 
 loadPatternsSelect: function()
@@ -1829,6 +1867,14 @@ loadPatternsSelect: function()
 	}
 	this.set("commonPatterns", resultArray);
 	console.log(this.commonPatterns);
+	keys = Object.keys(pat.answerMatches);
+	numKeys = keys.length;
+	var acArray = [];
+	for(i=0; i<numKeys;i++)
+	{
+		acArray.push(pat.answerMatches[keys[i]]);
+	}
+	this.set("commonACPatterns", acArray);
 },
 
 clearMatches: function()
@@ -1841,6 +1887,33 @@ clearMatches: function()
 _computePatterns: function(one,two,regexFilter, selectedPattern, oneAA,twoAA,threeAA){
 
 	return [one,two, regexFilter, selectedPattern, oneAA, twoAA, threeAA];
+},
+
+sortPatterns: function(argOne, argTwo)
+{
+	if(!argOne || !argTwo)
+	{
+		return 0;
+	}
+	//console.log(argOne);
+	var lenOne = argOne.pattern.split(" ").length;
+	var lenTwo = argTwo.pattern.split(" ").length;
+	//console.log("lenOne = " + lenOne + " and lenTwo = " + lenTwo);
+	if(lenOne == lenTwo)
+	{
+		if(argOne.pattern == argTwo.pattern)
+		{
+			return 0;
+		}
+		else
+		{
+			return (argOne.pattern > argTwo.pattern ? 1: -1);
+		}
+	}
+	else
+	{
+		return (lenOne > lenTwo? -1 : 1);
+	}
 },
 
 _matchWords:function(patterns){
@@ -1859,7 +1932,7 @@ _matchWords:function(patterns){
         //console.log(this.regexMatchResults);
         return function(item) {
             //var question = item.QT.toLowerCase();
-            console.log(item);
+            //console.log(item);
             var question = item.stem.toLowerCase();
             var filterOn = false;
             var filterResults = false;

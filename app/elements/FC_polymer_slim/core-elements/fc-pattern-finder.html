@@ -11,6 +11,7 @@ PATTERNS
 
 <paper-button style="background:red" role="button" raised on-tap="findPatterns">Patterns</paper-button>
 <paper-button style="background:blue" role="button" raised on-tap="persistQuestions">Save to Firebase</paper-button>
+<paper-button style="background:orange" role="button" raised on-tap="persistPatterns">Save Patterns</paper-button>
 
 <div class="horizontal layout">
 	<div>
@@ -76,6 +77,11 @@ FcPatternFinder=Polymer({
 			notify: true
 		},
 		matches: {
+			type: Object,
+			value: {},
+			notify: true
+		},
+		answerMatches: {
 			type: Object,
 			value: {},
 			notify: true
@@ -150,6 +156,7 @@ attached: function()
 	this.qList = ["As used in line 2, “form” most nearly means", "Which choice best describes what happens in the passage?", "Which choice best describes the developmental pattern of the passage?", "The authors’ use of the words “exact,” “specific,” and “complement” in lines 47-49 in the final paragraph functions mainly to", "As used in line 19, “demands” most nearly means"];
 	this.questionList = {};
 	this.matches = {};
+	this.answerMatches = {};
 	this.questionArray = [];
 	if(this.autoMode == true)
 	{
@@ -157,6 +164,9 @@ attached: function()
 		console.log("loaded questions");
 		this.findPatterns();
 		console.log("found patterns");
+		this.findAnswerChoicePatterns();
+		console.log("found answer choice patterns");
+		console.log(this.answerMatches);
 	}
 },
 
@@ -182,6 +192,21 @@ sortMatches: function(argOne, argTwo)
 	{
 		return (lenOne > lenTwo? -1 : 1);
 	}
+},
+
+persistPatterns: function()
+{
+	console.log("I am persisting patterns");
+	var keys = Object.keys(this.matches);
+	var numKeys = keys.length;
+	var saveObj = {};
+	for(i=0; i<numKeys; i++)
+	{
+		saveObj['/patterns/' + keys[i]] = this.matches[keys[i]];
+	}
+	var fb = new Firebase("https://focusedstaging1.firebaseio.com/");
+	console.log(saveObj);
+	fb.update(saveObj);
 },
 
 persistQuestions: function()
@@ -358,9 +383,9 @@ stripLineNum: function(argString)
 	return argString;
 },
 
-isDupe: function(argMatchObj)
+isDupe: function(argMatchObj, argIsStem)
 {
-	var keys = Object.keys(this.matches);
+	var keys = argIsStem == true ? Object.keys(this.matches): Object.keys(this.answerMatches);
 	//console.log(keys.length);
 	var result = false;
 
@@ -370,7 +395,7 @@ isDupe: function(argMatchObj)
 	for(i = 0; i < numKeys; i++)
 	{
 		//check argument pattern match object against existing matches
-		var match = this.matches[keys[i]];
+		var match = argIsStem == true? this.matches[keys[i]] : this.answerMatches[keys[i]];
 		if(argMatchObj.pattern == keys[i])
 		{
 			//exact pattern already in the match list; duplicate
@@ -402,6 +427,101 @@ stripAuthor: function(argString)
 	result = result.replace("author", "AUTHOR");
 	return result;
 },
+
+findAnswerChoicePatterns: function()
+{
+	this.answerMatches = {};
+	var i = 0;
+	var j = 0;
+	var keys = Object.keys(this.questionList);
+	var numQ = keys.length;
+	for(i=0; i < numQ; i++)
+	{
+		var q = this.questionList[keys[i]];
+		for(j=0; j<4;j++)
+		{
+			var choice = q.answerChoices[j].choiceContent;
+			choice = this.stripQuotes(choice);
+			choice = this.stripLineNum(choice);
+			choice = this.stripNonAlpha(choice);
+			choice = this.stripAuthor(choice);
+			choice = this.stripCommonPatterns(choice);
+			this.questionList[keys[i]].answerChoices[j].choiceContent = choice;
+			var wordArray = this.questionList[keys[i]].stem.split(" ");
+			var numWords = wordArray.length;
+			//this.stripNonAlpha(wordArray);
+			//console.log(this.matches);
+
+			for(startWord = 0; startWord < numWords; startWord++)
+			{
+			for(endWord = numWords-1; endWord > startWord; endWord--)
+				//j=numWords -1; j > 0; j--)
+			{
+				var k = startWord+1;
+				var patt = wordArray[startWord];
+				while(k <= endWord)
+				{
+					patt += " ";
+					patt += wordArray[k];
+					k++;
+				}
+				//console.log("Question " + (i+1) + " pattern to search for = " + patt);
+				var m = i+1;
+				var matchObj = {"pattern": patt, "questions": "", "startWord": startWord, "endWord":endWord};
+				//console.log(this.matches);
+				for(m=i+1;m<numQ;m++)
+				{
+					var letters = ["a", "b", "c", "d"];
+					for(k=0;k<4;k++)
+					{
+						var matches = this.questionList[keys[m]].answerChoices[k].choiceContent.match(patt);
+						if(matches != null)
+						{
+							//console.log("found match for question " + (i+1) + " pattern(" + patt + ") in question " + (m+1));
+							//if(!this.matches[patt])
+							if(matchObj.choices == "")
+							{
+								//this.matches[patt] = {questions: i.toString(), startWord:0, endWord:j};
+								var qNum = "00" + ((i%52)+1);
+								var qId = "T" + (Math.floor(i / 52) + 1) + "S1Q" + qNum.slice(-2) + letters[k];
+								matchObj.questions = qId; //(i+1).toString();
+							}
+							matchObj.questions += " ";
+							var newQNum = "00" + ((m%52)+1);
+							var newQID = "T" + (Math.floor(m/52) + 1) + "S1Q" + newQNum.slice(-2) + letters[k];
+							matchObj.questions += newQID; //(m+1).toString();
+							//this.matches[patt].questions += " ";
+							//this.matches[patt].questions += m.toString();
+						}
+					}
+				}
+				//console.log(this.matches);
+				//console.log(matchObj.questions);
+				if(matchObj.questions == "")
+				{
+				}
+				else if(this.isDupe(matchObj, false))
+				{
+					//console.log("did not insert match for pattern (" + patt + ") " + matchObj.questions);
+				}
+				else
+				{
+
+					this.answerMatches[patt] = matchObj;
+					var keyz = Object.keys(this.answerMatches);
+					for(z = 0; z < keyz.length; z++)
+					{
+						//console.log(keyz[z]);
+						//console.log(this.answerMatches[keyz[z]]);
+					}
+				}
+			}
+		}
+		}
+	}
+},
+
+
 
 findPatterns: function()
 {	
@@ -484,7 +604,7 @@ findPatterns: function()
 				if(matchObj.questions == "")
 				{
 				}
-				else if(this.isDupe(matchObj))
+				else if(this.isDupe(matchObj, true))
 				{
 					//console.log("did not insert match for pattern (" + patt + ") " + matchObj.questions);
 				}
