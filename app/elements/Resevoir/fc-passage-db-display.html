@@ -86,9 +86,7 @@
 		  	</fc-dropdown-menu>
 		</section>
 	  </paper-material>
-	<!--   <div class="flex vertical layout">
-	  <div class="flex vertical layout" id="firepad"> -->
-	    <!-- </div>  -->
+<button on-tap="_computeSelectedQuestions()">++</button>
 	   <div class="layout vertical flex" style="height: 1900px;">
 	     		<section 
 	     			class="blurb-class"
@@ -143,6 +141,27 @@ Polymer({
 		notify: true
 
 	},
+	passageSet:{
+		type: Object,
+		notify: true
+
+	},
+	selectedQuestions: {
+		type: String,
+		computed: "_computeSelectedQuestions(selected, menuArray, passageSet)",
+		notify: true
+	},
+	searchValue:{
+		type: String,
+		notify: true
+
+	},
+	searchArray: {
+		type: Array,
+		computed: "_computeSearchArray(searchValuem,menuArray)",
+		notify: true
+	},
+
 	lineNumbers: {
 		type: Number,
 		value: function(){
@@ -165,22 +184,41 @@ attached: function() {
 	this.getPassagesTwo(); 
 	 this.addEventListener("mouseover", this.setMeasureParams);
 },
+	_computeSelectedQuestions: function(selected, menuArray, passageSet) {
+		var keys = Object.keys(passageSet);
+		if (selected ==keys[1]){return "testone";}
+		else if (selected==keys[6]){return "testtwo";}
+		else if (selected ==keys[11]){return "testthree";}
+		else if (selected == keys[12]){return "testfour";}
+		
+	
+
+
+
+	},
+	_computeSearchArray: function (searchValue, menuArray){ 
+
+
+
+
+		},
  getPassagesTwo: function()
  {
 		var self=this;
-		var arrayN=[];
+		self.passageSet={};
 		self.menuArray=[];
 		var ref=new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
 			ref.on("value", function(snapshot){
-				self.firepadPassageWordArraysTwo=snapshot.val();
-				var pset = self.firepadPassageWordArraysTwo;
+				var pset = snapshot.val();
+				self.set("passageSet", snapshot.val());
 				var keys = Object.keys(pset);
+				console.log(keys, self.passageSet);
 				var counter = keys.length;
 				while(counter >0){ 
 					counter--;
 					
 					self.push("menuArray", pset[keys[counter]]);
-					console.log( "here are the menuArray and Menu Item", self.menuArray[0]);
+					
 				}
 				
   				});
