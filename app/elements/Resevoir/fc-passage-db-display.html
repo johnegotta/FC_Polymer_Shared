@@ -132,6 +132,15 @@ Polymer({
 	behaviors: [Polymer.IronResizableBehavior],
 	listeners: {'iron-resize': '_onIronResize'},
 	properties: {
+	 estimatedHeight: {
+			type: Number,
+			value: function(){
+			  var estimatedHeight=Math.ceil(screen.height*.795);
+		 	return estimatedHeight;
+			},
+			notify: true,
+			reflectToAttribute: true 
+	    }, 
 		menuArray: {
 			type: Array,
 			notify: true
@@ -146,9 +155,9 @@ Polymer({
 		notify: true
 
 	},
-	selectedQuestions: {
+	selectedKeys: {
 		type: String,
-		computed: "_computeSelectedQuestions(selected, menuArray, passageSet)",
+		computed: "_computeSelectedKeys(passageSet, fcidArray)",
 		notify: true
 	},
 	searchValue:{
@@ -158,7 +167,7 @@ Polymer({
 	},
 	searchArray: {
 		type: Array,
-		computed: "_computeSearchArray(searchValuem,menuArray)",
+		computed: "_computeSearchArray(searchValue,menuArray)",
 		notify: true
 	},
 
@@ -171,45 +180,92 @@ Polymer({
 	},
 	lineNumberArray: {
 		  type: Array,
-		  computed: '_computeLineNumberArray(selected, menuArray)',
+		  computed: '_computeLineNumberArray(menuArray)',
 		  notify: true
-		  }, 
+		  },
+    fcidArray: {
+    	type: Array,
+    	value: function(){return [];},
+    	notify: true
+    }, 
+    passageObject: {
+    	type: Object,
+    	 notify: true
+    },
+   arrayNums:{
+   		type: Array,
+   		notify: true
 
+   }
 
-	}, //end of properties
+}, //end of properties
+ready: function(){
+ var myPassages = localStorage.getItem("myPassages"); 
+ var myMenu = JSON.parse(myPassages);
+ this.set("menuArray", myMenu);
 
+},
 
 
 attached: function() { 
-	this.getPassagesTwo(); 
+	// this.getPassagesTwo(); 
 	 this.addEventListener("mouseover", this.setMeasureParams);
 },
-	_computeSelectedQuestions: function(selected, menuArray, passageSet) {var returnValue;
-		var keys = Object.keys(passageSet);
-		if (selected ==keys[1])
-			{
-			returnValue= "testone";
-			}
-		else if (selected==keys[6])
-		{
-			returnValue= "testtwo";
-		}
-		else if (selected ==keys[11])
-		{
-			returnValue= "testthree";
-		}
-		else if (selected == keys[12])
-		{
-			returnValue= "testfour";
-		}
-		console.log(returnValue);
-		alert(returnValue);
-		return returnValue;
+	_computeSelectedKeys: function(passageSet, fcidArray) {
 		
-	
-
-
-
+			var returnValue;
+			var keys = Object.keys(passageSet);
+			var counter=keys.length;
+			var pickle="T0000";
+	// 		while(counter>1)
+	// 		{
+	// 			this.passageObject={};
+	// 			counter--;
+	// 			var fcidString=(keys[counter].slice(10));
+	// 			console.log(fcidString);
+	// 			fcidString=pickle.concat(fcidString);
+	// 			this.push("fcidArray", fcidString);
+	// 			var objZero = this.passageSet[keys[counter]][0];
+	// 			var j=this.passageSet[keys[counter]].length-1;
+	// 			var pnum=this.passageSet[keys[counter]][j].paragraph_number + 1;
+	// 			this.set("passageObject",
+	// 					{ 
+	// 						"fcid": fcidString,
+	// 						"wordArray": passageSet[keys[counter]],
+	// 						"wordCount": objZero.total_word_count,
+	// 						"menuItem": objZero.menuItem,
+	// 						"metaObject": {		
+	// 								"passageTitle": objZero.passageTitle,
+	// 								"passageType": objZero.passageType,
+	// 								"passageBlurb": objZero.passageBlurb,
+	// 								"passageIsDouble": objZero.is_double_passage,
+	// 								"passageHasCharts": objZero.has_charts,
+	// 								"passageIsFocused": false,
+	// 								"passageWordCount": objZero.total_word_count,
+	// 								"passageSubtype": "unknown",
+	// 								"passageSubtypeComments": "unknown",
+	// 								"citationQuestions": "unknown",
+	// 								"totalCitations": "unknown",
+	// 								"mostNearlyMeans": "unknown",
+	// 								"totalNumberQuestions": "unknown",
+	// 								"vocabularyTested": "unknown",
+	// 								"citationsArray": "unknown",
+	// 								"passageDifficult": "unknown",
+	// 								"culturalContext": "unknown",
+	// 								"passageStructure": "crec_irac_ind_ded",
+	// 								"passageNumberParagraphs": pnum, 
+	// 								"fcid": fcidString, 
+	// 								"passageMenuItem": objZero.menuItem,
+	// 							}, 
+	// 						"otherFields": "unknown"
+	// 					});
+	// 			console.log(objZero, this.passageObject);
+	// 			var self=this;
+	// 			var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 	ref.child(fcidString).set(self.passageObject);
+	// }
+		
+		return pickle;
 	},
 	_computeSearchArray: function (searchValue, menuArray){ 
 
@@ -217,28 +273,32 @@ attached: function() {
 
 
 		},
- getPassagesTwo: function()
- {
-		var self=this;
-		self.passageSet={};
-		self.menuArray=[];
-		var ref=new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
-			ref.on("value", function(snapshot){
-				var pset = snapshot.val();
-				self.set("passageSet", snapshot.val());
-				var keys = Object.keys(pset);
-				console.log(keys, self.passageSet);
-				var counter = keys.length;
-				while(counter >0){ 
-					counter--;
+ // getPassagesTwo: function()
+ // {
+	// 	var self=this;
+	// 	self.passageSet={};
+	// 	self.menuArray=[];
+	// 	var ref=new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
+	// 		ref.on("value", function(snapshot){
+	// 			var pset = snapshot.val();
+	// 			self.set("passageSet", snapshot.val());
+	// 			var keys = Object.keys(pset);
+	// 			console.log(keys, self.passageSet);
+	// 			var counter = keys.length;
+	// 			while(counter >0){ 
+	// 				counter--;
 					
-					self.push("menuArray", pset[keys[counter]]);
+	// 				self.push("menuArray", pset[keys[counter]]);
 					
-				}
-				
-  				});
-		},
-_computeLineNumberArray: function(selected, menuArray){
+	// 			}
+	// 			self.shift("menuArray");
+
+	// 			var localpset=JSON.stringify(self.menuArray);
+
+	// 			localStorage.setItem('myPassages', localpset);
+ //  				});
+	// 	},
+_computeLineNumberArray: function(selected, menuArray, passageSet){
 		  this.arrayNums=[]
 		  for(var i=1; i <= 180; i++)
 		     {
@@ -246,7 +306,6 @@ _computeLineNumberArray: function(selected, menuArray){
 			this.push('arrayNums',{'number': i, 'show': showLine});
 			}
 			
-     		// this.notifyResize();
 			return this.arrayNums;
 		},
     
@@ -254,18 +313,23 @@ _computeLineNumberArray: function(selected, menuArray){
 	 _onIronResize: function(){
 	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
 	     console.log(ht);
-	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams) && this.notifyResize:this._computeLineNumberArray();
+	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams) && this.notifyResize:this.setMeasureParams();
 
 	 },
 	  setMeasureParams: function(){
-	  
 	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
 	     console.log(ht);
 	      if(!isNaN(ht) && ht>20)
 	      	{
 	      	this.set("lineNumbers", ht);
 	      	 this.removeEventListener("mouseover",this.setMeasureParams);
-	      	 this.notifyResize;}
+	      	 this.notifyResize;
+	      	}
+	      else if(isNan(ht))
+	      	{
+	      	var lineNumbers=Math.ceil((this.estimatedHeight/24)-2);
+	      	this.set("lineNumbers",lineNumbers);
+	    	} 
 
 	  },
 
