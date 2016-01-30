@@ -1,0 +1,405 @@
+<dom-module id="fc-pickle">
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 99%;
+	max-width: 99vw;
+	width: 100%;
+    }
+.phpanel{
+	height: 93vh; 
+	padding: 6px 6px 24px 6px; 
+	font-weight: 600; 
+	margin-top: 12px; 
+	background: #fff; 
+	border: 3px ridge silver; 
+	font-size: 20pt; 
+	color: #000088;
+	width: 100%;
+
+}
+ .paper-material-header{
+    	min-height: 65px; 
+    	padding: 12px 6px 4px 6px; 
+    	font-weight: 600; 
+    	background: aliceblue; 
+    	font-size: 20pt; 
+    	border-bottom: 1px solid #000088; 
+    	color: #000088;
+    	
+    }
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+
+    .highlighted {
+	background: yellow;
+    }
+
+    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; margin: 0px auto; width: 96%;}
+</style>            
+</style>
+<template>
+		<paper-header-panel class="vertical layout phpanel" style="height: 93vh;"  mode="waterfall">
+  			<paper-material class="paper-header layout horizontal paper-material-header">
+  			<section class="horizontal layout flex self-stretch">
+  				<fc-input-prime 
+  					label="New Save Destination" 
+  					class="layout horizontal flex center"
+  					input-type="flex"
+  					style="width: 100%;"
+  					value="{{newDatabasePath}}">
+  				</fc-input-prime>
+  				<fc-input-prime
+  			  		label="Current Save Destination"
+  			  		class="layout horizontal flex center"
+  			  		input-type="flex"
+  					style="width: 100%;" 
+  			  		value="{{currentDatabasePath}}">
+  			 	</fc-input-prime>
+  			 </section>
+  			</paper-material>
+  			<div class="layout vertical flex">
+    				<section class="layout horizontal flex nowrap" style="margin-top:24px;">
+    					<fc-input-prime style="width: 50%;" input-type="text"  value="{{passageTitle}}" label="Passage Title"></fc-input-prime>
+    					<fc-input-prime style="width: 50%;" input-type="text" always-float-label value="{{passageBlurb}}" label="Passage Blurb"></fc-input-prime>
+    				</section>
+    			
+					<section class="horizontal layout nowrap">
+		    			 <fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{fcid}}"
+		    				label="FCID">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+							label="Passage Type"
+							input-type="text" 
+							class="horizontal layout flex center"
+							value="{{passageType}}"
+							>
+						</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text"
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtype}}" 
+		    				label="Passage Sub-Type">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="datetime-local"
+		    				class="horizontal layout flex center"
+		    				value="{{passageContext}}" 
+		    				label="Passage Period">
+		    			</fc-input-prime>
+		    			
+					
+					</section>
+		    			<section class="horizontal layout flex nowrap">
+		    			<fc-input-prime 
+		    				input-type="range" 
+		    				max="16" 
+		    				min="6" 
+		    				label="Number of Questions"
+		  					class="horizontal layout flex center"
+		    				value="{{totalNumberQuestions}}"
+		    				style="border: 2px solid #efefef;"> 
+		    			</fc-input-prime>
+	    					<fc-input-prime 
+	    						type="range" 
+	    						max="9" 
+	    						min="0"  
+	    						label="Vocabulary Questions" 
+	    						style="border: 2px solid #efefef;" 
+	    						class="flex horizontal layout center" 
+	    						input-type="range"
+	    					class="horizontal layout flex center"
+	    						value="{{mostNearlyMeans}}">
+	    					</fc-input-prime> 
+		    			
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="9"
+		    				min="0"
+		    				label="Citation Questions"
+		    				style="border: 2px solid #efefef;" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="24"
+		    				min="0"
+		    				style="border: 2px solid #efefef;"  
+		    				label="Number of Citations"
+		  					class="horizontal layout flex center"
+		    				value="{{totalCitations}}">
+		    			</fc-input-prime>
+		    			</section>
+		    			<section class="horizontal layout flex nowrap">
+	    				<fc-input-prime
+		    				input-type="text"
+		    				label="Insert Vocabulary Tested"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{vocabularyQuestions}}" 
+		    				label="Insert Vocabulary Questions">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Insert Each Citation"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Insert Citation Questions">
+		    			</fc-input-prime>
+		    		</section>
+		
+		     		<section class="horizontal layout flex nowrap">
+		     		<div style="width: 35%;">
+		    				<fc-input-prime type="checkbox" 
+		    					input-type="checkbox" 
+		    					label="Charts"
+		    					class="horizontal layout flex center" 
+		    					checked-prop="{{passageHasCharts}}">
+		    				</fc-input-prime>
+			    			<fc-input-prime 
+			    				type="checkbox" 
+			    				input-type="checkbox" 
+			    				label="Double Passage"
+			    				class="horizontal layout flex center" 
+			    				checked-prop="{{passageIsDouble}}">
+			    			</fc-input-prime>
+			    		
+	  						<fc-input-prime 
+	  							type="checkbox" 
+	  							input-type="checkbox" 
+	  							label="Focused Product"
+	  							class="horizontal layout flex center" 
+	  							checked-prop="{{passageIsFocused}}">
+	  						</fc-input-prime>
+	  							</div>
+	  						<fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtypeComments}}" 
+		    				label="Additional Comments">
+		    			</fc-input-prime>
+	  				</section>
+		
+			<section class="horizontal layout">
+			<paper-button on-tap="saveLocal" style="width: 100%; color: green; max-height: 75px; background: aliceblue; border: 2px solid #afafaf;">Enter Details</paper-button>
+    			<paper-button on-tap="getText" style="max-height:  75px; color: gray; width: 100%; background: aliceblue; border: 2px solid #afafaf;">Load Text</paper-button>
+  			</section>
+   			<div class="flex horizontal layout center justified-around" id="firepad">
+    		</div> 
+		<section class="horizontal layout">
+			<paper-button on-tap="saveToDb" style="max-height: 75px; color: gray; width: 100%; background: aliceblue; border: 2px solid #afafaf;">Save Data</paper-button>
+    		<paper-button on-tap="clearInputs" style="width: 100%;background: aliceblue;color: gray; max-height: 75px; border: 2px solid #afafaf;"> Clear Data</paper-button>
+		</section>
+		<section class="horizontal layout">
+			<paper-button on-tap="" style="background: aliceblue;max-height: 75px; color: gray;  width: 100%; border: 2px solid #afafaf;">Retrieve Save</paper-button>
+			<paper-button on-tap="" style="background: aliceblue; max-height: 75px; color: gray;  width: 100%; border: 2px solid #afafaf;">Edit Save</paper-button>
+		</section>
+		<section style="height: 100%;">
+
+		<paper-textarea value="METAOBJECT BEWARE: {{metaObject}}
+			Passage Title: {{passageTitle}}
+			Passage Type: {{passageType}} \n
+			Passage Blurb: {{passageBlurb}}
+			Double Passage: {{passageIsDouble}}
+			Data Passage: {{passageHasCharts}}
+			Focused Original: {{passageIsFocused}}
+			Word Count: {{passageWordCount}}
+			Passage Subtype: {{passageSubtype}}
+			Passage Subtype Comments: {{passageSubtypeComments}}
+			Citation Question: {{citationQuestions}}
+			{{totalCitations}} this.totalCitations,
+			most nearly means{{mostNearlyMeans}}
+			{{totalNumberQuestions}}this.totalNumberQuestions,
+			{{vocabularyTested}} this.vocabularyTested,
+			{{citationsArray}} this.citationArray,
+			{{passageDifficult}} this.passageDifficulty,
+			{{culturalContext}} this.culturalContext,
+			{{passageStructure}} this.passageStructure,
+			{{passageNumberParagraphs}} this.passageNumberParagraphs, 
+			{{fcid}} this.fcid 
+			{{passageMenuItem}}: this.passageMenuItem,
+			{{isTwoColumns}} this.isTwoColumns"
+			add vocabularyQuestions
+			>
+			</paper-textarea>
+		</section>
+	  	</div>
+	</paper-header-panel>
+</template>
+<script>
+'use strict';
+    (function() {
+	class FcPickle {
+	   get behaviors() { 
+	    return [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.MetaObjectSavingBehavior
+		  ];
+	   }
+	   beforeRegister() {
+
+	this.is = 'fc-pickle';
+	    this.properties = {
+		newDatabasePath:{
+			type: String,
+			value: function() {return "";},
+			notify: true
+
+		},
+
+	    passagesWordArrays:{
+			type: Array,
+			value: function(){return []},
+			notify: true
+	},
+	inputTestNumber:{
+		type: String,
+		value: function(){
+			var returnValue = (this.fcid!==" ")?this.fcid:"";
+			return returnValue;
+			},
+		notify: true
+		},
+	inputSectionNumber:{
+		type: String,
+		value: function(){
+			var returnValue = (this.fcid!==" ")?this.fcid:"";
+			return returnValue;
+			},
+		notify: true
+		},
+	inputPassageNumber:{
+		type: String,
+		value: function(){
+			var returnValue = (this.fcid!==" ")?this.fcid:"";
+			return returnValue;
+			},
+		notify: true
+		},
+	isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+		  }, 
+		
+	yourName: {
+	    	type: String,
+		  	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	
+	passageWordArrayOrdered:{
+			type:Array,
+			value: [],
+			notify: true
+	    },
+
+	
+	firepadPassageWordArrays:{
+		type: Array,
+		value: function(){
+			return [];
+		},
+		notify: true
+	}, 
+
+	hitSaveOne:{
+		type: Boolean,
+		value: function(){
+			return false;
+		},
+		notify: true
+	},
+	metaObject:{
+		type: Object,
+		value: {},
+		notify: true,
+		reflectToAttribute: true
+	},
+	wordArray: {
+		type: Array,
+		value: [],
+		notify: true,
+		reflectToAttribute: true
+	}, 
+	fcid: {
+		type: String,
+		computed: "_computeFcid(onlineData)",
+		notify: true
+	},
+	wordCount: {
+		type: Number,
+		value: 550,
+		notify: true
+	},
+	otherFields: {
+		type: Object,
+		value: {},
+		notify: true
+	},
+	onlineData:{
+		type: Array,
+		notify: true
+	},
+	currentDatabasePath:{
+	    	type: String,
+		  	value: function() 
+		  	{	var returnValue= "https://focusedcoaching.firebaseio.com/reading/passages" +"/" +this.fcid;
+
+		  		return returnValue;
+		  	},
+			notify: true
+		}	
+    };
+
+	
+	   }
+	
+	 attached(){
+	 	this.loadFirepad();
+	     }
+	
+	/*getText, createMetaObject, saveLocal, saveToDb, clearInputs, need to grab fcid, 
+	localStorage.setItem("myPassageTemp", myPassage);  is in get text so that is accessable too; need retrieveFromDatabase: function(){} retrieve hold in session hold in cache
+
+*/
+
+}
+
+    Polymer(FcPickle);
+
+  })();
+ </script>
+ </dom-module>
+ 

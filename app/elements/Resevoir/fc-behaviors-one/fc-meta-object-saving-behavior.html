@@ -55,7 +55,7 @@ properties:{
 			}, 
 			passageMenuItem:{
 			 	type: String,
-				computed: "_computePassageMenuItem(passageTitle)"
+				computed: "_computePassageMenuItem(passageTitle)",
 				notify: true
 			}, 
 			passageNumberParagraphs:{
@@ -140,14 +140,122 @@ properties:{
 			type: Array,
 			value: [],
 			notify: true
-	    }
+	    },
+	    newDatabasePath:{
+			type: String,
+			value: function() {return "";},
+			notify: true
+
+		},
+
+	    passagesWordArrays:{
+			type: Array,
+			value: function(){return []},
+			notify: true
+	    },
+	   
+	isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+		  }, 
+		
+	yourName: {
+	    	type: String,
+		  	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	
+	passageWordArrayOrdered:{
+			type:Array,
+			value: [],
+			notify: true
+	    },
+
+	
+	firepadPassageWordArrays:{
+		type: Array,
+		value: function(){
+			return [];
+		},
+		notify: true
+	}, 
+
+	hitSaveOne:{
+		type: Boolean,
+		value: function(){
+			return false;
+		},
+		notify: true
+	},
+	metaObject:{
+		type: Object,
+		value: {},
+		notify: true,
+		reflectToAttribute: true
+	},
+	wordArray: {
+		type: Array,
+		value: [],
+		notify: true,
+		reflectToAttribute: true
+	}, 
+	fcid: {
+		type: String,
+		computed: "_computeFcid(currentDatabasePath)",
+		notify: true
+	},
+	wordCount: {
+		type: Number,
+		value: 550,
+		notify: true
+	},
+	otherFields: {
+		type: Object,
+		value: {},
+		notify: true
+	},
+	onlineData: {
+		type: Array,
+		notify: true
+	},
+	currentDatabasePath:{
+	    	type: String,
+		  	value: function() 
+		  	{	var returnValue= "https://focusedcoaching.firebaseio.com/reading/passages" +"/" +this.fcid;
+
+		  		return returnValue;
+		  	},
+			notify: true
+		}	
 
 
 		},
 
+		ready: function(){
+			// var ref=new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+			// var count = 0;
+			// ref.on();
 
 
-	_computeFcid_test: function(isFocused){
+// ref.on("child_added", function(snap) {
+//   count++;
+//   console.log("added", snap.key());
+// });
+// // length will always equal count, since snap.val() will include every child_added event
+// // triggered before this point
+// ref.once("value", function(snap) {
+//   console.log("initial data loaded!", Object.keys(snap.val()).length === count);
+// });
+
+		},
+
+
+	_computeFcid: function(currentDatabasePath){
 	 		var returnValue= "GetCheckFromDataBaseToString";
 	 		return returnValue;
 	     },
@@ -226,7 +334,7 @@ properties:{
 	    	var z=0;
 	    self.transitionArray=[];
 	    self.passageWordArrayOrdered=[];
-	    for(let passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
+	    for(var passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
 	    {
 		if(z==0){ //for backwards compatability
 		 self.push('passageWordArrayOrdered',
@@ -263,7 +371,7 @@ properties:{
 		localStorage.setItem("myPassageTemp", myPassage); 
 	},
 
-	createMetaObject:{
+	createMetaObject: function(){
 		this.$.isFocused.checked=this.isFocused;
 	    this.$.isDoublePassage.checked=this.isDoublePassage;
 	    this.$.hasCharts.checked=this.hasCharts;
@@ -290,7 +398,61 @@ properties:{
 			"fcid": this.fcid, 
 			"passageMenuItem": this.passageMenuItem,
 			"isTwoColumns": this.isTwoColumns
-		}
+		});
+		},
+
+		createPassageObject: function(){
+		this.set("passageObject",
+				{ 
+					"fcid": this.fcid,
+					"wordArray": this.wordArray,
+					"wordCount": this.wordCount,
+					"menuItem": this.menuItem,
+					"metaObject": this.metaObject,
+					"otherFields": this.otherFields
+				});
+		var self=this;
+				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		ref.child(fcidString).set(self.passageObject);
+
+
+
+	},
+	 saveLocal: function(){
+	 	this.getText();
+	 	this.createMetaObject();
+	 },
+		
+	 
+	saveToDb: function(){
+		this.saveLocal();
+		this.createPassageObject();
+		if(this.passageTitle!==""){ 
+		var self=this;
+		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		ref.child(self.fcid).set(self.passageObject);
+		this.clearInputs();
+		  
+	  }
+	  else {
+	  	this.openDialog();
+	  }
+	},
+	clearInputs: function(){
+		this.set("passageType", null);
+	    this.set("passageBlurb", null);
+		this.set('passageHasCharts', false);
+		this.set('passageIsFocused', false);
+		this.set('passageIsDoublePassage', false);
+		this.set("fcid",null);
+		this.set("passageTitle", null);
+	
+	},
+
+	openDialog: function(){
+		Polymer.dom(fc-dashboard-one).querySelector("#dataAdminPrime").open();
+
+	}
 	};
 
 </script> 
