@@ -1,0 +1,109 @@
+<dom-module id="fc-mc-select">
+<template>
+<style>
+
+*{-ms-overflow-style: none;}
+*{overflow: -moz-scrollbars-none;}
+select::webkit-scrollbar { width: 0 !important; visibility: none; }
+*{ -ms-overflow-style: none; }
+
+.fc-select
+{
+     font-family: merriweather; align: bottom; font-size: 14px; line-height: .8; font-weight: 600; color: #008; min-width: 45px; min-height: 20px; background: #fff; /*box-shadow: 10px 5px 5px #afafaf; z-index: 2;*/ border: none; border-bottom: 2px solid #008; margin: 4px; padding: 4px; text-align: bottom; outline: none;
+}
+</style>
+
+<label for$="{{selectId}}" style="font-size: 14px; font-family: meriweather; color: #008; font-weight: 600; line-height: .8;margin: 4px; padding: 4px;">{{inputLabel}}</label>
+<firebase-collection location="{{selectLocation}}" order-by-child="{{selectChild}}"data="{{selectData}}">
+</firebase-collection>
+<select id$="{{selectId}}" on-change="onChange" name$="{{inputLabel}}" class="fc-select">
+     <template is="dom-repeat" items="{{selectData}}">
+          <option value="{{computeMenuEntry(item)}}">{{computeMenuEntry(item)}}</option>
+     </template>
+</select>
+
+</template>
+<script>
+Polymer({
+  is: "fc-mc-select",
+  properties: {
+    selectedId:{
+      type: String, 
+      value: function(){
+        var returnValue = (this.selectedId==undefined || this.selectedId == null)? "select_" + Math.floor((Math.random() * 1000) + 1).toString():"";
+        return returnValue;
+
+      },
+      notify: true,
+      reflectToAttribute: true
+    },
+    inputLabel:{
+       type: String, 
+        value: function(){
+                return "";
+
+      },
+      notify: true,
+      reflectToAttribute: true
+    },
+    inputValue:{
+      type: String,
+      notify: true,
+      reflectToAttribute: true
+    },
+    path: {
+          type: String,
+          value: "",
+          notify: true,
+          reflectToAttribute: true
+    },
+    selectData: {
+          type: Object,
+          value: {},
+          notify: true,
+          reflectToAttribute: true
+    },
+    selectLocation: {
+          type: String,
+          value: "",
+          notify: true,
+          reflectToAttribute: true
+    },
+    selectChild: {
+          type: String,
+          value: "",
+          notify: true,
+          reflectToAttribute: true
+    }
+   
+  },//end properties
+
+computeMenuEntry: function(item)
+{
+     console.log(item);
+     var result = this.selectChild == "" ? item : item[this.selectChild];
+     return result;
+},
+
+attached: function()
+{
+     console.log(this.selectLocation);
+     console.log(this.selectChild);
+},
+
+onChange: function(e)
+{
+  console.log(e);
+  console.log(this.selectData);
+ this.set("inputValue", e.target.value);
+ console.log(this.inputValue);
+ alert(this.inputValue);
+}
+ 
+
+});
+</script>
+</dom-module>
+
+
+
