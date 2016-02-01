@@ -1,0 +1,65 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcPassageLocalDataBehavior = {
+properties:{
+	selected: {
+		type: Array,
+		notify: true
+	},
+	selectedItem:{
+		type:String,
+		notify: true
+	},
+	 menuItemArray: {
+   		type: Array,
+		value: function(){
+			var rValue = (this.menuItemArray ==[] && localStorage.getItem("localPassages")!==undefined)? localStorage.getItem("localPassages"): [];
+			return rValue;},
+    	notify: true
+    }
+
+},//end of properties
+
+
+
+	_getAndSetLocalOrDatabase:function(){
+		var gotLocalPassages=	localStorage.getItem('localPassages');
+			gotLocalPassages = JSON.parse(gotLocalPassages);
+	 (gotLocalPassages!=undefined)?this.set("menuItemArray",gotLocalPassages) && 	this.set("itemSelected", gotLocalPassages[0]):this._getFromFireBaseAndSetLocal();
+	 console.log(this.menuItemArray);
+		},
+attached: function(){
+		this._getAndSetLocalOrDatabase();
+	},
+	 _getFromFireBaseAndSetLocal: function(){
+		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		var self=this;
+		ref.on("value", function(snapshot){
+			var localContent = snapshot.val();
+			var keys = Object.keys(localContent);
+			var counter = keys.length;
+			for(var i=0; i<counter; i++)
+			{	var qik = keys[i].toString() + "Qs"
+				self.push("menuItemArray", 
+				{
+					"itemValue": localContent[keys[i]].wordArray,
+					"menuItem": localContent[keys[i]].menuItem,
+					"key": keys[i],
+					"questionItemKey":qik 
+				});
+		    console.log(self.menuItemArray[i].key, "I am the passage", self.menuItemArray[i].questionItemKey);
+		    }
+		    var holder = self.menuItemArray;
+		   holder= JSON.stringify(holder);
+		  	localStorage.setItem('localPassages', holder);
+		});		 
+	  },
+
+
+
+
+
+
+
+	};//end of file
+</script>

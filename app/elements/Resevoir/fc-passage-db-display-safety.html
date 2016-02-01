@@ -1,0 +1,461 @@
+<dom-module id="fc-passage-db-display">
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+    div.line-number {
+	width: 28px;
+	height: 20px;
+	line-height: 1.2;
+	font-size: 16pt;
+	/*font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+	padding: 2px 4px;
+	margin: 5px;
+
+    }
+
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    .blurb-class{
+    	max-width: 670px; 
+    	padding: 4px 0px 4px 8px; 
+    	font-size: 12pt; 
+    	line-height: 1.05;
+    	font-style: oblique;
+
+    }
+
+    .highlighted {
+	background: yellow;
+    }
+
+    div.text {
+	line-height: 1.2;
+	font-size: 16pt;
+     /* font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	padding: 2px 4px 8px 4px;
+	margin: 5px;
+	min-height: 900px !important;
+	display: flex;
+	min-width: 300px !important;
+	max-width: 680px !important;
+    }
+
+</style>
+
+<template>
+
+<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+	    <paper-material class="paper-header header-panel head horizontal layout" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+	    <section>Saved Passages</section>
+	    <section class="horizontal layout flex-2 nowrap">	
+			<array-selector 
+				id="selector" 
+				items="{{menuItemArray}}" 
+				selected="{{selected}}" 
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+	    		class="flex layout horizontal"							
+		  		style="min-width: 360px; max-width: 96%" 
+		  		on-select="toggleSelection"
+		  		selected="{{selected}}" 
+		  		id="passagesListFromDB"
+		  		data-source="{{menuItemArray}}" 
+		  		selected="{{selected}}"
+		  		return-item-key="{{selectedItemKey}}"
+		  		>
+		  	</fc-dropdown-menu>
+		</section>
+	  </paper-material>
+<button on-tap="_computeSelectedQuestions()">++</button>
+	   <div class="layout vertical flex" style="height: 1900px;">
+	     		<section 
+	     			class="blurb-class"
+	     			>
+	     			<p>[[selected.itemValue.0.passageType]]</p>
+	     			<p>[[selected.itemValue.0.passageBlurb]]</p>
+	     		</section>
+
+		<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+		<div id="lineNumbers" class="layout vertical line-number">
+		  <div class="line-numbers" id="linesA1">Lines</div>
+		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+			  <span hidden="{{item.show}}">&nbsp</span>
+		    </template> 
+		  </div>
+			  <!--passage-1-column-1 container-->
+	    <div id="firstColumn" class="layout horizontal flex wrap text">
+		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 8px; max-width: 600px;">
+	
+		  <template is="dom-repeat" items="{{selected.itemValue}}" id="aDarnedTemplate2" filter="">
+			<template is="dom-if" if="{{item.newPara}}">
+			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+			</template>
+			<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
+		     <a id$="A[[item.wordIndex]]_transition" style="" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a>
+		  
+		  </template>
+		  <br class="line-numbers">
+		  <hr>
+		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+		</article>
+	    </div>
+	    
+	    </div>
+
+	  </div>
+	  </paper-header-panel> 
+	</template>
+<script>
+Polymer({
+	is: "fc-passage-db-display",
+	behaviors: [Polymer.IronResizableBehavior,
+				FCBehaviors.MetaObjectSavingBehavior
+				],
+	listeners: {'iron-resize': '_onIronResize',
+				'notifyResize': 'setMeasureParams'},
+	properties: {
+	 estimatedHeight: {
+			type: Number,
+			value: function(){
+			  var estimatedHeight=Math.ceil(screen.height*.795);
+		 	return estimatedHeight;
+			},
+			notify: true,
+			reflectToAttribute: true 
+	    }, 
+	selected: {
+		type: Array,
+		notify: true
+
+	},
+	selectedItem:{
+		type:String,
+		value: function(){return"";},
+		notify: true
+	},
+	menuItem: {
+		type: Object,
+		value: {},
+		notify: true
+	},
+	
+	questionsSelected:{
+		type: String,
+		computed: "_computeSelectedQuestions(selected)",
+		notify: true,
+		reflectToAttribute: true
+	},
+	selectedPassage:{
+		type: Array,
+		computed:"_computeSelectedPassage(passageSet, selected, questionsSelected)",
+		 notify: true
+	},
+	passageSet:{
+		type: Object,
+		notify: true
+
+	},
+	lineNumbers: {
+		type: Number,
+		value: function(){
+		return 180;
+		},
+		notify: true
+	},
+	lineNumberArray: {
+		  type: Array,
+		  computed: '_computeLineNumberArray(menuItemArray)',
+		  notify: true
+		  },
+    fcidArray: {
+    	type: Array,
+    	value: function(){return [];},
+    	notify: true
+    }, 
+    passageObject: {
+    	type: Object,
+    	 notify: true
+    },
+   arrayNums:{
+   		type: Array,
+   		notify: true
+
+   },
+  
+   menuItem:{type: Array,
+    	value: function(){return [];},
+    	notify: true
+    }, 
+   menuItemArray: {type: Array,
+    	value: function(){return [];},
+    	notify: true
+    }, 
+  
+   metaObjectArray:{type: Array,
+    	value: function(){return [];},
+    	notify: true
+    }
+}, //end of properties
+ready: function(){
+ // this.getPassagesTwo(); 
+	 this.addEventListener("mouseover", this.setMeasureParams);
+
+},
+toggleSelection: function(){
+
+
+},
+
+	coincideChange: function(){
+		var counter = this.menuItemArray.length;
+		for(var i=0; i<counter; i++){
+			if(this.menuItemArray[i].key ==this.passageSelected){alert("We have a 	match");
+				this.set("selectedItem", this.menuItemArray[i]);
+				this.set("selected", this.selectedItem);
+				}
+		}
+	},
+
+	attached: function(){
+		this._getAndSetLocalOrDatabase();
+		this.setMeasureParams();
+	},
+	
+	_computePassageLocation: function(passageSelected, menuItemArray){
+		var counter = this.menuItemArray.length;
+		for(var i=0; i<counter; i++){
+			if (this.menuItemArray[i].qz===passageSelected){this.set('selected',this.menuItemArray[i]);}
+		}
+		return location;
+	},
+
+	_getAndSetLocalOrDatabase:function(){
+		var gotLocalPassages=	localStorage.getItem('localPassages');
+			gotLocalPassages = JSON.parse(gotLocalPassages);
+	 (gotLocalPassages!=undefined)?this.set("menuItemArray",gotLocalPassages) && 	this.set("itemSelected", gotLocalPassages[0]):this._getFromFireBaseAndSetLocal();
+	console.log(this.menuItemArray);
+	},
+
+	 _getFromFireBaseAndSetLocal: function(){
+		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		var self=this;
+		ref.on("value", function(snapshot){
+			var localContent = snapshot.val();
+			var keys = Object.keys(localContent);
+			var counter = keys.length;
+			for(var i=0; i<counter; i++)
+			{
+				self.push("menuItemArray", 
+				{
+					"itemValue": localContent[keys[i]].wordArray,
+					"menuItem": localContent[keys[i]].menuItem,
+					"key": keys[i]
+				});
+		    console.log(self.menuItemArray[i].key);
+		    }
+		    var holder = self.menuItemArray;
+		   holder= JSON.stringify(holder);
+		  	localStorage.setItem('localPassages', holder);
+		});
+		 
+	  },
+_computeSelectedQuestions: function (selected){
+	
+	var returnValue = selected.relatedItemKey; 
+	return returnValue;
+},
+_computeSelectedPassage: function(passageSet, selected){
+//console.log(selected, passageSet);
+
+},
+	resavePassages: function(){
+		
+			// var returnValue;
+			// var keys = Object.keys(passageSet);
+			// var counter=keys.length;
+			// var pickle="T0000";
+			// while(counter>1)
+			// {
+			// 	this.passageObject={};
+			// 	counter--;
+			// 	var fcidString=(keys[counter].slice(10));
+			// 	console.log(fcidString);
+			// 	fcidString=pickle.concat(fcidString);
+			// 	this.push("fcidArray", fcidString);
+			// 	var objZero = this.passageSet[keys[counter]][0];
+			// 	var j=this.passageSet[keys[counter]].length-1;
+			// 	var pnum=this.passageSet[keys[counter]][j].paragraph_number + 1;
+	
+	// 			this.set("passageObject",
+	// 					{ 
+	// 						"fcid": fcidString,
+	// 						"itemValue": passageSet[keys[counter]],
+	// 						"wordCount": objZero.total_word_count,
+	// 						"menuItem": { 
+										  // menuItemName: objZero.menuItem,
+										  // fcid: objZero.fcid,
+										  // menuItemValue: ??? 
+	// 						"passageMetaObject": {		
+	// 								"passageTitle": objZero.passageTitle,
+	// 								"passageType": objZero.passageType,
+	// 								"passageBlurb": objZero.passageBlurb,
+	// 								"passageIsDouble": objZero.is_double_passage,
+	// 								"passageHasCharts": objZero.has_charts,
+	// 								"passageIsFocused": false,
+	// 								"passageWordCount": objZero.total_word_count,
+	// 								"passageSubtype": "unknown",
+	// 								"passageSubtypeComments": "unknown",
+	// 								"citationQuestions": "unknown",
+	// 								"totalCitations": "unknown",
+	// 								"vocabularyPhrasingUsed": "unknown",
+	// 								"totalNumberQuestions": "unknown",
+	// 								"vocabularyTested": "unknown",
+	// 								"citationsArray": "unknown",
+	// 								"passageDifficult": "unknown",
+	// 								"culturalContext": "unknown",
+	// 								"passageStructure": "crec_irac_ind_ded",
+	// 								"passageNumberParagraphs": pnum, 
+	// 								"fcid": fcidString, 
+	// 								"passageMenuItem": objZero.menuItem,
+	// 							}, 
+	// 						"otherFields": "unknown"
+	// 					});
+	// 			console.log(objZero, this.passageObject);
+	// 			var self=this;
+	// 			var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passagesholder");
+	// 	ref.child(fcidString).set(self.passageObject);
+	// }
+	// }
+	// 	return pickle;
+	},
+	_computeSearchArray: function (searchValue, menuArray){ 
+
+
+
+
+		},
+ // getPassagesTwo: function()
+ // 	{
+	//  	var self=this;
+	//  	self.passageSet={};
+	//  	self.menuArray=[];
+	//  	var ref=new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 		ref.once("value", function(snapshot){
+	//  			var pset = snapshot.val();
+	//  			self.set("passageSet", snapshot.val());
+	// 			var keys = Object.keys(pset);
+	// 			//console.log(keys, self.passageSet);
+	// 			var counter = keys.length;
+	// 			var i=0;
+	// 			for(i=0;i<counter;i++){ 
+	// 				var localmenuitem = pset[keys[i]].menuItem.toString();
+	// 				var localvaluekey = "pset." + keys[i] + ".wordArray";
+	// 				self.push("menuItemArray", {
+	// 										   "relatedItemKey":keys[i] + "Qs",
+	// 										   "itemKey":keys[i],
+	// 										   "itemValueKey": localvaluekey,
+	// 										   "itemValue": pset[keys[i]].wordArray,
+	// 										   "menuItem": localmenuitem, 
+	// 										   "menuName": self.menuName,
+	// 										   "itemKeys": keys
+	// // 										});
+					
+	// // 			}
+	// 			console.log(self.menuItemArray);
+
+				
+
+	// 			var localpset=JSON.stringify(self.menuArray);
+
+	// 			localStorage.setItem('myPassages', localpset);
+ //  				});
+	// 	},
+_computeLineNumberArray: function(selected, menuArray){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			
+			return this.arrayNums;
+		},
+    
+
+	 _onIronResize: function(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     //console.log(ht);
+	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams) && this.notifyResize:this.setMeasureParams();
+
+	 },
+	  setMeasureParams: function(){
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     //console.log(ht);
+	      if(!isNaN(ht) && ht>20)
+	      	{
+	      	this.set("lineNumbers", ht);
+	      	 this.removeEventListener("mouseover",this.setMeasureParams);
+	      	 this.notifyResize;
+	      	}
+	      else if(isNaN(ht))
+	      	{
+	      	var lineNumbers=Math.ceil((this.estimatedHeight/24)-2);
+	      	this.set("lineNumbers",lineNumbers);
+	    	} 
+
+	  },
+loadloacalstorage: function(){
+	  var myPassages = localStorage.getItem("myPassages"); 
+ var myMenu = JSON.parse(myPassages);
+ this.set("menuArray", myMenu);
+ console.log("temp: ", (myMenu),"property: ", this.menuArray);
+},
+	
+
+_theContentFilter: function(firstWordIndex, lastWordIndex) {
+	// if(!isNaN(lastWordIndex)){
+	//   return (item) =>{
+	// 	return (item.wordIndex >= firstWordIndex && item.wordIndex <= lastWordIndex);
+	//   };
+	// } else {
+	//   return (item) =>{
+		return true;
+	//   };
+	// }
+  },
+
+
+  _numberFilter: function(lineNumbers) {
+	return (item) =>{
+	  return (item.number <= lineNumbers);
+	    };
+	  } 
+	
+	
+					
+});
+</script>
+</dom-module>

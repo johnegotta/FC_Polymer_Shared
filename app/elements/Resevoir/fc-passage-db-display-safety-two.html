@@ -56,7 +56,7 @@
 </style>
 <paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
 	    <paper-material class="paper-header header-panel head horizontal layout" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
-	    <section>Reading</section>
+	    <section>Saved Passages</section>
 	    <section class="horizontal layout flex-2 nowrap">	
 			<array-selector 
 				id="selector" 
@@ -105,7 +105,7 @@
 		  	</template>
 		  	<br class="line-numbers">
 		  	<hr>
-		  	<div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+		  	<div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused 		Coaching (c) 2016</div>
 		</article>
 	    </div>
 	    </div>
@@ -117,8 +117,7 @@ Polymer({
 	is: "fc-passage-db-display",
 	behaviors: [Polymer.IronResizableBehavior,
 				FCBehaviors.MetaObjectSavingBehavior,
-				FCBehaviors.FcPassageLocalDataBehavior,
-				FCBehaviors.FcSingleColumnLineNumberBehavior
+				FCBehaviors.FcPassageLocalDataBehavior
 				],
 	listeners: {'iron-resize': '_onIronResize',
 				'notifyResize': 'setMeasureParams'},
@@ -132,12 +131,20 @@ Polymer({
 			},
 			notify: true,
 	    }, 
-	
-	// lineNumberArray: {
-	// 	  type: Array,
-	// 	  computed: '_computeLineNumberArray(menuItemArray)',
-	// 	  notify: true
-	// 	  },
+	// selected: {
+	// 	type: Array,
+	// 	notify: true
+	// },
+	// selectedItem:{
+	// 	type:String,
+	// 	observer: "shareChange",
+	// 	notify: true
+	// },
+	lineNumberArray: {
+		  type: Array,
+		  computed: '_computeLineNumberArray(menuItemArray)',
+		  notify: true
+		  },
     passageObject: {
     	type: Object,
     	 notify: true
@@ -148,7 +155,13 @@ Polymer({
   		observer: "coincideChange",
   		computed: "_computeSharedSelection(selected)",
   	},
-  
+  //  menuItemArray: {
+  //  		type: Array,
+		// value: function(){
+		// 	var rValue = (this.menuItemArray ==[] && localStorage.getItem("localPassages")!==undefined)? localStorage.getItem("localPassages"): [];
+		// 	return rValue;},
+  //   	notify: true
+  //   }
 }, //end of properties
 	ready: function(){
 	 this.addEventListener("mouseover", this.setMeasureParams);
@@ -189,6 +202,69 @@ Polymer({
 		this.setMeasureParams();
 	},
 	
+
+	// _getAndSetLocalOrDatabase:function(){
+	// 	var gotLocalPassages=	localStorage.getItem('localPassages');
+	// 		gotLocalPassages = JSON.parse(gotLocalPassages);
+	//  (gotLocalPassages!=undefined)?this.set("menuItemArray",gotLocalPassages) && 	this.set("itemSelected", gotLocalPassages[0]):this._getFromFireBaseAndSetLocal();
+	//  console.log(this.menuItemArray);
+	// 	},
+
+	//  _getFromFireBaseAndSetLocal: function(){
+	// 	var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 	var self=this;
+	// 	ref.on("value", function(snapshot){
+	// 		var localContent = snapshot.val();
+	// 		var keys = Object.keys(localContent);
+	// 		var counter = keys.length;
+	// 		for(var i=0; i<counter; i++)
+	// 		{	var qik = keys[i].toString() + "Qs"
+	// 			self.push("menuItemArray", 
+	// 			{
+	// 				"itemValue": localContent[keys[i]].wordArray,
+	// 				"menuItem": localContent[keys[i]].menuItem,
+	// 				"key": keys[i],
+	// 				"questionItemKey":qik 
+	// 			});
+	// 	    console.log(self.menuItemArray[i].key, "I am the passage", self.menuItemArray[i].questionItemKey);
+	// 	    }
+	// 	    var holder = self.menuItemArray;
+	// 	   holder= JSON.stringify(holder);
+	// 	  	localStorage.setItem('localPassages', holder);
+	// 	});		 
+	//   },
+	
+	_computeLineNumberArray: function(selected, menuArray){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			return this.arrayNums;
+		},
+    
+	 _onIronResize: function(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	
+	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams) && this.notifyResize:this.setMeasureParams();
+		 },
+
+	  setMeasureParams: function(){
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     //console.log(ht);
+	      if(!isNaN(ht) && ht>20)
+	      	{
+	      	this.set("lineNumbers", ht);
+	      	 this.removeEventListener("mouseover",this.setMeasureParams);
+	      	 this.notifyResize;
+	      	}
+	      else if(isNaN(ht))
+	      	{
+	      	var lineNumbers=Math.ceil((this.estimatedHeight/24)-2);
+	      	this.set("lineNumbers",lineNumbers);
+	    	} 
+	  	},
 
 _theContentFilter: function(firstWordIndex, lastWordIndex) {
 	// if(!isNaN(lastWordIndex)){

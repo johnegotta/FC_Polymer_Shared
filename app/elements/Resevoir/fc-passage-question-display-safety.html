@@ -68,9 +68,15 @@
 <script>
 Polymer({
 	is: "fc-passage-question-display",
-	behaviors:[FCBehaviors.FcQuestionLocalDataBehavior],
+	behaviors:[FCBehaviors.QuLocalDataBehavior],
 	properties: {
-		
+		// selected: {
+		// 	notify: true,
+		// },
+		// selectedItem: {
+		// 	type: Array,
+		// 	notify: true
+		// 	},
 		sharedSelection: {
 			type: String,
 			notify: true,
@@ -80,15 +86,67 @@ Polymer({
 			type: String,
 			value: function(){return "fiction";},
 			notify: true
+		},
+		menuItemArray: {
+			type: Array,
+			value: function(){
+				var rValue = (this.menuItemArray ==[] && localStorage.getItem("localQuestions")!==undefined)? localStorage.getItem("localQuestions"): this._getAndSetData();
+				return rValue;
+			},
+    		notify: true
+    	}
+	},
+
+	coincideChange: function(){
+		var counter = this.menuItemArray.length;
+		for(var i=0; i<counter; i++){
+			if(this.menuItemArray[i].key ==this.sharedSelection){
+				//alert("We have a 	match");
+				this.set("selectedItem", this.menuItemArray[i]);
+				this.set("selected", this.selectedItem);
+				}
 		}
-		
+	},
+	shareSelections: function(){
+		this.set('sharedSelection', this.menuItemArray.key);
+
 	},
 
 	attached: function(){
 		this._getAndSetData();
-	}
+	},
 
-	
+	_getAndSetData:function(){
+		var gotLocalQuestions=	localStorage.getItem('localQuestions');
+			gotLocalQuestions = JSON.parse(gotLocalQuestions);
+	 (gotLocalQuestions!=undefined)?this.set("menuItemArray",gotLocalQuestions) && 	this.set("itemSelected", gotLocalQuestions[0]):this._getDataAndSetLocal();
+	console.log(this.menuItemArray);
+	},
+
+	 _getDataAndSetLocal: function(){
+		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+		var self=this;
+		ref.on("value", function(snapshot){
+			var locQs = snapshot.val();
+			var keys = Object.keys(locQs);
+			var counter = keys.length;
+			for(var i=0; i<counter; i++)
+			{	var relatedContentKey = locQs[keys[i]]._t.toString() + locQs[keys[i]]._sec.toString() +locQs[keys[i]]._p.toString();
+				self.push("menuItemArray", 
+				{
+					"itemValue": locQs[keys[i]],
+					"menuItem": keys[i],
+					"key": keys[i],
+					"relatedContentKey": relatedContentKey 
+				});
+		    console.log(self.menuItemArray[i].key);
+		    }
+		    var holder = self.menuItemArray;
+		   holder= JSON.stringify(holder);
+		  	localStorage.setItem('localQuestions', holder);
+		});
+		 
+	  }
 });
 </script>
 </dom-module>

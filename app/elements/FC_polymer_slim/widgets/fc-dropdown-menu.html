@@ -5,7 +5,8 @@
 	height: 65px;
 	max-width: 660px;
 	min-width: 480px;
-	padding: 1px;}
+	padding: 1px;
+}
 .inputclass{
 	height: 65px;
 	max-width: 620px;
@@ -20,10 +21,10 @@ paper-menu{
 paper-dropdown-menu{width: 95%;}
 </style>
 
-					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{selected.0.menuLabel}}">
-						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" class="inputclass" selected="[[_computeSelected(menuSelection)]]">
+					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{selected.menuName}}">
+						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" class="inputclass" selected="{{menuSelection}}">
 							<template id="fcDropDownMenuRepeater" is="dom-repeat" items="{{dataSource}}">
-								<paper-item class="inputclass" value="{{item}}">{{item.0.menuItem}}</paper-item>
+								<paper-item class="inputclass" value="{{item}}">{{item.menuItem}}</paper-item>
 								
 							</template>
 						</paper-menu>
@@ -34,6 +35,11 @@ paper-dropdown-menu{width: 95%;}
 Polymer({
 	is: 'fc-dropdown-menu',
 	properties: {
+		returnItemKey:{
+			type: String,
+			computed:"_computeReturnItemKey(menuItemValue)",
+			notify: true
+		},
 		menuName: {
 			type: String,
 			value: function(){return "Your Menu Selections: ";},
@@ -44,7 +50,10 @@ Polymer({
 			type: String,
 			value: function(){return "Your Selections: " ;},
 			notify: true,
-			reflectToAttribute: true
+		},
+		menuItemValue: {
+			computed: "_computeMenuItemValue(selected, menuSelection)",
+			notify: true
 		},
 		selected: {
 			type: Array,
@@ -76,7 +85,17 @@ Polymer({
 
 	},
 
+_computeMenuItemValue: function(selected, menuSelection){
+	var returnValue = (this.dataSource!=undefined)?this.dataSource[0].itemValueKey: " ";
+		//console.log(returnValue, "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key");
+		return returnValue;
 
+},
+_computeReturnItemKey: function(menuItemValue){
+	//console.log(menuItemValue);
+return menuItemValue;
+
+},
 _computeSelected: function(menuSelection){
 	return menuSelection;
 },

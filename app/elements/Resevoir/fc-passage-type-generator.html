@@ -3,36 +3,49 @@
 </style>
 <template>
 <div class="flex layout horizontal">
-<div class="layout flex-1 vertical">
-<fc-passage-db-display class="flex" selected-questions="{{testSelected}}">
+<div class="layout flex-2 vertical">
+<fc-passage-db-display class="flex" shared-selection"[[_computeSharedSelection(selectedItem)]]" selected-item="{{sharedSelection}}" selected="{{selectedItem}}">
 </fc-passage-db-display>
 </div>
-<div class="layout flex-2 vertical">
-<fc-pickle class="flex">
+<div class="layout flex-3 vertical">
+<fc-pickle meta-object="{{metaObject}}" menu-item-array="{{menuItemArray}}" word-array="{{wordArray}}" selected-item="{{selected}}" shared-selection="{{sharedSelection}}" class="flex">
 </fc-pickle>
 </div>
-<div class="layout flex-1 vertical">
-<fc-passage-question-display class="flex" test-selected="{{testSelected}}">
+<div class="layout flex-3 vertical">
+<fc-passage-question-display class="flex" selected="{{selectedItem}}" shared-selection="[[_computeSharedSelection(selectedItem)]]">
 </fc-passage-question-display>
 </div>
-
-<!-- <fc-question-type-setter>
-</fc-question-type-setter> -->
-
 </div>
 </template>
 <script>
 Polymer({
 is: "fc-passage-type-generator",
 properties: {
-	testSelected:{
+	sharedSelection:{
 		type: String,
-		value: function(){return "testfour";},
+		computed: "_computeSharedSelection(selectedItem)",
+		observer: "announceSharedSelection",
 		notify: true
-	}
+	}, 
+	menuItemArray: {type: Array,
+    	value: function(){return [];},
+    	notify: true
+    },
+    selectedItem: {
+    	type: String,
+    	notify: true
+    }
+   
+   },//end of properties
+   announceSharedSelection: function(){
+   	// alert(this.sharedSelection);
 
+}, 
 
-},//end of properties
+_computeSharedSelection: function(selectedItem){
+	return selectedItem;
+
+}
 
 });
 </script>

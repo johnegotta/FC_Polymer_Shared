@@ -46,7 +46,7 @@
 	background: yellow;
     }
 
-    #firepad {min-width: 330px; height: 450px; border: 6px ridge silver; margin: 0px auto; width: 96%;}
+    #firepad {min-width: 330px; max-height: 450px; height: 220px; border: 6px ridge silver; margin: 0px auto; width: 98%; border-radius: 4px; resize: vertical;}
 </style>            
 </style>
 <template>
@@ -82,13 +82,14 @@
 		    				value="{{fcid}}"
 		    				label="FCID">
 		    			</fc-input-prime>
-		    			<fc-input-prime
+		    		<fc-input-prime
 							label="Passage Type"
 							input-type="text" 
 							class="horizontal layout flex center"
 							value="{{passageType}}"
 							>
 						</fc-input-prime>
+						<!-- <fc-select-mc-star class="horizontal layout flex self-stretch center" style="margin-bottom: -14px; max-width: 180px;" select-child="menuItem"></fc-select-mc-star> -->
 		    			<fc-input-prime 
 		    				input-type="text"
 		  					class="horizontal layout flex center"
@@ -207,18 +208,44 @@
 	  				</section>
 		
 			<section class="horizontal layout">
-			<paper-button on-tap="saveLocal" style="width: 100%; color: green; max-height: 75px; background: aliceblue; border: 2px solid #afafaf;">Enter Details</paper-button>
-    			<paper-button on-tap="getText" style="max-height:  75px; color: gray; width: 100%; background: aliceblue; border: 2px solid #afafaf;">Load Text</paper-button>
+			<paper-button on-tap="saveLocal" style="width: 100%; margin: 12px; font-size: 20px; color: green; max-height: 75px; background: aliceblue; border: 2px solid #afafaf;">Enter Details</paper-button>
+    			<paper-button on-tap="getText" style="max-height:  75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Load Text</paper-button>
+    			<paper-button on-tap="saveToDb" style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Save Data</paper-button>
+    		<paper-button on-tap="clearInputs" style="width: 100%; margin: 12px; font-size: 20px; background: aliceblue;color: gray; max-height: 75px; border: 2px solid #afafaf;"> Clear Data</paper-button>
   			</section>
    			<div class="flex horizontal layout center justified-around" id="firepad">
     		</div> 
 		<section class="horizontal layout">
-			<paper-button on-tap="saveToDb" style="max-height: 75px; color: gray; width: 100%; background: aliceblue; border: 2px solid #afafaf;">Save Data</paper-button>
-    		<paper-button on-tap="clearInputs" style="width: 100%;background: aliceblue;color: gray; max-height: 75px; border: 2px solid #afafaf;"> Clear Data</paper-button>
-		</section>
-		<section class="horizontal layout">
-			<paper-button on-tap="" style="background: aliceblue;max-height: 75px; color: gray;  width: 100%; border: 2px solid #afafaf;">Retrieve Save</paper-button>
-			<paper-button on-tap="" style="background: aliceblue; max-height: 75px; color: gray;  width: 100%; border: 2px solid #afafaf;">Edit Save</paper-button>
+			<paper-button on-tap=""  style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Retrieve Save</paper-button><fc-input-prime
+		    				input-type="number"
+		    				label="Test"
+		    				style="border:1px #008 solid;"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				 style="border:1px #008 solid;"
+		    				input-type="number" 
+		  					class="horizontal layout flex center"
+		    				value="{{vocabularyQuestions}}" 
+		    				label="Section">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    			style="border:1px #008 solid;"
+		    				input-type="number"
+		    				label="Passage"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				style="border:1px #008 solid;font-size: 18px;"
+		    				input-type="number" 
+
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Detail">
+		    			</fc-input-prime>
+			<paper-button on-tap=""  style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Edit Save</paper-button>
 		</section>
 		<section style="height: 100%;">
 
@@ -259,8 +286,8 @@
 	   get behaviors() { 
 	    return [
 		  Polymer.IronResizableBehavior, 
-		  FCBehaviors.FCFirepadBehavior,
-		  FCBehaviors.MetaObjectSavingBehavior
+		  FCBehaviors.FCFirepadBehavior
+		 // FCBehaviors.MetaObjectSavingBehavior
 		  ];
 	   }
 	   beforeRegister() {
@@ -382,18 +409,125 @@
 			notify: true
 		}	
     };
-
-	
 	   }
 	
-	 attached(){
-	 	this.loadFirepad();
+	 ready(){
+	 this.loadFirepad();
 	     }
-	
-	/*getText, createMetaObject, saveLocal, saveToDb, clearInputs, need to grab fcid, 
-	localStorage.setItem("myPassageTemp", myPassage);  is in get text so that is accessable too; need retrieveFromDatabase: function(){} retrieve hold in session hold in cache
 
-*/
+	 createMetaObject(){
+		this.$.isFocused.checked=this.isFocused;
+	    this.$.isDoublePassage.checked=this.isDoublePassage;
+	    this.$.hasCharts.checked=this.hasCharts;
+		this.set("metaObject",{		
+			"passageTitle": this.passageTitle,
+			"passageType": this.passageType,
+			"passageBlurb": this.passageBlurb,
+			"passageIsDouble": this.passageIsDouble,
+			"passageHasCharts": this.passageHasChaerts,
+			"passageIsFocused": this.passageIsFocused,
+			"passageWordCount": this.passageWordCount,
+			"passageSubtype": this.passageSubtype,
+			"passageSubtypeComments": this.passageSubtypeComments,
+			"citationQuestions": this.citationQuestions,
+			"totalCitations": this.totalCitations,
+			"mostNearlyMeans": this.mostNearlyMeans,
+			"totalNumberQuestions": this.totalNumberQuestions,
+			"vocabularyTested": this.vocabularyTested,
+			"citationsArray": this.citationArray,
+			"passageDifficult": this.passageDifficulty,
+			"culturalContext": this.culturalContext,
+			"passageStructure": this.passageStructure,
+			"passageNumberParagraphs": this.passageNumberParagraphs, 
+			"fcid": this.fcid, 
+			"passageMenuItem": this.passageMenuItem,
+			"isTwoColumns": this.isTwoColumns
+		});
+		}
+
+	createPassageObject(){
+		this.set("passageObject",
+				{ 
+					"fcid": this.fcid,
+					"wordArray": this.wordArray,
+					"wordCount": this.wordCount,
+					"menuItem": this.menuItem,
+					"metaObject": this.metaObject,
+					"otherFields": this.otherFields
+				});
+		var self=this;
+				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		ref.child(fcidString).set(self.passageObject);
+
+	}
+	attached(){
+		this._toggleRightDrawer();
+		this._toggleLeftDrawer();
+
+	}
+
+	 saveLocal(){
+	 	var passageContent = this.firepad.getText();
+	 	this.getText(passageContent);
+	 	this.createMetaObject();
+	 	this.createPassageObject();
+	 }
+		
+	 
+	saveToDb(){
+		this.saveLocal();
+		this.createPassageObject();
+		if(this.passageTitle!==""){ 
+		var self=this;
+		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		ref.child(self.fcid).set(self.passageObject);
+		this.clearInputs();
+		  
+	  }
+	  else {
+	  	this.openDialog();
+	  }
+	}
+
+	clearInputs(){
+		this.set("passageType", null);
+	    this.set("passageBlurb", null);
+		this.set('passageHasCharts', false);
+		this.set('passageIsFocused', false);
+		this.set('passageIsDoublePassage', false);
+		this.set("fcid",null);
+		this.set("passageTitle", null);
+	
+	}
+
+	openDialog(){
+		Polymer.dom("fc-dashboard-one").querySelector("#dataAdminPrime").open();
+	}
+	_toggleRightDrawer(){
+			var drawer = document.querySelector('#drawer-2');	
+			if(drawer.forceNarrow!==true)
+			{drawer.forceNarrow = true;}
+			else{drawer.forceNarrow = false;
+			}
+	}
+	_toggleLeftDrawer(){
+		var drawer = document.querySelector('#drawerPrimed');
+          var dashboard = document.querySelector("#dashboardPrime");	
+		if(drawer.forceNarrow!==true)
+          {
+               drawer.forceNarrow = true;
+               drawer.responsiveWidth='90000px';
+               dashboard.leftHidden=true;
+          }
+          else
+          {
+               drawer.forceNarrow = false;
+               drawer.responsiveWidth ='1080px';
+               dashboard.leftHidden=false;
+
+          }
+     }
+	
 
 }
 
