@@ -1,0 +1,61 @@
+
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.dataManagerBehavior = {
+	properties: 
+	{
+		dataStrategy: 
+		{
+			type: String,
+			value: "firebaseOnly"
+			/* firebaseOnly, localOnly, or localAndFirebase */
+		},
+		firebaseLocation:
+		{
+			type: String,
+			value: ""
+		}
+	},
+
+	attached: function()
+	{
+	},
+
+	setFirebaseLocation: function(argLoc)
+	{
+		this.firebaseLocation = argLoc;
+		this.firebase = new Firebase(this.firebaseLocation);
+	},
+
+	setDataStrategy: function(argStrategy)
+	{
+		this.dataStrategy = argStrategy;
+	},
+
+	getData: function (argName, argCallback)
+	{
+		console.log(argName, argCallback);
+		var localVal = null;
+		var fbVal = null;
+		if(this.dataStrategy == "localOnly" || this.dataStrategy == "localAndFirebase")
+		{
+			localVal = localStorage.getItem(argName);
+			localVal = JSON.parse(localVal);
+			if(localVal != null)
+			{
+				argCallback(localVal);
+			}
+		}
+		else
+		{
+			var self = this;
+			this.firebase.child(argName).once("value", function(snap){
+				fbVal = snap.val();
+				var localResaveVal = JSON.stringify(fbVal);
+				localStorage.setItem(argName, localResaveVal);
+				argCallback(fbVal);
+			});
+		}
+	}
+}
+</script>
