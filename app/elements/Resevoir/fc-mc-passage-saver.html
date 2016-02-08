@@ -1,0 +1,209 @@
+<dom-module id="fc-mc-passage-saver">
+<template>
+<style>
+</style>
+
+<paper-button on-tap="doIt">DO IT</paper-button>
+<div id="firepad" style="background: white; height:600px"></div>
+
+
+</template>
+<script>
+
+FcMcPassageSaver=Polymer({
+	is: 'fc-mc-passage-saver',
+	//behaviors: [FCBehaviors.FCFirepadBehavior],				
+	properties: {
+		passageTitle: {
+			type: String,
+			value: "The Strangeness of Beauty"
+		},
+		passageType: {
+			type: String,
+			value: "fiction"
+		},
+		passageSubtype: {
+			type: String,
+			value: "old timey"
+		},
+		passageBlurb: {
+			type: String,
+			value: "a big blurb"
+		},
+		passageDifficulty: {
+			type: Number,
+			value: 2
+		},
+		passageIsDouble: {
+			type: Boolean,
+			value: true
+		},
+		passageNumQuestions: {
+			type: Number,
+			value: 10
+		},
+		hasCharts: {
+			type: Boolean,
+			value: false
+		},
+		isFocused: {
+			type: Boolean,
+			value: true
+		},
+		fcid: {
+			type: String,
+			value: "T00001S1P1"
+		}
+	},
+
+	attached: function()
+	{
+		//this.loadFirepad();
+		this.firepadRef = new Firebase('https://amber-inferno-3827.firebaseio.com/firepad');
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
+  		this.firebase = new Firebase("https://amber-inferno-3827.firebaseio.com/reading/");
+	},
+
+	doIt: function (e) {
+		var rawText = this.firepad.getText();
+		var passageObj = {
+			fcid: this.fcid,
+			title: this.passageTitle,
+		 	passageType: this.passageType,
+		 	passageSubtype: this.passageSubtype,
+		 	passageBlurb: this.passageBlurb,
+		 	passageDifficulty: this.passageDifficulty,
+		 	passageNumQuestions: this.passageNumQuestions,
+		 	rawText: rawText,
+		 	wordArray: [],
+		 	paragraphArray: [],
+		 	sentenceArray:[],
+		 	isDouble: this.passageIsDouble,
+		 	isFocused: this.isFocused,
+		 	hasCharts: this.hasCharts
+		 };
+		var paragraphArray = rawText.split("\n");
+		var numParagraphs = paragraphArray.length;
+		passageObj.numParagraphs = numParagraphs;
+		var i = 0;
+		var j = 0;
+		var k = 0;
+		var word = "";
+		var passageWordIndex = 0;
+		var previousSentenceFirstWord = "";
+		var previousWord = "";
+		for(i = 0; i < numParagraphs; i++)
+		{
+			var sentenceArray = [];
+			paragraphArray[i] = paragraphArray[i].replace(/^ +/, "");
+			paragraphArray[i] = paragraphArray[i].replace(/ +$/, "");
+			passageObj.paragraphArray.push(paragraphArray[i]);
+			var paragraph = paragraphArray[i];
+			var paraLen = paragraph.length;
+			var paragraphWordArray = paragraph.split(" ");
+			var numWordsInParagraph = paragraphWordArray.length;
+			var paragraphFirstWord = paragraphWordArray[0];
+			var paragraphFwi = passageWordIndex;
+			var paragraphLastWord = paragraphWordArray[numWordsInParagraph-1];
+			var paragraphLwi = paragraphFwi + numWordsInParagraph -1;
+			var matches = paragraph.match(/.*?(\.|\?|\!)/);
+			var loopCount = 0;
+			while(matches != null && paraLen > 0 && loopCount < 20)
+			{
+				var matchLen = matches[0].length;
+				matches[0] = matches[0].replace(/^ +/, "");
+				matches[0] = matches[0].replace(/ +$/, "");
+				sentenceArray.push(matches[0]);
+				passageObj.sentenceArray.push(matches[0]);
+				paragraph = paragraph.slice(matchLen);
+				paraLen -= matchLen;
+				matches = paragraph.match(/.*?(\.|\?|\!)/);
+				loopCount++;
+			} 
+			var numSentences = sentenceArray.length;
+			var paragraphWordIndex = 0;
+			var sentenceFirstWord = "";
+			for(j = 0; j < numSentences; j++)
+			{
+				var wordArray = sentenceArray[j].split(" ");
+				var numWords = wordArray.length;
+				sentenceFirstWord = wordArray[0];
+				var sentenceLastWord = wordArray[numWords-1];
+				//previousSentenceFirstWord = (j==0 /* && i != 0*/)? "": sentenceArray[j-1].split(" ")[0];
+				var nextSentenceFirstWord = "";
+				for(k = 0; k < numWords; k++)
+				{
+					word = wordArray[k];
+					if(k==0 && j==0) //first word of paragraph
+					{
+						if(i != 0)
+						{
+							passageObj.wordArray[passageWordIndex-1].nextWord = word;
+						}
+					}
+					//previousWord = (k==0)? "": wordArray[k-1];
+					var nextWord = (k==(numWords-1))? "": wordArray[k+1];
+					//first word of prev and next sentence
+					var wordObj = {
+						word: word, sentenceWordIndex: k,
+						paragraphWordIndex: paragraphWordIndex,
+						paraWordIndex: paragraphWordIndex,
+						paraNum: i+1,
+						paragraphIndex: i,
+						paragraphFirstWord: paragraphFirstWord,
+						paragraphLastWord: paragraphLastWord,
+						paraLwi: paragraphLwi,
+						paraFwi: paragraphFwi,
+						newPara: (k==0 && j==0),
+						isLastWordOfPara: (j==(numSentences-1) && k==(numWords-1)),
+						paraLength: numWordsInParagraph,
+						passageWordIndex:passageWordIndex,
+						passageTitle: passageObj.title,
+						passageType: passageObj.passageType,
+						passageSubtype: passageObj.passageSubtype,
+						passageBlurb: passageObj.passageBlurb,
+						passageDifficulty: passageObj.passageDifficulty,
+						passageIsDouble: passageObj.isDouble,
+						passageHasCharts: passageObj.hasCharts,
+						passageIsFocused: passageObj.isFocused,
+						passageNumQuestions: passageObj.passageNumQuestions,
+						previousWord: previousWord,
+						nextWord: nextWord,
+						sentenceIndex:j,
+						sentence: sentenceArray[j],
+						sentenceLength: numWords,
+						sentenceFirstWord: sentenceFirstWord,
+						sentenceLastWord: sentenceLastWord,
+						previousSentenceFirstWord: previousSentenceFirstWord,
+						partOfSpeech: "noun",
+						definition: "",
+						difficulty: 1,
+						relevance: 1,
+						relatedQuestions: ["T00001S1P1Q01", "T00002S1P2Q03"],
+						relatedQuestionsText: ["", ""],
+						relatedQuestionsQuote: ["", ""],
+						relatedAnswers: ["T00001S1P1Q01B"],
+						relatedAnswersText: [""],
+						relatedAnswersQuote: ["quoted stuff"],
+						commonQuestionPatterns: [""],
+						commonAnswerPatterns: [""],
+						culturalContext: "Australasian"
+					};
+					passageObj.wordArray.push(wordObj);
+					passageWordIndex++;
+					paragraphWordIndex++;
+					previousWord = word;
+				}
+				previousSentenceFirstWord = sentenceFirstWord;
+			}
+		}
+		console.log(passageObj);
+		var holderObj = {};
+		holderObj[passageObj.fcid] = passageObj;
+		this.firebase.child("newpassages").update(holderObj);
+	}
+});
+</script>
+</dom-module>
