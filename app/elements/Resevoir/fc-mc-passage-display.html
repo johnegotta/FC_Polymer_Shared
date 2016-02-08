@@ -21,15 +21,27 @@
 			font-style: italic;
 			display: block;
 		}
+		.fc-highlighted {
+			color: red;
+		}
 
 </style>
 <!--double-column line-number and passage vertical container-->
 <div id="fcmcpassagedisplay" style="width: 98%;">
-	<div>{{user}} logged in</div>
+	<div><b>{{user}}</b> logged in</div>
+	<div>{{userinfo}}</div>
+	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/" select-child="title">
+	</fc-mc-select>
+	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/" select-child="blurb">
+	</fc-mc-select>
+	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/" select-child="type">
+	</fc-mc-select>
+	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/">
+	</fc-mc-select>
 	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
 		<select on-change="changePassage" style="width:400px">
 			<template is="dom-repeat" items="{{passageArray}}">
-				<option value="{{_computePassageId(index)}}">{{item.title}}</option>
+				<option value="{{item.fcid}}">{{item.fcid}}</option>
 			</template>
 		</select>
 	<!--blurb full width container-->
@@ -37,30 +49,37 @@
 		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
 			{{passage.blurb}}
 		</div>
+
 		<br>
 		<div class="line-numbers" id="linesA1">Lines</div>
 
 	<!--single column container-->
 		<!-- <firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> -->
 		<div class="layout horizontal">
-		<div id="line-numbers" class="layout vertical line-number">
-		    <template is="dom-repeat" items="{{lineNumberArray}}"> <!--filter="{{_numberFilter(lineNumbers)}}"> -->
-			  <span hidden="{{_computeHidden(index)}}" id$="{{_computeLineNumber(index)}}">{{item}}</span>
-			  <span hidden="{{_computeHidden(index)}}">&nbsp</span>
-		    </template> 
-		</div>
-		<template is="dom-repeat" items="{{passage.wordArray}}">
-			<template is="dom-if" if="{{item.newPara}}">
-			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
-			</template>
-			<!--<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>-->
-		     <a id$="A[[index]]_transition" >{{item.word}}</a>&nbsp<!--style="background:green;"-->
-		</template>
+			<div id="line-numbers" class="layout vertical line-number">
+			    <template is="dom-repeat" items="{{lineNumberArray}}"> <!--filter="{{_numberFilter(lineNumbers)}}"> -->
+				  <span hidden="{{_computeHidden(index)}}" id$="{{_computeLineNumber(index)}}">{{item}}</span>
+				  <span hidden="{{_computeHidden(index)}}">&nbsp</span>
+			    </template> 
+			</div>
+			<div class="flex" style="max-width:70%;padding:16px">
+				<template is="dom-repeat" items="{{passage.wordArray}}">
+				<template is="dom-if" if="{{item.newPara}}">
+				  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+				</template>
+				<!--<a id$="A[[item.wordIndex]]" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>-->
+			     <a id$="A[[index]]_transition" name$="{{item.questionNumberClasses}}" class$="{{_computeAnchorClasses(item, selectedQuestion)}}" >{{item.word}}</a>&nbsp<!--style="background:green;"-->
+				</template>
+			</div>
+			<div class="layout vertical">
+				<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/unsortedquestions/" select-child="fcid" on-change="highlightQuestion"></fc-mc-select>
+				<label for="mcdef">Definition</label>
+				<div id="mcdef" style="width:200px;border: 1px solid black">{{currentDefinition}}</div>
+			</div>
 		</div>
 		<br>
 		<br>
 		<paper-tooltip for="{{currentId}}">{{currentDefinition}}</paper-tooltip>
-		<div>{{currentDefinition}}</div>
 		<paper-button on-tap="exploreDom" style="background:red">Explore Dom</paper-button>
 		<!-- end-of-column-1 line number and text container-->
 
@@ -71,17 +90,23 @@
 <script>
 Polymer({
 	is:'fc-mc-passage-display',
-	behaviors: [Polymer.IronResizableBehavior, FCBehaviors.dictionaryBehavior],
+	behaviors: [Polymer.IronResizableBehavior, FCBehaviors.dictionaryBehavior, FCBehaviors.dataManagerBehavior],
 	properties: {
 		passagePath: {
 			type: String,
-			value: 'passage1',
+			value: 'T00001S1P1',
 			notify: true,
 			reflectToAttributes: true
 		},
 		user: {
 			type: String,
-			value: ""
+			value: "",
+			notify: true
+		},
+		userdata: {
+			type: String,
+			value: "Maria",
+			notify: true
 		},
 		passage: {
 			type: Object,
@@ -94,7 +119,7 @@ Polymer({
 		passageRootPath: {
 			type: String,
 			value: function(){
-				return 'https://focusedstaging1.firebaseio.com/mcpassageDestinations/';
+				return 'https://amber-inferno-3827.firebaseio.com/reading/newpassages/';
 			},
 			notify: true,
 			reflectToAttributes: true
@@ -114,8 +139,13 @@ Polymer({
 			type: Array,
 			value: [],
 			notify: true
+		},
+		selectedQuestion: {
+			type: String,
+			value: ""
 		}
 		 /*,
+		}
 		}
 		passageTitle: {
 			type: String,
@@ -167,7 +197,7 @@ Polymer({
 		console.log(this);		
   		if (authData) {
     		console.log("User " + authData.uid + " is logged in with " + authData.provider);
-    		this.user = authData.password.email;
+    		this.user = authData.password.email.split("@")[0];
   		}
   	},
 
@@ -184,13 +214,20 @@ Polymer({
 		var ref = new Firebase(this.passageRootPath);
 		ref.onAuth(this.authDataCallback.bind(this));
 
-		ref.once("value", function(snap) {
+		this.setDataStrategy("firebaseOnly");
+		this.setFirebaseLocation("https://amber-inferno-3827.firebaseio.com/reading/");
+
+//		ref.on("value", 
+		this.getData("newpassages", function(snap) {
 			//console.log("added", snap.key());
-			self.passages = snap.val();
+			console.log(snap);
+			//self.passages = snap.val();
+			self.passages = snap;
 			console.log(self.passages);
 			self.passage = self.passages[self.passagePath];
 			var keys = Object.keys(self.passages);
 			var numP = keys.length;
+			self.set("passageArray", []);
 			for(i=0;i<numP;i++)
 			{
 				self.push("passageArray", self.passages[keys[i]]);
@@ -202,11 +239,35 @@ Polymer({
 			//self.splitPassageForColumns;
 			//ref.off();
 		});
+		var fb = new Firebase("https://focusedstaging1.firebaseio.com/users/" + this.user);
+    	fb.on("value", function(snapshot){
+    		self.userdata = snapshot.val().firstname;
+    		console.log(self.userdata);
+    	});
+	},
+
+	_computeAnchorClasses: function(argItem, argSel)
+	{
+		//console.log(argItem, this.selectedQuestion);
+		if(argItem.questionNumberClasses == null || argItem.questionNumberClasses.indexOf(this.selectedQuestion) < 0)
+		{
+			return "carrot";
+		}
+		else
+		{
+			return "fc-highlighted";
+		}
+	},
+
+	highlightQuestion: function(e)
+	{
+		this.selectedQuestion = e.target.value;
+		//console.log(e.target.value);
 	},
 
 	changePassage: function(e)
 	{
-		console.log(e.target.value);
+		//console.log(e.target.value);
 		this.anchorsWired = false; //recalculate dictionary listeners for new passage
 		this.currentDefinition = "Word Not Found";
 		this.passage = this.passages[e.target.value];
