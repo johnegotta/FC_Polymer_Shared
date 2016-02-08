@@ -39,7 +39,7 @@ properties:{
 		//this.myajax.setAttribute("onResponse", "handleResponse");
 		var fb = new Firebase("https://focusedstaging1.firebaseio.com/dictionary/");
 		var self = this;
-		fb.once("value", function(snapshot) {
+		fb.on("value", function(snapshot) {
 			console.log(snapshot);
 			self.dictionary = snapshot.val();
 			console.log(self.dictionary);
@@ -87,28 +87,30 @@ properties:{
 			anchor.setAttribute("name", "poop");
 			console.log(anchor);
 		}
-		this.anchorsWired = true;
+		if(numA != 0) this.anchorsWired = true;
 		//this.removeEventListener("mousemove", this.wireAnchors);
 	},
 
 	
 	//		this.$.myajax.generateRequest();
 
+	stripPunctuation: function(argString)
+	{
+		var result = argString.replace(/(\,|\.|\?|\!|\;|\:|\-|\(|\))/g, "");
+		return result;
+	},
+
 	lookupWord: function(e)
 	{
 		var target = e.target;
-		console.log(target);
+		//console.log(target);
 		this.currentId = target.id;
-		console.log(this);
+		//console.log(this);
 		console.log(this.dictionary);
 		var def = "";
 		var word = "";
-		// if(target.value)
-		// {
-		// 	word = target.value.toLowerCase();
-		// }
 		word = target.innerHTML.toLowerCase(); //geared to <a> tags
-
+		word = this.stripPunctuation(word);
 		try
 		{
 			def = this.dictionary[word];
@@ -123,17 +125,26 @@ properties:{
 				defText += keys[i].toUpperCase();
 				defText += ": ";
 				var synonyms = def[keys[i]].syn;
-				var numSyn = synonyms.length;
+				var similars = def[keys[i]].sim;
+				var numSyn = synonyms == null? 0 : synonyms.length;
+				var numSim = similars == null? 0 : similars.length;
 				var j = 0;
 				for(j=0;j<numSyn;j++)
 				{
 					defText += synonyms[j];
-					defText += " ";
+					defText += ", ";
+				}
+				for(j=0;j<numSim;j++)
+				{
+					defText += similars[j];
+					defText += ", ";
 				}
 			}
+			console.log(defText);
 		}
 		catch(err)
 		{
+			console.log(err);
 			defText = "Word Not Found";
 		}
 		this.currentDefinition = defText;
