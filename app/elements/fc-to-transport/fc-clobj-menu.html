@@ -1,0 +1,321 @@
+  <dom-module id="fc-clobj-menu">
+  <template>
+  <style>
+ 	.gradBackground{		
+		background: linear-gradient(to Top, #fff 2%,#1e5799 22%,#fff 42%,#fff 57%,#7db9e8 68%);
+	}
+:host{	overflow-x: scroll;
+		overflow-y: hidden;
+	/*	margin-right: 50%;
+		margin-left: 50%;*/
+
+		@apply(--horizontal-layout);
+		@apply(--flex-layout-nowrap);
+	}
+
+
+.blue-btn-class{
+ display: inline-block;
+ border:6px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+width: 20px;
+ height: 20px;
+ margin: 2px;
+ margin-top: 4px;
+ font-size: 13px;
+ padding: 3px;
+ /*box-shadow: 3px 14px 11px 4px #9fafaf;*/
+ /*box-shadow: 3px 4px 11px 3px #bebebe;
+ -moz-box-shadow: 3px 4px 11px 3px #41398A;
+ -webkit-box-shadow: 3px 4px 11px 3px #41398A;*/
+ /*text-shadow: 0 1px 0 #FFFFFF;*/
+ background-color: #5DD7FC;
+}
+.blue-btn-class:hover, .blue-btn-class:active, .thefocus{
+	 display: inline-block;
+ border:6px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+width: 20px;
+ height: 20px;
+ margin: 2px;
+ margin-top: 4px;
+ font-size: 13px;
+ padding: 3px;
+	padding: 6px 6px;
+ border:6px solid gold;
+ z-index:50000;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}
+	</style>
+<section style="width:100%; min-height: 22px; font-size: 18px; color: #008; font-family: merriweather; font-weight: 600;">	{{app.title}}</section>
+<!-- <iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}"> -->
+	<!-- <section on-tap="selectPrevious"><iron-icon icon="icons:chevron-left"></iron-icon></section> -->
+	<paper-tabs 
+			      		id="assistantMenu" 
+			      		scrollable="true"
+			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-tap="clickHandler"
+			      		bar="true"
+			      		hide-scroll-buttons="true" 
+			  			> 
+<section id="content" class="horizontal layout around-justified nowrap" style="overflow-x: scroll; padding: 0px 0px;">
+  				<template 
+					is='dom-repeat' 
+						class="horizontal layout flex nowrap justified" 
+						items="{{iconArrayA}}">
+						<section 
+							style$="[[computedStyle(determine)]]" 
+							data-transition$="[[item.dDialogTwo]]"
+							on-mouseover="labeler"
+							
+							 drags="true"
+							 label$={{item.label}}>
+							<iron-icon 
+								drags="true"
+								id$="[[item.dDialogTwo]]"
+				        		icon$="[[item.iconUsed]]"  
+				        		class$="[[item.sectionClass]]"
+				        		data-transition$="[[item.dDialogTwo]]"
+				        		label$="{{item.label}}"
+				        		
+				      			>
+							</iron-icon>
+						</section>
+					</template>
+	</section>
+	</paper-tabs>
+		<!-- <section></section> on-tap="selectNext"><iron-icon icon="icons:chevron-right"></iron-icon -->
+<!-- 	</iron-selector> -->
+
+</template>
+<script>
+FcClobjMenu=Polymer({
+	is:"fc-clobj-menu",
+	properties:{
+		iconArrayA:{
+			type: Array,
+			computed: "_computeIconArrayA(iconArray)",
+			notify: true
+		},
+		iconArray:{
+			type: Array,
+			value: function(){
+				return [
+					{	"sectionClass": "normal blue-btn-class",
+						"dDialogOne": "loginMenu",
+						"iconUsed": "icons:account-circle",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "loginMenu", 
+						"label": 	"Login & Profile"
+					},
+					{	"sectionClass": "normal blue-btn-class",
+						"dDialogOne": "dragAdmin",
+						"iconUsed": "icons:hardware:dock",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "dragAdmin",
+						"label":"The Focused Assistant"
+					},
+					
+					{	"sectionClass": "normal blue-btn-class",
+						"dDialogOne": "toDoList",
+						"iconUsed": "icons:list",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "toDoList", 
+						"label": "To-dos & Syllabus"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "completedTasks",
+						"iconUsed": "icons:toc",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "completedTasks",
+						"label": "Completed Tasks"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "clockTimer",
+						"iconUsed": "icons:alarm-on",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "clockTimer", 
+						"label": "Timers & Clocks",
+						"selected": 1
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "firePadPrime",
+						"iconUsed": "icons:spellcheck",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "firePadPrime",
+						"label": "Notepad"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "geoCalculator",
+						"iconUsed": "icons:view-module",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "geoCalculator", 
+						"label": "Focused Calculator"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "calendar",
+						"iconUsed": "icons:today",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "calendar",
+						"label": "Focused Calendar"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "readView",
+						"iconUsed": "icons:chrome-reader-mode",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "readView",
+						"label": "Reading Focus"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "howWeDoin",
+						"iconUsed": "icons:assessment",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "howWeDoin",
+						"label": "Chart Your Progress"
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "whatToSee",
+						"iconUsed": "icons:visibility",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "whatToSee",
+						"label": 	"Things To See"
+
+					},
+					{	"sectionClass": "normal buttons blue-btn-class",
+						"dDialogOne": "starRated",
+						"iconUsed": "icons:stars",
+						"iconClass": "menuItems-dark", 
+						"dDialogTwo": "starRated",
+						"label": "Focused LeaderBoard"
+					}
+				];
+			},
+		notify: true
+	},
+	scrollStyle: {
+       type: String,
+       value: 'horizontal'
+      },
+    app: {
+    	type: Object,
+    	value: {
+    		title:"",
+    		selected: Number,
+    		controls:[],
+    		icons:[],
+    		methods:[],
+    		notify: true
+    	},
+    	notify: true,
+    	reflectToAttribute: true
+    },
+    selected:{
+    	type: Number,
+    	notify: true
+    },
+     
+    widthRatio: {
+       type: Number,
+       value: 3
+      },
+      
+    opacityRate: {
+       type: Number,
+       value: 0.8
+      },
+    
+    transition: {
+        type: String,
+        value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+      }
+	},
+
+
+
+	_computeIconArrayA: function(iconArray){
+				var arr=[];
+				for(j=0; j<3;j++){
+				for(i=0; i<iconArray.length;i++){
+				arr.push(iconArray[i]);
+				}
+			}
+			return arr;
+	},
+	computedStyle: function(determine){
+						 return "margin: 6px;";},
+
+
+
+	ready: function() {
+			var len=this.iconArrayA.length;
+			var sel= Math.floor(len/2);
+			console.log(sel);
+			this.set("selected", sel);
+			console.log("this is the selected", this.selected);
+		      this._transitionProperty = 'opacity, transform';
+		      this._slideComplete = false;
+		      this._direction = '';
+		    },
+
+
+    labeler: function(e, detail){
+    	var elem=e.target;
+        console.log(elem);
+        var label=elem.attributes.label.value;
+        this.set("app.title",label);
+        console.log(this.appTitle);
+      var glowing= Polymer.dom(this.root).querySelectorAll(".thefocus");
+      console.log(glowing, "this is the nodelist");
+      	var len=glowing.length;
+      	for(i=0; i<len; i++){
+      		glowing[i].classList.remove("thefocus");
+      	}
+        if(elem.nodeName=="IRON-ICON"){
+        elem.classList.add("thefocus");
+    	}
+    	else if(elem.nodeName=="SECTION"){
+    		elem=elem.firstElementChild;
+    		if(elem.nodeName=="IRON-ICON")
+    		{
+    		elem.classList.add("thefocus");
+    		}
+    	}
+
+ 	},
+		clickHandler: function(e) {
+			console.log(e);
+			if(e.target.selected!=undefined){
+				var sel = e.target.selected;
+				this.set("app.selected", sel);
+			}
+		  var button = e.target;
+		  while (!button.hasAttribute('data-transition') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-transition')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-transition');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		}
+
+
+		
+});
+</script>
+</dom-module>

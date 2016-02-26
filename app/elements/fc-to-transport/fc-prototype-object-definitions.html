@@ -1,0 +1,160 @@
+<script>
+'use strict';
+function FcPerson(firstName, lastName, email, phone, address1. address2, fcid) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.address1=address1;
+    this.address2=address2;
+    this.fcid=fcid;
+    this.fullName=this.firstName + " " + this.lastName;
+	this.fcid= fcid || this.lastName + this.firstName + "00001"; //need function to check
+	return this;
+}
+
+function FcParent1(parent1FirstName, parent1LastName, parent1Telephone, parent1Email, relatedStudentNames, relatedStudentFcids, relatedParent2, fcid) {
+	this.parent1FirstName = parent1FirstName || "";
+	this.parent1LastName = parent1LastName || "";
+	this.parent1Email=parent1Email || "";
+	this.parent1Telephone = parent1Telephone || "";
+	this.relatedStudentNames=relatedStudentNames || [];
+	this.relatedStudentFcids = relatedStudentFcids || [];
+	this.relatedParent2 = relatedParent2 || "";
+	this.parent1FullName = this.parent1FirstName + " " this.parent1LastName;
+	this.fcid=fcid || this.parent1LastName + this.parent1FirstName + "00001";
+	return this;
+}
+
+function FcParent2(parent2FirstName, parent2LastName, parent2Telephone, parent2Email, relatedStudentNames, relatedStudentFcids, relatedParent1, fcid){
+	this.parent2FirstName = parent2FirstName || "";
+	this.parent2LastName = parent2LastName || "";
+	this.parent2Email=parent2Email || "";
+	this.parent2Telephone = parent2Telephone || "";
+	this.relatedStudentNames=relatedStudentNames || [];
+	this.relatedStudentFcids = relatedStudentFcids || [];
+	this.relatedParent1 = relatedParent1 || "";
+	this.parent2FullName= this.parent2FirstName + " " this.parent2LastName;
+	this.fcid=fcid || this.parent2LastName + this.parent2FirstName + "00001";
+	return this;
+}
+
+function FcStudent(studentFirstName,studentLastName, studentTelephone, studentEmail, relatedParentsFcids, relatedParentsFullNames, fcid)
+	{
+		this.studentFirstName= studentFirstName ||"";
+		this.studentLastName= studentLastName ||"";
+		this.studentEmail = studentEmail || "";
+		this.studentTelephone = studentTelephone || "";
+		this.relatedParentsFcids = relatedParentsFcids || [];
+		this.relatedParentsFullNames = relatedParentsFullNames || [];
+		this.fcid= this.fcid= fcid || this.studentLastName + this.studentFirstName + "00001";
+		return this;
+	}
+
+
+function FcInquiry(timestamp, relatedStudentFcid,inquirerFcid, inquirerFullName, relatedStudentFullName, inquiryMemo, inquiryRequest, isInquiryClosed, isInquirerPurchaseClosed, inquirerServiceMatch, isScheduledCallback, scheduledCallbackDateTime, contactNumbers, contactEmails, intakeFcid)
+	{  
+		this.timestamp=timestamp;
+		this.relatedStudentFcid=relatedStudentFcid || "";
+		this.inquirersFcids=inquirersFcids || []; 
+		this.inquirersFullNames=inquirersFcids || []; 
+		this.relatedStudentFullName= relatedStudentFullName || ""; 
+		this.inquiryMemo= inquiryMemo || "";
+		this.inquiryRequest= inquiryRequest || "";
+		this.isInquiryClosed= isInquiryClosed || false;
+		this.isInquirerPurchaseClosed= isInquirerPurchaseClosed || false;
+		this.inquirerServiceMatch= inquirerServiceMatch || "";
+		this.isScheduledCallbackNeeded= isScheduledCallbackNeeded || true;
+		this.scheduledCallbackDateTime= timestamp + 2days;//set
+		this.contactNumbers= contactNumbers || [];
+		this.contactEmails= contactEmails || [];
+		this.intakeFcid= intakeFcid || "";
+	return this;
+}
+
+function FcInquiries(timestamp, inquirersFcid, inquirerFullName, relatedStudentFullName, inquiryMemo, inquiryRequest, isInquiryClosed, isInquirerPurchaseClosed, inquirerServiceMatch, isScheduledCallback, scheduledCallbackDateTime, contactNumbers, contactEmails, intakeFcid, relatedStudentFcid,){
+	var FcInquiry = {};
+	FcInquity = FcInquiry(timestamp, relatedStudentFcid,inquirersFcids, inquirersFullNames, relatedStudentFullName, inquiryMemo, inquiryRequest, isInquiryClosed, isInquirerPurchaseClosed, inquirerServiceMatch, isScheduledCallback, scheduledCallbackDateTime, contactNumbers, contactEmails, intakeFcid);
+	this.fcInquiries.push(FcInquiry);
+	this.fcid= fcid;
+	return this;
+}
+function FcStudentPastAcademics(gradeLevel, currentSchool, pastSchool, highestEducationLvl, startMath, startReading, startTotal, fcid){
+	this.gradeLevel= gradeLevel ||"";
+	this.currentSchool= currentSchool ||"";
+	this.pastSchool= pastSchool ||"";
+	this.highestEducationLvl= highestEducationLvl ||"";
+	this.startMath =  startMath  || "";
+	this.startReading = startReading || "";
+	this.startTotal = startTotal || "";
+}
+
+//fucked the below
+function FcStudentProfile(parent1FirstName, parent1LastName, parent1Telephone, parent1Email, relatedStudentNames, relatedStudentFcids, relatedParent2,parent2FirstName, parent2LastName, parent2Telephone, parent2Email, relatedStudentNames, relatedStudentFcids, relatedParent1,studentFirstName,studentLastName, studentTelephone, studentEmail, relatedParentsFcids, relatedParentsFullNames,gradeLevel, currentSchool, pastSchool, highestEducationLvl, startMath, startReading, startTotal, fcid)
+{ 
+	var parent1={};
+	parent1=FcParent1(parent1FirstName, parent1LastName, parent1Telephone, parent1Email, relatedStudentNames, relatedStudentFcids, relatedParent2, fcid);
+	var parent2={};
+		parent2=FcParent2(parent2FirstName, parent2LastName, parent2Telephone, parent2Email, relatedStudentNames, relatedStudentFcids, relatedParent1, fcid);
+	var student = {};
+		student=FcStudent(studentFirstName,studentLastName, studentTelephone, studentEmail, relatedParentsFcids, relatedParentsFullNames, fcid);
+	var pastAcademics ={};
+		pastAcademics = FcStudentPastAcademics(gradeLevel, currentSchool, pastSchool, highestEducationLvl, startMath, startReading, startTotal,fcid);
+		this.parent1=parent1 || {};
+		this.parent2=parent2 || {};
+		this.student=student || {};
+		this.pastAcademics=pastAcademics || {};
+		return this;	
+}
+
+
+
+ 
+class FcStudent extends FcPerson{
+	constructor(firstName,lastName,address1,address2,parent1,parent2,phone1,parent1Telephone,parent2Telephone,email,parent1Email,parent2Email,telephone,fcid)
+	{
+		this.firstName= firstName ||"";
+		this.lastName= lastName ||"";
+		this.address1= address1 ||"";
+		this.address2= address2 ||"";
+		this.parent1= parent1 ||"";
+		this.parent2= parent2 ||"";
+		this.phone1= phone1 ||"";
+		this.parent1Telephone= parent1Telephone ||"";
+		this.parent2Telephone= parent2Telephone ||"";
+		this.email= email ||"";
+		this.parent1Email= parent1Email ||"";
+		this.parent2Email= parent2Email ||"";
+		this.telephone= telephone ||"";
+		this.fullName=this.firstName + " " + this.lastName;
+		this.fcid= fcid || this.lastName + this.firstName + "00001";
+	}
+	getFanout(){
+		var fanoutObj = {
+
+
+		};
+		fanoutObj[this.fcid]=this;
+		fanoutObj.currentStudents=this;
+		return fanoutObj;
+	}
+}
+
+class FcStudent extends FcProfile {
+	constructor(firstName,lastName,address1,address2,parent1,parent2,phone1,parent1Telephone,parent2Telephone,email,parent1Email,parent2Email,telephone,gradeLevel,currentSchool,pastSchool,highestEducationLvl,startMath, startReading, startTotal, fcid)
+	{
+		super(firstName,lastName,address1,address2,parent1,parent2,phone1,parent1Telephone,parent2Telephone,email,parent1Email,parent2Email,telephone,fcid);
+	this.gradeLevel= gradeLevel ||"";
+	this.currentSchool= currentSchool ||"";
+	this.pastSchool= pastSchool ||"";
+	this.highestEducationLvl= highestEducationLvl ||"";
+	this.startMath =  startMath  || "";
+	this.startReading = startReading || "";
+	this.startTotal = startTotal || "";
+	}
+}
+
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcStudentProfileClass= {
+};
+</script>

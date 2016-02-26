@@ -1,0 +1,205 @@
+<script>
+Date.prototype.addDays = function(days) {
+       var dat = new Date(this.valueOf())
+       dat.setDate(dat.getDate() + days);
+       return dat;
+}
+
+Date.prototype.getFCMonth = function()
+{
+	var dat = new Date(this.valueOf());
+	var monArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	return monArray[dat.getMonth()];
+}
+
+
+   function getDates(startDate, stopDate) {
+      var dateArray = new Array();
+      var currentDate = startDate;
+      while (currentDate <= stopDate) {
+        dateArray.push(currentDate)
+        currentDate = currentDate.addDays(1);
+      }
+      return dateArray;
+    }
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcCalendarBehaviorPrime = {
+	properties: {
+		// myData:{
+		// 	type: Array,
+		// 	computed:"computeDataCalendar(theDate)",
+		// 	notify: true
+		// },
+
+		displayedMonthIndex:{
+			type: Number,
+			notify: true
+		},
+		theDate:{
+			type: Date,
+			value: function(){var d = new Date(); return d;},
+			notify: true
+		},
+		displayedMonth:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		monthsArray:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		dayOfWeek: {
+			type: String,
+			notify: true
+		},
+		date: {
+			type: Array,
+			value: function(){ return [];},
+			notify: true
+		},
+		year: {
+			type: String,
+			notify: true
+		},
+			days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+			},
+			notify: true
+		}, 
+		
+		month: {
+			type: String,
+			value:function(){return"";},
+			notify: true
+		}
+
+
+	},
+
+
+	attached: function(){
+		this.calendarCreator;
+		//console.log(this.day, this.theId);
+	},
+
+	calendarCreator: function()
+	{
+		var self=this;
+		var i=0;
+		var startDate = (new Date()).addDays(-165);
+		while(startDate.getDay() != 0)
+		{
+			startDate = startDate.addDays(-1);
+		}
+		var endDate = (new Date()).addDays(365);
+		this.set('date', getDates(startDate, endDate));
+		var numDays = this.date.length;
+		var currentMonth = 0; 
+		for (i = 0; i < numDays; i++) 
+		{
+			var currDate = self.date[i];
+			if(i==0)
+			{	
+				self.push("monthsArray", []);
+				var startDay = currDate.getDay(); 
+				while(startDay-- > 0)
+				{	//console.log("this should never be called");
+					this.monthsArray[currentMonth].push("Prior to Request");
+				}
+				this.monthsArray[currentMonth].push(currDate);
+				self.set("month", currDate.getFCMonth());
+			}
+			else if(i>0)
+			{
+				var currDate = self.date[i];
+				var yesterday = self.date[i-1];
+				var dateMicro = yesterday.toDateString();
+				var dateMini = currDate.toDateString();
+				if(currDate.getFCMonth() != yesterday.getFCMonth())
+				{	
+					self.push("monthsArray", [currDate]);
+					currentMonth++;
+					//we do all data at once in start, this makes the data make sense other way fine for dynamic even necessary.  Now not important less in auth context
+				}
+				else
+				{
+					this.monthsArray[currentMonth].push(currDate);
+				}
+			}
+		}
+		//console.log(this.monthsArray);
+		this.padMonths();
+		//console.log(this.monthsArray);
+		self.set("displayedMonth", self.monthsArray[0]);
+		self.set("year", this.displayedMonth[0].getFullYear());
+		self.set("displayedMonthIndex",0);
+		var numDizDays = this.displayedMonth.length;
+		self.set("month", this.displayedMonth[numDizDays-1].getFCMonth());
+	},//end of function
+
+	padMonths: function()
+	{
+		var i = 0;
+		var numMonths = this.monthsArray.length;
+		for(i=1; i < numMonths; i++)
+		{
+			var month = this.monthsArray[i];
+			//console.log(month);
+			var lastMonth = this.monthsArray[i-1];
+			var numDaysPrevMonth = this.monthsArray[i-1].length;
+			var fillerDay = numDaysPrevMonth - 1;
+			while (month[0].getDay() != 0)
+			{
+				month.unshift(this.monthsArray[i-1][fillerDay--]);
+			}
+			//console.log(this.monthsArray[i]);
+		}
+	},
+
+
+	_backOneMonth:function(){
+		if(this.displayedMonthIndex==0){
+			var counter =this.monthsArray.length-1;
+			this.set("displayedMonth", this.monthsArray[counter]);
+			this.displayedMonthIndex=counter;
+		}
+		else{
+			var diLess=this.displayedMonthIndex-1;
+			this.set("displayedMonth", this.monthsArray[diLess]);
+			this.displayedMonthIndex--;
+		}
+		var length=(this.displayedMonth.length-1);
+		var month = this.displayedMonth[length].getFCMonth();
+			var year = this.displayedMonth[length].getFullYear();
+			this.set("month",month);
+			//console.log(year);
+			this.set("year", year);
+	},
+
+	_forwardOneMonth:function(){
+		if(this.displayedMonthIndex==this.monthsArray.length-1)
+		{
+			this.set("displayedMonth",this.monthsArray[0]);
+			this.displayedMonthIndex=0;						
+		}
+		else{
+			var diMore=this.displayedMonthIndex+1;
+			this.set("displayedMonth", this.monthsArray[diMore]);
+			this.displayedMonthIndex=diMore;
+			
+		}
+		var length=(this.displayedMonth.length-1);
+		var month = this.displayedMonth[length].getFCMonth();
+		var year = this.displayedMonth[length].getFullYear();
+			this.set("month",month);
+			//console.log(year);
+			this.set("year", year);
+	}
+
+};
+</script>

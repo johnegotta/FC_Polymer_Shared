@@ -1,0 +1,245 @@
+<dom-module id="fc-calendar-animee">
+<style>
+     paper-header-panel {
+        float: left;
+        max-width: 100%;
+        min-width: calc(100%/7.5);
+        max-height: 740px;
+        min-height: 130px;
+        margin: 3px;
+        border: 2px solid #efefef;
+        @apply(--shadow-elevation-2dp);
+      }
+      .paper-header {
+        height: 28px;
+        font-size: 16px;
+        line-height: 24px;
+        padding: 0 0px;
+        color: white;
+        line-height: 1;
+        transition: height 0.2s;
+      }
+      .paper-header.tall {
+        height: 120px;
+      }
+      .paper-header.medium-tall {
+        height: 100px;
+        line-height: 50px;
+      }
+      .content {
+        height: 2000px;
+      }
+      .cover {
+        margin: 2px;
+      }
+      .blue .paper-header {
+        background-color: var(--paper-light-blue-500);
+      }
+      .red .paper-header {
+        background-color: var(--paper-red-500);
+      }
+      .orange .paper-header {
+        background-color: var(--paper-amber-500);
+      }
+      .green .paper-header {
+        background-color: var(--paper-green-500);
+      }
+      .cyan .paper-header {
+        background-color: var(--paper-cyan-500);
+      }
+      .lime .paper-header {
+        background-color: var(--paper-lime-500);
+      }
+      .pink .paper-header {
+        background-color: var(--paper-pink-a200);
+      }
+.toDoItem paper-icon-button[icon=delete]{
+			-webkit-transition: opacity 0.5s;
+			transition: opacity 0.5s;
+			opacity: 0;
+		}
+		.toDoItem:hover paper-icon-button[icon=delete]{
+			opacity: 100;
+		}
+
+		paper-button {
+		  flex-shrink: 1;
+		}
+		paper-input {
+		  flex-grow: 1;
+		}
+
+		paper-checkbox {
+		  display: inline-block;
+		  margin: 5px 0;
+		  transition: opacity 0.3s;
+		}
+
+		paper-checkbox[checked] + .label {
+		  opacity: 0.5;
+		  text-decoration: line-through;
+		}
+	
+      .blue .content {
+        background: linear-gradient(white, #b3e5fc);
+      }
+      .red .content {
+        background: linear-gradient(white, #ffcdd2);
+      }
+      .orange .content {
+        background: linear-gradient(white, #ffecb3);
+      }
+      .green .content {
+        background: linear-gradient(white, #c8e6c9);
+      }
+      .cyan .content {
+        background: linear-gradient(white, #b2ebf2);
+      }
+      .lime .content {
+        background: linear-gradient(white, #f0f4c3);
+      }
+      .pink .content {
+        background: linear-gradient(white, #f8bbd0);
+      }
+</style>
+<template>
+	<div class="flex layout vertical" style="padding:0x; margin: 14px; margin-bottom: 24px;">
+		<paper-material class="vertical flex layout center" style="max-height: 110px; min-height: 90px;min-width: 740px; max-width: 98vw; background: #aecdfd;">
+			<div class="horizontal layout flex center-justified" style="width: 100%; [[_computePlacementTwo(isSecond)]]">
+				<section class="horizontal layout flex-3 around-justified" style="text-align: center; font-size: 36px; font-family: merriweather;">
+
+						<section  style=" width:24px; height: 24px; padding: 6px; border: 6px solid white; border-radius: 180px; background: #008; color: white;" on-tap="_backOneMonth">
+						<iron-icon icon="icons:arrow-back" style="margin-bottom: 24px;"></iron-icon>
+						</section>
+
+			 	
+						
+						[[month]] [[year]]
+						
+				
+				
+						<section  style=" width:24px; height: 24px; padding: 6px; border: 6px solid white; border-radius: 180px; background: #008; color: white;"on-tap="_forwardOneMonth"><iron-icon icon="icons:arrow-forward"  style="margin-bottom: 24px;">
+						</iron-icon>
+						</section>
+				</section>
+			</div>
+			<div class="horizontal flex layout wrap self-stretch" style="background: snow; width: 100%; min-width: 740px; margin-left: 2px;">
+				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
+					<paper-material style="border: 2px solid white;text-align: center; padding:1px; width:calc(100%/7.8)!important; min-width:98px; font-size: 18px; font-weight: 600; margin: auto; margin-bottom: 6px; background: white;">
+					{{item}}
+					</paper-material>
+				</template>
+			</div>
+		</paper-material>
+		<div class="vertical layout " style="min-width: 740px!important; max-width: 98vw; background: white; border: 1px double red; height: 94%; width: 100%; overflow-y: scroll; min-height: 600px; padding-bottom: 20px;">
+			<section class="horizontal flex layout wrap self-stretch" style="width: 100%; max-height: 40vh; overflow-y:scroll; margin-bottom: 80px;">
+				<template is="dom-repeat" class="horizontal layout wrap"  items="{{displayedMonth}}">
+					 
+					<paper-header-panel resizable="both" hidden$=[[!isNarrow]] day="[[item]]" draggable="true"  class$="[[computeHeaderColor(item)]]"on-dragstart="trackstart" style="border-top: 1px solid silver;text-align: center; width:calc(100%/7.8); margin: auto;margin-bottom: 2px; margin-top: 2px; height: calc(100%/3)">
+	        			<div class="paper-header" style="padding-top: 3px; font-size: 14px;">
+	        				[[computePrettyDay(item)]]
+	        			</div>
+	        			<div class="content" style="font-size: 14px; font-weight: 500; font-family: merriweather;">
+	        				add here the item adder from the to-do list
+						</div>
+	      			</paper-header-panel>
+	   
+
+	      			<fc-date-card hidden$=[[isNarrow]] class$=[[computeHeaderColor(item)]] day=[[item]] draggable="true" on-dragstart="trackstart" is-mini="true" style="border-top: 1px solid silver;text-align: center; width:calc(100%/7.4); margin: auto;margin-bottom: 6px; margin-top: 4px; height: calc(43vh/4)"></fc-date-card>
+				</template>
+			</section>
+		</div>
+	</div>
+</template>
+<script>
+
+FcCalendarAnimee=Polymer({
+	is: "fc-calendar-animee",
+	behaviors:[
+				Polymer.PaperInputBehavior,
+			 	Polymer.IronFormElementBehavior,
+				FCBehaviors.FcCalendarBehaviorPrime,
+				Polymer.NeonSharedElementAnimatableBehavior,
+				fcDraggableDataBehavior
+				],
+	properties: {
+
+		inputValue:{
+				type: String,
+				notify: true
+		},
+		isSecond:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true
+		},
+		isNarrow:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true
+		},
+		value: {
+			type: String,
+			notify: true
+		},
+		day:{
+			type: Date,
+			notify: true
+		},
+		occurance: {
+				type: String,
+				notify: true
+		},
+		days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+			},
+			notify: true
+		},
+		dataFcid:{
+				type: Object, //this should be an object with methods backwards and forwards
+				notify: true
+			}
+	  
+	},
+  trackstart: function(e){
+  	var day = e.model.item;
+  	day = JSON.stringify(day);
+  	e.dataTransfer.setData("fcdata", day);
+  	//e.dataTransfer.setData("fcgooddate", this.computePrettyDay(day));
+  	//console.log("I am a track star", e, e.detail, e.model.item);
+
+  },
+  _computePlacementTwo: function(isSecond){
+  	var returnVal = (isSecond==true)? "position: fixed; top:24px;left: 96px; color: white;": "";
+  	return returnVal;
+
+
+  },
+    
+
+     
+	attached: function(){
+		this.calendarCreator();
+		},
+	
+computePrettyDay: function(day)
+ 	{
+  		var result = day.toDateString();
+  		
+  		return result;
+ 	},
+
+computeHeaderColor: function(day)
+ 	{
+  		var numDays = this.displayedMonth.length;
+  		var lastDay = this.displayedMonth[numDays -1];
+  		var result = (day.getMonth() == lastDay.getMonth()) ? "blue": "pink";
+  		//console.log()
+  		return result;
+ 	},
+});
+</script>
+</dom-module>

@@ -1,0 +1,251 @@
+<dom-module id="fc-highschools-nj-selector">
+
+<template>
+<style>
+:host{padding: 0px 12px;
+      margin: 4px;
+      margin-top: -32px;
+      margin-bottom: 24px;
+      }
+  :root::{-ms-overflow-style: none;}
+              paper-input{
+                --paper-input-container-input:{
+                        font-family: merriweather;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: brown;
+                      };
+      @apply(--paper-input-container-input);
+      --paper-input-container-label:{
+                        font-family: merriweather;
+                        font-size: 14px;
+                        font-weight: 600;
+                      };
+      @apply(--paper-input-container-label);
+    }
+        
+	paper-menu{min-width: 256px;}
+
+	paper-button.better-platinum {
+		padding:36px;
+      background: #E5E4E2;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 500;
+     color: #006;
+  	border-radius: 180px;
+     font-size: 12pt;
+     text-align: center;
+     text-indent: 0px;
+    width: 24px !important;
+  	height: 24px !important;
+  	  border: 3px white solid;
+     }
+  .div::-webkit-scrollbar { width: 0 !important; }
+  .select::-webkit-scrollbar { width: 0 !important; }
+  :root::-webkit-scrollbar { width: 0 !important; }
+</style>
+<div style="">
+<paper-input label="New Jersey High School Search" style="" value="{{searchValue}}"></paper-input>
+<div class="horizontal layout" style="border: 1px solid silver; z-index: 3; padding:12px 42px 18px 42px; margin-bottom: 8px;">
+<section hidden={{menuHidden}}  class="vertical layout">
+<!-- <paper-input label="New Jersey High School Search" no-label-float value="{{searchValue}}"></paper-input> -->
+
+	<paper-dropdown-menu 
+		name$="{{fcSelectorName}}"   label="Current NJ High School" always-float-label on-iron-select="_ironSelected">
+		<paper-menu 
+			class="dropdown-content" 
+			attr-for-selected="value"
+      label="Current School" 
+			style="width: 100%;" 
+			selected="{{menuSelected}}">
+			<template is="dom-repeat" items="{{liArray}}" filter="{{_mySelectFilter(searchValue)}}">
+				<paper-item value="{{item}}">{{item}}
+				</paper-item>
+			</template>
+		</paper-menu>
+	</paper-dropdown-menu>
+</section>
+
+</div>
+</div>
+</template>
+<script>
+FcInputProSelect=Polymer({
+  is: "fc-highschools-nj-selector",
+    behaviors: [],
+    properties: {
+     
+       searchValue:{
+          type: String, 
+          notify: true
+        },
+
+      	fcSelectorName:{
+      		type: String,
+      		value: function(){
+      			return 'fcSelector';
+      		},
+      		notify: true,
+      		reflectToAttribute: true
+      	},
+      	selectorLabel: {
+      		type: String,
+      		value: function(){
+      			return "Current High School";
+      		},
+      		notify: true
+      	},
+      	menuHidden: {
+      		type: Boolean,
+      		value: function(){
+      			return false;
+      		},
+      		notify: true
+      	},
+      	menuSelected:{
+      		type: Number,
+      		value: 323,
+      		notify: true 
+      	},
+      	
+      	startListItems: {
+      		type: Array,
+      		computed: 'computeStartListItems(fullPath)',
+      		notify: true
+      	}, 
+      	liArray: {
+      		type: Array,
+      		notify: true
+      	},
+      njhs: {
+        type:Array,
+        notify: true
+      },
+      
+        fullPath: {
+          type: String,
+          computed: 'computefullPath(rootPath, instancePath)',
+          notify: true
+        },
+        fcid:{
+          type: String,
+          value:function(){
+            return "njhighschools000020160208";
+          },
+          notify: true
+        },
+        instancePath: {
+          type: String,
+          value: function(){
+            var instancePath = 'forms/callIntake';
+            return instancePath;
+          },
+          notify: true
+        },
+        rootPath: {
+          type: String,
+          value: function()
+              { var rootPath= "https://focusedstaging1.firebaseio.com";
+                return  rootPath;
+              },
+          notify: true
+        }
+         
+      },
+
+  _mySelectFilter: function(searchValue){
+  return function(item) {
+    if (!searchValue) return true;
+    if (!item) return false;
+    return (item && ~item.indexOf(searchValue));
+    };
+  },
+ 
+
+  computefullPath: function(rootPath, instancePath){
+    var olive = rootPath + '/' + instancePath; 
+    return olive;
+  },
+
+_ironSelected: function(selected)
+  {
+      // this.set("selectedMenu", this.njhs);
+    },
+
+  computeStartListItems: function(fullPath, localStorageHs){
+    var self=this;
+    var olive = fullPath;
+    // console.log(olive);
+    return 250;
+
+  },
+
+
+	computeliArray: function(startTempArray, startListItems, count, njhs){
+  this.tempArray =[];
+
+    	var counterOne = njhs.length;
+
+     return njhs;
+
+},
+
+	
+	attached:function(){
+    //  var olive = this.rootPath + '/' + this.instancePath;
+    //  this.set("fullPath", olive); 
+    // var items = localStorage.getItem("NJHIGHSCHOOLS");
+    // items=JSON.parse(items);
+    // console.log(items);
+    // this.set("njhs", items);
+    // console.log("i am in attached", this.njhs);
+    // this.set('liArray', this.njhs);
+     var self=this;
+     var ref = new Firebase(self.fullPath+"/"+self.fcid);
+    ref.on("value", function(snap){
+      var vald = snap.val();
+        // console.log(vald);
+      self.set("njhs",vald); 
+      self.set('liArray', self.njhs);
+    });
+  }
+});
+</script>
+</dom-module>
+<!--
+ <template>
+    <div>[[arrayItem(myArray.*, 0, 'name')]]</div>
+    <div>[[arrayItem(myArray.*, 1, 'name')]]</div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'bind-array-element',
+
+      properties: {
+
+        myArray: {
+          type: Array,
+          value: [{ name: 'Bob' }, { name: 'Doug' } ]
+        }
+      },
+     
+      // first argument is the change record for the array change,
+      // change.base is the array specified in the binding
+      arrayItem: function(change, index, path) {
+        // this.get(path, root) returns a value for a path
+        // relative to a root object.
+        return this.get(path, change.base[index]);
+      },
+     
+      ready: function() {
+        // mutate the array
+        this.unshift('myArray', { name: 'Susan' });
+        // change a subproperty
+        this.set('myArray.1.name', 'Rupert');
+      }
+    });
+  </script>
+
+</dom-module>

@@ -28,10 +28,12 @@
 	      		class$="{{inputTemplateClass}}vertical layout flex wrap" 
       			items="{{dataSourcePaperInputs}}">
       			<fc-input-prime 
-						input-type$="[[item.inputTypeB]]" 
-						label="[[item.inputTypeB]]" 
-						button-name="Pancakes" 
-						type$="[[item.inputTypeB]]">
+						input-type$="[[item.inputTypeA]]" 
+						label="[[item.inputLabelA]]" 
+						class$="[[item.inputTypeA]]"
+						value="[[item.inputValueA]]"
+						name="[[item.inputNameA]]"
+						>
 					</fc-input-prime>
 		    		
  			</template>
@@ -41,16 +43,19 @@
       			class$="{{inputTemplateClass}}vertical layout flex wrap" 
       			items="{{dataSourcePaperInputs}}">
 					<fc-input-prime 
-		    			button-name="press-me"
-		    			label="[[item.inputTypeB]]"
-		    			input-type$=[[item.inputTypeB]]
-		    			type$=[[item.inputTypeB]]>
+		    			label="[[item.inputLabelB]]"
+		    			input-type$="[[item.inputTypeB]]"
+		    			value="{{item.inputValueB}}"
+		    			class$="[[item.inputTypeB]]"
+		    			name="[[item.inputNameB]]"
+		    			>
 		    		</fc-input-prime>
     		</template>
     	</section>
     </article>
    <span style="text-color:brown; font-size:.8em; font-family: merriweather;font-weight: 700;">{{item.inputRowFooterHeader}}</span>
 </section> 
+<span>tiv: {{dataSourcePaperInputs.1.inputValueB}} {{dataSourcePaperInputs.1.inputTypeB}}</span>
  </iron-form> 
 	</template>
 	<script>
@@ -100,21 +105,23 @@
 						displayArea: {
 							type: String,
 							value: function(){
-								console.log(this.root)
+								// console.log(this.root)
 							},
-
-
-
-
+							notify: true
 						},
 						deviceType:{
 
-
-
-
 						},
-						formArray:{
-							type: Array, 
+						formArrayA:{
+							type: Array,
+							value: [],
+							notify: true
+						},
+
+
+						formArrayB:{
+							type: Array,
+							value: [], 
 							notify: true
 						},
 						notBox: {
@@ -141,64 +148,7 @@
 							type: String,
 							notify: true,
 						}
-					// 	inputProperties: {
-					// 		type: Array,
-					// 		value:function(){
-					// 			return [
-				 //                    {
-				 //                      "dataSource": "dataSourcePaperInputs", /*this has no item in front of it*/
-				 //                      "inputIdA": "thedynamically generated I",
-				 //                      "inputClassA": `{this.classList.add(this.myClass);}`,
-				 //                      "inputNameA":'computeThisValue',
-				 //                      "tabIndexA": 0,
-				 //                      "inputLabelA": "UserChoice",
-				 //                      "inputValueA": "userChocie",
-				 //                      "floatlabel": false,
-				 //                      "autoComplet": true,
-				 //                      // "inputTapA":`${this.innerHtml='something';}`,
-				 //                      "inputNameA":"userChoice || dynamic",
-				 //                      "inputTypeA": 'radio',
-				 //                      "inputTypeB": "focusedDiv",
-				 //                      "autoComplete": true,
-				 //                      "required": false,
-				 //                      "disabled":false,
-				 //                      "invalid": false,
-				 //                      "preventInvalidInput": true,
-				 //                      "allowedPattern":"COMPUTEThisValueTWO",
-				 //                      "validator": "SOME CODE FOR A VALIDATOR",
-				 //                      "pattern": "some RedEx",
-				 //                      "required": false,
-				 //                      "autofocus": true,
-				 //                      "inputmode": ["latin", 
-				 //                                "latin-prose", 
-				 //                                "fullwidth-latin", 
-				 //                                "tel", 
-				 //                                "email", 
-				 //                                "url"], 
-				 //                      "minlength": Number,
-				 //                      "maxlength": Number,//chars in a string
-				 //                      "min": Number, 
-				 //                      "max": Number,
-				 //                      "step": 10,
-				 //                      "placeholder": false,
-				 //                      "readonly": false,
-				 //                      "list": "should restrict options to only the preselected to force menu-like behavior",
-				 //                      "size": 18, //width in characters visible
-				 //                      "autocapitalize": true,
-				 //                      "autocorrect": true,
-				 //                      "onChange": "_itemMethodOnChange",//need to do something on this
-				 //                      "tabindex": true,
-				 //                      "autosave": true, 
-				 //                      "results": 10,
-				 //                      // "accept": "json" wasted prop
-				 //                      "multiple": false,
-				 //                      "meta":"String of stuff"
-				 //                  	}
-     //            				];
-     //            			},//function in value closes
-     //          				notify: true, 
-     //          				reflectToAttribute: true
-     //        			}//inputProperties Closes
+					
 					 }; //This properties closes 
 				}	//end before register
 						//note: should have observers in before register?
@@ -206,45 +156,581 @@
 						//note no word function in functions??
 				ready(){
 					this.dataDouble=[];
-					var i=16;
-					while(i>0){
+					var i=0;
+					var j=0;
+					var value ="Tony Orlando and Dawn";
+					var nameValue ="item.value";
+					var nameLabelA=[];
+					nameLabelA=["Caller First Name", "Caller Phone", "Student First Name", "Student Phone", "Add Parent 2", "Parent 2 First Name", "Parent 2 Phone", "Address Line 1", "Current Grade Level", "Math Score", "Combined Score", "Additional Information"];
+					var nameLabelB=[];
+						nameLabelB=["Caller Last Name", "Caller Email","Student Last Name","Student Email","Add Address","Parent 2 Last Name","Parent 2 Email","Address Line 2","Current School","Reading Score","Goal Improvement"];
+					var nameA=[];
+					nameA=["parent1FirstName", "parent1Telephone", "studentFirstName", "studentTelephone", "addParent2", "parent2FirstName", "parent2Telephone", "addressLine1", "currentGradeLevel", "startSatMath", "startSatTotal", "additionalInformation"];
+						var nameB=[];
+							nameB=["parent1LastName", "parent1Email","studentLastName","studentEmail","addAddress","parent2LastName","parent2Email","addressLine2","currentSchool","startSatReading","startGoalScore"];
+					var nameValueA=[];
+						nameValueA=[{"parent1FirstName": value}, {"parent1Telephone": value}, {"studentFirstName": value}, {"studentTelephone":value}, {"addParent2": value}, {"parent2FirstName": value}, {"parent2Telephone":value}, {"addressLine1":value}, {"currentGradeLevel":value}, {"startSatMath": value}, {"startSatTotal": value},{"additionalInformation":value}];
+					var nameValueB=[];
+						nameValueB=[{"parent1LastName": value}, {"parent1Email": value}, {"studentLastName": value}, {"studentEmail":value}, {"addAddress": value}, {"parent2LastName": value}, {"parent2Email":value}, {"addressLine2":value}, {"currentSchool":value}, {"startSatReading": value}, {"startGoalScore": value}];
+
+
+
+					while(i<11){		
+						var formArrayA= [
+							{"inputType": "text",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "tel",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "text",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "tel",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "checkbox",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "text",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+							 },
+							{"inputType": "tel",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "text",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "select",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "number",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "number",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+
+
+						},
+							{"inputType": "text",
+							 "label":nameLabelA[i],
+							 "name":nameA[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueA[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						}
 						
-						i--;									
-						var formArray= [
-						"tel",
-						"email",
-						"datetime-local",
-						"radio",
-						"radio",
-						"radio",
-						"radio",
-						"tel",
-						"checkbox",
-						"checkbox",
-						"checkbox",
-						"button",
-						"button",
-						"text",
-						"text",
-						"datetime-local",
 						];
-						this.set('formArray', formArray);
-						// var rndLimit=typeArray.length;
-						// let j=Math.floor(Math.random()*rndLimit);
-						// let p=Math.floor(Math.random()*7);
-						// let q=Math.floor(Math.random()*7);
-						var classArray=['tab-button-pressed', 'tab-button', 'icon-buttons', 'icon-buttons-pressed','fire-class','fire-class-pressed','fire-class' ];
+						
+					
+			var formArrayB=[
+							{"inputType":"text",
+						 	"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"email",
+							"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{
+							"inputType":"text",
+							"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{"inputType":"email",
+						"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{"inputType":"checkbox",
+						"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"text",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"email",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	
+							"inputType":"text",
+							"label":nameLabelB[i],
+							 "name":nameB[i],
+							 "min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"select",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"number",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"number",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						},
+						{	"inputType":"text",
+							"label":nameLabelB[i],
+							"name":nameB[i],
+							"min":"",
+							"max":"",
+							"value":nameValueB[i],
+							"option-one":"",
+					        "option-two":"",
+					        "option-three":"",
+					        "option-four":"",
+					        "option-five":"",
+					        "option-six":"",
+					        "option-seven":"",
+					        "option-eight":"",
+					        "option-nine":"",
+					        "option-ten":"",
+					        "class":"",
+					        "step":"",
+					        "fcid":"",
+							"hidden":"isChecked"
+						}
+					];
+						
+
+						this.push('formArrayA', formArrayA[i]);
+						this.push('formArrayB', formArrayB[i]);
 						this.inputTypeA = [];
 						this.inputTypeB = [];
 
-						this.set("inputTypeA", "checkbox");
-						this.set("inputTypeB", this.formArray[i]);
+						this.set("inputTypeA", this.formArrayA[i].inputType);
+						this.set("inputTypeB", this.formArrayB[i].inputType);
 						this.push('dataDouble', 
 							{
 								
-									"fcSecondaryLabelA":this.formArray[i]  , 
-									"inputTypeB":this.formArray[i],
-									"inputTypeA": "checkbox",
+								"fcSecondaryLabelA":this.formArrayA[i], 
+								"inputTypeB":this.formArrayB[i].inputType,
+								"inputLabelB":this.formArrayB[i].label,
+								"inputNameB": this.formArrayB[i].name,
+								"inputTypeA": this.formArrayA[i].inputType,
+								"inputLabelA":this.formArrayA[i].label,
+								"inputNameA": this.formArrayA[i].name,
+								"inputValueA": this.formArrayA[i].name,
 								"autocomplete": true,
 								"autofocus": true,		
 								"autocapitalize":true,
@@ -254,12 +740,12 @@
 								"noLabelFloatA": false,
 								"alwaysFloatLabelB": false,
 								"alwaysFloatLabelA": true,
-								"inputValueB":formArray[i],
+								"inputValueB":this.formArrayB[i].name
 								
 							}
 						);
-					console.log(this.inputLabelA);	
-					}
+				i++;	// console.log(this.inputLabelA);	
+					} 
 
 			}
 				_computeDataSourcePaperInputs(dataDouble){

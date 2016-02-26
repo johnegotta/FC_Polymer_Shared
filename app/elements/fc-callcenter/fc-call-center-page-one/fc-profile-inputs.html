@@ -1,0 +1,544 @@
+<dom-module id="fc-profile-inputs">
+<style>
+
+.intakeForm{min-height: 601px; padding: 20px 12px 64px 12px; min-width: 320px;}
+
+</style>
+	<template>
+	<div class="card-content vertical layout intakeForm">	
+	<span class="horizontal layout" style="font-size: 14px;"> Is Caller a Previous Caller: Yes <fc-input-prime input-type="checkbox" style="margin-top: -6px;" name="isPreviousCaller"></fc-input-prime><span style="font-size: 14px;">(If "Yes", a Focused Search will speed along the intake!)</span></span>		
+		
+				<section style="max-height: 25px; margin-left: 4px; color: brown; font-size:18px;  border-bottom: solid brown 1px; margin-bottom: 8px;">Caller Classification and Search
+				</section>
+				<div class="horizontal layout flex wrap" style="max-height: 82px;">
+					 
+						<fc-input-prime input-type="datetime-local" class="labelsClass horizontal layout flex" name="timestamp" id="callTimestamp" is-time-stamp="true"  readonly="true" label='Time Stamp'>
+						</fc-input-prime>
+						<fc-input-prime name="callerRole" class="labelsClass horizontal layout flex wrap center" input-type="select" id="callerRole" option-one="Parent1" option-two="Parent2" option-three="Student" option-four="Mother" option-five="Father" option-six="Other" label="Caller Role">
+						</fc-input-prime>
+	
+	
+					    <fc-input-prime id='GeneralSearch' class="labelsClass horizontal layout flex" name='search' tab-index='0' label='Focused Search'  value='{{searchFields}}' on-input="updateInput">
+					    </fc-input-prime>
+					    <fc-input-prime id='login' class="labelsClass horizontal layout flex" name='intakeFcid' tab-index='0' label='Your Login'  value='{{yourLogin}}' on-input="updateInput">
+					    </fc-input-prime>
+				</div>
+	<!-- 	<sortable-js group="group" handle=".handle">  -->          
+		<template is="dom-repeat" items="{{dataSource}}">
+			<div class="vertical layout wrap" style="margin-bottom: 16px;">
+					<section class="horizontal layout wrap"> 
+						<span style=" border-bottom: solid brown 1px; max-height: 25px; margin-left: 4px; color: brown; font-size:18px;"> [[item.aaHeader]]
+						</span>
+					</section> 
+					<section class="horizontal layout flex wrap" style="font-size: 16px; margin-left: 24px; margin-top: 8px;" > 
+					<section class="horizontal layout flex wrap"> 
+						<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.aaInputType]]" name$="[[item.aaName]]" class="horizontal layout flex wrap" value="{{aa}}" always-float-label label="[[item.aaLabel]]"></fc-input-prime> 
+						<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.abInputType]]" name$="[[item.abName]]"class="horizontal layout flex wrap" value="{{ab}}" always-float-label label="[[item.abLabel]]"></fc-input-prime>
+					</section>
+					<section class="horizontal layout flex wrap"> 
+						<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.acInputType]]" name$="[[item.acName]]"class="horizontal layout flex wrap" value="{{ac}}" always-float-label label="[[item.acLabel]]">
+						</fc-input-prime>
+						<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.adInputType]]" name$="[[item.adName]]"class="horizontal layout flex wrap" value="{{ad}}" always-float-label label="[[item.adLabel]]">
+						</fc-input-prime>
+					</section>
+				</section>
+			</div>
+			<div class="vertical layout wrap">
+				<section class="horizontal layout wrap">
+					<span style="max-height: 25px; margin-left: 4px; color: brown; font-size:18px; border-bottom: 1px solid brown;">[[item.abHeader]]</span>
+				</section>
+				<section class="horizontal flex wrap layout" style="font-size: 16px; margin-left: 24px; margin-top: 8px;">
+					<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.aeInputType]]" name$="[[item.aeName]]" class="horizontal layout flex wrap" value="{{ae}}"  label="[[item.aeLabel]]">
+					</fc-input-prime>
+					<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.afInputType]]" name$="[[item.afName]]"class="horizontal layout flex wrap" always-float-label label="[[item.afLabel]]" value="{{af}}">
+					</fc-input-prime>	
+					<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.agInputType]]" name$="[[item.agName]]" class="horizontal layout flex wrap center" label="[[item.agLabel]]" always-float-label  value="{{ag}}">
+					</fc-input-prime> 
+					<fc-input-prime on-keyup="_sendInputChanged" input-type="[[item.ahInputType]]" name$="[[item.ahName]]" class="horizontal layout flex wrap center"  label="[[item.ahLabel]]" value="{{ah}}">
+					</fc-input-prime> 
+				</section>
+			</div>
+						<div class="horizontal layout wrap" style="max-height: 65px; padding-left: 24px;" >
+						<fc-input-prime input-type="[[item.ayInputType]]"  name$="[[item.ayName]]" class="horizontal layout flex" always-float-label label="[[item.ayLabel]]"  checked-prop="{{isSecondParent}}" value="{{ay}}">
+							</fc-input-prime>
+							<fc-input-prime input-type="[[item.azInputType]]" checked-prop="{{isAddAddress}}" class="horizontal layout flex wrap"  name$="[[item.azName]]" always-float-label label="[[item.azLabel]]" value="{{az}}">
+							</fc-input-prime>
+						</div> 
+					
+					
+					<div class="horizontal flex wrap layout" style="margin-left:24px;" hidden$="[[!isSecondParent]]">
+							<fc-input-prime input-type="[[item.ai2InputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.ai2Label]]"  name$="[[item.ai2Name]]" value="{{ai2}}">
+							</fc-input-prime> 
+							<fc-input-prime input-type="[[item.aj2InputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.aj2Label]]"  name$="[[item.aj2Name]]" value="{{aj2}}">
+							</fc-input-prime>
+							<fc-input-prime input-type="[[item.aiInputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.aiLabel]]"  name$="[[item.aiName]]" value="{{ai}}">
+							</fc-input-prime> 
+							<fc-input-prime input-type="[[item.ajInputType]]" class="horizontal flex wrap layout" always-float-label label="[[item.ajLabel]]"  name$="[[item.ajName]]" value="{{aj}}">
+							</fc-input-prime> 
+					</div>
+			
+						<section class="horizontal flex layout" style="margin-left:24px;" hidden$="[[!isAddAddress]]">
+							<fc-input-prime input-type="[[item.amInputType]]"  name$="[[item.amName]]" class="horizontal layout flex wrap" label="[[item.amLabel]]"  value="{{am}}">
+							</fc-input-prime> 
+							<fc-input-prime input-type="[[item.anInputType]]"  name$="[[item.anName]]" class="horizontal layout flex wrap" always-float-label label="[[item.anLabel]]" value="{{an}}">
+							</fc-input-prime> 
+
+						</section>
+					<div class="vertical layout wrap">
+						<section class="horizontal layout wrap">
+								<span style="max-height: 25px; margin-left: 4px; color: brown; border-bottom: solid brown 1px; font-size:18px;">[[item.acHeader]]</span>
+								
+						</section>
+						
+						
+						<section class="horizontal flex wrap layout" style="margin-top: 8px; font-size: 16px; margin-left: 24px;">
+							<fc-input-prime input-type="[[item.a_InputType]]" class="horizontal layout flex wrap"  label="[[item.a_Label]]"  name$="[[item.a_Name]]"  value="{{a_}} Here Link Search To HIgh Schools and results">
+							</fc-input-prime>
+							<fc-input-prime input-type="[[item.akInputType]]" min="[[item.akMin]]"  name$="[[item.akName]]" step="1" max="[[item.akMax]]" class="horizontal layout flex wrap"
+								label="[[item.akLabel]]" 
+								option-one="[[item.akOptionOne]]"
+								option-two="[[item.akOptionTwo]]"
+								option-three="[[item.akOptionThree]]"
+								option-four="[[item.akOptionFour]]"
+								option-five="[[item.akOptionFive]]"
+								option-six="[[item.akOptionSix]]"
+								option-seven="[[item.akOptionSeven]]"
+								option-eight="[[item.akOptionEight]]"
+								option-nine="[[item.akOptionNine]]"
+								option-ten="[[item.akOptionTen]]"
+								value="{{ak}}"
+								selected-value="{{ak}}" 
+								>
+							</fc-input-prime>
+							
+						
+						<fc-input-prime input-type="[[item.atInputType]]" class="horizontal layout flex wrap" button-name="[[item.atLabel]]" label="[[item.atLabel]]"  is-repeater-select="true" name$="[[item.atName]]" select-items="{{_compute_atFocusedProgramFit(ak)}}" selected-value="{{at}}" value="{{at}}">	
+						</fc-input-prime>
+
+						<fc-input-prime input-type="[[item.asInputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.asLabel]]"  name$="[[item.asName]]"  value="{{as}}">
+						</fc-input-prime> 
+						
+						
+					</section>
+						<section class="horizontal flex wrap layout" style="margin-top: 8px; font-size: 14px; margin-left: 24px;">
+								<fc-input-prime input-type="[[item.b_InputType]]"  name$="[[item.b_Name]]" class="horizontal layout flex wrap center" min="[[item.b_Min]]" step="10" max="[[item.b_Max]]" label="[[item.b_Label]]" value="{{b_}}"></fc-input-prime>
+							<fc-input-prime step="10" min="[[item.alMin]]"  name$="[[item.alName]]" max="[[item.alMax]]" input-type="[[item.alInputType]]" class="horizontal layout flex wrap center" label="[[item.alLabel]]" always-float-label value="{{al}}">
+							</fc-input-prime> 
+							<fc-input-prime id="aoInput" input-type="[[item.aoInputType]]"  name$="[[item.aoName]]" step="10"class="horizontal layout flex wrap center" min="[[item.aoMin]]" max="[[item.aoMax]]" label="[[item.aoLabel]]"  value="{{ao}}">
+							</fc-input-prime> 
+							<fc-input-prime min="[[item.apMin]]" max="[[item.apMax]]"  name$="[[item.apName]]" step="10" input-type="[[item.apInputType]]" class="horizontal layout flex wrap center" label="[[item.apLabel]]"  value="{{ap}}"></fc-input-prime>
+						</section>
+						<!-- <section>
+				
+					<fc-highschools-nj-selector></fc-highschools-nj-selector>
+						</section> -->
+					<section lass="horizontal layout flex wrap" style="margin-top: 8px; font-size: 16px; margin-left: 24px;">
+						<fc-input-prime input-type="checkbox" label="Additional Academic History" name="addCourseHistory" value="{{addCourses}}"></fc-input-prime> <span style="color: brown; margin-left: 34px; font-size: 14px;"> Academic History Allows Focused Coaches to Better Match Clients to Services. It is not necessary, but is preferred.</span>
+						<section hidden$="{{!addCourses}}" class="horizontal layout flex wrap" style="margin-top: 8px; font-size: 16px; margin-left: 24px;">
+						<fc-input-prime input-type="[[item.auInputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.auLabel]]"  name$="[[item.auName]]" 
+								option-one="[[item.auOptionOne]]"
+								option-two="[[item.auOptionTwo]]"
+								option-three="[[item.auOptionThree]]"
+								option-four="[[item.auOptionFour]]"
+								option-five="[[item.auOptionFive]]"
+								option-six="[[item.auOptionSix]]"
+								option-seven="[[item.auOptionSeven]]"
+								option-eight="[[item.auOptionEight]]"
+								option-nine="[[item.auOptionNine]]"
+								option-ten="[[item.auOptionTen]]"
+								value="{{au}}"
+								selected-value="{{au}}" 
+								>
+							</fc-input-prime>
+						<fc-input-prime input-type="[[item.avInputType]]" class="horizontal layout flex wrap" label="[[item.avLabel]]" button-name="[[item.avButtonName]]"  name$="[[item.avName]]"
+								option-one="[[item.avOptionOne]]"
+								option-two="[[item.avOptionTwo]]"
+								option-three="[[item.avOptionThree]]"
+								option-four="[[item.avOptionFour]]"
+								option-five="[[item.avOptionFive]]"
+								option-six="[[item.avOptionSix]]"
+								option-seven="[[item.avOptionSeven]]"
+								option-eight="[[item.avOptionEight]]"
+								option-nine="[[item.avOptionNine]]"
+								option-ten="[[item.avOptionTen]]"
+								value="{{av}}"
+								selected-value="{{av}}" 
+						>
+						</fc-input-prime> 
+						<fc-input-prime input-type="[[item.awInputType]]" class="horizontal layout flex" label="[[item.awLabel]]"  name$="[[item.awName]]"
+								option-one="[[item.awOptionOne]]"
+								option-two="[[item.awOptionTwo]]"
+								option-three="[[item.awOptionThree]]"
+								option-four="[[item.awOptionFour]]"
+								option-five="[[item.awOptionFive]]"
+								option-six="[[item.awOptionSix]]"
+								option-seven="[[item.awOptionSeven]]"
+								option-eight="[[item.awOptionEight]]"
+								option-nine="[[item.awOptionNine]]"
+								option-ten="[[item.awOptionTen]]"
+								value="{{aw}}"
+								selected-value="{{aw}}" 
+						>
+							</fc-input-prime> 
+						<fc-input-prime input-type="[[item.axInputType]]" class="horizontal layout flex wrap" always-float-label label="[[item.axLabel]]" name$="[[item.axName]]" 
+								option-one="[[item.axOptionOne]]"
+								option-two="[[item.axOptionTwo]]"
+								option-three="[[item.axOptionThree]]"
+								option-four="[[item.axOptionFour]]"
+								option-five="[[item.axOptionFive]]"
+								option-six="[[item.axOptionSix]]"
+								option-seven="[[item.axOptionSeven]]"
+								option-eight="[[item.axOptionEight]]"
+								option-nine="[[item.axOptionNine]]"
+								option-ten="[[item.axOptionTen]]"
+								value="{{ax}}"
+								selected-value="{{ax}}"
+						>
+						</fc-input-prime>
+						</section>
+					</section>
+					</div>
+					<section class=" vertical layout wrap">
+						<section class="horizontal layout wrap" style="padding-top: 18px;">
+								<span style="max-height: 25px; margin-left: 4px; color: brown; border-bottom: solid brown 1px; font-size:18px;">[[item.aeHeader]]</span>
+						</section>
+						<section class="horizontal layout" style="display: block; margin-top: 8px; font-size: 16px; margin-left: 24px;">
+							<paper-textarea  class="horizontal layout flex self-stretch" style="border: 2px gold solid; min-width:320px; min-height:70px; max-width: 680px; max-height: 450px;"  name$="[[item.arName]]" class="horizontal block layout" always-float-label placeholder="funk you" label="[[item.arLabel]]"  value="{{ar}}">
+							</paper-textarea> 
+							
+						</section>
+					</section>
+			</template>
+	<!-- 	</sortable-js> -->
+	</div>
+</template>
+<script>
+FcProfileInputs=Polymer({
+	is:"fc-profile-inputs",
+	// behaviors:[fcDraggableDataBehavior],
+	properties:{
+		profileObj:{
+			type: Object,
+			computed: "_computeProfileObj(dataSource)",
+			notify: true
+		},	
+		timeStamp: {
+			type: String,
+			notify: true
+		},	
+		timeStampUseful: {
+			type: String,
+			computed: "_computeTimeStampUseful(timeStamp, callLogFormOneObject)",
+			notify: true
+		},	
+		a_:{
+			type: String,
+			notify: true
+		}, 
+		
+		b_:{
+			type: String, 
+			notify: true
+		},
+		
+		c_:{
+			type: String, 
+			notify: true
+		},
+								
+		aa:{
+			type: String, 
+			notify: true
+		},
+						
+		ab:{
+			type: String, 
+			notify: true
+		},
+								
+		ac:{
+			type: String, 
+			notify: true
+		},
+			
+		ad:{
+			type: String, 
+			notify: true
+		},
+								
+		ae:{
+			type: String, 
+			notify: true
+		},
+				
+		af:{
+			type: String, 
+			notify: true
+		},
+				
+		ag:{
+			type: String, 
+			notify: true
+		},
+					
+		ah:{
+			type: String, 
+			notify: true
+		},
+								
+		ai:{
+			type: String, 
+			notify: true
+		},
+				
+		aj:{
+			type: String, 
+			notify: true
+		},
+					
+		ak:{
+			type: String, 
+			notify: true
+		},
+					
+		al:{
+			type: String, 
+			notify: true
+		},
+				
+		am:{
+			type: String, 
+			notify: true
+		},
+			
+		an:{
+			type: String, 
+			notify: true
+		}, 
+								
+		ao:{
+			type: String, 
+			notify: true
+		},
+							
+		ap:{
+			type: String, 
+			notify: true
+		},
+						
+		aq:{
+			type: String, 
+			notify: true
+		},		
+		ar:{
+			type: String, 
+			notify: true
+		},
+				
+		as:{
+			type: String, 
+			notify: true
+		},		
+		at:{
+			type: Array, 
+			computed: "_compute_atFocusedProgramFit(ak)",
+			notify: true
+		},	
+		au:{
+			type: String, 
+			notify: true
+		},
+			
+		av:{
+			type: String, 
+			notify: true
+		},		
+		aw:{
+			type: String, 
+			notify: true
+		},
+		ax:{
+			type: String, 
+			notify: true
+		},
+				
+		ay:{
+			type: String, 
+			notify: true
+		},
+		az:{
+			type: String, 
+			notify: true
+		},
+		 _aPersonFcid:{
+		 	type: String,
+		 	notify: true
+		 },		
+		 _a:{
+			type: String, 
+			notify: true
+			},
+		_aStaffFcid:{
+			type: String,
+			notify: true
+		},  
+		_qoa: {
+			type: Array, 
+			notify: true
+		},
+		callLogFormOneObject: {
+			type: Object,
+			notify: true
+		},
+		dataSource: {
+			type: Array,
+			notify: true
+		},
+		dataSourceInputMap: {
+			type: Object,
+			notify: true
+						},			
+		location:{
+			type: String,
+			notify: true
+		},
+		isSecondParent:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		isAddAddress:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		addCourses:{
+			type: Boolean,
+			value: false,
+			notify: true 
+		}, 
+		dataSource: {
+			type: Array,
+			notify: true
+		},
+		 rootPath: {
+          type: String,
+          value: function()
+              { var rootPath= "https://focusedstaging1.firebaseio.com";
+                return  rootPath;
+              },
+          notify: true
+        },
+        callRecordPath:{
+        	type: String,
+        	value: function(){return "/calls"}
+
+
+        },
+        searchVals:{
+        	type: Object,
+        	value: {},
+        	notify: true,
+        	reflectToAttribute: true
+        },
+	},//end of properties
+
+
+ready: function(){ 
+		var d = new Date();
+		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		this.daysOfWeek = days[d.getDay()].toString();  
+		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		this.month = months[d.getMonth()].toString().slice(0,3);
+		console.log(this.month);
+
+		var day = this.day = d.getDate().toString();
+		console.log(d);
+		var year = this.year = d.getFullYear().toString();
+		this.timeStamp = days[d.getDay()].toString().slice(0,3) +'.' + ' ' + this.month + ' ' + day + ',' + ' ' +year;
+
+	},
+	_sendInputChanged: function(e, detail){
+		
+		var target=e.target;
+		while(target.nodeName!=="FC-INPUT-PRIME"){
+			console.log(target.nodeName, e.target.value);
+			target=target.parentNode;
+		}
+		var name=target.name;
+		this.fire("sendInputVal", {value: e.target.value, name: name});
+		this.searchVals[name]=e.target.value;
+
+
+
+
+	},
+_computeProfileObj: function(dataSource){
+	console.log(dataSource.itemValue);
+},
+_compute_atFocusedProgramFit: function(ak){
+		var returnVal =(ak=="Grade 4")?["Young Scholars Reading","Young Scholars Math"]:(ak=="Grade 5")?["Young Scholars Reading","Young Scholars Math"]:(ak=="Grade 6")?["Young Scholars Reading","Young Scholars Math","PSAT 8/9"]:(ak=="Grade 7")?["PSAT 8/9","Young Scholars Reading","Young Scholars Math"]:(ak=="Grade 8")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II"]:(ak=="Grade 9")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II"]:(ak=="Grade 10")?["1600 SAT","PSAT-NMSQT","PSAT 10"]:["1600 SAT"];
+			return returnVal;
+	},
+_computeTimeStampUseful: function(timeStamp, callLogFormOneObject){
+		var d = new Date();
+		var n = -d.getTime();
+		console.log(n);
+		return n;
+
+
+
+},
+_enterCall: function(){
+// this.set("callLogFormOneObject", {					
+// 						"currentSchool": this.a_, 
+// 						"startScore":	this.b_,
+// 						"callerRole": this.c_,
+// 						"parent1FirstName": this.aa,
+// 						"parent1LastName":this.ab,
+// 						"relatedStudentFirstName": this.ac,
+// 						"relatedStudentLastName": this.ad,
+// 						"parent1Telephone": this.ae,
+// 						"parent1Email": this.af,
+// 						"relatedStudentTelephone": this.ag,
+// 						"relatedStudentEmail": this.ah,
+// 						"parent2Telephone": this.ai,
+// 						"parent2Email": this.aj,
+// 						"studentCurrentGrade": this.ak,
+// 						"studentSatMath":this.al,
+// 						"addressLine1": this.am,
+// 						"addressLine2":this.an, 
+// 						"studentSatReading":this.ao,
+// 						"targetScoreIncrease": this.ap,
+// 						"secondContactDate": this.aq,
+// 						"lastFocusedContact":this.ar,
+// 						"currentCoach": this.as,
+// 						"currentScoreAtFocused":this.at,
+// 						"currentFocusedHwkLog":this.au,
+// 						"seeContactHistoryPATH": this.av,
+// 						"focusedProgramFit": this.aw,
+// 						"focusedRegistrationInfoPATH": this.ax,
+// 						"addParentTwo": this.ay,
+// 						"addAddress": this.az,
+// 						"newlyAssignedFcid": _aPersonFcid,
+// 						"intakeFcid":this._aStaffFcid   
+// 					});
+
+
+var self=this;
+// var ref = new Firebase(self.fullPath);
+// 		ref.child(self.timeStampUseful+"_" +self._aStaffFcid).set(self.callLogFormOneObject);
+},
+_onChange: function(e){
+console.log(e.target.value);
+
+},
+updateInput: function(e){
+
+
+
+}
+
+});
+</script>
+</dom-module>

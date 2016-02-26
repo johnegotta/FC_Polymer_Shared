@@ -1,0 +1,450 @@
+<dom-module id="fc-call-list-view">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-vertical);
+        max-height: 1500px;
+        height: 100%;
+        width: 100%;
+        visibility: visible;
+      }
+      .main {
+        height: 100%;
+        @apply(--layout-flex);
+        @apply(--layout-scroll);
+        @apply(--layout-self-stretch)
+        @apply(--shadow-elevation-8dp);
+      }
+      iron-icon {
+        color: var(--google-blue-500);
+
+      }
+    </style>
+
+
+<firebase-collection data="{{calls}}" id="FBCallReads" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+<!-- <fc-toolbar data="{{data}}" class="horizontal layout fixed">
+ <div style="height: 22px; overflow-y: color: black; scroll; width: 120px;"> 
+ [[address1]] [[address2]] [[callerRole]] [[contactHistory]] [[currentCoach]] [[dateStamp]] [[fcSelector]] [[focusedProgramFit]] [[gradeLevel]] [[hwkRecord]] [[intakeFcid]] [[lastFocusedContact]] [[parent1FirstName]] [[parent1LastName]] [[parent1Telephone]] [[parent2Email]] [[parent2FirstName]] [[parent2LastName]] [[parent2Telephone]] [[parent1Email]] [[previousContact]] [[register]] [[returnContactTime]] [[satMath]] [[satReading]] [[satTotal]] [[search]] [[studentEmail]] [[studentFirstName]] [[studentLastName]] [[studentTelephone]]
+</div>
+            </fc-toolbar> -->
+ <div class="main">
+
+    <template is="dom-repeat" filter="{{_filter(searchVals, myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease)}}" items="{{calls}}" as="call">
+   
+     <fc-call-item id="callItem" data="{{call}}">
+     <iron-icon icon="icons:account-circle"  on-tap="_onClick"></iron-icon>
+      <iron-icon icon="icons:check-circle" on-tap="selectCaller"></iron-icon>
+     </fc-call-item>
+      
+        </template>
+</div>
+</template>
+
+<script>
+  Polymer({
+    is: 'fc-call-list-view',
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+   
+    properties: {
+      searchVals: {
+          type: Object,   
+        notify: true
+      },
+      dataItems: {
+        type: Array,
+        notify: true, 
+        reflectToAttribute: true
+      },
+      myProperty:{
+        type: String,
+        value: "",
+        notify: true
+      },
+      data: {
+        type: Array,
+        notify: true
+        },
+      address1:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        address2:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        callerRole:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        contactHistory:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        currentCoach:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        dateStamp:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        fcSelector:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        focusedProgramFit:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        gradeLevel:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        hwkRecord:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        intakeFcid:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        lastFocusedContact:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent1FirstName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent1LastName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent1Telephone:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent2Email:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent2FirstName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent2LastName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent2Telephone:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        parent1Email:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        previousContact:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        register:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        returnContactTime:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        satMath:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        satReading:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        satTotal:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        search:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        studentEmail:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        studentFirstName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        studentLastName:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        studentTelephone:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        targetScoreIncrease:{
+        type: String,
+        value: "",
+        notify: true
+      },
+        notify: true,
+        reflectToAttribute: true,
+      call:{
+        type: Object,
+        value: {
+                address1: "",
+                address2: "",
+                callerRole: "",
+                contactHistory: "",
+                currentCoach: "",
+                dateStamp: "",
+                fcSelector: "",
+                focusedProgramFit: "",
+                gradeLevel: "",
+                hwkRecord: "",
+                intakeFcid: "",
+                lastFocusedContact: "",
+                parent1FirstName: "",
+                parent1LastName: "",
+                parent1Telephone: "",
+                parent1Email: "",
+                parent2FirstName: "",
+                parent2LastName: "",
+                parent2Telephone: "",
+                parent2Email: "",
+                previousContact: "",
+                register: "",
+                returnContactTime: "",
+                satMath: "",
+                satReading: "",
+                satTotal: "",
+                search: "",
+                studentEmail: "",
+                studentFirstName: "",
+                studentLastName: "",
+                studentTelephone: "",
+                targetScoreIncrease: "",
+                notify: true,
+                reflectToAttribute: true
+               },
+        notify: true
+      },
+      
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      },
+
+    
+    },  
+      _scott: function(e){
+  console.log(e.model.pastinquirer);
+  this.pastinquirer = e.model.transfsferpastinquirer;
+  // configure the page animation
+  this.sharedElements = {
+    'hero': e.target,
+  };
+  this.fire('item-click', {caller: this.searchVals});
+    },
+
+    attached: function(){
+      // console.log(this.searchVals);
+
+
+    },
+
+    updateSearchVals: function(nsv, name, val){
+      this.set("searchVals", nsv);
+      // console.log(this.searchVals);
+ 
+      this.set("myProperty", nsv.parent1FirstName);
+      if(name=="parent1FirstName"){this.set("parent1FirstName", nsv.parent1FirstName);}else if(name=="parent1LastName"){this.set("parent1LastName", nsv.parent1LastName);} else if(name=="parent2FirstName"){this.set("parent2FirstName", nsv.parent2FirstName);}else if(name=="parent2LastName"){this.set("parent2LastName", nsv.parent2LastName);}else if(name=="firstName" || name=="studentFirstName"){ this.set("studentFirstName", nsv.studentFirstName);}else if(name=="studentLastName" || name=="lastName"){ this.set("studentLastName", nsv.studentLastName);}else if(name=="parent1Email"){this.set("parent1Email", nsv.parent1Email);} else if(name=="studentEmail" || name=="email"){ this.set("studentEmail", nsv.studentEmail);} else if(name=="parent2Email"){ this.set("parent2Email", nsv.parent2Email);}else if(name=="parent1Telephone"){ this.set("parent1Telephone", nsv.parent1Telephone);}else if(name=="parent2Telephone"){ this.set("parent2Telephone", nsv.parent2Telephone);} else if(name=="telephone" || name=="studentTelephone"){this.set("studentTelephone", nsv.studentTelephone);}else{this.set("myProperty", this.myProperty);}
+
+      // console.log(this.studentFirstName);
+    },
+
+
+ _filter: function(searchVals, myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease){
+        // console.log(myProperty);
+        // console.log(this.searchVals.parent1FirstName, "firstname", this.parent1FirstName);
+        return function(call){
+          if(!searchVals) {
+            return true;
+          }
+          //start out with true result & falsify if any non blank match fails
+          var result = true;
+          // console.log(searchVals);
+          // console.log(call);
+          var val="";
+          if(searchVals.parent1FirstName && searchVals.parent1FirstName != "")
+          {
+            //user entered a value in first name search
+            if(call.parent1FirstName)            
+            {val=call.parent1FirstName.toLowerCase();
+              result &= (val.indexOf(searchVals.parent1FirstName.toLowerCase()) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
+
+          if(searchVals.parent1LastName && searchVals.parent1LastName != "")
+          {
+            //user entered a value in last name search
+            if(call.parent1LastName)           
+            { val=call.parent1LastName.toLowerCase();
+              result &= (val.indexOf(searchVals.parent1LastName.toLowerCase()) > -1);
+            }
+            else return false; // last name searched but none in record
+          }
+          if(searchVals.studentFirstName && searchVals.studentFirstName != "")
+          {
+            //user entered a value in email search
+            if(call.studentFirstName)            
+            { val=call.studentFirstName.toLowerCase();
+              result &= (val.indexOf(searchVals.studentFirstName.toLowerCase()) > -1);
+            }
+            else return false; //user entered email search but none in record
+          }
+          if(searchVals.studentLastName && searchVals.LastFirstName != "")
+          {
+            //user entered a value in email search
+            if(call.studentLastName)            
+            { val=call.studentLastName.toLowerCase();
+              result &= (val.indexOf(searchVals.studentLastName.toLowerCase()) > -1);
+            }
+            else return false; //user entered email search but none in record
+          }
+          if(searchVals.parent2FirstName && searchVals.parent2FirstName != "")
+          {
+            //user entered a value in first name search
+            if(call.parent2FirstName)            
+            {val=call.parent2FirstName.toLowerCase();
+              result &= (val.indexOf(searchVals.parent2FirstName.toLowerCase()) > -1);
+            }
+            else return false; // first name searched but none in record
+          }           
+          if(searchVals.parent2LastName && searchVals.parent2LastName != "")
+          {
+            //user entered a value in last name search
+            if(call.parent2LastName)           
+            { val=call.parent2LastName.toLowerCase();
+              result &= (val.indexOf(searchVals.parent2LastName.toLowerCase()) > -1);
+            }
+            else return false; // last name searched but none in record
+          }
+          // if(searchfields.message && searchfields.message != "")
+          // {
+          //   //user entered a value in first name search
+          //   if(call.message)            
+          //   {
+          //     result &= (call.message.indexOf(searchfields.message) > -1);
+          //   }
+          //   else return false; // first name searched but none in record
+          // }           
+          // if(searchfields.phone && searchfields.phone != "")
+          // {
+          //   //user entered value in phone search
+          //   if(call.phone)            
+          //   {
+          //     result &= (call.phone.indexOf(searchfields.phone) > -1);
+          //   }
+          //   else return false; //user entered phone search but none in record
+          // }
+          // console.log("callFilter returning " + result);
+          // console.log(call, "this is the call", result, "this is the result");
+          return result;
+        }
+      },
+
+    _onClick: function(event) {
+      var targetOne = event.target;
+      console.log(event.model.data);
+      while (targetOne !== this && !targetOne._templateInstance) {
+        targetOne = targetOne.parentNode;
+      }
+      this.set("call", targetOne.data);
+      // configure the page animation
+      this.sharedElements = {
+        'hero': this
+      };
+      this.fire('on-call-click', {
+        item: targetOne.data
+      });
+    }
+
+  //   selectCaller:function(event){
+
+  //     console.log(this.call);
+  //     var target = event.target;
+  //     this.set("call", target.parentNode.data);
+  //     while (target !== this && target!==target._templateInstance) {
+  //       target = target.parentNode;
+  //     }
+  //     console.log(target);
+  //     this.fire('on-selected-caller', {
+  //       item: target.data
+  //   });
+  // }
+  }); 
+</script>
+</dom-module>
+<!-- <fc-list-item style="width:100%; height: 64px;">
+
+<content></content>
+questions in an input bound to database processed through a reader
+
+</fc-list-item> -->

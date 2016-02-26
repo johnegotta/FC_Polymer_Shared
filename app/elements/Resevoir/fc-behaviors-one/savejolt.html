@@ -1,0 +1,192 @@
+    _computePassageOneWordArray: function(passagesTestOne){
+		this.passagesWordArrays =[];
+		var blurb = this.passageBlurb;
+		var passageTitle = this.passageTitle;
+		var passageType = this.passageType;
+		var test = this.testId;
+		var fcid = this.fcid;
+		var self = this;
+		var passagesCounter = passagesTestOne.length;
+		// console.log(passagesCounter);
+		var p=1;
+		while(p<passagesCounter){
+		var passageContent = passagesTestOne[p];
+		self.set('passageBlurb', passageContent.blurb);
+		self.set('passageType', passageContent.passageType);
+		var matches = passageContent.blurb.match(/“[^”]*”/g);
+		//console.log(matches);
+
+
+		var truePassageContent = passageContent.passage.replace(/[\—]/g, " — ");
+		var arrayPassed=truePassageContent.split(/\s/g);
+		var order =arrayPassed.length;
+		self.orderIndex=0;
+		self.paragraphArray = truePassageContent.split(/\n/);
+		  self.passageArray = [];
+		  var i = self.paragraphArray.length-1;
+		  var paraNumHolder=self.paragraphArray.length;
+		  for(; i>= 0; i--)
+		    {
+			  //console.log(i + " " + self.paragraphArray[i]);
+			var wordCounter = 0;
+			var newPara = false;
+			var wordArray = self.paragraphArray[i].split(/\s/g);
+			var paraWordRemaining = paraNumHolder-1;
+			var paragraph_number = paraNumHolder-i;
+			var isLastWordOfPara =false;
+			var currentWord;
+			var totParaNum=paraNumHolder; 
+			var orderIndex = self.orderIndex;
+
+			while(paraWordRemaining>=0)
+			// para word loop
+			{       
+			    self.orderIndex++;
+			    order--;
+			    self.wordCounter--;
+			    if (paraWordRemaining==0){
+				newPara = true;
+				
+				
+			    }
+			    else if(wordCounter==0)
+			    { 
+		  
+				isLastWordOfPara = true;
+			    }
+			    else{
+				newPara=false;
+				isLastWordOfPara=false;
+			    
+			    }
+				
+				currentWord = wordArray[paraWordRemaining];               
+				self.push("passageArray",
+				  { 
+				    "passageTitle": matches,
+				    "passageBlurb": blurb,
+				    "indexPrime":orderIndex,
+				    'order': order,
+				    'word' : currentWord, 
+				    'newPara': newPara,
+				    'paragraph_number': paragraph_number,
+				    'isLastWordOfPara':isLastWordOfPara,
+				    'paragraphsRemaining': i
+				  });
+				wordCounter++;
+				paraWordRemaining--;
+					} console.log("singleParaMaybe", self.passageArray);
+			  }
+	    //this is the paragraph for loop
+	    
+	  var qtip= self.passageArray.length;
+	    var z=0;
+		  var upperbound= Math.floor(qtip*(1-.578));
+		  var upperboundholder=upperbound;
+		  var lowerbound = Math.ceil(qtip*(1-.675));
+		  var lowerboundholder=lowerbound;
+		  var numTWords = upperbound-lowerbound;
+	   
+	    // console.log(self.passageArray);
+	    self.minTarra=[];
+	    self.transitionArray=[];
+	    self.passageWordArrayOrdered=[];
+	    for(var  passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
+	    {
+	
+		if(z==0 && passageArrayLength>648)
+		{
+		  var upperbound= Math.floor(passageArrayLength*(1-.578));
+		  var upperboundholder=upperbound;
+		  var lowerbound = Math.ceil(passageArrayLength*(1-.675));
+		  var lowerboundholder=lowerbound;
+		  var  numTWords = upperbound-lowerbound;
+		  var  q=1;
+		  for(;upperbound>=lowerbound; upperbound--)
+		  {
+
+		    var  pickle= passageArrayLength-upperbound;
+		    var firstPickle=passageArrayLength-upperboundholder;
+		    var secondPickle=passageArrayLength-lowerboundholder;
+		    self.push('transitionArray', { 
+					'indextransitionArray':pickle ,
+					'word': self.passageArray[upperbound].word,
+					'numberOrder': q,
+					'transition_total':numTWords,
+					'L8ofFst': ((q<=22)?true:false),
+					'happy': true,
+					'lowerbound': firstPickle,
+					'upperbound': secondPickle
+					});
+				}
+		    if(q<=22){self.push('minTarra', {'word':self.passageArray[upperbound].word, 'passageIndex':pickle, 'isMinTarra': true});}
+			  q++;
+			  lowerbound++;
+	  		  
+	  		}
+	     if (passageArrayLength<650)
+	     	{self.transitionArray=[];}
+	     if(z==0)
+	     {
+		 self.push('passageWordArrayOrdered',
+				   { 'wordIndex': z,
+					"passageType": passageContent.passageType,
+					"passageTitle": matches,
+					"menuLabel": passageContent.menuLabel,
+					"menuItem": matches,
+					"passageBlurb": passageContent.blurb,
+					"total_word_count": passageArrayLength, 
+					"number_transition_words": numTWords,                   
+					"transitionArray":self.transitionArray,
+					"has_charts": "TRUE",
+					"is_double_passage": "TRUE"
+						 });
+	    
+	    }
+	    else{
+
+		var miniUpper=secondPickle-21;
+		self.push('passageWordArrayOrdered', 
+		    {           'wordIndex': z,
+				    'word' : self.passageArray[passageArrayLength].word, 
+				    'newPara': self.passageArray[passageArrayLength].newPara,
+				    'paragraph_number': self.passageArray[passageArrayLength].paragraph_number,
+				    'isLastWordOfPara':self.passageArray[passageArrayLength].isLastWordOfPara,
+				    'partOfSpeach': "self.dictionary.com",
+				    'definition': "definition",
+				    'containingSentenceRed': "sentenceArrayIndex",
+				    'containingParagraph': "paragraphArrayIndex",
+				    'difficultyOfWord':"0 to 7: had to pick seven",
+				    'relevanceOfWord': "0 to 7",
+				    'isWordInQuote': "y/n",
+				    'indexStartofQuote': "FIRST WORD OF QUOTE INDEX IN Passage Array",
+					'indexEndOfQuote': "last word in quotes PASSAGE INDEX",
+					'textOfQuote': "text of quote",
+					'textOfRelatedQuestion': 'textOfRelatedQuestionPATH',
+					'isWordPartOfRegularQuotedPattern': "boolean",
+					'textOfRelatedAnswer':  "textlink: we should have easy refs"
+				    
+
+
+			});
+		}
+		z++;
+	  }
+// console.log("transition array in zero ${JSON.stringify(self.passageWordArrayOrdered)}");
+	   self.push('passagesWordArrays', self.passageWordArrayOrdered);
+	
+	    self.set('passageArray', null);
+	    self.set('passageWordArrayOrdered',null);
+	    order=0;;
+	    p++;
+	    self.passageWordArrayOrdered=[];
+	    self.passageArray=[];
+	    self.set('transitionArray', null);
+	    self.set("passageType", null);
+	    self.set("passageBlurb", null);
+	    
+	  }
+	  return self.passagesWordArrays[0];
+	 
+	  },
+     

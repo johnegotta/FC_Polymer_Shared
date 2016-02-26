@@ -1,0 +1,486 @@
+<dom-module id="fc-callcenter-center">
+<template>
+<style>
+:host {
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 99%;
+	max-width: 99vw;
+	width: 100%;
+	width: 40%;
+    }
+.phpanel{
+	height: 93vh; 
+	padding: 6px 6px 24px 6px; 
+	font-weight: 600; 
+	margin-top: 12px; 
+	background: #fff; 
+	border: 3px ridge silver; 
+	font-size: 20pt; 
+	color: #000088;
+	width: 100%;
+
+}
+ .paper-material-header{
+    	min-height: 65px; 
+    	padding: 12px 6px 4px 6px; 
+    	font-weight: 600; 
+    	background: aliceblue; 
+    	font-size: 20pt; 
+    	border-bottom: 1px solid #000088; 
+    	color: #000088;
+    	
+    }
+    div#inner-editor{font-size: 2.0em;}
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    section{ padding-bottom: -4px;}
+    fc-input-prime{padding-bottom: 1px;}
+input[type="number"]{text-align: center; }
+    .highlighted {
+	background: yellow;
+    }
+
+    #firepad {min-width: 330px; max-height: 450px; height: 460px; border: 6px ridge silver; margin: 0px auto; width: 98%; border-radius: 4px; resize: vertical;}
+   .headstyle{font-size: 20px;}
+      </style>     
+</style>
+
+		<paper-header-panel class="vertical layout flex phpanel" mode="waterfall" style="height: 93vh;" >
+  	<paper-material class="paper-header header-panel head horizontal layout left-justified" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+  			<section class="horizontal layout flex self-stretch headstyle">
+  				<fc-input-prime 
+  					label="New Save Destination" 
+  					class="layout horizontal flex center"
+  					input-type="flex"
+  					style="width: 100%;"
+  					value="{{newDatabasePath}}">
+  				</fc-input-prime>
+  				<fc-input-prime
+  			  		label="Current Save Destination"
+  			  		class="layout horizontal flex center"
+  			  		input-type="flex"
+  					style="width: 100%;" 
+  			  		value="{{currentDatabasePath}}">
+  			 	</fc-input-prime>
+  			 </section>
+  			</paper-material>
+  			<div class="layout vertical flex">
+    				<section class="layout horizontal flex nowrap" style="top-margin: 16px;">
+    					<fc-input-prime style="width: 50%;" input-type="text"  value="{{passageTitle}}" label="Passage Title"></fc-input-prime>
+    					<fc-input-prime style="width: 50%;" input-type="text" always-float-label value="{{passageBlurb}}" label="Passage Blurb"></fc-input-prime>
+    				</section>
+    			
+					<section class="horizontal layout nowrap">
+		    			 <fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{fcid}}"
+		    				label="FCID">
+		    			</fc-input-prime>
+		    		<fc-input-prime
+							label="Passage Type"
+							input-type="text" 
+							class="horizontal layout flex center"
+							value="{{passageType}}"
+							>
+						</fc-input-prime>
+						<!-- <fc-select-mc-star class="horizontal layout flex self-stretch center" style="margin-bottom: -14px; max-width: 180px;" select-child="menuItem"></fc-select-mc-star> -->
+		    			<fc-input-prime 
+		    				input-type="text"
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtype}}" 
+		    				label="Passage Sub-Type">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="datetime-local"
+		    				class="horizontal layout flex center"
+		    				value="{{passageContext}}" 
+		    				label="Passage Period">
+		    			</fc-input-prime>
+		    			
+					
+					</section>
+		    			<section class="horizontal layout flex nowrap">
+		    			<fc-input-prime 
+		    				input-type="range" 
+		    				max="16" 
+		    				min="6" 
+		    				label="Number of Questions"
+		  					class="horizontal layout flex center"
+		    				value="{{totalNumberQuestions}}"
+		    				style="border: 2px solid #efefef;"> 
+		    			</fc-input-prime>
+	    					<fc-input-prime 
+	    						type="range" 
+	    						max="9" 
+	    						min="0"  
+	    						label="Vocabulary Questions" 
+	    						style="border: 2px solid #efefef;" 
+	    						class="flex horizontal layout center" 
+	    						input-type="range"
+	    					class="horizontal layout flex center"
+	    						value="{{mostNearlyMeans}}">
+	    					</fc-input-prime> 
+		    			
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="9"
+		    				min="0"
+		    				label="Citation Questions"
+		    				style="border: 2px solid #efefef;" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="24"
+		    				min="0"
+		    				style="border: 2px solid #efefef;"  
+		    				label="Number of Citations"
+		  					class="horizontal layout flex center"
+		    				value="{{totalCitations}}">
+		    			</fc-input-prime>
+		    			</section>
+		     		<section class="horizontal layout flex nowrap">
+		     		<div style="width: 20%;">
+		    				<fc-input-prime type="checkbox" 
+		    					input-type="checkbox" 
+		    					label="Charts"
+		    					class="horizontal layout flex center" 
+		    					checked-prop="{{passageHasCharts}}">
+		    				</fc-input-prime>
+			    			<fc-input-prime 
+			    				type="checkbox" 
+			    				input-type="checkbox" 
+			    				label="Double Passage"
+			    				class="horizontal layout flex center" 
+			    				checked-prop="{{passageIsDouble}}">
+			    			</fc-input-prime>
+			    		
+	  						<fc-input-prime 
+	  							type="checkbox" 
+	  							input-type="checkbox" 
+	  							label="Focused Product"
+	  							class="horizontal layout flex center" 
+	  							checked-prop="{{passageIsFocused}}">
+	  						</fc-input-prime>
+	  							</div>
+	  				<section class="horizontal layout flex wrap">
+	  		
+		  
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Vocabulary Tested"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{vocabularyQuestions}}" 
+		    				label="Vocabulary Questions">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtypeComments}}" 
+		    				label="Context Tested">
+		    				</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Insert Each Citation"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Insert Citation Qs">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtypeComments}}" 
+		    				label="Additional Comments">
+		    			</fc-input-prime>
+		    			</section>
+	  				</section>
+		
+			<section class="horizontal layout">
+			
+			<paper-button on-tap="saveLocal" style="width: 100%; margin: 12px; font-size: 20px; color: green; max-height: 75px; background: aliceblue; border: 2px solid #afafaf;" >Local Schools</paper-button>
+    			<paper-button on-tap="getText" style="max-height:  75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Load Text</paper-button>
+    			<paper-button on-tap="saveLocal" style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Save Data</paper-button>
+    		<paper-button on-tap="clearInputs" style="width: 100%; margin: 12px; font-size: 20px; background: aliceblue;color: gray; max-height: 75px; border: 2px solid #afafaf;"> Clear Data</paper-button>
+  			</section>
+   			<div class="flex horizontal layout center justified-around" style="height: 245px; width: 100%;" id="firepad">
+    		</div> 
+		<section class="horizontal layout">
+			<paper-button on-tap=""  style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Retrieve Save</paper-button><fc-input-prime
+		    				input-type="number"
+		    				label="Test"
+		    				style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;text-align: center; max-height: 48px !important;"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				 style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;text-align: center;max-height: 48px !important; margin-left: auto; margin-right: auto; display: flex;"
+		    				input-type="number" 
+		  					class="horizontal layout flex center"
+		    				value="{{}}" 
+		    				label="Section">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    			style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;margin-top: 10px; text-align: center;max-height: 48px !important;"
+		    				input-type="number"
+		    				label="Passage"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;font-size: 18px;text-align: center;max-height: 48px !important;"
+		    				input-type="number" 
+
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Detail">
+		    			</fc-input-prime>
+			<paper-button on-tap=""  style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Edit Save</paper-button>
+		</section>
+
+
+	</paper-header-panel>
+	</div>
+</template>
+<script>
+FcCallCenterCenter=Polymer({
+	is:"fc-callcenter-center",
+behaviors: [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior, 
+		  ],
+
+    properties:{
+		newDatabasePath:{
+			type: String,
+			value: function() {return "";},
+			notify: true
+		},
+	
+	isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+		  }, 
+		
+	yourName: {
+	    	type: String,
+		  	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	
+	fcid: {
+		type: String,
+		computed: "_computeFcid(onlineData)",
+		notify: true
+	},
+	
+	otherFields: {
+		type: Object,
+		value: {},
+		notify: true
+	},
+	onlineData:{
+		type: Array,
+		notify: true
+	},
+	currentDatabasePath:{
+	    	type: String,
+		  	value: function() 
+		  	{	var returnValue= "";
+
+		  		return returnValue;
+		  	},
+			notify: true
+		}, 
+
+		argArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		njhs:{
+			type: Array,
+			value: [],
+			notify: true
+
+		},	
+
+	   },
+	
+	 ready: function(){
+	 this.loadFirepad();
+	   //this both ewere always trough and ruffed
+
+	   },// 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/patterns");
+// 		ref.orderByChild("questions").on("child_added", function(snapshot) {
+//   console.log(snapshot.val()+ " was " + JSON.stringify(snapshot.val().questions + " question nunmber");
+
+
+attached: function(){
+
+	 getText();
+
+	},
+	getText(){
+	 	var gotContent = this.firepad.getText();
+	 },
+
+
+	 createProfileObject: function(){
+		this.$.isFocused.checked=this.isFocused;
+	    this.$.isDoublePassage.checked=this.isDoublePassage;
+	    this.$.hasCharts.checked=this.hasCharts;
+		this.set("metaObject",{		
+			"passageTitle": this.passageTitle,
+			"passageType": this.passageType,
+			"passageBlurb": this.passageBlurb,
+			"passageIsDouble": this.passageIsDouble,
+			"passageHasCharts": this.passageHasChaerts,
+			"passageIsFocused": this.passageIsFocused,
+			"passageWordCount": this.passageWordCount,
+			"passageSubtype": this.passageSubtype,
+			"passageSubtypeComments": this.passageSubtypeComments,
+			"citationQuestions": this.citationQuestions,
+			"totalCitations": this.totalCitations,
+			"mostNearlyMeans": this.mostNearlyMeans,
+			"totalNumberQuestions": this.totalNumberQuestions,
+			"vocabularyTested": this.vocabularyTested,
+			"citationsArray": this.citationArray,
+			"passageDifficult": this.passageDifficulty,
+			"culturalContext": this.culturalContext,
+			"passageStructure": this.passageStructure,
+			"passageNumberParagraphs": this.passageNumberParagraphs, 
+			"fcid": this.fcid, 
+			"passageMenuItem": this.passageMenuItem,
+			"isTwoColumns": this.isTwoColumns
+		});
+		},
+
+	createPaidAccount: function (){
+		this.set("passageObject",
+				{ 
+					"fcid": this.fcid,
+					"wordArray": this.wordArray,
+					"wordCount": this.wordCount,
+					"menuItem": this.menuItem,
+					"metaObject": this.metaObject,
+					"otherFields": this.otherFields
+				});
+		var self=this;
+				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+		
+	},
+	attached: function(){
+
+	},
+	
+
+	 saveLocal: function(){
+	 	var arr=[];
+	 	arr.push(this.firepad.getText());
+		var self=this;
+		console.log(arr);
+		var array=[];
+		arr.forEach(function(element, index, arr){
+		if(element.newPara!==true){array=element[index].concat(element[index+1]);}
+		console.log(array);
+		array=[];
+	});
+			console.log(this.argArray);	
+			localStorage.setItem("NJHIGHSCHOOLS",arr);
+			console.log(arr);
+
+	},
+
+
+	 	// var passageContent = this.firepad.getText();
+	 	// this.getText(passageContent);
+	 	// this.createMetaObject();
+	 	// this.createPassageObject();
+
+	// saveToDb: function(){
+	// 	this.saveLocal();
+	// 	this.createPassageObject();
+	// 	if(this.passageTitle!==""){ 
+	// 	var self=this;
+	// 	var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 	ref.child(self.fcid).set(self.passageObject);
+	// 	this.clearInputs();
+		  
+	//   }
+	//   else {
+	//   	this.openDialog();
+	//   }
+	// },
+
+	clearInputs: function(){
+		this.set("passageType", null);
+	    this.set("passageBlurb", null);
+		this.set('passageHasCharts', false);
+		this.set('passageIsFocused', false);
+		this.set('passageIsDoublePassage', false);
+		this.set("fcid",null);
+		this.set("passageTitle", null);
+	
+	},
+
+	openDialog: function(){
+		Polymer.dom("fc-dashboard-one").querySelector("#dataAdminPrime").open();
+	}
+	// _toggleRightDrawer: function(){
+	// 		var drawer = document.querySelector('#drawer-2');	
+	// 		if(drawer.forceNarrow!==true)
+	// 		{drawer.forceNarrow = true;}
+	// 		else{drawer.forceNarrow = false;
+	// 		}
+	// },
+	// _toggleLeftDrawer: function(){
+	// 	var drawer = document.querySelector('#drawerPrimed');
+ //          var dashboard = document.querySelector("#dashboardPrime");	
+	// 	if(drawer.forceNarrow!==true)
+ //          {
+ //               drawer.forceNarrow = true;
+ //               drawer.responsiveWidth='90000px';
+ //               dashboard.leftHidden=true;
+ //          }
+ //          else
+ //          {
+ //               drawer.forceNarrow = false;
+ //               drawer.responsiveWidth ='1080px';
+ //               dashboard.leftHidden=false;
+
+ //          }
+ //     }
+	
+
+  });
+ </script>
+ </dom-module>
+ 

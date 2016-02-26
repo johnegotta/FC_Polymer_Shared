@@ -1,0 +1,659 @@
+<dom-module id="fc-student-intake-form">
+<template>
+<style is="custom-style">
+host: {--container-layout-center-center-justified-block
+	@apply
+};
+
+neon-animatable {
+        color: black;
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+        @apply(--paper-font-merriweather);
+        @apply(--paper-font-size-.9em);
+      }
+      neon-animatable:nth-child(1) {
+        background: var(--paper-white-500);
+      }
+      neon-animatable:nth-child(2) {
+        background: var(--paper-white-500);
+      }
+      neon-animatable:nth-child(3) {
+        background: var(--paper-white-500);
+      }
+
+.intakeForm {
+    --paper-card-header-image: {
+    	display: block;
+        max-width: 240px;
+        min-width: 72px;
+        max-height: 106px;
+        min-height: 64px;
+        margin-top: 12px;
+    };
+    --paper-card-header-text: {
+    	display: flex; 
+    	color: #000066;
+    	font-family: merriweather; 
+    	right: 30px;
+    	font-weight: 700;
+    	padding: 8px;
+    	font-size: 24px;
+    	line-height: .2;
+    	display: block;
+
+
+    
+    	
+    };
+    --paper-card:{
+    	max-width: 550px;
+    	min-width: 300px;
+    	max-height: 710px;
+    	min-height: 481px;
+    	margin: 12px;
+    	padding: 8px;
+    	display: flex;
+    	flex-direction: column;
+
+
+
+    };
+
+
+    }
+    .labelsClass {
+    	    width: 240px; 
+    		height: 75px; 
+    		padding: 0px 8px;
+      --paper-input-container-label:{
+        font-family: Merriweather;
+        font-weight: 700;
+        font-size: 21px;
+        color: navy;
+    };
+
+    --paper-input-container-label-focus:{
+        color: #000066;
+        font-size: 21px;
+
+
+    };
+  }
+.questionHeader {
+	font-size: .8em;
+	font-family: Merriweather;
+	font-weight: 600;
+	line-height: 0px;
+	
+}
+  .offset{
+  	   width: 240px; 
+    		height: 75px; 
+    		padding: 0px 15px;
+      --paper-input-container-label:{
+        font-family: Merriweather;
+        font-weight: 700;
+        font-size: 21px;
+        color: navy;
+        margin-left: -42px;
+    };
+    
+  }
+
+  paper-input.input { 
+          max-width: 138px;
+          min-width: 72px; 
+          max-height: 72px;
+          min-height: 24px; 
+          padding: 0px 3px;
+        }
+    h5{
+    	margin-bottom: 12px;
+    	padding-bottom: 0px;
+
+
+    }
+
+    option{
+    	margin: 0px 40px;
+    }
+
+    .holderClass {
+    	min-width: 240px;
+		max-width: 624px;    	
+		min-height: 48px;
+		max-height: 72px;
+}
+	.subheading {
+	font-size: 16px;
+	margin-top: 10px;
+    }
+    iron-icon{ 
+    	width: 36px;
+    	height: 36px;
+
+
+    }
+  .setHeight {
+  	min-height: 680px;
+  	max-height: 1200px;
+  	max-width: 665px;
+  	min-width: 380px;
+  	margin: 4px;
+  	padding: 4px;
+  }
+
+</style>
+<firebase-collection location="focusedstudents.firebaseio.com/"></firebase-collection>
+<iron-form id="studentIntakeForm">
+
+<neon-animated-pages id="pages" class="flex" selected="0" entry-animation="[[slide-from-right-animation]]" exit-animation="[[slide-left-animation]]">
+	<neon-animatable class="setHeight horizontal layout center">
+		
+		<paper-card heading="Intake Form" elevation="3" class="intakeForm vertical layout" image="../../../images/FC_frontpage_logo.png">
+				<div class="card-content">
+					<section name="callDateAndTimeAndCallerRole">
+						<span class="questionHeader">Classify the caller as a student, a student's parent or 'other'.</span>
+						<fc-holder class="horizontal layout container holderClass"> 
+								<paper-input class="labelsClass" id="callTimestamp" value='[[timeStamp]]' read-only=true label='Date & Time'></paper-input>
+								<paper-input type="list" value='{{call.callerRole}}' class="labelsClass" id="callerRole" label="Caller Role" always-float-label='true' list="two"> </paper-input>
+                                         <datalist id="callerRoleInput">
+                                              <option value="{{Mother}}"> Mother</option>
+                                              <option value="{{Father}}"> Father </option>
+                                              <option value="{{Student}}"> Student </option>
+                                              <option value="{{Other}}"> Other </option>
+                                         </datalist>
+				        		</fc-holder>
+					</section>
+
+					<section name="callerIntake">
+						<span class="questionHeader">Type the Caller's first & last names into the below fields.</span>
+						<fc-holder class="horizontal layout container holderClass">
+					            <fc-paperInput id='callerFirstName' class="labelsClass" name='callerFirst' tab-index='0' label='Caller First'  value='{{call.callerFirst}}' on-input="updateInput">
+					            </fc-paperInput>
+					            <fc-paperInput id='callerLastName' class="labelsClass" name='callerLast' label='Caller Last'  value='{{call.callerLast}}' on-input="updateInput">
+					            </fc-paperInput>
+				        </fc-holder>
+				     </section>
+				     <section name="studentName">
+				        	<span class="questionHeader">Type the <a href="http://www.focusedcoaching.com"><i>Related Student</i></a>'s names into the labelled fields below.</span>
+				        	<fc-holder class="horizontal layout container holderClass">
+					          <fc-paperInput id='studentFirst' class="labelsClass" name='studentFirst' class="labelsClass" label='Student First' value='{{call.studentFirst}}' on-input="updateInput">
+					          </fc-paperInput>
+					          <fc-paperInput id='studentLast' class="labelsClass"  name='studentLast' label='Student Last'  value='{{call.studentLast}}' on-input="updateInput">
+					          </fc-paperInput>
+				        	</fc-holder>
+				   
+				    	</section>
+					<section>
+					    	<span class="questionHeader">Confirm a client's phone number or email address.</span>
+					    	<fc-holder class="horizontal layout container holderClass center-justified">  
+				               <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='callerPhone' label='Phone' value='{{call.callerPhone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
+				               </gold-phone-input> 
+				               <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{call.callerEmail}}'></gold-email-input>   
+					     </fc-holder>
+				    </section>
+
+
+
+					<section>   
+						<span class="questionHeader">SELECT<a href="http://www.focusedcoaching.com"><u>a Previous Caller</u></a> </span><span class="questionHeader">from the</span><paper-button class="questionHeader" on-tap="_focusedAssistant">Call List</paper-button>.</span>
+						<br>
+					</section>
+
+				<paper-status></paper-status>
+				</div>
+
+				<div class="card-actions horizontal layout flex container center-justified">
+					<paper-button class="flex-1">back
+					</paper-button>
+					<paper-button class="flex-1" id="one" on-tap="nextPage">CONTINUE
+					</paper-button>
+				</div>
+			</paper-card>
+		</neon-animatable>
+<!--NEW CARD SERVICE MATCH-->
+				
+<neon-animatable class="setHeight fit">
+	<paper-card id="pagetwo" heading="Student Intake Page 2" elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
+		<div class="card-content layout vertical container flex wrap center center-justify">
+			
+				<fc-holder class="horizontal layout container holderClass">
+				   	<fc-paperInput id='courseOptions' class="labelsClass" name='courses' tab-index='0' label='Course Options'  list='courses'>
+				     </fc-paperInput>
+				     <data-list="courses">
+	                		<option value="{{courses.optionOne}}">{{courses.optionOne}}</option>
+	                		<option value="{{courses.optionTwo}}">{{courses.optionTwo}}</option>
+	                		<option value="{{courses.optionThree}}">{{courses.optionThree}}</option>
+	                		<option value="{{courses.optionFour}}">{{courses.optionFour}}</option>
+	                		<option value="{{courses.optionFive}}">{{courses.optionFive}}</option>	
+	                	</data-list>
+				            
+				     <fc-paperInput id='coachOptions' class="labelsClass" name='coachOptions' label='Focused Coaches'  value='{{coaches}}' list="coaches">
+				     </fc-paperInput>
+				    	<data-list="additionalMaterials">
+	                		<option value="{{coaches.optionOne}}">{{coaches.optionOne}}</option>
+	                		<option value="{{coaches.optionTwo}}">{{coaches.optionTwo}}</option>
+	                		<option value="{{coaches.optionThree}}">{{coaches.optionThree}}</option>
+	                		<option value="{{coaches.optionFour}}">{{coaches.optionFour}}</option>
+	                		<option value="{{coaches.optionFive}}">{{coaches.optionFive}}</option>	
+	                	</data-list>
+				</fc-holder>
+				          
+
+				<fc-holder class="horizontal layout container holderClass"> 
+				     <fc-paperInput id='additionalMaterials' class="labelsClass" name='additionalMaterials' class="labelsClass" label='Additional Materials Name' value='{{additionalMaterals}}' list="additionalMaterials">
+				     </fc-paperInput>
+			          <data-list="additionalMaterials">
+	                		<option value="{{additionalMaterials.optionOne}}">{{additionalMaterials.optionOne}}</option>
+	                		<option value="{{additionalMaterials.optionTwo}}">{{additionalMaterials.optionTwo}}</option>
+	                		<option value="{{additionalMaterials.optionThree}}">{{additionalMaterials.optionThree}}</option>
+	                		<option value="{{additionalMaterials.optionFour}}">{{additionalMaterials.optionFour}}</option>
+	                		<option value="{{additionalMaterials.optionFive}}">{{additionalMaterials.optionFive}}</option>	
+	                	</data-list>	
+		<!--end additional Materials option list-->		              
+				     <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{}}'>
+				     </fc-paperInput>
+				</fc-holder>
+				          
+
+				<fc-holder class="horizontal layout container holderClass">  
+				        
+				                    <paper-input type="list" class="labelsClass" always-float-label='true' label="Grade Level" list="betty" name="bday"> </paper-input>
+                                         <datalist id="betty">
+                                         	  <option value='4'> 4th </option>
+                                              <option value="5"> 5th </option>
+                                              <option value="6"> 6th</option>
+                                              <option value="7"> 7th </option>
+                                              <option value="8"> 8th </option>
+                                              <option value="9"> 9th </option>
+                                              <option value="10">10th</option>
+                                              <option value="11">11th </option>
+                                              <option value="12">12th </option>
+                                         </datalist>
+				                  
+				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{}}'>
+				                         </fc-paperInput>
+				          </fc-holder>
+				          <fc-holder class='horizontal layout container holderClass'>
+				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{}}'>
+				                         </fc-paperInput>
+				                         <paper-input type="list" class="labelsClass" id="role" label="caller Role" always-float-label='true' list="two"> </paper-input>
+				                                             <datalist id="two">
+				                                                  <option value="Mother"> Mother</option>
+				                                                  <option value="Father"> Father </option>
+				                                                  <option value="Student"> Student </option>
+				                                                  <option value="Other"> Other </option>
+				                                             </datalist>
+				               
+				          </fc-holder>
+				          
+				
+				<details> 
+<summary>					Current School:
+
+				School Town/City/State:
+
+				Current Grade Level: *
+				This question will influence future options for all students.
+
+				Caller Role: *
+				 
+				Phone Number(s): *</summary>
+				Please click here to add an additional phone number. [Have Student and Parent]
+				 
+				Email Address(es): *
+				Please click here to add an additional email address. [Have Student and Parent]
+				 
+				What Focused SAT Test Preparation Class Interests You Most *
+				 			I would like to prepare for multiple test dates and take advantage of Focused packaged discounts.
+				 			A Class for the March 14, 2015 Test Date
+				 			A Class for the May 2, 2015 Test Date
+				 			A Class for the June 6, 2015 Test Date
+				 			Summer SAT Class
+
+
+				22% completed
+				</details>
+				<paper-progress></paper-progress>
+				</div>
+				<div class="card-actions horizontal layout flex container center-justified">
+				              <paper-button class="flex-1" on-tap='lastPage'>BACK</paper-button><paper-button id="two" class="flex-1" on-tap="nextPage">CONTINUE</paper-button>
+				      </div>
+				      </div>
+				 </paper-card>
+</neon-animatable>
+<!--CARD_THREE-->
+<neon-animatable class="setHeight fit">
+				<paper-card id="pagethree" heading="Student Intake Page 3" hidden elevation="3" class="intakeForm" image="../../../images/FC_frontpage_logo.png">
+				<div class="card-content layout vertical container flex wrap center center-justify">
+				<div class="subheading">Course and Service Match</div>
+				     <fc-holder class="horizontal layout container holderClass">
+				                <fc-paperInput id='callerFirstName' class="labelsClass" name='firstname' tab-index='0' label='Caller Fist Name'  value='{{call.callerFirstName}}'>
+				                    </fc-paperInput>
+				                <fc-paperInput id='callerLastName' class="labelsClass" name='lastname' label='Caller Last Name'  value='{{call.callerLastName}}'>
+				                    </fc-paperInput>
+				          </fc-holder>
+				          <fc-holder   class="horizontal layout container holderClass"> 
+				                <fc-paperInput id='studentfirst' class="labelsClass" name='studentfirstname' class="labelsClass" label='Student Name' value='{{call.studentfirstname}}'>
+				                </fc-paperInput>
+				              
+				                 <fc-paperInput id='studentlast' class="labelsClass"  name='studentlastname' label='Student Name'  value='{{call.studentlastname}}'>
+				                  </fc-paperInput>
+				          </fc-holder>
+				          <fc-holder class="horizontal layout container holderClass">  
+				        
+				                    <paper-input class="labelsClass" always-float-label='true' label="Grade Level" list="betty" name="bday"> </paper-input>
+				                                             
+				                    <fc-paperInput id='fcInp6' class="labelsClass" name='schoolname' label='Current School' tabindex='0'  value='{{caller.school}}'>
+				                         </fc-paperInput>
+				          </fc-holder>
+				          <fc-holder class='horizontal layout container holderClass'>
+				                      <fc-paperInput id='fcInp7' class="labelsClass" always-float-label='true' name='townname' label='School Address' value='{{caller.schooltown}}'>
+				                         </fc-paperInput>
+				                         <paper-input class="labelsClass" id="role" label="caller Role" always-float-label='true' list="two"> </paper-input>
+				                                             <datalist id="two">
+				                                                  <option value="Mother"> Mother</option>
+				                                                  <option value='Father'> Father </option>
+				                                                  <option value=> Student </option>
+				                                                  <option> Other </option>
+				                                             </datalist>
+				               
+				          </fc-holder>
+				          <fc-holder class="horizontal layout container holderClass center-justified">  
+				                <gold-phone-input validate="true" id='fcInp9' tabindex='0' name='phone' label='Phone' value='{{caller.phone}}' class="offset" always-float-label='true' phone-number-pattern="XXX-XXX-XXXX">
+				                    </gold-phone-input> 
+				                <gold-email-input label="Email" class="labelsClass" tabindex='0' always-float-label='true' value='{{caller.email}}'></gold-email-input>   
+				          </fc-holder>   
+				<details><summary>Student Intake Forms</summary>
+				Student Intake Forms
+				Service Match
+				Student Intake Forms
+				SAT Class Options for Spring, Summer and Fall 2015
+				Below are some Focused 2015 Offerings and Packages, please select a service for scheduling and other information?
+				There are a number of Focused offerings and packages based on what we have seen best serves students. If you want more details, please ask to speak to a Focused Coach. If you do not have time for a phone call now, please simple select services which seem interesting at first glance.
+				  A SPRING 2015 Focused SAT Class and Study Group Package, purchased together for a $425 discount.
+				 A SPRING 2015 Focused SAT Class and 2 Study Group Package, a $900+ discount
+				 A Focused SAT Class for the 2015 March SAT Test, $1950
+				 A Focused SAT Class for the May 2015 SAT, $1950
+				 A Focused SAT Class for the June 2015 SAT, $1950
+				 A Focused Summer SAT Class, $1950
+				 A Focused October SAT Class, $2050
+				 A Focused Fall October, November, December SAT Package
+				 A Focused October, November or November, December SAT Package
+				 A Fall Full October through January 2400 SAT Close-Out Perfect Score Package
+				« Back Continue »	
+				30% completed
+				Powered by
+				 Back Continue 
+				33% completed
+				</details>
+				</div>
+				<paper-progress></paper-progress>
+				<div class="card-actions horizontal layout flex container center-justified">
+				              <paper-button on-tap="nextPage" class="flex-1">BACK</paper-button><paper-button  on-tap="lastPage" class="flex-1">CONTINUE</paper-button>
+				      </div>
+				</paper-card>
+				<!--
+				<fc-call-card-input-model-one heading="page 4">
+				<div>
+				Student Intake Form
+				* Required
+				Service Selected and Notes Page Prior to Payment
+				This page will allow you to exit, or bring customers to payment and automated invoicing, welcome email and schedule distribution to the client.  
+
+				This Page will also allow you to place any notes on the client's file record.  If you have reached this page you are almost done with your client call!! 
+
+				Get the payment and you are done!!! Yah! 
+				Additional Information
+				Here is where you ask the client if he or she would like to add any additional notations to his or her Focused file or call back information.
+				 
+				If you have no more questions, would you like to proceed to payment now? *
+				If clients do not proceed to payment, set up a second call date and time. Also, follow up within 48 hours, stating any spots "held," can no longer be held!
+				  Yes! Proceed to Payment please!
+				 No!  Attempt to schedule a second Call.
+				« Back Continue »	
+				61% completed
+				</div>
+				</fc-call-card-input-model-one>
+				<fc-call-card-input-model-one heading="page later">
+				<div>
+				Student Intake Forms
+				* Required
+				Second Call Scheduling and Client Close Completion
+				If you have reached this page, you are inches away from an amazing job, one well done, with all victories hard won.  All that remains is that you set up the follow up call.  This will be placed below as a button.
+
+				If possible, collect a credit card number and actually register the date the card is to be run.  Then proceed to Authorized for processing.
+				When would you like me to call you back, so we can complete your registration? *
+				Here you must set up a date and time to call the potential client back, otherwise the potential may fester for months in our data logs, and never be served, the client's children left alone in the academic wilderness in which we all are now wandering.
+				 
+				mm/dd/yyyy
+				Example: 03/05/2013 11:30 AM
+				If it is more convenient for you, I can automate your payment on a set date, and we can just proceed smoothly from there. *
+				Ask for the CC number and an autopayment here.
+				  Can I take your CC information and schedule your auto payment and registration for Focused service?
+				 If you are not interested in setting up an automated payment, then I look forward to speaking to you on... DATE ABOVE
+				Back Continue 	
+				76% completed
+				</div>
+				</fc-call-card-input-model-one>
+				<fc-call-card-input-model-one>
+				<div>
+				Student Intake Forms
+				* Required
+				Exit and Proceed to Payment Site: Authorized
+				If You Have Reached this Page, Run the CCs through Authorized and Check that the Student is Registered for the proper Class.
+				What is the Price of the Total Service Purchased? *
+				This price should be automatically set based on the service selected. Discounts, however, may apply.
+				 
+				If any discounts apply, what are the amounts of the discounts? *
+				Here there are set discounts, that should be applied automatically if a button is pushed.
+				 
+				Will the Total Price be Split into two Payments? *
+				  Yes
+				 No... Run the card and exit! Yeah!
+				If there is a second payment, what date will it be made?
+				This should be a set date, prior to the service being offered. The date should be automatically filled in based on the service.
+				 
+				mm/dd/yyyy
+				What is the amount of the first payment to be run today? *
+				 
+				What is the amount of the second payment if one will be made? *
+				 
+				Do you have any more questions or do you want any more information? *
+				  Yes.
+				 No.
+				« Back Continue »
+				</div>
+				</fc-call-card-input-model-one>
+				<fc-call-card-input-model-one>
+				<div>
+				Student Intake Forms
+				Thank You For Choosing Focused
+				Thank Client, repeat client first name, say something nice about clients child. 
+
+				THE END
+				« Back Submit
+				Never submit passwords through Google Forms.
+				100%: You made it.
+
+				Yeah!
+				</div>
+				</fc-call-card-input-model-one>
+				-->
+				<!--</neon-animated-pages>-->
+
+
+</neon-animatable>
+</neon-animated-pages>
+
+</iron-form>
+</template>
+<script>
+Polymer({
+	is: 'fc-student-intake-form',
+	behaviors: [
+    		Polymer.NeonAnimatableBehavior,
+    		],
+	properties: {
+		animatable: true,
+		timeStamp: Date,
+		callerSearch: String,
+		daysOfWeek: String,
+		month: String,
+		day: String, 
+		year: String,
+		callTime:String,
+		call: {
+			type: Object,
+			value: {
+				callerRole: String,
+				callerFirst: String,
+				callerLast: String,
+				studentFirst: String,
+				studentLast: String,
+				callerEmail: String,
+				callerPhone: String,
+				grade: String,
+				school: String, 
+				schoolTown: String,
+				coachChoice: String, 
+				courseScheduleChoice: String,
+				testDateChoice: Date,  
+				studentEmail: String, 
+				studentPhone: String, 
+				studentPastAcademics: Object, 
+				callerCommitsToCourse: Boolean,
+				startScoreMath: String, 
+				startScoreReading: String,
+				startScoreWriting: String,
+				startEssayScore: String,
+				currentScoreMath: String,
+				currentScoreReading: String,
+				currentScoreWriting: String,
+				currentsScoreEssay: String,
+				deltaMath: String,
+				deltaReading: String,
+				deltaWriting: String,
+				deltaEssay: String,
+				deltaTotal: String,
+				amountPaid: String,
+				amountOwed: String,
+				datePaymentDue: Date,
+				dateCourseCompletion: Date,
+				homeworkCompletionPercentage: String,
+				ROI: String,
+				lostROI: String, 
+
+				reflectToAttributes: true, 
+				notify: true
+			},
+
+			notify: true,
+			reflectToAttributes: true
+		}, 
+		notify: true,
+		reflectToAttributes: true,
+
+animationConfig: {
+  value: function() {
+    return {
+      // fade-in-animation is run with a 50ms delay from slide-down-animation
+      'entry': [{
+        name: 'slide-from-right-animation',
+        node: this
+      }, {
+        name:  'slide-left-animation',
+        node: this,
+        timing: {delay: 50}
+      }],
+      'exit': [{
+        name: 'slide-left-animation',
+        node: this
+      }, {
+        name:  'slide-from-right-animation',
+        node: this,
+        timing: {delay: 50}
+      }]
+    }
+  }
+},
+		
+
+	},
+
+	updateInput: function(e){
+		var x = document.querySelector("#griddy");
+		var tempObj = {"firstname": this.call.callerFirst};//, "lastname": this.caller.lastname, "studentfirstname": this.caller.studentfirstname, "studentlastname": this.caller.studentlastname};
+		if(x)
+		{
+			x.updateFilter(tempObj);
+		}
+	},
+	
+	ready: function(){ 
+		var d = new Date();
+		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		this.daysOfWeek = days[d.getDay()].toString();  
+		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		this.month = months[d.getMonth()].toString().slice(0,3);
+		console.log(this.month);
+
+		var day = this.day = d.getDate().toString();
+		console.log(d);
+		var year = this.year = d.getFullYear().toString();
+		this.timeStamp = days[d.getDay()].toString().slice(0,3) +'.' + ' ' + this.month + ' ' + day + ',' + ' ' +year;
+
+	},
+
+	nextPage: function(e){
+		/*var num = e.target.id;
+		console.log(e.target);
+		console.log("continue clicked for " + num);
+
+		if(num == "one")
+		{
+			this.$.pageone.hidden = true;
+			this.$.pagetwo.hidden = false;
+		}*/
+   		this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+        this.selected = this.selected === 2 ? 0 : (this.selected + 1);
+              },
+
+    lastPage: function() {
+     	this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+     	this.selected = this.selected === 0 ? 2 : (this.selected - 1);
+      },
+
+
+	__someButtonPushLeft: function(){
+
+
+
+
+	},
+
+	__someButtonPushRight: function(){
+
+
+
+
+
+
+	},
+
+	__somethingCreditCardy: function(){
+
+
+
+
+	
+
+}
+});
+</script>
+</dom-module>
+

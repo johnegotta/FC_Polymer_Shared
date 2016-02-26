@@ -1,0 +1,125 @@
+<dom-module id="fc-list-viewssssssss">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-vertical);
+        max-height: 8500px;
+        height: 100%;
+        width: 100%;
+        visibility: visible;
+      }
+      .main {
+        @apply(--layout-flex);
+        @apply(--layout-scroll);
+        @apply(--layout-self-stretch)
+        @apply(--shadow-elevation-8dp);
+      }
+      iron-icon {
+        color: var(--google-blue-500);
+
+      }
+     
+      .circle {
+
+        border-radius: 180px;
+        width: 20px;
+        height: 20px;
+        z-index: 1;
+        background: green;
+        border: 6px solid white;
+        @apply(--shadow-elevation-8dp);
+
+      
+      }
+      paper-input{ margin: 0px 3px;}
+    </style>
+<!-- <firebase-collection limit-to-first="30" location="https://focusedstaging1.firebaseio.com/questions" data="{{dataItems}}"></firebase-collection>
+ --> <div class="main">
+    <template is="dom-repeat" items="{{dataItems}}">
+      <paper-item on-tap="trigger"class="vertical layout" style="height: 65px; border: 1px solid #008;"> 
+      <section class="horizontal layout flex">
+              <paper-input class="flex layout vertical" style="width: 18%;" always-float-label label="QNum" value="{{item.fcid}}.">
+              </paper-input> 
+              <paper-input value="{{item.stem}}" class="flex-4 layout vertical" always-float-label label="Q. Part A"></paper-input> 
+      </section>
+        <template hidden="true" is="dom-repeat" items="{{item.answerChoices}}" as="choice">
+          
+            <paper-item-body id="{{choice.fcid}}" class="horizontal layout wrap">
+              <section class=" horizontal layout wrap">
+                <paper-input always-float-label label="Letter"style="max-width: 40px;" value="({{choice.letter}})"></paper-input>
+                <paper-input label="Ans. Part A" always-float-label value="{{choice.choiceContent}}">
+                </paper-input>
+              </section> 
+           </paper-item-body>
+           </template>
+ <!--            <section hidden="true"  <div>[[item.Answer_A]]</div>
+              <div>[[item.Answer_B]]</div>
+              <div>[[item.Answer_C]]</div>
+              <div >[[item.Answer_D]]</div></section> -->
+<!--            </paper-item-body> -->
+           </paper-item>
+        </template>
+        </div>
+
+
+  </template>
+
+
+
+<script>
+  Polymer({
+    is: 'fc-list-viewssssssssssss',
+    behaviors: [
+      Polymer.NeonAnimatableBehavior
+    ],
+    listeners: {
+      'click': '_onClick'
+    },
+    properties: {
+      dataItems: {
+        type: Array,
+        notify: true, 
+        reflectToAttribute: true
+      },
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+      }
+    },
+    _onClick: function(event) {
+      var target = event.target;
+      while (target !== this && !target._templateInstance) {
+        target = target.parentNode;
+      }
+      // configure the page animation
+      this.sharedElements = {
+        'hero': target,
+      };
+      this.fire('item-click', {
+        item: target,
+      });
+    },
+  }); 
+</script>
+</dom-module>
+<!-- <fc-list-item style="width:100%; height: 64px;">
+
+<content></content>
+questions in an input bound to database processed through a reader
+
+</fc-list-item> -->

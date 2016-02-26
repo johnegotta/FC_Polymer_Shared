@@ -1,0 +1,46 @@
+<dom-module id="fc-draggableDataBehavior">
+
+<script>
+  fcDraggableDataBehavior = {
+    properties: {      
+      dataType: String,
+      data: Object,
+      draggable: {
+        type: Boolean,
+        value: true,
+        reflectToAttributes: true
+      },
+      notify: true,
+      reflectToAttributes: true
+    },
+    listeners: {
+      "dragstart": "handleDragStart"
+    },
+    
+    attached: function(){
+      console.log("fcDraggableDataBehavior::attached dataType = " + this.dataType);
+      this.draggable = true;
+    },
+    handleDragStart: function(e){
+      console.log("fcDraggableDataBehavior handleDragStart");
+     var cucumber =JSON.stringify(this.data);
+      e.dataTransfer.setData("fcdata", JSON.stringify(this.data));
+      var pickle=localStorage.setItem("cucumber", cucumber);
+      //e.dataTransfer.setData("dataType", this.dataType);
+      console.log("fcDraggableDataBehavior drag begun for ");
+      console.log(e.dataTransfer.getData("fcdata"));
+        console.log(e.target, e.detail, "Stringified this.data called Cucumber: " + cucumber);
+    },
+    allowDrop: function (e) {
+      console.log("fcDraggableDataBehavior handleDragStart");
+      var cucumber =JSON.stringify(this.data);
+      e.dataTransfer.setData("fcdata", JSON.stringify(this.data));
+      var pickle=localStorage.setItem("cucumber", cucumber);
+      e.preventDefault();
+    
+      console.log("drag over");
+    }
+     
+};
+</script>
+</dom-module>

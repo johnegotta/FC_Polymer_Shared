@@ -1,0 +1,177 @@
+<dom-module id="fc-drag-resize-date-card">
+  <template>
+    <style include="paper-dialog-shared-styles">
+    :host{
+          background: white; 
+          border-radius: 16px;
+          border: 8px double #000066;
+          min-width: 320px;
+          max-width: 1600px;
+          min-height: 340px;
+          max-height: 1600px;
+          box-shadow: 10px 5px 5px #afafaf;
+          padding: 6px 8px 6px 8px;
+          margin: 6px; 
+          position: absolute;
+          
+        }
+    </style>
+ <iron-icon 
+            icon="icons:highlight-off" 
+            name="fc-dialog-closer"
+            on-tap="_closeDialog"
+            description="designed to close the dialog"
+            class="menuItems-light"
+            style="position: absolute; width: 26px; height: 26px; right: -22px; top: -22px;"
+          >
+      </iron-icon>
+  <iron-icon 
+            icon="icons:open-with" 
+            name="fc-dragtag"
+            on-track="dragmeplease"
+            track
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-light"
+            style="position: absolute; width: 26px; height: 26px; left: -22px; top: -22px;"
+          >
+  </iron-icon>
+   
+    
+    <content></content>
+  <iron-icon 
+            icon="icons:aspect-ratio" 
+            name="fc-resizer"
+            on-track="_resize"
+            track
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-light"
+            style="position: absolute; width: 26px; height: 26px; right: -26px; bottom: -26px;"
+          >
+      </iron-icon>
+  </template>
+
+
+<script>
+(function() {
+  Polymer({
+    is: 'fc-drag-resize-date-card',
+    behaviors: [
+      Polymer.PaperDialogBehavior,
+      Polymer.NeonAnimationRunnerBehavior
+    ],
+    listeners: {
+      'neon-animation-finish': '_onNeonAnimationFinish'
+    },
+    properties: {
+      selectionArray: {
+        type: Array,
+        value: function(){
+          return [
+                'first', 
+                'second', 
+                'third', 
+                'fourth'
+          ];
+        },
+        notify: true
+      },
+      selected: {
+        type: String,
+        computed: 'computeSelected(selectionArray)',
+        notify: true
+      },
+      currentWidth: {
+          type: String, 
+          value: function(){
+                    return '140';
+              },
+          notify: true, 
+          reflectToAttribute: true
+      },
+      currentHeight: {
+          type: String, 
+          value: function(){
+                    return '140';
+              },
+          notify: true, 
+          reflectToAttribute: true
+      }
+    },
+    computeSelected: function(selectionArray){
+      return `[name=first]`;
+    },
+    _renderOpened: function() {
+      if (this.withBackdrop) {
+        this.backdropElement.open();
+      }
+      this.playAnimation('entry');
+    },
+    _renderClosed: function() {
+      if (this.withBackdrop) {
+        this.backdropElement.close();
+      }
+      this.playAnimation('exit');
+    },
+    _onNeonAnimationFinish: function() {
+      if (this.opened) {
+        this._finishRenderOpened();
+      } else {
+        this._finishRenderClosed();
+      }
+    },
+    _resize: function(e){
+          var self=this;
+          e.preventDefault();
+              switch(e.detail.state) {
+                case 'start':
+                  console.log(e.detail);
+                  break;
+                case 'track':
+                  var newheight = parseInt(self.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                  self.currentWidth=trueWidth;
+                  self.currentHeight=trueHeight
+                  this.style.width= trueWidth;
+                  this.style.height= trueHeight;
+                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+                
+                  break;
+                case 'end':
+               
+                  break;
+          }
+        },
+        _closeDialog: function(){
+          this.close();
+        },
+      dragmeplease: function(e) {
+     this.dragging=true;
+        var self=this;
+      e.preventDefault();
+        switch(e.detail.state) {
+          case 'start':
+            self.style.left ='0px';
+            self.style.top ='0px';
+            self.style.left = e.detail.x.toString() + 'px';
+            self.style.top = e.detail.y.toString() + 'px';
+            break;
+          case 'track':
+            self.translate3d(e.detail.dx.toString() + 'px', e.detail.dy.toString() + 'px', 0);
+            break;
+          case 'end':
+            console.log("ENDING", e.detail.x, e.detail.y, e.detail.dx, e.detail.dy);
+            self.translate3d(0, 0, 0);
+            self.style.left = e.detail.x.toString() + 'px';
+            self.style.top = e.detail.y.toString() + 'px';
+            self.dragging=false;
+            break;
+        }
+     }, 
+});
+})();
+</script>
+</dom-module>

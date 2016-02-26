@@ -1,0 +1,732 @@
+<dom-module id="fc-call-center-page-one-holder">
+<style>
+:host{
+padding: 0px;
+background: #007;}
+
+</style>
+<template>
+<div class="layout horizontal center-justified">
+        <div class="vertical flex-7 layout center" style="height: 96vh;background: white;">
+            
+           <sortable-js group="group" handle=".handle">               
+           
+               <template is="dom-repeat" items="{{flexCards}}" class="ghost dropzone" style="max-height: 2500px;">
+                    <fc-ddr-card header-title="[[item.title]]" id$="[[item.theId]]" class="group" on-tap="assignFixed" head-class="[[item.class]]"style$="[[item.style]]">
+                    <section style="border:2px solid #afafaf;"on-tap="revealInq"> [[item.title]]
+                    <ol title="item.title"><span style="border-bottom: 2px solid blue; color: #008; font-weight: 600; font-size: 16px;"> [[item.content.title0]] &nbsp; &nbsp; &nbsp; &nbsp;  [[item.content.value0]] &nbsp; &nbsp; &nbsp; &nbsp; [[item.content.title01]]: [[item.content.value01]]<span><iron-icon icon="{{iconForPayment}}" style$="{{iconStyle}}"></iron-icon></span></span>
+                    <section class="horizontal layout flex wrap" hidden$="{{!notHidden}}" id="hiddenInquiry">
+                         <ol title="item.title" class="horizontal layout wrap">
+                            <li> [[item.content.title1]]: [[item.content.value1]],  [[item.content.title2]]: [[item.content.value2]], [[item.content.title3]]: [[item.content.value3]]</li> <li>[[item.content.title4]]: [[item.content.value4]], [[item.content.title5]]: [[item.content.value5]], [[item.content.title6]]: [[item.content.value6]] [[item.content.title7]]: [[item.content.value7]]</li><li> [[item.content.title8]]: [[item.content.value8]], [[item.content.title9]]: [[item.content.value9]]</li>   <li> [[item.content.title10]]: [[item.content.value10.contact]], [[item.content.value10.phone]], [[item.content.value10.phone2]], [[item.content.value10.email]], [[item.content.value10.email2]]</li>
+                              </ol> 
+                    </section>
+                    </ol>
+                    </section>
+                    <section style="border:2px solid #afafaf;" on-tap="revealInq">
+                    <ol title="item.title"><span style="border-bottom: 2px solid blue; color: #008; font-weight: 600; font-size: 16px;"> [[item.content.title0]] &nbsp; &nbsp; &nbsp; &nbsp;  [[item.content.value0]] &nbsp; &nbsp; &nbsp; &nbsp; [[item.content.title01]]: [[item.content.value01]]<span><iron-icon icon="{{iconForPayment}}" style$="{{iconStyle}}"></iron-icon></span></span>
+                    <section hidden$="{{!notHidden}}" class="horizontal layout flex wrap" id="hiddenInquiry">
+                     <ol title="item.title" class="horizontal layout wrap">
+                            <li> [[item.content.title1]]: [[item.content.value1]],  [[item.content.title2]]: [[item.content.value2]], [[item.content.title3]]: [[item.content.value3]]</li> <li>[[item.content.title4]]: [[item.content.value4]], [[item.content.title5]]: [[item.content.value5]], [[item.content.title6]]: [[item.content.value6]] [[item.content.title7]]: [[item.content.value7]]</li><li> [[item.content.title8]]: [[item.content.value8]], [[item.content.title9]]: [[item.content.value9]]</li>   <li> [[item.content.title10]]: [[item.content.value10.contact]], [[item.content.value10.phone]], [[item.content.value10.phone2]], [[item.content.value10.email]], [[item.content.value10.email2]]</li>
+                              </ol> 
+                    </section>
+                    </ol>
+                    </section>
+                </fc-ddr-card>
+                </template>
+            </sortable-js>
+            </div>
+      
+        <div class="vertical flex-10 layout center">
+      
+        <fc-ddr-card header-title="Focused Calendar" header-color="green">
+            <fc-calendar-animee is-narrow="true" style="height: 350px; width: 100%;">
+            </fc-calendar-animee>
+          </fc-ddr-card>
+        
+            <fc-ddr-card header-title="New Caller Intake Form" style="width: 100%; height: 100%;">
+                <fc-titling-form class="horizontal layout content" style="padding: 12px; font-weight: 600;   background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
+                    <fc-profile-inputs class="card-content" search-vals="{{searchVals}}" style="width: 100%;" data-source$="{{myData}}">
+                    </fc-profile-inputs>
+                </fc-titling-form>
+            </fc-ddr-card>
+
+       <fc-ddr-card>
+       <fc-grid-table pink="true"></fc-grid-table> 
+        </fc-ddr-card>       
+        </div>
+            
+        <div class="vertical flex-7 layout center" style="background: white; height: 96vh;">
+               
+                   <fc-ddr-card header-title="Searchable Call List" style="width: 100%; height: 100%;">
+                        <neon-animated-pages class="fit" id="pages" selected="0">
+                            <fc-call-list-view id="callList" search-vals="{{searchVals}}"></fc-call-list-view>
+                            <fc-tabbed-card id="viewProfile" on-close="_onClose"></fc-tabbed-card>
+                        </neon-animated-pages>
+                    </fc-ddr-card>
+                    
+            
+        </div>
+    </div>
+</template>
+<script>
+'use strict';
+Polymer({
+is: "fc-call-center-page-one-holder",
+listeners: {"on-call-click": "_onCallClick", 
+            "sendInputVal": "_passSearchVals"
+            },
+properties: {
+    notHidden:{
+        type: Boolean,
+        value: false,
+        notify: true
+    },
+
+    // newItems:{
+    //     type: Array,
+    //     value: function(){
+    //         var A={};
+    //         A=new FcCalendarAnimee();
+    //         var B={};
+    //         B=new FcProfileInputs();
+    //         var C={};
+    //         C=new FcGridTable();
+    //         return [ "A", "B", "C"]; 
+    //                     // {"header": "Focused Events Calendar", "element": JSON.parse(A)},
+    //                     // {"header":"New Caller Intake Form", "element": B}, 
+    //                     // {"header": "Profile Input Grid", "element": C}
+                    
+    //         },
+    //     notify: true
+    // }, 
+    flexCards:{ 
+        type: Array,
+        // observer:"mutation",
+        value: function(){ 
+            return [{"title": "Clients Closed Today",
+                    "class": "green",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberOne"
+                    }, 
+                    {"title": "Clients to be Closed Today",
+                    "class": "red",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberTwo"
+                    },
+                    {"title": "Today's Revenue",
+                    "class": "lime",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberThree"
+                    },
+                    {"title": "Today's Missed Revenue",
+                    "class": "orange",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberFour"
+                    },
+                    {"title": "Today's Highest Interest Offering",
+                    "class": "cyan",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberFive"
+                    },
+                     {"title": "Tomorrow's Target Sales",
+                    "class": "pink",
+                    "style": "width: 640px !important; height: 120px;",
+                    "theId": "numberSix"
+                    },
+                     {"title": "Todays Inquiries",
+                    "class": "magenta",
+                    "style": "min-width: 640px!important; height: 120px;",
+                    "theId": "numberSeven",
+                    "content": 
+                            {"title0": "Inquiry No. 1",
+                             "value0": "Inquiry Closed",
+                             "title01":"Revenue Colected:",
+                             "value01":"$2200.00",
+                             "title1": "Date-time",
+                             "value1":"timestamp",
+                             "title2": "Name",
+                             "value2": "CALLERNAME",
+                             "title3": "Closed",
+                             "value3": "Yes",
+                             "title4": "Service Needs",
+                             "value4": "Schedule Confirmations",
+                             "title5": "Need Fulfilled",
+                             "value5": "Yes.",
+                             "title6": "Follow-up Contact Time",
+                             "value6": "None Needed.",
+                             "title7": "INTAKE FCID",
+                             "value7": "LOLINC00001",
+                             "title8": "Client Message",
+                             "value8": "client message details... Stuff Client Says",
+                             "title9": "Related Profile",
+                             "value": "fcid as appropriate",
+                             "title10": "Quick Contact Info",
+                             "value10": {"contact": "callername callerLastname, relStudeName",
+                                         "phone": "732-999-9999",
+                                         "phone2": "732-999-8999",
+                                         "email":"clientFCID@FOCUSED.com",
+                                         "email2":"clientFCID2@FOCUSED2.com"}
+                        
+                            }
+                        
+                    }
+            ];
+        },
+        notify: true
+
+    },
+     flexCards2:{ 
+        type: Array,
+        value: function(){ 
+            return [{"title": "Clients Closed Today",
+                    "class": "green",
+                    "style": "width: 640px !important; height: 120px;"
+                    }, 
+                    {"title": "Clients to be Closed Today",
+                    "class": "red",
+                    "style": "width: 640px !important; height: 120px;"
+                    },
+                    {"title": "Today's Revenue",
+                    "class": "lime",
+                    "style": "width: 640px !important; height: 120px;"
+                    },
+                    {"title": "Today's Missed Revenue",
+                    "class": "orange",
+                    "style": "width: 640px !important; height: 120px;"
+                    },
+                    {"title": "Today's Highest Interest Offering",
+                    "class": "cyan",
+                    "style": "width: 640px !important; height: 120px;"
+                    },
+                     {"title": "Tomorrow's Target Sales",
+                    "class": "pink",
+                    "style": "width: 640px !important; height: 120px;"
+                    },
+                     {"title": "Todays Inquiries",
+                    "class": "magenta",
+                    "style": "min-width: 640px!important; height: 120px;"
+                    }
+
+
+                ];
+            },
+        notify: true
+
+    },
+	searchVals:{
+        type: Object,
+        value: {
+              studentFirstName: "",
+              studentLastName:"",
+              parent1LastName:"",
+              parent1FirstName:"",
+              parent2FirstName:"",
+              parent2LastName:"",
+              parent1Email:"", 
+              parent2Email:"",
+              studentEmail:"",
+              studentTelephone:"",
+              parent1Telephone: "",
+              parent2Telephone: "",
+              coach:"",
+              fcid:"",
+              notify: true,
+              reflectToAttribute: true
+          },
+    notify: true, 
+    reflectToAttribute: true
+  },
+	data: {
+    type: Array,
+    	value: function(){return [];},
+    	notify: true
+    },
+  myData: {
+      type: Array,
+      value: function(){return  [ 
+        { "a_Name": "currentSchool",
+            "a_Label": "Current School",
+            "a_Class": "",
+            "a_":"",
+            "a_InputType":"text",
+            "a_":"",
+            "b_": "",
+            "b_InputType":"range",
+            "b_Min":400,
+            "b_Max":1600,
+            "b_Label":"Best SAT/PSAT Total",
+            "b_Name": "satTotal",
+            "aa": "",
+            "aaName":"parent1FirstName",
+            "aaLabel": "Parent First Name",
+            "_adataSourceMapA": "profiles",
+            "aaInputType":"text",
+            "aaClass": "",
+            "_aPersonfcid":"",
+            "_aStafffcid":"",
+            "aaHeader":"Parent and Student Profile and Contact Information",
+            "abHeader":"Phone and Email",
+            "acHeader":"Academic History, Preferences & Related Test Scores",
+            "aeHeader":"Call Message, Comments and Next Contact Time", 
+            "adHeader":"",
+            "afHeader":"",
+            "ab": "",
+            "abName":"parent1LastName",
+            "abLabel": "Parent Last Name",
+            "abInputType":"text",
+            "abClass": "",
+            "ac": "",
+            "acName":"firstName",
+            "acLabel": "Student First Name",
+            "acInputType":"text",
+            "acClass": "",
+            "ad": "",
+            "adName":"lastName",
+            "adLabel": "Student Last Name",
+            "adInputType":"text",
+            "adClass": "",
+            "ae": "",
+            "aeName":"parent1Telephone",
+            "aeLabel": "Parent 1 Phone",
+            "aeInputType":"tel",
+            "aeClass": "",
+            "af": "",
+            "afName":"parent1Email",
+            "afLabel": "Parent 1 Email",
+            "afInputType":"email",
+            "afClass": "",
+            "ag": "",
+            "agName":"telephone",
+            "agLabel": "Student Phone",
+            "agInputType":"tel",
+            "agClass": "",
+            "ah": "",
+            "ahName":"email",
+            "ahLabel": "Student Email",
+            "ahInputType":"email",
+            "ahClass": "",
+            "ai2": "",
+            "ai2Name":"parent2FirstName",
+            "ai2Label": "Parent 2 First Name",
+            "ai2InputType":"text",
+            "ai2Class": "",
+            "ai": "",
+            "aiName":"parent2Telephone",
+            "aiLabel": "Parent 2 Phone",
+            "aiInputType":"text",
+            "aiClass": "",
+            "aj": "",
+            "ajName":"parent2Email",
+            "ajLabel": "Parent 2 Email",
+            "ajInputType":"text",
+            "ajClass": "",
+            "aj2": "",
+            "aj2Name":"parent2LastName",
+            "aj2Label": "Parent 2 Last Name",
+            "aj2InputType":"text",
+            "aj2Class": "",
+            "ak": "selector",
+            "akName":"gradeLevel",
+            "akLabel": "Current Grade",
+            "akInputType":"select",
+            "akOptionOne": "Grade 4",
+            "akOptionTwo": "Grade 5",
+            "akOptionThree": "Grade 6",
+            "akOptionFour": "Grade 7",
+            "akOptionFive": "Grade 8",
+            "akOptionSix": "Grade 9",
+            "akOptionSeven": "Grade 10",
+            "akOptionEight": "Grade 11",
+            "akOptionNine": "Grade 12",
+            "akOptionTen": "Other",
+            "akClass": "",
+            "al": "",
+            "alName":"satMath",
+            "alLabel": "Best Math SAT",
+            "alInputType":"range",
+            "alMin": 200,
+            "alMax": 800,
+            "alClass": "",
+            "am": "",
+            "amName":"address1",
+            "amLabel": "Address Line 1",
+            "amInputType":"text",
+            "amClass": "",
+            "an": "",
+            "anName":"address2",
+            "anLabel": "Address Line 2",
+            "anInputType":"text",
+            "anClass": "",
+            "ao": "Select",
+            "aoName":"satReading",
+            "aoLabel": "Highest SAT Reading",
+            "aoInputType":"range",
+            "aoMin": 200,
+            "aoMax":800,
+            "aoClass": "",
+            "ap": "",
+            "apName":"targetScoreIncrease",
+            "apLabel": "Target Score Increase",
+            "apInputType":"range",
+            "apMin": 100,
+            "apMax": 500,
+            "apStep":10,
+            "apClass": "",
+            "aq": "",
+            "aqName":"returnContactTime",
+            "aqLabel": "Next Schedule Contact",
+            "aqInputType":"datetime-local",
+            "aqClass": "",
+            "ar": "",
+            "arName":"callMessage",
+            "arLabel": "Additional Information",
+            "arInputType":"text",
+            "arClass": "",
+            "as": "",
+            "asName":"currentCoach",
+            "asLabel": "Preferred Coach",
+            "asInputType":"select",
+            "asButtonName":"Prefered Coach",
+            "asClass": "",
+            "at": "",
+            "atName":"focusedProgramMatch",
+            "atLabel": "Focused Program Match",
+            "atInputType":"select",
+            "atClass": "",
+            "au": "",
+            "auName":"completedMathCourse",
+            "auLabel": "Completed Math Course",
+            "auInputType":"select",
+            "auButtonName": "",
+            "auOptionOne": "Pre-Algebra",
+            "auOptionTwo": "Algebra I",
+            "auOptionThree": "Geometery, no Algebra I",
+            "auOptionFour": "Algebra I and Geometery",
+            "auOptionFive": "Algebra II, no Geometry",
+            "auOptionSix": "Algebra II and Geometry",
+            "auOptionSeven": "Currently in Pre-Calculus",
+            "auOptionEight": "Completed Pre-Calculus",
+            "auOptionNine": "Completed Basic Statistics",
+            "auOptionTen": "Calculus AB or Higher", 
+            "auClass": "",
+            "av": "",
+            "avName":"currentEnglishClass",
+            "avLabel": "Current English Course",
+            "avInputType":"select",
+            "avOptionOne": "Standard English",
+            "avOptionTwo": "Honors English",
+            "avOptionThree": "AP Language and Composition",
+            "avOptionFour": "APLiterature and Composition",
+            "avOptionFive": "English Writing Colloquim",
+            "avOptionSix": "Other English Course",
+            "avOptionSeven": "Other English Course",
+            "avOptionEight": "Other English Course",
+            "avOptionNine": "Other English Course",
+            "avOptionTen": "Other English Course", 
+            "avClass": "",
+            "avButtonName": "",
+            "aw": "",
+            "awName":"completedScience",
+            "awLabel": "Completed Science Course",
+            "awOptionOne": "Biology",
+            "awOptionTwo": "Chemistry",
+            "awOptionThree": "Physics",
+            "awOptionFour": "AP Biology",
+            "awOptionFive": "AP Chemistry",
+            "awOptionSix": "AP Physics",
+            "awOptionSeven": "AP Bio & AP Chem",
+            "awOptionEight": "AP Bio & AP Phys",
+            "awOptionNine": "AP Phys & AP Chem",
+            "awOptionTen": "AP Phys, AP Bio & AP Chem", 
+            "awInputType":"select",
+            "awClass": "",
+            "awButtonName": "",
+            "ax": "",
+            "axName":"currentHistoryCourse",
+            "axLabel": "Current History Course",
+            "axInputType":"select",
+            "axButtonName":"",
+            "axOptionOne": "World History",
+            "axOptionTwo": "AP U.S. History One",
+            "axOptionThree": "AP U.S. History Two",
+            "axOptionFour": "AP Human Geography",
+            "axOptionFive": "AP World History",
+            "axOptionSix": "AP European History",
+            "axOptionSeven": "AP Art History",
+            "axOptionEight": "U.S. History",
+            "axOptionNine": "AP Gov. & Pol.",
+            "axOptionTen": "other", 
+            "axClass": "",
+            "ay": "",
+            "ayName":"addParentTwo",
+            "ayLabel": "Add Parent Two",
+            "ayInputType":"checkbox",
+            "ayButtonName":"",
+            "ayClass": "",
+            "az": "",
+            "azName":"addAdress",
+            "azLabel": "Add Address",
+            "azInputType":"checkbox",
+            "azButtonName":"",
+            "azClass": ""    
+          }
+        ];
+      },
+    notify: true
+  },
+myDataTwo: {
+          type: Array,
+          value: function(){ return [{
+          "a_Name": "Current Offerings",
+            "a_Label": "Calendar of Offerings",
+            "a_Class": "",
+            "a_":"",
+            "a_InputType":"select",
+            "a_":"",
+            "b_": "",
+            "b_InputType":"select",
+            "b_Min":"",
+            "b_Max":"",
+            "b_Label":"May Classes",
+            "b_Name": "maySAT",
+            "aa": "",
+            "aaName":"JuneSAT",
+            "aaLabel": "June SAT",
+            "_adataSourceMapA": "courseSchedules",
+            "aaInputType":"text",
+            "aaClass": "",
+            "_aPersonfcid":"generated",
+            "_aStafffcid":"",
+            "aaHeader":"Spring and Summer Focused Offerings",
+            "abHeader":"Focused Academic Matching and ROI",
+            "acHeader":"Focused Performance Courses",
+            "aeHeader":"Focused Summer Camps", 
+            "adHeader":"Focused Admissions Guidance",
+            "afHeader":"",
+            "ab": "",
+            "abName":"MayM_W",
+            "abLabel": "May Monday Wednesday 6:00pm - 9:00pm",
+            "abInputType":"select",
+            "abClass": "",
+            "ac": "",
+            "acName":"MayT_Th",
+            "acLabel": "May Tuesday Thursday  6:00pm - 9:00pm",
+            "acInputType":"select",
+            "acClass": "",
+            "ad": "",
+            "adName":"MayM_W_FAfternoon",
+            "adLabel": "May Mon. Wed. Fri. 3:45pm-5:45pm",
+            "adInputType":"select",
+            "adClass": "",
+            "ae": "",
+            "aeName":"JuneM_W",
+            "aeLabel": "June Monday Wednesday 6:00pm - 9:00pm",
+            "aeInputType":"select",
+            "aeClass": "",
+            "af": "",
+            "afName":"JuneT_Th",
+            "afLabel": "June Tuesday Thursday  6:00pm - 9:00pm",
+            "afInputType":"select",
+            "afClass": "",
+            "ag": "",
+            "agName":"JuneSG",
+            "agLabel": "June Study Group 3:45pm - 9:00pm",
+            "agInputType":"select",
+            "agClass": "",
+            "ah": "",
+            "ahName":"summerM_W9amto1pm",
+            "ahLabel": "Summer Mon. Wed. 9:00am to 1:00pm",
+            "ahInputType":"select",
+            "ahClass": "",
+            "ai2": "",
+            "ai2Name":"summerT_Th9amto1pm",
+            "ai2Label": "Summer Tue. Thurs. 9:00am to 1:00pm",
+            "ai2InputType":"select",
+            "ai2Class": "",
+            "ai": "",
+            "aiName":"summerM_W1pm_5pm",
+            "aiLabel": "Summer Mon. Wed. 1:30pm to 5:00pm",
+            "aiInputType":"select",
+            "aiClass": "",
+            "aj": "",
+            "ajName":"summerT_Th1pm_5pm",
+            "ajLabel":"Summer Tues. Thu. 1:30pm to 5:00pm",
+            "ajInputType":"select",
+            "ajClass": "",
+            "aj2": "",
+            "aj2Name":"summerM_W6pm_9pm",
+            "aj2Label": "Summer Mon. Wed. 5:30pm to 9:00pm",
+            "aj2InputType":"select",
+            "aj2Class": "",
+            "ak": "",
+            "akName":"octoberClass",
+            "akLabel": "October M W F 3:45pm-5:45pm",
+            "akInputType":"select",
+            "akMin": "",
+            "akMax": "",
+            "akClass": "",
+            "al": "",
+            "alName":"youngScholarsSummer",
+            "alLabel": "Young Scholars Summer Reading",
+            "alInputType":"select",
+            "alMin":"",
+            "alMax": "",
+            "alClass": "",
+            "am": "",
+            "amName":"youngScholarsFall",
+            "amLabel": "Young Scholars Fall Reading and Math",
+            "amInputType":"select",
+            "amClass": "",
+            "an": "",
+            "anName":"onlineTesting",
+            "anLabel": "Focused Online Testing and Tutorials",
+            "anInputType":"select",
+            "anClass": "",
+            "ao": "Select",
+            "aoName":"focusedWritingMaterialSet",
+            "aoLabel": "Focused Writing Materials Set",
+            "aoInputType":"select",
+            "aoMin": "",
+            "aoMax":"",
+            "aoClass": "",
+            "ap": "",
+            "apName":"focusedMathMaterialSet",
+            "apLabel": "Focused Math Material Set",
+            "apInputType":"select",
+            "apMin": "",
+            "apMax": "",
+            "apStep":"",
+            "apClass": "",
+            "aq": "",
+            "aqName":"focusedReadingMaterialSet",
+            "aqLabel": "Focused Reading Material Set",
+            "aqInputType":"select",
+            "aqClass": "",
+            "ar": "",
+            "arName":"lastFocusedContact",
+            "arLabel": "Last Call or Email",
+            "arInputType":"text",
+            "arClass": "",
+            "as": "",
+            "asName":"focusedCoachProfiles",
+            "asLabel": "Focused Profiles",
+            "asInputType":"select",
+            "asButtonName":"Prefered Coach",
+            "asClass": "",
+            "at": "",
+            "atName":"focusedProgramFit",
+            "atLabel": "Focused Program Match",
+            "atInputType":"select",
+            "atClass": "",
+            "au": "outputFromUs",
+            "auName":"hwkRecord",
+            "auLabel": "Homework Record",
+            "auInputType":"button",
+            "auButtonName": "Home Work Record",
+            "auClass": "",
+            "av": "",
+            "avName":"contactHistory",
+            "avLabel": "View Previous Contact",
+            "avInputType":"button",
+            "avClass": "",
+            "avButtonName": "View Previous Contacts",
+            "aw": "link",
+            "awName":"previousContact",
+            "awLabel": "Enter Payment",
+            "awInputType":"button",
+            "awClass": "",
+            "awButtonName": "Enter Payment",
+            "ax": "link",
+            "axName":"register",
+            "axLabel": "Register @ Focused",
+            "axInputType":"button",
+            "axButtonName":"Registister @ Focused",
+            "axClass": "",
+            "ay": "",
+            "ayName":"addParentTwo",
+            "ayLabel": "Add Parent Two",
+            "ayInputType":"checkbox",
+            "ayButtonName":"",
+            "ayClass": "",
+            "az": "isAddParentTwo",
+            "azName":"addAdress",
+            "azLabel": "Add Address",
+            "azInputType":"checkbox",
+            "azButtonName":"",
+            "azClass": ""    
+          },
+          {"":""}
+        ];
+    },
+    notify: true
+  }
+},
+
+// attached: function(){
+
+    
+// },
+
+      // arrayItem: function(change, index, path) {
+      //  var q= this.get(path, root);       var p=this.get(path, change.base[index]);
+      
+      //  console.log(p, q);
+      // },
+// mutation: function(changerecord, changerecordold){
+
+// console.log(changerecord, changerecordold);
+// var counter=this.flexCards.length;
+// for(i=0;i<counter; i++){
+//     console.log(this.flexCards, "these are the flex cards", this.flexCards[i]);
+//     }
+
+
+// },
+// _computeFrank: function(flexCards){
+
+// var counter=flexCards.length;
+// for(i=0;i<counter; i++){
+//     console.log(flexCards, "these are the flex cards", flexCards[i]);
+//     }
+// },
+
+// assignFixed: function(e){
+//     console.log(e.detail);
+
+
+
+// },
+revealInq: function(){
+    this.notHidden=!this.notHidden;
+
+},
+_callSearch: function(event){
+  this.fire('search-val-change', {
+        item: this.callSearchVal
+      });
+
+
+},
+  _onCallClick: function(e) {
+      this.$.pages.selected = 1;
+      console.log(e.detail.item);
+     this.$.viewProfile.setProfile(e.detail.item);
+  
+    },
+    _onClose: function() {
+      this.$.pages.selected = 0;
+    },
+    _passSearchVals: function(e, detail){
+      console.log(e.detail.value, e.detail.name);
+      var name = e.detail.name;
+      var val = e.detail.value;
+        if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}
+      this.$.callList.updateSearchVals(this.searchVals, name, val);
+
+
+    },
+
+
+});
+</script>
+</dom-module>

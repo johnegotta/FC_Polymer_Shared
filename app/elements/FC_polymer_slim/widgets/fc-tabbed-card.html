@@ -1,6 +1,22 @@
 <dom-module id="fc-tabbed-card">
 <template>
-<style is="custom-style">
+<style>
+ :host {
+        max-width: 900px; max-height: 2200px;
+        @apply(--layout-vertical);
+      }
+      .main {
+        width: 680px;
+        border: 1px solid green;
+        background: white;
+        @apply(--layout-flex);
+        @apply(--layout-scroll);
+        @apply(--shadow-elevation-5dp);
+      }
+fc-input-prime{
+  max-width: 110px;
+  max-height: 42px;
+}
 .grid-box{
   min-width: 340px;
   min-height: 480px;
@@ -26,14 +42,31 @@
   width: calc(95%-85px);
   max-height: calc(98vh-64px);
   overflow: scroll;
+  border: 2px solid red;
 }
 
 .selectedp{ 
-min-width: 560px;
+min-width: 660px;/*will change*/
 min-height: 560px;
+max-height: 100%;
+max-width: 900px;
 border: 2px solid blue;
 
 }
+ .circle{
+        border-radius: 180px;
+        width: 12px;
+        height: 12px;
+        z-index: 28;
+        background: red;
+        border: 2px solid white;
+        padding: 2px;
+        margin: 0px 2px 2px 2px;
+        cursor: pointer;
+      
+        @apply(--shadow-elevation-8dp);
+
+      }
 
 </style>
 <!-- <firebase-document id="ModelClass" location="focusedstudents.firebaseio.com/ModelClass" data="{{ModelClass}}" on-firebase-child-added="showTime"></firebase-document>
@@ -42,9 +75,12 @@ border: 2px solid blue;
   <firebase-collection id='contactinfo' location="https://focusedstudents.firebaseio.com/contactinfo" order-by-child='fcid' equal-to="{{fcid}}" data='{{ci}}'></firebase-collection>
 
   
-  <div class="vertical layout wrap grid-holder">
+  <div id="main" class="vertical layout wrap main">
+
     <div class="horizontal layout wrap">
         <paper-material elevation="2" class="grid-box">
+     <div class="circle" id="button" class="layout vertical flex center justified" on-click="_onClearButtonClick">  <section class="layout vertical flex center justified" icon="clear"> </section></div>
+
         <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
               <paper-tab>Profile</paper-tab>
               <paper-tab>Scores</paper-tab>
@@ -59,29 +95,33 @@ border: 2px solid blue;
             <div class="grid-image">
             <img src="{{item.photo}}" height="72px" width="73px">
             </div>
+          <div class="horizontal layout wrap left justified" style="min-width: 210px; height: 108px; overflow-y: scroll; max-width: 720px;"> 
+             
+              <section class="horizontal layout flex wrap" style="font-size: 11px;">
+                      <fc-input-prime input-type="tiny" class="tiny" style="width: 65px;" label="First" value="{{data.studentFirstName}} {{data.firstName}}"></fc-input-prime> 
+                      <fc-input-prime input-type="tiny" style="width: 75px;"label="Last" class="tiny" value="{{data.studentLastName}} {{data.lastName}}"></fc-input-prime>
+                      <fc-input-prime input-type="tiny" label="Email" class="tiny" value="{{data.email}} {{data.studentEmail}}"></fc-input-prime>
+                      <fc-input-prime input-type="tiny" label="Phone" class="tiny" value="{{data.studentTelephone}}"></fc-input-prime>
+                      <fc-input-prime input-type="tiny" label="Grade" class="tiny" style="width: 36px;" value="{{data.gradeLevel}}"></fc-input-prime>
+                      <fc-input-prime label="School" class="tiny" input-type="tiny" value="{{data.fcSelector}}"></fc-input-prime>
+                      <fc-input-prime input-type="digit" value="{{data.studentTelephone}}"></fc-input-prime>
+                    </section>
 
-          <div class="horizontal layout wrap left justified" style="width: 210px; height: 78px; overflow-y: scroll;"> 
-              <span><b>Full Name</b>: <b><span>{{item.firstname}}</span>&nbsp<span>{{item.lastname}}</span></b>&nbsp</span>
-             <span><b>FCID</b>: <i><u><span>[[item.fcid]]</span></u></i>&nbsp</span>
-            <span><b>Phone</b>: <span>[[item.phone]]</span></span>&nbsp
-              <span>
-		              <b>Email</b>: <span>[[item.email]]</span>&nbsp
-		              <b>S-email</b>: <span>[[item.studentemail]]</span>
-              </span>
+
           </div>
         </div>
         <hr>
-         <iron-pages id="pageHanger" class="horizontal row wrap layout" style="padding:3px" selected="{{selected}}">
+         <iron-pages id="pageHanger" class="horizontal row wrap layout" style="height: 100vh; padding:3px; overflow-y: scroll;" selected="{{selected}}">
          <div class="selectedp">
             Profile: <br>
-            <b>Email</b>: <span>[[item.email]]</span>&nbsp
+            <fc-grid-table data-sourcetwo$="{{data}}"></fc-grid-table>
         </div>
 
         <div class="selectedp">
     	<div>
-    	<div style="overflow-x: scroll; overflow-y: hidden; max-width: 480px;">
-  <firebase-collection id='scores' location="{{firebasepath}}" on-query-value="_getScores" order-by-child='fcid' equal-to='{{fcid}}' on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection>
-          <template is="dom-repeat" items="{{score}}" as="potato">
+    	<div style="overflow-x: scroll;  min-width: 320px; max-width: 900px;">
+<!--   <firebase-collection id='scores' location="{{firebasepath}}" on-query-value="_getScores" order-by-child='fcid' equal-to='{{fcid}}' on-firebase-child-added="_scoreGetter" data='{{score}}'></firebase-collection> -->
+         <!--  <template is="dom-repeat" items="{{score}}" as="potato"> -->
                  <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Pretest</b>: <span>[[potato.scoresPreTest]]</span></span><br><br>
                 <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 1</b>: <span>[[potato.scoresTest1]]</span></span><br><br>
                  <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 2</b>: <span>[[potato.scoresTest2]]</span></span><br><br>
@@ -91,7 +131,7 @@ border: 2px solid blue;
                  <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 6</b>: <span>[[potato.scoresTest6]]</span></span><br><br>
                 <span style="font-size: 16px; color: #000066; font-weight: 700;">REAL SAT: <span>[[potato.realSAT]]</span></span><br><br>
                 
-            </template>
+          <!--   </template> -->
             </div>
         </div>
         </div>
@@ -101,8 +141,8 @@ border: 2px solid blue;
         
         <div class="selectedp">
         ROI<br>
-        <firebase-collection location="https://focusedstudents.firebaseio.com/roi" data="{{roi}}" order-by-child="fcid" equal-to="{{fcid}}">
-        </firebase-collection>
+       <!--  <firebase-collection location="https://focusedstudents.firebaseio.com/roi" data="{{roi}}" order-by-child="fcid" equal-to="{{fcid}}">
+        </firebase-collection> -->
         <template is="dom-repeat" items="{{roi}}" as="ro">
           <b>Courses Taken: </b><span>{{ro.coursesTaken}}</span><br>
           <b>FcValueAtCompletion70Percent: </b><span>{{ro.FcValueAtCompletion70Percent}}</span><br>
@@ -111,8 +151,8 @@ border: 2px solid blue;
 
 		<div class="selectedp">
         Past Academics<br>
-        <firebase-collection location="https://focusedstudents.firebaseio.com/pastacademics" data="{{pasta}}" order-by-child="fcid" equal-to="{{fcid}}">
-        </firebase-collection>
+       <!--  <firebase-collection location="https://focusedstudents.firebaseio.com/pastacademics" data="{{pasta}}" order-by-child="fcid" equal-to="{{fcid}}">
+        </firebase-collection> -->
         <template is="dom-repeat" items="{{pasta}}" as="pa">
           <b>Graduates: </b><span>{{pa.graduates}}</span><br>
           <b>School: </b><span>{{pa.school}}</span><br>
@@ -120,8 +160,8 @@ border: 2px solid blue;
         </div>
 
         <div class="selectedp" id="inquiries">
-<firebase-collection location="https://focusedstudents.firebaseio.com/inquiries" data="{{inq}}" order-by-child="fcid" equal-to="{{fcid}}">
-        </firebase-collection>
+<!-- <firebase-collection location="https://focusedstudents.firebaseio.com/inquiries" data="{{inq}}" order-by-child="fcid" equal-to="{{fcid}}"> -->
+    <!--     </firebase-collection> -->
         Inquiries<br>
         <template is="dom-repeat" items="{{inq}}" as="q">
           <b>Timestamp: </b><span>{{q.timestamp}}</span><br>
@@ -140,6 +180,10 @@ border: 2px solid blue;
 <script>
  (function(){Polymer({
    	is: 'fc-tabbed-card',
+     behaviors: [
+      Polymer.NeonAnimatableBehavior,
+      fcDraggableDataBehavior
+    ],
   properties: {
     defaultPath: "",
     pathOne: String, 
@@ -189,9 +233,55 @@ border: 2px solid blue;
     	notify: true,
     	reflectToAttributes: true
     },
-    reflectToAttributes: true,
-    notify: true
-  },
+    data: {
+      type: Object,
+      notify: true
+
+      },
+    layoutClasses: {},
+    sharedElements: {
+        type: Object,
+        value: function() {
+          return {
+            'hero': this.$.main
+          };
+        }
+      },
+    animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'scale-down-animation',
+              node: this.$.main,
+              transformOrigin: '50% 50%',
+              axis: 'y'
+            }]
+          }
+        }
+      }
+    },
+    _onClearButtonClick: function() {
+      this.fire('close');
+    },
+    setProfile:function(data){
+      this.set("data", data);
+      console.log(this.data);
+
+
+    },
+ 
 
 ready: function (){
   this.fcid = "GanaMary00001";
@@ -253,3 +343,4 @@ showArrays: function(){
 });})();
 </script>
 </dom-module>
+

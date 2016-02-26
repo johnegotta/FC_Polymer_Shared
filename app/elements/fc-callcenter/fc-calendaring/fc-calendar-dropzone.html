@@ -1,0 +1,81 @@
+<dom-module id="fc-calendar-dropzone">
+<style>
+:host{
+      min-width: 100%px;
+      @apply(layout-flex);
+      @apply(layout-horizontal);
+
+    }
+
+
+    
+/*.card-grid-medium{border:2px solid gold; width:calc(42vw/4.3); height: calc((40vh-156px)/4); overflow-y: scroll; min-width: 320px;}*/
+</style>
+
+<template>
+<div class="horizontal flex wrap layout" on-dragover="allowDrop" on-drop="handleDrop" style="width: 98%; height: 44vh; overflow-y: scroll; background: white; border: 8px ridge #afafaf;">
+  <template is="dom-repeat" class="horizontal layout flex wrap" filter="" sort="{{orderDays(days)}}" items="{{days}}" as="day">
+     <fc-date-card fcid-data="{{fcidDataDays}}" day="{{day}}"></fc-date-card>
+  </template>
+</div>
+</template>
+<script>
+  Polymer({
+    is: 'fc-calendar-dropzone',
+    listeners: {
+    },
+    properties: {
+      keyMaster:{
+        type:Object,
+        notify:true
+      },
+      days: {
+        type: Array,
+        value: function(){return [];},
+        notify: true
+      },
+     },
+
+     ready: function()
+     {
+       
+     },
+
+     attached: function()
+     {
+       
+     },
+
+    handleDrop: function (e) {
+      var strData=   (e.dataTransfer.getData("fcdata"));
+      //console.log(strData);
+    
+      var edata = JSON.parse(strData);
+        var d=new Date(edata);
+     //console.log(d.toDateString());
+      this.push("days", d);
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+      //console.log("drag over");
+    },
+
+    saveSet: function(e)
+    {
+      
+    
+    },
+    orderDays: function(days){
+
+
+    },
+
+    computeIsInstructor: function(argType)
+    { var returnVal=1;
+      return returnVal;
+    }
+     
+});
+
+</script>
+</dom-module>

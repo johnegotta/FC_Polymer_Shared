@@ -1,0 +1,597 @@
+<dom-module id="fc-input-pro-select">
+
+<template>
+<style>
+  :root::{-ms-overflow-style: none;}
+    .fc-select {
+                font-family: merriweather; 
+                align: center-justified; 
+                font-size: 14pt; 
+                font-size: 1.25em;
+                line-height: 1.5; 
+                font-weight: 700; 
+                color: #000066; 
+                max-width: 720px;
+                min-width: 172px; 
+                max-height: 142px; 
+               /* border-radius: 16px;*/
+                background: #fff;
+                box-shadow: 10px 5px 5px #afafaf; 
+                z-index: 1; 
+                border: 0px;
+                border-bottom: thick dotted #ff0000;
+                text-align: left; 
+                outline: none;
+              }
+    .selectlabel{
+    	text-align: center;
+    	 		font-size: 10pt; 
+                font-size: 1.05em;
+                line-height: 1.0; 
+                font-weight: 700; 
+                color: blue; 
+                margin-bottom: -20px;
+                max-width: 420px;
+                min-width: 264px; 
+                height: 36px; 
+                opacity: .89;
+               
+              
+               
+                z-index: 1; 
+    }
+    paper-button.better-red {
+     background: red;
+     raised: true;
+     padding:36px;
+   
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 700;
+     color: #ffffff;
+     font-size: 12pt;
+     font-size: 1.0em;
+     text-align: center;
+     width: 24px !important;
+  	height: 24px !important;
+  	  border: 3px white solid;
+     border-radius: 180px;
+     border: 3px white solid;
+ 
+}
+paper-button.better-green {
+     background: green;
+     raised: true;
+    border: 3px white solid;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 700;
+     color: #fff;
+	padding:12px 48px 26px 12px;
+     font-size: 12pt;
+      width: 120px !important;
+      white-space: nowrap;
+  	height: 24px !important;
+  	  border: 3px white solid;
+     text-align: center;
+     text-indent: 0px;
+
+     }
+fc-paperInput {
+  display: inline;
+  max-width: 88px;
+ /* padding: 6px 8px 8px 8px;*/
+     font-size: 10px;
+}
+	paper-menu{min-width: 256px;}
+
+	paper-button.better-platinum {
+		padding:36px;
+      background: #E5E4E2;
+     box-shadow: 6px 5px 2px #888888;
+     font-weight: 500;
+     color: #006;
+  	border-radius: 180px;
+     font-size: 12pt;
+     text-align: center;
+     text-indent: 0px;
+    width: 24px !important;
+  	height: 24px !important;
+  	  border: 3px white solid;
+     }
+  .div::-webkit-scrollbar { width: 0 !important; }
+  .select::-webkit-scrollbar { width: 0 !important; }
+  :root::-webkit-scrollbar { width: 0 !important; }
+  paper-button:{padding: 12px;}
+</style>
+<div class="horizontal layout">
+<section hidden={{menuHidden}}  class="vertical layout">
+	<paper-dropdown-menu 
+		name$="{{fcSelectorName}}" always-float-label label="{{selectorLabel}}" on-iron-select="_ironSelected">
+		<paper-menu 
+			id$="{{computeSelectorId(fcSelectorName,fcSelectorCounter)}}"
+			class="dropdown-content" 
+			attr-for-selected="value" 
+			style="width: 100%;" 
+			selected="{{menuSelected}}">
+			<template is="dom-repeat" items="{{items}}">
+				<paper-item value="{{item}}">{{item}}
+				</paper-item>
+			</template>
+		</paper-menu>
+	</paper-dropdown-menu>
+	<paper-button 
+		hidden$="{{notAuthorized}}"
+		id="addooooo232" 
+		class="better-green"
+		on-tap='_openDialogHelper'>open & add
+	</paper-button>	
+
+		
+</section>
+<section hidden$="{{!menuHidden}}" class="vertical layout">
+      <code class="selectlabel">{{selectorLabel}} </code>
+      <select id="{{computeSelectorId(fcSelectorName,fcSelectorCounter)}}" label$={{selectorLabel}} onmouseover="seeMoreOptions" on-blur='seeOneOption'name$="{{fcSelectorName}}" class="fc-select" size="2">
+        <template is="dom-repeat" items="{{aaitems}}">
+              <option value="item">{{item}}</option>
+        </template>
+      </select>
+     
+</section>
+<paper-dialog id="myDialogArranger" style="min-width: 280px; height: 440px;">
+<section class="vertical layout">
+	<paper-input 
+		hidden$="{{notAuthorized}}"
+		id$='{{selectorInputId}}' 
+		always-float-label label$="{{fcselectorinputlabel}}" 
+		value="{{optionToBeAdded}}">
+	</paper-input>
+</section>
+<section class="vertical layout">
+	<paper-input 
+		hidden$="{{notAuthorized}}"
+		id$='{{selectorInputId}}_remove' 
+		always-float-label 
+    label$="{{fcselectorinputlabelRemove}}" 
+		value="{{menuSelected}}">
+	</paper-input>
+	<div class="horizontal layout flex center">
+<paper-button 
+			hidden$="{{notAuthorized}}"
+			class="better-platinum"
+			id="saveooo" 
+      on-tap="saveNewList">
+			Save
+		</paper-button>
+<paper-button 
+		hidden$="{{notAuthorized}}"
+		id="addooooo" 
+		class="better-green"
+		on-tap='addItem'>Add
+	</paper-button>	
+	<paper-button 
+		hidden$="{{notAuthorized}}"
+		id="addooooo" 
+		class="better-red"
+		on-tap='removeItem'>-
+	</paper-button>
+</div>
+</section>
+</paper-dialog>
+</div>
+</template>
+<script>
+FcInputProSelect=Polymer({
+  is: "fc-input-pro-select",
+      behaviors: [],
+            properties: {
+
+
+      notAuthorized:{
+      	type: Boolean,
+      	computed:"_computeNotAuthorized(selectorLabel)",
+      	notify: true
+      },
+      aaitems:{type: Array, value:[], notify: true},
+
+      	fcSelectorName:{
+      		type: String,
+      		value: function(){
+      			return 'fcSelector';
+      		},
+      		notify: true,
+      		reflectToAttribute: true
+      	},
+      	selectorLabel: {
+      		type: String,
+      		value: function(){
+      			return "Select an Option";
+      		},
+      		notify: true
+      	},
+      	menuHidden: {
+      		type: Boolean,
+      		value: function(){
+      			return false;
+
+      		},
+      		notify: true
+      	},
+      	menuSelected:{
+      		type: Number,
+      		value: 0,
+      		notify: true 
+      	},
+      	optionsVisible: {
+      		type: Number,
+      		value: function()
+      		{
+      			return 2;
+      		},
+      		notify: true
+      	},
+      	fcselectorinputlabel: {
+      		type: String,
+      		value: function(){
+      			return "Add List Options";
+      		},
+      		notify: true
+      	},
+        fcselectorinputlabelRemove:{
+          type: String,
+          value: function(){
+            return "Remove List Options";
+          },
+          notify: true
+        },
+        startTempArray: {
+          type: Array,
+          value: function(){
+            return [];
+          },
+          notify: true
+        },
+      	startListItems: {
+      		type: Array,
+      		computed: 'computeStartListItems(fullPath)',
+      		notify: true
+      	}, 
+      	optionToBeAdded:{ 
+      		type: String,
+      		value: function(){
+      			return '';
+      		},
+      		notify: true
+      	},
+      	optionAdded:{ 
+      		type: String,
+      		value: function(){
+      			return '';
+      		},
+      		notify: true
+      	},
+      	optionRemoved:{ 
+      		type: String,
+      		value: function(){
+      			return 'I will be nill after testing';
+      		},
+      		notify: true
+      	},
+      	liArray: {
+      		type: Array,
+      		computed: 'computeliArray(startTempArray, startListItems, count)',
+      	},
+      	addToList:{
+      		type: Boolean,
+      		value: function(){
+      			return false;
+      		},
+      		notify: true
+      	},
+
+      	listItems: {
+      		type: Array,
+      		computed: 'computeListItemsArray(liArray, optionAdded, addToList)',
+      		notify: true
+      	},
+      	selectorId:  {
+      		type: String,
+      		computed: 'computeSelectorId(fcSelectorName,fcSelectorCounter)',
+      		notify: true
+		},     
+
+      	selectorInputId: {
+      		type: String,
+      		computed: 'computeSelectorInputId(selectorId)',
+      		notify: true
+      	},
+      	selectorCounter: {
+      		type: String,
+      		value: function(){
+      			var numDate = Date.now()-1400000000000; 
+      			var idStringNum = '0' + numDate.toString();;
+				return idStringNum;
+			},
+      		notify: true
+      	},
+
+        njhs: {type:Array,notify: true},
+        instanceClass: {
+          type: Object,
+          value: function(){
+              return {'stuff': 'shouldBeanObject thing class and behavior',
+                     'other_stuff': 'this is only a rough context model'
+                    };
+          },
+          notify: true
+        },
+        selectedSelector:{
+          type: Object,
+          notify: true
+        },
+        selectedListItemArray:{
+          type: Array,
+          computed: "_computeSelectedListItemArray(selectedSelector)",
+          notify: true
+        }, 
+        fullPath: {
+          type: String,
+          computed: 'computefullPath(rootPath, instancePath)',
+          notify: true
+        },
+        instancePath: {
+          type: String,
+          value: function(){
+            var instancePath = 'students/profiles/' + fcid;
+            return instancePath;
+          },
+          notify: true
+        },
+        rootPath: {
+          type: String,
+          value: function()
+              {
+                var rootPath= "https://focusedstaging1.firebaseio.com/calls";
+                return  rootPath;s
+              },
+          notify: true
+            // shared classes will share paths; that will be how we hard wire these paths in
+        },
+        fanoutPaths:{
+          type: Array,
+          value: function(){
+            var returnValueArray= ["https://focusedstaging1.firebaseio.com/student/profiles", 
+            "https://focusedstaging1.firebaseio.com/parent/profiles","https://focusedstaging1.firebaseio.com/potentialClient/profiles"];
+            return returnValue;
+          },
+          notify: true
+        },
+        count: {
+          value: Number,
+          notify: true
+        }
+      },
+
+  created: function(){
+    
+	},
+  _createSelectedSelector: function(selectorLabel, selectedListItemArray, instanceClass, selectorCounter, liArray, selectorId, startListItems, menuName, linkedMenus, selectorKey)
+
+  {
+    this.set("selectorAttributes",
+
+    {
+      selectorLabel:"",
+      selectedListItemArray:"",
+      instanceClass:"",
+      selectorCounter:"",
+      liArray:"",
+      selectorId:"",
+      startListItems: "",
+      menuName: "",
+      linkedMenus: "",
+      selectorKey: "", 
+      notAuthorized: "",
+      fanoutPaths:"",
+      rootPath:"",
+      instanceClassPath:"",
+      instancePath:""
+    });
+
+  },
+
+
+
+	_openDialogHelper: function(){
+		this.$.myDialogArranger.open();
+
+
+	},
+computefullPath: function(rootPath, instancePath){
+  var olive = rootPath + '/' + instancePath; 
+  return olive;
+
+},
+_ironSelected: function(selected){this.set("selectedMenu", this.njhs;}','
+_computeNotAuthorized: function(selectorLabel){
+	var id = "#" + this.selectorId; 
+	console.log(this.$$(id).style.focus);
+	if(selectorLabel!==undefined && selectorLabel!==null && this.$$(id).style.focus==true){return false;}
+		else{return true;}
+
+
+},
+
+	ready: function(){
+    
+	},
+  computeStartListItems: function(fullPath){
+    var self=this;
+    var olive = fullPath;
+    console.log(olive);
+    var ref = new Firebase(olive);
+    self.count = 0;
+      ref.on("child_added", function(snap) {
+         
+          self.push('startTempArray', snap.val());
+          console.log("added", snap.key() + ' ' + snap.val() + ' ' + self.startTempArray[self.count] + " this is the count: " + self.count);
+          self.count++;
+          console.log(self.startTempArray + " this is the whole array");
+          var cucumber = self.startTempArray;
+          console.log("here i am here here here" + cucumber);
+          });
+        
+        
+        // length will always equal count, since snap.val() will include every child_added event
+        // triggered before this point
+        ref.once("value", function(snap) {
+        console.log("initial data loaded!" + self.count, Object.keys(snap.val()).length === self.count);
+        console.log(snap.val());
+      });
+        return self.count;
+  },
+
+	computeSelectorInputId: function(selectorId){
+		return 'fcSelectorInputId_' + selectorId;
+
+	},
+
+  computeSelectedListItemArray: function(selectedSelector){
+
+
+
+
+
+  },
+
+	computeSelectorId: function (fcSelectorName,fcSelectorCounter){
+		return fcSelectorName + '_' + fcSelectorCounter;
+	},
+
+	computeliArray: function(startTempArray, startListItems, count)
+	{	this.tempArray =[];
+		var counterOne = startTempArray.length;
+		for(var i=0; i<counterOne; i++){
+			this.push('tempArray', startTempArray[i]);
+			console.log("item: " + i +  " of startListitems[i] is: " + startTempArray[i]);
+		}
+		return this.tempArray;
+
+},
+
+	computeListItemsArray: function (liArray, optionAdded, addToList){
+		var pickle = (this.listItems!=undefined && optionAdded!='' && this.addToList ==true)? (this.set('addToList', false), this.push('liArray', optionAdded), this.liArray): liArray;
+		this.set('optionAdded', ''); 
+		console.log(pickle + ' ' + this.liArray);
+		return pickle;
+
+
+	},
+
+	attached:function(){var items = localStorage.getItem(NJHIGHSCHOOLS);
+    console.log("my schools",items, "the items"); this.set("njhs", items);
+    co"nsole.log(i am in attached")},
+	addItem: function(){
+		console.log(this.addToList + ' ' + this.optionAdded);
+		this.set('addToList', true);
+		this.set("optionAdded",this.optionToBeAdded);
+		this.set('optionToBeAdded', '');
+	},
+
+  saveNewList: function(){
+          this.indexD = '1';
+          this.descriptor = 'Admin_Access';
+          var self = this;
+          var ref = new Firebase("https://focusedstaging1.firebaseio.com/newjerseyhighschools");
+                var indexor = ("0000" + self.indexD).slice(-5);
+                var descriptor = 'What_The_View_Class_Does';
+                var size = (self.liArray.length!=undefined)? self.liArray.length: 10;
+                var instanceClass = indexor + '_' + descriptor + '_number_of_views_' + '_dataIndex_NUMBER'
+                var usersToGetObjectFirebaseFanOutViewSave = ['fcidGetsIt__00001', 'fcidGetsIt__00002', 'fcidGetsIt__00003', 'fcidGetsIt__00004', '0000000000000_admin'];
+                self.instanceClass['00000'] = {
+                      'nameOfClass': 'link to an input',
+                      'size': size,
+                      'fanOuters': usersToGetObjectFirebaseFanOutViewSave,
+                      'dataLayout': "small_medium_large",
+                      'class_view_instances': self.liArray,
+                      'classesItSubsums': 'classes in the class',
+                      'elementsItUses': 'ARRAY: elements we use',
+                      'neededFactoryImpls': 'array_Of_Objects_That_Nails_The_FCTR_IMPLFILL_IN_ALL_THE_VARIABLES_TO_TH_F_IMPS:classing will eventually take care of this for us',
+                      'deviceCachingForLayout': "we will figure this out"
+                    };
+                    for(var j = 0;j < size; j++){
+                      var k = j+1;
+                      var viewInstance = "0000" + (k).toString();
+                      self.instanceClass[viewInstance] = {
+                          'nameOfInstanceClass': self.liArray[j],
+                          'class_prototype_page_view_objects': 'These Are the page objects that will build the site'
+
+                          };
+                    };
+          ref.child(instanceClass).set(self.instanceClass);
+          console.log(instanceClass + 'liArray ' + self.liArray + ' were just saved');
+          
+
+
+
+  },
+
+  removeItem: function(){
+    console.log(this.liArray);
+    alert(this.liArray);
+
+  },
+
+	factoryImpl: function(){
+	//do something
+
+
+	},
+
+	
+
+	notifyResize: function(){
+
+	}
+
+
+    
+  
+});
+</script>
+</dom-module>
+<!--
+ <template>
+    <div>[[arrayItem(myArray.*, 0, 'name')]]</div>
+    <div>[[arrayItem(myArray.*, 1, 'name')]]</div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'bind-array-element',
+
+      properties: {
+
+        myArray: {
+          type: Array,
+          value: [{ name: 'Bob' }, { name: 'Doug' } ]
+        }
+      },
+     
+      // first argument is the change record for the array change,
+      // change.base is the array specified in the binding
+      arrayItem: function(change, index, path) {
+        // this.get(path, root) returns a value for a path
+        // relative to a root object.
+        return this.get(path, change.base[index]);
+      },
+     
+      ready: function() {
+        // mutate the array
+        this.unshift('myArray', { name: 'Susan' });
+        // change a subproperty
+        this.set('myArray.1.name', 'Rupert');
+      }
+    });
+  </script>
+
+</dom-module>

@@ -1,0 +1,263 @@
+<dom-module id="fc-call-center-center-page-one">
+<template>
+<style>
+:host {
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 99%;
+	max-width: 99vw;
+	width: 100%;
+    }
+.phpanel{
+	height: 93vh; 
+	padding: 6px 6px 24px 6px; 
+	font-weight: 600; 
+	margin-top: 12px; 
+	background: #fff; 
+	border: 3px ridge silver; 
+	font-size: 20pt; 
+	color: #000088;
+	width: 100%;
+
+}
+ .paper-material-header{
+    	min-height: 65px; 
+    	padding: 12px 6px 4px 6px; 
+    	font-weight: 600; 
+    	background: aliceblue; 
+    	font-size: 20pt; 
+    	border-bottom: 1px solid #000088; 
+    	color: #000088;
+    	
+    }
+    div#inner-editor{font-size: 2.0em;}
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    section{ padding-bottom: -4px;}
+    fc-input-prime{padding-bottom: 1px;}
+input[type="number"]{text-align: center; }
+    .highlighted {
+	background: yellow;
+    }
+
+    #firepad {min-width: 330px; max-height: 450px; height: 460px; border: 6px ridge silver; margin: 0px auto; width: 98%; border-radius: 4px; resize: vertical;}
+   .headstyle{font-size: 20px;}
+      </style>     
+</style>
+
+		<paper-header-panel class="vertical layout flex phpanel" mode="waterfall" style="height: 93vh;" >
+		  
+		   	<div class="paper-header vertical layout wrap"> 
+				
+			</div>
+	</div>
+	</paper-header-panel>
+
+</template>
+<script>
+FcCallCenterCenterPageOne=Polymer({
+	is:"fc-call-center-center-page-one",
+behaviors: [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior, 
+		  FCBehaviors.PassageDataBehavior
+		  ],
+
+    properties:{
+		newDatabasePath:{
+			type: String,
+			value: function() {return "";},
+			notify: true
+		},
+	
+	isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+		  }, 
+		
+	yourName: {
+	    	type: String,
+		  	value: function(){
+		    	return "";
+			},
+			notify: true
+		},
+	
+	fcid: {
+		type: String,
+		computed: "_computeFcid(onlineData)",
+		notify: true
+	},
+	
+	otherFields: {
+		type: Object,
+		value: {},
+		notify: true
+	},
+	onlineData:{
+		type: Array,
+		notify: true
+	},
+	currentDatabasePath:{
+	    	type: String,
+		  	value: function() 
+		  	{	var returnValue= "";
+
+		  		return returnValue;
+		  	},
+			notify: true
+		}, 
+
+		argArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		njhs:{
+			type: Array,
+			value: [],
+			notify: true
+
+		},	
+
+	   },
+	
+	 ready: function(){
+	 // this.loadFirepad();
+	   //this both ewere always trough and ruffed
+
+	   },
+
+
+attached: function(){
+
+	
+
+	},
+	
+changeMonthMinus:function(){},
+changeMonthsPlus: function(){},
+
+	 createProfileObject: function(){
+		this.$.isFocused.checked=this.isFocused;
+	    this.$.isDoublePassage.checked=this.isDoublePassage;
+	    this.$.hasCharts.checked=this.hasCharts;
+		this.set("metaObject",{		
+			"passageTitle": this.passageTitle,
+			"passageType": this.passageType,
+			"passageBlurb": this.passageBlurb,
+			"passageIsDouble": this.passageIsDouble,
+			"passageHasCharts": this.passageHasChaerts,
+			"passageIsFocused": this.passageIsFocused,
+			"passageWordCount": this.passageWordCount,
+			"passageSubtype": this.passageSubtype,
+			"passageSubtypeComments": this.passageSubtypeComments,
+			"citationQuestions": this.citationQuestions,
+			"totalCitations": this.totalCitations,
+			"mostNearlyMeans": this.mostNearlyMeans,
+			"totalNumberQuestions": this.totalNumberQuestions,
+			"vocabularyTested": this.vocabularyTested,
+			"citationsArray": this.citationArray,
+			"passageDifficult": this.passageDifficulty,
+			"culturalContext": this.culturalContext,
+			"passageStructure": this.passageStructure,
+			"passageNumberParagraphs": this.passageNumberParagraphs, 
+			"fcid": this.fcid, 
+			"passageMenuItem": this.passageMenuItem,
+			"isTwoColumns": this.isTwoColumns
+		});
+		},
+
+	createPaidAccount: function (){
+		this.set("passageObject",
+				{ 
+					"fcid": this.fcid,
+					"wordArray": this.wordArray,
+					"wordCount": this.wordCount,
+					"menuItem": this.menuItem,
+					"metaObject": this.metaObject,
+					"otherFields": this.otherFields
+				});
+		var self=this;
+				
+		
+	},
+	
+
+	 saveLocal: function(){
+	 	 var contentOne = this.getText();
+	 	console.log(contentOne);
+
+	 	var array=[];
+		var self=this;
+		arr=contentOne;
+		console.log(arr);
+		var str="";
+		arr.forEach(function(element, index, arr){
+		if(index<2 && index>0 ||element.newPara!==true && index>0)
+			{
+				str+=element.word + " ";
+			console.log(str);}
+		else if(index>0){
+		self.push('njhs', str);
+		console.log(self.njhs);
+		str="";
+		str+=element.word + " ";
+		}
+	});
+			var highSchools=JSON.stringify(self.njhs);
+			localStorage.setItem("NJHIGHSCHOOLS",highSchools);
+
+	},
+
+
+
+	clearInputs: function(){
+
+	
+	},
+
+	openDialog: function(){
+		Polymer.dom("fc-dashboard-one").querySelector("#dataAdminPrime").open();
+	}
+	// _toggleRightDrawer: function(){
+	// 		var drawer = document.querySelector('#drawer-2');	
+	// 		if(drawer.forceNarrow!==true)
+	// 		{drawer.forceNarrow = true;}
+	// 		else{drawer.forceNarrow = false;
+	// 		}
+	// },
+	// _toggleLeftDrawer: function(){
+	// 	var drawer = document.querySelector('#drawerPrimed');
+ //          var dashboard = document.querySelector("#dashboardPrime");	
+	// 	if(drawer.forceNarrow!==true)
+ //          {
+ //               drawer.forceNarrow = true;
+ //               drawer.responsiveWidth='90000px';
+ //               dashboard.leftHidden=true;
+ //          }
+ //          else
+ //          {
+ //               drawer.forceNarrow = false;
+ //               drawer.responsiveWidth ='1080px';
+ //               dashboard.leftHidden=false;
+
+ //          }
+ //     }
+	
+
+  });
+ </script>
+ </dom-module>
+ 

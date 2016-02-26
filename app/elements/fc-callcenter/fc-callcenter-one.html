@@ -1,0 +1,179 @@
+<dom-module id="fc-callcenter-one">
+<style is="custom-style">
+    :host{
+        margin: -24px
+        min-height: 100vh;
+        height: 100%;
+        height: 2500px;
+        background: white;
+        display: inline;
+        
+        @apply(--layout-vertical);
+      }
+      .toolbar {
+        background: gold;
+        padding: 0px;
+      }
+      neon-animated-pages {
+        @apply(--layout-flex);
+        margin: 0px;
+        padding: 0px;
+        background: white;
+      }
+      neon-animatable {
+        color: white;
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        @apply(--paper-font-display3);
+        margin: 0px;
+        padding: 0px;
+      }
+
+    </style>
+    <template>
+<paper-header-panel mode="seamed">
+      <paper-material class="layout vertical flex" style="height: 125px; background: #008; border-bottom: 8px ridge silver;" class="paper-header toolbar">
+        <section class="horizontal layout center flex">
+        <paper-icon-button icon="icons:arrow-back" style="position: absolute; left: 0px; top: 0px; height: 48px;width:48px; border-radius: 180px; z-index: 1; background: #aedefe;" on-click="_onNextClick"></paper-icon-button>
+         
+<div class="horizontal layout flex center center-justified">        
+        <h2 class="flex layout horizontal center center-justified" style="text-align: center; font-size: 42px; color: silver;">[[_computeHeader(selected)]]</h2> 
+      
+
+   
+
+   
+       
+      
+       
+        </div>
+        
+        <paper-icon-button style="align: right; position: absolute; right: 0px; top: 0px; height: 48px; width: 48px; border-radius: 180px;background: #aedefe;" icon="icons:arrow-forward" on-click="_onPrevClick"></paper-icon-button>
+        </section>
+
+      </paper-material>
+      <div class="vertical layout" style="max-width: 99vw; width: 100%; max-height: 2500px; min-height: 95vh; overflow-y: scroll;">
+      <neon-animated-pages id="pages" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
+       
+        <div class="horizontal layout flex self-stretch center-justified">
+        <fc-call-center-page-one-holder></fc-call-center-page-one-holder>
+   
+          </div>
+        
+        <div style="height: 2200px; width: 900px;">two
+        <fc-titling-form style="max-width: 800px!important;"> 
+        <fc-input-set-generator>
+        </fc-input-set-generator style="max-width: 800px!important;">
+        </fc-titling-form>
+        </div>
+        <div style="display: flex;" class="horizontal layout flex">three
+        </div>
+        <div>four</div>
+        <div>five</div>
+        <div>six</div>
+        <div>seven</div> 
+     
+      </neon-animated-pages>
+      </div>
+</paper-header-panel>
+    </template>
+    <script>
+Polymer({
+      is:"fc-callcenter-one",
+      behaviors:[Polymer.NeonAnimatableBehavior,
+                Polymer.NeonAnimationBehavior,
+                Polymer.NeonAnimationRunnerBehavior],
+      properties: {
+        entryAnimation: {
+          type: String,
+          value: function(){ return "";},
+          notify: true
+        },
+        exitAnimation:{
+          type: String,
+            value: function(){return "";},
+          notify: true
+        },
+        selected: {
+          type: Number,
+          value: 0,
+          notify: true
+        }, 
+
+        dataSource:{
+          type: Array,
+          value: function()
+          {     return[      {"title": "Inquiry No. 1",
+                             "value": "Inquiry Closed"},
+                              {"title":"Revenue Colected:",
+                             "value":"$2200.00"},
+                             {"title": "Date-time",
+                             "value":"timestamp"},
+                             {"title": "Name",
+                             "value": "CALLERNAME"},
+                             {"title": "Closed",
+                             "value": "Yes"},
+                             {"title": "Service Needs",
+                             "value": "Schedule Confirmations"},
+                             {"title": "Need Fulfilled",
+                             "value": "Yes."},
+                             {"title": "Follow-up Contact Time",
+                             "value": "None Needed."},
+                             {"title": "INTAKE FCID",
+                             "value": "LOLINC00001"},
+                             {"title": "Client Message",
+                             "value": "client message details... Stuff Client Says"},
+                             {"title": "Related Profile",
+                             "value": "fcid as appropriate"},
+                             {"title": "Quick Contact Info",
+                             "value": "jjhjh"}
+                            ];
+                    },
+          notify: true
+        }
+
+      },
+
+      _computeHeader: function(selected){
+        var title;
+        switch (selected){
+          case 1:
+            title="Focused Scheduling and Calendaring";
+            break;
+        case 2: 
+            title="Focused Course Offerings";
+            break;
+        case 3: 
+            title="Focused Payment System";
+            break;
+        case 4: 
+            title="Focused Daily Sales";
+            break;
+        case 5: 
+            title="Focused Daily SpreadSheets";
+            break;
+        default: 
+            title="The Focused Call Center"; 
+
+        }
+        return title;
+
+      },
+      _onPrevClick: function() {
+        this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+       this.selected = this.selected === 7 ? 0 : (this.selected + 1);
+       
+      },
+      _onNextClick: function() {
+        this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+       this.selected = this.selected === 0 ? 7 : (this.selected - 1);
+         
+      },
+       _onItemClick: function() {
+      this.$.pages.selected = 1;
+    }
+});
+    </script>
+</dom-module>

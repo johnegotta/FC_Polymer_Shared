@@ -1,0 +1,527 @@
+<dom-module id="fc-clockObj">
+<style is="custom-style">
+:host{position: absolute;top: 8px;right: 64px;width: 240px;height: 332px; z-index:93;};
+
+paper-material{opacity: 1;position: relative;background: #ffffff;border: 3px ridge #aecdfe;padding: 6px 4px;margin: 20px;display: block;@apply(--horizontal-layout);@apply(--nowrap-layout);
+}
+.arrows{opacity: 1;font-size: 22px; margin: 5px 8px 2px 8px; width 40px; height: 45px;
+-webkit-transition: width 2s, height 2s, display 2s, background-color 2s, -webkit-transform 2s;
+    transition: width 2s, height 2s, background-color 2s, transform 2s, display 2s;
+}
+.query-builder{opacity: 1;width: 16px;height: 16px;border-radius: 180px;padding: 2px;margin: 2px;border: #fff 1px solid;background: green;color: white;  position: absolute;right: 3px;top: 3px;
+	}
+.clear{ width: 16px;height: 16px;border-radius: 180px;padding: 2px; margin: 2px;border: #fff 1px solid;background: red;color: white;  position: absolute;right: 0px;top: 0px; opacity: 2;}
+/*.glass{background: white;opacity: .7; }*/
+.ironOne{opacity: 2;width: 16px;height: 16px;border-radius: 180px;padding: 3px 5px 5px 5px;margin: 2px 7px;border: #007 4px solid;background: #5DD7FC;color: white;box-shadow: 3px 14px 11px 4px #9fafaf;
+ -webkit-transition: width 2s, display 2s, height 2s, background-color 2s, -webkit-transform 2s;
+    transition: width 2s, height 2s, background-color 2s, transform 2s, display 2s;
+}
+.ironOne:active{ opacity: 1; color: gold; box-shadow: 0px;border: gold 5px solid; opacity: 2;}
+.ironTwo{width: 16px; opacity: 1; height: 16px;border-radius: 180px;padding: 5px;margin: 2px 7px;background: #5DD7FC;color: gold; box-shadow: 0px;border: #007 3px solid;}
+.timer{font-size: 17px; opacity: 1; font-weight: 600; font-family: merriweather; color: #007; padding: 6px 4px 2px 4px; border: .4px solid #efefef;}
+.slight{font-size: 14px; font-family: merriweather; opacity: 1; color: #008; font-weight: 400;}
+</style>
+<template>
+
+<div style="padding: 6px; border: 1px #efefef solid; text-align: center;" class="layout vertical"  on-track="dragYes">
+	<div style="border: 1px #008 solid; color:#008;" on-track="_focusedDraggable">
+	<iron-icon icon="icons:{{swapIcon}}" class$="{{swapIcon}}" on-tap="toggle">
+				</iron-icon>
+		<div style="padding: 4px; border: 1px #efefef solid; text-align: center;cursor:pointer;" class="layout vertical"  on-track="dragYes">
+		<iron-collapse id="collapse2"  class="horizontal layout center-justified glass" >
+				<span style="font-size: 16px; font-weight: 600; font-family: merriweather; color: #007;">{{clockName}} &nbsp;</span>
+			</iron-collapse>
+			<paper-material class="layout vertical" elevation="3">
+				<span draggable drags on-track="_focusedDraggable" class="slight">{{date}}</span>
+				<section class="timer">{{theTime}} </section>	
+				<neon-animated-pages id="pagesAssistant" hidden selected="{{dialogObj.selected}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+					
+					<section class="clockinterfaces">
+						<fc-clobjid id="dsv" datasetvals="{{holder}}">
+						</fc-clobjid>
+					</section>
+					<section>
+					<fc-to-do-list></fc-to-do-list>
+					</section>
+					<section class="clockinterfaces">
+						<fc-clobjid id="dsv2" datasetvals="{{holder2}}"></fc-clobjid>
+					</section> 		
+				</neon-animated-pages>
+				<!--  -->
+			</paper-material>
+		</div>
+	</div> 
+	<iron-collapse id="collapse"  class="horizontal layout center-justified glass">
+<!-- 
+			<span class="arrows" on-tap="otherWayNow">{{downarrow}}</span>
+				<iron-icon class="ironOne" name="Countdown" on-tap="pressed" icon="device:access-alarm"></iron-icon>
+				<iron-icon class="ironOne" name="Clock" on-tap="pressed" icon="device:access-time"></iron-icon>
+				<iron-icon class="ironOne" name="Stopwatch" on-tap="pressed" icon="device:add-alarm"></iron-icon>
+			<span class="arrows" on-tap="goNow">{{uparrow}}</span> 
+ -->
+
+	<div class="content" id="content" class="vertical layout" style="overflow-x: scroll; overflow-y: hidden;height: 180px; width: 340px;"> 
+					<!-- <section>{{dialogObj.title}}</section> -->
+					<fc-clobj-menu 
+						class="content" 
+						class="horizontal layout flex justified-around nowrap" 
+						style="width: 1020px;"
+						app="{{dialogObj}}">
+					</fc-clobj-menu>
+			</div>
+		<!-- </paper-header-panel>
+ -->
+			</iron-collapse>
+</div>
+</template>
+<script>
+FcClockObj = Polymer({
+	is: "fc-clockObj",
+	properties: {
+		selected:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		holder: {
+			type: Object,
+			notify: true
+		},
+		holder2: {
+			type: Object,
+			notify: true
+		},
+		dialogObj: {
+			type: Object,
+			value: {
+				selected:0,
+				notify: true
+			},
+			notify: true
+		},
+
+		 swapIcon: {
+		 	type: String,
+		 	value: function(){return "query-builder";},
+		 	notify: true
+		 },
+		 countDownFunc:{
+		 	type: Function,
+		 	value:null,
+		 	notify: true
+		 },
+		 swatch:{
+		 	type: Function,
+		 	value:null,
+		 	notify: true
+		 },
+		drags:{
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		dragCounter:{
+			type: Number,
+			value: 0,
+			notify: true
+		},	
+		theTime:{
+			type: String,
+			value:function(){
+				var newtime = new Date();
+				var update = newtime.toLocaleTimeString();
+				return update;
+			},
+			notify: true
+		}, 
+		uparrow:{
+			type: String,
+			value:"",
+			notify: true
+		},
+		downarrow:{
+			type: String,
+			value: "",
+			notify: true
+		}, 
+		clockName:{
+			type: String,
+			value: "",
+			notify: true
+
+		},
+		pressedClock:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true
+		},
+		pressedSW:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		pressedCD:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		isPressed:{
+			type: Boolean,
+			computed: "_computeIsPressed(pressedCD, pressedSW, pressedClock)",
+			notify: true
+		},
+		date:{
+			type: Date,
+			value:function(){
+				var d=new Date();
+				return d.toDateString();
+			},
+			notify: true
+		},
+		hundredth: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		tenth: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		sec: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		tsec: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		min: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		tmin: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		hours: { 
+			type: Number, 
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+		},
+		thours: { 
+			type: Number,
+			value: 0,
+			notify: true,
+			reflectToAttribute: true
+			},
+		theCountdown:{
+			type: Number,
+			value: 0,
+			notify: true
+			}, 
+		swholder:{
+			type:Number,
+			value: 0,
+			notify: true
+
+		},
+		counter:{
+			type:Number,
+			notify: true
+
+		},
+	slideStyle: {
+       type: String,
+       value: 'horizontal'
+      },
+     
+    
+      widthRatio: {
+       type: Number,
+       value: 3
+      },
+     
+      transition: {
+        type: String,
+        value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+      }
+
+		},
+	behaviors:[Polymer.NeonAnimatableBehavior,
+                Polymer.NeonAnimationBehavior,
+                Polymer.NeonAnimationRunnerBehavior],
+
+
+
+ready: function() {
+  
+    },
+  
+    dragYes: function(){
+    	this.drags=true;
+    	//this._focusedDraggable();
+    },
+  
+
+_constructTime: function(thours, hours, tminutes, minutes, tseconds, seconds, tenths, hundreths, interval) {
+	this.ctobj={};
+	this.thours = thours;
+	this.hours = hours;
+	this.hrsTot = thours;
+	this.tminutes = tminutes;
+	this.minutes = minutes;
+	this.tseconds = tseconds;
+	this.second = seconds;
+	this.tenths = tenths;
+	this.interval = interval;
+	this.intervalset = setInterval(this.countDown, interval, this);
+	this.set("ctobj",{"thours":this.thours, "hours":this.hours, "tminutes":this.tminutes, "minutes":this.minutes, "tseconds":this.tseconds, "seconds":this.seconds, "tenths":this.tenths, "hundreths":this.hundreths, "interval":this.interval});
+	return this.ctobj;
+	},
+
+goNow:function(){
+	if(this.pressedSW==true && this.swatch==null)
+	{
+	 this.swatch=setInterval(this.startStopwatch, 100, this);
+	}
+	if(this.pressedCD==true && this.countDownFunc==null)
+	{
+		this.countDownFunc=setInterval(this.countDown,100,this);
+	}
+	console.log(this.holder);
+},
+otherWayNow:function(){
+
+	clearInterval(this.swatch);
+		clearInterval(this.countDownFunc);
+		this.pressedCD==false;
+		this.pressedSW==false;
+		this.pressedClock==false;
+		this.set("swatch", null);
+		this.set("countDownFunc", null);
+		//this.debounce(clearInterval(this.swatch), clearInterval(this.countDownFunc), this);
+
+	  
+},
+toggle: function(e){	
+	this.$.collapse.opened=!this.$.collapse.opened;
+	this.$.collapse2.opened=!this.$.collapse2.opened;
+	var setVal = this.swapIcons=="query-builder"?"clear":"query-builder";
+	this.set("swapicons", setVal);
+},
+attached: function(){
+	setInterval(this.updateClock, 1000, this);
+},
+
+countDown: function(argThis){
+	var self=argThis;
+	console.log(self.holder, self.$.dsv.datasetvals);
+	if(self.holder.tenth>0){self.holder.tenth--;}
+	else if(self.holder.tenth==0)
+	{
+		self.set("holder.tenth",9);
+		if (self.holder.sec> 0) {
+			self.holder.sec--;
+		}
+		else if (self.holder.sec == 0) {
+			self.set("holder.sec", 9); self.holder.counter++;
+			if (self.holder.sec == 9 && self.holder.tsec > 0)
+				self.holder.tsec--;
+			else if (self.holder.tsec == 0) {
+				self.set("holder.tsec", 5);
+				if (self.holder.tsec == 5 && self.holder.min > 0) {
+					self.holder.min--;
+				} else if (self.holder.min == 0) {
+					self.holder.min = 9;
+				}
+				if (self.holder.min == 9 && self.holder.tmin > 0) {
+					self.holder.tmin--;
+				} else if (self.holder.tmin == 0) {
+					self.holder.tmin = 5;
+				}
+				if (self.holder.tmin == 5 && self.holder.hours > 0) {
+					self.holder.hours--;
+				}
+			}
+		}
+	}
+},
+_computeIsPressed: function(pressedCD, pressedSW, pressedClock){
+	var torf =(pressedCD==true || pressedSW==true || pressedClock == true)?true: false;
+	return torf;
+},
+startStopwatch:function(argThis){
+	var self=argThis;
+	var num;
+	if (self.tenth<9)
+	 	{
+	 	self.tenth++;
+	 	}
+	else if(self.tenth==9)
+		{
+		self.set("tenth",0); self.sec++;
+		if(self.sec==9)
+			{
+			self.set("sec",0);
+				if(self.tsec<5)
+					{
+					self.tsec++;
+					}
+				else if(self.tsec==5)
+					{
+					self.set("tsec",0);
+					if(self.min<9)
+						{
+							self.min++;
+
+
+						}
+						else if(self.min==9)
+						{
+							self.set("min", 0);
+							if(self.hours == 0 && self.tmin<9)
+							{
+								self.tmin++;
+
+							}
+
+							else if(self.tmin==9 && self.hours==0)
+							{
+								self.set("tmin", 4);
+								self.set("hours", 1);
+
+							}
+							else if(self.tmin<5 && self.hours>0){
+								self.tmin++;
+
+							}
+							else if(self.tmin==5 && self.hours>1)
+							{
+								self.set("tmin", 0);
+								self.hours++;
+
+
+
+							}
+							else if(self.hours==9)
+							{
+
+								clearInteval(self.swatch);
+
+
+							}
+
+
+
+						}
+
+
+
+					}
+
+
+				}
+
+			}
+
+		},
+
+showClock: function(pressedClock){var retVal =(this.pressedClock==true)?false: true; return retVal;},
+showStopwatch: function(pressedSW){var retVal =(this.pressedSW==true)?false: true; return retVal;},
+showCountdown: function(pressedCD){var retVal =(this.pressedCD==true)?false: true; return retVal;},
+
+
+pressed:function(e){
+	var button = e.target; 
+	var name=e.target.attributes.name.value;
+	if(this.isPressed==true){Polymer.dom(button).classList.remove("ironTwo");}
+	else{Polymer.dom(button).classList.add("ironTwo");}
+	if(name=="Clock"){
+		this.pressedClock=!this.pressedClock;
+		this.showClock();
+	}
+	if(name=="Stopwatch"){
+		this.pressedSW=!this.pressedSW;
+		this.showStopwatch();
+	}
+	if(name=="Countdown"){
+		this.pressedCD=!this.pressedCD;
+		this.showCountdown();
+	}
+	var buttons = this.querySelectorAll(".ironOne");
+	var counter=buttons.length;
+	for(var i=0; i<counter; i++){
+		if(buttons[i]!=button && buttons[i].hidden==false){buttons[i].hidden=true;}
+		else{buttons[i].hidden=false;}
+		} 
+	var retVal = this.uparrow ==""? '▲': "";
+	this.set("uparrow", retVal);
+	var detVal = this.downarrow ==""? '▼': ""; 
+	this.set("downarrow", detVal);
+	var nameplus = (this.clockName=="")?"Set " + name:"";
+	this.set("clockName", nameplus);
+},
+
+updateClock: function(argThis){
+	var self=argThis;
+	var update = new Date();
+	update = update.toLocaleTimeString();
+	self.set("theTime", update);
+},
+
+
+
+_focusedDraggable:function(e){
+  	// console.log("we tried to drag");
+  	 if(this.drags==true){
+        var self=this;
+        e.preventDefault();
+switch(e.detail.state) {
+          case 'start':
+            // console.log('START NoWayAreWe Draggin');
+            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+            console.log('top distance differenced?' + self._topprime);
+            // }
+            self.changeX=0;
+            self.changeY=0;
+            Polymer.dom.flush();
+            break;
+          case 'track':
+            self.changeX=e.detail.ddx + self.changeX;
+            self.changeY=e.detail.ddy + self.changeY;
+            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+            break;
+          case 'end':
+            console.log(self._topprime);
+            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+            self._bottom = self.getBoundingClientRect().top;
+            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            self.translate3d(0, 0, 0);
+
+            console.log("ENDING", self._x);
+            self.style.left=self._x.toString()+'px';
+            self.style.top=self._y.toString()+'px';
+            console.log('y: ' + e.detail.y);
+            self.dragging=false;
+            Polymer.dom.flush();
+            break;
+        }
+      }
+    }
+});
+</script>
+</dom-module>

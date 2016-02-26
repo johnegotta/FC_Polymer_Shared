@@ -1,0 +1,83 @@
+<dom-module id="fc-mc-passage-saver">
+<template>
+<style>
+</style>
+
+<paper-button on-tap="doIt">DO IT</paper-button>
+<div id="firepad" style="background: white; height:600px"></div>
+
+
+</template>
+<script>
+
+FcMcPassageSaver=Polymer({
+	is: 'fc-mc-passage-saver',
+	//behaviors: [FCBehaviors.FCFirepadBehavior],				
+	properties: {
+
+	},
+
+	attached: function()
+	{
+		//this.loadFirepad();
+		this.firepadRef = new Firebase('https://amber-inferno-3827.firebaseio.com/firepad');
+  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+      		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
+  		this.firebase = new Firebase("https://amber-inferno-3827.firebaseio.com/reading/");
+	},
+
+	doIt: function (e) {
+		var rawText = this.firepad.getText();
+		var passageObj = {title: "The Strangeness of Beauty", wordArray: []};
+		var paragraphArray = rawText.split("\\n");
+		var numParagraphs = paragraphArray.length;
+		var i = 0;
+		var j = 0;
+		var k = 0;
+		var word = "";
+		var wordArray = [];
+		var sentenceArray = [];
+		var passageWordIndex = 0;
+		for(i = 0; i < numParagraphs; i++)
+		{
+			sentenceArray = [];
+			paragraphArray[i] = paragraphArray[i].replace(/^ +/, "");
+			paragraphArray[i] = paragraphArray[i].replace(/ +$/, "");
+			var paragraph = paragraphArray[i];
+			var paraLen = paragraph.length;
+			var matches = paragraph.match(/.*?(\.|\?|\!)/);
+			var loopCount = 0;
+			while(matches != null && paraLen > 0 && loopCount < 20)
+			{
+				var matchLen = matches[0].length;
+				matches[0] = matches[0].replace(/^ +/, "");
+				matches[0] = matches[0].replace(/ +$/, "");
+				sentenceArray.push(matches[0]);
+				paragraph = paragraph.slice(matchLen);
+				paraLen -= matchLen;
+				matches = paragraph.match(/.*?(\.|\?|\!)/);
+				loopCount++;
+			} 
+			var numSentences = sentenceArray.length;
+			var sentenceLastWord = "";
+			for(j = 0; j < numSentences; j++)
+			{
+				wordArray = sentenceArray[j].split(" ");
+				var numWords = wordArray.length;
+				for(k = 0; k < numWords; k++)
+				{
+					word = wordArray[k];
+					var wordObj = {word: word, passageIndex:passageWordIndex, sentenceIndex:j, paragraphIndex: i, sentence: sentenceArray[j]};
+					passageObj.wordArray.push(wordObj);
+					passageWordIndex++;
+				}
+			}
+		}
+		console.log(passageObj);
+		//this.firebase.child("newpassages").set(passageObject);
+	}
+
+});
+</script>
+</dom-module>

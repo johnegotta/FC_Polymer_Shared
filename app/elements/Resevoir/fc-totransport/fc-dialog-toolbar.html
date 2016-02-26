@@ -1,0 +1,162 @@
+<dom-module id="fc-dialog-toolbar">
+<style>
+:host{cursor: pointer;}
+.menubuttons{
+	cursor: pointer;
+  display: inline-block; 
+  width: 42px; 
+  height: 36px;
+  background: silver;
+  z-index: 1;
+  box-shadow: 0px  -5px 15px #d9d9d9 inset;
+  align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: buttontext;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    background-color: buttonface;
+    box-sizing: border-box;
+    padding: 6px;
+    border: 2px outset buttonface;
+    height: 100%;
+
+}
+.longer{width: 64px;}
+.longest{width: 108px;}
+.mini{width: 48px; height: 48px; color: green; border: 1px solid #aedefe; font-size: 11px;}
+.micro{color: blue; width: 16px; height: 16px;} 
+</style>
+<template>
+<template is='dom-repeat' items="{{iconDialogArray}}">
+<section class$="[[item.sectionClass]]" style="cursor: pointer;" data-dialog$="[[item.dDialogOne]]">
+        <iron-icon 
+            icon$="[[item.iconUsed]]"  
+            class$="[[item.iconClass]]"
+            data-dialog$="[[item.dDialogTwo]]"
+          >
+        </iron-icon>
+ </section>
+ </template>
+
+
+ </template>
+ <script>
+ Polymer({
+is:"fc-dialog-toolbar",
+properties: {
+	notRouter: {
+		type: Boolean,
+		value: true,
+		notify: true
+	},
+	dataDialog:{
+		type: String,
+		notify: true,
+	},
+	iconDialogArray:{
+			type: Array,
+			value: function(){
+				return [{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "loginMenu",
+ 							"iconUsed": "icons:account-circle",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "loginMenu"
+ 						},
+ 						{
+							"sectionClass": "menubuttons",
+							"dDialogOne": "dragAdmin",
+ 							"iconUsed": "icons:hardware:dock",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "dragAdmin"
+ 						},
+ 						
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "toDoList",
+ 							"iconUsed": "icons:list",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "toDoList"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "completedTasks",
+ 							"iconUsed": "icons:toc",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "completedTasks"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "clockTimer",
+ 							"iconUsed": "icons:alarm-on",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "clockTimer"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "firePadPrime",
+ 							"iconUsed": "icons:spellcheck",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "firePadPrime"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "geoCalculator",
+ 							"iconUsed": "icons:view-module",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "geoCalculator"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "calendar",
+ 							"iconUsed": "icons:today",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "calendar"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "readView",
+ 							"iconUsed": "icons:chrome-reader-mode",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "readView"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "howWeDoin",
+ 							"iconUsed": "icons:assessment",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "howWeDoin"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "whatToSee",
+ 							"iconUsed": "icons:visibility",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "whatToSee"
+ 						},
+ 						{	"sectionClass": "menubuttons",
+							"dDialogOne": "starRated",
+ 							"iconUsed": "icons:stars",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "starRated"
+ 						}
+				];
+			},
+			notify: true
+		}
+
+}, //end of 
+		clickHandler: function(e) {
+			console.log(e);
+		  var button = e.target;
+		  while (!button.hasAttribute('data-dialog') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-dialog')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-dialog');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		}
+ });
+ </script>
+ </dom-module>

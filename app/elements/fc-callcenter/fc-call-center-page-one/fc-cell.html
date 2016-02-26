@@ -1,0 +1,259 @@
+<dom-module id="fc-cell">
+<style>
+</style>
+<template>
+<div class="flex layout vertical">
+<paper-material class="horizontal flex layout center-justified" style="max-height: 110px; background: snow;">
+		    
+			<paper-icon-button style="margin-right: 35%;" icon="icons:arrow-back" on-tap="_backOneMonth"></paper-icon-button>
+			<h1 style="text-align: center;">[[_computeOurMonth(month, monthsArray, displayedMonthIndex, displayedMonth)]] [[year]]  J: [[_computeTheYear(day)]]</h1>
+
+			<paper-icon-button icon="icons:arrow-forward" style="margin-left: 35%;" on-tap="_forwardOneMonth"></paper-icon-button>
+</paper-material>
+	<div class="horizontal flex layout  center-justified nowrap self-stretch" style="width: 100%; width:42vw;">
+		<template is="dom-repeat" class="horizontal flex layout nowrap" items="{{days}}">
+			<section class="horizontal layout flex self-stretch" style="border-top: 1px solid silver;text-align: center; min-width:calc(41.2vw/7); padding-left: 3px;">[[item]]</section>
+		</template>
+	</div>
+	<div class="horizontal flex layout wrap self-stretch" style="width: 100%; width:42vw;">
+		<template is="dom-repeat" class="horizontal layout nowrap"  items="{{displayedMonth}}" as="day">
+	
+			<textarea input-type="text" style="width: calc(100%/7.5); margin: 0px; padding: 0px; border: 1px solid grey;" value="{{day}}"></textarea>
+		</template>
+	</div>
+</div>
+</template>
+<script>
+Date.prototype.addDays = function(days) {
+       var dat = new Date(this.valueOf())
+       dat.setDate(dat.getDate() + days);
+       return dat;
+  
+}
+
+   function getDates(startDate, stopDate) {
+      var dateArray = new Array();
+      var currentDate = startDate;
+      while (currentDate <= stopDate) {
+        dateArray.push(currentDate)
+        currentDate = currentDate.addDays(1);
+      }
+      return dateArray;
+    }
+Polymer({
+	is: "fc-cell",
+	properties: {
+		myData:{
+			type: Array,
+			computed:"computeDataCalendar(theDate)",
+			notify: true
+		},
+
+		displayedMonthIndex:{
+			type: Number,
+			notify: true
+		},
+		theDate:{
+			type: Date,
+			value: function(){var d = new Date(); return d;},
+			notify: true
+		},
+		displayedMonth:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		monthsArray:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		currentMonth:{
+			type: Array,
+		computed: "_computeCurrentMonth(month, monthsArray)",
+			notify: true
+		},
+		holderArray:{
+			type: Array,
+		value: function(){return [];},
+			notify: true
+		}, 
+		days:{
+			type: Array,
+			notify: true
+		}, 
+		months: {
+			type: Array,
+			notify: true
+		},
+		month: {
+			type: String,
+			value:function(){return"";},
+			notify: true
+		},
+		dayOfWeek: {
+			type: String,
+			notify: true
+		},
+		date: {
+			type: Array,
+			value: function(){ return [];},
+			notify: true
+		},
+		year: {
+			type: String,
+			notify: true
+		},
+		myminiobj:{
+			type: Array,
+			value:[],
+			notify: true
+		}, 
+		ministring:{
+			type: String, 
+			value: "",
+			notify: true
+		}
+
+
+	},//end of properties
+
+	_computeOurMonth: function(month, monthsArray, displayedMonthIndex, displayedMonth)
+	{
+
+	var mon=(displayedMonth==undefined || displayedMonth==[])? month:displayedMonth[displayedMonthIndex].toString().substring(4,7);
+		var returnVal =(mon=="Feb")?"February": (mon=="Mar")?"March":(mon=="Apr")?"April": (mon=="May")?"May":(mon=="Jun")?"June":(mon=="Jul")?"July":(mon=="Aug")?"August":(mon=="Sep")?"September":(mon=="Oct")?"October": (mon=="Nov")?"November":(mon=="Dec")?"December":"January";  
+		console.log(returnVal);
+			return returnVal;
+	},
+	_computeTheYear: function(day)
+	{
+		console.log(day.getFullYear());
+
+	},
+attached: function(){
+		var dateDate=new Date().valueOf();
+		console.log(valueOf);
+	var self=this;
+		self.myCalendarArray=[];//"Sun Feb 7, 2016", "Mon Feb 8 2016", "Tue Feb 9, 2016"
+		var d = new Date();
+		var d=d.toDateString();
+		this.days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		var dateArray=[];
+		var i=0;
+		var k=0;
+		var start =0;
+		var end =365;
+	dateArray = getDates(new Date().addDays(start), (new Date()).addDays(end));
+	var isSunday =dateArray[0].getDay;
+
+	this.set('date', dateArray);
+	var counter=dateArray.length;
+	var currentMonth=0; 
+		for (i = 0; i < counter; i++) 
+		{var dateMini = self.date[i].toDateString();
+			dateMini=dateMini;
+			var j=i-1;
+			
+
+			var j=i-1;
+			if(i==0)
+			{	self.push("monthsArray",[dateMini]);
+				self.set("month",dateMini.substring(4,7));
+				this.set("month", self.date[0].toDateString().substring(4,7));
+			}
+			else if(i>0)
+			{
+				var dateMicro = self.date[j].toDateString();
+				if(dateMini.substring(4,7)!==dateMicro.substring(4,7))
+				{	
+					var sday = dateMicro.substring(0,3);
+					console.log(sday);
+					var arr=[];
+					var returnVal=sday=="Sun"?1:sday=="Mon"?2:sday=="Tue"?3:sday=="Wed"?4:sday=="Thu"?5:sday=="Fri"?6:7;
+					while(returnVal>=0){
+						
+						var p=i-returnVal;
+						if(p>0){
+						arr.push(self.date[p].toDateString());
+						returnVal--;}
+					}
+												//arr Here??? was [dateMini]
+
+					self.push("monthsArray", arr);
+					currentMonth++;
+					
+					//we do all data at once in start, this makes the data make sense other way fine for dynamic even necessary.  Now not important less in auth context
+				}
+				else{
+					this.monthsArray[currentMonth].push(dateMini);
+				}
+			}
+		}
+						self.set("displayedMonth", self.monthsArray[0]);
+						self.set("displayedMonthIndex",0);
+					
+	},//end of function
+
+	_computeCurrentMonth: function(month, monthsArray){
+
+
+
+	},
+
+	_backOneMonth:function(){
+
+		if(this.displayedMonthIndex==0){
+			var counter =this.monthsArray.length-1;
+			this.set("displayedMonth", this.monthsArray[counter]);
+			this.displayedMonthIndex=counter;
+		}
+		else{
+			var diLess=this.displayedMonthIndex-1;
+			this.set("displayedMonth", this.monthsArray[diLess]);
+			this.displayedMonthIndex--;
+		}
+		var length=(this.displayedMonth.length-1);
+		var month = this.displayedMonth[length].toString().substring(4,7);
+			this.set("month",month);
+	},
+
+	_forwardOneMonth:function(){
+		if(this.displayedMonthIndex==this.monthsArray.length-1)
+		{
+			this.set("displayedMonth",this.monthsArray[0]);
+			this.displayedMonthIndex=0;
+			
+								
+		}
+		else{
+			var diMore=this.displayedMonthIndex+1;
+			this.set("displayedMonth", this.monthsArray[diMore]);
+			this.displayedMonthIndex=diMore;
+			
+		}
+		var length=(this.displayedMonth.length-1);
+		var month = this.displayedMonth[length].toString().substring(4,7);
+			this.set("month",month);
+	},
+
+
+
+computeDataCalendar: function(theDate){
+		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		this.dayOfWeek = days[theDate.getDay()].toString();  
+		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		this.month = months[theDate.getMonth()].toString().slice(0,3);
+		console.log(this.month);
+
+		var day = this.date = theDate.getDate().toString();
+		
+		var year = this.year = theDate.getFullYear().toString();
+	
+
+	}
+	
+
+});
+</script>
+</dom-module>

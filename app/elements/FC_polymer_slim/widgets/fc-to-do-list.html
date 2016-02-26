@@ -1,12 +1,50 @@
 <dom-module id="fc-to-do-list">
 <template>
 	<style>
-		form {
-		  display: flex;
-		  flex-direction: row;
-		  align-items: center;
-		  margin-bottom: 20px;
-		}
+		.blue-btn-class{
+ display: inline-block;
+ border:6px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+width: 20px;
+ height: 20px;
+ margin: 2px;
+ margin-top: 4px;
+ font-size: 13px;
+ padding: 3px;
+ /*box-shadow: 3px 14px 11px 4px #9fafaf;*/
+ /*box-shadow: 3px 4px 11px 3px #bebebe;
+ -moz-box-shadow: 3px 4px 11px 3px #41398A;
+ -webkit-box-shadow: 3px 4px 11px 3px #41398A;*/
+ /*text-shadow: 0 1px 0 #FFFFFF;*/
+ background-color: #5DD7FC;
+}
+.blue-btn-class:hover, .blue-btn-class:active, .thefocus{
+	 display: inline-block;
+ border:6px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+width: 20px;
+ height: 20px;
+ margin: 2px;
+ margin-top: 4px;
+ font-size: 13px;
+ padding: 3px;
+
+ border:6px solid gold;
+ z-index:50000;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+}
 		.toDoItem paper-icon-button[icon=delete]{
 			-webkit-transition: opacity 0.5s;
 			transition: opacity 0.5s;
@@ -42,15 +80,46 @@
 		</firebase-auth>
 		<paper-toast id="errorToast">
 		</paper-toast>
-		<form on-submit="addItem">
-	      	<paper-input 
-	      		value="{{newItemValue}}" 
-	        	placeholder="Enter your item here...">
-	        </paper-input>
-	      	<paper-button on-click="addItem">
-	      		Add
-	      	</paper-button>
+		<form on-submit="addItem" class="horizontal layout flex wrap" style="padding:32px;">
+		<section class="vertical layout flex wrap self-stretch around-justified" style="width:50%;">
+	      	<fc-input-prime 
+	      		value="{{newItemValue}}"
+	      		
+	      		label="To-Do-Item here..." 
+	      		input-type="text"
+	      		name="To-Do-Item">
+	        </fc-input-prime>
+	        <fc-input-prime 
+	        	input-type="datetime-local" 
+	        	label="Start Date"
+	        	name="dateStarted" 
+	        	is-time-stamp="true" 
+	        	value="{{dateStarted}}">
+	        </fc-input-prime>
+	         
+	        <fc-input-prime 
+	        	input-type="text" 
+	        	label="Progress Notes" 
+	        	value="{{notes}}">
+	        </fc-input-prime>
+	         <fc-input-prime 
+	        	input-type="number" 
+	        	min="0" max="60"
+	        	step="1"
+	        	name="timeline" 
+	        	label="Timeline in Days" 
+	        	value="{{timeline}}">
+	        </fc-input-prime>
+	      
+	      	
+	      	  ADD
+	      	<fc-input-prime input-type="button" icon="icons:add-circle-outline" class="blue-btn-class" on-click="addItem">
+	      		
+	      	</fc-input-prime>
+	      	</section>
+
 	    </form>
+	    <div style="background: white; border: silver solid 2px; max-height: 380px; overflow-y: scroll">
 	    <template is="dom-repeat" items="{{toDos}}">
 	      	<div class="toDoItem">
 	        	<paper-checkbox
@@ -62,6 +131,16 @@
 	          		on-tap="deleteItem">
 	          	</paper-icon-button>
 	      	</div>
+	    </template>
+	    </div>
+	    <template is="dom-repeat" hidden items="{{completedItems}}">
+	    <span>[[completedItem.userFullName]]</span>
+	    
+
+
+
+
+
 	    </template>
 	</template>
 	<script>
@@ -101,49 +180,52 @@
   			value: 'password',
   			notify: true
   			},
+  		firebaseURL2: {
+  			type: String,
+  			value: "https://focused0ne.firebaseio.com/completedItems",
+  			notify: true
+  		},
   		completedItems:{
   			type: Array,
-  			computed: 'computeCompletedItems(completedItem, item)',
+  			notify: true
+  		},
+  		dateStarted: {
+  			type: Date, 
+  			notify: true
+  		},
+  		notes: {
+  			type: String,
+  			value: '',
+  			notify: true
+  		},
+  		dateCompleted: {
+  			type: Date,
+  			notify: true
+  		},
+  		timeline: {
+  			type: Date,
+  			value: "90 days",
   			notify: true
   		},
   		completedItem:{
   			type: Object, 
-  			value: {
-  				done: true,
-  				dateStarted: Date,
-  				dateCompleted: Date, 
-  				userFullName: function(){return 'Jason C. Frazzano';},
-  				notes: String
-  			},
+  			computed: "_computeCompletedItem(dateStarted, dateCompleted, timeAllocated, userFullName, notes, done)",
   			notify: true
-  			}
-  		},
-		addItem: function(event) {
-		  	event.preventDefault(); // Don't send the form!
-		  	this.push('toDos', {
-		    	done: false,
-		    	text: newItemValue
-		  });
-		  	this.newItemValue = '';
-		},
+  		}
 
-		toggleItem: function(event) {
-		  	event.model.item.set('done', !event.model.item.done);
-		},
+  	},
 
-		deleteItem: function(event) {
-		  	this.splice('toDos', event.model.index, 1);
-		},
-
-		computeCompletedItems: function(event, completedItem, item){
-			return {"silly": "object"};
-		},
-
+		
 		onFirebaseLogin: function(event) {
 		  	this.ref = new Firebase(this.firebaseURL + '/users/' + 
 		                                                  event.detail.user.uid);
 		  	this.ref.on('value', function(snapshot) {
 		    	this.updateToDos(snapshot);
+		  	}.bind(this));
+		  	this.ref2= new Firebase(this.firebaseURL2 + + '/users/' + 
+		                                                  event.detail.user.uid);
+		  	this.ref2.on('value',function(snapshot2){
+		  		this.updateCompletedItems(snapshot2);
 		  	}.bind(this));
 		},
 
@@ -154,6 +236,7 @@
 	
 		onFirebaseLogout: function(event) {
 			this.updateToDos();
+			this.updateCompletedItems();
 		},
 
 		updateToDos: function(snapshot) {
@@ -164,12 +247,23 @@
 		    	this.push('toDos', item);
 		  	}.bind(this));
 		},
+		updateCompletedItems: function(snapshot2){
+			this.completedItems=[];
+			snapshot2.forEach(function(childSnapshot){
+				var item = childSnapshot.val();
+		    	item.uid = childSnapshot.key();
+		    	this.push('completedItems', item);
+		  	}.bind(this));
+		},
 
 		addItem: function(event) {
 		  	event.preventDefault();
 		  	this.ref.push({
 		    	'done': false,
-		    	'text': this.newItemValue
+		    	'text': this.newItemValue,
+		    	'timeline': this.timeline,
+		    	'startDate': this.dateStarted,
+		    	'notes': this.notes,
 		  	});
 		  	this.newItemValue = '';
 		},
@@ -185,4 +279,3 @@
 	});
 </script>
 </dom-module> 
-View

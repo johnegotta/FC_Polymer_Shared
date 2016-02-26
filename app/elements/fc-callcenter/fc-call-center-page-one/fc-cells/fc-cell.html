@@ -1,0 +1,198 @@
+<dom-module id="fc-cell-gen">
+<style>
+     paper-header-panel {
+        float: left;
+        max-width: 100%;
+        min-width: calc(100%/7.7);
+        max-height: 640px;
+        min-height: 120px;
+        margin: 3px;
+        border: 1px solid #efefef;
+        @apply(--shadow-elevation-2dp);
+      }
+      .paper-header {
+        height: 24px;
+        font-size: 16px;
+        line-height: 24px;
+        padding: 0 4px;
+        color: white;
+        transition: height 0.2s;
+      }
+      .paper-header.tall {
+        height: 120px;
+      }
+      .paper-header.medium-tall {
+        height: 100px;
+        line-height: 50px;
+      }
+      .content {
+        height: 2000px;
+      }
+      .cover {
+        margin: 2px;
+      }
+      .blue .paper-header {
+        background-color: var(--paper-light-blue-500);
+      }
+      .red .paper-header {
+        background-color: var(--paper-red-500);
+      }
+      .orange .paper-header {
+        background-color: var(--paper-amber-500);
+      }
+      .green .paper-header {
+        background-color: var(--paper-green-500);
+      }
+      .cyan .paper-header {
+        background-color: var(--paper-cyan-500);
+      }
+      .lime .paper-header {
+        background-color: var(--paper-lime-500);
+      }
+      .pink .paper-header {
+        background-color: var(--paper-pink-a200);
+      }
+.toDoItem paper-icon-button[icon=delete]{
+			-webkit-transition: opacity 0.5s;
+			transition: opacity 0.5s;
+			opacity: 0;
+		}
+		.toDoItem:hover paper-icon-button[icon=delete]{
+			opacity: 100;
+		}
+
+		paper-button {
+		  flex-shrink: 1;
+		}
+		paper-input {
+		  flex-grow: 1;
+		}
+
+		paper-checkbox {
+		  display: inline-block;
+		  margin: 5px 0;
+		  transition: opacity 0.3s;
+		}
+
+		paper-checkbox[checked] + .label {
+		  opacity: 0.5;
+		  text-decoration: line-through;
+		}
+	
+      .blue .content {
+        background: linear-gradient(white, #b3e5fc);
+      }
+      .red .content {
+        background: linear-gradient(white, #ffcdd2);
+      }
+      .orange .content {
+        background: linear-gradient(white, #ffecb3);
+      }
+      .green .content {
+        background: linear-gradient(white, #c8e6c9);
+      }
+      .cyan .content {
+        background: linear-gradient(white, #b2ebf2);
+      }
+      .lime .content {
+        background: linear-gradient(white, #f0f4c3);
+      }
+      .pink .content {
+        background: linear-gradient(white, #f8bbd0);
+      }
+</style>
+<template>
+<div class="flex layout vertical">
+<paper-material class="horizontal flex layout center" style="max-height: 80px; background: snow;">
+		    
+			<paper-icon-button style="margin-right: 35%;" icon="icons:arrow-back" on-tap="_backOneMonth"></paper-icon-button>
+			<h1 style="text-align: center;">[[_computeTheMonths(year, month, displayedMonth)]] [[year]]</h1>
+			<paper-icon-button icon="icons:arrow-forward" style="margin-left: 35%;" on-tap="_forwardOneMonth"></paper-icon-button>
+			</paper-material>
+	<div class="horizontal flex layout nowrap self-stretch" style="width: 100%; min-width:42vw;">
+		<template is="dom-repeat" class="horizontal flex layout nowrap" items="{{days}}">
+			<section class="horizontal layout flex self-stretch" style="border-top: 1px solid silver;text-align: center; min-width:calc(41.2vw/6.9); padding-left: 3px;">[[item]]</section>
+		</template>
+	</div>
+	<div class="horizontal flex layout wrap self-stretch" style="width: 100%; min-width:42vw;">
+		<template is="dom-repeat" class="horizontal layout nowrap"  items="{{displayedMonth}}" as="day">
+		<paper-header-panel class="blue">
+        <div draggable="true" class="paper-header" on-tap="openDialog" day=[[day]]>[[day]]<fc-date-card day="[[day]]" occurance="{{occurance}}" data-fcid$="{{dataFcid}}" style="font-size:48px;"></fc-date-card></div>
+  
+        <div class="content">
+           <paper-textarea rows="40" style="font-size: 48px;" cols="18" value="Hi! Am Text Area!"></paper-textarea>
+
+           	
+		</div>
+		<fc-date-card drags="true" input-value="{{value}}" the-id="{{day}}"></fc-date-card>
+      </paper-header-panel>
+		</template>
+	</div>
+</div>
+</template>
+<script>
+Polymer({
+	is: "fc-cell-gen",
+	behaviors:[
+				Polymer.PaperInputBehavior,
+			 	Polymer.IronFormElementBehavior,
+				FCBehaviors.FcCalendarBehavior
+				],
+	properties: {
+		myData:{
+			type: Array,
+			computed:"computeDataCalendar(theDate)",
+			notify: true
+		},
+		inputValue:{
+				type: String,
+				notify: true
+		},
+		value: {
+			type: String,
+			notify: true
+		},
+		day:{
+			type: String,
+			notify: true
+		},
+		occurance: {
+				type: String,
+				notify: true
+		},
+		days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+			},
+			notify: true
+		},
+		dataFcid:{
+				type: Object, //this should be an object with methods backwards and forwards
+				notify: true
+		}
+	},//end of properties
+
+	attached: function(){
+		this.calendarCreator();
+		},
+	computeDataCalendar: function(theDate){
+		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		this.dayOfWeek = days[theDate.getDay()].toString();  
+		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		this.month = months[theDate.getMonth()].toString().slice(0,3);
+		console.log(this.month);
+		var day = this.date = theDate.getDate().toString();
+		var year = this.year = theDate.getFullYear().toString();
+	},
+	openDialog:function(e){
+		console.log(e);
+			e.target.lastElementChild.open();
+			e.day
+
+
+	},
+});
+</script>
+</dom-module>

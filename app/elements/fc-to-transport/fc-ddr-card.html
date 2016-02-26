@@ -1,0 +1,542 @@
+<dom-module id="fc-ddr-card">
+ <template>
+<style>
+ :host{
+          margin: 7px 8px 8px 24px;
+          min-width: 320px;
+          width: 95%;
+          max-width: 1300px;
+          min-height: 64px;
+          max-height: 1300px;
+          position: relative;
+    
+        }
+     paper-header-panel {
+     float: left;
+        max-width: 1280px;
+        min-width: 320px;
+        width: 95%;
+        max-height: 1280px;
+        min-height: 52px;
+        margin: 4px;
+         position: relative; 
+        border: 4px solid #efefef;
+        @apply(--shadow-elevation-2dp);
+      }
+      .paper-header {
+        height: 46px;
+        font-size: 22px;
+        line-height: 30px;
+        padding: 4px;
+        color: white;
+        transition: height 0.2s;
+      }
+      .paper-header.tall {
+        height: 60px;
+      }
+      .paper-header.medium-tall {
+        height: 48px;
+        line-height: 40px;
+      }
+      .content {
+        max-height: 2500px;
+        min-height: 100%;
+        overflow-y: scroll;
+        max-width: 100%;
+   
+      }
+      .cover {
+        margin: 2px;
+      }
+      .magenta .paper-header {
+        background-color: magenta;
+      }
+      .blue .paper-header {
+        background-color: var(--paper-light-blue-500);
+      }
+      .red .paper-header {
+        background-color: var(--paper-red-500);
+      }
+      .orange .paper-header {
+        background-color: var(--paper-amber-500);
+      }
+      .green .paper-header {
+        background-color: var(--paper-green-500);
+      }
+      .cyan .paper-header {
+        background-color: var(--paper-cyan-500);
+      }
+      .lime .paper-header {
+        background-color: var(--paper-lime-500);
+      }
+      .pink .paper-header {
+        background-color: var(--paper-pink-a200);
+      }
+.toDoItem paper-icon-button[icon=delete]{
+			-webkit-transition: opacity 0.5s;
+			transition: opacity 0.5s;
+			opacity: 0;
+		}
+		.toDoItem:hover paper-icon-button[icon=delete]{
+			opacity: 100;
+		}
+
+		paper-button {
+		  flex-shrink: 1;
+		}
+		paper-input {
+		  flex-grow: 1;
+		}
+
+		paper-checkbox {
+		  display: inline-block;
+		  margin: 5px 0;
+		  transition: opacity 0.3s;
+		}
+
+		paper-checkbox[checked] + .label {
+		  opacity: 0.5;
+		  text-decoration: line-through;
+		}
+	
+      .blue .content {
+        background: white;
+      }
+      .red .content {
+        background: linear-gradient(white, #ffcdd2);
+      }
+      .orange .content {
+        background: linear-gradient(white, #ffecb3);
+      }
+      .green .content {
+        background: linear-gradient(white, #c8e6c9);
+      }
+      .cyan .content {
+        background: linear-gradient(white, #b2ebf2);
+      }
+      .lime .content {
+        background: linear-gradient(white, #f0f4c3);
+      }
+      .pink .content {
+        background: linear-gradient(white, #f8bbd0);
+      }
+</style>
+
+<!-- <button style: "display:fixed;  background: red; right: 150px; top: 150px; height: 64px; width: 64px; border-radius: 180px; border: 5px white solid; border-shadow: 14px 8px 24px 12px #afafaf;" on-click="goDialog"> Go!</button>
+
+
+ -->
+   <!--<paper-dialog class="vertical layout" style="height: 600px; width: 480px;"> -->
+<!-- <div style$="height: [[currentHeight]]; width: [[currentWidth]];"> -->
+
+<!-- on-track="_focusedDraggable" -->
+  <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" id$="{{relId}}" class$="[[headClass]] self-stretch"> 
+  <div class="paper-header layout horizontal center-justified handle"  on-track="_focusedDraggable" style="text-align: center;">
+  <iron-icon 
+            icon="icons:highlight-off" 
+            name="fc-dialog-closer"
+            description="designed to close the dialog"
+            class="menuItems-light"
+            dialog-dismiss
+            on-tap="falseClose"
+            style="position: absolute; z-index: 45; border-radius: 180px; background: [[_computeButtonBG(toggleColor)]]; width: 20px; height: 20px; border-shadow: 11px 4px 18px 7px #afafaf; right: 0px; top: 0px;"
+          >
+      </iron-icon>
+
+
+     
+     	  
+
+     [[_computeHeader(headerTitle)]]
+
+
+
+     </div>
+  
+        <div id="attachContent" class="content" style$="height: [[currentHeight]]; width: [[currentWidth]]; background: white;">
+   <content id="cardContent">
+
+
+
+
+   </content>
+   
+  
+          
+
+           	
+		</div>
+	 <iron-icon 
+            icon="icons:aspect-ratio" 
+            name="fc-resizer"
+            on-track="_resize"
+            track
+            drags="true"
+            draggable="true"
+            description="the dragable edge of a panel intended to change height"
+            class="menuItems-light"
+            style="position: absolute; width: 16px; height: 16px; right: 0px; bottom: 0px; background: gold;"
+          >
+      </iron-icon>
+ </paper-header-panel>    
+       
+<!--  </div> -->
+ 
+
+</template>
+    <script>
+    
+FcDdrCard=Polymer({
+	is:'fc-ddr-card',
+	behaviors:[
+      // Polymer.PaperDialogBehavior,
+      Polymer.NeonAnimationRunnerBehavior, 
+      Polymer.IronFitBehavior, 
+      Polymer.IronResizableBehavior,
+      Polymer.IronRangeBehavior
+    ],
+    listeners: {
+      'neon-animation-finish': '_onNeonAnimationFinish', 
+      'on-iron-resize':'resizeMe'
+    },
+	properties: {
+    headClass:{
+      type: String,
+      value: "blue",
+      notify: true,
+      reflectToAttribute: true
+    },
+    toggleColor:{
+      type: Boolean,
+      value: true,
+      notify: true
+    },
+    headerTitle:{
+      type: String,
+      notify: true,
+      reflectToAttribute: true
+    },
+    attachContent: {
+      type: Array,
+      value: [],
+      reflectToAttribute: true,
+      notify: true
+    },
+		drags:{
+			type: Boolean, 
+			value: false,
+			notify: true
+		},
+		isResizing: {
+			type: Boolean,
+			value: true, 
+			notify: true
+		},
+		isAddingEvent: {
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		inputValue: {
+				type: String,
+				notify: true,
+				reflectToAttribute: true
+
+		},
+		noCancelOnOutsideClick:{
+			type: Boolean,
+			value: function(){return true;},
+			notify: true
+		},
+    widthCounter:{
+      type: Number,
+      value: 0,
+      notify: true
+    },
+  selectionArray: {
+        type: Array,
+        value: function(){
+          return [
+                'first', 
+                'second', 
+                'third', 
+                'fourth'
+          ];
+        },
+        notify: true
+      },
+ 
+      selected: {
+        type: String,
+        notify: true
+      },
+      currentWidth: {
+          type: String, 
+          notify: true, 
+          reflectToAttribute: true
+      },
+      currentHeight: {
+          type: String, 
+     	  value:function(){ return "55px";},
+          notify: true, 
+          reflectToAttribute: true
+      },
+      day:{
+      		type: String,
+      		notify: true,
+      		reflectToAttribute: true
+      },
+      theId: {
+      	type: String, 
+      	notify: true,
+      },
+      id:{
+      	type: String,
+      	computed: "_computeId(theId, day)",
+      	notify: true
+      },
+      dragCounter: {
+        type: Number,
+        value: 0,
+        notify: true
+      },
+      dragCorrection: {
+      	type:Number,
+      	value: function(){return 0;},
+      	notify: true
+      }
+    },
+    ready: function(){
+
+
+    },
+     attached: function(){
+      this.resizeMe();
+       this.set("_notifyingDescendant", true);
+    },
+
+    _computeHeader: function(headerTitle){
+      return headerTitle;
+    },
+
+     startWidth: function(widthCounter){
+           var wc = widthCounter;
+          if(widthCounter==0){ 
+            var nodes=Polymer.dom(this.$.cardContent).getDistributedNodes();
+            //console.log(nodes);
+            wc++;
+            this.set("widthCounter", wc);
+          }
+          else{ 
+            wc++;
+          this.set("widthCounter", wc);
+
+          }
+        },
+
+    resizeMe: function(){
+       Polymer.dom.flush();
+       var resizer = this.parentNode;
+       var w = parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+       while(w==NaN && resizer!=document.body){
+        resizer=resizer.parentNode;
+        w== parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+
+       } 
+       var z = window.getComputedStyle(resizer, null).getPropertyValue("width");
+       console.log(z);
+            var wn=Math.ceil(w*.8);
+      var width=wn.toString() + "px";
+      this.set("currentWidth", width);
+      this.notifyResize();  
+    },
+    // afterStartResize: function(){
+    //   var pre =this.previousSibling;
+    //   var next=this.nextSibling;
+    //   while(pre.nodeName!="FC-DDR-CARD" && pre!=document.body)
+    //   {
+    //     pre=pre.previousSibling;
+    //     if (pre.nodeName=="FC-DDR-CARD")
+    //     {
+    //      var w=window.getComputedStyle(pre, null).getPropertyValue("width");
+    //      if(this.currentWidth!=w)
+    //         { 
+    //         pre=pre.previousSibling;
+    //         console.log(pre);
+    //         var v=window.getComputedStyle(pre, null).getPropertyValue("width");
+    //         if(v==w && pre.nodeName=="FC-DDR-CARD")
+    //           {
+    //             this.set("currentWidth", w);
+    //             console.log(v,w, "the widths");
+    //           }
+    //         }
+    //     }
+    //   }
+    //   v="";
+    //   w="";
+    //    while(next.nodeName!="FC-DDR-CARD" && next!=document.body)
+    //   {
+    //     next=next.nextSibling;
+    //     if (next.nodeName=="FC-DDR-CARD")
+    //     {
+    //      var w=window.getComputedStyle(next, null).getPropertyValue("width");
+    //      if(this.currentWidth!=w)
+    //         { 
+    //         next=next.nextSibling;
+    //         console.log(next);
+    //         var v=window.getComputedStyle(next, null).getPropertyValue("width");
+    //         if(v==w && next.nodeName=="FC-DDR-CARD")
+    //           {
+    //             this.set("currentWidth", w);
+    //             console.log(v,w, "the widths");
+    //           }
+    //         }
+    //     }
+    //   }
+    // },
+   
+    onIronResize: function(){
+      this.resizeMe();
+      this.afterStartResize();
+      notifyResize();
+    },
+    goDialog: function(){
+      this.$.myDialog.opened=!this.$.myDialog.opened;
+
+    },
+    _computeCurrentHeight: function(drags){
+    	var ht="450px";
+    	if(currentHeight==undefined) {return ht;}
+    	else{ this._resize(e);
+    	}
+    },
+    _computeId: function(theId, day){
+    	//console.log(theId, day, day, day, day, theId);
+
+    },
+    computeSelected: function(selectionArray){
+      return "[name=first]";
+    },
+    _renderOpened: function() {
+      if (this.withBackdrop) {
+        this.backdropElement.open();
+      }
+      this.playAnimation('entry');
+    },
+    _renderClosed: function() {
+      if (this.withBackdrop) {
+        this.backdropElement.close();
+      }
+      this.playAnimation('exit');
+    },
+    _onNeonAnimationFinish: function() {
+      if (this.opened) {
+        this._finishRenderOpened();
+      } else {
+        this._finishRenderClosed();
+      }
+    },
+    _computeRelId: function(day){
+    	 var dayId	= day.replaceAll("\\s+","");
+    	 //console.log(dayId, dayId, dayId, dayId);
+    	 return dayId;
+    },
+    computeId:function(theId){
+    	//console.log(theId, theId, theId, theId, theId, theId);
+    },
+    _resize: function(e){
+          var self=this;
+          e.preventDefault();
+          switch(e.detail.state) {
+                case 'start':
+                var theId=this.relId;
+                var elem=this.$$(theId);
+                var sWidth =window.getComputedStyle(self.$.myPanel, null).getPropertyValue("width");
+                self.set("currentWidth", sWidth);
+              
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                  
+           
+                  self.set("currentWidth",trueWidth);
+                  self.set("currentHeight",trueHeight);
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                
+                  break;
+                case 'end':
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                  self.notifyResize();
+                  self.ironResize;
+                  Polymer.dom.flush();
+                  break;
+              }
+        },
+        _closeDialog: function(){
+          this.$.myDialog.close();
+        },
+
+       falseClose: function(){
+        if(this.toggleColor==false){
+        this.set('currentHeight',"80px;");
+        this.set('toggleColor', true);
+      }
+        else{
+          this.set('currentHeight', "680px;");
+            this.set('toggleColor', false);
+            }
+
+       },
+       _computeButtonBG: function(toggleColor){
+        var returnVal=(toggleColor==false)?"red;":"green;";
+        return returnVal;
+
+       },
+
+  _focusedDraggable:function(e){
+  	// console.log("we tried to drag");
+  	 if(this.drags==true){
+        var self=this;
+        e.preventDefault();
+switch(e.detail.state) {
+          case 'start':
+            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+            console.log('top distance differenced?' + self._topprime);
+            // }
+            self.changeX=0;
+            self.changeY=0;
+            Polymer.dom.flush();
+            break;
+          case 'track':
+            self.changeX=e.detail.ddx + self.changeX;
+            self.changeY=e.detail.ddy + self.changeY;
+            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+            break;
+          case 'end':
+            console.log(self._topprime);
+            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+            self._bottom = self.getBoundingClientRect().top;
+            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            self.translate3d(0, 0, 0);
+
+            console.log("ENDING", self._x);
+            self.style.left=self._x.toString()+'px';
+            self.style.top=self._y.toString()+'px';
+            console.log('y: ' + e.detail.y);
+            self.dragging=false;
+            Polymer.dom.flush();
+            break;
+        }
+      }
+    }
+
+});
+</script>
+</dom-module>

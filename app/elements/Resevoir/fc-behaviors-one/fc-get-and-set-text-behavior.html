@@ -1,0 +1,355 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcGetAndSetTextBehavior = {
+properties:{
+
+	paragraphArray: {
+			type: Array,
+			value: [],
+			notify: true
+	    },
+
+	truePassageArray:{
+			type: Array,
+			value: [],
+			notify: true
+	    },
+	passageWordArrayOrdered:{
+			type:Array,
+			value: [],
+			notify: true
+	    },
+	passageArray:{
+		type:Array,
+		value: [],
+		notify: true
+	    }, 
+	   
+	orderIndex: {
+		type: Number, 
+		value: 0,
+		notify: true
+	    },
+	columnOne: {
+		type: Boolean,
+		value: false,
+		notify: true,
+		reflectToAttribute: true
+	    },
+ passagesWordArrays:{
+		type: Array,
+		value: function(){return []},
+		notify: true
+	    },
+
+	hasCharts:{
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+	 passageType: {
+	    	type: String,
+	    	value: function(){
+	    		return "";
+	    	},
+	    	notify: true
+	    	},
+	
+	    fcid: {
+	    	type: String,
+			value: function(){
+		    	return "";
+		    },
+			notify: true
+	    },
+	   
+	   
+	   
+	    isFocused: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+
+	    isDoublePassage: {
+	    	type: Boolean,
+	    	value: function(){return false;},
+	    	notify: true
+	    },
+		
+	    passageTitle: {
+			value: function(){
+		    return "";},
+			notify: true
+	    },
+	    passageBlurb:{
+			value: function(){
+		    return "";},
+			notify: true
+		},
+	  
+	myMenu:{
+		type: Array,
+		notify: true,
+		reflectToAttribute: true
+	}
+
+
+},
+	
+
+	 getText: function(){
+	 	var passageContent = this.$.firepad.getText();
+		var self=this;
+		var fcid = this.fcid;
+		var blurb = this.passageBlurb;
+		var passageTitle = this.passageTitle;
+		var passageType = this.passageType;
+		passageContent = passageContent.replace(/[\—]/g, " — ");
+		var order =arrayPassed.length;
+		self.orderIndex=0;
+		self.paragraphArray = passageContent.split(/\n/);
+		self.passageArray = [];
+		var i = self.paragraphArray.length;
+		while(i>0){i--;
+			var wordCounter = 0;
+			var newPara = false;
+			var wordArray = self.paragraphArray[i].split(/\s/g);
+			var paraWordRemaining = wordArray.length-1;
+			var isLastWordOfPara =false;
+			var currentWord;
+			var orderIndex = self.orderIndex;
+			while(paraWordRemaining>=0)
+			{       
+			    self.orderIndex++;
+			    order--;
+			    self.wordCounter--;
+			    if (paraWordRemaining==0){
+				newPara = true;
+			    }
+			    else if(wordCounter==0)
+			    { 
+				isLastWordOfPara = true;
+			    }
+			    else{
+				newPara=false;
+				isLastWordOfPara=false;
+			    }
+				currentWord = wordArray[paraWordRemaining];              
+				self.push("passageArray",
+				  { 
+				    "passageTitle": this.passageTitle,
+				    "passageBlurb": this.passageBlurb,
+				    'order': order,
+				    'word' : currentWord, 
+				    'newPara': newPara,
+				    'paragraph_number': paragraph_number,
+				    'isLastWordOfPara':isLastWordOfPara,
+				    'paragraphsRemaining': i
+				  });
+				wordCounter++;
+				paraWordRemaining--;
+			    }
+			  } 
+	  	var qtip= self.passageArray.length;
+	    var z=0;
+	    self.passageWordArrayOrdered=[];
+	    for(var passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
+	    {
+		 self.push('passageWordArrayOrdered',
+				   {  
+				   	'wordIndex': z,
+					"passageType": this.passageType,
+					"passageTitle": this.passageTitle,
+					"menuItem": this.passageTitle,
+					"passageBlurb": this.passageBlurb,
+					"total_word_count": passageArrayLength, 
+					"has_charts": this.hasCharts,
+					"is_double_passage": this.isDoublePassage,
+					"Focused Test": this.isFocused
+				    'word' : self.passageArray[passageArrayLength].word, 
+				    'newPara': self.passageArray[passageArrayLength].newPara,
+				    'isLastWordOfPara':self.passageArray[passageArrayLength].isLastWordOfPara,
+			});
+		
+		z++;
+	  }
+		var paraSent = this.fcParagraphMaker(self.passageWordArrayOrdered);
+		var parasback= this.sentenceMaker(paraSent);
+	},
+
+fcParagraphMaker: function(passage){
+	this.paragraphArray=[];
+ 	 var paraCounter=0;
+ 	 this.counter=0;
+      var fc= passage.length;
+      var passageParagraphsArray=[];
+      var passageParagraphObject ={};
+      var ppWordArray=[];
+      var paragraphNumber;
+      var passageWordIndex;
+      var paragraph=[];
+      var paragraphArrayTest=[];
+      var paranum=0;
+      var paraWordLength=0;
+     	for(i=0; i<fc; i++){
+     		var newPushYes = ((passage[i].newPara==true && passage[i-1].isLastWordOfPara==true))? true:false;
+     		
+     		if (newPushYes==false){
+     			passage[i].paraWordLength=paraWordLength;
+     			passage[i].paragraph_number=paranum;
+     			paragraph.push(passage[i]);
+     			paraWordLength++;
+     		}
+     		else{
+
+     			var thisLastWordinPara=i-1;
+     			var less=thisLastWordinPara-1;
+     			var self=this;
+     			paragraph.forEach(function(element, index, paragraph){
+     				paragraph.lastwordInParagraph=thisLastWordinPara;
+     				paragraph.thisLastWordinPara=passage[less].word;
+     			});
+     			ppWordArray.push(paragraph);
+     			paranum++;
+     			paraWordLength=1;
+     		 var tightArray=paragraph.filter(function(element, index, paragraph){
+	  		if(element.word== undefined || element.word==null || element.word=="" || element.word.match(/.*\S.*/)==null){return false;}
+	  		else{return true;}
+			});
+     		var counterThree=tightArray.length;
+     		this.counter;
+     		for(var p=0;p<counterThree; p++){
+     			if(p==0){var fwi=this.counter; var lwi=this.counter+counterThree-1;}
+							tightArray[p].isLastWordOfPara= ((p+1)==counterThree)?true:false;
+							delete tightArray[p].is_miniTarra;
+							delete tightArray[p].is_transitionWord;
+							delete tightArray[p].paragraphWordlength;
+							tightArray[p].newPara=(p==0)?true: false;
+							tightArray[p].paraWordIndex= p;
+							tightArray[p].paraLength=counterThree;
+							tightArray[p].wordIndex=this.counter;
+							tightArray[p].paraNum=paraCounter;
+							tightArray[p].paraLwi= lwi;
+							tightArray[p].paraFwi= fwi;
+							tightArray[p].wordIndex=this.counter;
+							this.counter++;
+						}
+						paraCounter++;
+
+			this.push("paragraphArray",tightArray);
+			this.eWordArray = this.eWordArray.concat(tightArray);
+			console.log(this.eWordArray, "eWordArray");
+			tightArray=[];
+     		paragraph=[];
+ 
+     		passage[i].indexOfFirstParaWord=i;
+     		paragraph.push(passage[i]);
+     		paraWordLength ++;
+     		}
+     	}
+     	var fulllwi =this.eWordArray.length-1;
+     	this.eWordArray.forEach(function(element, index, arr){element.lwi=fulllwi;});
+     	var array=this.eWordArray;
+     	console.log(this.eWordArray, "eWordArray", this.paragraphArray, "paragraphArray");	
+     	return this.paragraphArray;
+     	
+     },
+sentenceMaker: function(paragraph){
+		this.counter=0;
+		//console.log(paragraph);
+		var counter = paragraph.length;
+		var sentences=[];
+		var ps= [];
+		var lastIndex=0;
+		var endofsentence=0;
+		var sentencelwi=0;
+		var sentencefwi=0;
+		var sentenceCounter=0;
+		var wordNumInS=0;
+		var nextSentenceStart=0;
+		var sentenceFirstWord=0;
+		var sentence='';
+		for(var i=0; i<counter; i++){
+			
+			var zero=0;
+			var para =paragraph[i];
+			var counterTwo=para.length;
+			//console.log(counterTwo);
+			for(var j=0;j<counterTwo;j++){
+				sentence+=para[j].word + " ";
+				this.sentenceArray.push(para[j])
+				var next=j+1;
+				if (para[j].word.match(/\.|\?|\!/)!=null){
+					var holder = para.slice(zero,next);
+					console.log(sentence);
+						var nextSentenceStartWordIndex=para[j].wordIndex+1;
+						var nextSentencefww=(para[j].isLastWordOfPara!=true&&j==para[j].lwi)?para[next].word: "NULL";
+						sentence=sentence;
+						var	sentenceFirstWord=para[zero].wordIndex;
+						var	numberOfSentences=this.counter;
+						var sentenceLastWord=para[j].word;
+						var	sentenceLength=j-zero;
+
+						holder.forEach(function(element, index, holder){
+							element.nextSentenceStartWordIndex=nextSentenceStartWordIndex;
+							element.nextSentenceStarts=nextSentenceStart;
+							element.sentence=sentence;
+							element.sentenceIndex=index;
+						    element.sentenceFirstWord=sentenceFirstWord;
+							element.numberOfSentences=numberOfSentences;
+							element.sentenceLastWord=sentenceLastWord;
+							element.sentenceLength=sentenceLength;
+						});
+							zero=next;
+							this.counter++;
+
+					this.sentenceArray.sentence=sentence;
+					this.push("psArray", this.sentenceArray);
+					sentence="";
+					console.log(this.psArray, "psarray");
+					this.sentenceArray=[];
+				}
+			}		
+		}	
+		return this.psArray;				
+	},
+
+	saveToDb: function(){
+		if(this.passageTitle!==""){ 
+		var self=this;
+		var ref = new Firebase("https://focusedstaging1.firebaseio.com/readingPassages");
+		ref.child("passage_" + self.fcid_test).set(self.passageWordArrayOrdered);
+		this.clearInputs();  
+	  }
+	  else {
+	  	this.openDialog();
+	  }
+	},
+	openDialog: function (){alert("YOU MUST HAVE A TITLE FOR USE IN THE DROPDOWNS");},
+	clearInputs: function(){
+		this.set("passageType", null);
+	    this.set("passageBlurb", null);
+		this.set('hasCharts', false);
+		this.set('isFocused', false);
+		this.set('isCollegeBoard', false);
+		this.set('isDoublePassage', false);
+		this.set("testSource", null);
+		this.set('testId', null);
+		this.set("fcid_test",null);
+		this.set("passageTitle", null);
+	
+
+		this.set('inputHasCharts', false); 
+		this.set('inputIsCollegeBoard', false); 
+		this.set('inputIsDoublePassage', false); 
+		this.set('inputIsFocused', false);
+		this.set('inputPassageType', null);
+		this.set('inputPassageBlurb', null);
+		this.set('inputFcid_test', null);
+		this.set('inputTestId', null);
+		this.set('inputTestSource', null);
+		this.set("inputPassageTitle", null);
+	},
+
+  

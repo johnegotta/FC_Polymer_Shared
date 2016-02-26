@@ -1,0 +1,507 @@
+<dom-module id="fc-clockObj">
+<style is="custom-style">
+:host{position: absolute;
+	top: 24px;
+	left: 80%;
+	width: 320px;
+z-index:93;};
+
+paper-material{
+	position: relative;
+	background: #ffffff;
+	border: 3px ridge #aecdfe;
+	padding: 6px 4px;
+	margin: 20px;
+	display: block;
+	@apply(--horizontal-layout);
+	@apply(--nowrap-layout);
+}
+
+.arrows{
+
+font-size: 22px; margin: 5px 8px 2px 8px; width 40px; height: 45px;
+-webkit-transition: width 2s, height 2s, display 2s, background-color 2s, -webkit-transform 2s;
+    transition: width 2s, height 2s, background-color 2s, transform 2s, display 2s;
+}
+.query-builder{
+		width: 16px;
+		height: 16px;
+		border-radius: 180px;
+		padding: 2px;
+		margin: 2px;
+		border: #fff 1px solid;
+		background: green;
+		color: white;  
+		position: absolute;
+		right: 0px;
+		top: 0px;
+	}
+.clear{ width: 16px;
+	height: 16px;
+	border-radius: 180px;
+	padding: 2px
+	margin: 2px;
+	border: #fff 1px solid;
+	background: red;
+	color: white;  
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+
+.ironOne{
+width: 16px;
+height: 16px;
+border-radius: 180px;
+padding: 3px 5px 5px 5px;
+margin: 2px 7px;
+border: #007 4px solid;
+background: #5DD7FC;
+color: white;
+box-shadow: 3px 17px 11px 4px #9fafaf;
+ -webkit-transition: width 2s, display 2s, height 2s, background-color 2s, -webkit-transform 2s;
+    transition: width 2s, height 2s, background-color 2s, transform 2s, display 2s;
+}
+.ironOne:active{ color: gold; box-shadow: 0px;border: gold 5px solid;}
+.ironTwo{width: 16px;height: 16px;border-radius: 180px;padding: 5px;margin: 2px 7px;background: #5DD7FC;color: gold; box-shadow: 0px;border: #007 3px solid;}
+p{font-size: 20px; font-weight: 600; font-family: merriweather; color: #007;}
+</style>
+<template>
+<span style="height: 19px; width: 24px; font-size: 18px; color:#008;"></span>
+<div style="padding: 8px; border: 1px #efefef solid; text-align: center;" class="layout vertical" draggable on-track="_focusedDraggable">
+<iron-collapse id="collapse2"  class="horizontal layout center-justified">
+<iron-icon icon="icons:{{swapIcon}}" class$="{{swapIcon}}" on-tap="toggle"></iron-icon>
+<span style="font-size: 20px; font-weight: 600; font-family: merriweather; color: #007;">{{clockName}} &nbsp;</span>
+</iron-collapse>
+<paper-material class="layout vertical" elevation="3">
+<p >{{theTime}} </p>
+
+<section style="padding: 8px 4px 8px 4px; margin: 2px 2px 2px 2px; min-width: 214px;" class="layout horizontal flex justified-around">
+	<fc-input-prime input-type="digit" label="H"  value="{{thour}}"></fc-input-prime>
+	<fc-input-prime input-type="digit" label="H"  value="{{hour}}"></fc-input-prime>:
+	
+	<fc-input-prime input-type="digit" label="M" value="{{tmin}}"></fc-input-prime>
+	<fc-input-prime input-type="digit" label="M" value="{{min}}">
+	</fc-input-prime>:
+	
+	<fc-input-prime input-type="digit"  label="S" value="{{tsec}}"></fc-input-prime>
+	<fc-input-prime input-type="digit" label="S" value="{{sec}}"></fc-input-prime>|
+	<fc-input-prime input-type="digit" label="D"  value="{{tenth}}">
+	</fc-input-prime>
+</section>						
+
+									
+								<!--	<p class="swatch"> {{swatch}}</p> -->
+</paper-material> 
+			<iron-collapse id="collapse"  class="horizontal layout center-justified">
+
+					<span class="arrows" on-tap="otherWayNow">{{downarrow}}</span>
+			
+
+					<iron-icon class="ironOne" name="Countdown" on-tap="pressed" icon="device:access-alarm"></iron-icon>
+				<iron-icon class="ironOne" name="Clock" on-tap="pressed" icon="device:access-time"></iron-icon>
+				<iron-icon class="ironOne" name="Stopwatch" on-tap="pressed" icon="device:add-alarm"></iron-icon>
+
+
+
+
+
+
+				<span class="arrows" on-tap="goNow">{{uparrow}}</span>
+			</iron-collapse>
+</div>
+</template>
+<script>
+FcClockObj = Polymer({
+	is: "fc-clockObj",
+	properties: {
+		 swapIcon: {
+		 	type: String,
+		 	value: function(){return "query-builder";},
+		 	notify: true
+		 },
+		 countDownFunc:{
+		 	type: Function,
+		 	notify: true
+		 },
+		 swatch:{
+		 	type: Function,
+		 	notify: true
+		 },
+		drags:{
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		dragCounter:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		theTime:{
+			type: String,
+			value:function(){
+				var newtime = new Date();
+				var update = newtime.toLocaleTimeString();
+				return update;
+			},
+			notify: true
+		}, 
+		uparrow:{
+			type: String,
+			value:"",
+			notify: true
+		},
+		downarrow:{
+			type: String,
+			value: "",
+			notify: true
+		}, 
+		clockName:{
+			type: String,
+			value: "",
+			notify: true
+
+		},
+		pressedClock:{
+			type: Boolean,
+			value: function(){return true;},
+			notify: true
+		},
+		pressedSW:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		pressedCD:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		isPressed:{
+			type: Boolean,
+			computed: "_computeIsPressed(pressedCD, pressedSW, pressedClock)",
+			notify: true
+		},
+		sectionOne:{
+			type: Number,
+			value:function(){
+				// this.set("hour",0);
+				// this.set("tmin",6);
+				// this.set("min",5);
+				// this.set("tsec",0);
+				// this.set("sec",0);
+				//want a constructor here
+				return 65;
+			},
+			notify: true
+		},
+		hundredth: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		tenth: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		sec: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		tsec: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		min: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		tmin: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		hour: { 
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		thour: { 
+			type: Number,
+			value: 0,
+			notify: true
+			},
+		theCountdown:{
+			type: Number,
+			value: 50000,
+			notify: true
+			}, 
+		swholder:{
+			type:Number,
+			value: 0,
+			notify: true
+
+		},
+		counter:{
+			type:Number,
+			notify: true
+
+		}
+
+		},
+	behaviors:[],
+
+
+
+
+goNow:function(){
+	if(this.pressedSW==true)
+	{
+	 this.swatch=setInterval(this.startStopwatch, 100, this);
+	}
+
+
+
+
+
+	// }
+	if(this.pressedCD==true)
+	{
+		this.countDownFunc=setInterval(this.countDown,1000,this);
+	}
+
+	// }
+
+
+},
+otherWayNow:function(){
+
+	clearInterval(this.swatch);
+		clearInterval(this.countDownFunc);
+		this.pressedCD==false;
+		this.pressedSW==false;
+		this.pressedClock==false;
+		this.debounce(clearInterval(this.swatch), clearInterval(this.countDownFunc), this);
+
+	  
+},
+toggle: function(e){	
+	this.$.collapse.opened=!this.$.collapse.opened;
+	this.$.collapse2.opened=!this.$.collapse2.opened;
+	var setVal = this.swapIcons=="query-builder"?"clear":"query-builder";
+	this.set("swapicons", setVal);
+},
+attached: function(){
+	setInterval(this.updateClock, 1000, this);
+},
+
+createTimer: function(){
+	
+},
+countDown: function(argThis){
+	var self=argThis;
+	if (self.sec> 0) {
+		self.sec--;
+	}
+		else if (self.sec == 0) {
+			self.set("sec", 9); self.counter++;
+			if (self.sec == 9 && self.tsec > 0)
+				self.tsec--;
+			else if (self.tsec == 0) {
+				self.set("tsec", 5);
+				if (self.tsec == 5 && self.min > 0) {
+					self.min--;
+				} else if (self.min == 0) {
+					self.min = 9;
+				}
+				if (self.min == 9 && self.tmin > 0) {
+					self.tmin--;
+				} else if (self.tmin == 0) {
+					self.tmin = 5;
+				}
+				if (self.tmin == 5 && self.hours > 0) {
+					self.hours--;
+				}
+			}
+		}
+
+},
+_computeIsPressed: function(pressedCD, pressedSW, pressedClock){
+	var torf =(pressedCD==true || pressedSW==true || pressedClock == true)?true: false;
+	return torf;
+},
+startStopwatch:function(argThis){
+	var self=argThis;
+	var num;
+	if (self.tenth<9)
+	 	{
+	 	self.tenth++;
+	 	}
+	else if(self.tenth==9)
+		{
+		self.set("tenth",0); self.sec++;
+		if(self.sec==9)
+			{
+			self.set("sec",0);
+				if(self.tsec<5)
+					{
+					self.tsec++;
+					}
+				else if(self.tsec==5)
+					{
+					self.set("tsec",0);
+					if(self.min<9)
+						{
+							self.min++;
+
+
+						}
+						else if(self.min==9)
+						{
+							self.set("min", 0);
+							if(self.hour == 0 && self.tmin<9)
+							{
+								self.tmin++;
+
+							}
+
+							else if(self.tmin==9 && self.hour==0)
+							{
+								self.set("tmin", 4);
+								self.set("hour", 1);
+
+							}
+							else if(self.tmin<5 && self.hour>0){
+								self.tmin++;
+
+							}
+							else if(self.tmin==5 && self.hour>1)
+							{
+								self.set("tmin", 0);
+								self.hour++;
+
+
+
+							}
+							else if(self.hour==9)
+							{
+
+								clearInteval(self.swatch);
+
+
+							}
+
+
+
+						}
+
+
+
+					}
+
+
+				}
+
+			}
+
+		},
+
+showClock: function(pressedClock){var retVal =(this.pressedClock==true)?false: true; return retVal;},
+showStopwatch: function(pressedSW){var retVal =(this.pressedSW==true)?false: true; return retVal;},
+showCountdown: function(pressedCD){var retVal =(this.pressedCD==true)?false: true; return retVal;},
+
+
+pressed:function(e){
+	var button = e.target; 
+	var name=e.target.attributes.name.value;
+	if(this.isPressed==true){Polymer.dom(button).classList.remove("ironTwo");}
+	else{Polymer.dom(button).classList.add("ironTwo");}
+	if(name=="Clock"){
+		this.pressedClock=!this.pressedClock;
+		this.showClock();
+	}
+	if(name=="Stopwatch"){
+		this.pressedSW=!this.pressedSW;
+		this.showStopwatch();
+	}
+	if(name=="Countdown"){
+		this.pressedCD=!this.pressedCD;
+		this.showCountdown();
+	}
+	var buttons = this.querySelectorAll(".ironOne");
+	var counter=buttons.length;
+	for(var i=0; i<counter; i++){
+		if(buttons[i]!=button && buttons[i].hidden==false){buttons[i].hidden=true;}
+		else{buttons[i].hidden=false;}
+		} 
+	var retVal = this.uparrow ==""? '▲': "";
+	this.set("uparrow", retVal);
+	var detVal = this.downarrow ==""? '▼': ""; 
+	this.set("downarrow", detVal);
+	var nameplus = (this.clockName=="")?"Set " + name:"";
+	this.set("clockName", nameplus);
+},
+
+updateClock: function(argThis){
+	var self=argThis;
+	var update = new Date();
+	update = update.toLocaleTimeString();
+	self.set("theTime", update);
+},
+
+detatched: function(){
+
+},
+
+destroyed: function(){
+
+
+},
+
+_focusedDraggable:function(e){
+  	// console.log("we tried to drag");
+  	 if(this.drags==true){
+        var self=this;
+        e.preventDefault();
+switch(e.detail.state) {
+          case 'start':
+            // console.log('START NoWayAreWe Draggin');
+            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+            console.log('top distance differenced?' + self._topprime);
+            // }
+            self.changeX=0;
+            self.changeY=0;
+            Polymer.dom.flush();
+            break;
+          case 'track':
+            self.changeX=e.detail.ddx + self.changeX;
+            self.changeY=e.detail.ddy + self.changeY;
+            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+            break;
+          case 'end':
+            console.log(self._topprime);
+            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+            self._bottom = self.getBoundingClientRect().top;
+            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            self.translate3d(0, 0, 0);
+
+            console.log("ENDING", self._x);
+            self.style.left=self._x.toString()+'px';
+            self.style.top=self._y.toString()+'px';
+            console.log('y: ' + e.detail.y);
+            self.dragging=false;
+            Polymer.dom.flush();
+            break;
+        }
+      }
+    }
+});
+</script>
+</dom-module>

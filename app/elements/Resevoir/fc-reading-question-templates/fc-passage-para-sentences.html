@@ -1,0 +1,1032 @@
+<dom-module id="fc-passage-para-sentences">
+<template>
+<style>
+:host {height: 99200px; width: 100%;
+background: white;
+	}
+paper-input{
+		padding: 5px;
+
+}
+</style>
+
+<paper-material style='height: 1900px;'>
+<paper-header-panel mode="waterfall" class="vertical layout" style="max-width: 100vw; background: white; border: 3px solid blue; min-height: 360px; max-height: 750px;">
+
+<div style="background: cyan; height: 100px;" class="paper-header head header panel layout horizontal">
+<fc-pattern-finder id="fcpatternmatcher" auto-mode="true" style="display:none"></fc-pattern-finder>
+		
+
+		
+
+
+<paper-input label="Question Filter I" style="max-width: 190px; padding: 5px;" value="{{one}}"></paper-input>
+<paper-input label="Question Filter II" style="max-width: 190px; padding: 5px;" value="{{two}}"></paper-input>
+<paper-input label="RegEx Question Filter" style="max-width: 190px; padding: 5px;" value="{{regexFilterTwo}}" on-input="clearMatches"></paper-input>
+<select style="width:200px">
+  <template is="dom-repeat" items="[[regexMatchResults]]">
+    <option value="{{item}}">{{item}}</option>
+  </template>
+</select>
+<select style="width:200px" on-change="setSelectedPattern">
+  <template is="dom-repeat" items="[[commonPatterns]]">
+    <option value="{{item.pattern}}">{{item.pattern}}</option>
+  </template>
+</select>
+<paper-button on-tap="loadPatternsSelect">Load Patterns</paper-button>
+ <paper-button style="background:cyan; color: white; border: 4px white solid; outline: 2px solid green; font-size: 14pt; border-radius: 6px;" on-tap="_saveFB_Test_1Qs">SAVE TO FIREBASE</paper-button>
+<div id="firepad2" stykle="background: black;"></div>
+</div>
+<div class="vertical layout flex">
+<div class="horizontal layout flex wrap" style="height: 50000px; padding: 0px; 24px;">
+	<section class="vertical flex layout" style="max-width: 440px; padding: 5px; border: 1px solid #008; margins: 5px;">
+		<template is="dom-repeat" items="{{testone}}">
+			<paper-material style="border: 1px solid black; margin: 3px; padding: 2px;">
+				<paper-input label="T1_S1_PassageNum Q. Part 1" value="{{item._q}}"></paper-input>
+				<paper-input label="Ans. A Part 1" value="{{item._a}}"></paper-input>  <paper-input label="Ans. B Part 1" value="{{item._b}}"></paper-input>
+				<paper-input label="Ans. C Part 1" value="{{item._c}}"></paper-input>
+				<paper-input label="Ans. D Part 1" value="{{item._d}}"></paper-input>
+			</paper-material>
+		</template>
+	</section>
+
+	<section class="vertical flex layout" style="max-width: 440px; padding: 5px; border: 1px solid #008; margins: 5px;">
+		<template is="dom-repeat" items="{{testtwo}}">
+					<paper-material style="border: 1px solid black; margin: 3px; padding: 2px;">
+						<paper-input label="T2_S1_PassageNum Q. Part 1" value="{{item._q}}"></paper-input>
+						<paper-input label="Ans. A Part 1" value="{{item._a}}"></paper-input>  <paper-input label="Ans. B Part 1" value="{{item._b}}"></paper-input>
+						<paper-input label="Ans. C Part 1" value="{{item._c}}"></paper-input>				
+						<paper-input label="Ans. D Part 1" value="{{item._d}}"></paper-input>
+					</paper-material>   
+				</template>
+			</section>
+	<paper-material class="vertical flex layout" style="max-width: 440px; padding: 5px; margins: 5px; border: 1px solid #008; background: #efefef; outline: 2px solid black;">
+		<template is="dom-repeat" items="{{testthree}}">
+			<paper-material style="border: 1px solid black; margin: 3px; padding: 2px;">
+					<paper-input label="T3_S1_PassageNum Q. Part 1" value="{{item._q}}"></paper-input>
+			 		<paper-input label="Ans. A Part 1" value="{{item._a}}"></paper-input>   
+					<paper-input label="Ans. B Part 1" value="{{item._b}}"></paper-input>
+					<paper-input label="Ans. C Part 1" value="{{item._c}}"></paper-input>
+					<paper-input label="Ans. D Part 1" value="{{item._d}}"></paper-input>
+			</paper-material>
+		</template>
+	</paper-material>
+		<section class="vertical flex layout" style="max-width: 440px; padding: 12px 5px; margins: 5px 10px 20px 10px; border: 1px solid #008;">
+			<template is="dom-repeat" items="{{testfour}}" as="item">
+				<paper-material style="border: 1px solid black; margin: 3px; padding: 2px;">
+					<paper-input label="T4_S1_PassageNum Q. Part 1" value="{{item._q}}"></paper-input>
+					<paper-input label="Ans. A Part 1" value="{{item._a}}">
+					</paper-input> 
+					<paper-input label="Ans. B Part 1" value="{{item._b}}">
+					</paper-input>
+					<paper-input label="Ans. C Part 1" value="{{item._c}}">
+					</paper-input>
+					<paper-input label="Ans. D Part 1" value="{{item._d}}">
+					</paper-input>
+				</paper-material>
+			</template>
+	</section> 
+		<section class="vertical flex layout" style="max-width: 440px; padding: 12px 5px; margins: 5px 10px 20px 10px; border: 1px solid #008;">
+			<!-- <firebase-collection data="{{fcquestions}}" location="https://focusedstaging1.firebaseio.com/readingQuestionsTwo/testthree"></firebase-collection> -->
+			<template is="dom-repeat" items="{{fcquestions}}" as="item">
+				<paper-material style="height: 430px; border: 1px solid black; margin: 3px; padding: 2px;">
+					<paper-textarea label="TextArea for {{item._qfcid}}" value=
+					"{{item.Qn}} {{item.Qa}} {{item.Qb}} {{item.Qc}} {{item.Qd}} {{item.Qe}}  
+{{item.An}}  {{item.Aa}} {{item.Ab}} {{item.Ac}} {{item.Ad}} {{item.Ae}}
+
+{{item.Bn}} {{item.Ba}} {{item.Bb}} {{item.Bc}} {{item.Bd}} {{item.Be}} 
+
+{{item.Cn}} {{item.Ca}} {{item.Cb}} {{item.Cc}} {{item.Cd}} {{item.Ce}} 
+
+{{item.Dn}} {{item.Da}} {{item.Db}} {{item.Dc}} {{item.Dd}} {{item.De}} ">
+				</paper-textarea>
+			</paper-material>
+			</template>
+		</section> 
+		<paper-button style="height:180px; width: 180px; background: pink; color: green;" value={{quotes}} on-tap="findLineNumbers"> Get Line Numbers and Citations</paper-button>
+
+		<iron-list items="[[fcquestions]]" style="height: 900px;" as="quotes">
+		<template>[[quotes.Af]] [[quotes.Bf]] [[quotes.Cf]] [[quotes.Df]] [[quotes.Qf]]</template></iron-list>
+	</div>
+</div>
+</paper-header-panel>
+</paper-material>
+
+
+
+</template>
+
+<script>
+FcPassageParaSentence=Polymer({
+	is: 'fc-passage-para-sentences',
+	behaviors: [FCBehaviors.FcPassageLocalDataBehavior,
+				FCBehaviors.FCFirepadBehavior,
+				FCBehaviors.FcQuestionData		
+				],				
+	properties: {
+		argQAO:{
+			type: Array,
+			value: function(){return[];},
+			notify: true
+		},
+		patterns: {
+			type: Array,
+			computed: "_computePatterns(one, two, regexFilter, selectedPattern, one_a, two_a, three_a)",
+			notify: true
+			},
+		fcquestions:{
+			type: Array,
+			computed: "_computeFcQuestions(isFirepad, Jason)"
+		},
+		selected: {
+			type: String,
+			computed: "_onMySelected(mySelected)",
+			notify: true
+		},
+		passagesMenuObjectArray:{
+			type: Array,
+			notify: true
+		},
+		passagesArray:{
+			type: Array,
+			notify: true
+
+
+		},
+		one:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		fbquestionsone:{
+			type: Array,
+			notify: true
+		},
+		two: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		regexFilter: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		one_a:{
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		two_a: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		myPassageStringsArray:{
+			type: Array,
+			value: [],
+			notify: true
+
+		},
+		three_a: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true
+		},
+		question:{
+			type: Object,
+			value: function(){return {};},
+			notify: true
+		},
+		regexMatchResults: {
+			type: Array,
+			value: [],
+			notify: true
+		}, 
+		commonPatterns: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		selectedPattern: {
+			type: String,
+			value: "",
+			notify: true
+		},
+		jason:{
+			type: String,
+			notify: true
+
+		},
+		
+		addAnwers: {
+			type: String, 
+			value: function(){
+				return "true";
+				},
+			notify: true	
+			},
+		objectArray: {
+			type: Array,
+			value: function(){
+				return [];
+			},
+			notify: true
+		},
+		questionArray:{
+			type: Array,
+			value:function(){
+				return [];
+
+			},
+			notify: true
+		},
+		isFirepad:{
+			type: Boolean,
+			notify: true
+
+		},
+		quoteMatches:{
+			type: Array,
+			value: function(){
+				return[];
+			},
+			notify: true
+		},
+
+	paragraphArray: {
+		type: Array,
+		value: function(){return[];},
+		notify: true
+	},
+	sentenceArray: {type: Array,
+		value: function(){return[];},
+		notify: true
+
+	},
+	passageMetaObjectArray: {
+		type: Array,
+		value: [],
+		notify: true
+	}, 
+	quoteArray:{type: Array,
+		value: function(){return[];},
+		notify: true
+	},
+	eWordArray:{
+		type: Array,
+		value: [],
+		notify: true
+	},
+	wordArrayHolder:{
+		type: Array,
+		value: [],
+		notify: true
+
+	},
+	sentenceArray:{
+		type: Array,
+		value: [],
+		notify: true
+	},
+	psArray: {
+		type: Array,
+		value: [],
+		notify: true
+
+
+	},
+},
+
+attached: function(){
+ // this._saveFB_Test_1Qs();
+ 	this.fcStringAttempt();
+ 	var firstPara=this.fcParagraphMaker(this.passagesArray[0]);
+	this.sentenceMaker(firstPara);
+},
+ fcParagraphMaker: function(passage, sentence){
+ 	 // var passage = this.passagesArray[0];
+ 	 var paraCounter=0;
+ 	 this.counter=0;
+      var fc= passage.length;
+      console.log(fc, "is this the right value for counting? NOPE!");
+      var passageParagraphsArray=[];
+      var passageParagraphObject ={};
+      var ppWordArray=[];
+      var paragraphNumber;
+      var passageWordIndex;
+      var paragraph=[];
+      var paragraphArrayTest=[];
+      var paranum=0;
+      var paraWordLength=0;
+     	for(i=0; i<fc; i++){
+     		var newPushYes = ((passage[i].newPara==true && passage[i-1].isLastWordOfPara==true))? true:false;
+     		
+     		if (newPushYes==false){
+     			passage[i].paraWordLength=paraWordLength;
+     			passage[i].paragraph_number=paranum;
+     			paragraph.push(passage[i]);
+     			paraWordLength++;
+     		}
+     		else{
+
+     			var thisLastWordinPara=i-1;
+     			var less=thisLastWordinPara-1;
+     			var self=this;
+     			paragraph.forEach(function(element, index, paragraph){
+     				paragraph.lastwordInParagraph=thisLastWordinPara;
+     				paragraph.thisLastWordinPara=passage[less].word;
+     			});
+     			ppWordArray.push(paragraph);
+  			
+     			
+     			paranum++;
+     			paraWordLength=1;
+     		 var tightArray=paragraph.filter(function(element, index, paragraph){
+	  		if(element.word== undefined || element.word==null || element.word=="" || element.word.match(/.*\S.*/)==null){return false;}
+	  		else{return true;}
+			});
+
+	  	 console.log("tightArray", tightArray);
+     		var counterThree=tightArray.length;
+     		this.counter;
+     		for(var p=0;p<counterThree; p++){
+     			if(p==0){var fwi=this.counter; var lwi=this.counter+counterThree-1;}
+							tightArray[p].isLastWordOfPara= ((p+1)==counterThree)?true:false;
+							delete tightArray[p].is_miniTarra;
+							delete tightArray[p].is_transitionWord;
+							delete tightArray[p].paragraphWordlength;
+							tightArray[p].newPara=(p==0)?true: false;
+							tightArray[p].paraWordIndex= p;
+							tightArray[p].paraLength=counterThree;
+							tightArray[p].wordIndex=this.counter;
+							tightArray[p].paraNum=paraCounter;
+							tightArray[p].paraLwi= lwi;
+							tightArray[p].paraFwi= fwi;
+							tightArray[p].wordIndex=this.counter;
+							this.counter++;
+						}
+						paraCounter++;
+			this.push("paragraphArray",tightArray);
+			this.eWordArray = this.eWordArray.concat(tightArray);
+			console.log(this.eWordArray);
+			tightArray=[];
+     		
+     		paragraph=[];
+     		
+     		
+     		passage[i].indexOfFirstParaWord=i;
+     		paragraph.push(passage[i]);
+     		paraWordLength ++;
+     		}
+     	}
+     	var fulllwi =this.eWordArray.length-1;
+     	this.eWordArray.forEach(function(element, index, arr){element.lwi=fulllwi;});
+     	var array=this.eWordArray;
+     	console.log(array);
+     	return this.paragraphArray;
+     	console.log(this.paragraphArray, "this is the para array");
+     	
+     },
+
+
+fcStringAttempt:function(){
+
+	this.myPassageStringsArray=[];
+	this.loadQuestionsFirepad();
+	var passageString; 
+	var myPassages = localStorage.getItem("localPassages");
+	myPassages = JSON.parse(myPassages);
+	// console.log(myPassages);
+	 this.passagesMenuObjectArray=[];
+	 this.set("passagesMenuObjectArray", myPassages);
+	 this.passagesArray=[];
+	 var counter = myPassages.length;
+
+	 for(var k=0; k<counter; k++)
+	 	{ 
+	 	this.push("passagesArray", this.passagesMenuObjectArray[k].itemValue);
+	  	} 
+	  	var holder=this.passagesArray[0];
+	  		console.log(holder);
+
+	  		
+	 for(var i=0; i<counter; i++)
+	 	{ 
+	 		var counterTwo = this.passagesArray[i].length;
+	  		for (var j = 0; j<counterTwo; j++)
+	  		{
+
+	  			passageString= passageString + " " + this.passagesArray[i][j].word;
+	 		}
+	  		this.push("myPassageStringsArray",passageString);
+	  		//console.log(this.myPassageStringsArray, "my passage string array???");
+	  		passageString="";
+	  }
+	  var ptest = this.myPassageStringsArray[20];
+	  ptest=ptest.replace(/\“/g, ""); //start curly quote!
+  	  ptest = ptest.replace(/\”/g, "");
+  	  ptest = ptest.replace(/\.\.\./g, "VOMITTED");
+	  var endPunc=/\.|\?|\!/;
+	  var sentenceArray= ptest.split(endPunc);
+	  var mCounter = sentenceArray.length;
+	  var clauseArray;
+	  // for (i=0;i<mCounter;i++){
+	  // 	sentenceArray[i]=sentenceArray[i].replace("VOMITTED", "...");
+	  // }
+	   //console.log("this should be it",sentenceArray);
+	},
+     
+     
+     //	console.log(this.paragraphArray, "local", ppWordArray);
+	
+	sentenceMaker: function(paragraph){
+		this.counter=0;
+		console.log(paragraph);
+		var counter = paragraph.length;
+		var sentences=[];
+		var ps= [];
+		var lastIndex=0;
+		var endofsentence=0;
+		var sentencelwi=0;
+		var sentencefwi=0;
+		var sentenceCounter=0;
+		var wordNumInS=0;
+		var nextSentenceStart=0;
+		var sentenceFirstWord=0;
+		var sentence='';
+		for(var i=0; i<counter; i++){
+			
+			var zero=0;
+			var para =paragraph[i];
+			var counterTwo=para.length;
+			//console.log(counterTwo);
+			for(var j=0;j<counterTwo;j++){
+				sentence+=para[j].word + " ";
+				this.sentenceArray.push(para[j])
+				var next=j+1;
+				if (para[j].word.match(/\.|\?|\!/)!=null){
+					var holder = para.slice(zero,next);
+				
+					console.log(sentence);
+						var nextSentenceStartWordIndex=para[j].wordIndex+1;
+						var nextSentencefww=(para[j].isLastWordOfPara!=true&&j==para[j].lwi)?para[next].word: "NULL";
+						sentence=sentence;
+						var	sentenceFirstWord=para[zero].wordIndex;
+						var	numberOfSentences=this.counter;
+						var sentenceLastWord=para[j].word;
+						var	sentenceLength=j-zero;
+
+						holder.forEach(function(element, index, holder){
+							element.nextSentenceStartWordIndex=nextSentenceStartWordIndex;
+							element.nextSentenceStarts=nextSentenceStart;
+							element.sentence=sentence;
+							element.sentenceIndex=index;
+						    element.sentenceFirstWord=sentenceFirstWord;
+							element.numberOfSentences=numberOfSentences;
+							element.sentenceLastWord=sentenceLastWord;
+							element.sentenceLength=sentenceLength;
+						});
+							zero=next;
+							this.counter++;
+
+					//console.log(holder, holder, holder, para[j], para);
+					this.sentenceArray.sentence=sentence;
+					this.push("psArray", this.sentenceArray);
+					console.log(this.psArray, this.sentenceArray);
+					sentence="";
+					this.sentenceArray=[];
+				}
+
+				else{
+
+
+
+
+
+
+				}
+						
+					// 	sent.wordIndexInSentence=wordNumInS;
+					// 	sent.push(holder[j]);
+					// 	 console.log(holder[j]);
+					// 	jsons.push(sent);
+					// 	sentence='';
+					// 	// console.log(jsons);
+					
+					// 	wordNumInS=0;
+
+					// 	numSentences++;
+					// 	sent=[];
+					// }
+					// else{
+					// console.log
+					// 	sentence+=paragraph[i][j].word + " ";
+					// 	var numberingI=i+1;
+					// 	wordNumInS++;
+					// 	if (paragraph[i][j].word!= undefined){console.log(paragraph[i][j].word.match(/\.|\?|\!/))};
+					// 	paragraph[i][j].sentenceNum=numSentences;
+					// 	paragraph[i][j].wordNumInS=wordNumInS;
+					// 	sent.push(paragraph[i][j]);
+					// 	console.log(sent);
+
+					}
+
+				
+				}
+			
+				//console.log("one", jsons,"two", sent);
+			// return jsons;
+	},
+	setIsFirepad: function(firepadfunction){
+		if(firepadfunction==true){
+			this.set("isFirepad", true);
+		}
+	},
+
+	_computeFcQuestions: function(isFirepad, jason){
+		if(isFirepad==true){
+
+			return textOfQuestions;
+			}
+		},
+
+ _saveFB_Test_1Qs: function(key, value){
+		var savingNameArray=['T00001S1P', 'T00002S1P', 'T00003S1P', 'T00004S1P'];
+		var savingArray=[this.testone,this.testtwo,this.testthree,this.testfour];
+		var argString;
+		var _qabcd =["_q","_a","_b","_c","_d"];
+		var _QABCD=["Q","A","B","C","D"];
+		var qabcdefghijkl=["q","a","b","c","d","e", "f", "g", "h","i","j","k","l"];
+	for(var i=0; i<4; i++)
+	{
+		var test =savingArray[i];
+		for(var j=0;j<52;j++)
+		{
+					var question = test[j];
+					if(i==0)
+					{
+		 			question._ptype=(j<10)?"Fiction": (j>9 && j<21)? "Economics":(j>20 && j<31)? "Natural Science": (j>30&&j<41)? "Historic Dialogue on Rights":"TBD DOUBLE";
+		 			// question._qtype="gettoUndit";
+		 			question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<31)?"P3": (j>30 &&j<41)?"P4":"P5_P6";
+		 			(question._p=="P3" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P5_P6")?question.Qm=true: question.Qm=false;
+		 			}
+		 			else if(i==1)
+		 				{	question._ptype=(j<10)?"Fiction": (j>9 && j<20)? "Economics":(j>19 && j<32)? "TBD DOUBLE": (j>31&&j<42)? "Historic Dialogue on Right": "Natural Science";
+		 					question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<32)?"P3": (j>31 &&j<42)?"P4_P5":"P6";
+		 					(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			else if(i==2)
+		 				{	question._ptype=(j<10)?"Fiction": (j>9 && j<20)? "Economics":(j>19 && j<30)? "TBD SINGLE": (j>29&&j<41)? "Historic Dialogue on Rights":  "Natural science";
+		 				question._p=(j<10)?"P1": (9<j && j<20)?"P2":(19<j && j<30)?"P3": (j>29 &&j<41)?"P4_P5":"P6";
+		 				(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			else if(i==3)
+		 				{	question._ptype=(j<10)?"Fiction": (j>9 && j<21)? "Economics;":(j>20 && j<31)? "TBD": (j>30&&j<41)? "Historic Dialogue on Rights;": "Natural science";
+		 					question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<31)?"P3": (j>31 &&j<41)?"P4_P5":"P6";
+		 					(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			question._t=(i<9)?"T" + "0" +"0" +"0" +"0" + (i+1).toString():(i>=9&& i<99)?"T" + "0" +"0" +"0" +(i+1).toString():(i>=99&&i<999)?"T" + "0" +"0"+(i+1).toString():(i>=999&&i<9999)?"T" + "0"+(i+1).toString():i>=9999&&i<99999?"T" + (i+1).toString(): alert("Jason, see Julius and Stacy and Leo and Helena and J.Jr. and Wake: you have made 100,000 tests: that is enough;");
+		 			question._sec="S1";
+		 			question._qindex=j;
+		 			question._qnumb=j+1;
+		 			
+		 			question._qfcid= (j<9)?question._t+question._sec+question._p+"Q" + "0" + (j+1).toString(): question._t+question._sec+question._p+"Q" + (j+1).toString();
+		 			question.fcid=question._qfcid;
+					for(var k=0; k<5; k++)
+					{
+						var part =question[_qabcd[k]];
+						var matches = part.match( /\“.+?\”/g ); 
+						var wordlist = part.split(" ");
+						var questionPart = [_QABCD[k]];
+						question[_QABCD[k] + "n"]=wordlist.shift();
+			 				question[_QABCD[k]+"a"] = wordlist.slice(0,3).join(" "); 
+			 				question[_QABCD[k]+"b"]=wordlist.slice(3,5).join(" ");
+			 				question[_QABCD[k]+"c"]=(wordlist.slice(5,7)!==undefined && wordlist.slice(5,7)!==null)?(wordlist.slice(5,7).join(" ")):"";
+			 				question[_QABCD[k]+"d"]=(wordlist.slice(7,10)!==undefined && wordlist.slice(7,10)!==null)?(wordlist.slice(7,10).join(" ")):"";
+			 				question[_QABCD[k]+"e"]=(wordlist.slice(10,wordlist.length)!==undefined && wordlist.slice(10,wordlist.length)!==null)?(wordlist.slice(10,wordlist.length).join(" ")): "";
+			 			
+		 			 	if(i==0 && j<10 && matches!=null && matches!=undefined)
+		 			 	{ 	this.findQuote(this.myPassageStringsArray[0],matches[0],question._qnumb, question._q, question.questionPart, question.fcid);
+		 			 		question.qz = question._t + question._sec + question._p + "Qs";
+		 					question.qp = question._t + question._sec + question._p; 
+		 					this.objectArray=[];
+							// this.findQuote(this.itemValue, matches[0], question._qnumb, question._q, questionPart, question.fcid, quoteAO);
+							//this.push("question.quoteObject",returnValue);	
+			
+					}
+			// if (i==0)
+			// 		{
+			// 			if(j<10){
+			// 				this.push("questionArray",question);
+			// 				if(j===9){
+			// 				var self=this;
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			//  				ref.child("T00001S1P1Qs").set(self.questionArray);
+			//  				self.questionArray=[];
+			//  				}
+
+			// 			}
+			// 			else if(j>9 && j<22){
+			// 				this.push("questionArray",question);
+			// 				if(j==21){
+						   
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00001S1P2Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+						
+			// 				}
+			// 			}
+			// 			else if (j>21 && j<32){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==31){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00001S1P3Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+
+			// 			else if (j>31 && j<42){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==41){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00001S1P4Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 			else {
+						   
+			// 			   self.push("questionArray", question);
+			// 			   if(j==51){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00001S1P5_6Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 				}
+			// 			}
+			// 		}
+			// else if (i==1)
+			// 		{
+			// 			if(j<10){
+			// 				self=this;
+						  
+			// 			  self.push("questionArray", question);
+			// 			   if(j==9){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			//  				ref.child("T00002S1P1Qs").set(self.questionArray);
+			//  				this.questionArray=[];
+			//  			}
+
+			// 			}
+			// 			else if(j>9 && j<21){
+			// 				self.push("questionArray", question);
+			// 			   if(j==20){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00002S1P2Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 				}
+			// 			}
+			// 			else if (j>20 && j<32){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==31){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00002S1P3Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+
+			// 			else if (j>31 && j<42){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==41){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00002S1P4_5Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 			else {
+			// 			   self.push("questionArray", question);
+			// 			   if(j==51){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00002S1P6Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 		}
+			// else if (i==2)
+			// 		{
+			// 			if(j<10){
+			// 				self=this;
+						  
+			// 			  self.push("questionArray", question);
+			// 			   if(j==9){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			//  				ref.child("T00003S1P1Qs").set(self.questionArray);
+			//  				this.questionArray=[];
+			//  				}
+
+			// 			}
+			// 			else if(j>10 && j<20){
+			// 				self.push("questionArray", question);
+			// 			   if(j==19){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00003S1P2Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 			else if (j>19 && j<30){
+			// 				self.push("questionArray", question);
+			// 			   if(j==29){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00003S1P3Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+
+			// 			else if (j>29 && j<41){
+			// 				self.push("questionArray", question);
+			// 			   if(j==40){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00003S1P4_5Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 			else {
+			// 			   self.push("questionArray", question);
+			// 			   if(j==51){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00003S1P6Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 		}
+			// else if (i==3)
+			// 		{
+			// 			if(j<10){
+			// 				self=this;
+			// 			  self.push("questionArray", question);
+			// 			   if(j==9){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			//  				ref.child("T00004S1P1Qs").set(self.questionArray);
+			//  				this.questionArray=[];
+			//  			}
+
+			// 			}
+			// 			else if(j>9 && j<21)
+			// 			{
+			// 				self.push("questionArray", question);
+			// 			   if(j==20){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions/");
+			// 				ref.child("T00004S1P2Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// 			else if (j>20 && j<31){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==30){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00004S1P3Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+
+			// 			else if (j>30 && j<41){
+			// 				self.push("questionArray", question);
+
+			// 			   if(j==40){
+			// 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00004S1P4_5Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 			}
+			// 			}
+			// else {
+						   
+			// 			   self.push("questionArray", question);
+			// 			   if(j==51)
+			// 			   {
+			// 					var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/questions");
+			// 				ref.child("T00004S1P6Qs").set(self.questionArray);
+			// 				this.questionArray=[];
+			// 				}
+			// 			}
+					
+					// }
+				}
+			}
+  		}		
+
+	},
+
+ findQuote: function(argPassage, argQuote, argPassageQuestionNumber, argPassageQuestion, questionPart, fcid)
+ 	{
+  var quote = argQuote.replace(/\“/g, ""); //start curly quote!
+  quote = quote.replace(/\”/g, ""); //end curly quote!
+  var elliptical = quote.indexOf("...");
+  console.log(quote);
+  var matches = [];
+  
+  if(elliptical > 0)
+  {
+   var chunks = quote.split("...");
+   var regexString = chunks[0] + ".+?" + chunks[1];
+   var regex = new RegExp(regexString, "g"); //take out g if confident only one match
+   matches = argPassage.match(regex);
+   console.log(matches);
+  }
+  else
+  {
+   matches = argPassage.match(quote);
+  }
+  if(matches == null)
+  {
+   console.log("ERROR should have matched: ", quote);
+  }
+  else
+  {
+   var numMatches = matches.length;
+   for(i=0; i < numMatches; i++)
+   {
+    console.log(matches);
+    matches=matches.toString();
+ 	this.push("quoteArray",	{		
+ 			"question": argPassageQuestion,
+ 			"questionPart":questionPart,
+ 			"quote": argQuote, 
+ 			"questionNumber": argPassageQuestionNumber,
+ 			"fcid": fcid, 
+ 			"fullQuote": matches,
+ 			"lengthOfLoop": i
+ 		});
+
+
+
+ 	}
+ 	console.log(this.quoteArray);
+}
+ //   this.push("quoteMatches", matches);
+
+
+ //  var numMatches = this.quoteMatches.length;
+ //  for(pick=0; pick < numMatches; pick++)
+ //  {
+ //   var quoteWordList = matches[pick].split(" ");
+ //   var numWordsInQuote = quoteWordList.length-1;
+ //   var passageWordList = this.myPassageStringsArray[0].split(" ");
+ //   var numWordsInPassage = passageWordList.length;
+ //   var j = 0; //index into passage word list
+ //   var k = 0;
+ //   var foundMatch = false;
+  
+ //  }
+  
+ //  	var holder=argPassageQuestionNumber-1;
+	// this.push("argQAO",{"questionNumber":argPassageQuestionNumber,
+ //  				"questionIndex": holder,
+	// 			"questionPart": this.quoteMatches[i],
+	// 			"question": argPassageQuestion,
+	// 			"questionSubpart": questionPart,
+	// 			"quoteStartIndex": startindex,
+	// 			"quoteEndIndex": endindex,
+	// 			"quote": this.quoteMatches[i], 
+	// 			"fcid": fcid
+ //  			});
+	// console.log(startindex, "end Index");
+	// 		 startindex=-1;
+ //   			endindex=-1;
+	// 		return this.argQAO;
+	// 		}
+	// 	}
+	},			
+
+
+_computePatterns: function(one,two,three,one_a,two_a,three_a){
+
+ 	return [one, two, three, one_a, two_a, three_a];
+ }
+        
+});
+</script>
+</dom-module>
+
+ <!--var arrayArray = localStorage.getItem("myPassages");
+   arrayArray=JSON.parse(arrayArray);
+   
+   var z=1;
+   var p=0;
+   var startindex=-1;
+   var endindex=-1;
+   var foundFirst = false;
+   for(z=1; z<numWordsInPassage; z++){
+  	var word=arrayArray[9][z].word;
+  	if(word==quoteWordList[0])
+  	{
+  				foundFirst=true;
+  				startindex= arrayArray[9][z].wordIndex;;
+  			
+ 	}
+  	else
+  	{
+  		if(foundFirst)
+  		{ 	
+  			if(word==quoteWordList[numWordsInQuote])
+  			{
+  			endindex=(word.wordIndex!==undefined && word.wordIndex!==null)?word.wordIndex: -1;
+  			}
+  			}
+  		}
+findLineNumbers: function()
+{
+	var savingArray=[this.testone,this.testtwo,this.testthree,this.testfour];
+	var argString;
+	var qabcd =["_q","_a","_b","_c","_d"];
+	var qarray=["Qf","Af","Bf","Cf", "Df"];
+	for(var i=0; i<4; i++){
+		for(var j=0;j<52;j++){
+			for(var pi=0; pi<5; pi++){
+			
+			argString =savingArray[i][j][qabcd[pi]];
+				
+				var matches = argString.match(/\(?lines [0-9]+-[0-9]+\)?/g);
+				if(matches != null)
+				{
+					//console.log("found line num string = " + matches);
+					var numMatches = matches.length;
+					for(var k = 0; k < numMatches; k++)
+					{	
+						var lineNum;
+						if(k>0){lineNum+=" ";}
+					 	lineNum=matches[k];
+				
+					savingArray[i][j][qarray[pi]]+=lineNum;
+					//console.log(lineNum);
+					}
+				
+				}
+				var matches = argString.match( /\(?line [0-9]+\)?/g ); 
+				if(matches != null)
+				{
+				
+					var numMatches = matches.length;
+					for(var k = 0; k < numMatches; k++)
+					{	
+						var lineNum;
+						if(k>0){lineNum+=" ";}
+					 	lineNum=matches[k];
+				
+					savingArray[i][j][qarray[pi]]+=lineNum;
+					}
+
+				}
+				
+				matches = argString.match(/the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last|final|penultimate) paragraph/g);
+				if(matches != null)
+				{
+					var numMatches = matches.length;
+					for(var k = 0; k < numMatches; k++)
+					{	
+						var lineNum;
+						if(k>0){lineNum+=" ";}
+					 	lineNum=matches[k];
+				
+					savingArray[i][j][qarray[pi]]+=lineNum;
+					}
+				}
+				}
+			}
+		}
+				// return argString;
+	},
+
+
+
+					
+					
+					
+					nextSentenceStartWordIndex=paragraph[i][next].wordIndex;
+					nextSentenceStart=paragraph[i][next].word;
+					sentenceLastword=paragraph[i][j].word;
+					sentencelwi=paragraph[i][j].wordIndex
+					var holder=paragraph[i];
+				}
+
+
+-->

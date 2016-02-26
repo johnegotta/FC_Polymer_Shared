@@ -8,7 +8,7 @@
 	top: 0px;
 	font-size: 16pt;
 	bottom: 0px;
-	height: 99vh;
+	height: 96vh;
 	right: 0px;
 	left: 0px;
 	display: flex;
@@ -54,9 +54,9 @@
 	max-width: 680px !important;
     }
 </style>
-<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+<paper-header-panel class="vertical layout flex" style="height: 91vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
 	    <paper-material class="paper-header header-panel head horizontal layout" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
-	    <section>Reading</section>
+
 	    <section class="horizontal layout flex-2 nowrap">	
 			<array-selector 
 				id="selector" 
@@ -111,12 +111,12 @@
 	    </div>
 	  </div>
 	  </paper-header-panel> 
-	</template>
+	</template><!--the arrays below should contain useful subPropertieslike their length;-->
 <script>
 Polymer({
 	is: "fc-passage-db-display",
 	behaviors: [Polymer.IronResizableBehavior,
-				FCBehaviors.MetaObjectSavingBehavior,
+				//FCBehaviors.MetaObjectSavingBehavior,
 				FCBehaviors.FcPassageLocalDataBehavior,
 				FCBehaviors.FcSingleColumnLineNumberBehavior
 				],
@@ -142,12 +142,12 @@ Polymer({
     	type: Object,
     	 notify: true
     },
-  	sharedSelection: {
-  		type: String,
-  		notify: true, 
-  		observer: "coincideChange",
-  		computed: "_computeSharedSelection(selected)",
-  	},
+  	// sharedSelection: {
+  	// 	type: String,
+  	// 	notify: true, 
+  	// 	observer: "coincideChange",
+  	// 	computed: "_computeSharedSelection(selected)",
+  	// },
   
 }, //end of properties
 	ready: function(){
@@ -163,27 +163,27 @@ Polymer({
 		console.log(bound, "I am bound, iron bound");
 		console.log(JSON.stringify(e.details.item));
 	},
-	coincideChange: function(){
-		if(this.menuItemArray==undefined){this._getAndSetLocalOrDatabase();}
-		var counter = this.menuItemArray.length;
-		for(var i=0; i<counter; i++){
-			var bound = this.menuItemArray[i]+"Qs";
-			if(bound ==this.sharedSelection)
-			{	//alert("We have a match");
-				this.set("selectedItem", this.menuItemArray[i]);
-				this.set("selected", this.selectedItem);
-				this.set("sharedSelection", bound);
-			}
-		}
-	},
-	shareChange: function(){
-		this.coincideChange();
+	// coincideChange: function(){
+	// 	if(this.menuItemArray==undefined){this._getAndSetLocalOrDatabase();}
+	// 	var counter = this.menuItemArray.length;
+	// 	for(var i=0; i<counter; i++){
+	// 		var bound = this.menuItemArray[i]+"Qs";
+	// 		if(bound ==this.sharedSelection)
+	// 		{	//alert("We have a match");
+	// 			this.set("selectedItem", this.menuItemArray[i]);
+	// 			this.set("selected", this.selectedItem);
+	// 			this.set("sharedSelection", bound);
+	// 		}
+	// 	}
+	// },
+	// shareChange: function(){
+	// 	this.coincideChange();
 
-	},
+	// },
 	_computeSharedSelection:function(selected){
-			var returnValue = this.menuItemArray.questionItemKey;
-			return returnValue; 
-	},
+	 		var returnValue = this.menuItemArray.questionItemKey;
+	 		return returnValue; 
+	 },
 	attached: function(){
 		this._getAndSetLocalOrDatabase();
 		this.setMeasureParams();

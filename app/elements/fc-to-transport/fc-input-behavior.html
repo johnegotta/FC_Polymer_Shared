@@ -1,0 +1,525 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcInputBehavior = {
+	properties: {
+		isInline:{
+			type: String,
+			value: function(){return "layout-horizontal block";},//note switch direction on flex for checkboxes
+			notify: true,
+			reflectToAttribute: true
+		},
+		icon0:{
+			type:String,
+			value:function(){
+				return "icons:today";},
+			notify: true
+		},
+		isSelect: {
+			type: Boolean,
+			value: false,
+			notify: true
+
+		},
+		isNotRange:{
+			type:Boolean,
+			computed: "_computeIsNotRange(inputType)",
+			notify: true
+		},
+		unlessSelect:{
+			type: Boolean,
+			computed: "computeUnlessSelected(inputType)",
+			notify: true
+		},
+
+		min: {
+			type: Number,
+			value: function(){return 400;},
+			notify: true
+		},
+		max: {
+			type: Number,
+			value: function(){return 2000;},
+			notify: true
+		},
+		inputValue:{
+			type: String, 
+			notify: true
+
+		},
+		icon1:{
+			type:String,
+			notify: true,
+			value:function(){
+				return "icons:dashboard";}
+			
+		},
+		autocorrect:{
+			type: String,
+			value: function(){return "on";},
+			notify: true
+		},
+		autosave:{
+			type: String,
+			value: function(){return "";},
+			notify: true
+		},
+		autocomplete:{
+			type: String,
+			value: function(){return "on";},
+			notify: true
+		},
+		icon2:{
+			type:String,
+			value:function(){
+		 	return "icons:alarm-on";},
+			notify: true
+		},
+		inputId: {
+			type: String,
+			computed: "_computeInputId(inputType, inputName)", /*this should be hostId, hostContextpartially or mostly for mapping and avoiding weak key maps*/
+			notify: true,
+			
+		},
+		
+		inputType:{
+			type: String,
+			observer: '_triggerInputTransformation',
+			value: function(){return "text";},
+			notify: true
+		},
+		isIcon: {
+			type: Boolean,
+		 	value: false,
+			notify: true
+		},
+		isIcon1: {
+			type: Boolean,
+		 	value: false,
+			notify: true
+		},
+		isIcon2: {
+			type: Boolean,
+		 	value: false,
+			notify: true
+		},
+		isIcon3: {
+			type: Boolean,
+		 	value: false,
+			notify: true
+		},
+		 
+		isTest: {
+			type: String,
+			notify: true
+						//if is test, enter "test", will change font-size on radio buttons
+		},
+		label: {
+		 	type: String,
+		 	notify: true
+		},
+		labelId: {
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var labelId = "labelId_" + (rndNum.getTime() + Math.floor((Math.random() * 10000) + 1)).toString();
+				return labelId;
+				},
+			notify: true
+			},
+		name:{
+			type: String,
+			notify: true
+		},
+		optionOne:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionTwo:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionThree:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionFour:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionFive:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionSix:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionSeven:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},optionEight:{
+			type: String,
+			notify: true,
+			reflectToAttribute:true
+		},
+		localName:{
+			type: String,
+			notify: true //local option is the type the use and the count in the page element--we are going to map the mother f
+		},
+		doAgain:{
+			type: Number,
+			value: function(){
+				// var self=this;
+				// setInterval(function(){self.updateTime(); }, 999);
+				return 1;
+			},
+			notify: true
+		},
+		checkedProp: {
+			type: Boolean,
+			observer: "checkObserver",
+			notify: true
+		},
+		hostAttribute:{
+			value:{
+				notify: true,
+	
+			}
+		},
+		horizontal:{
+			type: String,
+			computed: '_computeHorizontal(inputType)',
+			notify: true,
+		
+		},
+		buttonName: {
+			type: String,
+			value: function(){
+				return "";
+			},
+			notify: true,
+		
+		},
+		myChecked: {
+			type: Boolean,
+			value: function(){
+				return false;
+			},
+			notify: true,
+
+		},
+		eventsOneThroughFive:{
+			type: Function,
+			notify: true
+		},
+		radioGroupNameFC: {
+			type: String,
+			value: function(){
+				var rndNum = new Date();
+				var radioGroupNameFC="thisRadioGroupName" + rndNum.getTime().toString();
+				
+				return radioGroupNameFC;
+			},//move up to the controller
+			notify: true	
+
+		},
+		inputName:{
+			type: String,
+			computed: "_computeInputName(inputType, localName)",//localName Could be replaced with inputId
+			notify: true
+		},
+		inputDefaultValue: {
+			type: String,
+			value:"text",
+			notify: true
+		},
+		isTimeStamp:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true, 
+			reflectToAttribute: true
+		},	
+		timeStamp: {
+			type: String,
+			computed: "_computeTimeStamp(inputType, currentTime, isTimeStamp)",
+			notify: true
+		},
+		inputRange:{
+			type: Number,
+			observer: "trackRanger",
+			notify: true
+		},
+		currentTime:{
+			type: Object,
+			computed: '_computeCurrentTime(inputType, doAgain)',
+			notify: true
+		}
+	},
+
+	computeSection1Layout: function (inputType){
+		return "padding: 2px; margin: 0px;";
+
+
+	},
+	computeUnlessSelected: function(inputType){
+		var returnValue=(inputType=="select")?false: true;
+		return returnValue;
+	},
+	_computeSelectOne: function(isRepeaterSelect){
+		if(isRepeaterSelect==true){return "none;";}
+		else{ return "flex;";}
+	},
+	_computeIsNotRange: function(inputType){
+		var returnVal=(inputType=="range")?false:true;
+		return returnVal;
+	},
+	checkObserver: function(){
+		if(this.inputType=="radio" || this.inputType=="checkbox"){
+			this.set('value',this.checkedProp);
+			if(this.checkedProp == true && this.inputType=="radio"){
+				this.fire('radio-checked-changed',{'name': this.inputName, 'id':this.inputId});
+				//console.log("IN CHECKOBSERVER", this);
+				}
+		}
+	},
+	trackRanger: function(e){
+		if(this.inputType=="range"){
+		this.$.span1.styles="float: right; right: 2px; margin-left: 60%;"
+        switch(e.detail.state) {
+          case 'start':
+           // this.$.span3.innerHTML=this.value;
+            break;
+          case 'track':
+             // this.$.span3.innerHTML=this.value;
+          
+            break;
+          case 'end':
+             // this.$.span3.innerHTML=this.value;
+            break;
+        }
+    	}
+     },
+     _triggerInputTransformation:function(){
+     	var self =this;
+     	if(this.inputType=="range" && (this.value==NaN ||this.value==undefined ||this.value ==null)){
+
+			var average = Math.ceil((parseInt(this.min)+parseInt(this.max))/2);
+     		this.value=average.toString();}
+     	else if(this.inputType == "range"){this.value=this.value.toString();}
+     	},
+
+	_computeOuterSectionStyle: function(inputType){
+		var returnValue="padding: 0px; margin:0px; border: 0px; outline: 0px;";
+		if(inputType=="range"){returnValue="z-index: 3; border: 1px silver solid; padding:6px;"}
+			return returnValue;
+	},
+	_computeSpan0Class: function(inputType){return inputType},
+	_computeSpan0Class: function(inputType){return inputType},
+	eventsOneThroughFive: function(e){
+		//console.log("hey, someone listened",e);
+	},
+	_onChange:function(e){
+		if(this.inputType=="select"){this.set("value", e.target.value);}
+		else{this.set("value", e.target.value);}
+	},
+	_computeInputId: function(inputType,inputName)
+	{
+		var d = new Date();
+		var n = d.getMilliseconds();
+		var rnd = new Uint32Array(10);
+		window.crypto.getRandomValues(rnd);
+
+		// console.log("Your lucky numbers:");
+			for (var i = 0; i < rnd.length; i++) {
+    			// console.log(rnd[i]);
+    			var joe=rnd[0];
+    			joe+=rnd[i];
+    			// console.log(joe);
+    		}
+    	var uniqueId=this.inputType +"_" +this.inputName.toString() +"_"+joe.toString();
+    		// console.log(uniqueId);
+    		return uniqueId;
+	},
+	ready: function(){
+		
+		
+	},
+	_computeCurrentTime: function(inputType, doAgain){
+		if(inputType=="datetime-local"){
+			var theDate = new Date();	
+			var yearNjs = theDate.getYear();
+			var yearN = (yearNjs + 1900);
+			var year = yearN.toString();
+			var monthN = theDate.getMonth() + 1;
+			var month = (monthN<10)? "0" + monthN.toString(): monthN.toString();
+			var dateN = theDate.getDate();
+			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
+			var hoursN = theDate.getHours();
+			var ampm = hoursN >= 12? "PM": "AM"; 
+			//done her for convenience comparison: do right way later//
+			var minutesN = theDate.getMinutes();
+			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
+			var secondsN = theDate.getSeconds();
+			var seconds =secondsN<10 && secondsN>0? "0" + secondsN.toString():secondsN==0? "0" +"0": secondsN.toString();
+			var millisecondsN = theDate.getMilliseconds();
+			var milliseconds = millisecondsN ==0? "0" + "0" + "0":millisecondsN >0 && millisecondsN<10? "0" +"0" + millisecondsN.toString(): millisecondsN >=10 && millisecondsN<100? "0" + millisecondsN.toString(): millisecondsN.toString(); 
+			var milliseconds = millisecondsN.toString();
+			var hoursNUS= hoursN>0 && hoursN>12? (hoursN-12): hoursN == 0? 12: hoursN;
+			var hours = hoursNUS <10? "0" + hoursNUS.toString(): hoursNUS.toString();
+			var hours24 = hoursN == 0? "0" + "0": hoursN<10 && hoursN>0?"0" + hoursN.toString(): hoursN.toString();
+// console.log(
+// 				year,
+// 				month,
+// 				date,
+// 				hours,
+// 				minutes,
+// 				seconds,
+// 				milliseconds
+// 	);
+	
+			
+			var timeNow = year+"-"+month+"-"+date+" "+hours+":"+minutes+" "+ampm;
+			var timeNowTwo = "Date: " + month + "/"+date+"/"+year+" Time: "+hours+":" + minutes+":"+ seconds+" " + ampm;
+			var toInputDateTimeLocal = year+"-"+month+"-"+date+"T"+hours24+":"+minutes;
+			var holderObject={
+				"year":year, 
+				"month":month, 
+				"date":date, 
+				"hours":hours, 
+				"minutes":minutes, 
+				"seconds":seconds, 
+				"milliseconds":milliseconds,
+				"yearN": yearN,
+				"monthN": monthN,
+				"dateN": dateN,
+				"hoursN": hoursN,
+				"minutesN": minutesN,
+				"secondsN": secondsN,
+				"millisecondsN": millisecondsN, 
+				"yearNjs": yearNjs, 
+				"timeNow": timeNow,
+				"timeNowTwo":timeNowTwo,
+				"toInputDateTimeLocal":toInputDateTimeLocal
+
+									};
+				// this.set("label", timeNowTwo);
+				
+			
+			return holderObject;
+		}
+	},
+
+	updateTime: function(){
+		this.doAgain++;
+	},
+
+	_computeTimeStamp: function(inputType, currentTime, isTimeStamp)
+		{ console.log("value time");
+			if(inputType=="datetime-local" && this.doAgain>0 && isTimeStamp==
+				true){console.log("dateTime-local", this.isTimeStamp);
+			 var returnVal=currentTime.toInputDateTimeLocal;
+			 this.set("value", returnVal);
+			 this.set("inputValue", returnVal);
+			 this.set("bindValue", returnVal);
+			 console.log("value time");
+			  return returnVal;
+			}
+		},
+	//Date(year, month, day, hours, minutes, seconds, milliseconds)//
+
+	attached: function(){
+		if(this.inputType=="button"){; this.set('icon4', false); this.set("buttonName", this.label);this.set("value", this.label); this.set('label',"");}
+		if(this.inputType=="select"){this.set("readonly", true);}
+		
+
+	},
+	_computeHorizontal: function (inputType){
+		var layoutCheck = (inputType!=="radio"&&inputType!=="checkbox")?
+			"layout vertical flex": "layout horizontal-layout";
+		return layoutCheck;
+	},
+
+	_focusedValueChanged: function(){
+		this.fire();
+	},
+
+	_computeLayout0: function(inputType, icon0){
+		var returnClass = (icon0)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout2: function(inputType, icon2){
+		var returnClass = (icon2)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout3: function(inputType, icon3){
+		var returnClass = (icon3)? inputType.toString() + " icon": inputType.toString();
+		this.classList.add("icon");
+		return returnClass; 
+	},
+	_computeLayout4: function(inputType, icon4){
+		var returnClass = (icon4)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout5: function(inputType, icon5){
+		var returnClass = (icon5)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+	_computeLayout6: function(inputType, icon6){
+		var returnClass = (icon6)? inputType.toString() + " icon": inputType.toString();
+		return returnClass; 
+	},
+
+			
+
+	doAnimation: function(e){
+		var wrapper=document.getElementById(this.labelId);
+		if(e.target.type=="text"|| e.target.type=="datetime-local"|| e.target.type== "date" || e.target.type== "number" || e.target.type=="tel" || e.target.type=="email"){
+			Polymer.dom(wrapper).classList.add("wrapper-text-focus");
+		}
+		else if(e.target.type=="checkbox"){
+			if(e.target.checked){this.classList.add("wrapper-checkbox-checked");}
+			else if(!e.target.checked){this.classList.remove("wrapper-checkbox-checked");}
+		}
+		
+	},
+	
+	
+
+	unDoAnimation: function(){
+		if (this.inputType=="checkbox")
+		{	
+			var wrapper = '#' + this.labelId;
+			var labelElm=this.$$(wrapper);
+			Polymer.dom(labelElm).classList.remove("wrapper-checkbox-checked");
+		}
+		else
+		{
+			var wrapper = '#' + this.labelId;
+			var labelElm=this.$$(wrapper);
+			Polymer.dom(labelElm).classList.remove("wrapper-text-focus");
+		}
+	},
+	
+	_onChange: function(e){
+		
+			var wrapperId=this.labelId;
+			var wrapper=document.getElementById(this.labelId);
+			//console.log(e.target.checked, e.target.name, this.inputName);
+			// this.set("myChecked", e.target.checked);
+			//console.log(this.value);
+			//Polymer.dom(e.target.bindValue);
+			var wrapperId=this.labelId;
+			var wrapper=document.getElementById(this.labelId);
+			 Polymer.dom(wrapper).classList.add("wrapper-checkbox-checked");
+				  	// console.log("I am changing the color");
+	},
+
+	_computeInputName: function(inputType, localName){
+		var inputNameReturnValue = (inputType=="radio")?"frank": this.inputName;
+		return inputNameReturnValue;
+
+
+	}
+};
+</script>

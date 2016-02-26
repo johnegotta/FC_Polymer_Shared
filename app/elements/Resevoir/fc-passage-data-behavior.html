@@ -535,14 +535,13 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 				   {  'wordIndex': z,
 					"passageType": this.passageType,
 					"passageTitle": this.passageTitle,
-					"menuLabel": this.passageTitle,
 					"menuItem": this.passageTitle,
 					"passageBlurb": this.passageBlurb,
-					"total_word_count": passageArrayLength, 
+					"wordCount": passageArrayLength, 
 					"number_transition_words": numTWords,                   
 					"transitionArray":self.transitionArray,
-					"has_charts": this.hasCharts,
-					"is_double_passage": this.isDoublePassage,
+					"hasCharts": this.hasCharts,
+					"isDouble": this.isDoublePassage,
 					"Focused Test": this.isFocused
 						 });
 	    
@@ -568,6 +567,7 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 	   	self.push('passagesWordArrays', self.passageWordArrayOrdered);
 		self.push('firepadPassageWordArrays', self.passageWordArrayOrdered);
 		    order=0;
+		    return self.passageWordArrayOrdered;
 	},
 	saveToDb: function(){
 		if(this.passageTitle!==""){ 
@@ -643,16 +643,18 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 		self.paragraphArray = truePassageContent.split(/\n/);
 		  self.passageArray = [];
 		  var i = self.paragraphArray.length-1;
+		  var paraNumHolder=self.paragraphArray.length;
 		  for(; i>= 0; i--)
 		    {
 			  //console.log(i + " " + self.paragraphArray[i]);
 			var wordCounter = 0;
 			var newPara = false;
 			var wordArray = self.paragraphArray[i].split(/\s/g);
-			var paraWordRemaining = wordArray.length-1;
-			var paragraph_number = Math.ceil(i/2);
+			var paraWordRemaining = paraNumHolder-1;
+			var paragraph_number = paraNumHolder-i;
 			var isLastWordOfPara =false;
 			var currentWord;
+			var totParaNum=paraNumHolder; 
 			var orderIndex = self.orderIndex;
 
 			while(paraWordRemaining>=0)
@@ -692,8 +694,8 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 				  });
 				wordCounter++;
 				paraWordRemaining--;
-			    } //SINGLE word entry ends here, WOULD LOVE TO CUT THIS IN HALF
-			  }//SINGLE line loop
+				}	// } console.log("singleParaMaybe", self.passageArray);
+			  }
 	    //this is the paragraph for loop
 	    
 	  var qtip= self.passageArray.length;
@@ -711,14 +713,16 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 	    for(var  passageArrayLength= self.passageArray.length; passageArrayLength>=0; passageArrayLength--)
 	    {
 	
-		if(z==0){
+		if(z==0 && passageArrayLength>648)
+		{
 		  var upperbound= Math.floor(passageArrayLength*(1-.578));
 		  var upperboundholder=upperbound;
 		  var lowerbound = Math.ceil(passageArrayLength*(1-.675));
 		  var lowerboundholder=lowerbound;
 		  var  numTWords = upperbound-lowerbound;
 		  var  q=1;
-		  for(;upperbound>=lowerbound; upperbound--){
+		  for(;upperbound>=lowerbound; upperbound--)
+		  {
 
 		    var  pickle= passageArrayLength-upperbound;
 		    var firstPickle=passageArrayLength-upperboundholder;
@@ -733,16 +737,18 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 					'lowerbound': firstPickle,
 					'upperbound': secondPickle
 					});
+				}
 		    if(q<=22){self.push('minTarra', {'word':self.passageArray[upperbound].word, 'passageIndex':pickle, 'isMinTarra': true});}
 			  q++;
 			  lowerbound++;
-			}  
-
-
-		   
-	     
+	  		  
+	  		}
+	     if (passageArrayLength<650)
+	     	{self.transitionArray=[];}
+	     if(z==0)
+	     {
 		 self.push('passageWordArrayOrdered',
-				   {  'wordIndex': z,
+				   { 'wordIndex': z,
 					"passageType": passageContent.passageType,
 					"passageTitle": matches,
 					"menuLabel": passageContent.menuLabel,
@@ -765,8 +771,20 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 				    'newPara': self.passageArray[passageArrayLength].newPara,
 				    'paragraph_number': self.passageArray[passageArrayLength].paragraph_number,
 				    'isLastWordOfPara':self.passageArray[passageArrayLength].isLastWordOfPara,
-				    'is_transitionWord': (z>=firstPickle&&z<=secondPickle)?true:false,
-				    'is_miniTarra': ((z>=miniUpper && z<=secondPickle)?true: false),
+				    'partOfSpeach': "self.dictionary.com",
+				    'definition': "definition",
+				    'containingSentenceRed': "sentenceArrayIndex",
+				    'containingParagraph': "paragraphArrayIndex",
+				    'difficultyOfWord':"0 to 7: had to pick seven",
+				    'relevanceOfWord': "0 to 7",
+				    'isWordInQuote': "y/n",
+				    'indexStartofQuote': "FIRST WORD OF QUOTE INDEX IN Passage Array",
+					'indexEndOfQuote': "last word in quotes PASSAGE INDEX",
+					'textOfQuote': "text of quote",
+					'textOfRelatedQuestion': 'textOfRelatedQuestionPATH',
+					'isWordPartOfRegularQuotedPattern': "boolean",
+					'textOfRelatedAnswer':  "textlink: we should have easy refs"
+				    
 
 
 			});
@@ -799,12 +817,12 @@ Space miners, like their earthly counterparts, are often reluctant to engage wit
 	    return passagesTestOne[2].passage;
 	  },
 	  _computePassageFourWordArray: function(passagesTestOne){
-	  	this.setMeasureParams();
+	  	// this.setMeasureParams();
 	     return passagesTestOne[3].passage;
 	  },
 	  _computeDoublePassageWordArray: function(passagesTestOne){
 
-		return passagesTestOne[4].passage, passagesTestOne[4].passageTwo;
+		// return passagesTestOne[4].passage, passagesTestOne[4].passageTwo;
 	  }
 };
 </script>

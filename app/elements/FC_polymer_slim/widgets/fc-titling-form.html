@@ -1,24 +1,23 @@
 <dom-module id="fc-titling-form">
 	<style>
   :host{
-      max-height: 3500px;
-    min-width: 600px;
-    max-width: 900px;
+    position: relative;
+      max-height: 2200px;
+    min-width: 360px;
+    max-width: 1800px;
      overflow-y: scroll;
      margin:auto;
      padding: auto;
+  
   }
 	
 
   paper-card.form {padding: 16px;
   	border: 4px double #008;
   	margin: auto;
-  	min-height: 1080px;
-    max-height:9000px;
-    max-width: 840px !important;
-  	padding: auto;
+    max-height:2200px;
     overflow-y: scroll;
-    outline: 8px solid white;
+    outline: 8px solid #aecefe;
  --paper-card-header: {
     border-bottom: 4px solid #efefef;
 
@@ -26,25 +25,24 @@
         @apply(--layout-center);
     };
     --paper-card-header-image: {
-        width: 144px;
-        height: 108px;
-        margin-top: 22px;
-        position: absolute: 
-        left: 25px: top: 25px;
+        width: 127px;
+        height: 48.6px;
+        padding: 12px;
+        margin: 12px;
+        position: relative: 
+   
     };
    
     --paper-card-header-text: {
       color: #008;
       margin-right: 50px;
-      line-height: 1.2;
-      font-size: 34px;
+      line-height: 1;
+      font-size: 28px;
       font-weight: 600;
       @apply(--layout-vertical);
         @apply(--layout-center);
     };
 
-
-  
 
 @apply(--paper-card);
 @apply(--paper-card-header-text);
@@ -57,32 +55,25 @@
                   border-top: 4px solid #006; 
                   border-bottom: 6px solid #c6dafc;
                   height: 4px;
-
-
                             }
-
-
 	</style>
 	<template>
-
-
  <paper-card 
-    heading="The Focused Form Generator" 
+    heading="Focused New Call Intake Form" 
     image="../../../images/FC_frontpage_logo.png" 
-    style="border-bottom: 6px edged gold; overflow-y: scroll; margin: auto; padding: auto;" 
+    style="border-bottom: 6px edged gold; overflow-y: scroll;  padding: auto;" 
     elevation="5" 
     class="form vertical flex wrap layout" 
     animated-shadow="true">
  <paper-material class="headSeparator"></paper-material>
  <form is="iron-form" class="form" id="formGet" method="get" action="/">
-<content>
+<content class="horizontal layout center-justified">
 </content>
       <div class="card-actions horizontal layout container center-justified">
           <paper-button raised
               on-tap="submitHandler" class="flex=1">Record and Continue</paper-button>
-          <paper-button raised
-              class="flex-1"
-              onclick="resetHandler(event)">Clear</paper-button>
+         <content select="paper-button"></content>
+         <paper-button raised on-tap="resetHandler"> clear 3</paper-button>
       </div>
 </form>
 </paper-card>
@@ -169,7 +160,8 @@
                       "results": 10,
                       // "accept": "json" wasted prop
                       "multiple": false,
-                      "meta":"String of stuff"
+                      "meta":"String of stuff", 
+                      "max": 1700
                   }
                 ]
               },
@@ -187,6 +179,16 @@
         }
        submitHandler(event){
           var formResults = this.$.formGet.serialize();
+            var d = new Date();
+            var n = -d.getTime();
+            console.log(n);
+            var profile = new FcProfile();
+            profile=Object.assign(profile, formResults);
+            console.log(profile);
+            var saveObj=profile.getFanout();
+          var ref = new Firebase("https://focusedstaging1.firebaseio.com/holdingplace"); 
+    ref.update(saveObj);
+
           console.log(formResults);
 
         }
@@ -206,6 +208,7 @@
             }
           }
         }
+      
         display(event) {
           var output = document.getElementById('output');
             output.innerHTML = JSON.stringify(event.detail);
@@ -213,7 +216,10 @@
 
     
         resetHandler(event) {
-          Polymer.dom(event).localTarget.parentElement.reset();
+        
+          Polymer.dom(event).localTarget.parentElement.myData=null;
+          Polymer.dom(event).localTarget.parentElement.myData=Polymer.dom(event).localTarget.parentElement.myDataTwo;
+          this.set("formResults", null);
         }
 
 			}//end of Class
