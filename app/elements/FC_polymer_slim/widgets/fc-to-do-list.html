@@ -80,11 +80,11 @@ width: 20px;
 		</firebase-auth>
 		<paper-toast id="errorToast">
 		</paper-toast>
-		<form on-submit="addItem" class="horizontal layout flex wrap" style="padding:32px;">
-		<section class="vertical layout flex wrap self-stretch around-justified" style="width:50%;">
+		<iron-collapsable id="uncollapsed">
+		<form on-submit="addItem" class="horizontal layout flex wrap" style="padding:8px;">
+		<section class="layout horizontal nowrap" style="width:96%;">
 	      	<fc-input-prime 
 	      		value="{{newItemValue}}"
-	      		
 	      		label="To-Do-Item here..." 
 	      		input-type="text"
 	      		name="To-Do-Item">
@@ -102,24 +102,17 @@ width: 20px;
 	        	label="Progress Notes" 
 	        	value="{{notes}}">
 	        </fc-input-prime>
-	         <fc-input-prime 
-	        	input-type="number" 
-	        	min="0" max="60"
-	        	step="1"
-	        	name="timeline" 
-	        	label="Timeline in Days" 
-	        	value="{{timeline}}">
-	        </fc-input-prime>
-	      
+	       
 	      	
-	      	  ADD
-	      	<fc-input-prime input-type="button" icon="icons:add-circle-outline" class="blue-btn-class" on-click="addItem">
+	      	
+	      	
 	      		
-	      	</fc-input-prime>
+	      	
 	      	</section>
 
 	    </form>
-	    <div style="background: white; border: silver solid 2px; max-height: 380px; overflow-y: scroll">
+	    <div class="layout vertical" style="height:240px; overflow: hidden; border: ridge 4px silver;" >
+	    <div class="layout vertical flex wrap" style="background: white; border: silver solid 2px; max-height: 340px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
 	    <template is="dom-repeat" items="{{toDos}}">
 	      	<div class="toDoItem">
 	        	<paper-checkbox
@@ -133,6 +126,20 @@ width: 20px;
 	      	</div>
 	    </template>
 	    </div>
+	   </div>
+	   </iron-collapsable>
+	   <section>
+	   <b>ADD</b> ITEM 										SEE <b>COMPLETED</b> LIST
+	   <section class="blue-btn-class" on-tap="addItem">
+	   		<iron-icon icon="icons:add-circle-outline">
+	   		</iron-icon>
+	   	</section>
+	   	<section class="blue-btn-class" on-tap="flipSides">
+	   		<iron-icon icon="icons:icons:cloud-done">
+	   		</iron-icon>
+	   	</section>
+	   </section>
+	   <iron-collapsable id="collapsed">
 	    <template is="dom-repeat" hidden items="{{completedItems}}">
 	    <span>[[completedItem.userFullName]]</span>
 	    
@@ -142,6 +149,7 @@ width: 20px;
 
 
 	    </template>
+	    </iron-collapsable>
 	</template>
 	<script>
   Polymer({
@@ -212,7 +220,6 @@ width: 20px;
   			computed: "_computeCompletedItem(dateStarted, dateCompleted, timeAllocated, userFullName, notes, done)",
   			notify: true
   		}
-
   	},
 
 		

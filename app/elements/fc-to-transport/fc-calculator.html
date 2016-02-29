@@ -1,0 +1,285 @@
+<dom-module id="fc-calculator">
+<style>
+.calcbutton {
+	background: lightgray;
+	border: 1px solid gray;
+}
+.opbutton{
+	background: orange;
+	border: 1px solid gray;
+}
+</style>
+<template>
+<div style="background:red;border-radius:40px; border: 3px ridge black; width:500px; height:660px">
+<div class="layout vertical" style="background:gray; width:450px; height: 600px; margin:30px 20px 10px 25px">
+	<input style="background:#666666; color:white; text-align:right; padding:5px; padding:0px 15px 0px 15px; font-size:270%; height:90px" readonly type="text" value="{{lastExpression}}">
+	<input style="background:#666666; color:white; text-align:right; padding:5px; padding:0px 15px 0px 15px; font-size:270%; height:90px" readonly type="text" value="{{currentExpression}}">
+	<div class="layout horizontal flex nowrap">
+		<paper-button raised name="AC" class="flex-1 flex calcbutton" on-tap="doAllClear">AC</paper-button>
+		<paper-button id="calcclear" raised name="C" class="flex-1 flex calcbutton" on-tap="doClear">C</paper-button>
+		<paper-button raised name="^" class="flex-1 flex calcbutton" on-tap="addToExpression">x^y</paper-button>
+		<paper-button raised name="%" class="flex-1 flex calcbutton" on-tap="addToExpression">%</paper-button>
+	</div>
+	<div class="layout horizontal flex">
+		<paper-button raised name="7" class="flex-1 flex calcbutton" on-tap="addToExpression">7</paper-button>
+		<paper-button raised name="8" class="flex-1 flex calcbutton" on-tap="addToExpression">8</paper-button>
+		<paper-button raised name="9" class="flex-1 flex calcbutton" on-tap="addToExpression">9</paper-button>
+		<paper-button raised name="/" class="flex-1 flex opbutton" on-tap="addToExpression">/</paper-button>
+	</div>
+	<div class="layout horizontal flex">
+		<paper-button raised name="4" class="flex-1 flex calcbutton" on-tap="addToExpression">4</paper-button>
+		<paper-button raised name="5" class="flex-1 flex calcbutton" on-tap="addToExpression">5</paper-button>
+		<paper-button raised name="6" class="flex-1 flex calcbutton" on-tap="addToExpression">6</paper-button>
+		<paper-button raised name="*" class="flex-1 flex opbutton" on-tap="addToExpression">X</paper-button>
+	</div>
+	<div class="layout horizontal flex nowrap">
+		<paper-button raised name="1" class="flex-1 flex calcbutton" on-tap="addToExpression">1</paper-button>
+		<paper-button raised name="2" class="flex-1 flex calcbutton" on-tap="addToExpression">2</paper-button>
+		<paper-button raised name="3" class="flex-1 flex calcbutton" on-tap="addToExpression">3</paper-button>
+		<paper-button raised name="-" class="flex-1 flex opbutton" on-tap="addToExpression">-</paper-button>
+	</div>
+	<div class="layout horizontal flex nowrap">
+		<paper-button raised name="0" class="flex-1 flex calcbutton" on-tap="addToExpression">0</paper-button>
+		<paper-button raised name="." class="flex-1 flex calcbutton" on-tap="addToExpression">.</paper-button>
+		<paper-button raised class="flex-1 flex opbutton" on-tap="evaluateExpression">=</paper-button>
+		<paper-button raised name="+" class="flex-1 flex opbutton" on-tap="addToExpression">+</paper-button>
+
+	</div>
+</div>
+</div>
+
+</template>
+<script>
+Polymer({
+	is: 'fc-calculator',
+	//behaviors: [FCBehaviors.FCFirepadBehavior],
+	observers: ['updateCurrentExpression(expressionArray.splices)'],				
+	properties: {
+		lastKey: {
+			type: String,
+			value: ""
+		},
+		currentExpression: {
+			type: String,
+			value: "0"
+		},
+		expressionArray: {
+			type: Array,
+			value: ["0"],
+			notify: true,
+			reflectToAttribute: true
+		},
+		lastExpression: {
+			type: String,
+			value: ""
+		},
+		operatorList: {
+			type: Array,
+			value: ["+", "-", "*", "/", "=", "%", "^"]
+		}
+	},
+
+	attached: function(){
+		alert("am here");
+		this.currentExpression = "0";
+		this.lastExpression = "";
+		this.doAllClear();
+		var buttons = Polymer.dom(this).querySelectorAll(".paper-button-0");
+		var numButtons = buttons.length;
+		console.log("found " + numButtons + " buttons");
+		var i = 0;
+		for(i=0;i<numButtons;i++){
+			console.log(buttons[i].name, buttons[i].ontap);
+			buttons[i].addOwnKeyBinding(buttons[i].name, buttons[i].ontap);
+		}
+	},
+
+	addToExpression: function(e)
+	{
+		console.log(this.expressionArray);
+		var key = e.target.getAttribute("name");
+		if(this.isNumber(key))
+		{
+			if(this.isOperator(this.lastKey))
+			{
+				//this.currentExpression += " "; //spacing for aesthetics
+			}
+			if(this.computeCurrentExpression() == "0" || this.lastKey == "=")
+			{
+				this.pop("expressionArray");
+				this.push("expressionArray", key);	
+			}
+			else
+			{
+				this.push("expressionArray", key);	
+			}
+		}
+		else if(this.isOperator(key))
+		{
+			if(this.isOperator(this.lastKey))
+			{
+				this.pop("expressionArray");
+				this.push("expressionArray", key);	
+				console.log(this.currentExpression);
+			}
+			else
+			{
+				this.push("expressionArray", key);	
+			}
+		}
+		else if(key == ".")
+		{
+			if(this.lastKey == "=")
+			{
+				this.pop("expressionArray");
+				this.push("expressionArray", key);
+			}
+			else
+			{
+				var currEx = this.computeCurrentExpression();
+				var opLoc = this.findLastOperator(currEx);
+				var decLoc = currEx.lastIndexOf(".");
+				if(decLoc == -1 || opLoc > decLoc)
+					//this.computeCurrentExpression().indexOf(".") == -1)
+				{
+					this.push("expressionArray", key);	
+				}
+				else
+				{
+					return; //already a decimal in most recent term so do nothing
+				}
+			}
+		}
+		console.log(this.expressionArray);
+		this.lastKey = key;
+		this.$.calcclear.removeAttribute("disabled");
+	},
+
+	findLastOperator: function(argString)
+	{
+		var numOps = this.operatorList.length;
+		var i = 0;
+		var lastLoc = -1;
+		for(i=0; i<numOps;i++)
+		{
+			var loc = argString.lastIndexOf(this.operatorList[i]);
+			if(loc > lastLoc)
+			{
+				lastLoc = loc;
+			}
+		}
+		return lastLoc;
+	},
+
+	computeButtonAvailability: function()
+	{
+		var result = (this.lastKey == "=")? 'readonly' : '';
+		return result;
+	},
+
+	computeCurrentExpression: function(argArray)
+	{
+		var len = this.expressionArray.length;
+		var i=0;
+		var result = "";
+		for(i=0; i<len;i++)
+		{
+			result += this.expressionArray[i];
+		}
+		return result;
+	},
+
+	updateCurrentExpression: function(newVal)
+	{
+		console.log(newVal);
+		this.currentExpression = this.computeCurrentExpression();
+	},
+
+
+	evaluateExpression: function(e)
+	{
+		try
+		{
+			if(this.lastKey == "=")
+			{
+				return;
+			}
+			var exp = this.computeCurrentExpression();
+			var evaluateableExp = this.transformExpression(exp);
+			var result = eval(evaluateableExp);
+			this.lastExpression = exp; //this.currentExpression;
+			this.set("expressionArray", []);
+			this.push("expressionArray", result.toString());
+			this.lastKey = "=";
+			this.$.calcclear.setAttribute("disabled", true);
+		}
+		catch(err)
+		{
+			console.log(err);
+			alert("Invalid mathematical expression. Please try again.");
+		}
+		
+	},
+
+	//possibly insert spaces or turn single symbols like square root into eval() form
+	//use mathjs.js library instead??
+	transformExpression: function(argExp)
+	{
+		var result = argExp;
+		var powMatches = result.match(/(([0-9]|\.)+|Math\.pow\(.*?\))\^([0-9]|\.)+/);
+		//var numPM = powMatches.length;
+		while(powMatches != null)
+		{
+			var match = powMatches[0];
+			console.log(match);
+			var powLoc = match.indexOf("^");
+			var op1 = match.slice(0, powLoc);
+			var op2 = match.slice(powLoc+1);
+			console.log(op1, "and", op2);
+			result = result.replace(match, "Math.pow("+op1+","+op2+")");
+			console.log(result);
+			powMatches = result.match(/(([0-9]|\.)+|Math\.pow\(.*?\))\^([0-9]|\.)+/);
+		}
+		
+		return result;
+	},
+
+	isOperator: function(argKey)
+	{
+		return (argKey == "+" || argKey == "-" || argKey == "*" || argKey == "/" || argKey == "^");
+	},
+
+	isNumber: function(argKey)
+	{
+		return (argKey == "1" || argKey == "2" || argKey == "3" || argKey == "4" || argKey == "5" || argKey == "6" || argKey == "7" || argKey == "8" || argKey == "9" || argKey == "0");
+	},
+
+	isNumberOrDecimal: function(argKey)
+	{
+		return (this.isNumber(argKey) || argKey == ".");
+	},
+
+	doClear: function(e)
+	{
+		var len = this.expressionArray.length;
+		if(len != 0)
+		{
+			this.pop("expressionArray");
+		}
+		len = this.expressionArray.length;
+		if(len == 0)
+		{
+			this.push("expressionArray", "0");
+		}
+		this.lastKey = this.expressionArray[len-1]; //this.currentExpression[len-1];
+	},
+
+	doAllClear: function(e)
+	{
+		this.set("expressionArray", ["0"]);
+		this.lastKey = "0";
+	}
+
+});
+</script>
+</dom-module>

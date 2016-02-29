@@ -1,0 +1,257 @@
+
+
+<!--  <template is="dom-repeat" items="{{times}}" as="time">
+            <paper-item hidden$="{{eventHidden}}" style="padding-left: 0px;">
+                  [[time.hour]]:[[time.halfhour]]0[[time.ampm]]<fc-input-prime input-type="text" style="display: inline-block;whitespace: nowrap;" name="[[datetime.locale]]" class="nowrap" is-inline="true" name$="[[time.hour]]:[[time.halfhour]]0[[time.ampm]]">
+                  </fc-input-prime><span style="opacity:0;" hidden$=[[time.space]]>&nbsp</span>
+                  <fc-input-prime class="layout-end" style="margin-right: 0px; padding-right: 0px;" input-type="checkbox" label="Add" name="changeSchedule">
+                  </fc-input-prime>
+            </paper-item> -->
+
+    <fc-ddr-card draggable="true" drags="true" class="vertical layout" style="max-width: 1200px; min-width: 320px;">
+        <div class="horizontal flex wrap layout" style="width: 98%; height: 100%; overflow-y: scroll; background: white; border: 8px ridge #afafaf;">
+          <section class="vertical layout flex wrap left-justified" style="width: 44%; height: 100%;position: absolute; left: 8px; top: 8px; background: #B3E5FC; border: 5px double #008;">
+              <template is="dom-repeat" items="inputs" as="input">
+                  <fc-input-generator dataobject-event$="{{}}"></fc-input-generator>
+              </template>
+          </section>
+          <section class="vertical layout flex wrap left-justified"  on-dragover="allowDrop" on-drop="handleDrop"style="width: 44%; height: 100%;position: absolute; left: 52%; top: 8px; background: #B3E5FC; border:#F3E5F5 5px double #008;">
+            <template is="dom-repeat" class="horizontal layout flex wrap" filter="" sort="{{orderDays(days)}}" items="{{days}}" as="day">
+                <fc-date-card fcid-data="{{fcidDataDays}}" drags draggable="true" data={{item}} day="{{day}}"></fc-date-card>
+                </template>
+          </section>
+  
+
+
+
+
+
+
+<script>
+
+
+Polymer({
+    is: 'fc-todaysEventCard',
+    properties: {
+      today: {
+        type: Date,
+        value: funct
+
+
+      },
+      dataobjectEvent:{
+        type: Array,
+        value: function(){
+          return [  { {"name":'eventName'},
+                      {"name":'startTime'},
+                      {"name":'endTime'},
+                      {"name":'location'},                  
+                      {"name":'description'},
+                      {"name":'duration'},
+                      {"name":"color"},
+                      {"name":"studentNumber"},
+                      {"name":"assocRevenue"},
+                      {"name": "revenuePeriodDays"},
+                      {"name":"revenuePeriodHours"},
+                      {"name":"perDiem"},
+                      {"name":"perWorkHour"}
+                      {"name":"connectedFCIDs}
+
+
+      },
+      todaysEvents: {
+        type: Array,
+        value: function(){
+          return [  { 
+                'eventName': "SAT Practice Test", 
+                'startTime': "09:00" + "AM",
+                'endTime': "12:45" + "PM", 
+                'location': "704 Ginesi, Morganville, Focused",
+                'description': "Practice Test for New and Enrolled Students",
+                'duration': 3.75,
+                "color": "#ff00b6",//fuscia bright
+                "studentNumber": 47,
+                "assocRevenue": 94000,
+                "revenuePeriodDays":41,
+                "revenuePeriodHours":144, //two teacher minimum plus prep et al
+                "perDiem":  2292,
+                "perWorkHour": 564,
+                "connectedFCIDs": ["RimakisGeorge00001", "GottaJohn00001", "ZirkelJoe00001", "ColleretteStacy00001", "RazzaMustaffa00001", "SatMorgamvilleUnderAbove"]
+                },
+                {
+                'eventName': "George Private Tutoring",
+                'startTime': "01:00" + "PM",
+                'endTime': "04:00" +"PM", 
+                'location': "704 Ginesi, Morganville, Focused",
+                'description': "Privare Tutoring, with Richard Rich IBS",
+                'duration': 3,
+                "color": "#00ff3b",//green
+                "studentNumber": 1,
+                "assocRevenue": 8400,
+                "revenuePeriodDays":41,
+                "perDiem":  23,
+                "revenuePeriodHours":40, //two teacher minimum plus prep et al
+                "perWorkHour": 210,
+                "connectedFCIDs": ["RimakisGeorge00001", "RichRichardIBS00001"],
+                }
+              ];
+          },
+        notify: true
+        },
+      todaysEvent: {
+        type: Object,
+        value: {
+          eventName: String,
+          startTime: String,
+          endTime: String, 
+          location: String,
+          duration: Number,
+          description: String
+          },
+        notify: true
+        },
+      firebaseURL: {
+        type: String, 
+        value: "https://focused0ne.firebaseio.com/todaysEvents",
+        notify: true
+        },
+      firebaseProvider: {
+        type: String,
+        value: 'password',
+        notify: true
+        },
+      completedTodaysEvents:{
+        type: Array,
+        computed: 'computeCompletedTodaysEvents(completedTodaysEvents, todaysEvent)',
+        notify: true
+      },
+      todaysCompletedEvent:{
+        type: Object, 
+        value: {
+          done: true,
+          dateStarted: Date,
+          dateCompleted: Date, 
+          userFullName: function(){return 'Jason C. Frazzano';},
+          notes: String
+        },
+        notify: true
+        }
+      },
+
+  days: {
+        type: Array,
+        value: function(){return [];},
+        notify: true
+      },
+     },
+
+     ready: function()
+     {
+       
+     },
+
+     attached: function()
+     {
+       
+     },
+
+    handleDrop: function (e) {
+      var strData=(e.dataTransfer.getData("fcdata"));
+      //console.log(strData);
+    
+      var edata = JSON.parse(strData);
+        var d=new Date(edata);
+     //console.log(d.toDateString());
+      this.push("days", d);
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+      //console.log("drag over");
+    },
+
+    saveSet: function(e)
+    {
+      
+    
+    },
+    orderDays: function(days){
+
+
+    },
+
+    computeIsInstructor: function(argType)
+    { var returnVal=1;
+      return returnVal;
+    }
+
+
+
+    addEventToday: function(event) {
+        event.preventDefault(); // Don't send the form!
+        this.push('todaysEvents', {
+          done: false,
+          text: newItemValue
+      });
+        this.newTodaysEvent = '';
+    },
+
+    toggleEventToday: function(event) {
+        event.model.todaysEvent.set('over', !event.model.todaysEvent.over);
+    },
+
+    deleteItem: function(event) {
+        this.splice('todaysEvent', event.model.index, 1);
+    },
+
+    computeTodaysCompletedEvents: function(event, eventsCompletedToday, todaysEvent){
+      return {"silly": "object"};
+    },
+
+    onFirebaseLogin: function(event) {
+        this.ref = new Firebase(this.firebaseURL + '/users/' + 
+                                                      event.detail.user.uid);
+        this.ref.on('value', function(snapshot) {
+          this.updateTodaysEvents(snapshot);
+        }.bind(this));
+    },
+
+    onFirebaseError: function(event) {
+        this.$.errorToast.text = event.detail.message;
+        this.$.errorToast.show();
+          },
+  
+    onFirebaseLogout: function(event) {
+      this.updateTodaysEvents();
+    },
+
+    updateEvents: function(snapshot) {
+        this.eventsToday = [];
+        snapshot.forEach(function(childSnapshot) {
+          var item = childSnapshot.val();
+          item.uid = childSnapshot.key();
+          this.push('eventsToday', item);
+        }.bind(this));
+    },
+
+    addTodaysEvent: function(event) {
+        event.preventDefault();
+        this.ref.push({
+          'eventName': this.eventName
+          'startTime': this.startTime,
+          'endTime': this.endTime, 
+          'location': this.eventLocation,
+          'description': this.eventDescription,
+          'duration': this.eventDuration,
+        });
+        this.newItemValue = '';
+    },
+
+    toggleItem: function(event) {
+        this.ref.child(event.model.item.uid).
+          update({done: event.model.item.done});
+    },
+
+    deleteItem: function(event) {
+        this.ref.child(event.model.item.uid).remove();
+    }
+  });

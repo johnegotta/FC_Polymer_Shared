@@ -247,6 +247,29 @@ font-weight: 600;
 @apply(--flex-layout);
 @apply(--layout-center);
 }
+span.button-set-person, label.button-set-person, input.button-set-person{
+ display: inline-block;
+ border:6px solid #2435C9;
+ color: #FFFFFF;
+ border-radius: 180px 180px 180px 180px;
+ -webkit-border-radius: 180px 180px 180px 180px;
+ -moz-border-radius: 180px 180px 180px 180px;
+ font-family: Merriweather;
+width: 20px;
+ height: 20px;
+ margin: 2px;
+ margin-top: 4px;
+ font-size: 13px;
+ padding: 3px;
+ /*box-shadow: 3px 14px 11px 4px #9fafaf;*/
+ /*box-shadow: 3px 4px 11px 3px #bebebe;
+ -moz-box-shadow: 3px 4px 11px 3px #41398A;
+ -webkit-box-shadow: 3px 4px 11px 3px #41398A;*/
+ /*text-shadow: 0 1px 0 #FFFFFF;*/
+ background-color: #5DD7FC;
+}
+input.button-set-person{opacity: 0;}
+section.button-set-person{@apply(--layout-vertical)@apply(--layout-center-justified); @apply(--layout-flex);@apply(layou-self-stretch);}
 input.range{
 	@apply(--horizontal-layout);
 @apply(--flex-layout);
@@ -274,7 +297,7 @@ input.tiny{ border: 0px; font-size: 13px; padding: 1px; font-weight: 600; font-f
 									class$="[[_computeSpan0Class(inputType)]]">
 									<iron-icon
 										hidden$="[[icon0hide]]"
-										name$="[[icon0]]"
+										icon$="[[icon0]]"
 										>
 									</iron-icon>
 								</span>
@@ -411,7 +434,7 @@ input.tiny{ border: 0px; font-size: 13px; padding: 1px; font-weight: 600; font-f
 				name="icon2"
 				icon="[[icon2]]"
 				class$="[[inputType]]"
-				hidden$="[[hideIcon2]]">
+				hidden$="{{!isIcon2}}">
 			</iron-icon>
 		</span>
 <!--end Icon button 3-->
@@ -429,6 +452,11 @@ FcInputPrime=Polymer({
 		'uncheck':"_radioUncheck"
 	},
 	properties:{
+		myInputeName:{
+			type:String,
+			value: "",
+			notify: true,
+		},
 		selectItems: {
 			type: Array,
 			notify: true
@@ -720,7 +748,7 @@ FcInputPrime=Polymer({
 	},
 
 
-	ready: function(){console.log(this.name);},
+	// ready: function(){console.log(this.name);},
 	_computeType: function(inputType){ var returnVal = inputType=="digit"? "number": inputType; return returnVal;
 
 
@@ -816,10 +844,7 @@ FcInputPrime=Polymer({
     	var uniqueId=this.inputType +"_" +this.inputName.toString() +"_"+joe.toString();
     		return uniqueId;
 	},
-	ready: function(){
-		
-		
-	},
+	
 	_computeCurrentTime: function(inputType, doAgain){
 		if(inputType=="datetime-local"){
 			var theDate = new Date();	
@@ -893,6 +918,32 @@ FcInputPrime=Polymer({
 	attached: function(){
 		if(this.inputType=="button"){; this.set('icon4', false); this.set("buttonName", this.label);this.set("value", this.label); this.set('label',"");}
 		if(this.inputType=="select"){this.set("readonly", true);}
+		if(this.inputType=="button-set-person"){  
+				this.set("span0hide", false);
+				this.set("icon0hide", false);
+				this.set("icon2", "social:person-add"); 
+				this.set("icon1", "icons:date-range");
+				this.set("icon2hide", false);
+				this.set("isIcon2", true);
+
+
+		}
+		// console.log("attached");
+		// this.counter=0;
+		// this.counter++;
+		// var d = new Date();
+		// console.log(d);
+		// console.log(interval);
+		// var interval = d.setMinutes(+65, 00, 00)- d.getMinutes();
+		// while(interval>0 && this.counter<30000){
+		// 	console.log(interval, this.counter, interval);
+		// 	this.counter+=this.counter;
+		// var interval = d.setMinutes(+65, 00, 00)- d.getMinutes();
+		// 	console.log(interval, this.counter, interval);
+		// }		
+	
+
+		// this.counter+=this.counter;
 		
 
 	},
@@ -911,9 +962,11 @@ FcInputPrime=Polymer({
 		return returnClass; 
 	},
 	_computeLayout3: function(inputType, icon3){
-		var returnClass = (icon3)? inputType.toString() + " icon": inputType.toString();
+		var returnClass = (icon3)? inputType.toString() + " icon":inputType=="button-set-person"?false: inputType.toString();
 		this.classList.add("icon");
+		if(inputType=="button-set-person"){		this.set("myInputName", "Teacher");	this.set("icon1", "social:school");}
 		return returnClass; 
+
 	},
 	_computeLayout4: function(inputType, icon4){
 		var returnClass = (icon4)? inputType.toString() + " icon": inputType.toString();

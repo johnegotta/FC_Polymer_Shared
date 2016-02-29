@@ -4,15 +4,14 @@
     position: relative;
       max-height: 2200px;
     min-width: 360px;
-    max-width: 1800px;
      overflow-y: scroll;
-     margin:auto;
-     padding: auto;
+  
   
   }
 	
 
-  paper-card.form {padding: 16px;
+  paper-card, paper-card.form {
+    padding: 16px;
   	border: 4px double #008;
   	margin: auto;
     max-height:2200px;
@@ -22,7 +21,8 @@
     border-bottom: 4px solid #efefef;
 
         @apply(--layout-horizontal);
-        @apply(--layout-center);
+        @apply(--layout-flex);
+        @apply(--around-justified);
     };
     --paper-card-header-image: {
         width: 127px;
@@ -59,7 +59,7 @@
 	</style>
 	<template>
  <paper-card 
-    heading="Focused New Call Intake Form" 
+    heading="Focused Call Intake Form" 
     image="../../../images/FC_frontpage_logo.png" 
     style="border-bottom: 6px edged gold; overflow-y: scroll;  padding: auto;" 
     elevation="5" 
@@ -71,9 +71,9 @@
 </content>
       <div class="card-actions horizontal layout container center-justified">
           <paper-button raised
-              on-tap="submitHandler" class="flex=1">Record and Continue</paper-button>
+              on-tap="submitHandler" class="flex layout self-stretch">Record and Continue</paper-button>
          <content select="paper-button"></content>
-         <paper-button raised on-tap="resetHandler"> clear 3</paper-button>
+         <paper-button raised class="flex layout self-stretch" on-tap="resetHandler"> clear 3</paper-button>
       </div>
 </form>
 </paper-card>
@@ -179,14 +179,16 @@
         }
        submitHandler(event){
           var formResults = this.$.formGet.serialize();
+          console.log(formResults);
             var d = new Date();
             var n = -d.getTime();
             console.log(n);
-            var profile = new FcProfile();
-            profile=Object.assign(profile, formResults);
+            // var profile = new FcStudentProfile();
+            // profile=Object.assign(profile, formResults);
+           var profile = new FcStudentProfile(formResults);
             console.log(profile);
             var saveObj=profile.getFanout();
-          var ref = new Firebase("https://focusedstaging1.firebaseio.com/holdingplace"); 
+          var ref = new Firebase("https://focusedstaging1.firebaseio.com/calls"); 
     ref.update(saveObj);
 
           console.log(formResults);
@@ -216,7 +218,6 @@
 
     
         resetHandler(event) {
-        
           Polymer.dom(event).localTarget.parentElement.myData=null;
           Polymer.dom(event).localTarget.parentElement.myData=Polymer.dom(event).localTarget.parentElement.myDataTwo;
           this.set("formResults", null);

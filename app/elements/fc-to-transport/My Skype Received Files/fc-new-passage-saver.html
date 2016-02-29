@@ -1,0 +1,1164 @@
+<dom-module id="fc-new-passage-saver">
+<style>
+:host {
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 900px;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 99%;
+	max-width: 99vw;
+	width: 100%;
+    }
+.phpanel{
+	height: 93vh; 
+	padding: 6px 6px 24px 6px; 
+	font-weight: 600; 
+	margin-top: 12px; 
+	background: #fff; 
+	border: 3px ridge silver; 
+	font-size: 20pt; 
+	color: #000088;
+	width: 100%;
+
+}
+
+.dirtypassage {
+	color: green;
+}
+.cleanpassage {
+	color: gray;
+}
+.savedpassage {
+	color: gray;
+}
+.unsyncedpassage {
+	color: red;
+}
+ .paper-material-header{
+    	min-height: 65px; 
+    	padding: 12px 6px 4px 6px; 
+    	font-weight: 600; 
+    	background: aliceblue; 
+    	font-size: 20pt; 
+    	border-bottom: 1px solid #000088; 
+    	color: #000088;
+    	
+    }
+    div#inner-editor{font-size: 2.0em;}
+    paper-textarea, paper-input{
+    	padding: 12px;
+
+    }
+    section{ padding-bottom: -4px;}
+    fc-input-prime{padding-bottom: 1px;}
+input[type="number"]{text-align: center; }
+    .highlighted {
+	background: yellow;
+    }
+
+    #firepad {min-width: 330px; max-height: 450px; height: 220px; border: 6px ridge silver; margin: 0px auto; width: 98%; border-radius: 4px; resize: vertical;}
+   .headstyle{font-size: 20px;}
+</style>            
+</style>
+<template>
+		<paper-header-panel class="vertical layout phpanel" mode="waterfall" style="height: 93vh;" >
+  	<paper-material class="paper-header header-panel head horizontal layout left-justified" style="min-hieght: 60px; max-height: 62px; padding: 12px 6px 12px 6px; font-weight: 600; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+  		<!-- <input type="text" value="{{passage.title}}"> -->
+  			<section class="horizontal layout flex self-stretch headstyle">
+  				<fc-input-prime 
+  					readonly
+  					label="Root Path" 
+  					class="layout horizontal flex center"
+  					input-type="flex"
+  					style="width: 100%;"
+  					value="{{passageRootPath}}">
+  				</fc-input-prime>
+  				<fc-input-prime
+  					readonly
+  			  		label="Current Save Destination"
+  			  		class="layout horizontal flex center"
+  			  		input-type="flex"
+  					style="width: 100%;" 
+  			  		value="{{passagesPath}}">
+  			 	</fc-input-prime>
+  			 </section>
+  			</paper-material>
+  			<div class="layout vertical flex">
+    				<section class="layout horizontal flex nowrap" style="top-margin: 16px;">
+    					<fc-input-prime style="width: 50%;" input-type="text"  value="{{passageCopy.title}}" label="Passage Title"></fc-input-prime>
+    					<fc-input-prime style="width: 50%;" input-type="text" always-float-label value="{{passageCopy.passageBlurb}}" label="Passage Blurb"></fc-input-prime>
+    				</section>
+    			
+					<section class="horizontal layout nowrap">
+		    			 <fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageCopy.fcid}}"
+		    				label="FCID">
+		    			</fc-input-prime>
+		    		<fc-input-prime
+							label="Passage Type"
+							input-type="text" 
+							class="horizontal layout flex center"
+							value="{{passageCopy.passageType}}"
+							>
+						</fc-input-prime>
+						<!-- <fc-select-mc-star class="horizontal layout flex self-stretch center" style="margin-bottom: -14px; max-width: 180px;" select-child="menuItem"></fc-select-mc-star> -->
+		    			<fc-input-prime 
+		    				input-type="text"
+		  					class="horizontal layout flex center"
+		    				value="{{passageCopy.passageSubtype}}" 
+		    				label="Passage Sub-Type">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="text"
+		    				class="horizontal layout flex center"
+		    				value="{{passageCopy.culturalContext}}" 
+		    				label="Passage Setting Year">
+		    			</fc-input-prime>
+		    			
+					
+					</section>
+		    			<section class="horizontal layout flex nowrap">
+		    			<fc-input-prime 
+		    				input-type="range" 
+		    				max="16" 
+		    				min="6" 
+		    				label="Number of Questions"
+		  					class="horizontal layout flex center"
+		    				value="{{passageCopy.passageNumQuestions}}"
+		    				style="border: 2px solid #efefef;"> 
+		    			</fc-input-prime>
+	    					<fc-input-prime 
+	    						type="range" 
+	    						max="9" 
+	    						min="0"  
+	    						label="Vocabulary Questions" 
+	    						style="border: 2px solid #efefef;" 
+	    						class="flex horizontal layout center" 
+	    						input-type="range"
+	    					class="horizontal layout flex center"
+	    						value="{{mostNearlyMeans}}">
+	    					</fc-input-prime> 
+		    			
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="9"
+		    				min="0"
+		    				label="Citation Questions"
+		    				style="border: 2px solid #efefef;" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="range"
+		    				max="24"
+		    				min="0"
+		    				style="border: 2px solid #efefef;"  
+		    				label="Number of Citations"
+		  					class="horizontal layout flex center"
+		    				value="{{totalCitations}}">
+		    			</fc-input-prime>
+		    			</section>
+		     		<section class="horizontal layout flex nowrap">
+		     		<div style="width: 20%;">
+		    				<fc-input-prime type="checkbox" 
+		    					input-type="checkbox" 
+		    					label="Charts"
+		    					class="horizontal layout flex center" 
+		    					checked-prop="{{passageCopy.hasCharts}}">
+		    				</fc-input-prime>
+			    			<fc-input-prime 
+			    				type="checkbox" 
+			    				input-type="checkbox" 
+			    				label="Double Passage"
+			    				class="horizontal layout flex center" 
+			    				checked-prop="{{passageCopy.isDouble}}">
+			    			</fc-input-prime>
+			    		
+	  						<fc-input-prime 
+	  							type="checkbox" 
+	  							input-type="checkbox" 
+	  							label="By Focused"
+	  							class="horizontal layout flex center" 
+	  							checked-prop="{{passageCopy.isFocused}}">
+	  						</fc-input-prime>
+	  							</div>
+	  				<section class="horizontal layout flex wrap">
+	  		
+		  
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Vocabulary Tested"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{vocabularyQuestions}}" 
+		    				label="Vocabulary Questions">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageSubtypeComments}}" 
+		    				label="Context Tested">
+		    				</fc-input-prime>
+		    			<fc-input-prime
+		    				input-type="text"
+		    				label="Insert Each Citation"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				type="text" 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Insert Citation Qs">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				input-type="text" 
+		  					class="horizontal layout flex center"
+		    				value="{{passageCopy.additionalComments}}" 
+		    				label="Additional Comments">
+		    			</fc-input-prime>
+		    			</section>
+	  				</section>
+		
+			<section class="horizontal layout">
+			<paper-button id="stageChangesButton" on-tap="stageChanges" style="width: 100%; margin: 12px; font-size: 20px; max-height: 75px; background: aliceblue; border: 2px solid #afafaf;" class="cleanpassage">&#8592 Stage Changes</paper-button>
+    			<paper-button on-tap="loadFirepadText" style="max-height:  75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Load Firepad Text</paper-button>
+    			<paper-button id="saveDataButton" on-tap="savePassage" style="max-height: 75px; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;" class="savedpassage">Save Staged Data</paper-button>
+    		<paper-button on-tap="clearInputs" style="width: 100%; margin: 12px; font-size: 20px; background: aliceblue;color: gray; max-height: 75px; border: 2px solid #afafaf;"> Clear Data</paper-button>
+  			</section>
+   			<div class="flex horizontal layout center justified-around" id="firepad">
+    		</div> 
+		<section class="horizontal layout">
+			<paper-button on-tap="revertPassage"  style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Revert To Last Save</paper-button><fc-input-prime
+		    				input-type="number"
+		    				label="Test"
+		    				style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;text-align: center; max-height: 48px !important;"
+		    				value="{{vocabularyTested}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				 style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;text-align: center;max-height: 48px !important; margin-left: auto; margin-right: auto; display: flex;"
+		    				input-type="number" 
+		  					class="horizontal layout flex center"
+		    				value="{{}}" 
+		    				label="Section">
+		    			</fc-input-prime>
+		    			<fc-input-prime
+		    			style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;margin-top: 10px; text-align: center;max-height: 48px !important;"
+		    				input-type="number"
+		    				label="Passage"
+		    				value="{{citationsArray}}"
+		    				class="horizontal layout flex center">
+		    			</fc-input-prime>
+		    			<fc-input-prime 
+		    				style="border:1px #008 solid; border-radius: 8px; margin-top: 10px;font-size: 18px;text-align: center;max-height: 48px !important;"
+		    				input-type="number" 
+
+		  					class="horizontal layout flex center"
+		    				value="{{citationQuestions}}" 
+		    				label="Detail">
+		    			</fc-input-prime>
+			<paper-button on-tap="generateQuestions" style="max-height: 75px; color: gray; width: 100%; margin: 12px; font-size: 20px; background: aliceblue; border: 2px solid #afafaf;">Generate Questions</paper-button>
+		</section>
+		<section style="height: 100%;"></section>
+		
+
+		
+	</paper-header-panel>
+</template>
+<script>
+'use strict';
+
+/*
+var _qabcd =["_q","_a","_b","_c","_d"];
+		var _QABCD=["Q","A","B","C","D"];
+		var qabcdefghijkl=["q","a","b","c","d","e", "f", "g", "h","i","j","k","l"];
+	for(var i=0; i<4; i++)
+	{
+		var test =savingArray[i];
+		for(var j=0;j<52;j++)
+		{
+					var question = test[j];
+					if(i==0)
+					{
+		 			question._ptype=(j<10)?"Fiction": (j>9 && j<21)? "Economics":(j>20 && j<31)? "Mixed: Natural Science Rights Narrative": (j>30&&j<41)? "Rights Narrative: Virginia Woolf; Three Gineas;":"Mixed: Double: Space Mining, Natural Science, Economics";
+		 			// question._qtype="gettoUndit";
+		 			question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<31)?"P3": (j>30 &&j<41)?"P4":"P5_6";
+		 			(question._p=="P3" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P5_6")?question.Qm=true: question.Qm=false;
+		 			}
+		 			else if(i==1)
+		 				{	question._ptype=(j<10)?"Fiction;the Professor, Charlotte Bronte, 724 words; 4 sentences; Voice Narrative; narrative is in a male voice;": (j>9 && j<20)? "Economics, sort-of ethics and philosophy; Adam Smith;":(j>19 && j<32)? "DOUBLE PASSAGE WEB about the web; vague science about the web;": (j>31&&j<42)? "Rights Narative; 1869; suffrage; civil rights history;": "Natural science; Undersea waves; topography";
+		 					question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<32)?"P3": (j>31 &&j<42)?"P4_P5":"P6";
+		 					(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			else if(i==2)
+		 				{	question._ptype=(j<10)?"Fiction;Mrs. Quabarl, 1911 SAKI; Woman Greets a Governess at the train station: again a piece on manners; social position; and 'coming up'": (j>9 && j<20)? "social science, urban planning, population dynamics, polution, sort-of ethics and philosophy;Fluff piece again; modern; HAS CHARTS;":(j>19 && j<30)? "Thor Handson: Biology; Evolotion. Birds flying; Natural Science;": (j>29&&j<41)? "DOUBLE PASSAGE; SOCIAL SCIENCE EDUCATION WOMEN`s Rights; report on public instruction, education for women; Second Passage: Mary Wolstencraft: rights of women; life of women; both from 1790s; dirrect response; She slams the first side;": "Natural science; the bees... colony collapse disorder; HAS CHARTS;";
+		 				question._p=(j<10)?"P1": (9<j && j<20)?"P2":(19<j && j<30)?"P3": (j>29 &&j<41)?"P4_P5":"P6";
+		 				(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			else if(i==3)
+		 				{	question._ptype=(j<10)?"fiction; Set in 1897; Modern Writer; Swedish Scientists set out for the north pole in a hydrogen-think Hindenburg here kids-baloon. Adventure in the world before time;": (j>9 && j<21)? "social science, low brow economics; Cities & Demographics; Suburbs Cities;Fluff piece again; migration; modern; HAS CHARTS;":(j>20 && j<31)? "Natural Science: Emily Anthes: frankenstein's cat; genetic manipulation; cloning; engineered medicine; positive take, although slow to acknowledge the frankenstein nature of her actual descriptions. No chart;": (j>30&&j<41)? "DOUBLE PASSAGE; SOCIAL CONTRACT: 1890 Edmund Burke French Revolution; Thomas Paine 1791 Rights of Man; Social Contract; No charts;": "Natural science; atmospheric science; geology; radio carbon dating; cause of a medieval erruption different distant volcanos caused a cooling period in Europe; HAS CHARTS;";
+		 					question._p=(j<10)?"P1": (9<j && j<21)?"P2":(20<j && j<31)?"P3": (j>31 &&j<41)?"P4_P5":"P6";
+		 					(question._p=="P6" || question._p =="P2")? question.Ql=true:question.Ql=false;
+		 					(question._p=="P4_P5")?question.Qm=true: question.Qm=false;
+		 				}
+		 			question._t=(i<9)?"T" + "0" +"0" +"0" +"0" + (i+1).toString():(i>=9&& i<99)?"T" + "0" +"0" +"0" +(i+1).toString():(i>=99&&i<999)?"T" + "0" +"0"+(i+1).toString():(i>=999&&i<9999)?"T" + "0"+(i+1).toString():i>=9999&&i<99999?"T" + (i+1).toString(): alert("Jason, see Julius and Stacy and Leo and Helena and J.Jr. and Wake: you have made 100,000 tests: that is enough;");
+		 			question._sec="S1";
+		 			question._qindex=j;
+		 			question._qnumb=j+1;
+		 			
+		 			question._qfcid= (j<9)?question._t+question._sec+question._p+"Q" + "0" + (j+1).toString(): question._t+question._sec+question._p+"Q" + (j+1).toString();
+		 			question.fcid=question._qfcid;
+					for(var k=0; k<5; k++)
+					{
+						var part =question[_qabcd[k]];
+						var matches = part.match( /\“.+?\”/g ); 
+						var wordlist = part.split(" ");
+						var questionPart = [_QABCD[k]];
+						question[_QABCD[k] + "n"]=wordlist.shift();
+			 				question[_QABCD[k]+"a"] = wordlist.slice(0,3).join(" "); 
+			 				question[_QABCD[k]+"b"]=wordlist.slice(3,5).join(" ");
+			 				question[_QABCD[k]+"c"]=(wordlist.slice(5,7)!==undefined && wordlist.slice(5,7)!==null)?(wordlist.slice(5,7).join(" ")):"";
+			 				question[_QABCD[k]+"d"]=(wordlist.slice(7,10)!==undefined && wordlist.slice(7,10)!==null)?(wordlist.slice(7,10).join(" ")):"";
+			 				question[_QABCD[k]+"e"]=(wordlist.slice(10,wordlist.length)!==undefined && wordlist.slice(10,wordlist.length)!==null)?(wordlist.slice(10,wordlist.length).join(" ")): "";
+			 				var quoteAO=[];
+		 			// 	if(i==0 && j<10 && matches!=null && matches!=undefined)
+		 			// 	{
+						// 	question.quoteObject=(this.findQuote(this.myPassageStringsArray[1], matches[0], question._qnumb, question._q, questionPart, question.fcid, quoteAO)!==undefined)?this.findQuote(this.myPassageStringsArray[1], matches[0], question._qnumb, question._q, questionPart, question.fcid, quoteAO): [];
+						// }
+		 				question.qz = question._t + question._sec + question._p + "Qs";
+		 				this.objectArray=[];
+		 				this.push("objectArray",question);		
+					}
+*/
+
+class FcReadingPassageQuestion
+{
+	constructor(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD)
+	{
+			this._t = testNum || "";
+			this._p = passageNum || "";
+			this._qnumb = this.Qn = questionNum || "";
+			this._ptype = passageType || "";
+			this._qtype = this.Qt = questionType || "";
+			this._q = this.Qa = questionStem || "";
+			this._a = this.Aa = choiceA || "";
+			this._b = this.Ba = choiceB || "";
+			this._c = this.Ca = choiceC || "";
+			this._d = this.Da = choiceD || "";
+	}
+	/*
+	beforeRegister()
+	{
+		this.is = "fc-reading-passage-question";
+		this.properties = {
+			_ptype: {
+				type: String,
+				value: ""
+			},
+			_p: {
+				type: String,
+				value: ""
+			},
+			_qtype: {
+				type: String,
+				value: ""
+			},
+			_qnumb: {
+				type: Number
+			},
+			
+			_t: {
+				type: String,
+				value: ""
+			},
+			fcid: {
+				type: String,
+				value: ""
+			},
+			_q: {
+				type: String
+			},
+			_a: {
+				type: String
+			},
+			_b: {
+				type: String
+			},
+			_c: {
+				type: String
+			},
+			_d: {
+				type: String
+			}
+		};
+		
+	}*/
+	//Polymer(FcReadingPassageQuestion);
+}
+
+    (function() {
+	class FcNewPassageSaver {
+	   get behaviors() { 
+	    return [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.dictionaryBehavior,
+		  //FCBehaviors.PassageDataBehavior,
+		  FCBehaviors.FcQuestionLocalDataBehavior,
+		  FCBehaviors.dataManagerBehavior
+		 //FCBehaviors.MetaObjectSavingBehavior
+		  ];
+	   }
+	   beforeRegister() {
+
+		this.is = 'fc-new-passage-saver';
+		this.listeners = [];
+	    this.properties = {
+			// newDatabasePath:{
+			// 	type: String,
+			// 	value: function() {return "";},
+			// 	notify: true
+			// },
+			passage: {
+				type: Object,
+				value: {},
+				notify: true,
+				//observer: 'copyPassage',
+				reflectToAttribute: true
+			},
+			passageCopy: {
+				type: Object,
+				value: {}
+			},
+			lastSavedPassage: {
+				type: Object,
+				value: {}
+			},
+			passagesPath: {
+				type: String,
+				notify: true
+			},
+			passageRootPath: {
+				type: String
+			},
+			passageDirty: {
+				type: Boolean,
+				value: false,
+				observer: 'updateDirtyStyles'
+			},
+			passageUnsaved: {
+				type: Boolean,
+				value: false,
+				observer: 'updateUnsavedStyles'
+			},
+			questions: {
+				type: Array,
+				value: [],
+				notify: true,
+				reflectToAttribute: true
+			},
+
+		// contains: {
+		// 	type: String,
+		// 	value: function(){return ["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10"];},
+		// 	notify: true
+		// },
+
+	    passagesWordArrays:{
+			type: Array,
+			value: function(){return []},
+			notify: true
+		},
+
+	// inputTestNumber:{
+	// 	type: String,
+	// 	value: function(){
+	// 		var returnValue = (this.fcid!==" ")?this.fcid:"";
+	// 		return returnValue;
+	// 		},
+	// 	notify: true
+	// },
+
+	// inputSectionNumber:{
+	// 	type: String,
+	// 	value: function(){
+	// 		var returnValue = (this.fcid!==" ")?this.fcid:"";
+	// 		return returnValue;
+	// 		},
+	// 	notify: true
+	// },
+
+	// inputPassageNumber:{
+	// 	type: String,
+	// 	value: function(){
+	// 		var returnValue = (this.fcid!==" ")?this.fcid:"";
+	// 		return returnValue;
+	// 		},
+	// 	notify: true
+	// },
+
+	isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+		  	},
+		  	notify: true
+	}, 
+		
+	// yourName: {
+	//     	type: String,
+	// 	  	value: function(){
+	// 	    	return "";
+	// 		},
+	// 		notify: true
+	// },
+	
+	// passageWordArrayOrdered:{
+	// 		type:Array,
+	// 		value: [],
+	// 		notify: true
+	// },
+
+	
+	firepadPassageWordArrays:{
+		type: Array,
+		value: function(){
+			return [];
+		},
+		notify: true
+	}, 
+
+	// hitSaveOne:{
+	// 	type: Boolean,
+	// 	value: function(){
+	// 		return false;
+	// 	},
+	// 	notify: true
+	// },
+
+	// metaObject:{
+	// 	type: Object,
+	// 	value: {},
+	// 	notify: true,
+	// 	reflectToAttribute: true
+	// },
+
+	// wordArray: {
+	// 	type: Array,
+	// 	value: [],
+	// 	notify: true,
+	// 	reflectToAttribute: true
+	// }, 
+
+	fcid: {
+		type: String,
+		computed: "_computeFcid(onlineData)",
+		notify: true
+	},
+
+	wordCount: {
+		type: Number,
+		value: 550,
+		notify: true
+	},
+
+	// otherFields: {
+	// 	type: Object,
+	// 	value: {},
+	// 	notify: true
+	// },
+
+	// onlineData:{
+	// 	type: Array,
+	// 	notify: true
+	// },
+
+	// currentDatabasePath:{
+	//     	type: String,
+	// 	  	value: function() 
+	// 	  	{	var returnValue= "https://focusedcoaching.firebaseio.com/reading/passages" +"/" +this.fcid;
+
+	// 	  		return returnValue;
+	// 	  	},
+	// 		notify: true
+	// }	
+}; // end of properties
+this.observers = ['checkPassageDirty(passageCopy.*)', 'checkPassageUnsaved(passage.*)', 'checkPassageUnsaved(lastSavedPassage.*)', 'checkPassageDirty(passage.*)'];
+
+	}
+	
+	ready(){
+	     
+// 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/patterns");
+// 		ref.orderByChild("questions").on("child_added", function(snapshot) {
+//   console.log(snapshot.val()+ " was " + JSON.stringify(snapshot.val().questions) + " question nunmber");
+// });
+	}
+
+	revertPassage(){
+		this.fire("passage-revert", {fcorigin: "fc-new-passage-saver"});
+	}
+
+	changePassage(argPassage)
+	{
+		console.log(argPassage);
+		console.log(this.questions);
+		this.passage = JSON.parse(JSON.stringify(argPassage));
+		this.passageCopy = JSON.parse(JSON.stringify(argPassage));
+		this.lastSavedPassage = JSON.parse(JSON.stringify(argPassage));
+		this.passageDirty = false;
+		this.passageUnsaved = false;
+	}
+
+	stageChanges(){
+		if(this.passageDirty == false)
+		{
+			alert("Warning: no changes have been made; cannot stage anything");
+			return;
+		}
+		//var locP = this.passageCopy;
+		//this.passage = {};
+		//this.set("passage", locP);
+		this.set("passage", JSON.parse(JSON.stringify(this.passageCopy)));
+		this.fire("passage-stage", this.passage);
+		console.log(this.passage);
+	}
+
+	checkPassageUnsaved(argChangeRec)
+	{
+		console.log(argChangeRec);
+		var passageJson = JSON.stringify(this.passage);
+		var lastSavedJson = JSON.stringify(this.lastSavedPassage);
+		if(passageJson == lastSavedJson)
+		{
+			this.passageUnsaved = false;
+		}
+		else
+		{
+			this.passageUnsaved = true;
+		}
+		console.log(this.passageUnsaved);
+	}
+
+	checkPassageDirty(argChangeRec){
+		console.log("dirty", argChangeRec);
+		if(!this.passage)
+		{
+			this.passageDirty = true;
+		}
+		if(!this.passageCopy)
+		{
+			this.passageDirty = false;
+		}
+		if(this.passage && this.passageCopy)
+		{
+			console.log(this.passageCopy.title, this.passage);
+			var passageCopyJson = JSON.stringify(this.passageCopy);
+			var passageJson = JSON.stringify(this.passage);
+			if(passageJson == passageCopyJson)
+			{
+				this.passageDirty = false;
+			}
+			else
+			{
+				this.passageDirty = true;
+			}
+		}
+		console.log(this.passageDirty);
+	}
+
+	updateUnsavedStyles(newVal, oldVal)
+	{
+		var oldSC = this.$.saveDataButton.className;
+		if(newVal == true)
+		{
+			this.$.saveDataButton.className = oldSC.replace(/ ?savedpassage/g, "");
+			if(oldSC.indexOf("unsyncedpassage") == -1)
+			{
+				this.$.saveDataButton.className += " unsyncedpassage";
+			}
+		}
+		else
+		{
+			this.$.saveDataButton.className = oldSC.replace(/ ?unsyncedpassage/g, "");
+			if(oldSC.indexOf("savedpassage") == -1)
+			{
+				this.$.saveDataButton.className += " savedpassage";
+			}
+		}
+		console.log(this.$.saveDataButton.className);
+	}
+
+	updateDirtyStyles(newVal, oldVal){
+		console.log(newVal);
+		var oldVC = this.$.stageChangesButton.className;
+		if(newVal == true)
+		{
+			this.$.stageChangesButton.className = oldVC.replace(/ ?cleanpassage/g, "");
+			if(oldVC.indexOf("dirtypassage") == -1)
+			{
+				this.$.stageChangesButton.className += " dirtypassage";
+			}
+			console.log(this.$.stageChangesButton.className);
+		}
+		else
+		{
+			this.$.stageChangesButton.className = oldVC.replace(/ ?dirtypassage/g, "");
+			if(oldVC.indexOf("cleanpassage") == -1)
+			{
+				this.$.stageChangesButton.className += " cleanpassage";
+			}
+			console.log(this.$.stageChangesButton.className);
+		}
+	}
+
+	copyPassage(newVal, oldVal){
+		console.log(newVal, oldVal);
+		if(newVal.fcid != null)
+		{
+			this.passageCopy = JSON.parse(JSON.stringify(newVal));
+			if(this.lastSavedPassage.fcid == null)
+			{
+				this.lastSavedPassage = JSON.parse(JSON.stringify(newVal));
+			}
+		}
+		console.log(this.lastSavedPassage);
+	}
+
+	generateQuestions(e)
+	{
+		//console.log(this, e);
+		console.log(this.questions);
+		if(this.passage.passageType == "fiction")
+		{
+			var passageType = this.passage.passageType;
+			var testNum = this.passage.fcid.split("S")[0];
+			var passageNum = "P" + this.passage.fcid.split("P")[1];
+
+			var questionNum = "Q01";
+			var questionType = "mainpoint";
+			var questionStem = "Which choice best describes what happens in the passage?";
+			var choiceA = "word";
+			var choiceB = "word";
+			var choiceC = "word";
+			var choiceD = "word";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q02";
+			questionType = "structure";
+			questionStem = "Which choice best describes the developmental pattern of the passage?";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q03";
+			questionType = "definition";
+			questionStem = "As used in " + questionNum + "LINE, “" + questionNum + "VOCAB” most nearly means:";
+			var voc = this.findPassageVocab(0);
+			questionStem = questionStem.replace(questionNum+"VOCAB", voc.word);
+			var def = this.manualLookupWord(voc.word);
+			var answers = [];
+			var defs = def.split(":")[1];
+			defs = defs.split(",");
+			var numDefs = defs.length;
+			choiceA = defs[0]?defs[0]:"word";
+			choiceB = defs[1]?defs[1]:"word";
+			choiceC = defs[2]?defs[2]:"word";
+			choiceD = defs[3]?defs[3]:"word";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+			choiceA = "word";
+			choiceB = "word";
+			choiceC = "word";
+			choiceD = "word";
+
+			questionNum = "Q04";
+			questionType = "two-parter-1";
+			questionStem = "TBD";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q05";
+			questionType = "two-parter-2";
+			questionStem = "Which choice provides the best evidence for the answer to the previous question?";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q06";
+			questionType = "TBD";
+			questionStem = "TBD";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q07";
+			questionType = "TBD";
+			questionStem = "TBD";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q08";
+			questionType = "definition";
+			questionStem = "As used in " + questionNum + "LINE, “" + questionNum + "VOCAB” most nearly means:";
+			voc = this.findPassageVocab(1);
+			questionStem = questionStem.replace(questionNum+"VOCAB", voc.word);
+			def = this.manualLookupWord(voc.word);
+			defs = def.split(":")[1];
+			defs = defs.split(",");
+			numDefs = defs.length;
+			choiceA = defs[0]?defs[0]:"word";
+			choiceB = defs[1]?defs[1]:"word";
+			choiceC = defs[2]?defs[2]:"word";
+			choiceD = defs[3]?defs[3]:"word";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+			choiceA = "word";
+			choiceB = "word";
+			choiceC = "word";
+			choiceD = "word";
+
+			questionNum = "Q09";
+			questionType = "two-parter-1";
+			questionStem = "TBD";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+			questionNum = "Q10";
+			questionType = "two-parter-2";
+			questionStem = "Which choice provides the best evidence for the answer to the previous question?";
+			this.push("questions", new FcReadingPassageQuestion(testNum, passageNum, questionNum, passageType, questionType, questionStem, choiceA, choiceB, choiceC, choiceD));
+
+
+		}
+		console.log(this.questions);
+	}
+
+	findPassageVocab(argIndex)
+	{
+		var words = this.passage.wordArray;
+		var numWords = words.length;
+		var i = 0;
+		var numVocab = 0;
+		for(i=0; i < numWords; i++)
+		{
+			console.log(words[i].word, this.manualLookupWord(words[i].word));
+			if(this.manualLookupWord(words[i].word) != "Word Not Found")
+			{
+				if(numVocab == argIndex){
+					console.log(words[i]);
+					return words[i];
+				}
+				numVocab++;
+			}
+		}
+	}
+
+	loadFirepadText(e) {
+		/*
+		var passageObj = {
+			fcid: this.fcid,
+			title: this.passageTitle,
+		 	passageType: this.passageType,
+		 	passageSubtype: this.passageSubtype,
+		 	passageBlurb: this.passageBlurb,
+		 	passageDifficulty: this.passageDifficulty,
+		 	passageNumQuestions: this.passageNumQuestions,
+		 	rawText: rawText,
+		 	wordArray: [],
+		 	paragraphArray: [],
+		 	sentenceArray:[],
+		 	isDouble: this.passageIsDouble,
+		 	isFocused: this.isFocused,
+		 	hasCharts: this.hasCharts
+		 };
+		*/
+		var rawText = this.firepad.getText();
+		//var passageObj = this.passageCopy;
+		this.set("passageCopy.paragraphArray", []);
+		this.passageCopy.sentenceArray = [];
+		this.passageCopy.wordArray = [];
+		var paragraphArray = rawText.split("\n");
+		var numParagraphs = paragraphArray.length;
+		this.passageCopy.numParagraphs = numParagraphs;
+		var i = 0;
+		var j = 0;
+		var k = 0;
+		var word = "";
+		var passageWordIndex = 0;
+		var previousSentenceFirstWord = "";
+		var previousWord = "";
+		for(i = 0; i < numParagraphs; i++)
+		{
+			var sentenceArray = [];
+			paragraphArray[i] = paragraphArray[i].replace(/^ +/, "");
+			paragraphArray[i] = paragraphArray[i].replace(/ +$/, "");
+			this.passageCopy.paragraphArray.push(paragraphArray[i]);
+			var paragraph = paragraphArray[i];
+			var paraLen = paragraph.length;
+			var paragraphWordArray = paragraph.split(" ");
+			var numWordsInParagraph = paragraphWordArray.length;
+			var paragraphFirstWord = paragraphWordArray[0];
+			var paragraphFwi = passageWordIndex;
+			var paragraphLastWord = paragraphWordArray[numWordsInParagraph-1];
+			var paragraphLwi = paragraphFwi + numWordsInParagraph -1;
+			var matches = paragraph.match(/.*?(\.|\?|\!)/);
+			var loopCount = 0;
+			while(matches != null && paraLen > 0 && loopCount < 20)
+			{
+				var matchLen = matches[0].length;
+				matches[0] = matches[0].replace(/^ +/, "");
+				matches[0] = matches[0].replace(/ +$/, "");
+				sentenceArray.push(matches[0]);
+				this.passageCopy.sentenceArray.push(matches[0]);
+				paragraph = paragraph.slice(matchLen);
+				paraLen -= matchLen;
+				matches = paragraph.match(/.*?(\.|\?|\!)/);
+				loopCount++;
+			} 
+			var numSentences = sentenceArray.length;
+			var paragraphWordIndex = 0;
+			var sentenceFirstWord = "";
+			for(j = 0; j < numSentences; j++)
+			{
+				var wordArray = sentenceArray[j].split(" ");
+				var numWords = wordArray.length;
+				sentenceFirstWord = wordArray[0];
+				var sentenceLastWord = wordArray[numWords-1];
+				//previousSentenceFirstWord = (j==0 /* && i != 0*/)? "": sentenceArray[j-1].split(" ")[0];
+				var nextSentenceFirstWord = "";
+				for(k = 0; k < numWords; k++)
+				{
+					word = wordArray[k];
+					if(k==0 && j==0) //first word of paragraph
+					{
+						if(i != 0)
+						{
+							this.passageCopy.wordArray[passageWordIndex-1].nextWord = word;
+						}
+					}
+					//previousWord = (k==0)? "": wordArray[k-1];
+					var nextWord = (k==(numWords-1))? "": wordArray[k+1];
+					//first word of prev and next sentence
+					var wordObj = {
+						word: word, sentenceWordIndex: k,
+						paragraphWordIndex: paragraphWordIndex,
+						paraWordIndex: paragraphWordIndex,
+						paraNum: i+1,
+						paragraphIndex: i,
+						paragraphFirstWord: paragraphFirstWord,
+						paragraphLastWord: paragraphLastWord,
+						paraLwi: paragraphLwi,
+						paraFwi: paragraphFwi,
+						newPara: (k==0 && j==0),
+						isLastWordOfPara: (j==(numSentences-1) && k==(numWords-1)),
+						paraLength: numWordsInParagraph,
+						passageWordIndex:passageWordIndex,
+						passageTitle: this.passageCopy.title,
+						passageType: this.passageCopy.passageType,
+						passageSubtype: this.passageCopy.passageSubtype,
+						passageBlurb: this.passageCopy.passageBlurb,
+						passageDifficulty: this.passageCopy.passageDifficulty,
+						passageIsDouble: this.passageCopy.isDouble,
+						passageHasCharts: this.passageCopy.hasCharts,
+						passageIsFocused: this.passageCopy.isFocused,
+						passageNumQuestions: this.passageCopy.passageNumQuestions,
+						previousWord: previousWord,
+						nextWord: nextWord,
+						sentenceIndex:j,
+						sentence: sentenceArray[j],
+						sentenceLength: numWords,
+						sentenceFirstWord: sentenceFirstWord,
+						sentenceLastWord: sentenceLastWord,
+						previousSentenceFirstWord: previousSentenceFirstWord,
+						partOfSpeech: "noun",
+						definition: "",
+						difficulty: 1,
+						relevance: 1,
+						relatedQuestions: ["T00001S1P1Q01", "T00002S1P2Q03"],
+						relatedQuestionsText: ["", ""],
+						relatedQuestionsQuote: ["", ""],
+						relatedAnswers: ["T00001S1P1Q01B"],
+						relatedAnswersText: [""],
+						relatedAnswersQuote: ["quoted stuff"],
+						commonQuestionPatterns: [""],
+						commonAnswerPatterns: [""],
+						culturalContext: "Australasian"
+					};
+					this.passageCopy.wordArray.push(wordObj);
+					passageWordIndex++;
+					paragraphWordIndex++;
+					previousWord = word;
+				}
+				previousSentenceFirstWord = sentenceFirstWord;
+			}
+		}
+		//console.log(passageObj);
+		console.log(this.passageCopy);
+		console.log(this.passage);
+		console.log(this.lastSavedPassage);
+		var holderObj = {};
+		holderObj[this.passageCopy.fcid] = this.passageCopy;
+		//this.firebase.child("newpassages").update(holderObj);
+	}
+
+	savePassage()
+	{
+		if(this.passageUnsaved == false)
+		{
+			alert("No changes have been staged for saving. Please push 'stage changes' button first.");
+			return;
+		}
+		if(this.passageDirty == true)
+		{
+			alert("Warning: most recent changes not staged for saving; are you sure you want to save now?");
+			return;
+		}
+		//save to firebase
+		this.setData(this.passagesPath, this.passage);
+		//this.setData("reading/reallynewpassages/T00001S1P1", this.passage);
+		this.lastSavedPassage = JSON.parse(JSON.stringify(this.passage));
+		this.fire("passage-save", {passage: this.passage});
+	}
+
+	// createMetaObject(){
+	// 	this.$.isFocused.checked=this.isFocused;
+	//     this.$.isDoublePassage.checked=this.isDoublePassage;
+	//     this.$.hasCharts.checked=this.hasCharts;
+	// 	this.set("metaObject",{		
+	// 		"passageTitle": this.passageTitle,
+	// 		"passageType": this.passageType,
+	// 		"passageBlurb": this.passageBlurb,
+	// 		"passageIsDouble": this.passageIsDouble,
+	// 		"passageHasCharts": this.passageHasChaerts,
+	// 		"passageIsFocused": this.passageIsFocused,
+	// 		"passageWordCount": this.passageWordCount,
+	// 		"passageSubtype": this.passageSubtype,
+	// 		"passageSubtypeComments": this.passageSubtypeComments,
+	// 		"citationQuestions": this.citationQuestions,
+	// 		"totalCitations": this.totalCitations,
+	// 		"mostNearlyMeans": this.mostNearlyMeans,
+	// 		"totalNumberQuestions": this.totalNumberQuestions,
+	// 		"vocabularyTested": this.vocabularyTested,
+	// 		"citationsArray": this.citationArray,
+	// 		"passageDifficult": this.passageDifficulty,
+	// 		"culturalContext": this.culturalContext,
+	// 		"passageStructure": this.passageStructure,
+	// 		"passageNumberParagraphs": this.passageNumberParagraphs, 
+	// 		"fcid": this.fcid, 
+	// 		"passageMenuItem": this.passageMenuItem,
+	// 		"isTwoColumns": this.isTwoColumns
+	// 	});
+	// }
+
+	// createPassageObject(){
+	// 	this.set("passageObject",
+	// 			{ 
+	// 				"fcid": this.fcid,
+	// 				"wordArray": this.wordArray,
+	// 				"wordCount": this.wordCount,
+	// 				"menuItem": this.menuItem,
+	// 				"metaObject": this.metaObject,
+	// 				"otherFields": this.otherFields
+	// 			});
+	// 	var self=this;
+	// 			//var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 	//ref.child(fcidString).set(self.passageObject);
+
+	// }
+
+	attached()
+	{
+		this.questions = [{_q:"Why?"}];
+		console.log(this.questions);
+		this.loadFirepad(this.passageRootPath);
+		//this._toggleRightDrawer();
+		//this._toggleLeftDrawer();
+		this.setDataStrategy("localAndFirebase");
+		console.log(this.passageRootPath);
+		this.setFirebaseLocation(this.passageRootPath);
+	}
+
+	//  saveLocal(){
+	//  	var passageContent = this.firepad.getText();
+	//  	this.getText(passageContent);
+	//  	this.createMetaObject();
+	//  	this.createPassageObject();
+	//  }
+	// saveToDb(){
+	// 	this.saveLocal();
+	// 	this.createPassageObject();
+	// 	if(this.passageTitle!==""){ 
+	// 	var self=this;
+	// 	var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
+	// 	//ref.child(self.fcid).set(self.passageObject);
+	// 	this.clearInputs();
+		  
+	//   }
+	//   else {
+	//   	this.openDialog();
+	//   }
+	// }
+
+	clearInputs(e){
+
+		this.passageCopy = {};
+		var pCopy = this.passage;
+		//pCopy.passageType = "";
+		//this.set("passage", pCopy);
+		//this.passage = pCopy;
+		console.log(this.passage);
+	    /*
+	    this.set("passageBlurb", null);
+		this.set('passageHasCharts', false);
+		this.set('passageIsFocused', false);
+		this.set('passageIsDoublePassage', false);
+		this.set("fcid",null);
+		this.set("passageTitle", null);
+		*/
+	}
+
+	// openDialog(){
+	// 	Polymer.dom("fc-dashboard-one").querySelector("#dataAdminPrime").open();
+	// }
+
+	// _toggleRightDrawer(){
+	// 		var drawer = document.querySelector('#drawer-2');	
+	// 		if(drawer.forceNarrow!==true)
+	// 		{drawer.forceNarrow = true;}
+	// 		else{drawer.forceNarrow = false;
+	// 		}
+	// }
+
+	// _toggleLeftDrawer(){
+	// 	var drawer = document.querySelector('#drawerPrimed');
+ //          var dashboard = document.querySelector("#dashboardPrime");	
+	// 	if(drawer.forceNarrow!==true)
+ //          {
+ //               drawer.forceNarrow = true;
+ //               drawer.responsiveWidth='90000px';
+ //               dashboard.leftHidden=true;
+ //          }
+ //          else
+ //          {
+ //               drawer.forceNarrow = false;
+ //               drawer.responsiveWidth ='1080px';
+ //               dashboard.leftHidden=false;
+
+ //          }
+ //     }
+	
+
+} //close beforeRegister()
+
+    Polymer(FcNewPassageSaver);
+
+  })();
+ </script>
+ </dom-module>
+ 

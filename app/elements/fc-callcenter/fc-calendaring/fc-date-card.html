@@ -3,12 +3,13 @@
 <style>
  :host{
           margin: 2px;
-          min-width: 100px;
+          min-width: 50px;
           max-width: 1300px;
           min-height: 120px;
           max-height: 1300px;
          /*//position: fixed; */
         }
+        fc-input{max-width: 121px!important;}
   form {
       display: flex;
       flex-direction: row;
@@ -17,8 +18,8 @@
      paper-header-panel {
         float: left;
         background: white;
-        max-width: 1280px;
-        min-width: 88px;
+        max-width: 780px;
+        min-width: 65px;
         max-height: 1280px;
         min-height: 112px;
         margin: 2px;
@@ -28,7 +29,7 @@
       .paper-header {
         height: 36px;
         font-size: 22px;
-        line-height: 30px;
+        line-height: 26px;
         padding: 4px;
         color: white;
         transition: height 0.2s;
@@ -67,20 +68,26 @@
       .pink .paper-header {
         background-color: var(--paper-pink-a200);
       }
-.toDoItem paper-icon-button[icon=delete]{
+      .grey .paper-header{
+        background-color: var(--paper-indigo-50);
+
+      }
+      .grey .content{background: #E;}
+.todaysEvent paper-icon-button[icon=delete]{
 			-webkit-transition: opacity 0.5s;
 			transition: opacity 0.5s;
 			opacity: 0;
 		}
-		.toDoItem:hover paper-icon-button[icon=delete]{
+		.todaysEvent:hover paper-icon-button[icon=delete]{
 			opacity: 100;
 		}
 
 		paper-button {
 		  flex-shrink: 1;
 		}
-		paper-input {
-		  flex-grow: 1;
+		fc-input-prime {
+      max-width: 95;
+		  flex-shrink: 1;
 		}
 
 		checkbox {
@@ -95,8 +102,8 @@
 		}
 	
    .content {
-           padding-bottom: 145px;
-           margin-bottom: 45px;
+           padding-bottom: 22px;
+           margin-bottom: 23px;
       }
       .red .content {
         background: linear-gradient(white, #ffcdd2);
@@ -118,70 +125,130 @@
       }
 </style>
 <template>
-<form>
-
-  <paper-header-panel id="focusedDateCard" drags="true" id$="{{relId}}" style="height: [[_computeCurrentHeight(isMini)]]; padding-right: 2px;" class="blue">
+  <paper-header-panel id="focusedDateCard" drags="true" id$="{{relId}}" style="height: [[_computeCurrentHeight(isMini)]]; width:[[_computeCurrentWidth(day, id, isAddingEvent)]] padding-right: 2px;" class="blue">
 
 
      <div class="paper-header" style="text-align: center;padding-right: 2px;">     
         <section class="layout horizontal nowrap"  > 
-              <section class="vertical flex-9 layout" style="text-align: center;">[[computePrettyDay(day)]]</section>
+              <section class="vertical flex-9 layout" on-tap="toggle" style="text-align: center;">[[computePrettyDay(day)]]</section>
              <section class="horizontal flex-2 layout" style="font-size:9px;">Open<iron-icon icon="icons:swap-vertical-circle"></iron-icon></section> 
              
         </section>
      </div>
-  
-        <div class="content">
-      <template is="dom-repeat" items="{{times}}" as="time">
-            <paper-item hidden$="{{eventHidden}}" style="padding-left: 0px;">
-                  [[time.hour]]:[[time.halfhour]]0[[time.ampm]]<fc-input-prime input-type="text" style="display: inline-block;whitespace: nowrap;" name="[[datetime.locale]]" class="nowrap" is-inline="true" name$="[[time.hour]]:[[time.halfhour]]0[[time.ampm]]">
-                  </fc-input-prime><span style="opacity:0;" hidden$=[[time.space]]>&nbsp</span>
-                  <fc-input-prime class="layout-end" style="margin-right: 0px; padding-right: 0px;" input-type="checkbox" label="Add" name="changeSchedule">
-                  </fc-input-prime>
-            </paper-item>
-  
-         </template> 
+       <div style="height: 2500px;" class="content vertical layout"> 
+     
+          <form>
+            <section class="horizontal layout flex nowrap">
+          <fc-input-prime 
+             input-type="text"
+             class="nowrap" is-inline="true"  
+            name="eventName" 
+            label="Event Name" 
+            value="{{eventName}}">
+          </fc-input-prime>
+          <fc-input-prime 
+             input-type="datetime-local"
+             class="nowrap" is-inline="true"
+             step="30"  
+            name="eventStartTime" 
+            label="Start Time" 
+            value="{{startTime}}">
+          </fc-input-prime>
+          </section>
+           <section class="horizontal layout flex nowrap">
+           <fc-input-prime 
+            input-type="datetime-local" 
+            class="nowrap" is-inline="true"
+            step="30" 
+            name="eventEndTime" 
+            label="End Time" 
+            value="{{endTime}}">
+          </fc-input-prime>
+          <paper-icon-button icon="icons:add-circle-outline" class="blue-btn-class" on-click="addTodaysEvent">
+          </paper-icon-button>
+          </section>
+      </form>
+      <div class="layout vertical" style="height:180px; overflow: hidden; border: ridge 4px silver;" >
+      <div class="layout vertical flex wrap" style="background: white; max-width: 280px; border: silver solid 2px; max-height: 340px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
+      <template is="dom-repeat" items="{{todaysEvents}}">
+          <div class="event">
+            <paper-checkbox
+              on-change="toggleItem"
+                checked="{{item.done}}"></paper-checkbox>
+               <section class="vertical layout">
+                <span class="event">[[item.eventName]]</span>
+              <span class="label">[[item.startTime]] to[[item.endTime]]</span>
+              <div id="collapse" style="color:#008;" class="event location"> 
+                  <paper-item style="background:[[item.color]]"><fc-grid-cell  gc-readonly gc-label="{{item.eventName}}" gc-value="{{item.location}}"></fc-grid-cell>  <fc-grid-cell gc-readonly="false" gc-value=[[item.eventlocation]]></fc-grid-cell></paper-item>
 
-           	
-		</div>
+                <paper-item style="background:[[item.color]]">  <fc-grid-cell gc-readonly="false" gc-value$="[[item.startTime]]"></fc-grid-cell>  <fc-grid-cell gc-readonly="false" gc-value$="{{item.endTime}}"></fc-grid-cell></paper-item>
 
-</paper-header-panel>
-</form>
-</template>
-    <script>
+  <paper-item style="background:[[item.color]]"> <fc-grid-cell readonly=false gc-value="{{item.description}}"></fc-grid-cell>  <fc-grid-cell gc-readonly="false" gc-value="{{item.duration}}"></fc-grid-cell>  </paper-item>         
+     
+      <paper-item style="background:[[item.color]]">      <fc-grid-cell value="{{item.studentNumber}}"></fc-grid-cell>  <fc-grid-cell gc-value="{{item.connectedFCIDs}}"></fc-grid-cell>   </paper-item>
+                   </div>
+              </section>
+          </div>
+      </template>
+      </div>
+     </div>
+     </div>
+  </paper-header-panel>
+</template> 
+<script>
 FcDateCard=Polymer({
 	is:'fc-date-card',
 
 	properties: {
+     todaysEvents: {
+        type: Array,
+        value: function(){
+          return [  { 
+                "dateToday": this.day,
+                'eventName': "SAT Practice Test", 
+                'startTime': "09:00" + "AM",
+                'endTime': "12:45" + "PM", 
+                'location': "704 Ginesi, Morganville, Focused",
+                'description': "Practice Test for New and Enrolled Students",
+                'duration': 3.75,
+                "color": "#ff00b6",//fuscia bright
+                "studentNumber": 47,
+                "assocRevenue": 94000,
+                "revenuePeriodDays":41,
+                "revenuePeriodHours":144, //two teacher minimum plus prep et al
+                "perDiem":  2292,
+                "perWorkHour": 564,
+                "connectedFCIDs": ["RimakisGeorge00001", "GottaJohn00001", "ZirkelJoe00001", "ColleretteStacy00001", "RazzaMustaffa00001", "SatMorgamvilleUnderAbove",],
+                 "done": false
+                },
+                {"dateToday": this.day,
+                'eventName': "George Private Tutoring",
+                'startTime': "01:00" + "PM",
+                'endTime': "04:00" +"PM", 
+                'location': "704 Ginesi, Morganville, Focused",
+                'description': "Privare Tutoring, with Richard Rich IBS",
+                'duration': 3,
+                "color": "#00ff3b",//green
+                "studentNumber": 1,
+                "assocRevenue": 8400,
+                "revenuePeriodDays":41,
+                "perDiem":  23,
+                "revenuePeriodHours":40, //two teacher minimum plus prep et al
+                "perWorkHour": 210,
+                "connectedFCIDs": ["RimakisGeorge00001", "RichRichardIBS00001"],
+                "done": false,
+                }
+              ];
+          },
+        notify: true
+        },
 		drags:{
 			type: Boolean, 
 			value: false,
 			notify: true
 		},
     times:{
-      type: Array,
-      value: function(){
-          var timeArr = [];
-          j=0;
-        for(var i=12; i<=48;i++){
-              var hour=(Math.floor(i/2) <13)?Math.floor(i/2):(Math.floor(i/2)-12);
-              var j=false;
-              j=(i>47)?true:false;
-              if(hour<10){hour='0'+hour.toString();}
-              var space=(i<20)?true: false;
-              var halfhour=(i%2==0)?0:3;
-              var ampm=(i<24)?"am":(j==true)?"am":"pm";
-              var tobj = {"hour": hour,
-                          "halfhour": halfhour,
-                          "ampm": ampm, 
-                          "space": space
-                        };
-              
-              timeArr.push(tobj);
-            //console.log(timeArr);
-          }
-          return timeArr;
-        },
+      type: Date,
       notify: true,
     },
     eventHidden:{
@@ -204,25 +271,7 @@ FcDateCard=Polymer({
 			value: false,
 			notify: true
 		},
-		inputValue: {
-				type: String,
-				notify: true,
-				reflectToAttribute: true
-
-		},
-
-  selectionArray: {
-        type: Array,
-        value: function(){
-          return [
-                'first', 
-                'second', 
-                'third', 
-                'fourth'
-          ];
-        },
-        notify: true
-      },
+		
       isMini: {
         type: Boolean,
         value: false,
@@ -232,14 +281,6 @@ FcDateCard=Polymer({
       selected: {
         type: String,
         notify: true
-      },
-      currentWidth: {
-          type: String, 
-          value: function(){
-                    return '320px';
-              },
-          notify: true, 
-          reflectToAttribute: true
       },
       currentHeight: {
           type: String, 
@@ -263,6 +304,7 @@ FcDateCard=Polymer({
       }
       
     },
+    behaviors:["fcDraggableDataBehavior", "Polymer.IronResizableBehavior"],
     attached: function(){
     	// this.center();
     	
@@ -282,21 +324,44 @@ FcDateCard=Polymer({
       }
       else{ return "360px";}
     },
+    _computeCurrentWidth:function(day, id, isAddingEvent){
+       Polymer.dom.flush();
+       var resizer = this.parentNode;
+       var w = parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+       while(w==NaN && resizer!=document.body){
+        resizer=resizer.parentNode;
+        w== parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+console.log(w);
+       } 
+       var z = parse.Int(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+       console.log(z);
+            var wn=Math.ceil(z/7.8);
+      var width=wn.toString() + "px";
+      
+      this.notifyResize();
+      return width;  
+    },
+
+
+
+  toggle: function()
+    { 
+        console.log(this.$.collapse);},
     _computeId: function(theId, day){
     	//console.log(theId, day, day, day, day, theId);
     },
-    computeSelected: function(selectionArray){
-      return "[name=first]";
+    // computeSelected: function(selectionArray){
+    //   return "[name=first]";
   
-    },
+    // },
     _computeRelId: function(day){
     	 var dayId	= day.replaceAll("\\s+","");
     	 //console.log(dayId, dayId, dayId, dayId);
     	 return dayId;
     },
-    computeId:function(theId){
-    	//console.log(theId, theId, theId, theId, theId, theId);
-    },
+    // computeId:function(theId){
+    // 	//console.log(theId, theId, theId, theId, theId, theId);
+    // },
 });
 </script>
 </dom-module>
@@ -372,34 +437,52 @@ FcDateCard=Polymer({
   </template>
   <script>
   Polymer({
-    is: 'fc-to-do-list',
+    is: 'fc-todaysEventCard',
     properties: {
-      toDos: {
+      today: {
+        type: Date,
+        value: funct
+
+
+      },
+      todaysEvents: {
         type: Array,
         value: function(){
           return [  { 
-                text: 'Write a TODO app', 
-                done: false
+                'eventName': this.eventName
+                'startTime': this.startTime,
+                'endTime': this.endTime, 
+                'location': this.eventLocation,
+                'description': this.eventDescription,
+                'duration': this.eventDuration,
                 },
                 {
-                text: 'Use Firebase',
-                done: false
+                'eventName': this.eventName
+                'startTime': this.startTime,
+                'endTime': this.endTime, 
+                'location': this.eventLocation,
+                'description': this.eventDescription,
+                'duration': this.eventDuration,
                 }
               ];
           },
         notify: true
         },
-      item: {
+      todaysEvent: {
         type: Object,
         value: {
-          done: false,
-          text: String,
+          eventName: String,
+          startTime: String,
+          endTime: String, 
+          location: String,
+          duration: Number,
+          description: String
           },
         notify: true
         },
       firebaseURL: {
         type: String, 
-        value: "https://focused0ne.firebaseio.com/toDoLists",
+        value: "https://focused0ne.firebaseio.com/todaysEvents",
         notify: true
         },
       firebaseProvider: {
@@ -407,12 +490,12 @@ FcDateCard=Polymer({
         value: 'password',
         notify: true
         },
-      completedItems:{
+      completedTodaysEvents:{
         type: Array,
-        computed: 'computeCompletedItems(completedItem, item)',
+        computed: 'computeCompletedTodaysEvents(completedTodaysEvents, todaysEvent)',
         notify: true
       },
-      completedItem:{
+      todaysEvent:{
         type: Object, 
         value: {
           done: true,
@@ -424,24 +507,24 @@ FcDateCard=Polymer({
         notify: true
         }
       },
-    addItem: function(event) {
+    addEventToday: function(event) {
         event.preventDefault(); // Don't send the form!
-        this.push('toDos', {
+        this.push('todaysEvents', {
           done: false,
           text: newItemValue
       });
-        this.newItemValue = '';
+        this.newTodaysEvent = '';
     },
 
-    toggleItem: function(event) {
-        event.model.item.set('done', !event.model.item.done);
+    toggleEventToday: function(event) {
+        event.model.todaysEvent.set('over', !event.model.todaysEvent.over);
     },
 
     deleteItem: function(event) {
-        this.splice('toDos', event.model.index, 1);
+        this.splice('todaysEvent', event.model.index, 1);
     },
 
-    computeCompletedItems: function(event, completedItem, item){
+    computeTodaysCompletedEvents: function(event, eventsCompletedToday, todaysEvent){
       return {"silly": "object"};
     },
 
@@ -449,7 +532,7 @@ FcDateCard=Polymer({
         this.ref = new Firebase(this.firebaseURL + '/users/' + 
                                                       event.detail.user.uid);
         this.ref.on('value', function(snapshot) {
-          this.updateToDos(snapshot);
+          this.updateTodaysEvents(snapshot);
         }.bind(this));
     },
 
@@ -459,23 +542,27 @@ FcDateCard=Polymer({
           },
   
     onFirebaseLogout: function(event) {
-      this.updateToDos();
+      this.updateTodaysEvents();
     },
 
-    updateToDos: function(snapshot) {
-        this.toDos = [];
+    updateEvents: function(snapshot) {
+        this.eventsToday = [];
         snapshot.forEach(function(childSnapshot) {
           var item = childSnapshot.val();
           item.uid = childSnapshot.key();
-          this.push('toDos', item);
+          this.push('eventsToday', item);
         }.bind(this));
     },
 
     addItem: function(event) {
         event.preventDefault();
         this.ref.push({
-          'done': false,
-          'text': this.newItemValue
+          'eventName': this.eventName
+          'startTime': this.startTime,
+          'endTime': this.endTime, 
+          'location': this.eventLocation,
+          'description': this.eventDescription,
+          'duration': this.eventDuration,
         });
         this.newItemValue = '';
     },
