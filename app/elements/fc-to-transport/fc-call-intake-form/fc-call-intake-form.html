@@ -1,4 +1,4 @@
-<dom-module id="fc-titling-form">
+<dom-module id="fc-call-intake-form">
 	<style>
   :host{
     position: relative;
@@ -53,6 +53,20 @@
                             }
 	</style>
 	<template>
+<paper-dialog id="searchConfirm" style="min-width: 320px; max-width: 600px; min-height: 320px; max-height: 600px;" no-cancel-on-outside-click>
+        <paper-button> Confirm Is Previous Caller</paper-button>
+         <fc-input-prime name="callerRole" class="horizontal flex layout wrap" input-type="select" id="callerRole" option-one="Select a Role" option-two="parent1" option-three="student" option-four="parent2" option-five="other" value="{{callerRoleSelected}}" label="Caller Role"></fc-input-prime>
+
+
+         <fc-input-prime label="{{callerRoleSelected}} First Name" on-keyup="_sendInputChanged" hidden="[[_searchHidden(callerRoleSelected)]]" name="{{callerRoleSelected}}FirstName"></fc-input-prime>
+         <fc-input-prime label="{{callerRoleSelected}} Last Name" on-keyup="_sendInputChanged" hidden="[[_searchHidden(callerRoleSelected)]]" name="{{callerRoleSelected}}LastName"></fc-input-prime>
+
+         <paper-button on-tap="selectStudent"></paper-button>
+
+         <paper-button dismiss-dialog>dismiss</paper-button>
+  </paper-dialog>
+
+
  <paper-card 
     heading="Focused Call Intake Form" 
     image="../../../images/FC_frontpage_logo.png" 
@@ -63,7 +77,7 @@
  <form is="iron-form" class="form" id="formGet" method="get" action="/">
  <paper-material elevation="4" style="background: #dadada; box-shadow: 3px 7px 11px 4px #9a9a9a;" class="vertical layout">
  <paper-material class="headSeparator" style="margin-bottom: 6px;"></paper-material>
-    <section  class="horizontal layout flex wrap"
+    <section class="horizontal layout flex wrap"
       style="max-height: 25px; margin-left: 4px; color: brown; font-size:18px;  border-bottom: solid brown 1px; margin-bottom: 8px;">
       Timestamp & Callback Time 
     </section>
@@ -88,21 +102,19 @@
           input-type="checkbox" 
           style="margin-top: -6px;"
           label="Yes. This is a previous caller." 
-          name="isPreviousCaller">
+          name="isPreviousCaller"
+          checked-prop="{{isPreviousCaller}}">
         </fc-input-prime>
         <fc-input-prime 
           input-type="checkbox"
           style="margin-top: -6px;" 
           label="No. This is a New Caller" 
           name="isNewCaller" 
-          checked>
+          checked-prop="{{!isPreviousCaller}}">
         </fc-input-prime>
       </section>
       <section class="horizontal layout flex wrap">
-      <fc-input-prime input-type="button" type="button" style="width: 110px; height: 65px; background: gold;" label="Select Profile"> </fc-input-prime>
        <fc-input-prime id='login' class="horizontal layout flex" name='intakeFcid' label='Your Login'  value='{{yourLogin}}' on-input="updateInput">
-        </fc-input-prime>
-          <fc-input-prime name="callerRole" class="horizontal flex layout wrap" input-type="select" id="callerRole" option-one="parent1" option-two="parent2" option-three="student" option-four="Other" label="Caller Role">
         </fc-input-prime>
          <!-- on-tap="{{_selectProfile(fcProfile)}}"  -->
       </section>
@@ -131,17 +143,17 @@
 	<script>
 		'use strict';
 		(function() {
-			class FCTitlingForm {
+			class FCCallIntakeForm {
 				get behaviors() {
 					return [Polymer.IronResizableBehavior
 					//add databehavior?
 					];
 				}
 				beforeRegister() {
-					this.is ="fc-titling-form";
+					this.is ="fc-call-intake-form";
 					this.listeners = {
             "radio-checked-changed": "handleRadioChecked", "onclick": "display"};
-					this.observeres={};
+					this.observers={};
 					this.properties = {
             formSubmitOne:{
               type: Boolean,
@@ -152,6 +164,7 @@
             isPreviousCaller:{
               type: Boolean,
               value: false,
+              observer: "isPreviousCallerNow",
               notify: true,
               reflectToAttribute: true
             },
@@ -160,6 +173,29 @@
               value: {},
               notify: true, 
               reflectToAttribute: true
+            },
+            callerRoleSelected:{
+              type: String,
+              observer: "_whoIsTheCaller",
+              notify: true,
+              reflectToAttribute: true
+            },
+            searchValues:{
+              type: Object,
+              value: {},
+              notify: true,
+              reflectToAttribute: true
+            },
+            focusedStudent: {
+              type: Object,
+              notify: true
+            }, 
+            selectedFocusedStudent:{
+              type: Object,
+              computed:"computePreviousFocusedStudent(searchValues, focusedStudent)",
+              notify: true, 
+              reflectToAttribute: true
+
             }
             
 					}; //end properties
@@ -170,6 +206,90 @@
         attached(){
 
         }
+        isPreviousCallerNow(newval, oldval)
+          { 
+            console.log(oldval, newval);
+            alert(oldval);
+            if(newval==true){this.opendialog();} 
+          }
+
+        computePreviousFocusedStudent(searchValues, focusedStudent)
+        {
+
+          console.log(focusedStudent,"this is the search val: ", searchValues);
+
+        }
+
+        opendialog()
+        {
+          this.$.searchConfirm.open();
+        }
+
+        _searchHidden(callerRoleSelected)
+        {
+          if(callerRoleSelected!=null){return false;}
+          else return true;
+
+
+
+
+        }
+
+        selectStudent(){
+
+
+
+
+        }
+
+        _sendInputChanged(e, detail){
+    
+          var target=e.target;
+          while(target.nodeName!=="FC-INPUT-PRIME")
+          {
+              console.log(target.nodeName, e.target.value);
+              target=target.parentNode;
+          }
+          var name=target.name;
+          this.fire("sendInputVal", {value: e.target.value, name: name});
+          this.searchValues[name]=e.target.value;
+        }
+
+        _whoIsTheCaller(newVal, oldVal)
+        {
+          if(newVal=="parent1")
+          {
+               console.log(oldVal, newVal);
+          }
+          else if(newVal=="student")
+          {
+
+
+               console.log(oldVal, newVal);
+
+          }
+          else if(newVal=="parent2")
+          {
+
+            console.log(oldVal, newVal);
+
+          }
+          else if(newVal=="other")
+          {
+
+            console.log(oldVal, newVal);
+
+          }
+          else
+          {
+            console.log(oldVal, newVal);
+
+
+          }
+
+
+        }
+
        submitHandler(event){
         this.set("formSubmitOne", true);
           var formResults = this.$.formGet.serialize();
@@ -184,9 +304,12 @@
             // var saveObj=inquiry.getFanout();
           var ref = new Firebase("https://focused0ne.firebaseio.com"); 
             //inquiry.fcSave(ref);
+            var callerRole = this.callerRoleSelected;
             ref.child("students/" + profile.fcid).update(profile);
             ref.child("students/" + pacademics.fcid + "/pastacademics").update(pacademics);
-              var inquiry = new FcInquiry(formResults, profile);
+              var inquiry = new FcInquiry(formResults, callerRole, profile);
+             
+              console.log(this.callerRoleSelected);
                inquiry.fcSave(ref);
             ref.onAuth(function(authdata){alert(authdata.uid);});
 
@@ -224,7 +347,7 @@
         }
 
 			}//end of Class
-			Polymer(FCTitlingForm);
+			Polymer(FCCallIntakeForm);
 		})();
 	</script>
 </dom-module>

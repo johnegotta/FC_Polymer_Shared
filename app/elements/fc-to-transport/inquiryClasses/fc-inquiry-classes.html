@@ -1,0 +1,52 @@
+<script>
+"use strict";
+
+class FcInquiry{
+	constructor(argInquiry, argCallerRole, argFcProfile)
+	{
+		this.builder(argInquiry.timeStamp, argInquiry.callerFullName, argInquiry.isClosed, argInquiry.relatedStudent, argInquiry.callerMessage, argInquiry.focusedProgramMatch, argInquiry.returnContactTime, argInquiry.callerExpectedFollowUp, argInquiry.isPreviousCaller, argInquiry.intakeFcid, argInquiry.fcid, argCallerRole, argFcProfile);
+	} 
+
+	builder(timeStamp, callerFullName, isClosed, relatedStudent, callerMessage, focusedProgramMatch, returnContactTime, callerExpectedFollowUp, isPreviousCaller, intakeFcid, fcid, callerRole, fcProfile){
+
+	this.timeStamp=timeStamp || "ALERT FAIL"; 
+	var  callerFirstName = fcProfile[callerRole+"FirstName"];
+	var callerLastName = fcProfile[callerRole+"LastName"];
+	this.callerFullName=callerFullName || callerFirstName + " " + callerLastName;
+	var email= fcProfile[callerRole+"Email"];
+	this.callerEmail=email  || "";
+	var phone = fcProfile[callerRole+"Telephone"];
+	this.callerTelephone=phone  || "";
+	this.isClosed=isClosed || false;  
+	this.relatedStudent=relatedStudent || fcProfile.studentFullName;  
+	this.callerMessage=callerMessage || "AlertVital"; 
+	this.focusedProgramMatch=focusedProgramMatch || "Focused 1600SAT";  
+	this.returnContactTime=returnContactTime || "";  
+	this.callerExpectedFollowUp=callerExpectedFollowUp || "";
+	this.callerRole =callerRole || "fail";
+	this.isPreviousCaller = isPreviousCaller || false; 
+	if(this.inquiryNumber==null){this.inquiryNumber= 1; console.log(this.inquiryNumber);}
+	else if(this.inquiryNumber==Nan){var num = parseInt(this.inquiryNumber); if(num ==Nan || num == null){this.inquiryNumber=1;} else{ num++; this.inquiryNumber=num; console.log(this.inquiryNumber, num, "this is the else on the if in the else if one");}}
+	else if(typeof this.inquiryNumber==Number){this.inquiryNumber++; this.inquiryNumber = this.inquiryNumber; console.log(this.inquiryNumber, "this is if stuff goes right");}   
+	this.intakeFcid=intakeFcid || "ALERT"; 
+	this.fcid= fcid || fcProfile.fcid;
+	this.fcProfile= fcProfile || {};
+	}
+
+
+
+	fcSave(ref){
+		var inq = ref.child("inquiries");
+		var key1= -(new Date(this.timeStamp).getTime()) + "_" + this.fcid;
+		var savObject ={};
+		savObject[key1]=this;
+		inq.update(savObject);
+		var student = ref.child("students/" + this.fcid + "/inquiries");
+		student.update(savObject);
+	}
+	
+
+
+};
+</script>
+

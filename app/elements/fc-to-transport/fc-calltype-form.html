@@ -1,0 +1,255 @@
+<dom-module id="fc-calltype-form">
+<template>
+	<style>
+  :host{
+    position: relative;
+      max-height: 2200px;
+    min-width: 330px;
+     overflow-y: scroll;
+  }
+	
+
+  paper-card, paper-card.form, paper-card.content {
+    padding: 16px;
+  	border: 4px double #008;
+  	margin: auto;
+    max-height:2000px;
+    overflow-y: scroll;
+    outline: 8px solid #aecefe;
+ --paper-card-header: {
+    border-bottom: 4px solid #efefef;
+
+        @apply(--layout-horizontal);
+        @apply(--layout-flex);
+        @apply(--around-justified);
+    };
+    --paper-card-header-image: {
+        width: 127px;
+        height: 48.6px;
+        padding: 12px;
+        margin: 12px;
+        position: relative: 
+   
+    };
+   
+    --paper-card-header-text: {
+      color: #008;
+      margin-right: 50px;
+      line-height: 1;
+      font-size: 28px;
+      font-weight: 600;
+      @apply(--layout-vertical);
+        @apply(--layout-center);
+    };
+
+
+@apply(--paper-card);
+@apply(--paper-card-header-text);
+@apply(--paper-card-header-image);
+}
+
+  .headSeparator{
+                  width: 100%;
+                  background: #006;
+                  border-top: 4px solid #006; 
+                  border-bottom: 6px solid #c6dafc;
+                  height: 4px;
+                            }
+	</style>
+ <fc-ddr-card header-title="Focused Call Intake Form Set" head-class="cyan"> 
+ <paper-card 
+    heading="Focused Call Intake Form" 
+    image="../../../images/FC_frontpage_logo.png" 
+    style="border-bottom: 6px edged gold; overflow-y: scroll;  padding: auto;" 
+    elevation="5" 
+    class="form vertical flex wrap layout" 
+    animated-shadow="true">
+ <paper-material class="headSeparator"></paper-material>
+ <form is="iron-form" class="form" id="formGet" method="get" action="/">
+<content class="horizontal layout center-justified">
+</content>
+      <div class="card-actions horizontal layout container center-justified">
+          <paper-button raised
+              on-tap="submitHandler" class="flex layout self-stretch">Record and Continue</paper-button>
+         <content select="paper-button"></content>
+         <paper-button raised class="flex layout self-stretch" on-tap="resetHandler"> clear 3</paper-button>
+      </div>
+</form>
+</paper-card>
+</fc-ddr-card>
+
+	</template>
+	<script>
+		'use strict';
+		(function() {
+			class FCCalltypeForm {
+				get behaviors() {
+					return [Polymer.IronResizableBehavior
+					//add databehavior?
+					];
+				}
+				beforeRegister() {
+					this.is ="fc-calltype-form";
+					this.listeners = {
+            "radio-checked-changed": "handleRadioChecked", "onclick": "display"};
+					this.observers={};
+					this.properties = {
+              profileObject:{
+                type: Object,
+                value: function: {
+                  var obj = new FcStudentProfile();
+                  return obj;
+                },
+                notify: true, 
+                reflectToAttribute: true
+            },
+            inquiryRecord:{
+                type: Object,
+                  value: {
+                    fcid: 
+                    intakeFcid: 
+                    timestamp: 
+                    callerFullName: 
+                    callerRole: 
+                    callerMessage:
+                    serviceMatchIfEnrolled:  
+                    callerExpectedFollowUp: 
+                  },
+                notify: true,
+                reflectToAttribute: true 
+            },
+            todaysInquiriesRecordObject: {
+              profileInquiryRecordObject: Object, 
+              serviceMatch: String,  
+              dateOfFirstInquiy: 
+              numberOfInquiries:
+              intakeFcidResponsible:  
+              InquiryList:{
+                      type: Array, 
+                      value: function(){[{"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},
+                                          {"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},
+                                          {"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},
+                                          {"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},
+                                          {"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},{"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo},
+                                          {"timestamp": timestamp,
+                                          "intakeFcid": intakeFcid,
+                                          "serviceMatch": serviceMatch,
+                                          "memo": memo} //etc
+                                        ];
+                                      },
+                      notify: true
+                },
+              servicePurchaseComplete: Boolean,
+              purchaseIncompleteObject: {
+                  incompleteReason:{},
+                  anticipatedResult: {close/noclose},
+                  nextContact: {date},//auto 48 hour timer... at 48 turns yellow, at 72 red push notice sent.
+                  goalOfContact: {CLOSE},
+                  timealreadyspent: (LOG FROM CALL CLOCK) 
+              },
+              purchaseCompletObject: {
+                amountOfServicePurchased: TOTAL COST,
+                amountPaidonClose: 
+                closeDate:
+                amountRemaining: 
+                dateofNextPayment: 
+                amountofNextPayment:
+                isRecurring: Boolean,
+                numberOfRecurrances: Number, 
+                dateOfFinalPayent: Date,
+                dateOfServcieStart: Date //(check against above, cannot cross);
+              },
+
+
+
+
+
+              }, 
+
+
+              },
+
+
+
+
+
+            },
+
+            
+					}; //end properties
+			}
+           ready(){
+
+        }
+        attached(){
+
+        }
+       submitHandler(event){
+          var formResults = this.$.formGet.serialize();
+          console.log(formResults);
+            var d = new Date();
+            var n = -d.getTime();
+            console.log(n);
+            // var profile = new FcStudentProfile();
+            // profile=Object.assign(profile, formResults);
+           var profile = new FcStudentProfile(formResults);
+            console.log(profile);
+            var saveObj=profile.getFanout();
+          var ref = new Firebase("https://focusedstaging1.firebaseio.com/calls"); 
+    ref.update(saveObj);
+
+          console.log(formResults);
+
+        }
+        handleRadioChecked(event){
+          event.stopPropagation();
+          var generator = this.queryEffectiveChildren('fc-input-set-generator');
+          var inputs = generator.querySelectorAll('fc-input-prime[input-name=' + event.detail.name + ']');
+          var labels = generator.querySelectorAll('label');
+          console.log("In handleRadioChecked", labels);
+          for(var i=0; i < inputs.length; i++){
+            if(inputs[i].inputId !== event.detail.id){
+              inputs[i].checkedProp = false;
+              inputs[i].classList.remove('wrapper-checkbox-checked');
+            } else {
+              inputs[i].checkedProp = true;
+              inputs[i].classList.add('wrapper-checkbox-checked');
+            }
+          }
+        }
+      
+        display(event) {
+          var output = document.getElementById('output');
+            output.innerHTML = JSON.stringify(event.detail);
+        }
+
+    
+        resetHandler(event) {
+          Polymer.dom(event).localTarget.parentElement.myData=null;
+          Polymer.dom(event).localTarget.parentElement.myData=Polymer.dom(event).localTarget.parentElement.myDataTwo;
+          this.set("formResults", null);
+        }
+
+			}//end of Class
+			Polymer(FCTitlingForm);
+		})();
+	</script>
+</dom-module>

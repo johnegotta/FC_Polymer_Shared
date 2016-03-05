@@ -243,6 +243,11 @@ FcDdrCard=Polymer({
 				reflectToAttribute: true
 
 		},
+    dragCounter:{
+      type: Number,
+      value: 0,
+      notify: true
+    },
 		noCancelOnOutsideClick:{
 			type: Boolean,
 			value: function(){return true;},
@@ -346,7 +351,7 @@ FcDdrCard=Polymer({
 
        } 
        var z = window.getComputedStyle(resizer, null).getPropertyValue("width");
-       console.log(z);
+       //console.log(z);
             var wn=Math.ceil(w*.8);
       var width=wn.toString() + "px";
       this.set("currentWidth", width);
@@ -507,9 +512,19 @@ FcDdrCard=Polymer({
         e.preventDefault();
 switch(e.detail.state) {
           case 'start':
+             
             self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
             self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-            console.log('top distance differenced?' + self._topprime);
+            if (this.dragCounter<1){
+              self.style.left=0;
+              self.style.top=0;
+              this.dragCounter++;
+              self.style.left=e.detail.x;
+              self.style.top=e.detail.y;
+              console.log('top distance differenced?' + self._topprime);
+              console.log('left distance' + self._leftprime);
+            }
+            //console.log('top distance differenced?' + self._topprime);
             // }
             self.changeX=0;
             self.changeY=0;
@@ -521,14 +536,14 @@ switch(e.detail.state) {
             self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
             break;
           case 'end':
-            console.log(self._topprime);
+            //console.log(self._topprime);
             self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
             self._bottom = self.getBoundingClientRect().top;
-            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
-            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): e.detail.x;
+            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):e.detail.y;
             self.translate3d(0, 0, 0);
 
-            console.log("ENDING", self._x);
+            //console.log("ENDING", self._x);
             self.style.left=self._x.toString()+'px';
             self.style.top=self._y.toString()+'px';
             console.log('y: ' + e.detail.y);

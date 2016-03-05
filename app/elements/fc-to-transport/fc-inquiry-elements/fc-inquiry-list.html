@@ -1,0 +1,95 @@
+<dom-module id="fc-inquiry-list">
+<style>
+:host{font-size: 18px;
+	line-height: 1.25;}
+.one{
+	font-weight: 700;
+	color: brown;
+	font-size: 18px;
+}
+.two{
+	display: inline-block;
+	width: 107px !important;
+	overflow: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+		font-size: 18px;
+}
+</style>
+<template>
+	<firebase-collection 
+		id='inquiries' 
+		location="https://focused0ne.firebaseio.com/inquiries"
+		order-by-child="{{orderby}}"
+		data="{{inquiries}}">
+	</firebase-collection>
+	<fc-ddr-card header-title="{{headerTitle}}" id$="{{myId}}" class="group" on-tap="assignFixed" head-class="{{headClass}}" >
+	<ol title="Todays Inquiries">
+		<template is="dom-repeat" items="[[inquiries]]" as="inquiry">
+			<li>
+				<fc-inquiry inquiry="{{inquiry}}">
+				</fc-inquiry>
+			</li>
+		</template>
+	</ol>
+	</fc-ddr-card>
+</template>
+<script>
+"use strict";
+Polymer({
+	is: "fc-inquiry-list",
+	properties:{
+		myId:{
+			type: String,
+			value: "InquiriesListOne",
+			notify: true
+		},
+		inquiries: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		inquiry: {
+			type: Object,
+			notify: true
+		}, 
+		equals: {
+			type: String,
+			value: '',
+			notify: true
+		},
+		orderby:{
+			type: String,
+			value: "timeStamp",
+			notify: true,
+			reflectToAttribute: true
+		},
+		headerTitle:{
+			type: String, 
+			value: "Today's Inquiries",
+			notify: true
+		},
+		headClass:{
+			type: String,
+			value:"blue",
+			notify:true
+		},
+	},
+	ready(){
+
+
+	},
+	attached(){
+	
+
+	}, 
+
+    assignFixed(){
+    	// this.$.InquiriesListOne.style.position="fixed";
+    	// this.$.InquiriesListOne.drags=true;
+
+    }
+
+});
+</script>
+</dom-module>

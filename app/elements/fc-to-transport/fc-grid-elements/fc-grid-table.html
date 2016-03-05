@@ -11,7 +11,7 @@
 <sortable-js group="group" class="horizontal layout flex wrap" handle=".handle">
 
 <template is="dom-repeat" class="horizontal layout flex wrap ghost dropzone" draggable items="{{dataArray}}">
-<fc-grid-cell group="group" name$="{{item.index}}" class="pickle group handle" gc-label="{{item.label}}" gc-val="{{item.val}}">
+<fc-grid-cell group="group" name$="{{item.index}}" class="pickle group handle" gc-label="{{item.label}}" gc-val="{{item.val}}" value="{{item.val}}">
 
 </fc-grid-cell>
 </template>
@@ -21,77 +21,8 @@
 FcGridTable=Polymer({
 	is: "fc-grid-table",
 	properties: {
-		dataSource: {
-			type: Array, 
-			value: function(){
-				return [ {"label": "parent1FirstName",
-						"val":"parent1FirstName" },
-						{"label":"parent1LastName",
-						"val": "parent1LastName" },
-						{"label":"parent1Telephone",
-						"val": "parent1Telephone" },
-						{"label":"parent1Email",
-						"val": "parent1Email" },
-						{"label":"relatedStudentNames",
-						"val": "relatedStudentNames" },
-						{"label":"relatedStudentFcids",
-						"val": "relatedStudentFcids" },
-						{"label":"relatedParent2",
-						"val": "relatedParent2"},
-						{"label":"parent2FirstName",
-						"val": "parent2FirstName" },
-						{"label":"parent2LastName",
-						"val": "parent2LastName"},
-						{"label":"parent2Telephone",
-						"val": "parent2Telephone,"},
-						{"label":"parent2Email",
-						"val": "parent2Email"},
-						{"label":"relatedStudentNames",
-						"val": "relatedStudentNames"},
-						{"label":"relatedStudentFcids",
-						"val": "relatedStudentFcids"},
-						{"label":"relatedParent1",
-						"val": "relatedParent1"},
-						{"label":"studentFirstName",
-						"val": "studentFirstName"},
-						{"label":"studentLastName",
-						"val": "studentLastName"},
-						{"label":"studentTelephone",
-						"val": "studentTelephone"},
-						{"label":"studentEmail",
-						"val": "studentEmail"},
-						{"label":"relatedParentsFcids",
-						"val": "relatedParentsFcids"},
-						{"label":"relatedParentsFullNames",
-						"val": "relatedParentsFullNames"},
-						{"label":"gradeLevel",
-						"val": "gradeLevel"},
-						{"label":"currentSchool",
-						"val": "currentSchool"},
-						{"label":"pastSchool",
-						"val": "pastSchool"},
-						{"label":"highestEducationLvl",
-						"val": "highestEducationLvl"},
-						{"label":"startMath",
-						"val": "startMath"},
-						{"label":"startReading",
-						"val": "startReading"},
-						{"label":"startTotal",
-						"val": "startTotal"},
-						{"label":"fcid",
-						 "val": "fcid"}
-
-				];
-			}, 
-			notify: true
-		},
-		pink:{
-			type: Boolean,
-			value: false,
-			notify: true,
-			reflectToAttribute: true
-		},
-		dataSourcetwo:{
+		
+		dataSource:{
 			type: Object,
 			value: {},
 			notify: true, 
@@ -99,7 +30,7 @@ FcGridTable=Polymer({
 		},
 		dataArray:{
 			type: Array,
-			computed: "computeDataArray(dataSourcetwo, dataSource, pink)",
+			computed: "computeDataArray(dataSource)",
 			notify: true
 		},
 
@@ -107,37 +38,54 @@ FcGridTable=Polymer({
 	// behaviors:[fcDraggableDataBehavior],
 
 	ready: function(){
-		console.log(this.dataSourcetwo);
+	
 
 
 	},
 	attached: function(){
-		console.log(this.dataSourcetwo);
+		
 	},
 	detached: function(){
-		console.log(this.dataSourcetwo);
+	
 	},
-	computeDataArray: function(dataSourcetwo, dataSource, pink){
-		console.log("in middle", dataSource, dataSourcetwo);
-		if(dataSourcetwo==undefined || dataSourcetwo=={}){
-			return dataSource;
-		}
-		else if(pink==true){return dataSource;}
-		else{
+	computeDataArray: function(dataSource){
 		var obj ={};
-		obj=dataSourcetwo;
-		var arra=[];
-		var arr = [];
-		obj=new FcStudentProfile(dataSourcetwo);
-		console.log(obj); 
-		Object.keys(obj).forEach(function(key,index) {
-	     arr.push({"label": key,"val": obj[key], "index": index});
-		});
-		return arr;
-	}
+		var arr=[];
+		obj=dataSource;
+		console.log(dataSource); 
+		var uppers=[];
+      Object.keys(obj).forEach(function(key,index){
+      	
+      	 // var len = key.length;
+      	 // for(var i=0; i<len; i++){
+      	 // 	var upper=key[i].toUpperCase();
+      	 // 	if(key[i]===upper)
+      	 // 	{ 
+      	 // 		uppers.push(i);
+      	 // 	}
+      	 // }
+      	 // var counter=uppers.length;
+      	 // var lastIndex=0;
+      	 // var label ="";
+      	 // for(var j=0; j<counter; j++)
+      	 // {
+      	 // 	var index=uppers[j];
+      	 // 	var word = key.slice(lastIndex, index);
+      	 // 	label += word;
+      	 // 	if(j!=counter-1)
+      	 // 	{
+      	 // 		label+=" ";
+      	 // 	}
+      	 // 	lastIndex=index;
+      	 // }
+      	 //  label[0]=label[0].toUpperCase();
+         arr.push({"label": key,"val": obj[key], "index": index});
+       });
+      console.log(arr);
+      return arr;
+    }
 
 
-	},
 
 });
 </script>

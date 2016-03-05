@@ -18,6 +18,12 @@ span.radio: {
 input{ padding: 4px;
 margin: 2px;
 @apply(--horizontal-layout-flex);}
+input.inpright{
+text-align: right;}
+input.inpleft{ 
+text-align: left;}
+input.inpcenter{
+text-align: center;}
 
 section[name=section1].text, section.select {
  border: 0px solid #999;
@@ -724,10 +730,21 @@ FcInputPrime=Polymer({
 			value: function(){return false;},
 			notify: true, 
 			reflectToAttribute: true
-		},	
+		},
+		isCallback:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true, 
+			reflectToAttribute: true
+		},		
 		timeStamp: {
 			type: String,
 			computed: "_computeTimeStamp(inputType, currentTime, isTimeStamp)",
+			notify: true
+		},
+		callback: {
+			type: String,
+			computed: "_computeCallback(inputType, isCallback)",
 			notify: true
 		},
 		inputRange:{
@@ -906,6 +923,24 @@ FcInputPrime=Polymer({
 			if(inputType=="datetime-local" && this.doAgain>0 && isTimeStamp==
 				true){console.log("dateTime-local", this.isTimeStamp);
 			 var returnVal=currentTime.toInputDateTimeLocal;
+			 this.set("value", returnVal);
+			 this.set("inputValue", returnVal);
+			 this.set("bindValue", returnVal);
+			 this.set("readonly", true);
+			 //console.log("value time");
+			  return returnVal;
+			}
+		},
+
+		_computeCallback: function(inputType, isCallback)
+		{ //console.log("value time");
+			if(inputType=="datetime-local" && isCallback==
+				true){console.log("callback?", this.isCallback);
+			 var d= new Date();
+				var cbtime = d.setHours(+24);
+				cbtime = cbtime.toLocaleString();
+				console.log(d, cbtime, cbtime, cbtime, "this is callback time");
+			 var returnVal=d.toInputDateTimeLocal;
 			 this.set("value", returnVal);
 			 this.set("inputValue", returnVal);
 			 this.set("bindValue", returnVal);

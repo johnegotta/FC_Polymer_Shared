@@ -8,51 +8,29 @@ background: #007;}
 <template>
 <div class="layout horizontal center-justified">
         <div class="vertical flex-3 layout center" style="height: 96vh;background: white;">
+        <firebase-collection 
+            id='student' 
+            location="https://focused0ne.firebaseio.com/inquiries"
+            order-by-child="timeStamp"
+            data="{{inquiries}}">
+        </firebase-collection>
             
            <sortable-js group="group" handle=".handle">               
            
                <template is="dom-repeat" items="{{flexCards}}" class="ghost dropzone" style="max-height: 2500px;">
-                    <fc-ddr-card header-title="[[item.title]]" id$="[[item.theId]]" class="group" on-tap="assignFixed" head-class="[[item.class]]"style$="[[item.style]]">
-                    <section style="border:2px solid #afafaf;"on-tap="revealInq"> [[item.title]]
-                    <ol title="item.title"><span style="border-bottom: 2px solid blue; color: #008; font-weight: 600; font-size: 16px;"> [[item.content.title0]] &nbsp; &nbsp; &nbsp; &nbsp;  [[item.content.value0]] &nbsp; &nbsp; &nbsp; &nbsp; [[item.content.title01]]: [[item.content.value01]]<span><iron-icon icon="{{iconForPayment}}" style$="{{iconStyle}}"></iron-icon></span></span>
-                    <section class="horizontal layout flex wrap" hidden$="{{!notHidden}}" id="hiddenInquiry">
-                         <ol title="item.title" class="horizontal layout wrap">
-                            <li> [[item.content.title1]]: [[item.content.value1]],  [[item.content.title2]]: [[item.content.value2]], [[item.content.title3]]: [[item.content.value3]]</li> <li>[[item.content.title4]]: [[item.content.value4]], [[item.content.title5]]: [[item.content.value5]], [[item.content.title6]]: [[item.content.value6]] [[item.content.title7]]: [[item.content.value7]]</li><li> [[item.content.title8]]: [[item.content.value8]], [[item.content.title9]]: [[item.content.value9]]</li>   <li> [[item.content.title10]]: [[item.content.value10.contact]], [[item.content.value10.phone]], [[item.content.value10.phone2]], [[item.content.value10.email]], [[item.content.value10.email2]]</li>
-                              </ol> 
-                    </section>
-                    </ol>
-                    </section>
-                    <section style="border:2px solid #afafaf;" on-tap="revealInq">
-                    <ol title="item.title"><span style="border-bottom: 2px solid blue; color: #008; font-weight: 600; font-size: 16px;"> [[item.content.title0]] &nbsp; &nbsp; &nbsp; &nbsp;  [[item.content.value0]] &nbsp; &nbsp; &nbsp; &nbsp; [[item.content.title01]]: [[item.content.value01]]<span><iron-icon icon="{{iconForPayment}}" style$="{{iconStyle}}"></iron-icon></span></span>
-                    <section hidden$="{{!notHidden}}" class="horizontal layout flex wrap" id="hiddenInquiry">
-                     <ol title="item.title" class="horizontal layout wrap">
-                            <li> [[item.content.title1]]: [[item.content.value1]],  [[item.content.title2]]: [[item.content.value2]], [[item.content.title3]]: [[item.content.value3]]</li> <li>[[item.content.title4]]: [[item.content.value4]], [[item.content.title5]]: [[item.content.value5]], [[item.content.title6]]: [[item.content.value6]] [[item.content.title7]]: [[item.content.value7]]</li><li> [[item.content.title8]]: [[item.content.value8]], [[item.content.title9]]: [[item.content.value9]]</li>   <li> [[item.content.title10]]: [[item.content.value10.contact]], [[item.content.value10.phone]], [[item.content.value10.phone2]], [[item.content.value10.email]], [[item.content.value10.email2]]</li>
-                              </ol> 
-                    </section>
-                    </ol>
-                    </section>
-                </fc-ddr-card>
+                    <fc-inquiry-list head-class="[[item.class]]" style="[[item.style]]" orderby="[[item.orderby]]" my-id="[[item.theId]]" class="group .handle" header-title="[[item.title]]">
+                    </fc-inquiry-list>
                 </template>
             </sortable-js>
             </div>
       
         <div class="vertical flex-5 layout center" style="height: 96vh;">
-      
-        <fc-ddr-card header-title="Focused Calendar" header-color="green">
-            <fc-calendar-animee is-narrow="true" style="height: 350px; width: 100%;">
-            </fc-calendar-animee>
-          </fc-ddr-card>
-        
             <fc-ddr-card header-title="New Caller Intake Form">
-                <fc-titling-form class="horizontal layout content" style="padding: 12px; font-weight: 600;   background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
-                    <fc-profile-inputs class="card-content" search-vals="{{searchVals}}" style="width: 100%;" data-source$="{{myData}}">
+                <fc-call-intake-form form-submit-one="{{isFormSubmitted}}"  search-values="{{searchVals}}" is-previous-caller="{{launchDialog}}" focused-student="{{studentSelectable}}" class="horizontal layout content" style="padding: 12px; font-weight: 600; background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
+                    <fc-profile-inputs class="card-content" fc-student="{{studentSelectable}}" search-vals="{{searchVals}}" style="width: 100%;" data-source$="[[_dataSource(myData, myDataThree, isFormSubmitted)]]">
                     </fc-profile-inputs>
-                </fc-titling-form>
+                </fc-call-intake-form>
             </fc-ddr-card>
-
-       <fc-ddr-card header-title="Student Profile Field Grid">
-       <fc-grid-table pink="true"></fc-grid-table> 
-        </fc-ddr-card>       
         </div>
             
         <div class="vertical flex-3 layout center" style="background: white; height: 96vh;">
@@ -60,7 +38,7 @@ background: #007;}
                    <fc-ddr-card header-title="Searchable Call List" style="width: 100%; height: 100%;">
                         <neon-animated-pages class="fit" id="pages" selected="0">
                             <fc-call-list-view id="callList" search-vals="{{searchVals}}"></fc-call-list-view>
-                            <fc-tabbed-card id="viewProfile" on-close="_onClose"></fc-tabbed-card>
+                            <fc-tabbed-card id="viewProfile" student="{{studentSelectable}}" on-close="_onClose"></fc-tabbed-card>
                         </neon-animated-pages>
                     </fc-ddr-card>
                     
@@ -73,102 +51,61 @@ background: #007;}
 Polymer({
 is: "fc-call-center-page-one-holder",
 listeners: {"on-call-click": "_onCallClick", 
-            "sendInputVal": "_passSearchVals"
+            "sendInputVal": "_passSearchVals", 
+            "studentSelected":"_setPreviousCaller"
             },
 properties: {
+    
     notHidden:{
         type: Boolean,
         value: false,
         notify: true
     },
-
-    // newItems:{
-    //     type: Array,
-    //     value: function(){
-    //         var A={};
-    //         A=new FcCalendarAnimee();
-    //         var B={};
-    //         B=new FcProfileInputs();
-    //         var C={};
-    //         C=new FcGridTable();
-    //         return [ "A", "B", "C"]; 
-    //                     // {"header": "Focused Events Calendar", "element": JSON.parse(A)},
-    //                     // {"header":"New Caller Intake Form", "element": B}, 
-    //                     // {"header": "Profile Input Grid", "element": C}
-                    
-    //         },
-    //     notify: true
-    // }, 
+    studentArray:{
+        type: Array,
+        value:[],
+        notify: true
+    },
+    launchDialog:{
+        type: Boolean,
+        value: false,
+        notify: true,
+        reflectToAttribute: true
+    },
+    studentSelectable:{
+        type: Object,
+        value: {},
+        notify: true,
+        reflectToAttribute: true
+    },
     flexCards:{ 
         type: Array,
         // observer:"mutation",
         value: function(){ 
             return [{"title": "Clients Closed Today",
                     "class": "green",
-                    "style": "width: 640px !important; height: 120px;",
+                    "style": "width: 600px !important; height: 60px;",
+                    "orderby": "isClosed",
                     "theId": "numberOne"
                     }, 
                     {"title": "Clients to be Closed Today",
                     "class": "red",
-                    "style": "width: 640px !important; height: 120px;",
+                    "style": "width: 600px !important; height: 60px;",
+                    "orderby": "isClosed",
                     "theId": "numberTwo"
                     },
-                    {"title": "Today's Revenue",
-                    "class": "lime",
-                    "style": "width: 640px !important; height: 120px;",
-                    "theId": "numberThree"
-                    },
-                    {"title": "Today's Missed Revenue",
-                    "class": "orange",
-                    "style": "width: 640px !important; height: 120px;",
-                    "theId": "numberFour"
-                    },
+                   
                     {"title": "Today's Highest Interest Offering",
                     "class": "cyan",
-                    "style": "width: 640px !important; height: 120px;",
+                    "style": "width: 600px !important; height: 60px;",
+                    "orderby": "focusedProgramMatch",
                     "theId": "numberFive"
-                    },
-                     {"title": "Tomorrow's Target Sales",
-                    "class": "pink",
-                    "style": "width: 640px !important; height: 120px;",
-                    "theId": "numberSix"
                     },
                      {"title": "Todays Inquiries",
                     "class": "magenta",
-                    "style": "min-width: 640px!important; height: 120px;",
-                    "theId": "numberSeven",
-                    "content": 
-                            {"title0": "Inquiry No. 1",
-                             "value0": "Inquiry Closed",
-                             "title01":"Revenue Colected:",
-                             "value01":"$2200.00",
-                             "title1": "Date-time",
-                             "value1":"timestamp",
-                             "title2": "Name",
-                             "value2": "CALLERNAME",
-                             "title3": "Closed",
-                             "value3": "Yes",
-                             "title4": "Service Needs",
-                             "value4": "Schedule Confirmations",
-                             "title5": "Need Fulfilled",
-                             "value5": "Yes.",
-                             "title6": "Follow-up Contact Time",
-                             "value6": "None Needed.",
-                             "title7": "INTAKE FCID",
-                             "value7": "LOLINC00001",
-                             "title8": "Client Message",
-                             "value8": "client message details... Stuff Client Says",
-                             "title9": "Related Profile",
-                             "value": "fcid as appropriate",
-                             "title10": "Quick Contact Info",
-                             "value10": {"contact": "callername callerLastname, relStudeName",
-                                         "phone": "732-999-9999",
-                                         "phone2": "732-999-8999",
-                                         "email":"clientFCID@FOCUSED.com",
-                                         "email2":"clientFCID2@FOCUSED2.com"}
-                        
-                            }
-                        
+                    "style": "width: 600px !important; height: 60px;",
+                    "orderby": "timeStamp",
+                    "theId": "numberThree"   
                     }
             ];
         },
@@ -216,26 +153,11 @@ properties: {
 	searchVals:{
         type: Object,
         value: {
-              studentFirstName: "",
-              studentLastName:"",
-              parent1LastName:"",
-              parent1FirstName:"",
-              parent2FirstName:"",
-              parent2LastName:"",
-              parent1Email:"", 
-              parent2Email:"",
-              studentEmail:"",
-              studentTelephone:"",
-              parent1Telephone: "",
-              parent2Telephone: "",
-              coach:"",
-              fcid:"",
-              notify: true,
-              reflectToAttribute: true
-          },
-    notify: true, 
-    reflectToAttribute: true
-  },
+            fcProfile: {},
+        },
+        notify: true, 
+        reflectToAttribute: true
+    },
 	data: {
     type: Array,
     	value: function(){return [];},
@@ -245,6 +167,249 @@ properties: {
       type: Array,
       value: function(){return  [ 
         { "a_Name": "currentSchool",
+            "a_Label": "Current School",
+            "a_Class": "",
+            "a_":"",
+            "a_InputType":"text",
+            "a_":"",
+            "b_": "",
+            "b_InputType":"range",
+            "b_Min":400,
+            "b_Max":1600,
+            "b_Label":"Best SAT/PSAT Total",
+            "b_Name": "startTotal",
+            "aa": "",
+            "aaName":"parent1FirstName",
+            "aaLabel": "Parent First Name",
+            "_adataSourceMapA": "profiles",
+            "aaInputType":"text",
+            "aaClass": "",
+            "_aPersonfcid":"",
+            "_aStafffcid":"",
+            "aaHeader":"Parent and Student Profile and Contact Information",
+            "abHeader":"Phone and Email",
+            "acHeader":"Academic History, Preferences & Related Test Scores",
+            "aeHeader":"Caller Message and Comments", 
+            "adHeader":"",
+            "afHeader":"",
+            "ab": "",
+            "abName":"parent1LastName",
+            "abLabel": "Parent Last Name",
+            "abInputType":"text",
+            "abClass": "",
+            "ac": "",
+            "acName":"studentFirstName",
+            "acLabel": "Student First Name",
+            "acInputType":"text",
+            "acClass": "",
+            "ad": "",
+            "adName":"studentLastName",
+            "adLabel": "Student Last Name",
+            "adInputType":"text",
+            "adClass": "",
+            "ae": "",
+            "aeName":"parent1Telephone",
+            "aeLabel": "Parent 1 Phone",
+            "aeInputType":"tel",
+            "aeClass": "",
+            "af": "",
+            "afName":"parent1Email",
+            "afLabel": "Parent 1 Email",
+            "afInputType":"email",
+            "afClass": "",
+            "ag": "",
+            "agName":"studentTelephone",
+            "agLabel": "Student Phone",
+            "agInputType":"tel",
+            "agClass": "",
+            "ah": "",
+            "ahName":"studentEmail",
+            "ahLabel": "Student Email",
+            "ahInputType":"email",
+            "ahClass": "",
+            "ai2": "",
+            "ai2Name":"parent2FirstName",
+            "ai2Label": "Parent 2 First Name",
+            "ai2InputType":"text",
+            "ai2Class": "",
+            "ai": "",
+            "aiName":"parent2Telephone",
+            "aiLabel": "Parent 2 Phone",
+            "aiInputType":"text",
+            "aiClass": "",
+            "aj": "",
+            "ajName":"parent2Email",
+            "ajLabel": "Parent 2 Email",
+            "ajInputType":"text",
+            "ajClass": "",
+            "aj2": "",
+            "aj2Name":"parent2LastName",
+            "aj2Label": "Parent 2 Last Name",
+            "aj2InputType":"text",
+            "aj2Class": "",
+            "ak": "selector",
+            "akName":"gradeLevel",
+            "akLabel": "Current Grade",
+            "akInputType":"select",
+            "akOptionOne": "Grade 4",
+            "akOptionTwo": "Grade 5",
+            "akOptionThree": "Grade 6",
+            "akOptionFour": "Grade 7",
+            "akOptionFive": "Grade 8",
+            "akOptionSix": "Grade 9",
+            "akOptionSeven": "Grade 10",
+            "akOptionEight": "Grade 11",
+            "akOptionNine": "Grade 12",
+            "akOptionTen": "Grade 12+",
+            "akClass": "",
+            "al": "",
+            "alName":"startMath",
+            "alLabel": "Best Math SAT",
+            "alInputType":"range",
+            "alMin": 200,
+            "alMax": 800,
+            "alClass": "",
+            "am": "",
+            "amName":"addressLine1",
+            "amLabel": "Address Line 1",
+            "amInputType":"text",
+            "amClass": "",
+            "an": "",
+            "anName":"addressLine2",
+            "anLabel": "Address Line 2",
+            "anInputType":"text",
+            "anClass": "",
+            "ao": "Select",
+            "aoName":"startReading",
+            "aoLabel": "Highest SAT Reading",
+            "aoInputType":"range",
+            "aoMin": 200,
+            "aoMax":800,
+            "aoClass": "",
+            "ap": "",
+            "apName":"targetScoreIncrease",
+            "apLabel": "Target Score Increase",
+            "apInputType":"range",
+            "apMin": 100,
+            "apMax": 500,
+            "apStep":10,
+            "apClass": "",
+            "aq": "",
+            "aqName":"returnContactTime",
+            "aqLabel": "Next Schedule Contact",
+            "aqInputType":"datetime-local",
+            "aqClass": "",
+            "ar": "",
+            "arName":"callerMessage",
+            "arLabel": "Additional Information",
+            "arInputType":"text",
+            "arClass": "",
+            "as": "",
+            "asName":"coachMatch",
+            "asLabel": "Focused Coach Match",
+            "asInputType":"select",
+            "asButtonName":"Focused Coach Match",
+            "asOptionOne": "Stacy Collerette",
+            "asOptionTwo": "John Gotta",
+            "asOptionThree": "George Rimakis",
+            "asOptionFour": "Mustafa Raza",
+            "asOptionFive": "Jason Frazzano",
+            "asOptionSix": "Joseph Zirkel",
+            "asOptionSeven": "Radika Patel",
+            "asOptionEight": "Sara Viola",
+            "asOptionNine": "Scott McKinnley",
+            "asOptionTen": "", 
+            "asClass": "",
+            "at": "",
+            "atName":"focusedProgramMatch",
+            "atLabel": "Focused Program Match",
+            "atInputType":"select",
+            "atClass": "",
+            "au": "",
+            "auName":"completedMathCourse",
+            "auLabel": "Completed Math Course",
+            "auInputType":"select",
+            "auButtonName": "",
+            "auOptionOne": "Pre-Algebra",
+            "auOptionTwo": "Algebra I",
+            "auOptionThree": "Geometery, no Algebra I",
+            "auOptionFour": "Algebra I and Geometery",
+            "auOptionFive": "Algebra II, no Geometry",
+            "auOptionSix": "Algebra II and Geometry",
+            "auOptionSeven": "Currently in Pre-Calculus",
+            "auOptionEight": "Completed Pre-Calculus",
+            "auOptionNine": "Completed Basic Statistics",
+            "auOptionTen": "Calculus AB or Higher", 
+            "auClass": "",
+            "av": "",
+            "avName":"currentEnglishClass",
+            "avLabel": "Current English Course",
+            "avInputType":"select",
+            "avOptionOne": "Standard English",
+            "avOptionTwo": "Honors English",
+            "avOptionThree": "AP Language and Composition",
+            "avOptionFour": "APLiterature and Composition",
+            "avOptionFive": "English Writing Colloquim",
+            "avOptionSix": "Other English Course",
+            "avOptionSeven": "Other English Course",
+            "avOptionEight": "Other English Course",
+            "avOptionNine": "Other English Course",
+            "avOptionTen": "Other English Course", 
+            "avClass": "",
+            "avButtonName": "",
+            "aw": "",
+            "awName":"completedScience",
+            "awLabel": "Completed Science Course",
+            "awOptionOne": "Biology",
+            "awOptionTwo": "Chemistry",
+            "awOptionThree": "Physics",
+            "awOptionFour": "AP Biology",
+            "awOptionFive": "AP Chemistry",
+            "awOptionSix": "AP Physics",
+            "awOptionSeven": "AP Bio & AP Chem",
+            "awOptionEight": "AP Bio & AP Phys",
+            "awOptionNine": "AP Phys & AP Chem",
+            "awOptionTen": "AP Phys, AP Bio & AP Chem", 
+            "awInputType":"select",
+            "awClass": "",
+            "awButtonName": "",
+            "ax": "",
+            "axName":"currentHistoryCourse",
+            "axLabel": "Current History Course",
+            "axInputType":"select",
+            "axButtonName":"",
+            "axOptionOne": "World History",
+            "axOptionTwo": "AP U.S. History One",
+            "axOptionThree": "AP U.S. History Two",
+            "axOptionFour": "AP Human Geography",
+            "axOptionFive": "AP World History",
+            "axOptionSix": "AP European History",
+            "axOptionSeven": "AP Art History",
+            "axOptionEight": "U.S. History",
+            "axOptionNine": "AP Gov. & Pol.",
+            "axOptionTen": "other", 
+            "axClass": "",
+            "ay": "",
+            "ayName":"addParentTwo",
+            "ayLabel": "Add Parent Two",
+            "ayInputType":"checkbox",
+            "ayButtonName":"",
+            "ayClass": "",
+            "az": "",
+            "azName":"addAdress",
+            "azLabel": "Add Address",
+            "azInputType":"checkbox",
+            "azButtonName":"",
+            "azClass": ""    
+          }
+        ];
+      },
+    notify: true
+  },
+myDataTwo: {
+    type: Array,
+    value: function(){ return [{
+            "a_Name": "currentSchool",
             "a_Label": "Current School",
             "a_Class": "",
             "a_":"",
@@ -329,16 +494,16 @@ properties: {
             "akName":"gradeLevel",
             "akLabel": "Current Grade",
             "akInputType":"select",
-            "akOptionOne": "Grade 4",
-            "akOptionTwo": "Grade 5",
-            "akOptionThree": "Grade 6",
-            "akOptionFour": "Grade 7",
-            "akOptionFive": "Grade 8",
-            "akOptionSix": "Grade 9",
-            "akOptionSeven": "Grade 10",
-            "akOptionEight": "Grade 11",
-            "akOptionNine": "Grade 12",
-            "akOptionTen": "Other",
+            "akOptionOne": "4th",
+            "akOptionTwo": "5th",
+            "akOptionThree": "6th",
+            "akOptionFour": "7th",
+            "akOptionFive": "8th",
+            "akOptionSix": "9th",
+            "akOptionSeven": "10th",
+            "akOptionEight": "11th",
+            "akOptionNine": "12th",
+            "akOptionTen": "12+",
             "akClass": "",
             "al": "",
             "alName":"satMath",
@@ -348,12 +513,12 @@ properties: {
             "alMax": 800,
             "alClass": "",
             "am": "",
-            "amName":"address1",
+            "amName":"addressLine1",
             "amLabel": "Address Line 1",
             "amInputType":"text",
             "amClass": "",
             "an": "",
-            "anName":"address2",
+            "anName":"addressLine2",
             "anLabel": "Address Line 2",
             "anInputType":"text",
             "anClass": "",
@@ -468,16 +633,21 @@ properties: {
             "azLabel": "Add Address",
             "azInputType":"checkbox",
             "azButtonName":"",
-            "azClass": ""    
-          }
+            "azClass": ""
+            }
         ];
-      },
+    },
     notify: true
-  },
-myDataTwo: {
+},
+isFormSubmitted:{
+    type: Boolean,
+    value: false,
+    notify: true
+},
+myDataThree: {
           type: Array,
           value: function(){ return [{
-          "a_Name": "Current Offerings",
+            "a_Name": "Current Offerings",
             "a_Label": "Calendar of Offerings",
             "a_Class": "",
             "a_":"",
@@ -663,8 +833,28 @@ myDataTwo: {
 },
 
     attached: function(){
-
+// this.set("searchVals.fcProfile",{          
+//               studentFirstName: "",
+//               studentLastName:"",
+//               parent1LastName:"",
+//               parent1FirstName:"",
+//               parent2FirstName:"",
+//               parent2LastName:"",
+//               parent1Email:"", 
+//               parent2Email:"",
+//               studentEmail:"",
+//               studentTelephone:"",
+//               parent1Telephone: "",
+//               parent2Telephone: "",
+//               coach:"",
+//               fcid:""
+//           });
         
+    },
+
+    _dataSource: function(myData, myDataThree, isFormSubmitted){
+        var retVal = (isFormSubmitted == false)?myData: myDataThree;
+        return retVal;
     },
 
       
@@ -679,17 +869,35 @@ myDataTwo: {
 
 
     },
+    assignFixed: function(){
+        // this.$.InquiriesListOne.style.position="fixed";
+        // this.$.InquiriesListOne.drags=true;
+        console.log("assignFixed");
+    },
   _onCallClick: function(e) {
       this.$.pages.selected = 1;
       console.log(e.detail.item);
-     this.$.viewProfile.setProfile(e.detail.item);
+     this.$.viewProfile.setStudent(e.detail.item.fcid); 
+     console.log(e.detail.item.fcid);
+     console.log(this.studentSelectable, "here is selected");
   
     },
+
+    _setPreviousCaller: function(e, detail)
+    {
+        console.log(e.detail);
+        this.set("studentSelectable", e.detail);
+
+
+
+
+    },
+
     _onClose: function() {
       this.$.pages.selected = 0;
     },
     _passSearchVals: function(e, detail){
-      console.log(e.detail.value, e.detail.name);
+      console.log(e.detail.value, e.detail.name, "take Note here");
       var name = e.detail.name;
       var val = e.detail.value;
         if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}

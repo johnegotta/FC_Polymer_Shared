@@ -22,15 +22,16 @@
     </style>
 
 
-<firebase-collection data="{{calls}}" id="FBCallReads" location="https://focusedstaging1.firebaseio.com/calls"></firebase-collection>
+<firebase-collection data="{{calls}}" id="FBCallReads" location="https://focused0ne.firebaseio.com/inquiries"></firebase-collection>
 <!-- <fc-toolbar data="{{data}}" class="horizontal layout fixed">
  <div style="height: 22px; overflow-y: color: black; scroll; width: 120px;"> 
  [[address1]] [[address2]] [[callerRole]] [[contactHistory]] [[currentCoach]] [[dateStamp]] [[fcSelector]] [[focusedProgramFit]] [[gradeLevel]] [[hwkRecord]] [[intakeFcid]] [[lastFocusedContact]] [[parent1FirstName]] [[parent1LastName]] [[parent1Telephone]] [[parent2Email]] [[parent2FirstName]] [[parent2LastName]] [[parent2Telephone]] [[parent1Email]] [[previousContact]] [[register]] [[returnContactTime]] [[satMath]] [[satReading]] [[satTotal]] [[search]] [[studentEmail]] [[studentFirstName]] [[studentLastName]] [[studentTelephone]]
 </div>
+, myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease
             </fc-toolbar> -->
  <div class="main">
 
-    <template is="dom-repeat" filter="{{_filter(searchVals, myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease)}}" items="{{calls}}" as="call">
+    <template is="dom-repeat" filter="{{_filter(searchVals)}}" items="{{calls}}" as="call">
    
      <fc-call-item id="callItem" data="{{call}}">
      <iron-icon icon="icons:account-circle"  on-tap="_onClick"></iron-icon>
@@ -309,17 +310,19 @@
     },
 
     updateSearchVals: function(nsv, name, val){
-      this.set("searchVals", nsv);
+      this.set("searchVals", JSON.parse(JSON.stringify(nsv)));
       // console.log(this.searchVals);
  
-      this.set("myProperty", nsv.parent1FirstName);
-      if(name=="parent1FirstName"){this.set("parent1FirstName", nsv.parent1FirstName);}else if(name=="parent1LastName"){this.set("parent1LastName", nsv.parent1LastName);} else if(name=="parent2FirstName"){this.set("parent2FirstName", nsv.parent2FirstName);}else if(name=="parent2LastName"){this.set("parent2LastName", nsv.parent2LastName);}else if(name=="firstName" || name=="studentFirstName"){ this.set("studentFirstName", nsv.studentFirstName);}else if(name=="studentLastName" || name=="lastName"){ this.set("studentLastName", nsv.studentLastName);}else if(name=="parent1Email"){this.set("parent1Email", nsv.parent1Email);} else if(name=="studentEmail" || name=="email"){ this.set("studentEmail", nsv.studentEmail);} else if(name=="parent2Email"){ this.set("parent2Email", nsv.parent2Email);}else if(name=="parent1Telephone"){ this.set("parent1Telephone", nsv.parent1Telephone);}else if(name=="parent2Telephone"){ this.set("parent2Telephone", nsv.parent2Telephone);} else if(name=="telephone" || name=="studentTelephone"){this.set("studentTelephone", nsv.studentTelephone);}else{this.set("myProperty", this.myProperty);}
+      // this.set("myProperty", nsv.parent1FirstName);
+      // if(name=="parent1FirstName"){this.set("parent1FirstName", nsv.parent1FirstName);}else if(name=="parent1LastName"){this.set("parent1LastName", nsv.parent1LastName);} else if(name=="parent2FirstName"){this.set("parent2FirstName", nsv.parent2FirstName);}else if(name=="parent2LastName"){this.set("parent2LastName", nsv.parent2LastName);}else if(name=="firstName" || name=="studentFirstName"){ this.set("studentFirstName", nsv.studentFirstName);}else if(name=="studentLastName" || name=="lastName"){ this.set("studentLastName", nsv.studentLastName);}else if(name=="parent1Email"){this.set("parent1Email", nsv.parent1Email);} else if(name=="studentEmail" || name=="email"){ this.set("studentEmail", nsv.studentEmail);} else if(name=="parent2Email"){ this.set("parent2Email", nsv.parent2Email);}else if(name=="parent1Telephone"){ this.set("parent1Telephone", nsv.parent1Telephone);}else if(name=="parent2Telephone"){ this.set("parent2Telephone", nsv.parent2Telephone);} else if(name=="telephone" || name=="studentTelephone"){this.set("studentTelephone", nsv.studentTelephone);}else{this.set("myProperty", this.myProperty);}
 
       // console.log(this.studentFirstName);
     },
 
 
- _filter: function(searchVals, myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease){
+ _filter: function(searchVals){
+  // , myProperty,address1,address2,callerRole,contactHistory,currentCoach,dateStamp,fcSelector,focusedProgramFit,gradeLevel,hwkRecord,intakeFcid,lastFocusedContact,parent1FirstName,parent1LastName,parent1Telephone,parent2Email,parent2FirstName,parent2LastName,parent2Telephone,parent1Email,previousContact,register,returnContactTime,satMath,satReading,satTotal,search,studentEmail,studentFirstName,studentLastName,studentTelephone,targetScoreIncrease
+
         // console.log(myProperty);
         // console.log(this.searchVals.parent1FirstName, "firstname", this.parent1FirstName);
         return function(call){
@@ -334,8 +337,8 @@
           if(searchVals.parent1FirstName && searchVals.parent1FirstName != "")
           {
             //user entered a value in first name search
-            if(call.parent1FirstName)            
-            {val=call.parent1FirstName.toLowerCase();
+            if(call.fcProfile.parent1FirstName)            
+            {val=call.fcProfile.parent1FirstName.toLowerCase();
               result &= (val.indexOf(searchVals.parent1FirstName.toLowerCase()) > -1);
             }
             else return false; // first name searched but none in record
@@ -344,8 +347,8 @@
           if(searchVals.parent1LastName && searchVals.parent1LastName != "")
           {
             //user entered a value in last name search
-            if(call.parent1LastName)           
-            { val=call.parent1LastName.toLowerCase();
+            if(call.fcProfile.parent1LastName)           
+            { val=call.fcProfile.parent1LastName.toLowerCase();
               result &= (val.indexOf(searchVals.parent1LastName.toLowerCase()) > -1);
             }
             else return false; // last name searched but none in record
@@ -353,8 +356,8 @@
           if(searchVals.studentFirstName && searchVals.studentFirstName != "")
           {
             //user entered a value in email search
-            if(call.studentFirstName)            
-            { val=call.studentFirstName.toLowerCase();
+            if(call.fcProfile.studentFirstName)            
+            { val=call.fcProfile.studentFirstName.toLowerCase();
               result &= (val.indexOf(searchVals.studentFirstName.toLowerCase()) > -1);
             }
             else return false; //user entered email search but none in record
@@ -362,8 +365,8 @@
           if(searchVals.studentLastName && searchVals.LastFirstName != "")
           {
             //user entered a value in email search
-            if(call.studentLastName)            
-            { val=call.studentLastName.toLowerCase();
+            if(call.fcProfile.studentLastName)            
+            { val=call.fcProfile.studentLastName.toLowerCase();
               result &= (val.indexOf(searchVals.studentLastName.toLowerCase()) > -1);
             }
             else return false; //user entered email search but none in record
@@ -371,8 +374,8 @@
           if(searchVals.parent2FirstName && searchVals.parent2FirstName != "")
           {
             //user entered a value in first name search
-            if(call.parent2FirstName)            
-            {val=call.parent2FirstName.toLowerCase();
+            if(call.fcProfile.parent2FirstName)            
+            {val=call.fcProfile.parent2FirstName.toLowerCase();
               result &= (val.indexOf(searchVals.parent2FirstName.toLowerCase()) > -1);
             }
             else return false; // first name searched but none in record
@@ -380,8 +383,8 @@
           if(searchVals.parent2LastName && searchVals.parent2LastName != "")
           {
             //user entered a value in last name search
-            if(call.parent2LastName)           
-            { val=call.parent2LastName.toLowerCase();
+            if(call.fcProfile.parent2LastName)           
+            { val=call.fcProfile.parent2LastName.toLowerCase();
               result &= (val.indexOf(searchVals.parent2LastName.toLowerCase()) > -1);
             }
             else return false; // last name searched but none in record
