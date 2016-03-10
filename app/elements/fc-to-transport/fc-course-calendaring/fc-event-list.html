@@ -1,0 +1,234 @@
+	<dom-module id="fc-event-list">
+  <template>
+  <style>
+  </style>
+    
+    <form on-submit="addItem" class="horizontal layout flex wrap" style="padding:8px;">
+    <section class="layout horizontal nowrap" style="width:96%;">
+          <fc-input-prime 
+            value="{{item.name}}"
+            id="theNameOne"
+            label="Event Name" 
+            input-type="text"
+            name="name">
+          </fc-input-prime>
+          <fc-input-prime 
+            input-type="datetime-local" 
+            label="Start Time"
+            name="startTime"  
+            value="{{item.startTime}}">
+          </fc-input-prime>
+           <fc-input-prime 
+            input-type="datetime-local" 
+            label="end Time"
+            name="endTime" 
+            value="{{item.endTime}}">
+          </fc-input-prime>
+          <fc-input-prime 
+            input-type="text" 
+            label="Location" 
+            value="{{item.location}}">
+          </fc-input-prime>
+          <fc-input-prime 
+            input-type="text" 
+            label="Coach" 
+            value="{{item.coach}}">
+          </fc-input-prime>
+          </section>
+
+      </form>
+
+                ADD     
+     <paper-icon-button icon="icons:add-circle-outline" on-tap="addItem">
+         </paper-icon-button>
+      <div class="layout vertical" style="height:240px; width: 50%; overflow: hidden; border: ridge 4px silver;" >
+      <div class="layout vertical flex wrap" style="background: white; width: 100%; border: silver solid 2px; max-height: 340px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
+      <template is="dom-repeat" items="{{events}}" as='event'>
+          <div class="eventItem">
+            <paper-checkbox
+              on-change="toggleItem"
+                checked="{{event.completed}}"></paper-checkbox>
+              <span class="label">[[event.name]] [[event.startTime]] [[event.endTime]]  [[event.coach]]  [[event.location]] [[event.completed]]</span>
+              <paper-icon-button
+              icon="delete" 
+                on-tap="deleteItem">
+              </paper-icon-button>
+            </div>
+      </template>
+      </div>
+      </div>
+</template>
+<script>
+"use strict";
+class FcEvent {
+  constructor(theDate, argEvent){
+      this.build(theDate, argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.practiceTest, argEvent.holiday, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid)
+  }
+
+  getFirebaseLocation(theDate){return "https://focused0ne.firebaseio.com/events";}
+  isHoliday(theDate)
+    {
+      var holidayArray = [];
+      holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13]  }, 
+        {"name": "St. Patrick's Day", "holiday":[2016,3,17] },
+        {"name": "Palm Sunday", "holiday":[2016,3,20] }, 
+        {"name": "Passover Begins", "holiday": [2016,3,23]  },
+        {"name": "Purim", "holiday": [2016,3,24]  }, 
+        {"name": "Good Friday", "holiday": [2016,3,25]  },
+        {"name": "Easter", "holiday": [2016,3,27] },
+        {"name": "Orthodox Good Friday", "holiday": [2016,4,29] },
+        {"name": "Last Day of Passover", "holiday": [2016,4,30] }, 
+        {"name": "Yom HaShoah", "holiday": [2016,5,4] }, 
+        {"name": "Isra and Mi'raj, Cinco Di Mayo", "holiday": [2016,5,5]  }, 
+        {"name": "MOTHERS DAY!!!", "holiday": [2016,5,8]  },
+        {"name": "Memorial Day", "holiday": [2016,5,30] },
+        {"name": "Ramadan Begins", "holiday": [2016,6,7]  },
+        {"name": "Father's Day", "holiday": [2016,6,19] },
+        {"name": "Independence Day July 4", "holiday": [2016,7,4] },
+        {"name": "Labor Day", "holiday": [2016,9,5] },
+        {"name": "Rosh Hashana, Muharram", "holiday": [2016,10,3] },
+        {"name": "Columbus Day", "holiday": [2016,10,10]  },
+        {"name": "Yom Kippur", "holiday": [2016,10,12]  },
+        {"name": "Diwali", "holiday": [2016,10,29]  },
+        {"name": "Halloween", "holiday": [2016,10,31] },
+        {"name": "Veterans Day", "holiday": [2016,11,11]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,24]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,25]  }, 
+        {"name": "Christmas Eve", "holiday": [2016,12,24] },
+        {"name": "Christmas", "holiday": [2016,12,25] },
+        {"name": "New Year's Eve", "holiday": [2016,12,31]  }
+        ];
+  
+      var counter = holidayArray.length;
+      var i=0;
+      var eventDay={};
+      eventDay.holiday='';
+      eventDay.date=theDate;
+      for(i=0;i<counter;i++){
+        var holiday = new Date(holidayArray[i].holiday);
+     // if(theDate.getDate()==4){console.log(holiday, theDate);}
+        if (theDate.toLocaleString() == holiday.toLocaleString()){
+
+           eventDay.holiday = holidayArray[i].name + " ";
+           console.log(holiday, holiday, eventDay.holiday);
+        }
+        if (eventDay.holiday!='' && theDate.toLocaleString()!=holiday.toLocaleString())
+          {return eventDay;}
+      }
+      return eventDay;
+
+    }
+
+  build(theDate, name, startTime, endTime, practiceTest, holiday, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
+  {
+    this.theDate = theDate || "";
+    this.name=name || ""; 
+    var ref = new Firebase(this.getFirebaseLocation());
+    var self= this;
+    ref.child('counter').transaction(function(argCounter){return argCounter+1;}, 
+      function(error, isSuccessful, finalVal)
+        { console.log(error, isSuccessful, finalVal.val());
+          if(isSuccessful)
+            {
+              self.fcid=finalVal.val();
+            }
+        });
+    this.startTime=new Date(startTime) || ""; 
+    this.endTime=new Date(endTime) || ""; 
+    this.practiceTest = new Date(practiceTesty) || '';
+    this.holiday = this.isHoliday(theDate) || '';
+    this.location=location || ""; 
+    this.completed=completed || false;
+    this.relatedFcids=relatedFcids || "";  
+    this.parentEventName=parentEventName || ""; 
+    this.parentEventFcid=parentEventFcid || "";  
+  }
+
+}      
+Polymer({
+  	is: 'fc-event-list',
+  	properties: {
+  		events: {
+  			type: Array,
+  			value: function(){
+  				return [];	},
+  			notify: true
+  			},
+      newItemValue:{
+        type: Object,
+        value: function(){return {};},
+        notify: true
+      },
+  		item: {
+  			type: FcEvent,
+        value: function(){return new FcEvent({});},
+  			notify: true
+  			},
+  		firebaseURL: {
+  			type: String, 
+  			value: "https://focused0ne.firebaseio.com/events",
+  			notify: true
+  			},
+  		firebaseProvider: {
+  			type: String,
+  			value: 'password',
+  			notify: true
+  			}
+  	
+ 
+  	},
+
+		
+		attached: function() {
+        console.log(this.item);
+		  	this.ref = new Firebase(this.firebaseURL);
+		  	this.ref.on('value', function(snapshot) {
+		    	this.updateEvents(snapshot);
+		  	}.bind(this));
+		  	
+		},
+
+
+		onFirebaseError: function(event) {
+  			this.$.errorToast.text = event.detail.message;
+  			this.$.errorToast.show();
+					},
+	
+		onFirebaseLogout: function(event) {
+			this.updateEvents();
+		},
+
+		updateEvents: function(snapshot) {
+		  	this.events = [];
+		  	snapshot.forEach(function(childSnapshot) {
+		    	var item = childSnapshot.val();
+		    	if(childSnapshot.key()!="counter")
+          {
+            item.fcid = childSnapshot.key();
+            this.push('events', item);
+          }
+		  	}.bind(this));
+		},
+
+		addItem: function(event) {
+        console.log(this.$.theNameOne.getAttribute("value"));
+		  	event.preventDefault();
+        console.log(this.item);
+        var it ={};
+        it[this.item.fcid]=this.item;
+		  	this.ref.update(it);
+		  	this.set("item", new FcEvent({}));
+		},
+
+		toggleItem: function(event) {
+		//   	this.ref.child(event.model.item).
+		//     	update({completed: event.model.item.completed});
+		 },
+
+		deleteItem: function(event) {
+      console.log(event);
+		  	this.ref.child(event.model.event.fcid).remove();
+		}
+  });
+  </script>
+  </dom-module>

@@ -6,22 +6,19 @@ background: #007;}
 
 </style>
 <template>
-<div class="layout horizontal center-justified">
-        <div class="vertical flex-3 layout center" style="height: 96vh;background: white;">
+<div class="layout horizontal around-justified">
+        <div class="vertical flex-2 layout center" style="height: 96vh;background: white;">
         <firebase-collection 
-            id='student' 
+            id='inquiries' 
             location="https://focused0ne.firebaseio.com/inquiries"
             order-by-child="timeStamp"
             data="{{inquiries}}">
         </firebase-collection>
-            
-           <sortable-js group="group" handle=".handle">               
-           
-               <template is="dom-repeat" items="{{flexCards}}" class="ghost dropzone" style="max-height: 2500px;">
-                    <fc-inquiry-list head-class="[[item.class]]" style="[[item.style]]" orderby="[[item.orderby]]" my-id="[[item.theId]]" class="group .handle" header-title="[[item.title]]">
+
+               <template is="dom-repeat" items="{{flexCards}}" observer="callReportsObserver" class="dropzone" style="max-height: 2500px;">
+                    <fc-inquiry-list head-class="[[item.class]]" style="[[item.style]]" orderby="[[item.orderby]]" my-id="[[item.theId]]" header-title="[[item.title]]">
                     </fc-inquiry-list>
                 </template>
-            </sortable-js>
             </div>
       
         <div class="vertical flex-5 layout center" style="height: 96vh;">
@@ -35,9 +32,9 @@ background: #007;}
             
         <div class="vertical flex-3 layout center" style="background: white; height: 96vh;">
                
-                   <fc-ddr-card header-title="Searchable Call List" style="width: 100%; height: 100%;">
+                   <fc-ddr-card header-title="Searchable Call List">
                         <neon-animated-pages class="fit" id="pages" selected="0">
-                            <fc-call-list-view id="callList" search-vals="{{searchVals}}"></fc-call-list-view>
+                            <fc-call-list-view id="callList" style="height: 100%;" search-vals="{{searchVals}}"></fc-call-list-view>
                             <fc-tabbed-card id="viewProfile" student="{{studentSelectable}}" on-close="_onClose"></fc-tabbed-card>
                         </neon-animated-pages>
                     </fc-ddr-card>
@@ -84,28 +81,28 @@ properties: {
         value: function(){ 
             return [{"title": "Clients Closed Today",
                     "class": "green",
-                    "style": "width: 600px !important; height: 60px;",
+                    "style": "width: 100%; min-height: 60px;",
                     "orderby": "isClosed",
                     "theId": "numberOne"
-                    }, 
-                    {"title": "Clients to be Closed Today",
-                    "class": "red",
-                    "style": "width: 600px !important; height: 60px;",
-                    "orderby": "isClosed",
-                    "theId": "numberTwo"
-                    },
+                    // }, 
+                    // {"title": "Clients to be Closed Today",
+                    // "class": "red",
+                    // "style": "width: 600px !important; height: 60px;",
+                    // "orderby": "isClosed",
+                    // "theId": "numberTwo"
+                    // },
                    
-                    {"title": "Today's Highest Interest Offering",
-                    "class": "cyan",
-                    "style": "width: 600px !important; height: 60px;",
-                    "orderby": "focusedProgramMatch",
-                    "theId": "numberFive"
-                    },
-                     {"title": "Todays Inquiries",
-                    "class": "magenta",
-                    "style": "width: 600px !important; height: 60px;",
-                    "orderby": "timeStamp",
-                    "theId": "numberThree"   
+                    // {"title": "Today's Highest Interest Offering",
+                    // "class": "cyan",
+                    // "style": "width: 600px !important; height: 60px;",
+                    // "orderby": "focusedProgramMatch",
+                    // "theId": "numberFive"
+                    // },
+                    //  {"title": "Todays Inquiries",
+                    // "class": "magenta",
+                    // "style": "width: 600px !important; height: 60px;",
+                    // "orderby": "timeStamp",
+                    // "theId": "numberThree"   
                     }
             ];
         },
@@ -117,31 +114,31 @@ properties: {
         value: function(){ 
             return [{"title": "Clients Closed Today",
                     "class": "green",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     }, 
                     {"title": "Clients to be Closed Today",
                     "class": "red",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     },
                     {"title": "Today's Revenue",
                     "class": "lime",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     },
                     {"title": "Today's Missed Revenue",
                     "class": "orange",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     },
                     {"title": "Today's Highest Interest Offering",
                     "class": "cyan",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     },
                      {"title": "Tomorrow's Target Sales",
                     "class": "pink",
-                    "style": "width: 640px !important; height: 120px;"
+                    "style": "max-width: 640px !important; height: 120px;"
                     },
                      {"title": "Todays Inquiries",
                     "class": "magenta",
-                    "style": "min-width: 640px!important; height: 120px;"
+                    "style": "max-min-width: 640px!important; height: 120px;"
                     }
 
 
@@ -857,7 +854,10 @@ myDataThree: {
         return retVal;
     },
 
-      
+    callReportsObserver: function(){
+
+
+    },
     revealInq: function(){
         this.notHidden=!this.notHidden;
 

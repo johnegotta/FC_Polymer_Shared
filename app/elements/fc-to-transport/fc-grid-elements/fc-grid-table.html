@@ -2,9 +2,7 @@
 <template>
 <style>
 :host {border: 2px solid #ababab;
-	height: 420px;
-	width: 660px;
-	@apply(--layout-horizontal);
+		@apply(--layout-horizontal);
 	@apply(--layout-wrap);
 	}
 </style>
@@ -30,9 +28,15 @@ FcGridTable=Polymer({
 		},
 		dataArray:{
 			type: Array,
-			computed: "computeDataArray(dataSource)",
+			computed: "computeDataArray(dataSource, dataArrayTwo)",
 			notify: true
 		},
+		dataArrayTwo:{
+			type: Array,
+			value:[],
+			notify: true
+
+		}
 
 	},
 	// behaviors:[fcDraggableDataBehavior],
@@ -48,44 +52,27 @@ FcGridTable=Polymer({
 	detached: function(){
 	
 	},
-	computeDataArray: function(dataSource){
-		var obj ={};
-		var arr=[];
-		obj=dataSource;
-		console.log(dataSource); 
-		var uppers=[];
-      Object.keys(obj).forEach(function(key,index){
-      	
-      	 // var len = key.length;
-      	 // for(var i=0; i<len; i++){
-      	 // 	var upper=key[i].toUpperCase();
-      	 // 	if(key[i]===upper)
-      	 // 	{ 
-      	 // 		uppers.push(i);
-      	 // 	}
-      	 // }
-      	 // var counter=uppers.length;
-      	 // var lastIndex=0;
-      	 // var label ="";
-      	 // for(var j=0; j<counter; j++)
-      	 // {
-      	 // 	var index=uppers[j];
-      	 // 	var word = key.slice(lastIndex, index);
-      	 // 	label += word;
-      	 // 	if(j!=counter-1)
-      	 // 	{
-      	 // 		label+=" ";
-      	 // 	}
-      	 // 	lastIndex=index;
-      	 // }
-      	 //  label[0]=label[0].toUpperCase();
-         arr.push({"label": key,"val": obj[key], "index": index});
-       });
-      console.log(arr);
-      return arr;
-    }
+	computeDataArray: function(dataSource, dataArrayTwo){
+		if(dataArrayTwo==[])
+		{
+				var obj ={};
+				var arr=[];
+				obj=dataSource;
+				console.log(dataSource); 
+				var uppers=[];
+		      Object.keys(obj).forEach(function(key,index){
+		         arr.push({"label": key,"val": obj[key], "index": index});
+		       });
+
+      	console.log(arr);
+      	return arr;
+    	}
+    else { console.log("I am sending the right array");
 
 
+    	return dataArrayTwo;}
+
+	}
 
 });
 </script>

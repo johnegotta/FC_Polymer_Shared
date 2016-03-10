@@ -1,94 +1,31 @@
 <dom-module id="fc-date-card">
- 
 <style>
  :host{
-          margin: 2px;
-          min-width: 50px;
-          max-width: 1300px;
+          margin: 2px 2px 2px 2px;
+          min-width: 39px;
+          max-width: 2200
           min-height: 120px;
-          max-height: 1300px;
+          max-height: 1900px;
+          display: flex;
+          flex: flex-shrink;
+        
          /*//position: fixed; */
         }
-        fc-input{max-width: 121px!important;}
-  form {
-      display: flex;
-      flex-direction: row;
-      margin-bottom: 20px;
-    }
-     paper-header-panel {
-        float: left;
-        background: white;
-        max-width: 780px;
-        min-width: 65px;
-        max-height: 1280px;
-        min-height: 112px;
-        margin: 2px;
-        border: 4px solid #efefef;
-        @apply(--shadow-elevation-2dp);
-      }
-      .paper-header {
-        height: 36px;
-        font-size: 22px;
-        line-height: 26px;
-        padding: 4px;
-        color: white;
-        transition: height 0.2s;
-      }
-      .paper-header.tall {
-        height: 60px;
-      }
-      .paper-header.medium-tall {
-        height: 48px;
-        line-height: 40px;
-      }
-      .content {
-        height: 2500px;
-      }
-      .cover {
-        margin: 2px;
-      }
-      .blue .paper-header {
-        background-color: var(--paper-light-blue-500);
-      }
-      .red .paper-header {
-        background-color: var(--paper-red-500);
-      }
-      .orange .paper-header {
-        background-color: var(--paper-amber-500);
-      }
-      .green .paper-header {
-        background-color: var(--paper-green-500);
-      }
-      .cyan .paper-header {
-        background-color: var(--paper-cyan-500);
-      }
-      .lime .paper-header {
-        background-color: var(--paper-lime-500);
-      }
-      .pink .paper-header {
-        background-color: var(--paper-pink-a200);
-      }
-      .grey .paper-header{
-        background-color: var(--paper-indigo-50);
 
-      }
-      .grey .content{background: #E;}
-.todaysEvent paper-icon-button[icon=delete]{
+    .todaysEvent paper-icon-button[icon=delete]{
 			-webkit-transition: opacity 0.5s;
 			transition: opacity 0.5s;
 			opacity: 0;
 		}
 		.todaysEvent:hover paper-icon-button[icon=delete]{
-			opacity: 100;
+			opacity: 1;
 		}
+    .forCalendar{
+        margin:2px 3px 2px 3px;
+        width:calc(91%/7.8)!important;
 
-		paper-button {
-		  flex-shrink: 1;
-		}
-		fc-input-prime {
-      max-width: 95;
-		  flex-shrink: 1;
-		}
+    }
+
 
 		checkbox {
 		  display: inline-block;
@@ -100,101 +37,45 @@
 		  opacity: 0.5;
 		  text-decoration: line-through;
 		}
-	
-   .content {
-           padding-bottom: 22px;
-           margin-bottom: 23px;
-      }
-      .red .content {
-        background: linear-gradient(white, #ffcdd2);
-      }
-      .orange .content {
-        background: linear-gradient(white, #ffecb3);
-      }
-      .green .content {
-        background: linear-gradient(white, #c8e6c9);
-      }
-      .cyan .content {
-        background: linear-gradient(white, #b2ebf2);
-      }
-      .lime .content {
-        background: linear-gradient(white, #f0f4c3);
-      }
-      .pink .content {
-        background: linear-gradient(white, #f8bbd0);
-      }
+
 </style>
 <template>
-  <paper-header-panel id="focusedDateCard" drags="true" id$="{{relId}}" style="height: [[_computeCurrentHeight(isMini)]]; width:[[_computeCurrentWidth(day, id, isAddingEvent)]] padding-right: 2px;" class="blue">
-
-
-     <div class="paper-header" style="text-align: center;padding-right: 2px;">     
-        <section class="layout horizontal nowrap"  > 
-              <section class="vertical flex-9 layout" on-tap="toggle" style="text-align: center;">[[computePrettyDay(day)]]</section>
-             <section class="horizontal flex-2 layout" style="font-size:9px;">Open<iron-icon icon="icons:swap-vertical-circle"></iron-icon></section> 
+<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
              
-        </section>
-     </div>
-         
-      <div class="content layout vertical flex wrap" style="background: white;border: silver solid 2px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
-      <template is="dom-repeat" items="{{todaysEvents}}">
-          <paper-item style="border: 1px solid #9eaebe; max-height: 24px!important; width: 100%; background: [[item.color]];" class="vertical layout nowrap left-justified"> <span class="horizontal nowrap layout" style="display: inline; overflow-x: scroll;">[[item.eventName]]|[[item.startTime]]|[[item.endTime]]</span>
-                <paper-item-body hidden>                 
-                      <fc-grid-table>
-                      </fc-grid-table>  
-                </paper-item-body>
-          </paper-item>
-      </template>
-      </div>
-  </paper-header-panel>
+   <section class="daycard">[[event.holiday]]</section>
+   <section class="daycard">[[event.practiceTest]]</section>
+   <section class="daycard">[[event.startTime]]</section>
+   <section class="daycard">[[event.endTime]]</section>
+   <content class="daycard"></content>
+      <span on-track="_resize" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
+  </fc-ddr-card>
 </template> 
 <script>
 FcDateCard=Polymer({
 	is:'fc-date-card',
-
+  behaviors:["fcDraggableDataBehavior", "Polymer.IronResizableBehavior", "FCBehaviors.FcCalendarBehaviorPrime"],
 	properties: {
      todaysEvents: {
-        type: Array,
-        value: function(){
-          return [  { 
-                "dateToday": this.day,
-                'eventName': "SAT Practice Test", 
-                'startTime': "09:00" + "AM",
-                'endTime': "12:45" + "PM", 
-                'location': "704 Ginesi, Morganville, Focused",
-                'description': "Practice Test for New and Enrolled Students",
-                'duration': 3.75,
-                "color": "#ff00b6",//fuscia bright
-                "studentNumber": 47,
-                "assocRevenue": 94000,
-                "revenuePeriodDays":41,
-                "revenuePeriodHours":144, //two teacher minimum plus prep et al
-                "perDiem":  2292,
-                "perWorkHour": 564,
-                "connectedFCIDs": ["RimakisGeorge00001", "GottaJohn00001", "ZirkelJoe00001", "ColleretteStacy00001", "RazzaMustaffa00001", "SatMorgamvilleUnderAbove",],
-                 "done": false
-                },
-                {"dateToday": this.day,
-                'eventName': "George Private Tutoring",
-                'startTime': "01:00" + "PM",
-                'endTime': "04:00" +"PM", 
-                'location': "704 Ginesi, Morganville, Focused",
-                'description': "Privare Tutoring, with Richard Rich IBS",
-                'duration': 3,
-                "color": "#00ff3b",//green
-                "studentNumber": 1,
-                "assocRevenue": 8400,
-                "revenuePeriodDays":41,
-                "perDiem":  23,
-                "revenuePeriodHours":40, //two teacher minimum plus prep et al
-                "perWorkHour": 210,
-                "connectedFCIDs": ["RimakisGeorge00001", "RichRichardIBS00001"],
-                "done": false,
-                }
-              ];
-          },
-        notify: true
+      type: Array,
+      value: function(){
+        var timeSlots= [];
+        return timeSlots;
+      },
+      notify: true
         },
+    event: {
+      type: Object,
+      computed: "_computeEventDetails(day)",
+      notify: true
+    },
+
+    ptestarr:{
+      type: Array,
+      value:[],
+      observer: "practiceTestObserver",
+      notify: true,
+      reflectToAttribute: true
+    },
 		drags:{
 			type: Boolean, 
 			value: false,
@@ -224,7 +105,11 @@ FcDateCard=Polymer({
 			value: false,
 			notify: true
 		},
-		
+    currentWidth:{
+      type: String,
+      value: function(){return"180px";},
+      notify: true
+    },
       isMini: {
         type: Boolean,
         value: false,
@@ -237,7 +122,7 @@ FcDateCard=Polymer({
       },
       currentHeight: {
           type: String, 
-     	  computed: "_computeCurrentHeight(isMini)",
+     	    value:function(){return "360px";},
           notify: true, 
           reflectToAttribute: true
       },
@@ -246,36 +131,124 @@ FcDateCard=Polymer({
       		notify: true,
       		reflectToAttribute: true
       },
-      theId: {
-      	type: String, 
+      fcid: {
+      	type: String,
+        computed: "_computeFcid(day)",
       	notify: true,
       },
       id:{
       	type: String,
       	computed: "_computeId(theId, day)",
       	notify: true
-      }
+      },
+      theId: {
+        type: String, 
+        computed: "_computeRelId(day)",
+        notify: true,
+      },
       
     },
-    behaviors:["fcDraggableDataBehavior", "Polymer.IronResizableBehavior"],
+  
     attached: function(){
     	// this.center();
-    	
     },
+    _computeEventDetails: function(day){
+     //console.log(day);
+      var eventDay ={};
+      eventDay=this.setHolidays(day);
+      return eventDay;
+     // console.log(eventDay.date, eventDay.holiday, eventDay);
+
+    },
+
+    practiceTestObserver: function(newVal, oldVal){
+            console.log(oldVal);
+      // if(oldVal==[]){
+       console.log(newVal);
+        var counter = newVal.length;
+        var holder=[];
+        var i=0;
+        for(i=0;i<counter;i++)
+        { var str=newVal[i].toLocaleString();
+          console.log(str);
+          if(this.day.toLocaleString() == newVal[i].toLocaleString())
+            { console.log(newVal[i]);
+              this.set("event.practiceTest", "Practice Test: " + newVal[i].toDateString());
+              this.set("event.startTime", "Start Time: 9:00AM");
+              this.set("event.endTime", "End Time: 12:35PM");
+            }
+        }
+      // }
+
+
+    },
+    setHolidays: function(dayE){ 
+      var holidayArray = [];
+      holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13]  }, 
+        {"name": "St. Patrick's Day", "holiday":[2016,3,17] },
+        {"name": "Palm Sunday", "holiday":[2016,3,20] }, 
+        {"name": "Passover Begins", "holiday": [2016,3,23]  },
+        {"name": "Purim", "holiday": [2016,3,24]  }, 
+        {"name": "Good Friday", "holiday": [2016,3,25]  },
+        {"name": "Easter", "holiday": [2016,3,27] },
+        {"name": "Orthodox Good Friday", "holiday": [2016,4,29] },
+        {"name": "Last Day of Passover", "holiday": [2016,4,30] }, 
+        {"name": "Yom HaShoah", "holiday": [2016,5,4] }, 
+        {"name": "Isra and Mi'raj, Cinco Di Mayo", "holiday": [2016,5,5]  }, 
+        {"name": "MOTHERS DAY!!!", "holiday": [2016,5,8]  },
+        {"name": "Memorial Day", "holiday": [2016,5,30] },
+        {"name": "Ramadan Begins", "holiday": [2016,6,7]  },
+        {"name": "Father's Day", "holiday": [2016,6,19] },
+        {"name": "Independence Day July 4", "holiday": [2016,7,4] },
+        {"name": "Labor Day", "holiday": [2016,9,5] },
+        {"name": "Rosh Hashana, Muharram", "holiday": [2016,10,3] },
+        {"name": "Columbus Day", "holiday": [2016,10,10]  },
+        {"name": "Yom Kippur", "holiday": [2016,10,12]  },
+        {"name": "Diwali", "holiday": [2016,10,29]  },
+        {"name": "Halloween", "holiday": [2016,10,31] },
+        {"name": "Veterans Day", "holiday": [2016,11,11]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,24]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,25]  }, 
+        {"name": "Christmas Eve", "holiday": [2016,12,24] },
+        {"name": "Christmas", "holiday": [2016,12,25] },
+        {"name": "New Year's Eve", "holiday": [2016,12,31]  }
+        ];
+  
+      var counter = holidayArray.length;
+      var i=0;
+      var eventDay={};
+      eventDay.holiday='';
+      eventDay.date=dayE;
+      for(i=0;i<counter;i++){
+        var holiday = new Date(holidayArray[i].holiday);
+     // if(dayE.getDate()==4){console.log(holiday, dayE);}
+        if (dayE.toLocaleString() == holiday.toLocaleString()){
+
+           eventDay.holiday = holidayArray[i].name + " ";
+           console.log(holiday, holiday, eventDay.holiday);
+        }
+        if (eventDay.holiday!='' && dayE.toLocaleString()!=holiday.toLocaleString())
+          {return eventDay;}
+      }
+      return eventDay;
+
+    },
+    _computeFcid: function(day){},
     computePrettyDay: function(day)
   {
       var result = day.toDateString();
-
+     // console.log(day, result);
       
       return result;
   },
    
-    _computeCurrentHeight: function(isMini){
+    _computeCurrentHeight: function(isMini, currentHeight){
       if(isMini==true)
       {   
-        return "70px";   
+        return "70px";
+        this.set("isMini", false);   
       }
-      else{ return "360px";}
+      else{ return currentHeight;}
     },
     _computeCurrentWidth:function(day, id, isAddingEvent){
        Polymer.dom.flush();
@@ -295,26 +268,31 @@ console.log(w);
       return width;  
     },
 
+    resizeMe: function(){
+       Polymer.dom.flush();
+       var resizer = this.parentNode;
+       var w = parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
+       while(w==NaN && resizer!=document.body){
+        resizer=resizer.parentNode;
+        w== parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
 
-
-  toggle: function()
-    { 
-        console.log(this.$.collapse);},
-    _computeId: function(theId, day){
-    	//console.log(theId, day, day, day, day, theId);
+       } 
+       var z = window.getComputedStyle(resizer, null).getPropertyValue("width");
+       //console.log(z);
+            var wn=Math.ceil(w*.8);
+      var width=wn.toString() + "px";
+      this.set("currentWidth", width);
+      this.notifyResize();  
     },
-    // computeSelected: function(selectionArray){
-    //   return "[name=first]";
-  
-    // },
+
     _computeRelId: function(day){
-    	 var dayId	= day.replaceAll("\\s+","");
+    	 var dayId	= day.toLocaleString();
     	 //console.log(dayId, dayId, dayId, dayId);
     	 return dayId;
     },
-    // computeId:function(theId){
-    // 	//console.log(theId, theId, theId, theId, theId, theId);
-    // },
+    _computeId:function(theId){
+    	//console.log(theId, theId, theId, theId, theId, theId);
+    },
 });
 </script>
 </dom-module>

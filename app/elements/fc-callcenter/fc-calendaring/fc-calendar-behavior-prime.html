@@ -1,9 +1,85 @@
 <script>
-Date.prototype.addDays = function(days) {
-       var dat = new Date(this.valueOf())
-       dat.setDate(dat.getDate() + days);
-       return dat;
-}
+"use strict";
+// var day= {};
+// day = function DayConstructor(argDay, argDayCardMechanics)
+// {
+// 	this.dayBuilder(argTimeSlotsArray, argIsHoliday, argDateFcid, argSetDay, argSetInputs, argSize, argMonth, argDay, argYear, argIsInTestRun);
+
+
+// 	function dayBuilder(isHolidayArray, dateFcid, setDay, setInputs, size, month, day, year, isInTestRun)
+// 	{
+// 		//this.timeSlotsArray=  ["what the heck","super-fail"] || [];
+// 		this.isHoliday=" ";
+		 // function(){ 
+			// var holidayArray = [];
+			// holidayArray =[ {"name": "Daylight Saving Time", "Date":[2016,3,13]	}, 
+			// 	{"name": "St. Patrick's Day", "Date":[2016,3,17]	},
+			// 	{"name": "Palm Sunday", "Date":[2016,3,20]	}, 
+			// 	{"name": "Passover Begins", "Date": [2016,3,23]	},
+			// 	{"name": "Purim", "Date": [2016,3,24]	}, 
+			// 	{"name": "Good Friday", "Date": [2016,3,25]	},
+			// 	{"name": "Easter", "Date": [2016,3,27]	},
+			// 	{"name": "Orthodox Good Friday", "Date": [2016,4,29]	},
+			// 	{"name": "Last Day of Passover", "Date": [2016,4,30]	}, 
+			// 	{"name": "Yom HaShoah", "Date": [2016,5,4]	}, 
+			// 	{"name": "Isra and Mi'raj, Cinco Di Mayo", "Date": [2016,5,5]	}, 
+			// 	{"name": "MOTHERS DAY!!!", "Date": [2016,5,8]	},
+			// 	{"name": "Memorial Day", "Date": [2016,5,30]	},
+			// 	{"name": "Ramadan Begins", "Date": [2016,6,7]	},
+			// 	{"name": "Father's Day", "Date": [2016,6,19]	},
+			// 	{"name": "Independence Day July 4", "Date": [2016,7,4]	},
+			// 	{"name": "Labor Day", "Date": [2016,9,5]	},
+			// 	{"name": "Rosh Hashana, Muharram", "Date": [2016,10,3]	},
+			// 	{"name": "Columbus Day", "Date": [2016,10,10]	},
+			// 	{"name": "Yom Kippur", "Date": [2016,10,12]	},
+			// 	{"name": "Diwali", "Date": [2016,10,29]	},
+			// 	{"name": "Halloween", "Date": [2016,10,31]	},
+			// 	{"name": "Veterans Day", "Date": [2016,11,11]	},
+			// 	{"name": "Thanksgiving", "Date": [2016,11,24]	},
+			// 	{"name": "Thanksgiving", "Date": [2016,11,25]	}, 
+			// 	{"name": "Christmas Eve", "Date": [2016,12,24]	},
+			// 	{"name": "Christmas", "Date": [2016,12,25]	},
+			// 	{"name": "New Year's Eve", "Date": [2016,12,31]	}
+			// 	];
+			// var length = holidayArray.length;
+			// var i=0;
+			// for(i=0;i<counter;i++)
+			// 	{}
+			// return "no";
+
+			// };
+// 			var d=new Date(setDay);
+// 			d.setDay(d.getDay());
+// 		this.dateFcid= d.getMilliseconds() + "_datefcid";
+// 		this.setDay=setDay || "doSomething that looks both ways at nearby dates: see previous field;";
+// 		this.setInputs = setInputs || [];
+// 		this.size=size || [];//measure if you have to using javascript
+// 		this.month=month || "";
+// 		this.day = day || "";
+// 		this.year =year || "";
+// 	}
+// }
+// class FcEvent {
+//   constructor(argEvent){
+//       this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.coach)
+//   }
+//   build(name, startTime, endTime, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid, coach)
+//   {
+//     this.name=name || ""; 
+//     var ref = new Firebase("https://focused0ne.firebaseio.com/events");
+//     var self= this;
+//     ref.child('counter').transaction(function(argCounter){return argCounter+1;}, function(error, isSuccessful, finalVal){if(isSuccessful){self.fcid=finalVal;}});
+//     this.startTime=new Date(startTime) || ""; 
+//     this.endTime=new Date(endTime) || ""; 
+//     this.location=location || ""; 
+//     this.completed=completed || false;
+//     this.relatedFcids=relatedFcids || "";  
+//     this.parentEventName=parentEventName || ""; 
+//     this.parentEventFcid=parentEventFcid || "";
+  
+//  // static getFirebaseLocation(){return "https://focused0ne.firebaseio.com/events";}
+//   }
+// }      
 
 Date.prototype.assignFullMonth = function()
 {
@@ -11,6 +87,28 @@ Date.prototype.assignFullMonth = function()
 	var monArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	return monArray[dat.getMonth()];
 }
+
+function TimeSlots(){
+				var timeArr = [];
+        		for(var i=12; i<=48;i++){
+              var hour=(Math.floor(i/2) <13)?Math.floor(i/2):(Math.floor(i/2)-12);
+              var j=false;
+              j=(i>47)?true:false;
+              if(hour<10){hour='0'+hour.toString();}
+              var space=(i<20)?true: false;
+              var halfhour=(i%2==0)?0:3;
+              var ampm=(i<24)?"am":(j==true)?"am":"pm";
+              var tobj = {"hour": hour,
+                          "halfhour": halfhour,
+                          "ampm": ampm, 
+                          "space": space
+                        };
+              var string=hour.toString() + ":" + halfhour.toString() + "0"+ ampm;
+              var obj2={"label": string, "val": "open", "name": string};
+              timeArr.push(obj2);
+          }
+          return timeArr;
+         }
 
 
    function getDates(startDate, stopDate) {
@@ -23,11 +121,11 @@ Date.prototype.assignFullMonth = function()
       return dateArray;
     }
 
-// Date.prototype.addDays = function(days) {
-//        var dat = new Date(this.valueOf())
-//        dat.setDate(dat.getDate() + days);
-//        return dat;
-// }
+Date.prototype.addDays = function(days) {
+       var dat = new Date(this.valueOf())
+       dat.setDate(dat.getDate() + days);
+       return dat;
+}
 // var numChars=Number;
 // Date.prototype.assignFullMonth=function()
 // { 
@@ -49,7 +147,7 @@ Date.prototype.assignFullMonth = function()
 
 	
 function getShortDays(numChars, argDay)
-{	var shortDaysArray = [Su, M,Tu,W,Th,F,Sa];
+{	var shortDaysArray = [Su,M,Tu,W,Th,F,Sa];
 	var singlesArray = [M,W,F];
 	var dayBlocks=["M|W|F","Tu|Th"];
  	var md = argDay;
@@ -74,6 +172,7 @@ function getShortDays(numChars, argDay)
 						}
 				}
 		}
+
 
 // function CalendarConstructor()
 // Date.prototype.createClassSchedule= function(startDate, endDate, fcidObj)	
@@ -100,17 +199,12 @@ function getShortDays(numChars, argDay)
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FcCalendarBehaviorPrime = {
 	properties: {
-		
 		 startDate:{
 		 	type: Date,
-		 	value: function(){ var returnVal=new Date();
-		 			return returnVal;},
 		 	notify: true
 		 },
 		 endDate:{
 		 	type: Date,
-		 	value: function(){ var returnVal=new Date();
-		 			return returnVal;},
 		 	notify: true
 		 },
 		displayedMonthIndex:{
@@ -119,7 +213,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		},
 		theDate:{
 			type: Date,
-			value: function(){var d = new Date(); return d;},
 			notify: true
 		},
 		displayedMonth:{
@@ -145,6 +238,15 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			type: String,
 			notify: true
 		},
+		day:{
+			type: Date,
+			notify: true
+		},
+		dayArray:{
+			type: Array,
+			value: [],
+			notify: true
+		},
 		days:{
 			type: Array,
 			value: function()
@@ -158,6 +260,12 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			type: String,
 			value:"",
 			notify: true
+		}, 
+		units:{
+			type: String,
+			value:"months",
+			notify: true
+
 		}
 
 
@@ -166,15 +274,16 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 
 	attached: function(){
 	
-		//console.log(this.day, this.theId);
+		// this.calendarCreator()
 	},
 
-	calendarCreator: function()
+	calendarCreator: function(start, end, units)
 	{	
+		if (units!=undefined && units!=null){this.set("units", units);} 
+		var startDate=(start!=null)?start:(new Date()).addDays(0);
+		var endDate = (end!=null)?end:(new Date()).addDays(120);
 		var i=0;
-		var startDate = (new Date()).addDays(-30);
-		var endDate = (new Date()).addDays(150);
-		//console.log(startDate, endDate);
+		console.log(startDate, endDate);
 		if(endDate<=startDate)
 			{
 				var startDateHolder=startDate;
@@ -204,6 +313,8 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		for (i = 0; i < numDays; i++) 
 		{
 			var currDate = this.date[i];
+			//var dayE = this.setHolidays(currDate);
+
 			if(i==0)
 			{	
 				this.push("monthsArray", []);
@@ -216,37 +327,36 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				var yesterday = this.date[i-1];
 				var dateYester = yesterday.toDateString();
 				var dateToday = currDate.toDateString();
-				if(currDate.assignFullMonth() != yesterday.assignFullMonth())
+				if(currDate.assignFullMonth() != yesterday.assignFullMonth() && this.units=="months")
 				{	
 					this.push("monthsArray", [currDate]);
 					currentMonth++;
-					//we do all data at once in start, this makes the data make sense other way fine for dynamic even necessary.  Now not important less in auth context
 				}
 				else
-				{
+				{	
 					this.monthsArray[currentMonth].push(currDate);
+					
 				}
 			}
 		}
-		
 		this.padMonths();
 		this.set("displayedMonth", this.monthsArray[0]);
 		this.set("year", this.displayedMonth[0].getFullYear());
 		this.set("displayedMonthIndex",0);
 		var numDizDays = this.displayedMonth.length;
 		this.set("month", this.displayedMonth[numDizDays-1].assignFullMonth());
-		//console.log("length", numDizDays, "index", this.displayedMonthIndex, "year", this.year, "month0", this.displayedMonth[0], "length again", this.displayedMonth.length)
+		
 
 	},//end of function
 
 	padMonths: function()
-	{
+	{	var month=[];
 		var i = 0;
 		var numMonths = this.monthsArray.length;
 		for(i=1; i < numMonths; i++)
 		{
-			var month = this.monthsArray[i];
-			//console.log(month);
+			month = this.monthsArray[i];
+			console.log(month);
 			var lastMonth = this.monthsArray[i-1];
 			var numDaysPrevMonth = this.monthsArray[i-1].length;
 			var fillerDay = numDaysPrevMonth - 1;
@@ -299,6 +409,66 @@ console.log( "index", this.displayedMonthIndex, "year", this.year, "month0", thi
 		
 			this.set("year", year);
 			
+	},
+setHolidays: function(dayE){ 
+      var holidayArray = [];
+      holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13]  }, 
+        {"name": "St. Patrick's Day", "holiday":[2016,3,17] },
+        {"name": "Palm Sunday", "holiday":[2016,3,20] }, 
+        {"name": "Passover Begins", "holiday": [2016,3,23]  },
+        {"name": "Purim", "holiday": [2016,3,24]  }, 
+        {"name": "Good Friday", "holiday": [2016,3,25]  },
+        {"name": "Easter", "holiday": [2016,3,27] },
+        {"name": "Orthodox Good Friday", "holiday": [2016,4,29] },
+        {"name": "Last Day of Passover", "holiday": [2016,4,30] }, 
+        {"name": "Yom HaShoah", "holiday": [2016,5,4] }, 
+        {"name": "Isra and Mi'raj, Cinco Di Mayo", "holiday": [2016,5,5]  }, 
+        {"name": "MOTHERS DAY!!!", "holiday": [2016,5,8]  },
+        {"name": "Memorial Day", "holiday": [2016,5,30] },
+        {"name": "Ramadan Begins", "holiday": [2016,6,7]  },
+        {"name": "Father's Day", "holiday": [2016,6,19] },
+        {"name": "Independence Day July 4", "holiday": [2016,7,4] },
+        {"name": "Labor Day", "holiday": [2016,9,5] },
+        {"name": "Rosh Hashana, Muharram", "holiday": [2016,10,3] },
+        {"name": "Columbus Day", "holiday": [2016,10,10]  },
+        {"name": "Yom Kippur", "holiday": [2016,10,12]  },
+        {"name": "Diwali", "holiday": [2016,10,29]  },
+        {"name": "Halloween", "holiday": [2016,10,31] },
+        {"name": "Veterans Day", "holiday": [2016,11,11]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,24]  },
+        {"name": "Thanksgiving", "holiday": [2016,11,25]  }, 
+        {"name": "Christmas Eve", "holiday": [2016,12,24] },
+        {"name": "Christmas", "holiday": [2016,12,25] },
+        {"name": "New Year's Eve", "holiday": [2016,12,31]  }
+        ];
+  
+      var counter = holidayArray.length;
+      var i=0;
+      var eventDay={};
+      eventDay.holiday='';
+      eventDay.date=dayE;
+      for(i=0;i<counter;i++){
+        var holiday = new Date(holidayArray[i].holiday);
+     // if(dayE.getDate()==4){console.log(holiday, dayE);}
+        if (dayE.toLocaleString() == holiday.toLocaleString()){
+
+           eventDay.holiday+= holidayArray[i].name + " ";
+           console.log(holiday, holiday, eventDay.holiday);
+        }
+        if (eventDay.holiday!='' && dayE!=holiday)
+          {return eventDay;}
+      }
+      return eventDay;
+
+    },
+
+	_computeTheMonths: function(year, month, monthsArray, displayedMonthIndex, displayedMonth){
+
+	var mon=(displayedMonth==undefined || displayedMonth==[])? month:displayedMonth[displayedMonthIndex].toString().substring(4,7);
+		var returnVal =(mon=="Feb")?"February": (mon=="Mar")?"March":(mon=="Apr")?"April": (mon=="May")?"May":(mon=="Jun")?"June":(mon=="Jul")?"July":(mon=="Aug")?"August":(mon=="Sep")?"September":(mon=="Oct")?"October": (mon=="Nov")?"November":(mon=="Dec")?"December":"January";  
+		console.log(returnVal);
+			return returnVal;
+
 	}
 
 };

@@ -84,18 +84,21 @@ paper-tab{
 							</paper-tabs>
 						</paper-menu>
 							<paper-tabs 
-								id="tabRouterLeftPanel" 
+								
 								hide-scroll-buttons="false" 
 								draggable="false" 
 								scrollable="true" 
 								class="flex wrap right-justified"
 								style="margin: auto; background: #c6dafc; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);" 
-								on-tap="clickHandler"> 
+								id="leftDrawerToolsViewsTabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable> 
+								<paper-tab>
+								Widgets
+								</paper-tab>
 								<paper-tab>
 								Tools
 								</paper-tab>
 								<paper-tab>
-								Pages
+								Reports
 								</paper-tab>
 								<paper-tab>
 								People
@@ -106,11 +109,11 @@ paper-tab{
 							</paper-tabs>
 						
 					</div>
-					<!-- Here we put the second set of tabs 3/4 like you-tube-->
+				
 				</div> <!--HEADER AREA ENDS-->
-				<!--Content and Menu Area Begins-->						
-				<div class="content vertical layout flex">
-					<neon-pages class="gradBackground">
+				<!--Content and Menu Area Begins-->	
+				<iron-pages id="pageHangerLeftDrawer" class="content vertical layout flex" style="height: 100%; min-height: 1800px; padding:3px; overflow-y: scroll;" selected="{{selected}}">					
+					
 <!--TOOLS PAGE-->
 					<div class="horizontal layout flex wrap" style="margin: 5% 8%; min-height: 480px;"> 
 						<div class="horizontal layout flex wrap" style="margin: 5% 8%; "on-tap="clickHandler"> 
@@ -131,232 +134,286 @@ paper-tab{
 					 		</template>
 					 	</div>
 					 </div>
-				</neon-pages>
+					 <div>
+					Tools
+
+
+
+					</div>
+					<div>
+						
+						<sortable-js group="group" handle=".handle">               
+				           <template is="dom-repeat" items="{{flexCards}}" class="ghost dropzone" style="max-height: 2500px;">
+								<fc-inquiry-list head-class="[[item.class]]" style="[[item.style]]" orderby="[[item.orderby]]" my-id="[[item.theId]]" class="group .handle" header-title="[[item.title]]">
+				                </fc-inquiry-list>
+				            </template>
+            			</sortable-js>
+					</div>
+					<div>
+					people
+
+
+
+					</div>
+					<div>
+					precepts
+
+
+
+					</div>
+				</iron-pages>
 					 <paper-material style="height: 100%; background: orange; width: 100%; z-index: 4; margin-top: 24 px; box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);"></paper-material>
-				</div>
 		
-					
-		
-</paper-header-panel>
-				
-					
-	</template>
-	<script>
-		FcLeftTabbedDrawer=Polymer({
-		  is:"fc-left-tabbed-drawer",
-			behaviors: [FCBehaviors.ResizableRootBehavior],			
-			properties: {
-				measured: {
-					type: String,
-					value: '1000s',
-					notify: true,
-					reflectToAttributes: true
-				}, 
-				responsiveWidth: {
-					type: String,
-					value: '0px',
-					notify: true,
-					reflectToAttributes: true
-				},
+	</paper-header-panel>					
+</template>
+<script>
+FcLeftTabbedDrawer=Polymer({
+  is:"fc-left-tabbed-drawer",
+	behaviors: [FCBehaviors.ResizableRootBehavior],			
+	properties: {
+		flexCards:{ 
+    		type: Array,
+    		// observer:"mutation",
+			value: function(){ 
+            	return [	{"title": "Clients to be Closed Today",
+		                    "class": "red",
+		                    "style": "width: 600px !important; height: 60px;",
+		                    "orderby": "isClosed",
+		                    "theId": "numberTwo"
+		                    },
+		                   
+		                    {"title": "Today's Highest Interest Offering",
+		                    "class": "cyan",
+		                    "style": "width: 600px !important; height: 60px;",
+		                    "orderby": "focusedProgramMatch",
+		                    "theId": "numberFive"
+		                    },
+		                     {"title": "Todays Inquiries",
+		                    "class": "magenta",
+		                    "style": "width: 600px !important; height: 60px;",
+		                    "orderby": "timeStamp",
+		                    "theId": "numberThree"   
+		                    }
+	            ];
+        	},
+			notify: true
+		},
+		selected: {
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		measured: {
+			type: String,
+			value: '1000s',
+			notify: true,
+			reflectToAttributes: true
+		}, 
+		responsiveWidth: {
+			type: String,
+			value: '0px',
+			notify: true,
+			reflectToAttributes: true
+		},
 
-				determine: {
-					type: String,
-					value: function(){return '.gradBackground';}
+		determine: {
+			type: String,
+			value: function(){return '.gradBackground';}
 
-				},
-			
-				leftHidden: {
-					type: Boolean,
-					value: false,
-					notify: true
-				},
-				mwidth: {
-					type: String,
-					value: function(){
-						return this.style.width;
-					},
-					notify: true
-				},
-				iconArray:{
-					type: Array,
-					value: function(){
-						return [{
-									"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "loginMenu",
-		 							"iconUsed": "icons:account-circle",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "loginMenu",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "000"
-		 						},
-		 						{
-									"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "dragAdmin",
-		 							"iconUsed": "icons:hardware:dock",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "dragAdmin",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "001"
-		 						},
-		 						
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "toDoList",
-		 							"iconUsed": "icons:list",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "toDoList",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "002"
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "completedTasks",
-		 							"iconUsed": "icons:toc",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "completedTasks",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "003"
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "clockTimer",
-		 							"iconUsed": "icons:alarm-on",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "clockTimer",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "004"
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "firePadPrime",
-		 							"iconUsed": "icons:spellcheck",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "firePadPrime",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": "005"
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "geoCalculator",
-		 							"iconUsed": "icons:view-module",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "geoCalculator",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum" : "006" 
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "calendar",
-		 							"iconUsed": "icons:today",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "calendar",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum" : "007" 
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "readView",
-		 							"iconUsed": "icons:chrome-reader-mode",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "readView",
-		 							"dialogClass":"dialogClass",
-		 							'indexNum': '008'
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "howWeDoin",
-		 							"iconUsed": "icons:assessment",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "howWeDoin",
-		 							"dialogClass":"dialogClass",
-		 							'indexNum': '009' 
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "whatToSee",
-		 							"iconUsed": "icons:visibility",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "whatToSee",
-		 							"dialogClass":"dialogClass",
-		 							'indexNum': '010' 
-		 						},
-		 						{	"sectionClass": "menu x-large buttons btn-class",
-									"dDialogOne": "starRated",
-		 							"iconUsed": "icons:stars",
-		 							"iconClass": "menuItems-dark", 
-		 							"dDialogTwo": "starRated",
-		 							"dialogClass":"dialogClass",
-		 							"indexNum": '010'
-		 						}
-						];
-					},
-					notify: true
-				},
-				leftDrawer: {
-					type: Boolean,
-					value: true,
-					notify: true
-				},
-				notRouter:{
-					type: Boolean,
-					value: function(){
-						return true;
-					},
-					notify: true
-					
-				}
+		},
+	
+		leftHidden: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		mwidth: {
+			type: String,
+			value: function(){
+				return this.style.width;
 			},
+			notify: true
+		},
+		iconArray:{
+			type: Array,
+			value: function(){
+				return [{
+							"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "loginMenu",
+ 							"iconUsed": "icons:account-circle",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "loginMenu",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "000"
+ 						},
+ 						{
+							"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "dragAdmin",
+ 							"iconUsed": "icons:hardware:dock",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "dragAdmin",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "001"
+ 						},
+ 						
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "toDoList",
+ 							"iconUsed": "icons:list",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "toDoList",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "002"
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "completedTasks",
+ 							"iconUsed": "icons:toc",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "completedTasks",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "003"
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "clockTimer",
+ 							"iconUsed": "icons:alarm-on",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "clockTimer",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "004"
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "firePadPrime",
+ 							"iconUsed": "icons:spellcheck",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "firePadPrime",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": "005"
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "geoCalculator",
+ 							"iconUsed": "icons:view-module",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "geoCalculator",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum" : "006" 
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "calendar",
+ 							"iconUsed": "icons:today",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "calendar",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum" : "007" 
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "readView",
+ 							"iconUsed": "icons:chrome-reader-mode",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "readView",
+ 							"dialogClass":"dialogClass",
+ 							'indexNum': '008'
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "howWeDoin",
+ 							"iconUsed": "icons:assessment",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "howWeDoin",
+ 							"dialogClass":"dialogClass",
+ 							'indexNum': '009' 
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "whatToSee",
+ 							"iconUsed": "icons:visibility",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "whatToSee",
+ 							"dialogClass":"dialogClass",
+ 							'indexNum': '010' 
+ 						},
+ 						{	"sectionClass": "menu x-large buttons btn-class",
+							"dDialogOne": "starRated",
+ 							"iconUsed": "icons:stars",
+ 							"iconClass": "menuItems-dark", 
+ 							"dDialogTwo": "starRated",
+ 							"dialogClass":"dialogClass",
+ 							"indexNum": '010'
+ 						}
+				];
+			},
+			notify: true
+		},
+		leftDrawer: {
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		notRouter:{
+			type: Boolean,
+			value: function(){
+				return true;
+			},
+			notify: true
+			
+		}
+	},
 
 
 
-				_computedStyle: function(determine){
-						return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin: 4px;";
+		_computedStyle: function(determine){
+				return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin: 4px;";
 
 
-				}, 
+		}, 
 
-				_toggleRightDrawer: function(){
-						var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
-						if(drawer.forceNarrow!==true)
-						{drawer.forceNarrow = true;}
-						else{drawer.forceNarrow = false;
-						}
-				},
-				_toggleLeftDrawer: function(){
-					var drawer = document.querySelector('#drawerPrimed');	
-					if (drawer.forceNarrow!==true)
-					{
-						drawer.forceNarrow = true;
-				    	drawer.responsiveWidth='90000px';
-				    	this.leftHidden=true;
-				    }
-					else
-					{
-						drawer.forceNarrow = false;
-				    	drawer.responsiveWidth ='1080px';
-				    	this.leftHidden=false;
-					}
-				},
-				swapMenu: function(){
-					this.notRouter = !this.notRouter;
-				},
+		_toggleRightDrawer: function(){
+				var drawer = Polymer.dom(this.root).querySelector('#drawer-2');	
+				if(drawer.forceNarrow!==true)
+				{drawer.forceNarrow = true;}
+				else{drawer.forceNarrow = false;
+				}
+		},
+		_toggleLeftDrawer: function(){
+			var drawer = document.querySelector('#drawerPrimed');	
+			if (drawer.forceNarrow!==true)
+			{
+				drawer.forceNarrow = true;
+		    	drawer.responsiveWidth='90000px';
+		    	this.leftHidden=true;
+		    }
+			else
+			{
+				drawer.forceNarrow = false;
+		    	drawer.responsiveWidth ='1080px';
+		    	this.leftHidden=false;
+			}
+		},
+		swapMenu: function(){
+			this.notRouter = !this.notRouter;
+		},
 
-				clickHandler: function(e) {
-					console.log(e);
-				  var button = e.target;
-				  while (!button.hasAttribute('data-dialog') && button!==document.body) {
-				    button = button.parentElement;
-				  }
-				  if (!button.hasAttribute('data-dialog')) {
-				    return;
-				  }
-				  var id = button.getAttribute('data-dialog');
-				  var dialog = document.getElementById(id);
-				  console.log(document.getElementById(id), id);
-				  if (dialog) {
-				    dialog.open();
-				  }
-				},
+		clickHandler: function(e) {
+			console.log(e);
+		  var button = e.target;
+		  while (!button.hasAttribute('data-dialog') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-dialog')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-dialog');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		},
 
-				_focusedResize: function(e){
-      					var self = this;
-          				e.preventDefault();
-          			}
-
-
+		_focusedResize: function(e){
+					var self = this;
+  				e.preventDefault();
+  			}
 
 
-		});
-	</script>
+
+
+});
+</script>
 </dom-module>

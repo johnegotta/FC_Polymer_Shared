@@ -1,5 +1,4 @@
-<dom-module id="fc-calendaring-module">
-<template>
+<dom-module id="fc-course-builder">
 <style>
 .huge {
 	height: 1000px; 
@@ -74,8 +73,8 @@ color: grey;
 
 
 </style>
-<div class="horizontal layout">
-	<section class="vertical layout flex-2">
+<template>
+<div class="layout vertical">
 			<section class="holder layout vertical">
 				<section class="header-class layout vertical"> 
 				SAT Test Dates 2016-2019
@@ -115,31 +114,27 @@ color: grey;
 		</paper-listbox>
 	</section>
 
+          
+            <fc-calendar-animee ptest-array="{{practiceTestDates}}" id="immaguy"></fc-calendar-animee>
 
-	</section>
-<div class="vertical layout flex-7" style="min-height: 96vh; max-height: 2500px; overflow-y: scroll;">
-	<section>
-		<fc-calendar-dropzone class="horizontal layout flex-3">
-		</fc-calendar-dropzone>
-	</section>
-	<section>
-		<fc-calendar-animee ptest-array="{{practiceTestDates}}" id="immaguy" class="horizontal layout flex-3
-		" style="overflow-y: scroll; min-width:100%;">
-		</fc-calendar-animee>
-	</section>
-</div>
-</div>
+
+
+	</div>
+
+
+
 </template>
 <script>
+"use strict";
 Polymer({
-	is: "fc-calendaring-module",
+	is: 'fc-course-builder',
+	behaviors:["fcDraggableDataBehavior", 
+		"Polymer.IronResizableBehavior", 
+		"FCBehaviors.FcCalendarBehaviorPrime"],
+	// listeners:{"saturday.tap":"saturdayPracticeDay"
+				// "sunday.tap":"sundayPracticeDay"	},
 	properties: {
-		eventType: {
-			type: String,
-			value: function(){ return "course";},
-			notify: true 
-		},
-testDateArray:{
+		testDateArray:{
 			type: Array, 
 			value: [],
 			notify: true
@@ -457,11 +452,22 @@ testDateArray:{
 });
 </script>
 </dom-module>
-
-
-
-
-});
-</script>
-</dom-module>
-
+<!--
+console.log(this.courseObject);
+	// 	var targetValue = newVal;
+	// 	while(targetValue.nodeName!="PAPER-ITEM" && targetValue.nodeName!="BODY")
+	// 	{	
+	// 		targetValue=targetValue.parentNode;
+	// 	}
+	// 	if(this.courseObject.testDate==undefined || this.courseObject.testDate==null){
+	// 		if(targetValue.nodeName=="PAPER-ITEM" && typeof targetValue.value==Date)
+	// 		{
+	// 			this.set("courseObject.testDate", targetValue.value);
+	// 			Polymer.dom(targetValue).classList.add("selected");
+	// 		}
+	// 	else if(this.courseObject.testDate!=undefined || this.courseObject.testDate!=null)
+	// 	{Alert("Please Clear the Previously Selected SAT TEST DATE by tapping the star in the appropriate selected item");}
+	// 	console.log("this is the new item Value: ", newVal);
+	// 	console.log("this is the old item Value: ", oldVal);
+	// 	}
+-->
