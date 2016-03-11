@@ -2,9 +2,10 @@
   <template>
   <style>
   </style>
-    
-    <form on-submit="addItem" class="horizontal layout flex wrap" style="padding:8px;">
-    <section class="layout horizontal nowrap" style="width:96%;">
+    <div class="horizontal layout flex wrap">
+    <paper-icon-button on-tap="toggleCollapse"  style="color: yellow; background: aqua; border: 4px white solid; border-radius: 180px; width 12px; height: 12px; padding 4px; box-shadow: 4px 7px 13px 11px #AFAFAF;" icon="icons:dashboard"></paper-icon-button>
+    <form on-submit="addItem" class="horizontal layout flex wrap" style="padding:8px; width: 236px !important;">
+    <section class="horizontal layout nowrap" style="width:96%;">
           <fc-input-prime 
             value="{{item.name}}"
             id="theNameOne"
@@ -37,18 +38,22 @@
           </section>
 
       </form>
-
+       
                 ADD     
-     <paper-icon-button icon="icons:add-circle-outline" on-tap="addItem">
+     <paper-icon-button  style="color: yellow; background: aqua; border: 4px white solid; border-radius: 180px; width 12px; height: 12px; padding 4px; box-shadow: 4px 7px 13px 11px #AFAFAF;" icon="icons:add-circle-outline" on-tap="addItem">
          </paper-icon-button>
-      <div class="layout vertical" style="height:240px; width: 50%; overflow: hidden; border: ridge 4px silver;" >
+ 
+   </div>
+   <iron-collapse id="myCollapse" style="border: 2px aqua solid; outline: 2px solid cream;">  
+      <div class="layout vertical" style="height:320px; width: 90%; overflow: hidden; border: ridge 4px silver;" >
       <div class="layout vertical flex wrap" style="background: white; width: 100%; border: silver solid 2px; max-height: 340px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
       <template is="dom-repeat" items="{{events}}" as='event'>
           <div class="eventItem">
             <paper-checkbox
               on-change="toggleItem"
                 checked="{{event.completed}}"></paper-checkbox>
-              <span class="label">[[event.name]] [[event.startTime]] [[event.endTime]]  [[event.coach]]  [[event.location]] [[event.completed]]</span>
+              <span class="label">[[event.name]] [[event.startTime]] [[event.endTime]]</span>  
+              <span>[[event.coach]]  [[event.location]] [[event.completed]]</span>
               <paper-icon-button
               icon="delete" 
                 on-tap="deleteItem">
@@ -57,94 +62,11 @@
       </template>
       </div>
       </div>
+      </iron-collapse>
+      
 </template>
 <script>
-"use strict";
-class FcEvent {
-  constructor(theDate, argEvent){
-      this.build(theDate, argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.practiceTest, argEvent.holiday, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid)
-  }
-
-  getFirebaseLocation(theDate){return "https://focused0ne.firebaseio.com/events";}
-  isHoliday(theDate)
-    {
-      var holidayArray = [];
-      holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13]  }, 
-        {"name": "St. Patrick's Day", "holiday":[2016,3,17] },
-        {"name": "Palm Sunday", "holiday":[2016,3,20] }, 
-        {"name": "Passover Begins", "holiday": [2016,3,23]  },
-        {"name": "Purim", "holiday": [2016,3,24]  }, 
-        {"name": "Good Friday", "holiday": [2016,3,25]  },
-        {"name": "Easter", "holiday": [2016,3,27] },
-        {"name": "Orthodox Good Friday", "holiday": [2016,4,29] },
-        {"name": "Last Day of Passover", "holiday": [2016,4,30] }, 
-        {"name": "Yom HaShoah", "holiday": [2016,5,4] }, 
-        {"name": "Isra and Mi'raj, Cinco Di Mayo", "holiday": [2016,5,5]  }, 
-        {"name": "MOTHERS DAY!!!", "holiday": [2016,5,8]  },
-        {"name": "Memorial Day", "holiday": [2016,5,30] },
-        {"name": "Ramadan Begins", "holiday": [2016,6,7]  },
-        {"name": "Father's Day", "holiday": [2016,6,19] },
-        {"name": "Independence Day July 4", "holiday": [2016,7,4] },
-        {"name": "Labor Day", "holiday": [2016,9,5] },
-        {"name": "Rosh Hashana, Muharram", "holiday": [2016,10,3] },
-        {"name": "Columbus Day", "holiday": [2016,10,10]  },
-        {"name": "Yom Kippur", "holiday": [2016,10,12]  },
-        {"name": "Diwali", "holiday": [2016,10,29]  },
-        {"name": "Halloween", "holiday": [2016,10,31] },
-        {"name": "Veterans Day", "holiday": [2016,11,11]  },
-        {"name": "Thanksgiving", "holiday": [2016,11,24]  },
-        {"name": "Thanksgiving", "holiday": [2016,11,25]  }, 
-        {"name": "Christmas Eve", "holiday": [2016,12,24] },
-        {"name": "Christmas", "holiday": [2016,12,25] },
-        {"name": "New Year's Eve", "holiday": [2016,12,31]  }
-        ];
-  
-      var counter = holidayArray.length;
-      var i=0;
-      var eventDay={};
-      eventDay.holiday='';
-      eventDay.date=theDate;
-      for(i=0;i<counter;i++){
-        var holiday = new Date(holidayArray[i].holiday);
-     // if(theDate.getDate()==4){console.log(holiday, theDate);}
-        if (theDate.toLocaleString() == holiday.toLocaleString()){
-
-           eventDay.holiday = holidayArray[i].name + " ";
-           console.log(holiday, holiday, eventDay.holiday);
-        }
-        if (eventDay.holiday!='' && theDate.toLocaleString()!=holiday.toLocaleString())
-          {return eventDay;}
-      }
-      return eventDay;
-
-    }
-
-  build(theDate, name, startTime, endTime, practiceTest, holiday, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
-  {
-    this.theDate = theDate || "";
-    this.name=name || ""; 
-    var ref = new Firebase(this.getFirebaseLocation());
-    var self= this;
-    ref.child('counter').transaction(function(argCounter){return argCounter+1;}, 
-      function(error, isSuccessful, finalVal)
-        { console.log(error, isSuccessful, finalVal.val());
-          if(isSuccessful)
-            {
-              self.fcid=finalVal.val();
-            }
-        });
-    this.startTime=new Date(startTime) || ""; 
-    this.endTime=new Date(endTime) || ""; 
-    this.practiceTest = new Date(practiceTesty) || '';
-    this.holiday = this.isHoliday(theDate) || '';
-    this.location=location || ""; 
-    this.completed=completed || false;
-    this.relatedFcids=relatedFcids || "";  
-    this.parentEventName=parentEventName || ""; 
-    this.parentEventFcid=parentEventFcid || "";  
-  }
-
-}      
+"use strict";    
 Polymer({
   	is: 'fc-event-list',
   	properties: {
@@ -173,22 +95,47 @@ Polymer({
   			type: String,
   			value: 'password',
   			notify: true
-  			}
-  	
- 
+  			},
+      eventDate:{
+          type: Date,
+          computed:"computeEventDate(eventDay)",
+          notify: true
+      },
+      eventDay:{
+          type: String,
+          value: '',
+          notify: true
+      }
   	},
 
 		
 		attached: function() {
         console.log(this.item);
 		  	this.ref = new Firebase(this.firebaseURL);
-		  	this.ref.on('value', function(snapshot) {
-		    	this.updateEvents(snapshot);
-		  	}.bind(this));
-		  	
+        if(this.numberDate)
+          {
+             this.ref.orderByChild("numberDate").equalTo(this.numberDate).on('value', function(snapshot) {
+		    	   this.updateEvents(snapshot);}.bind(this));
+          }
+          else 
+          {
+               this.ref.on('value', function(snapshot){
+             this.updateEvents(snapshot);}.bind(this));
+          }
+
 		},
+    computeEventDate: function(eventDay){
+        var retVal=new Date(eventDay);
+        console.log(eventDay);
+        var dt= Date.UTC(retVal);
+        console.log(dt);
+        this.set("dateKeyOne",dt);
 
-
+        return retVal;      
+    },
+    toggleCollapse: function(){
+        this.$.myCollapse.opened=!this.$.myCollapse.opened;
+    },
 		onFirebaseError: function(event) {
   			this.$.errorToast.text = event.detail.message;
   			this.$.errorToast.show();
@@ -205,7 +152,7 @@ Polymer({
 		    	if(childSnapshot.key()!="counter")
           {
             item.fcid = childSnapshot.key();
-            this.push('events', item);
+            this.push('events', new FcEvent(item));
           }
 		  	}.bind(this));
 		},

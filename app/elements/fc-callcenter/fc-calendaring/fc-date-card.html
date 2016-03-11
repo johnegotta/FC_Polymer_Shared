@@ -8,9 +8,16 @@
           max-height: 1900px;
           display: flex;
           flex: flex-shrink;
+          color: #008;
+          font-weight: 700;
         
          /*//position: fixed; */
+        paper-header-panel{
+          @apply(--paper-header: {height: 42px; color: #008;});
+          @apply(--paper-header-panel: {max-width: 520px;});
         }
+
+        };
 
     .todaysEvent paper-icon-button[icon=delete]{
 			-webkit-transition: opacity 0.5s;
@@ -27,6 +34,7 @@
     }
 
 
+
 		checkbox {
 		  display: inline-block;
 		  margin: 1px 0;
@@ -40,12 +48,13 @@
 
 </style>
 <template>
-<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
-             
-   <section class="daycard">[[event.holiday]]</section>
+<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" is-mini=true header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
+    
+    <fc-event-list events="{{todaysEvents}}" number-date="{{computeNumberDate(data)}}" event-day="{{data}}" item={{event}} event="{{ptestarr}}"></fc-event-list>         
+ <!--   <section class="daycard">[[event.holiday]]</section>
    <section class="daycard">[[event.practiceTest]]</section>
    <section class="daycard">[[event.startTime]]</section>
-   <section class="daycard">[[event.endTime]]</section>
+   <section class="daycard">[[event.endTime]]</section> -->
    <content class="daycard"></content>
       <span on-track="_resize" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
   </fc-ddr-card>
@@ -67,6 +76,10 @@ FcDateCard=Polymer({
       type: Object,
       computed: "_computeEventDetails(day)",
       notify: true
+    },
+    data:{
+        type: Object,
+        notify: true
     },
 
     ptestarr:{
@@ -133,29 +146,37 @@ FcDateCard=Polymer({
       },
       fcid: {
       	type: String,
-        computed: "_computeFcid(day)",
+        computed: "_computeFcid(data)",
       	notify: true,
       },
       id:{
       	type: String,
-      	computed: "_computeId(theId, day)",
+      	computed: "_computeId(theId, data)",
       	notify: true
       },
       theId: {
         type: String, 
-        computed: "_computeRelId(day)",
+        computed: "_computeRelId(data)",
         notify: true,
       },
       
     },
   
     attached: function(){
+      console.log(this.data);
     	// this.center();
     },
-    _computeEventDetails: function(day){
+    computeNumberDate: function(data)
+    {
+        console.log(data);
+        var retVal=data.midnightToker();
+        return retVal;
+    },
+    _computeEventDetails: function(data){
      //console.log(day);
       var eventDay ={};
-      eventDay=this.setHolidays(day);
+      eventDay=this.setHolidays(data);
+      console.log(eventDay);
       return eventDay;
      // console.log(eventDay.date, eventDay.holiday, eventDay);
 
@@ -171,11 +192,12 @@ FcDateCard=Polymer({
         for(i=0;i<counter;i++)
         { var str=newVal[i].toLocaleString();
           console.log(str);
-          if(this.day.toLocaleString() == newVal[i].toLocaleString())
+          if(this.data.toLocaleString() == newVal[i].toLocaleString())
             { console.log(newVal[i]);
               this.set("event.practiceTest", "Practice Test: " + newVal[i].toDateString());
               this.set("event.startTime", "Start Time: 9:00AM");
               this.set("event.endTime", "End Time: 12:35PM");
+              console.log(this.data);
             }
         }
       // }
@@ -233,11 +255,12 @@ FcDateCard=Polymer({
       return eventDay;
 
     },
-    _computeFcid: function(day){},
-    computePrettyDay: function(day)
+    _computeFcid: function(data){},
+    computePrettyDay: function(data)
   {
-      var result = day.toDateString();
-     // console.log(day, result);
+     console.log(data, result);
+      var result = data.toDateString();
+      
       
       return result;
   },
@@ -245,12 +268,12 @@ FcDateCard=Polymer({
     _computeCurrentHeight: function(isMini, currentHeight){
       if(isMini==true)
       {   
-        return "70px";
+        return "76px";
         this.set("isMini", false);   
       }
       else{ return currentHeight;}
     },
-    _computeCurrentWidth:function(day, id, isAddingEvent){
+    _computeCurrentWidth:function(data, id, isAddingEvent){
        Polymer.dom.flush();
        var resizer = this.parentNode;
        var w = parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
@@ -285,8 +308,8 @@ console.log(w);
       this.notifyResize();  
     },
 
-    _computeRelId: function(day){
-    	 var dayId	= day.toLocaleString();
+    _computeRelId: function(data){
+    	 var dayId	= data.toLocaleString();
     	 //console.log(dayId, dayId, dayId, dayId);
     	 return dayId;
     },

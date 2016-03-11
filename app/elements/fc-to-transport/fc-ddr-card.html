@@ -37,6 +37,11 @@
         
    
       }
+      .tiny{
+        height: 42px;
+        font-size: 16px;
+
+      }
       .cover {
         margin: 2px;
       }
@@ -71,7 +76,7 @@
 
 <!-- on-track="_focusedDraggable" -->
   <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" id$="{{relId}}" class$="[[headClass]] layout vertical flex self-stretch around-justified">
-  <div class="paper-header layout horizontal center-justified"  on-track="_focusedDraggable" style$="min-height: 32px; text-align: center;">
+  <div class="paper-header layout horizontal center-justified"  on-track="_focusedDraggable" style$="min-height: 32px; text-align: center; height: [[computeHeadHeight(isMini, isPage, isColumn, isCard, isCounter)]]">
   <iron-icon 
             icon="icons:highlight-off" 
             name="fc-dialog-closer"
@@ -115,14 +120,11 @@
 FcDdrCard=Polymer({
 	is:'fc-ddr-card',
 	behaviors:[
-     
-      Polymer.IronFitBehavior, 
-      Polymer.IronResizableBehavior,
+     "Polymer.IronFitBehavior", 
+      "Polymer.IronResizableBehavior",
 
     ],
-    listeners: {
-      
-    },
+
 	properties: {
     headClass:{
       type: String,
@@ -140,11 +142,11 @@ FcDdrCard=Polymer({
       notify: true,
       reflectToAttribute: true
     },
-    headerClass:{
-      type: String,
-      value: "",
-      notify: true
-    },
+    // isDateCard:{
+    //   type: Boolean,
+    //   computed: "computeSize(headClass, widthCounter)",
+    //   notify: true
+    // },
     attachContent: {
       type: Array,
       value: [],
@@ -161,49 +163,48 @@ FcDdrCard=Polymer({
 			value: true, 
 			notify: true
 		},
-		isAddingEvent: {
+		isMini: {
 			type: Boolean,
-			value: true,
+			value: false,
 			notify: true
 		},
 		inputValue: {
 				type: String,
 				notify: true,
 				reflectToAttribute: true
-
 		},
+    isColumn:{
+        type: Boolean, 
+        value: true,
+        notify: true
+    }, 
+    isCard:{
+        type: Boolean, 
+        value: false,
+        notify: true
+    },
+    isPage:{
+      type: Boolean, 
+        value: false,
+        notify: true
+    },
     dragCounter:{
       type: Number,
       value: 0,
       notify: true
     },
-		noCancelOnOutsideClick:{
-			type: Boolean,
-			value: function(){return true;},
-			notify: true
-		},
+    isCounter:{
+        type: Object,
+        value: { counter: 0, size: "column"},
+        notify: true
+    },
+		
     widthCounter:{
       type: Number,
       value: 0,
       notify: true
     },
-  selectionArray: {
-        type: Array,
-        value: function(){
-          return [
-                'first', 
-                'second', 
-                'third', 
-                'fourth'
-          ];
-        },
-        notify: true
-      },
- 
-      selected: {
-        type: String,
-        notify: true
-      },
+  
       currentWidth: {
           type: String, 
           value: function(){return "auto";},
@@ -216,11 +217,7 @@ FcDdrCard=Polymer({
           notify: true, 
           reflectToAttribute: true
       },
-      day:{
-      		type: String,
-      		notify: true,
-      		reflectToAttribute: true
-      },
+      
       theId: {
       	type: String, 
       	notify: true,
@@ -246,18 +243,23 @@ FcDdrCard=Polymer({
       
     },
      attached: function(){
-       this.startHeight();
-       // this.startWidth();
+   
+       this.startWidth();
        this.set("_notifyingDescendant", true);
-       //this.resizeMe();
-
+       this.resizeMe();
+           this.startHeight();
 
     },
 
     _computeHeader: function(headerTitle){
       return headerTitle;
     },
-
+    computeHeadHeight: function(isMini, isPage, isColumn, isCard, isCounter)
+    {
+      var height = (isColumn==true)?"98px;": isMini==true? "32px; font-size: 12px;":isCard==true?"72px;": "130px;";
+      
+    },
+   
      startWidth: function(){
            var wc = this.widthCounter;
            console.log(this.widthCounter);
@@ -297,7 +299,7 @@ FcDdrCard=Polymer({
      startHeight: function(){
       var parent =this.parentNode;
       var ht = window.getComputedStyle(parent, null).getPropertyValue("height");
-       while(ht==NaN && parent!=document.body){
+       while(ht==NaN || parent!=document.body){
         parent=parent.parentNode;
       }
       if(parent==document.body){this.set("currentHeight", "100%");}
@@ -311,7 +313,7 @@ FcDdrCard=Polymer({
     
        var resizer = this.parentNode;
        var w = parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
-       while(w==NaN && resizer!=document.body){
+       while(w==NaN || resizer!=document.body){
         resizer=resizer.parentNode;
         w== parseInt(window.getComputedStyle(resizer, null).getPropertyValue("width"));
 
@@ -325,7 +327,7 @@ FcDdrCard=Polymer({
       if(typeof wn==NaN){this.set("currentWidth", "29vw"); console.log("set at a third")}
         else{
       this.set("currentWidth", width);
-      this.notifyResize();
+   
       }  
     },
 
@@ -388,7 +390,7 @@ FcDdrCard=Polymer({
                 case 'end':
                   self.style.width= trueWidth;
                   self.style.height= trueHeight;
-                  self.notifyResize();
+                  // self.notifyResize();
                   self.onIronResize();
                  // self.afterStartResize();
                   Polymer.dom.flush();

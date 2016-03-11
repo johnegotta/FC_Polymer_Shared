@@ -1,0 +1,198 @@
+
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.dictionaryBehavior = {
+properties:{
+    word: {
+		type: String,
+		value: "ameliorate",
+		notify: true
+	},
+	dictionary: {
+		type: Array,
+		value: [],
+		notify: true
+	},
+	currentWord: {
+		type: String,
+		value: ""
+	},
+	currentDefinition: {
+		type: String,
+		value: ""
+	},
+	myajax: {
+		type: Object,
+		value: {}
+	}
+},
+	
+	ready: function() {
+		this.word = "corroborate";
+		this.currentDefinition = "Word Not Found";
+	},
+
+	attached: function() {
+		//this.myajax = document.createElement("iron-ajax");
+		//this.myajax.setAttribute("handleAs", "json");
+		//this.myajax.setAttribute("id", "myajax");
+		//this.myajax.setAttribute("onResponse", "handleResponse");
+		var fb = new Firebase("https://focusedstaging1.firebaseio.com/dictionary/");
+		var self = this;
+		fb.on("value", function(snapshot) {
+			console.log(snapshot);
+			self.dictionary = snapshot.val();
+			console.log(self.dictionary);
+		});
+		//console.log(this.dictionary);
+		// var anchors = this.querySelectorAll("a");
+		// if(true) //anchors == null)
+		// {
+		// 	var otheranchors = this.$$("a");
+		// 	console.log(otheranchors);
+		// }
+		// console.log(anchors);
+		// var numA = anchors.length;
+		// console.log(anchors.length)
+		// for(i=0;i<numA;i++)
+		// {
+		// 	var anchor = anchors[i];
+		// 	anchor.addEventListener("mouseover", this.lookupWord.bind(this));
+		// 	anchor.setAttribute("name", "poop");
+		// 	console.log(anchor);
+		// }
+		this.addEventListener("mousemove", this.wireAnchors);
+		
+	},
+
+	wireAnchors: function(e)
+	{
+		if(this.anchorsWired == true)
+		{
+			return;
+		}
+		var anchors = this.querySelectorAll("a");
+		if(true) //anchors == null)
+		{
+			var otheranchors = this.$$("a");
+			//console.log(otheranchors);
+		}
+		//console.log(anchors);
+		var numA = anchors.length;
+		//console.log(anchors.length)
+		for(i=0;i<numA;i++)
+		{
+			var anchor = anchors[i];
+			anchor.addEventListener("mouseover", this.lookupWord.bind(this));
+			//anchor.setAttribute("name", "poop");
+			//console.log(anchor);
+		}
+		if(numA != 0) this.anchorsWired = true;
+		//this.removeEventListener("mousemove", this.wireAnchors);
+	},
+
+	
+	//		this.$.myajax.generateRequest();
+
+	stripPunctuation: function(argString)
+	{
+		var result = argString.replace(/(\,|\.|\?|\!|\;|\:|\-|\(|\))/g, "");
+		return result;
+	},
+
+	manualLookupWord: function(argWord)
+	{
+		var word = argWord;
+		word = this.stripPunctuation(word);
+		try
+		{
+			def = this.dictionary[word];
+			//console.log(def);
+			var defText = "";
+			var keys = Object.keys(def);
+			var numKeys = keys.length;
+			var i = 0;
+			for(i=0; i<numKeys;i++)
+			{
+				defText += "\n";
+				defText += keys[i].toUpperCase();
+				defText += ": ";
+				var synonyms = def[keys[i]].syn;
+				var similars = def[keys[i]].sim;
+				var numSyn = synonyms == null? 0 : synonyms.length;
+				var numSim = similars == null? 0 : similars.length;
+				var j = 0;
+				for(j=0;j<numSyn;j++)
+				{
+					defText += synonyms[j];
+					defText += ", ";
+				}
+				for(j=0;j<numSim;j++)
+				{
+					defText += similars[j];
+					defText += ", ";
+				}
+			}
+			//console.log(defText);
+		}
+		catch(err)
+		{
+			//console.log(err);
+			defText = "Word Not Found";
+		}
+		this.currentDefinition = defText;
+		return this.currentDefinition;
+	},
+	
+	lookupWord: function(e)
+	{
+		var target = e.target;
+		//console.log(target);
+		this.currentId = target.id;
+		//console.log(this);
+		//console.log(this.dictionary);
+		var def = "";
+		var word = "";
+		word = target.innerHTML.toLowerCase(); //geared to <a> tags
+		word = this.stripPunctuation(word);
+		try
+		{
+			def = this.dictionary[word];
+			//console.log(def);
+			var defText = "";
+			var keys = Object.keys(def);
+			var numKeys = keys.length;
+			var i = 0;
+			for(i=0; i<numKeys;i++)
+			{
+				defText += "\n";
+				defText += keys[i].toUpperCase();
+				defText += ": ";
+				var synonyms = def[keys[i]].syn;
+				var similars = def[keys[i]].sim;
+				var numSyn = synonyms == null? 0 : synonyms.length;
+				var numSim = similars == null? 0 : similars.length;
+				var j = 0;
+				for(j=0;j<numSyn;j++)
+				{
+					defText += synonyms[j];
+					defText += ", ";
+				}
+				for(j=0;j<numSim;j++)
+				{
+					defText += similars[j];
+					defText += ", ";
+				}
+			}
+			//console.log(defText);
+		}
+		catch(err)
+		{
+			//console.log(err);
+			defText = "Word Not Found";
+		}
+		this.currentDefinition = defText;
+		return this.currentDefinition;
+	}
+};
+</script>
