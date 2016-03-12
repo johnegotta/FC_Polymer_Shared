@@ -30,6 +30,7 @@
     .forCalendar{
         margin:2px 3px 2px 3px;
         width:calc(91%/7.8)!important;
+        height: 30px;
 
     }
 
@@ -48,8 +49,8 @@
 
 </style>
 <template>
-<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" is-mini=true header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
-    
+<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" is-mini="true" header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
+  <!--   [[_computeHoliday(data)]] -->
     <fc-event-list events="{{todaysEvents}}" number-date="{{computeNumberDate(data)}}" event-day="{{data}}" item={{event}} event="{{ptestarr}}"></fc-event-list>         
  <!--   <section class="daycard">[[event.holiday]]</section>
    <section class="daycard">[[event.practiceTest]]</section>
@@ -74,7 +75,7 @@ FcDateCard=Polymer({
         },
     event: {
       type: Object,
-      computed: "_computeEventDetails(day)",
+      computed: "_computeEventDetails(data)",
       notify: true
     },
     data:{
@@ -129,6 +130,10 @@ FcDateCard=Polymer({
         notify: true,
         reflectToAttribute: true
       },
+      holiday:{
+        type: Object,
+        notify: true
+      },
       selected: {
         type: String,
         notify: true
@@ -139,11 +144,7 @@ FcDateCard=Polymer({
           notify: true, 
           reflectToAttribute: true
       },
-      day:{
-      		type: Date,
-      		notify: true,
-      		reflectToAttribute: true
-      },
+     
       fcid: {
       	type: String,
         computed: "_computeFcid(data)",
@@ -169,17 +170,29 @@ FcDateCard=Polymer({
     computeNumberDate: function(data)
     {
         console.log(data);
+        if(!data){return 0;}
+        var todayDate = new Date(data);
         var retVal=data.midnightToker();
         return retVal;
     },
-    _computeEventDetails: function(data){
+    _computeHoliday: function(data){
      //console.log(day);
-      var eventDay ={};
-      eventDay=this.setHolidays(data);
-      console.log(eventDay);
-      return eventDay;
+      var holiday ={};
+      holiday=this.setHolidays(data);
+      console.log(holiday);
+      this.set("holiday", holiday);
+      var datestring=holiday.toString();
+      return datestring;
      // console.log(eventDay.date, eventDay.holiday, eventDay);
 
+    },
+
+    _computeEventDetails: function(data){
+   
+      var eventDay ={};
+      eventDay=this.setHolidays(data);
+    
+      return eventDay;
     },
 
     practiceTestObserver: function(newVal, oldVal){
@@ -230,7 +243,7 @@ FcDateCard=Polymer({
         {"name": "Halloween", "holiday": [2016,10,31] },
         {"name": "Veterans Day", "holiday": [2016,11,11]  },
         {"name": "Thanksgiving", "holiday": [2016,11,24]  },
-        {"name": "Thanksgiving", "holiday": [2016,11,25]  }, 
+        {"name": "Day After Thanksgiving", "holiday": [2016,11,25]  }, 
         {"name": "Christmas Eve", "holiday": [2016,12,24] },
         {"name": "Christmas", "holiday": [2016,12,25] },
         {"name": "New Year's Eve", "holiday": [2016,12,31]  }

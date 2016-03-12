@@ -3,6 +3,9 @@
   
 </style>
 <template>
+<!-- <iron-ajax id="myajax" handle-as="json" auto on-response="handleResponse" url="http://holidayapi.com/v1/holidays" last-response="{{holidayList}}" params="{'country':'US','year':{{myear}} }"> -->
+
+</iron-ajax>
 	<div class="flex layout vertical" style="padding:0x; margin: 14px; margin-bottom: 24px;">
 		<paper-material class="vertical flex layout center" style="max-height: 110px; min-height: 85px;min-width: 601px; max-width: 98vw; background: #aecdfd;">
 			<div class="horizontal layout flex center-justified" style="width: 100%; [[_computePlacementTwo(isSecond)]]">
@@ -29,11 +32,11 @@
 				<template is="dom-repeat" class="horizontal layout wrap"  items="{{displayedMonth}}">
 					 
 	      			<fc-date-card hidden$=[[isNarrow]] ptestarr="{{ptestArray}}" class$=[[computeHeaderColor(item)]] day="[[item]]" draggable="true" on-dragstart="trackstart" is-mini="true" style="border-top: 1px solid silver;text-align: center; width:calc(100%/7.4); margin: auto;margin-bottom: 6px; margin-top: 4px; height: 97%;" data="{{item}}">
-	      			<span class="daycard"><!-- [[computePracticeTestDay(ptestArray, item)]] --></span>
+	      			<!-- <fc-event-list event-array="{{eventArray}}" number-date="[[computeNumberDate(item)]]"> -->
 
 
 
-	      			</fc-date-card>
+	      			</fc-event-list>
 				</template>
 			</section>
 		</div>
@@ -70,6 +73,15 @@ FcCalendarAnimee=Polymer({
 			type: Boolean,
 			value: function(){return false;},
 			notify: true
+		},
+		myear: {
+			value: "2016",
+			notify: true
+		},
+		holidayList:{
+			type: Object,
+			value: {},
+			notify: true,
 		},
 		isNarrow:{
 			type: Boolean,
@@ -114,10 +126,15 @@ FcCalendarAnimee=Polymer({
 
   trackstart: function(e){
   	var day = e.model.item;
+  	console.log(day);
   	day = JSON.stringify(day);
   	e.dataTransfer.setData("fcdata", day);
   	//e.dataTransfer.setData("fcgooddate", this.computePrettyDay(day));
   	//console.log("I am a track star", e, e.detail, e.model.item);
+
+  },
+  handleResponse: function(argHolidays){
+  	console.log(argHolidays);
 
   },
   _computePlacementTwo: function(isSecond){

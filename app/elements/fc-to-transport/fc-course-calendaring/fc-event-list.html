@@ -42,12 +42,12 @@
                 ADD     
      <paper-icon-button  style="color: yellow; background: aqua; border: 4px white solid; border-radius: 180px; width 12px; height: 12px; padding 4px; box-shadow: 4px 7px 13px 11px #AFAFAF;" icon="icons:add-circle-outline" on-tap="addItem">
          </paper-icon-button>
- 
+ [[item.holiday]]
    </div>
    <iron-collapse id="myCollapse" style="border: 2px aqua solid; outline: 2px solid cream;">  
       <div class="layout vertical" style="height:320px; width: 90%; overflow: hidden; border: ridge 4px silver;" >
       <div class="layout vertical flex wrap" style="background: white; width: 100%; border: silver solid 2px; max-height: 340px; overflow: hidden; overflow-y: scroll; overflow-x: scroll">
-      <template is="dom-repeat" items="{{events}}" as='event'>
+      <template is="dom-repeat" items="{{events}}" as='event'><!--eventArray number date-->
           <div class="eventItem">
             <paper-checkbox
               on-change="toggleItem"
@@ -127,7 +127,7 @@ Polymer({
     computeEventDate: function(eventDay){
         var retVal=new Date(eventDay);
         console.log(eventDay);
-        var dt= Date.UTC(retVal);
+        var dt=retVal.midnightToker()
         console.log(dt);
         this.set("dateKeyOne",dt);
 
@@ -161,9 +161,7 @@ Polymer({
         console.log(this.$.theNameOne.getAttribute("value"));
 		  	event.preventDefault();
         console.log(this.item);
-        var it ={};
-        it[this.item.fcid]=this.item;
-		  	this.ref.update(it);
+		  	this.item.save();
 		  	this.set("item", new FcEvent({}));
 		},
 

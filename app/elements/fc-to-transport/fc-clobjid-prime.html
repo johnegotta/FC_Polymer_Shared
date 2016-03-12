@@ -1,0 +1,98 @@
+<dom-module id="fc-clobjid-prime">
+<template>
+<style>
+</style>
+
+<section style="padding: 1px 8px 10px 4px; margin: 2px 2px 2px 2px; min-width: 214px;" class$="layout flex justified-around {{orientation}}"><!--padding and margin needed for the digits to remain square-->
+<template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
+	<fc-input-prime
+		input-type="{{item.inputType}}" 
+		label="{{item.label}}" 
+		name$="{{item.name}}"
+		min="{{item.min}}"
+		max="{{item.max}}"
+		value="{{item.value}}"
+		option-one="{{item.optionOne}}"
+        option-two="{{item.optionTwo}}"
+        option-three="{{item.optionThree}}"
+        option-four="{{item.optionFour}}"
+        option-five="{{item.optionFive}}"
+        option-six="{{item.optionSix}}"
+        option-seven="{{item.optionSeven}}"
+        option-eight="{{item.optionEight}}"
+        option-nine="{{item.optionNine}}"
+        option-ten="{{item.optionTen}}"
+        class$="{{item.class}}"
+        min="{{item.min}}"
+        max="{{item.max}}"
+        step="{{item.step}}"
+        fcid="{{item.fcid}}"
+        on-change="handleInputChange"
+       >
+	</fc-input-prime>
+</template>
+</section>		
+</template>
+<script>
+FcClobjidPrime=Polymer({
+	is:"fc-clobjid-prime",
+	properties:{
+		dataobject: {
+			type: Object,
+			notify: true
+		},
+        orientation: {
+            type: String,
+            value: ""
+        }
+	},
+
+	attached: function(){
+		console.log(this.dataobject);
+        console.log(this.orientation);
+        this.orientation = this.orientation==""? "vertical": this.orientation;
+	},
+
+    handleInputChange: function(e)
+    {
+        //console.log(e.target);
+        this.dataobject[e.target.name].value = e.target.value;
+    },
+
+    _computeDataset: function(dataobject)
+    {
+        //console.log(dataobject);
+        var keys = Object.keys(this.dataobject);
+        var numKeys = keys.length;
+        //this.dataset = [];
+        var dataset = [];
+        for(var i = 0; i < numKeys; i++)
+        {
+            var val = this.dataobject[keys[i]];
+            //console.log(keys[i], val);
+            dataset.push({
+                "value": val.value,
+                "name": val.name, //keys[i], //"tenth",
+                "label": val.label?val.label: val.name[0], //keys[i][0], //"d",
+                "inputType": val.inputType, //"digit",
+                "optionOne": "",
+                "optionTwo": "",
+                "optionThree": "",
+                "optionFour": "",
+                "optionFive": "",
+                "optionSix": "",
+                "optionSeven": "",
+                "optionEight": "",
+                "optionNine": "",
+                "optionTen": "",
+                "class": "",
+                "min": val.inputType == "digit"? 0: 0,
+                "max": val.inputType == "digit"? 9: 99,
+                "step":"",
+                "fcid":""})
+        }
+        return dataset;
+    },
+});
+</script>
+</dom-module>
