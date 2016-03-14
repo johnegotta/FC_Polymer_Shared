@@ -71,7 +71,7 @@ width: 20px;
 			  			> 
 <section  class="horizontal layout around-justified nowrap" style="overflow-x: scroll; padding: 0px 0px;">
   				<template 
-  				id="content"
+  				id="content5"
 					is='dom-repeat' 
 						class="horizontal layout flex nowrap justified" 
 						items="{{iconArrayA}}">
@@ -79,12 +79,12 @@ width: 20px;
 							style$="[[computedStyle(determine)]]" 
 							data-transition$="[[item.dDialogTwo]]"
 							on-mouseover="labeler"
-							
+							class="buttonSections"
 							 drags="true"
 							 label$={{item.label}}>
 							<iron-icon 
 								drags="true"
-								id$="[[item.dDialogTwo]]"
+								
 				        		icon$="[[item.iconUsed]]"  
 				        		class$="[[item.sectionClass]]"
 				        		data-transition$="[[item.dDialogTwo]]"
@@ -304,39 +304,47 @@ FcClobjMenu=Polymer({
 
 
     labeler: function(e, detail){
+      var elemCon = this.$.content5; 
     	var elem=e.target;
-        console.log(elem);
+        console.log(elem.firstElementChild, elem.firstElementChild.nextSibling);
         var label=elem.attributes.label.value;
         this.set("app.title",label);
-        console.log(this.appTitle);
+        console.log(this.app.title);
       var glowing= Polymer.dom(this.root).querySelectorAll(".thefocus");
-      console.log(glowing, "this is the nodelist");
+       var bss= Polymer.dom(this.root).querySelectorAll(".buttonSections");
+      console.log(bss, "this is the nodelist");
       	var len=glowing.length;
+        console.log(elemCon);
       	var lastm = len-1;
+        var count = bss.length;
+        var lbss=count-1;
+        var lastbss=bss[lbss];
+        var firstbss=bss[0]
       	var last=glowing[lastm];
       	var first =glowing[0];
-      	//var firstListener = this.addEventlistener(first);
+      	var firstListener = this.addEventListener(firstbss);
       	
-      	//var lastlistener = this.addEventlistener(last);
-      	var distanceR=Polymer.dom(this).getBoundingClientRects(this.$.content).right;
-      	var dist2L = Polymer.dom(this).getBoundingClientRects(this.$.content).left;
-      	var last2r= Polymer.dom(this).getBoundingClientRects(last).right;
-      	var first2= Polymer.dom(this).getBoundingClientRects(first).left;
-      	console.log(distanceR,dist2L,last2r,first2);
-      	for(i=0; i<len; i++){
-      		glowing[i].classList.remove("thefocus");
-      		if(glowing[i].b){}
-      	}
-        if(elem.nodeName=="IRON-ICON"){
-        elem.classList.add("thefocus");
-    	}
-    	else if(elem.nodeName=="SECTION"){
-    		elem=elem.firstElementChild;
-    		if(elem.nodeName=="IRON-ICON")
-    		{
-    		elem.classList.add("thefocus");
-    		}
-    	}
+      	var lastlistener = this.addEventListener(lastbss);
+      	
+        var distanceR= elemCon.getBoundingClientRect().right;
+      	var dist2L = elemCon.getBoundingClientRect().left;
+      	var last2r= lastbss.getBoundingClientRect().right;
+      	var first2= firstbss.getBoundingClientRect().left;
+      	console.log("look here for distances", distanceR,dist2L,last2r,first2);
+        // for(i=0; i<count; i++){
+        // 		bss[i].classList.remove("thefocus");
+     //  		if(glowing[i].b){}
+     //  	}
+     //    if(elem.nodeName=="IRON-ICON"){
+     //    elem.classList.add("thefocus");
+    	// }
+    	// else if(elem.nodeName=="SECTION"){
+    	// 	elem=elem.firstElementChild;
+    	// 	if(elem.nodeName=="IRON-ICON")
+    	// 	{
+    	// 	elem.classList.add("thefocus");
+    	// 	}
+    	// }
 
  	},
 		clickHandler: function(e) {
@@ -354,121 +362,121 @@ FcClobjMenu=Polymer({
 		  }
 		  var id = button.getAttribute('data-transition');
 		  var dialog = document.getElementById(id);
-		  console.log(document.getElementById(id), id);
+		  console.log(document.getElementById(id), id, "LOOOK HERE DUMMY", dialog);
 		  if (dialog) {
 		    dialog.open();
 		  }
 		},
 
 	
-attached:function(){
-		 this._nodeObserver = Polymer.dom(this.$.content).observeNodes(
-          function(mutations) {console.log(mutations.length, mutations.length);
-          var child=this.$.content.firstElementChild;
-          while(child.classList.contains("blue-btn-class")!=true && child!=this.$.content){child=child.nextSibling;}
-          	if(child.classList.contains("blue-btn-class")==true){counter++; this.set("count", counter);console.log(counter, counter, counter, "this is where you look");}
-          }.bind(this));
-    },
-    _addListeners: function(node) {
-      if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.COMMENT_NODE)
-        return;
-      // Set up the animation.
-      if(node.nodeName=="IRON-ICON" && node.nextSibling.nextSibling.nodeName!=="IRON-ICON")
-      node.style.transitionProperty = this._transitionProperty;
-      node.style.transition = this.transition;
-      this.listen(node, 'track', '_onTrack');
-      this.listen(node, 'transitionend', '_onTransitionEnd');
-      if(node.nodeName=="IRON-ICON"){console.log(node);}
-    },
-    _removeListeners: function(node) {
-      if (node.nodeType === Node.TEXT_NODE)
-        return;
-      this.unlisten(node, 'track', '_onTrack');
-      this.unlisten(node, 'transitionend', '_onTransitionEnd');
-    },
-    detached: function() {
-      if (this._nodeObserver) {
-        Polymer.dom(this.$.content).unobserveNodes(this._nodeObserver);
-        this._nodeObserver = null;
-      }
-    },
-    _onTrack: function(event) {
-      if (this.disabled)
-        return;
-      var target = event.currentTarget;
-      if (target.classList.contains('disable-swipe'))
-        return;
-      var track = event.detail;
-      if (track.state === 'start') {
-        this._trackStart(track, target);
-      } else if (track.state === 'track') {
-        this._trackMove(track, target);
-      } else if (track.state === 'end') {
-        this._trackEnd(track, target);
-      }
-    },
-    _trackStart: function(event, target) {
-      // Save the width of the element, so that we don't trigger a style
-      // recalc every time we need it.
-      this._nodeWidth = target.offsetWidth;
-      target.style.transition = 'none';
-    },
-    _trackMove: function(event, target) {
-      this._animate(event.dx, target);
-    },
-    _trackEnd: function(event, target) {
-      // The element is swiped away if it's moved halfway its total width.
-      this._swipeComplete = Math.abs(event.dx) > this._nodeWidth / 2;
-      this._direction = event.dx > 0;
-      this._swipeEnd(target);
-    },
-    _animate: function(x, target) {
-      var direction = x > 0 ? 1 : -1;
-      // This is the total distance the animation will take place over.
-      var totalDistance = this._nodeWidth * this.widthRatio;
-      // Opacity distance overflow. `this._nodeWidth * this.opacityRate` is the
-      // total distance the element needs to travel to become completely
-      // transparent, and `x` is how much the element has already travelled.
-      var opaqueDistance = Math.max(0, Math.abs(x) - this._nodeWidth * this.opacityRate);
-      var opacity = Math.max(0, (totalDistance - opaqueDistance) / totalDistance);
-      target.style.opacity = opacity;
-      var translate, rotate;
-      if (this.swipeStyle === 'horizontal') {
-        translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
-        rotate = '';
-      } else {  // Default is assumed to be `curve`.
-        // Assume the element will be completely transparent at 90 degrees, so
-        // figure out the rotation and vertical displacement needed to
-        // achieve that.
-        var y = totalDistance - Math.sqrt(totalDistance * totalDistance - opaqueDistance * opaqueDistance);
-        var deg = (1 - opacity) * direction * 90;
-        translate = 'translate3d(' + x + 'px,' + y + 'px,0)';
-        rotate = ' rotate(' + deg + 'deg)';
-      }
-      this.transform(translate + rotate, target);
-    },
-    _swipeEnd: function(target) {
-      // Restore the original transition;
-      target.style.transition = this.transition;
-      if (this._swipeComplete) {
-        // If the element is ready to be swiped away, then translate it to the full
-        // transparency distance.
-        var totalDistance = this._nodeWidth * this.widthRatio;
-        this._animate(this._direction ? totalDistance : -totalDistance, target);
-      } else {
-        this._animate(0, target);
-      }
-    },
-    _onTransitionEnd: function(event) {
-      var target = event.currentTarget;
-      if (this._swipeComplete && event.propertyName === 'opacity') {
-        Polymer.dom(this).removeChild(target);
-        this.fire('iron-swipe',
-            { direction: this._direction > 0 ? 'right' : 'left',
-              target:target
-            });
-      }
-    }
+// attached:function(){
+// 		 this._nodeObserver = Polymer.dom(this.$.content).observeNodes(
+//           function(mutations) {console.log(mutations.length, mutations.length);
+//           var child=this.$.content.firstElementChild;
+//           while(child.classList.contains("blue-btn-class")!=true && child!=this.$.content){child=child.nextSibling;}
+//           	if(child.classList.contains("blue-btn-class")==true){counter++; this.set("count", counter);console.log(counter, counter, counter, "this is where you look");}
+//           }.bind(this));
+//     },
+//     _addListeners: function(node) {
+//       if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.COMMENT_NODE)
+//         return;
+//       // Set up the animation.
+//       if(node.nodeName=="IRON-ICON" && node.nextSibling.nextSibling.nodeName!=="IRON-ICON")
+//       node.style.transitionProperty = this._transitionProperty;
+//       node.style.transition = this.transition;
+//       this.listen(node, 'track', '_onTrack');
+//       this.listen(node, 'transitionend', '_onTransitionEnd');
+//       if(node.nodeName=="IRON-ICON"){console.log(node);}
+//     },
+//     _removeListeners: function(node) {
+//       if (node.nodeType === Node.TEXT_NODE)
+//         return;
+//       this.unlisten(node, 'track', '_onTrack');
+//       this.unlisten(node, 'transitionend', '_onTransitionEnd');
+//     },
+//     detached: function() {
+//       if (this._nodeObserver) {
+//         Polymer.dom(this.$.content).unobserveNodes(this._nodeObserver);
+//         this._nodeObserver = null;
+//       }
+//     },
+//     _onTrack: function(event) {
+//       if (this.disabled)
+//         return;
+//       var target = event.currentTarget;
+//       if (target.classList.contains('disable-swipe'))
+//         return;
+//       var track = event.detail;
+//       if (track.state === 'start') {
+//         this._trackStart(track, target);
+//       } else if (track.state === 'track') {
+//         this._trackMove(track, target);
+//       } else if (track.state === 'end') {
+//         this._trackEnd(track, target);
+//       }
+//     },
+//     _trackStart: function(event, target) {
+//       // Save the width of the element, so that we don't trigger a style
+//       // recalc every time we need it.
+//       this._nodeWidth = target.offsetWidth;
+//       target.style.transition = 'none';
+//     },
+//     _trackMove: function(event, target) {
+//       this._animate(event.dx, target);
+//     },
+//     _trackEnd: function(event, target) {
+//       // The element is swiped away if it's moved halfway its total width.
+//       this._swipeComplete = Math.abs(event.dx) > this._nodeWidth / 2;
+//       this._direction = event.dx > 0;
+//       this._swipeEnd(target);
+//     },
+//     _animate: function(x, target) {
+//       var direction = x > 0 ? 1 : -1;
+//       // This is the total distance the animation will take place over.
+//       var totalDistance = this._nodeWidth * this.widthRatio;
+//       // Opacity distance overflow. `this._nodeWidth * this.opacityRate` is the
+//       // total distance the element needs to travel to become completely
+//       // transparent, and `x` is how much the element has already travelled.
+//       var opaqueDistance = Math.max(0, Math.abs(x) - this._nodeWidth * this.opacityRate);
+//       var opacity = Math.max(0, (totalDistance - opaqueDistance) / totalDistance);
+//       target.style.opacity = opacity;
+//       var translate, rotate;
+//       if (this.swipeStyle === 'horizontal') {
+//         translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
+//         rotate = '';
+//       } else {  // Default is assumed to be `curve`.
+//         // Assume the element will be completely transparent at 90 degrees, so
+//         // figure out the rotation and vertical displacement needed to
+//         // achieve that.
+//         var y = totalDistance - Math.sqrt(totalDistance * totalDistance - opaqueDistance * opaqueDistance);
+//         var deg = (1 - opacity) * direction * 90;
+//         translate = 'translate3d(' + x + 'px,' + y + 'px,0)';
+//         rotate = ' rotate(' + deg + 'deg)';
+//       }
+//       this.transform(translate + rotate, target);
+//     },
+//     _swipeEnd: function(target) {
+//       // Restore the original transition;
+//       target.style.transition = this.transition;
+//       if (this._swipeComplete) {
+//         // If the element is ready to be swiped away, then translate it to the full
+//         // transparency distance.
+//         var totalDistance = this._nodeWidth * this.widthRatio;
+//         this._animate(this._direction ? totalDistance : -totalDistance, target);
+//       } else {
+//         this._animate(0, target);
+//       }
+//     },
+//     _onTransitionEnd: function(event) {
+//       var target = event.currentTarget;
+//       if (this._swipeComplete && event.propertyName === 'opacity') {
+//         Polymer.dom(this).removeChild(target);
+//         this.fire('iron-swipe',
+//             { direction: this._direction > 0 ? 'right' : 'left',
+//               target:target
+//             });
+//       }
+//     }
 
 
 

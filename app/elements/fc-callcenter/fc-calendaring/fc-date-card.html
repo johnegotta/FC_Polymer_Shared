@@ -49,13 +49,14 @@
 
 </style>
 <template>
-<fc-ddr-card draggable=true drags="true" id$="{{Fcid}}" is-mini="true" header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
+<fc-ddr-card draggable=true id$="{{Fcid}}" is-mini="true" header-title="[[computePrettyDay(day)]]" class="blue flex layout vertical nowrap forCalendar" > 
   <!--   [[_computeHoliday(data)]] -->
-    <fc-event-list events="{{todaysEvents}}" number-date="{{computeNumberDate(data)}}" event-day="{{data}}" item={{event}} event="{{ptestarr}}"></fc-event-list>         
- <!--   <section class="daycard">[[event.holiday]]</section>
+   <!--  <fc-event-list events="{{todaysEvents}}" day-stamp="{{computeDayStamp(data)}}" event="{{data}}" item={{event}} event="{{ptestarr}}">       
+   <section class="daycard">[[event.holiday]]</section>
    <section class="daycard">[[event.practiceTest]]</section>
    <section class="daycard">[[event.startTime]]</section>
-   <section class="daycard">[[event.endTime]]</section> -->
+   <section class="daycard">[[event.endTime]]</section>
+   </fc-event-list> -->
    <content class="daycard"></content>
       <span on-track="_resize" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
   </fc-ddr-card>
@@ -75,7 +76,7 @@ FcDateCard=Polymer({
         },
     event: {
       type: Object,
-      computed: "_computeEventDetails(data)",
+      computed: "_computeEventDetails(data, ptestarr, holiday)",
       notify: true
     },
     data:{
@@ -109,6 +110,9 @@ FcDateCard=Polymer({
 			value: false, 
 			notify: true
 		},
+    eventDay:{
+      notify: true,
+    },
     notFixed:{
       type: Boolean,
       value: function(){return true;},
@@ -167,12 +171,12 @@ FcDateCard=Polymer({
       console.log(this.data);
     	// this.center();
     },
-    computeNumberDate: function(data)
+    computeDayStamp: function(data)
     {
         console.log(data);
         if(!data){return 0;}
         var todayDate = new Date(data);
-        var retVal=data.midnightToker();
+        var retVal=data.dayStamp();
         return retVal;
     },
     _computeHoliday: function(data){
@@ -191,7 +195,7 @@ FcDateCard=Polymer({
    
       var eventDay ={};
       eventDay=this.setHolidays(data);
-    
+    this.eventDay=this.setHolidays(data);
       return eventDay;
     },
 
@@ -204,12 +208,15 @@ FcDateCard=Polymer({
         var i=0;
         for(i=0;i<counter;i++)
         { var str=newVal[i].toLocaleString();
-          console.log(str);
+          var d = newVal[i].toDateString();
+          console.log(str, d);
           if(this.data.toLocaleString() == newVal[i].toLocaleString())
             { console.log(newVal[i]);
+
               this.set("event.practiceTest", "Practice Test: " + newVal[i].toDateString());
               this.set("event.startTime", "Start Time: 9:00AM");
               this.set("event.endTime", "End Time: 12:35PM");
+              this.eventDay=this.event;
               console.log(this.data);
             }
         }

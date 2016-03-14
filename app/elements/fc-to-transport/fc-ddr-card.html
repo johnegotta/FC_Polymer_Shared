@@ -48,6 +48,10 @@
       .magenta .paper-header {
         background-color: magenta;
       }
+      .darkBlue .paper-header {
+        background-color: #008;
+
+      }
       .blue .paper-header {
         background-color: var(--paper-light-blue-500);
       }
@@ -75,23 +79,25 @@
 
 
 <!-- on-track="_focusedDraggable" -->
-  <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" id$="{{relId}}" class$="[[headClass]] layout vertical flex self-stretch around-justified">
-  <div class="paper-header layout horizontal center-justified"  on-track="_focusedDraggable" style$="text-align: center; height: [[computeHeadHeight(isMini, isPage, isColumn, isCard, isCounter)]]">
+  <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" id$="{{relId}}" class$="[[headClass]] [[verticalClass]] layout flex self-stretch around-justified">
+  <div class="paper-header layout horizontal center-justified"  on-track="_focusedDraggable" style$="text-align: center; height: [[computeHeadHeight(isMini, isPage, isColumn, isCard, isCounter, isPicker)]]">
   <iron-icon 
             icon="icons:highlight-off" 
             name="fc-dialog-closer"
             description="designed to close the dialog"
             class="menuItems-light"
-            dialog-dismiss
+            hidden="{{!isResizing}}"
             on-tap="falseClose"
             style$="position: absolute; z-index: 45; border-radius: 180px; background: [[_computeButtonBG(toggleColor)]]; width: 14px; height: 14px; border-shadow: 11px 4px 18px 7px #afafaf; right: 0px; top: 0px;"
           >
       </iron-icon>
+<content select=".headerLeft">
+</content>
 
-     	  
 
      [[_computeHeader(headerTitle)]]
-
+<content select=".headerRight">
+        </content>
 
 
      </div>
@@ -111,7 +117,7 @@
            	
 		</div>
 
-      <span on-track="_resize" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
+      <span on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
  </paper-header-panel>    
        
 </template>
@@ -126,6 +132,12 @@ FcDdrCard=Polymer({
     ],
 
 	properties: {
+    verticalClass:{
+      type: String,
+      value: "vertical",
+      reflectToAttribute: true,
+      notify: true
+    },
     headClass:{
       type: String,
       value: "blue",
@@ -156,17 +168,20 @@ FcDdrCard=Polymer({
 		drags:{
 			type: Boolean, 
 			value: false,
-			notify: true
+			notify: true,
+      reflectToAttribute: true
 		},
 		isResizing: {
 			type: Boolean,
 			value: true, 
-			notify: true
+			notify: true,
+      reflectToAttribute: true
 		},
 		isMini: {
 			type: Boolean,
 			value: function(){return false;},
-			notify: true
+			notify: true,
+      reflectToAttribute: true
 		},
 		inputValue: {
 				type: String,
@@ -213,7 +228,7 @@ FcDdrCard=Polymer({
       },
       currentHeight: {
           type: String, 
-     	  value:function(){ return "auto";},
+     	  value:function(){ return "480px";},
           notify: true, 
           reflectToAttribute: true
       },
@@ -236,7 +251,13 @@ FcDdrCard=Polymer({
       	type:Number,
       	value: function(){return 0;},
       	notify: true
-      } 
+      }, 
+      isPicker:{
+        type: Boolean, 
+        value: false, 
+        notifyResize: true,
+        reflectToAttribute: true
+      }
 
     },
     ready: function(){
@@ -244,19 +265,19 @@ FcDdrCard=Polymer({
     },
      attached: function(){
    
-       this.startWidth();
+       // this.startWidth();
        this.set("_notifyingDescendant", true);
        this.resizeMe();
-           this.startHeight();
+           // this.startHeight();
 
     },
 
     _computeHeader: function(headerTitle){
       return headerTitle;
     },
-    computeHeadHeight: function(isMini, isPage, isColumn, isCard, isCounter)
+    computeHeadHeight: function(isMini, isPage, isColumn, isCard, isCounter, isPicker)
     {
-      var height = (isColumn==true)?"98px;": isMini==true? "20px; font-size: 16px; font-weight: 700;":isCard==true?"48px;": "44px;";
+      var height = (isColumn==true)?"98px;": isMini==true? "20px; font-size: 16px; font-weight: 700;":isCard==true?"46px;":isPicker==true?"32px;": "39px";
       return height;
       
     },
@@ -299,10 +320,15 @@ FcDdrCard=Polymer({
         },
      startHeight: function(){
       var parent =this.parentNode;
-      var ht = window.getComputedStyle(parent, null).getPropertyValue("height");
+     var ht = window.getComputedStyle(parent, null).getPropertyValue("height");
+      ht=(parseInt(ht));
+      if(parent==document.body || ht<400){this.set("currentHeight", "100%");}
        while(ht==NaN || parent!=document.body){
         parent=parent.parentNode;
       }
+
+        ht = window.getComputedStyle(parent, null).getPropertyValue("height");
+        console.log(ht);
       if(parent==document.body){this.set("currentHeight", "100%");}
       else{
       var hInt =Math.floor(parseInt(ht)*.88);
@@ -337,11 +363,7 @@ FcDdrCard=Polymer({
       // this.afterStartResize();
       // this.notifyResize();
     },
-    goDialog: function(){
-      this.$.myDialog.opened=!this.$.myDialog.opened;
-
-    },
-
+   
     _computeCurrentHeight: function(drags){
     	var ht="450px";
     	if(currentHeight==undefined) {return ht;}
@@ -367,6 +389,7 @@ FcDdrCard=Polymer({
     _resize: function(e){
           var self=this;
           e.preventDefault();
+          if(this.isResizing==true){
           switch(e.detail.state) {
                 case 'start':
                 var theId=this.relId;
@@ -397,19 +420,16 @@ FcDdrCard=Polymer({
                   Polymer.dom.flush();
                   break;
               }
+            }
         },
     
        falseClose: function(){
-        if(this.toggleColor==false){
-         var parent = this.parentNode;
-          var ht = window.getComputedStyle(parent, null).getPropertyValue("height");
-          console.log(ht);
-        this.set('currentHeight', ht);
-        this.set('toggleColor', true);
+        this.toggleColor=!this.toggleColor;
+        if(this.toggleColor===false){
+        this.set('currentHeight', "128px");
       }
         else{
-          this.set('currentHeight', "128px");
-            this.set('toggleColor', false);
+          this.set('currentHeight', "480px");
             }
 
        },
@@ -422,22 +442,34 @@ FcDdrCard=Polymer({
   _focusedDraggable:function(e){
   	// console.log("we tried to drag");
   	 if(this.drags==true){
+      Polymer.dom(this).setAttribute("style.position", "fixed");
         var self=this;
         e.preventDefault();
+        console.log(e, e.detail);
         switch(e.detail.state) {
           case 'start':
-             
-            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-            if (this.dragCounter<1){
+          if (this.dragCounter<1){
+              console.log('top distance differenced?' + e.detail.y);
+              console.log('left distance' + self._leftprime, e.detail.x);
               self.style.left=0;
               self.style.top=0;
+            
+              self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+         console.log(self._leftprime);
+            // self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y-e.detail.y;
+              console.log(self._topprime);
               this.dragCounter++;
-              self.style.left=e.detail.x;
-              self.style.top=e.detail.y;
-              console.log('top distance differenced?' + self._topprime);
-              console.log('left distance' + self._leftprime);
             }
+            else{
+              self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+         console.log(self._leftprime);
+              self._topprime =  self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+            }
+              // self.style.left=e.detail.x;
+              // self.style.top=e.detail.y;
+             
+            
             //console.log('top distance differenced?' + self._topprime);
             // }
             self.changeX=0;
@@ -452,9 +484,9 @@ FcDdrCard=Polymer({
           case 'end':
             //console.log(self._topprime);
             self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
-            self._bottom = self.getBoundingClientRect().top;
-            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): e.detail.x;
-            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):e.detail.y;
+            self._bottom = self.getBoundingClientRect().bottom;
+            self._x= ((self._leftprime+e.detail.x)>=0)?(self._leftprime+e.detail.x):e.detail.x;
+            self._y=((self._topprime)+e.detail.y>=0)?(self._topprime+e.detail.y):e.detail.y;
             self.translate3d(0, 0, 0);
 
             //console.log("ENDING", self._x);
@@ -462,6 +494,7 @@ FcDdrCard=Polymer({
             self.style.top=self._y.toString()+'px';
             console.log('y: ' + e.detail.y);
             self.dragging=false;
+
             Polymer.dom.flush();
             break;
         }

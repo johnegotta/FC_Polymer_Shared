@@ -1,0 +1,134 @@
+<dom-module id="fc-course-interface-dropdowns">
+<template>
+<style>
+</style>
+
+<br>
+<br>
+<select label="Test Date" on-change="setTestDate">
+	<template is="dom-repeat" items="{{getTestDates()}}">
+		<option value="{{item}}">{{item}}</option>
+	</template>
+</select>
+<br>
+<select label="Practice Test Day" on-change="setPracticeTestDay">
+	<option value="saturday">saturday</option>
+	<option value="sunday">sunday</option>
+</select>
+<br>
+<select label="Course Meeting Days" name="Course Meeting Days" on-change="setCourseMeetingDays">
+	<template is="dom-repeat" items="{{getCourseMeetingDays()}}">
+		<option value="{{item}}">{{item}}</option>
+	</template>
+</select>
+<br>
+<select label="Course Meeting Start Time" name="Course Meeting Start Time" on-change="setCourseMeetingTime">
+	<template is="dom-repeat" items="{{getCourseMeetingTimes()}}">
+		<option value="{{item}}">{{item}}</option>
+	</template>
+</select>
+<br>
+<select label="Coach" name="Coach" on-change="setCoach">
+	<template is="dom-repeat" items="{{getCoaches()}}">
+		<option value="{{item}}">{{item}}</option>
+	</template>
+</select>
+<br>
+<paper-button style="background:white" on-tap="addHolidays">Add Holidays</paper-button>
+<br>
+<paper-button style="background:white" on-tap="saveCourse">Save Course</paper-button>
+</template>
+<script>
+
+FcCourseInterfaceDropdowns=Polymer({
+	is: 'fc-course-interface-dropdowns',
+	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"],
+	//observers: [''],				
+	properties: 
+	{
+		currentCourse:{
+			type: FcCourse,
+			notify: true
+		}
+	},
+
+	attached: function()
+	{
+		this.currentCourse = new FcCourse();
+		console.log(this.currentCourse);
+	},
+
+	addHolidays: function()
+	{
+		//generateHolidayEvents(new Date([2016,1,1]), new Date([2016,12,31]));
+	},
+
+	getTestDates: function()
+	{
+		return FcCourse.getTestDates();
+	},
+
+	getCourseMeetingDays: function()
+	{
+		return FcCourse.getCourseMeetingDays();
+	},
+
+	getCourseMeetingTimes: function()
+	{
+		return FcCourse.getCourseMeetingTimes();
+	},
+
+	getCoaches: function()
+	{
+		return FcCourse.getCoaches();
+	},
+
+	setTestDate: function(e)
+	{
+		this.currentCourse.setTestDate(new Date(e.target.value));
+		console.log(this.currentCourse);
+	},
+
+	setPracticeTestDay: function(e)
+	{
+		this.currentCourse.setPracticeTestDay(e.target.value);
+		console.log(this.currentCourse);
+	},
+
+	setCourseMeetingDays: function(e)
+	{
+		this.currentCourse.setCourseMeetingDays(e.target.value);
+		console.log(this.currentCourse);
+	},
+
+	setCourseMeetingTime: function(e)
+	{
+		this.currentCourse.setCourseMeetingTime(e.target.value);
+		//this.currentCourse.setCourseMeetingTime(e.target.value.split("-")[1], false);
+		console.log(this.currentCourse);
+	},
+
+	setCoach: function(e)
+	{
+		this.currentCourse.setCoach(e.target.value);
+		console.log(this.currentCourse);
+	},
+
+	saveCourse: function(e)
+	{
+		if(!this.currentCourse.testDate ||
+			!this.currentCourse.practiceTestDay ||
+			!this.currentCourse.courseMeetingDays ||
+			!this.currentCourse.courseMeetingTime ||
+			!this.currentCourse.coach)
+		{
+			alert("must set all values prior to saving a new course!");
+			return;
+		}
+		this.currentCourse.save();
+	}
+
+});
+
+</script>
+</dom-module>

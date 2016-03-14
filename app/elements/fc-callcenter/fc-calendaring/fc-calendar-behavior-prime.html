@@ -1,18 +1,38 @@
 <script>
 "use strict";
 
-function fcCreateBaseLineEvents(startDate,stopDate){
+
+var FcCreateBaselineEvents = function fcCreateBaseLineEvents(startDate,stopDate)
+{
      var daysArray = [];
-	 daysArray=getDates(startDate,stopDate);
-	 var counter =argDays.length;
-	 var eventDaysArrayII=[];
-		for(var i=0;i<counter;i++)
-		{
-			var aDay= this.holidayEvents(argDays[i]);
-		 	var aDay2 =	this.satTestCourseEvents(aDay);
-		 	daysArray.push(aDay2);
-		}
-	}
+     var gnarly =true;
+      var allTestDates=[];
+      allTestDates=nextReasonableTestDate(true);
+      this.events=[];
+      var FcTestEvents=allTestDates.map(this.event, function(item, index, arr)
+      {	
+      	this.testDate[index]=item.setDate(item.getDate());
+      	//this.numberDate[i]=item.midnightToker();
+      	this.startDate[index]=item.setDate(item.getDate()-49);
+       this.practiceTestOne[index] = this.startDate[index];
+       this.practiceTestTwo[index]= item.setDate(item.getDate()-42);
+       this.practiceTestThree[index]=item.setDate(item.getDate()-35);
+       this.practiceTestFour[index]=item.setDate(item.getDate()-28);
+       this.practiceTestFive[index]=item.setDate(item.getDate()-21);
+       this.practiceTestSix[index]=item.setDate(item.getDate()-14);
+       this.practiceTestSix[index]=item.setDate(item.getDate()-7);
+   		});
+      allTestDates.forEach(this,function(item, index, array)
+      {
+      	console.log(item, index, array, "Hello all");
+      });
+      var sd = new Date();
+      var ed = new Date(2019, 7,1);
+      this.event=[];	
+      this.eventList = holidayEvents(sd, ed);
+      var eventListOne=new FcEvent(this.eventList);
+      var eventListTwo= new FcEvent(FcTestEvents);
+}
 
 function holidayEvents(startDate,endDate){
       var holidayArray = [];
@@ -71,7 +91,7 @@ function holidayEvents(startDate,endDate){
 
     }
   
-FcCourseBuilder.prototype.FcCourseCalendar=function(testDate)
+var FcCourseCalendar=function FcCourseCalendar(testDate)
 	{
 		this.testDate = testDate || nextReasonableTestDate();	
 		var startDate = new Date(testDate);
@@ -130,15 +150,15 @@ FcCourseBuilder.prototype.FcCourseCalendar=function(testDate)
  		
  		return this.fcCourseDayArray;
 	}
-var fcCourseBuilder =function (argObjectBuilder)
+var FcCourseBuilder =function (argObjectBuilder)
 {	this.courseCalendar = this.FcCourseCalendar(testDate);
 	this.practiceTestMeetingsObject=this.practiceTestDays(argSetPracticeTestDays);
 	this.courseMeetingsObject =this.FcCourseMeetingDays(argMeetingDaysObject);
 
 
 }
-fcCourseBuilder.prototype.constructor=FcCourseBuilder;
-fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSaturday)
+FcCourseBuilder.prototype.constructor=FcCourseBuilder;
+FcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSaturday)
 	{	var practiceTestObjec={};
 		if(isPracticeTestSaturday)
 			{ 
@@ -178,7 +198,7 @@ fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSatu
 }
 
 
-FcCourseBuilder.prototype.FcCourseMeetingDays = function(testDate, isMonWedCourse, isTueThuCourse, isMonWedFriCourse, isOtherDaySchedule, otherDayScheduleArray)
+var FcCourseMeetingDays = function FcCourseMeetingDays(testDate, isMonWedCourse, isTueThuCourse, isMonWedFriCourse, isOtherDaySchedule, otherDayScheduleArray, numberOfWeeks)
 	{	var reverseCourseMeetingsArray=[];
 	  this.courseMeetingArrays=[];
 		this.otherDayScheduleArray=otherDayScheduleArray || [];
@@ -217,7 +237,7 @@ FcCourseBuilder.prototype.FcCourseMeetingDays = function(testDate, isMonWedCours
 	 	var j = 0;
 		var singleCourseMeetingsArray =[];
 		
-		for (j = 0; j < 7; j++) 
+		for (j = 0; j < numberOfWeeks; j++) 
 		{
 				for(var i=0;i<counter;i++)
 				{ var courseMeetingDay =new Date(testDate);
@@ -284,7 +304,7 @@ FcCourseMeetingDays.prototype.fcCourseMeetingTimes=function(isSixToNineCourse, i
 			onePM.endTime="4:30PM";
 			onePM.short="_1_430PM_SAT";
 			onePM.startNumHrsArray=[13,0,0];
-			onePM.endNumHrsArray=[17,30,0];
+			onePM.endNumHrsArray=[16,30,0];
 
 			time=(isSixToNineCourse==true)?sixToNine: (isAfternoonCourse==true)?afternoon:(is900AmCourse)?NineAm:(is100PMCourse==true)?onePM: otherStartTime;
 			time.classType="_1600SAT";
@@ -339,7 +359,7 @@ getFirebaseLocation(theDate){return "https://focused0ne.firebaseio.com/events";}
   build(name, startTime, endTime, holiday, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
   {
     
-    this.name=name || ""; 
+    this.name=name || "Focused Session"; 
     this.startTime=new Date(startTime) || new Date(); console.log(this.startTime);
     this.endTime=new Date(endTime) || ""; 
     if(fcid) {this.fcid=fcid}else this.fcid="";
@@ -416,7 +436,7 @@ getFirebaseLocation(theDate){return "https://focused0ne.firebaseio.com/events";}
 
 
  }
- function nextReasonableTestDate()
+ function nextReasonableTestDate(gnarly)
 	{
 		var d=new Date();
 		d.setDate(d.getDate(d +49));
@@ -424,13 +444,15 @@ getFirebaseLocation(theDate){return "https://focused0ne.firebaseio.com/events";}
 		allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
 		var counter = allTestDates.length;
 		var i = 0;
+		if(!gnarly){
 		for (i = 0; i < counter; i++)
 		{
 			var testDay = new Date(allTestDates[i]);
 			console.log(d.toLocaleString, testDate.toLocaleString);
 			if(d<testDay){return testDay;}
 		}
-	
+	}
+		else return allTestDates;
 	}
 
 

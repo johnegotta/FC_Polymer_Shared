@@ -1,0 +1,155 @@
+<dom-module id="fc-event-element">
+<template>
+<style>
+:host{
+	font-family: merriweather;
+	font-size: 14px;
+	line-height: 1.25;
+	margin: 4px;
+	background: white;
+}
+paper-item {background: white;
+    --paper-item-focused: {
+      background: var(--paper-amber-100);
+      font-weight: bold;
+    };
+    
+  }
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+	white-space: nowrap;
+	display: inline-block;
+}
+.two{
+	font-family: merriweather; 
+	display: inline-block;
+	width: 95px !important;
+	overflow: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+		font-size: 14px;
+}
+.three{
+	font-family: merriweather; 
+	display: inline-block;
+	width: 60px !important;
+	overflow: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+		font-size: 14px;
+
+}
+.four{
+	font-family: merriweather; 
+	display: inline-block;
+	width: 12px !important;
+	overflow: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+		font-size: 14px;
+
+}
+</style>
+
+	<paper-item class="vertical flex layout start nowrap" style="border:3px solid #afafaf; margin: 1px 4px 1px 1px; padding: 1px; overflow: hidden; overflow: scroll;" on-tap="revealInq">
+			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; border-bottom: 2.4px solid [[alert]]; padding: 1px; overflow: scroll;"> 
+
+				<span class="one">Timestamp</span>: <span class="two"> [[inquiry.timeStamp]] &nbsp; &nbsp;</span>
+				
+				<span class="one"><i>Tel</i></span>: <span class="one" style="color: #008; font-weight: 700;"> [[inquiry.callerTelephone]] &nbsp; &nbsp;</span>
+				
+				<span class="one">Caller</span>: <span class="one" style="color: #008; font-weight: 700;"> [[inquiry.callerFullName]] &nbsp;&nbsp;</span> 
+				 
+				<span class="one">Intake:</span><span class="two"> [[inquiry.intakeFcid]]</span>
+			</section>
+			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; max-height: 28px !important;">
+			<span class="one"><i>InRe</i></span>: <span style="color: #008;" class="one">[[inquiry.focusedProgramMatch]]</span>
+			&nbsp;&nbsp; 
+			<span class="one">Email</span>: [[inquiry.callerEmail]]
+			</section>
+			<section class="horizontal layout flex wrap" style="padding: 2px 0px; margin: 2px 4px 2px 1px;font-family: merriweather;" hidden$="{{!notHidden}}" id="hiddenInquiry">
+				 <ol title="inquiry.title" style="font-family: merriweather; color: #008; font-weight: 600; font-size: 14px;" class="vertical layout wrap">
+					<li> 
+						<span class="one">Caller</span>: [[inquiry.callerFullName]] 
+						&nbsp; &nbsp; &nbsp;
+						<span class="one">Caller Role</span>: [[inquiry.callerRole]]
+							&nbsp; &nbsp; &nbsp;
+						<span class="one">Student</span>: [[inquiry.relatedStudent]]
+					</li>
+					<li> 
+						<span class="one">Email</span>: [[inquiry.callerEmail]] 
+							&nbsp; &nbsp; &nbsp;
+						<span class="one">Phone</span>: [[inquiry.callerTelephone]]</li>
+					<li> 
+						<span class="one">Message</span>: [[inquiry.callerMessage]]
+					</li> 
+					<li> 
+						<span class="one">Expected Follow-Up</span>: [[inquiry.expectedFollowUp]]
+					</li>
+					<li>
+						<span class="one">Student FCID</span>: [[inquiry.fcid]]
+						&nbsp; &nbsp;
+						<span class="one"> Intake FCID</span>: [[inquiry.intakeFcid]]
+						&nbsp; &nbsp;
+						<span class="one" style="[[_displayIsClosed(isClosed)]];"> Issue: [[isClosed]]</span>
+					</li>
+					<li><span class="one"> Number of Inquiries</span>: [[inquiry.numberOfInquiries]]</li>
+					  </ol> 
+			</section>	
+		</paper-item>
+	</template>
+<script>
+"use-strict";
+Polymer({
+	is:"fc-event-element",
+	properties:{
+		event: {
+			type: Object,
+			notify: true
+		}, 
+		notHidden:{
+			type: Boolean,
+			value: false,
+			notify: true
+		}, 
+		isClosed: {
+			type: String,
+			computed: "_computeInqIsClosed(inquiry.isClosed)",
+			notify: true
+		},
+		alert:{
+			type: String,
+			notify: true
+		},
+	},
+	ready(){
+
+	},
+	attached(){
+	
+
+	}, 
+	_displayIsClosed(isClosed){
+		var retVal;
+		if(isClosed=="CLOSED"){retVal="color: green; font-weight: 700; margin: 1px"; this.set("alert", "green");}
+		else if(isClosed=="OPEN"){retVal="color: red; font-weight: 700; margin: 1px"; this.set("alert", "red");}
+		return retVal;
+	},
+  
+    revealInq(){
+        this.notHidden=!this.notHidden;
+    },
+    _computeInqIsClosed(inquiry)
+    {
+    	var retVal =(this.inquiry.isClosed==true)?"CLOSED": "OPEN";
+    	return retVal;
+    },
+
+
+});
+</script>
+</dom-module>

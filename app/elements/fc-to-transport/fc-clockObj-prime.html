@@ -84,16 +84,17 @@ paper-material{opacity: 1;position: relative;background: #ffffff;border: 3px rid
 </template>
 <script>
 
-function FcClockData(argType, argSeconds)
+function FcClockData(argType, argTenths)
 {
-	//this.clockType = argType;
+	
 	this.thours = {name: "thours", value: 0, inputType: "digit", label:"h"};
 	this.hours = {name: "hours", value: 0, inputType: "digit"};
 	this.tmin = {name: "tmin", value: 0, inputType: "digit", label:"m"};
 	this.min = {name: "min", value: 0, inputType: "digit"};
-	this.tsec = {name: "tsec", value: Math.floor(argSeconds / 10), inputType: "digit", label:"s"};
-	this.sec = {name: "sec", value: argSeconds % 10, inputType: "digit"};
+	this.tsec = {name: "tsec", value:0, inputType: "digit", label:"s"};
+	this.sec = {name: "sec", value: 0, inputType: "digit"};
 	this.tenth = {name: "tenth", value: 0, inputType: "digit"};
+	this.convertFromTenths(argTenths);
 }
 
 FcClockData.prototype.convertToTenths = function()
@@ -243,8 +244,8 @@ FcClockObjPrime = Polymer({
 
 	ready: function() {
 	  
-	  	this.clockArray.push(new FcClockData("countdown", 13));
-	  	this.clockArray.push(new FcClockData("stopwatch", 3600));
+	  	this.clockArray.push(new FcClockData("countdown", 39000));
+	  	this.clockArray.push(new FcClockData("stopwatch", 0));
 	  	this.currentClock = this.clockArray[0]; //new FcClockData("bs", 12);
 	},
   
@@ -281,7 +282,7 @@ FcClockObjPrime = Polymer({
 	toggle: function(e)
 	{	
 		this.$.collapse.opened=!this.$.collapse.opened;
-		this.$.collapse2.opened=!this.$.collapse2.opened;
+		//this.$.collapse2.opened=!this.$.collapse2.opened;
 		var setVal = this.swapIcons=="query-builder"?"clear":"query-builder";
 		this.set("swapicons", setVal);
 	},
