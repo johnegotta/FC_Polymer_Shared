@@ -75,10 +75,11 @@ color: grey;
 
 </style>
 <div class="horizontal layout">
+<fc-input-prime label="Event Length in Weeks" input-type="number" name="numberOfWeeks" value={{numWeeks}}></fc-input-prime>
 	<section class="vertical layout flex-2">
 			<section class="holder layout vertical">
 				<section class="header-class layout vertical"> 
-				SAT Test Dates 2016-2019
+			[[computeLabelHeader(labelArray)]]
 				</section>
 				
 				<paper-listbox class="layout vertical slides" selected="{{testDateSelected}}">
@@ -86,7 +87,7 @@ color: grey;
 						<paper-item on-tap="soSelected" class="layout horizontal courseData" group="courseData" draggable=true on-selected="changeInterface(testDateSelected)" value$="{{item.testDateDateObject}}">
 							<paper-item-body  class="layout vertical" value$="{{item.testDateDateObject}}" two-line>
 								<div class="primary">{{item.testDate}}</div>
-								<div class="secondary">SAT TEST DATE </div>
+								<div class="secondary">[[computeLabel(item)]]</div>
 							</paper-item-body>   	
 							<paper-icon-button icon="star" on-tap="soUnSelected" value$="{{item.testDateDateObject}}" alt="favourite this!">
 							</paper-icon-button>
@@ -167,6 +168,12 @@ testDateArray:{
 			type: Boolean,
 			value: true,
 			notify: true, 
+			reflectToAttribute: true
+		},
+		numWeeks:{
+			type: Number,
+			value:function(){return 7;},
+			notify: true,
 			reflectToAttribute: true
 		},
 		
@@ -257,6 +264,10 @@ testDateArray:{
 		},
 
 	},
+	computeLabel(item){
+		return item;
+
+	},
 
 	daySelected(e){
 		console.log(e.target);
@@ -272,7 +283,7 @@ testDateArray:{
 		else if(val=="saturday")
 		{ this.set("practiceTestDayLabel", "Saturday 9:00AM to 12:30PM");
 		var array = [];
-			for (j = 0; j < 6; j++) {
+			for (j = 0; j < numWeeks; j++) {
 					var d = new Date(this.testDate);
 					var sat = j*7+7;
 					var test = new Date();
@@ -290,7 +301,7 @@ testDateArray:{
 		}
 		else if(val=="sunday")
 		{ var array = [];
-			for (j = 0; j < 6; j++) {
+			for (j = 0; j < numWeeks; j++) {
 					var d = new Date(this.testDate);
 					var sun = j*7+6;
 					var test = new Date();
@@ -346,7 +357,7 @@ testDateArray:{
 				{
 				var testD = new Date(allTestDates[i]).toDateString();
 				var testDobj = new Date(allTestDates[i]);
-				this.push("testDateArray", {"testDate": testD, "testDateDateObject": testDobj});
+				this.push("testDateArray", {"testDate": testD, "testDateObject": testDobj});
 				// testDates.push({testD: testSet.reverse()});
 				}
 			if(testIndex!=undefined && testIndex!=null && testIndex!=NaN)

@@ -1,0 +1,142 @@
+<script>
+'use strict';
+
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcInputGenConverterBehavior = {
+	properties: {
+		 dataObject:
+		 {
+		 	type: Object,
+		 	notify: true,
+		 	reflectToAttribute: true
+		 },
+		 inputGenObject:
+		 {
+		 	type: Object,
+		 	notify: true,
+		 	value: {},
+		 	reflectToAttribute: true
+		 },
+		 converted:
+		 {
+		 	type: Boolean,
+		 	value: false
+		 }
+	},
+	observers: ['observeInputGenObject(inputGenObject.*)',
+				'observeDataObject(dataObject.*)'],
+
+
+	//users of this behavior should assign property "dataObject" in ready()
+	attached: function() {
+	  	this.set("inputGenObject", this.getInputGenObject(this.dataObject));
+	},
+
+	observeInputGenObject: function(newVal)
+	{
+		console.log("rutabega", newVal, this.dataObject);
+		if(newVal.path == "inputGenObject")
+		{
+			return;
+		}
+		var property = newVal.path.replace("inputGenObject.", "");
+		property = property.replace(".value", "");
+		var propertyString = "dataObject." + property;
+		this.set(propertyString, newVal.value);
+		//this.dataObject[property] = newVal.value;
+		console.log(this.dataObject);
+	},
+
+	observeDataObject: function(newVal)
+	{
+		console.log("ruta", newVal);
+		//do nothing if this is initialization of whole dataObject
+		if(newVal.path == "dataObject")
+		{
+			if(newVal.value && Object.keys(newVal.value).length != 0)
+			{
+				this.converted = false;
+			  	this.set("inputGenObject", this.getInputGenObject(this.dataObject));
+			}
+			return;
+		}
+		var property = newVal.path.replace("dataObject.", "");
+		this.inputGenObject[property].value = newVal.value;
+		this.set("inputGenObject."+property+".value", newVal.value);
+		console.log("ruta", this.inputGenObject);
+	},
+
+	getInputGenObject: function(argDataObject)
+	{	
+		var result = {};
+		if(!this.converted)
+		{
+			var keys = Object.keys(argDataObject);
+			var numKeys = keys.length;
+			console.log(keys);
+			//this.inputGenObject = {};
+			for(var i = 0; i < numKeys; i++)
+			{
+				var key = keys[i];
+				var type = typeof argDataObject[key];
+				console.log(key, type);
+				var iType = "";
+				var label = key;
+				result[key] = {name: key, label: label, value: argDataObject[key]};
+				if(type == "string")
+				{
+					iType = "text";
+					result[key].inputType = iType;
+				}
+				else if(type == "number")
+				{
+					iType = "number";
+					result[key].inputType = iType;
+				}
+				else if(type == "object")
+				{
+					if(Array.isArray(argDataObject[key]))
+					{
+						iType = "select";
+						//result[key+"Selected"] = {name: key+"Selected", label: key+"Selected", value: argDataObject[key][0]};
+						result[key].inputType = iType;
+						result[key].isRepeaterSelect = true;
+						result[key].selectItems = argDataObject[key];
+						result[key].value = argDataObject[key][0];
+					}
+					else
+					{
+						result[key].value = this.getInputGenObject(argDataObject[key]);
+						iType = "text";//tbd fix
+					}
+				}
+				//result[key].inputType = iType;
+				// if(iType == "select")
+				// {
+					
+				// 	result[key].value = argDataObject[key];
+				// }
+				// else
+				// {
+				// 	result[key].value = argDataObject[key];
+				// }
+			}
+			this.converted = true;
+		}
+		console.log("radish", result);
+		return result;
+	}
+
+	// computeCurrentClock: function(argClock)
+	// {
+	// 	console.log(this.currentClock.getInputGenObject());
+	// 	this.inputGenObject = this.currentClock.getInputGenObject();
+	// 	return this.inputGenObject;
+	// },
+
+	
+
+	
+  
+};
+</script>

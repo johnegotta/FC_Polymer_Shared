@@ -21,8 +21,8 @@ Date.prototype.dayStamp= function()
  	var year= this.getFullYear(); 
 	var month= this.getMonth();
 	var day = this.getDate();
-    var numberDate= Date.UTC(year, month, day);
-    return numberDate;
+    var dayStamp= Date.UTC(year, month, day);
+    return dayStamp;
 }	
 
 function getDates(startDate, stopDate)
@@ -67,7 +67,7 @@ class FcEvent
 	    this.relatedFcids = relatedFcids || "";  
 	    this.parentEventName = parentEventName || ""; 
 	    this.parentEventFcid = parentEventFcid || "";
-	    //this.numberDate = this.startTime.dayStamp();	
+	    //this.dayStamp = this.startTime.dayStamp();	
 	    if(this.startTime) this.dayStamp = this.startTime.dayStamp();
 	    console.log(this.dayStamp);
 	}
@@ -169,7 +169,7 @@ function generateHolidayEvents(startDate, endDate)
         endTime.setHours(23);
         endTime.setMinutes(59);
         var holidayTimestamp = startTime.dayStamp();
-        holidayArray[i].numberDate=holidayTimestamp;
+        holidayArray[i].dayStamp=holidayTimestamp;
         if(holidayTimestamp >= startDate && holidayTimestamp <= endDate && holidayArray[i].noBook)
         {	
         	ev = new FcEvent({name: holidayArray[i].name, 
@@ -187,17 +187,33 @@ function generateHolidayEvents(startDate, endDate)
 
 class FcCourse
 {
+
 	constructor()
 	{
 		this.testDate = "";
+		this.courseType = "";
+		this.courseLength= ""; 
+		this.practiceTestDay= "";
+		this.presetCoursePattern="";
+		this.numberOfMeetings="";
+		this.numberOfPracticeTests="";
+		this.startTime="";
+		this.endTime= "";
+		this.eventLocation=""; 
+		this.coach="";
+		this.associatedCoaches="";
+		this.courseSize="";
 		this.practiceTestDay = "";
 		this.courseMeetingDays = "";
 		this.coach = "";
-		this.location = "";
 		this.eventArray = [];
 		this.practiceTestArray = [];
 		this.courseMeetingArray = [];
-		this.fcid = ""; //FcCourse.getNewFcid();
+		this.fcid = "";
+		this.currentEnrollment="";
+		this.price="";
+		this.meetingLength="";
+		this.hoursTotal=""; //FcCourse.getNewFcid();
 	}
 
 	// static getNewFcid()
@@ -205,8 +221,8 @@ class FcCourse
 	// 	return this.fcidCounter++;
 	// }
 
-	static getTestDates()
-	{
+static getTestDates()
+	{	var tResult =[];
 		var result = [];
 		var allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
 		var numDates = allTestDates.length;
@@ -214,17 +230,32 @@ class FcCourse
 		for(var i = 0; i < numDates; i++)
 		{
 			var testdate = new Date(allTestDates[i]);
-			if(testdate.addDays(-60) >= now) //must be 35 days before test min
+			if(testdate.addDays(-28) >= now) //must be 35 days before test min
 			{
-				result.push(testdate.toLocaleString());
+				result.push(testdate.toDateString());
 			}
 		}
-		return result;	
+		var obj1 = {"label":"2016-2019 SAT Test Dates"};
+		var obj2={"label2": "Test Date"};
+		tResult.push(obj1);
+		tResult.push(obj2);
+		tResult.push(result);
+		return tResult;	
+	}
+
+	static getCourseTypes()
+	{
+
+
+
 	}
 
 	static getCourseMeetingDays()
 	{
-		return ["monday/wednesday", "tuesday/thursday", "monday/wednesday/friday"];
+		return [{"label": "Which Days will your Course Meet on each Week?"},
+				{label2: "Course Meeting Days"},
+				["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Select Days on your Calendar"]
+				];
 	}
 
 	static getCourseMeetingTimes()
@@ -232,14 +263,38 @@ class FcCourse
 		return ["15:45-17:45", "18:00-21:00", "9:00-12:30", "13:00-16:30" ];
 	}
 
+	static getTimes()
+	{	var slotsArr = [];
+		var timeArr = [];
+        for(var i=36; i<=84;i++)
+        {
+              var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
+              if(hour<10){hour='0'+hour.toString();}
+              var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
+              var ampm=(i<48)?"AM":"PM";
+              var tobj = {"hour": hour,
+                          "minutes": minutes,
+                          "ampm": ampm, 
+                        };
+              var string=hour.toString() + ":" + minutes+ ampm;
+              timeArr.push(string);
+          }
+ 	var obj1={"label": "Scheduled Appointment Times"};
+ 	var obj2={"label2": "Time Slots"};
+ 	slotsArr.push(obj1);
+ 	slotsArr.push(obj2);
+ 	slotsArr.push(timeArr);
+          return(slotsArr);
+    }
+
 	static getCoaches()
 	{
-		return ["Jason", "Scott", "Stacy", "John", "George"];
+		return ["Jason", "Scott", "Stacy", "John", "George"];//this should be a profile and be pulled from its own constructors.
 	}
 
 	static getFirebaseLocation()
 	{
-		return ("https://focused0ne.firebaseio.com/courses");
+		// return ("https://focused0ne.firebaseio.com/courses");
 	}
 
 	setTestDate(argDate)
@@ -371,6 +426,7 @@ class FcCourse
 		}
 	}
 
+
 	setCoach(argCoach)
 	{
 		this.coach = argCoach;
@@ -430,6 +486,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			type: Number,
 			notify: true
 		},
+		lastMonthIndex:{
+			type: Number,
+			notify: true
+
+		},
 		theDate:{
 			type: Date,
 			notify: true
@@ -484,13 +545,13 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			type: String,
 			value:"months",
 			notify: true
-		}
+		}, 
+
 	},
 
 	attached: function(){
-		// this.calendarCreator()
 	},
-
+	
 	calendarCreator: function(start, end, units)
 	{	this.monthsArray=null;
 		this.monthsArray=[];
@@ -499,9 +560,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		var startDate=(start!=null)?start:(new Date()).addDays(0);
 		var endDate = (end!=null)?end:(new Date()).addDays(120);
 		var i=0;
-		console.log("rudabegal","rudabegal","rudabegal","rudabegal","rudabegal","rudabegal");
-		console.log(start, end, startDate, endDate);
-		alert(startDate);
 		if(endDate<=startDate)
 			{
 				var startDateHolder=startDate;
@@ -509,7 +567,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				startDate=endDate;
 				endDate=[];
 				endDate=startDateHolder; 
-				//console.log(startDate, startDateHolder, endDate);
 			}//date crossing condition
 
 		
@@ -526,16 +583,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			}
 		var finishedFirstMonth=false;
 		this.set('dateArr', getDates(startDate, endDate));
-		 console.log(this.dateArr);
 		var numDays = this.dateArr.length;
 		var currentMonth = 0; 
-		console.log(this.monthsArray);
 		for (i = 0; i < numDays; i++) 
 		{
 			currDate=this.dateArr[i];
-			// currDate[i].baseEvent = new FcBaseEvents(this.date[i]);
-			// currDate[i].date = new Date(this.date[i]);
-			console.log(currDate);
 			if(i==0)
 			{	
 				this.push("monthsArray", []);
@@ -544,7 +596,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			}
 			else if(i>0)
 			{
-				//var currDate = this.date[i];
 				var yesterday = this.dateArr[i-1];
 				var dateYester = yesterday.toDateString();
 				var dateToday = currDate.toDateString();
@@ -568,18 +619,29 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				}
 			}
 		}
-		console.log(this.monthsArray);
-		console.log("rudabegal", "rudabegal", "rudabegal");
+			var monthIndex=0;
 		if(this.units==="months")
 		{
 		this.padMonths();
 		}
-		this.set("displayedMonth", this.monthsArray[0]);
-		this.set("year", this.displayedMonth[0].getFullYear());
-		this.set("displayedMonthIndex",0);
-		var numDizDays = this.displayedMonth.length;
-		this.set("month", this.displayedMonth[numDizDays-1].getFullMonth());
-		//console.log(this.month, this.month, this.month);
+		var today = new Date();
+		var todMonth = today.getMonth();
+		var todYear = today.getFullYear();
+		if (todYear==this.monthsArray[0][15].getFullYear())
+			{console.log(todYear, todYear, todYear,todYear, todYear);
+				
+				for(i=0;i<11; i++){
+				if(todMonth==this.monthsArray[i][15].getMonth())
+				{
+					this.set("displayedMonth", this.monthsArray[i]);
+					this.set("displayedMonthIndex",i);
+				}
+			}
+			}
+		else {alert(todYear);}
+		var lastMonthIndex=this.monthsArray.length-2;
+		console.log(lastMonthIndex, lastMonthIndex, lastMonthIndex);
+		this.set("lastMonthIndex", lastMonthIndex);
 	},//end of function
 
 	padMonths: function()
@@ -631,8 +693,8 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			this.displayedMonthIndex--;
 		}
 		var length=(this.displayedMonth.length-1);
-		var month = this.displayedMonth[length].getFullMonth();
-			var year = this.displayedMonth[length].getFullYear();
+		var month = this.displayedMonth[15].getFullMonth();
+			var year = this.displayedMonth[15].getFullYear();
 			this.set("month",month);
 			this.set("year", year);
 	},
@@ -719,7 +781,7 @@ function holidayEvents(startDate,endDate){
       	var noBookHolidays=[];
         var holiday = new Date(holidayArray[i].holiday);
         var holidaynumb = holiday.dayStamp();
-        holidayArray[i].numberDate=holidaynumb;
+        holidayArray[i].dayStamp=holidaynumb;
         if(holidaynum>=startDate && holidaynum<=endDate)
         {	
         	relHolidays.push(holidayArray[i]);
@@ -757,12 +819,12 @@ FcCourseBuilder.prototype.FcCourseCalendar=function(testDate)
 
 	for(i=0;i<counter; i++)
 	{ 	
-		var numbDate = dates.numberDate = new Date(calendarDaysArray[i].dayStamp());
+		var numbDate = dates.dayStamp = new Date(calendarDaysArray[i].dayStamp());
 		calendarDayObject={
 				date:calendarDaysArray[i],
 				startDate:self.startDate,
 				testDate: testDate,
-				daysNumberDate: numbDate,
+				daysdayStamp: numbDate,
 				endDate:"",
 				courseStartTime: "",
 				courseEndTime: "",
@@ -787,20 +849,20 @@ FcCourseBuilder.prototype.FcCourseCalendar=function(testDate)
 			};
 
 		this.fcCourseDayArray.push(calendarDayObject);
-		var startNumberDate=this.fcCourseDayArray[0];
-		var endNumberDate=this.fcCourseDayArray[endNum];
+		var startdayStamp=this.fcCourseDayArray[0];
+		var enddayStamp=this.fcCourseDayArray[endNum];
  			number--;
 		}
-		var startNumberDate=this.fcCourseDayArray[0];
-	var endNumberDate=this.fcCourseDayArray[endNum];
+		var startdayStamp=this.fcCourseDayArray[0];
+	var enddayStamp=this.fcCourseDayArray[endNum];
 	var holidayObjArrays ={};
-	holidayOnjArrays= setHolidays(startNumberDate,endNumberDate);
+	holidayOnjArrays= setHolidays(startdayStamp,enddayStamp);
 		
 		return this.fcCourseDayArray;
 }
 
 
-var fcCourseBuilder =function (argObjectBuilder)
+var fcCourseBuilder =function(argObjectBuilder)
 {	
 	this.courseCalendar = this.FcCourseCalendar(testDate);
 	this.practiceTestMeetingsObject=this.practiceTestDays(argSetPracticeTestDays);
@@ -817,7 +879,7 @@ fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSatu
 			{ 
 				for(i=0; i<7;i++)
 				{
-					var numberDate=sunday.dayStamp();
+					var dayStamp=sunday.dayStamp();
 					var ptestArray=[];				
 					var saturday = testDate.setDate(testDate.getDate() - (49-(7*i)-7));
 						practiceTestObject={
@@ -825,7 +887,7 @@ fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSatu
 							endTime: "12:30PM",
 							practiceTestDayOfWeek: "Saturday",
 							date: saturday,
-							numberDate: saturday
+							dayStamp: saturday
 						};
 					ptestArray.push[saturday];	
 				}
@@ -836,13 +898,13 @@ fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSatu
 				{
 					var ptestArray=[];				
 					var sunday = testDate.setDate(testDate.getDate() - (49-(7*i)-6));
-						var numberDate=sunday.dayStamp();
+						var dayStamp=sunday.dayStamp();
 						practiceTestObject={
 							startTime: "9:00AM",
 							endTime: "12:30PM",
 							practiceTestDayOfWeek: "Sunday",
 							date: sunday,
-							numberDate: numberDate
+							dayStamp: dayStamp
 						};
 					ptestArray.push[sunday];
 		}
@@ -893,7 +955,7 @@ FcCourseBuilder.prototype.FcCourseMeetingDays = function(testDate, isMonWedCours
 		for (j = 0; j < numberOfWeeks; j++) 
 		{
 				for(var i=0;i<counter;i++)
-				{ var courseMeetingDay =new Date(testDate);
+				{ 	var courseMeetingDay =new Date(testDate);
 					var dates={};
 					var numb = courseWeekDaysArray[i];
 					console.log(numb);
@@ -902,7 +964,7 @@ FcCourseBuilder.prototype.FcCourseMeetingDays = function(testDate, isMonWedCours
 					console.log(courseMeetingDay);
 					courseMeetingDay.setDate(courseMeetingDay.getDate() - less);
 				var cmd=courseMeetingDay;	
-				 	dates.numberDate = new Date(courseMeetingDay.dayStamp());
+				 	dates.dayStamp = new Date(courseMeetingDay.dayStamp());
 					dates.prettyDate = cmd.toDateString();
 					dates.localeDate = cmd.toLocaleString();
 					dates.date =courseMeetingDay;
@@ -962,8 +1024,8 @@ FcCourseMeetingDays.prototype.fcCourseMeetingTimes=function(isSixToNineCourse, i
 			time=(isSixToNineCourse==true)?sixToNine: (isAfternoonCourse==true)?afternoon:(is900AmCourse)?NineAm:(is100PMCourse==true)?onePM: otherStartTime;
 			time.classType="_1600SAT";
 
-			var numberTime = this.courseMeetingsArray[0].numberDate;
-			var startNumberTime = new Date(item.numberDate).setHours(18,0,0);
+			var numberTime = this.courseMeetingsArray[0].dayStamp;
+			var startNumberTime = new Date(item.dayStamp).setHours(18,0,0);
 
 			var courseObj={};
 			var cmt=[];
@@ -971,7 +1033,7 @@ FcCourseMeetingDays.prototype.fcCourseMeetingTimes=function(isSixToNineCourse, i
 			{	time.snt = new Date(item.numberTime).setHours(time.startNumHrsArray);
 				time.ent = new Date(item.numberTime).setHours(time.endNumHrsArray);
 				courseObj={
-					"numberDate":item.numberDate,
+					"dayStamp":item.dayStamp,
 					"prettyDate":item.prettyDate,
 					"localeDate":item.localeDate,
 					"date":item.date,
@@ -987,7 +1049,7 @@ FcCourseMeetingDays.prototype.fcCourseMeetingTimes=function(isSixToNineCourse, i
 					"full":time.full,
 					"startNumberTime": time.snt, 
 					"endNumberTime": time.ent, 
-					"FcidAB": item.numberDate + "_" + time.snt +"_",
+					"FcidAB": item.dayStamp + "_" + time.snt +"_",
 				};
 				cmt.push(courseObj);
 				console.log(time.snt);
@@ -1041,7 +1103,7 @@ function nextReasonableTestDate()
 
 function TimeSlots(){
 				var timeArr = [];
-        		for(var i=12; i<=48;i++){
+        		for(var i=18; i<=42;i++){
               var hour=(Math.floor(i/2) <13)?Math.floor(i/2):(Math.floor(i/2)-12);
               var j=false;
               j=(i>47)?true:false;
@@ -1084,9 +1146,8 @@ function shortDayLabel(argDay, numChars)
 		var lilLetters=md.slice(0,1);
 		if(shortDaysArray.indexOf(letters)!==-1)
 			{
-				var john = singlesArray.indexOf(lilLetters);
-				console.log(singlesArray[john]);
-				return singlesArray[john];
+				var letterIndex = singlesArray.indexOf(lilLetters);
+				return singlesArray[letterIndex];
 			}
 		else {var retVal= shortDaysArray.indexOf(letters);
 			console.log(shortDaysArray[retVal]);

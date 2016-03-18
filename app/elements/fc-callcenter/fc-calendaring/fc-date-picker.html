@@ -21,22 +21,19 @@
 	<paper-icon-button on-tap="_backOneMonth" icon="icons:arrow-back" style="margin-bottom: 11px; position: absolute; left: 15px;" class="headerLeft"></paper-icon-button>
 	
 		<paper-icon-button on-tap="_forwardOneMonth" icon="icons:arrow-forward" style="color: white; margin-bottom: 11px; position:absolute; right: 15px; top: 2px;" class="headerRight"></paper-icon-button>
-  <neon-animated-pages class="fit" id="pages" selected="0">
-                            
-          <div>             
-			<div class="horizontal flex layout wrap" style="background: white; width: 345px!important;">
+			<div class="horizontal flex layout wrap" style="background: white; width: 355px!important;">
 				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
-					<paper-material style="border-right: 1px solid white;text-align: center; padding-right:1px; width:calc(100%/7.3)!important; font-size: 9.5px; font-weight: 600; margin: auto; margin-top: 3px; border-top: 2px solid #afafaf; margin-bottom: 3px; background: white;">
+					<paper-material style="border-right: 1px solid white;text-align: center; padding-right:1px; width:calc(100%/7.5)!important; font-size: 9.1px; font-weight: 600; margin: auto; margin-top: 3px; border-top: 2px solid #afafaf; margin-bottom: 3px; background: white;">
 					{{item}}
 					</paper-material>
 				</template>
 			</div>
-		<div class="vertical layout" style="width: 345px!important; background: white; overflow:scroll; height: 295px; min-height: 242px;">
+		<div class="vertical layout" style="width: 355px!important; background: white; overflow:scroll; height: 295px; min-height: 242px;">
 			<section class="horizontal flex layout wrap">
 				<template is="dom-repeat" class="horizontal layout wrap" items="{{displayedMonth}}">
 				<fc-date-mini class="card" id$="[[computeId(item)]]" in-month="[[computeNotInMonths(item)]]" toggle-days="{{toggleDays}}" style="margin: 0px auto; [[computeNotInMonths(item)]]">
 					<a class="prettyDay">[[computePrettyDay(item)]]</a>
-					<a class="date">[[computeDate(item)]]</a>
+					<a class="date" on-tap="_onAnchorDateSelection">[[computeDate(item)]]</a>
 				</fc-date-mini>
 			
 				</template>
@@ -44,10 +41,7 @@
 		</div>
 		</div>
 		<div>
-		<fc-tabbed-calendar-card>
-		</fc-tabbed-calendar-card>
-		</div>
-		 </neon-animated-pages>
+		
 	</fc-ddr-card>
 </template>
 <script>
@@ -119,30 +113,66 @@ FcDatePicker=Polymer({
 			type: Date,
 			notify: true
 		},
+		 animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+   
+      }
+    
+    },  
 		
-	  
-	},
-	attached: function(){
+
+attached: function(){
 		var date=new Date(2016, 0, 1);
 		var dateEnd =new Date(2019, 11, 31)
 		 this.calendarCreator(date, dateEnd, "months");
 		},
-	
 
-computeDate: function(day){
-	var date = day.getDate();
+_onAnchorDateSelection: function(event) {
+      var targetOne = event.target;
+      console.log(event.model.data);
+      while (targetOne !== this && !targetOne._templateInstance) {
+        targetOne = targetOne.parentNode;
+      }
+      this.set("call", targetOne.data);
+      // configure the page animation
+      this.sharedElements = {
+        'hero': this
+      };
+      this.fire('on-call-click', {//this is where we pass data... we do not have a click yet... it will be on another level likely
+        item: targetOne.data
+      });
+    },
+
+computeDate: function(dayn){
+	var date = dayn.getDate();
 	return date;
 
 },
 computeId: function(date){
 	var theId=date.dayStamp().toString() +"_dateMini";
-	console.log(theId);
+	//console.log(theId);
 	return theId;
 },
 
 setDaysSelected: function(newVal, oldVal)
 {
-	console.log(newVal, oldVal, newVal, oldVal);
+	//console.log(newVal, oldVal, newVal, oldVal);
 
 
 },
@@ -167,31 +197,12 @@ computeYear: function(displayedMonth)
 
   },
   
-  handleResponse: function(argHolidays){
-  	console.log(argHolidays);
-
-  },
   _computePlacementTwo: function(isSecond){
   	var returnVal = (isSecond==true)? "position: fixed; top:24px;left: 96px; color: white;": "";
   	return returnVal;
 
 
   },
-
-  computePracticeTestDay: function(ptestArray, item){
-  	var counter = ptestArray.length;
-        var holder=[];
-        var i=0;
-        for(i=0;i<counter;i++)
-        {
-        	console.log(ptestArray[i]);
-          if(item.toLocaleString() == ptestArray[i].toLocaleString())
-            { 
-             return "Practice Test: " + ptestArray[i].toDateString();
-            }
-        }
-      },
-
 
   _computeCalendarHeading: function(displayedMonth)
   {
@@ -209,31 +220,16 @@ computeYear: function(displayedMonth)
         return retVal;
 
   },
-    
-
-     
-	attached: function(){
-		var date=new Date(2016, 0, 1);
-		var dateEnd =new Date(2019, 11, 31)
-		 this.calendarCreator(date, dateEnd, "months");
-		},
-	
+  
 computePrettyDay: function(day)
  	{
   		var result = day.toDateString();
   		result = result.slice(0,10);
   		
   		return result;
- 	},
+ 	}
 
-computeHeaderColor: function(day)
- 	{
-  		var numDays = this.displayedMonth.length;
-  		var lastDay = this.displayedMonth[numDays -1];
-  		var result = (day.getMonth() == lastDay.getMonth()) ? "blue": "pink";
-  		//console.log()
-  		return result;
- 	},
+
 });
 </script>
 </dom-module>

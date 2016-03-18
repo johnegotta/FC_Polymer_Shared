@@ -1,0 +1,262 @@
+<dom-module id="fc-date-picker-proto">
+<style>
+:host{
+/*	position: fixed;*/
+	
+	background: white;
+	box-shadow: 4px 11px 21px 7px #9fafaf;
+		display: block;
+	width: 320px;
+	margin-left: 12px;
+	margin-top: 12px;
+
+}
+  .card{
+  	border-top: 1px solid silver;
+  	text-align: center; 
+  	width:calc(100%/7.3); 
+  	margin: auto;
+  	margin-bottom: 4px; 
+  	margin-top: 2px; 
+  	height: 97%;
+  } 
+</style>
+<template>
+
+	
+			<div class="horizontal flex layout wrap" style="background: white; margin-top:3px; width: 320px !important;">
+			<paper-material style="background: #008;  border-bottom: silver solid 2px; height:42px; width: 100%;">
+					<section class="layout horizontal">
+					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden="[[backHidden]]" style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
+	
+					<paper-icon-button on-tap="_forward" hidden="[[forwardHidden]]" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button>
+					</section>
+			</paper-material>
+				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
+					<paper-material style="border-right: 1px solid white;text-align: center; padding-right:1px; width:calc(100%/7.5)!important; font-size: 9px; font-weight: 600; max-width: 37px; margin: auto; margin-top: 3px; border-top: 2px solid #afafaf; margin-bottom: 3px; background: white;">
+					{{item}}
+					</paper-material>
+				</template>
+			</div>
+		<div class="vertical layout" style="width: 320px!important; background: white; overflow:scroll; height: 280px; min-height: 242px;">
+			<section class="horizontal flex layout wrap">
+				<template is="dom-repeat" class="horizontal layout wrap" items="{{displayedMonth}}">
+				<fc-date-mini class="card" id$="[[computeId(item)]]" in-month="[[computeNotInMonths(item)]]" toggle-days="{{toggleDays}}" in-selected-array="[[_computeInSelectedArray(selectedArrayName, selectedArray)]]" style="margin: 0px auto; [[computeNotInMonths(item)]];" mini-date="[[computeDate(item)]]">
+			
+					<a class="date" on-tap="_dateClick">[[computeDate(item)]]</a>
+				</fc-date-mini>
+			
+				</template>
+			</section>
+		</div>
+		
+		
+	
+</template>
+<script>
+FcDatePickerProto=Polymer({
+	is: "fc-date-picker-proto",
+	behaviors:[
+				Polymer.PaperInputBehavior,
+			 	Polymer.IronFormElementBehavior,
+				FCBehaviors.FcCalendarBehaviorPrime,
+				Polymer.NeonSharedElementAnimatableBehavior,
+				Polymer.NeonAnimatableBehavior
+				],
+	listeners: {"catchTheCourse": "changesTheDays"},
+	properties: {
+		toggleDay:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		displayedMonth:{
+			type: Array,
+			notify: true
+		},
+		fcCourse:{
+			type: FcCourse,
+			value: function(){var course = new FcCourse(); return course;},
+			observer: "fcCourseObserver",
+			notify: true
+		},
+		days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+			},
+			notify: true
+		},
+		
+		daySelected:{
+			type: Object,
+			observer: "setDaysSelected",
+			notify: true,
+			reflectToAttribute: true
+		},  
+		numWeeks:{
+			type: Number,
+			value: 6,
+			notify: true
+
+		},
+		forwardHidden:{
+			type: Boolean,
+			computed: "_computeForwardHidden(lastMonthIndex, displayedMonthIndex)",
+			notify: true
+		},
+		backHidden:{
+			type: Boolean,
+			computed: "_computebackHidden(displayedMonthIndex)",
+			notify: true
+		},
+		day:{
+			type: Date,
+			notify: true
+		},
+		 animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+   
+      }
+    
+    },  
+		
+changesTheDays: function(e){
+
+
+},
+attached: function(){
+		var date=new Date(2016, 0, 1);
+		var dateEnd =new Date(2019, 11, 31)
+		 this.calendarCreator(date, dateEnd, "months");
+		
+		},
+_computeForwardHidden: function(lastMonthIndex, displayedMonthIndex)
+{		var retVal=false;
+	if(this.displayedMonthIndex===this.lastMonthIndex)
+	{
+		retVal=true;
+		console.log(retVal, retVal, retVal);
+
+	}
+	return retVal;
+
+},
+
+fcCourseObserver: function(newval, oldval){
+	console.log(newval, oldval);
+
+
+},
+_computebackHidden: function(displayedMonthIndex)
+	{		var retVal=false;
+		if(this.displayedMonthIndex===0)
+    	{
+    		retVal=true;
+    	}
+    	else{retVal=false;}
+    	return retVal;
+  	},
+
+_forward: function(){
+    	this._forwardOneMonth();
+    		
+    	
+    },
+ _backOne: function(){
+    	this._backOneMonth();
+    	
+    		
+    },
+      _computeCalendarHeading: function(displayedMonth)
+  {
+  		if(displayedMonth[15])
+  		{
+
+  		return this.displayedMonth[15].getFullMonth();
+
+  		}
+  },
+  computeYear: function(displayedMonth)
+{	
+	if(displayedMonth[15])
+	{
+	return displayedMonth[15].getFullYear();
+	}
+},
+
+_dateClick: function(event) {
+      var targetOne = event.target;
+      console.log(event.model.data, event.model.data, event.model.data, "rubarb");
+      while (targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL") {
+        targetOne = targetOne.parentNode;
+      }
+      this.set("event", targetOne.data);
+      // configure the page animation
+      this.sharedElements = {
+        'hero': this
+      };
+      this.fire('on-date-click', {//this is where we pass data... we do not have a click yet... it will be on another level likely
+        item: targetOne.data
+      });
+    },
+
+computeDate: function(day){
+	var date = day.getDate();
+	return date;
+
+},
+computeId: function(date){
+	var theId=date.dayStamp().toString() +"_dateMini";
+	//console.log(theId);
+	return theId;
+},
+
+setDaysSelected: function(newVal, oldVal)
+{
+	console.log(newVal, oldVal, newVal, oldVal);
+
+
+},
+hideArrowBack: function(displayedMonthIndex)
+		{
+			console.log(this.displayedMonthIndex);
+		},
+computeNotInMonths: function(date){
+	var retVal=(this.displayedMonth[15].getFullMonth()==date.getFullMonth());
+	return retVal;
+},
+computeTemporaryEventArrays: function(fcCourse, displayedMonth)
+{
+},
+    
+computePrettyDay: function(day)
+ 	{
+  		var result = day.toDateString();
+  		result = result.slice(0,10);
+  		
+  		return result;
+ 	},
+
+
+});
+</script>
+</dom-module>
