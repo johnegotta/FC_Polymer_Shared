@@ -29,6 +29,10 @@
 <firebase-document location="https://focusedstaging1.firebaseio.com/dictionary/" data="{{dictionary}}"></firebase-document>
 <paper-button role="button" raised style="background:blue" on-tap="doStuff">Do Stuff
 </paper-button>
+<paper-button role="button" raised style="background:orange" on-tap="lookupEcstatic">Lookup Ecstatic</paper-button>
+<paper-button role="button" raised style="background:green" on-tap="lookupAdroit">Lookup Adroit</paper-button>
+
+
 <iron-ajax id="myajax" handle-as="json" auto on-response="handleResponse" url="http://words.bighugelabs.com/api/2/25c304155532b508c6f5f62065bc390d/{{word}}/json" last-response="{{dictionaryWord}}">
 
 </iron-ajax>
@@ -2333,6 +2337,103 @@ Zoning Committee: an elected or appointed government board that recommends bound
 
 	}
 
+	// lookupQuote: function(argPassage, argQuote)
+	// {
+	// 	var quote = argQuote.replace(/\"/g, ""); //start curly quote!
+	// 	quote = quote.replace(/\"/g, ""); //end curly quote!
+	// 	var elliptical = quote.indexOf("...");
+	// 	var matches = [];
+	// 	if(elliptical > 0)
+	// 	{
+	// 		var chunks = quote.split("...");
+	// 		var regexString = chunks[0] + ".+?" + chunks[1];
+	// 		var regex = new RegExp(regexString, "g"); //take out g if confident only one match
+	// 		matches = argPassage.match(regex);
+	// 	}
+	// 	else
+	// 	{
+	// 		matches = argPassage.match(quote);
+	// 	}
+	// 	if(matches == null)
+	// 	{
+	// 		console.log("ERROR should have matched: ", quote);
+	// 	}
+	// 	else
+	// 	{
+	// 		var numMatches = matches.length;
+	// 		for(i=0; i < numMatches; i++)
+	// 		{
+	// 			console.log(matches[i]);
+	// 		}
+	// 		this.set("quoteMatches", matches);
+	// 	}
+	// 	//now switch to wordArray representation
+	// 	var numMatches = this.quoteMatches.length;
+	// 	for(i=0; i < numMatches; i++)
+	// 	{
+	// 		var quoteWordList = matches[i].split(" ");
+	// 		var numWordsInQuote = quoteWordList.length;
+	// 		var passageWordList = this.myPassages[0].split(" ");
+	// 		var numWordsInPassage = passageWordList.length;
+	// 		var j = 0; //index into passage word list
+	// 		var k = 0;
+	// 		var foundMatch = false;
+	// 		while(!foundMatch)
+	// 		{
+	// 			while(passageWordList[j] != quoteWordList[0] && j < numWordsInPassage)
+	// 			{
+	// 				j++;
+	// 			}
+	// 			var startIndex = j;
+	// 			//found match for first word or ran out of passage
+	// 			while(k < numWordsInQuote && j < numWordsInPassage)
+	// 			{
+	// 				if(quoteWordList[k] == passageWordList[j+k])
+	// 				{
+	// 					//matching continues
+	// 					j++; k++;
+	// 				}
+	// 				else
+	// 				{
+	// 					console.log("Error: failed to match word " + quoteWordList[k]);
+	// 					break;
+	// 				}
+	// 			}
+	// 			if(k == numWordsInQuote)
+	// 			{
+	// 				//we found whole quote
+	// 				foundMatch = true;
+	// 				var quoteObj = {"startIndex": startIndex, "endIndex": startIndex + numWordsInQuote - 1};
+	// 				console.log(quoteObj);
+	// 			}
+	// 			if(j == numWordsInPassage)
+	// 			{
+	// 				console.log("Error: ran out of passage without finding quote ", quote);
+	// 				break;
+	// 			}
+
+	// 		}
+	// 	}
+	// }
+
+	lookupEcstatic(e)
+	{
+		console.log("in lookupEcstatic");
+		var ec = new Firebase("https://focusedstaging1.firebaseio.com/dictionary/ecstatic");
+		ec.on("value", function(snapshot){
+			console.log(snapshot.val());
+		});
+	}
+
+	lookupAdroit(e)
+	{
+		console.log("in lookupAdroit");
+		var ec = new Firebase("https://focusedstaging1.firebaseio.com/dictionary/adroit");
+		ec.on("value", function(snapshot){
+			console.log(snapshot.val());
+		});
+	}
+
 	doStuff()
 	{
 		var lineList = this.rawThesaurus.split(/\r?\n/);
@@ -2345,7 +2446,7 @@ Zoning Committee: an elected or appointed government board that recommends bound
 		}
 		console.log(this.wordList);
 		var numWords = this.wordList.length;
-		for(i=700;i<1400;i++)
+		for(i=1400;i<2100;i++)
 		{
 			this.word = this.wordList[i];
 			this.$.myajax.generateRequest();

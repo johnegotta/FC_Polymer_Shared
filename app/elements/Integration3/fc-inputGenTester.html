@@ -1,0 +1,156 @@
+<dom-module id="fc-input-gen-tester">
+<style is="custom-style">
+:host{position: absolute;top: 24px;left: 80%;width: 320px;height: 380px; z-index:93;};
+
+paper-material{opacity: 1;position: relative;background: #ffffff;border: 3px ridge #aecdfe;padding: 6px 4px;margin: 20px;display: block;@apply(--horizontal-layout);@apply(--nowrap-layout);
+}
+
+</style>
+<template>
+<div style="padding: 8px; border: 1px #efefef solid; text-align: center;" class="layout vertical">
+	<div style="border: 1px #008 solid; color:#008;">
+		<div style="padding: 8px; border: 1px #efefef solid; text-align: center;cursor:pointer;" class="layout vertical">
+			TESTER
+			<select on-change="changeTester">
+				<option>Tester 1</option>
+				<option>Course</option>
+				<option>Student</option>
+			</select>
+			<paper-input id="input1" value="{{dataObject.firstname}}"></paper-input>
+			<paper-input id="input2" value="{{dataObject.year}}"></paper-input>
+			<paper-input id="input3" value="{{dataObject.meetingDaysSelected}}"></paper-input>
+			<paper-input id="input4" value="{{dataObject.colorsSelected}}"></paper-input>
+			<br><div style="background:red; border: #ff3333 solid 1px; width:100%;height:1px"></div><br>
+			CLOBJID
+			<fc-clobjid id="testa" orientation="vertical" dataobject="{{inputGenObject}}"></fc-clobjid>
+			<!-- <paper-button on-tap="onion">Onion</paper-button>-->
+			<paper-button on-tap="showme">Show Me</paper-button>
+		</div>
+	</div> 
+</div>
+</template>
+<script>
+'use strict';
+
+class FC_Tester
+{
+	constructor(argName, argAge, argColors, argTesterDos)
+	{
+		this.first = argName;
+		this.year = argAge;
+		this.colorsSelected = ""; //value of array below currently selected
+		this.colors = argColors;
+		//this.testerDos = argTesterDos;
+		//console.log(typeof this.array);
+	}
+}
+
+class FC_CourseTester
+{
+	constructor(argTestDate, argCoach, argCapacity, argLocation, argDays, argPDays)
+	{
+		this.testdate = argTestDate;
+		this.coach = argCoach;
+		this.capacity = argCapacity;
+		this.location = argLocation;
+		this.meetingDays = ["monday/wednesday", "tuesday/thursday", "monday/wednesday/friday"];
+		this.meetingDaysSelected = argDays;
+		this.practiceDays = ["saturday", "sunday"];
+		this.practiceDaysSelected = argPDays;
+	}
+}
+
+class FC_StudentTester
+{
+	constructor(argFirst, argLast, argPhone, argEmail, argClass, argReading, argMath, argWriting)
+	{
+		this.firstname = argFirst;
+		this.lastname = argLast;
+		this.phone = argPhone;
+		this.email = argEmail;
+		this.year = argClass;
+		this.reading = argReading;
+		this.math = argMath;
+		this.writing = argWriting;
+	}
+}
+
+Polymer({
+	is: "fc-input-gen-tester",
+	behaviors: [FCBehaviors.FcInputGenConverterBehavior],
+	properties:
+	{
+      	// inputGenObject: 
+      	// {
+      	// 	type: Object,
+      	// 	notify: true,
+      	// 	value: {},
+      	// 	reflectToAttribute: true
+      	// }
+	},
+	//observers: ["observeInputGenObject(inputGenObject.*)"],
+//				"observeDataObject(currentClock.*)"],
+
+	ready: function() {
+	  	this.set("dataObject", new FC_Tester("Charlie", 21, ["red", "green", "blue"]));//, new FC_TesterDos(72, "stanky")));
+	  	console.log(this.dataObject);
+	  	//this.inputGenObject = this.dataObject.getInputGenObject();
+	},
+
+	attached: function()
+	{
+		console.log(this.inputGenObject);
+	},
+
+	changeTester: function(e)
+	{
+		var type = e.target.value;
+		var data = {};
+		if(type == "Tester 1")
+		{
+			data = new FC_Tester("Charlie", 21, ["red", "green", "blue"]);
+		}
+		else if(type == "Course")
+		{
+			data = new FC_CourseTester("08/06/2017", "Scott", 24, "Arlington", "monday/wednesday", "saturday");
+		}
+		else if(type == "Student")
+		{
+			data = new FC_StudentTester("Mary", "Gana", 7323334444, "mary@nowhere.net", 2015, 700, 640, 600);
+		}
+		this.set("dataObject", data);
+	},
+
+	showme: function(e)
+	{
+		console.log(this.$.input1.value);
+		console.log(this.$.input2.value);
+		console.log(this.dataObject);
+		console.log(this.inputGenObject);
+		console.log(this.$.testa.dataobject);
+	},
+
+	// observeDataObject: function(newVal)
+	// {
+	// 	if(newVal.path == "currentClock") return;
+	// 	var property = newVal.path.replace("currentClock.", "");
+	// 	this.inputGenObject[property].value = newVal.value;
+	// 	this.notifyPath("inputGenObject"+property, newVal.value, false);
+	// 	console.log("ruta", this.inputGenObject);
+	// },
+
+	// observeInputGenObject: function(newVal)
+	// {
+	// 	console.log("rutabega", newVal);
+	// 	if(newVal.path == "inputGenObject")
+	// 	{
+	// 		return;
+	// 	}
+	// 	var property = newVal.path.replace("inputGenObject.", "");
+	// 	this.currentClock[property] = newVal.value;
+	// 	console.log(this.currentClock);
+	// }
+
+});
+</script>
+</dom-module>

@@ -41,20 +41,51 @@ FCBehaviors.dataManagerBehavior = {
 		{
 			localVal = localStorage.getItem(argName);
 			localVal = JSON.parse(localVal);
-			if(localVal != null)
+			console.log(localVal);
+			if(localVal != undefined)
 			{
+				console.log(argName, localVal);
 				argCallback(localVal);
 			}
 		}
-		else
+		if(localVal == undefined && this.dataStrategy != "localOnly")
 		{
 			var self = this;
 			this.firebase.child(argName).once("value", function(snap){
 				fbVal = snap.val();
+				console.log(argName, fbVal);
 				var localResaveVal = JSON.stringify(fbVal);
-				localStorage.setItem(argName, localResaveVal);
+				try
+				{
+					localStorage.setItem(argName, localResaveVal);
+				}
+				catch(err)
+				{
+					console.log(err);
+				}
 				argCallback(fbVal);
 			});
+		}
+	},
+
+	setData: function(argName, argObject)
+	{
+		if(this.dataStrategy == "localOnly" || this.dataStrategy == "localAndFirebase")
+		{
+			var saveObj = JSON.stringify(argObject);
+			try
+			{
+				localStorage.setItem(argName, saveObj);
+			}
+			catch(err)
+			{
+				console.log(err);
+			}
+		}
+		if(this.dataStrategy != "localOnly")
+		{
+			var self = this;
+			this.firebase.child(argName).update(argObject);
 		}
 	}
 }

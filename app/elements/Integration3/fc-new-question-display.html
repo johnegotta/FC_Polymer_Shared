@@ -1,0 +1,230 @@
+<dom-module id="fc-new-question-display">
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 0px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+  
+    .highlighted {
+	background: yellow;
+    }
+
+</style>
+<template>
+
+<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px 12px 0px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+	    <paper-material class="paper-header header-panel head horizontal layout left-justified" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+	    <div class="horizontal layout">
+			<!-- <array-selector 
+				id="selector" 
+				items="{{menuItemArray}}" 
+				selected="{{selected}}"
+
+				multi="true"
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+	    		class="flex layout horizontal"							
+		  		style="max-width: 60px;" 
+		  		on-select="toggleSelection" 
+		  		id="questionsForPassages"
+		  		data-source="{{menuItemArray}}" 
+		  		selected="{{selectedItem}}"
+		  		value$="{{selectedItem.key}}"
+		  		label="Questions"
+		  		>
+		  	</fc-dropdown-menu> -->
+		  	<div>{{computeFruit(fruits.*)}}</div><div>{{fruits.0}}</div><paper-button on-tap="showFruits">show</paper-button>
+		</div>
+		  </paper-material>
+		
+
+	   <div class="layout vertical flex" style="height: 1900px;">
+	     		<section 
+	     			class="blurb-class"
+	     			>
+	     			<template is="dom-repeat" items="{{fruits}}">
+	     				<paper-input value="{{item}}" ></paper-input>
+	     			</template>
+	     		</section>
+
+<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+<section class="vertical layout wrap" style="height: 180vh;" name="Bc">
+<fc-editable-question-template style="max-width: 100%;" data-source="{{questions}}"></fc-editable-question-template>
+<!--
+<template is="dom-repeat" filter="{{computeFilter(search)}}" items="{{questions}}">
+[[item.fcid]]
+</template>
+-->
+</section>
+	  </div>
+	  </paper-header-panel> 
+	</template>
+<script>
+Polymer({
+	is: "fc-new-question-display",
+	behaviors:[FCBehaviors.dataManagerBehavior],
+	properties: {
+		fruits: {
+			type: Array,
+			value: [], //["apple", "banana", "orange"],
+			notify: true
+		},
+		sharedSelection: {
+			type: String,
+			notify: true,
+			reflectToAttribute: true
+		},
+		passageTypeSelected: {
+			type: String,
+			value: function(){return this.passage? this.passage.passageType: "none";},
+			notify: true
+		},
+		passage: {
+			type: Object,
+			value: {},
+			observer: 'getQuestions',
+			notify: true,
+			reflectToAttribute: true
+		},
+		passageRootPath: {
+			type: String
+		},
+		questions: {
+			type: Array,
+			value: [],
+			//observer: 'updateQuestionArray',
+			notify: true,
+			reflectToAttribute: true
+		},
+		search: {
+			type: Object,
+			value: {},
+			notify: true
+		},
+		questionArray: {
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttribute: true
+		}
+	},
+
+	computeFruit: function(f)
+	{
+		return this.fruits[1];
+	},
+
+	fruity: function(e)
+	{
+		//nothing yet
+	},
+
+	showFruits: function(e)
+	{
+		console.log(this.fruits);
+	},
+
+	updateSearch: function(argSearch)
+	{
+		//this.set("search.one", argSearch.one);
+		//this.search = argSearch;
+		//this.set("search", {});
+		this.set("search", JSON.parse(JSON.stringify(argSearch)));
+		console.log(this.search);
+	},
+
+	computeFilter: function(search)
+	{
+		console.log(this.search);
+		var self = this;
+		return function(item){
+			var result = true;
+			/*
+			if(search.one && search.one != "")
+			{
+				result &= (item.fcid.indexOf(search.one) != -1);
+			}
+			if(search.two && search.two != "")
+			{
+				result &= (item.fcid.indexOf(search.two) != -1);
+			}
+			*/
+			return result;
+		};
+	},
+
+	getQuestions: function(newVal, oldVal)
+	{
+		var self = this;
+		console.log(newVal, oldVal);
+		console.log(this.passage);
+		if(this.passage.fcid == null || this.passage == undefined || this.passage == {} || !this.passage) return;
+
+		try
+		{
+			this.getData("reading/newquestions/"+this.passage.fcid+"Qs", function(snap)
+			{
+				console.log(snap);
+				//self.set("questionArray", []);
+				self.set("questions", snap==null?[]:snap);
+				if(snap == null) return;
+				/*
+				var keys = Object.keys(snap);
+				var numQ = keys.length;
+				for(i=0;i<numQ;i++)
+				{
+					self.push("questionArray", self.questions[keys[i]]);
+				}
+				*/
+				console.log(self.questions);
+			});
+		}
+		catch(err)
+		{
+			console.log("failed to find questions", err);
+			alert("failed to find questions for " + this.passage.fcid);
+		}
+	},
+
+	attached: function(){
+		//this._getAndSetData();
+		this.search = {one:"", two:""};
+		this.setDataStrategy("firebaseOnly");
+		console.log(this.passageRootPath);
+		this.setFirebaseLocation(this.passageRootPath); //"https://amber-inferno-3827.firebaseio.com/reading/");
+		this.getQuestions();
+		this.fruits = ["apple", "banana", "carrot"];
+
+	},
+
+	updateQuestionArray: function(newVal, oldVal)
+	{
+		console.log(newVal);
+		if(newVal == null) return;
+		this.set("questionArray", []);
+		var keys = Object.keys(newVal);
+		var numQ = keys.length;
+		var i = 0;
+		for(i=0;i<numQ;i++)
+		{
+			this.push("questionArray", this.questions[keys[i]]);
+		}
+		console.log(this.questionArray);
+	}
+
+	
+});
+</script>
+</dom-module>

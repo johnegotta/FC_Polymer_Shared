@@ -1,0 +1,94 @@
+<dom-module id="fc-mc-passage-question-display">
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+  
+    .highlighted {
+	background: yellow;
+    }
+
+</style>
+<template>
+
+<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+	    <paper-material class="paper-header header-panel head horizontal layout left-justified" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+	    <div class="vertical layout">
+	    <section>Questions for Passage: <span>[[selectedItem._t]][[selectedItem._sec]][[selectedItem._p]]</span></section>
+	    <section> Question Location: [[selectedItem.qz]]</section>
+	    </div>
+	    <section class="horizontal layout flex nowrap">	
+			<array-selector 
+				id="selector" 
+				items="{{menuItemArray}}" 
+				selected="{{selected}}"
+
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+	    		class="flex layout horizontal"							
+		  		style="max-width: 60px;" 
+		  		on-select="toggleSelection" 
+		  		id="questionsForPassages"
+		  		data-source="{{menuItemArray}}" 
+		  		selected="{{selectedItem}}"
+		  		value$="{{selectedItem.key}}"
+		  		>
+		  	</fc-dropdown-menu>
+		</section>
+	  </paper-material>
+
+	   <div class="layout vertical flex" style="height: 1900px;">
+	     		<section 
+	     			class="blurb-class"
+	     			>
+
+	     		</section>
+
+<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+<section class="vertical layout wrap" style="height: 180vh;" name="Bc">
+<fc-editable-question-template style="max-width: 100%;" data-source$="{{selectedItem}}"></fc-editable-question-template>
+</section>
+	  </div>
+	  </paper-header-panel> 
+	</template>
+<script>
+Polymer({
+	is: "fc-mc-passage-question-display",
+	behaviors:[FCBehaviors.FcQuestionLocalDataBehavior],
+	properties: {
+		
+		sharedSelection: {
+			type: String,
+			notify: true,
+			reflectToAttribute: true
+		},
+		passageTypeSelected: {
+			type: String,
+			value: function(){return "fiction";},
+			notify: true
+		}
+		
+	},
+
+	attached: function(){
+		this._getAndSetData();
+	}
+
+	
+});
+</script>
+</dom-module>

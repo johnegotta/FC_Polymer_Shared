@@ -30,6 +30,7 @@
 <div id="fcmcpassagedisplay" style="width: 98%;">
 	<div><b>{{user}}</b> logged in</div>
 	<div>{{userinfo}}</div>
+	<!--<fc-input-set-generator id="inputgen"></fc-input-set-generator>-->
 	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/" select-child="title">
 	</fc-mc-select>
 	<fc-mc-select select-location="https://amber-inferno-3827.firebaseio.com/reading/passages/" select-child="blurb">
@@ -88,6 +89,14 @@
 </div>
 </template>
 <script>
+
+function fcMCPassage(argDBObj){
+	this.title = {type: "text", value: argDBObj.title, formIndex: 4, label:"Title", propname: "title"};
+	this.blurb = {type: "text", value: argDBObj.passageBlurb, formIndex: 1, label:"Blurb", propname:"blurb"};
+	this.numParagraphs = {type: "number", value: argDBObj.numParagraphs, formIndex: 2, label: "Number of Paragraphs", propname:"numParagraphs"};
+	this.isDouble = {type: "checkbox", value: argDBObj.isDouble, formIndex: 3, propname:"isDouble", label: "Is Double Passage?"};
+}
+
 Polymer({
 	is:'fc-mc-passage-display',
 	behaviors: [Polymer.IronResizableBehavior, FCBehaviors.dictionaryBehavior, FCBehaviors.dataManagerBehavior],
@@ -143,8 +152,13 @@ Polymer({
 		selectedQuestion: {
 			type: String,
 			value: ""
+		},
+		mcPassage: {
+			type: Object,
+			value: {}
 		}
 		 /*,
+		}
 		}
 		}
 		passageTitle: {
@@ -203,7 +217,7 @@ Polymer({
 
 	ready: function(){
 		var self=this;
-		self.passageArray = [];
+		this.passageArray = [];
 
 		for(j=0;j<50;j++)
 		{
@@ -215,16 +229,19 @@ Polymer({
 		ref.onAuth(this.authDataCallback.bind(this));
 
 		this.setDataStrategy("firebaseOnly");
-		this.setFirebaseLocation("https://amber-inferno-3827.firebaseio.com/reading/");
+		this.setFirebaseLocation("https://amber-inferno-3827.firebaseio.com/");
 
 //		ref.on("value", 
-		this.getData("newpassages", function(snap) {
+		this.getData("reading/newpassages", function(snap)
+		{
 			//console.log("added", snap.key());
 			console.log(snap);
 			//self.passages = snap.val();
 			self.passages = snap;
 			console.log(self.passages);
+			//self.passage = new fcMCPassage(self.passages[self.passagePath]);
 			self.passage = self.passages[self.passagePath];
+			//self.$.inputgen.absorbObject(self.passage);
 			var keys = Object.keys(self.passages);
 			var numP = keys.length;
 			self.set("passageArray", []);

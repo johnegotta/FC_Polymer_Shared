@@ -1,0 +1,274 @@
+<dom-module id="fc-mc-light-display">
+<template>
+<style>
+:host {
+	padding-left: 12px;
+	margin-left: 6px;
+	position: relative;
+	top: 0px;
+	font-size: 16pt;
+	bottom: 0px;
+	height: 99vh;
+	right: 0px;
+	left: 0px;
+	display: flex;
+	min-width: 96%;
+	max-width: 99vw;
+    }
+div.line-number {
+	width: 28px;
+	height: 20px;
+	line-height: 1.2;
+	font-size: 16pt;
+	/*font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	font-style: italic;
+	padding: 2px 4px;
+	margin: 2px;
+
+
+    }
+    .blurb-class{
+    	max-width: 660px; 
+    	padding: 4px 0px 4px 8px; 
+    	font-size: 12pt; 
+    	line-height: 1.05;
+    	font-style: oblique;
+
+    }
+
+    .highlighted {
+	background: yellow;
+    }
+
+    div.text {
+	line-height: 1.2;
+	font-size: 16pt;
+     /* font-size: 1.25em;*/
+	font-family: merriweather;
+	font-weight: 500;
+	padding: 2px 0px 8px 4px;
+	margin: opx 0px 6px 0px;
+	min-height: 1800px !important;
+	display: flex;
+	min-width: 300px !important;
+	max-width: 620px !important;
+    }	
+
+</style>
+	<paper-header-panel class="vertical layout flex wrap text" header-mode="waterfall" style="margin: 12px; padding: 0px 20px 0px 20px; border: 3px ridge silver;">
+		<div 
+			class="paper-header" 
+			id="headerPanel" 
+			style="margin-bottom: 12px;"
+			> 
+			<array-selector 
+				id="selector" 
+				items="{{passagesWordArrays}}" 
+				selected="{{selected}}" 
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+		  		style="min-width: 360px;" 
+		  		on-select="toggleSelection" 
+		  		id="passagesList" 
+		  		data-source="{{passagesWordArrays}}" 
+		  		selected="{{selected}}"
+		  		>
+		  	</fc-dropdown-menu>
+		</div>
+
+	    	 
+	    	<div class="layout horizontal flex main-content super-content">
+	    	<div class="layout vertical flex-3">
+	     		<section 
+	     			class="blurb-class"
+	     			>
+	     			[[selected.0.passageBlurb]]
+	     		</section>
+		<div class="layout horizontal flex nowrap container" style="max-width: 660px; min-height: 5000px; padding: 2px 0px 12px 8px;">
+		<div id="line-numbers" class="layout vertical line-number">
+		  <div class="line-numbers" id="linesA1">Lines</div>
+		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+			  <span hidden="{{item.show}}">&nbsp</span>
+		    </template> 
+		  </div>
+			  <!--passage-1-column-1 container-->
+	    <div id="firstColumn" class="layout horizontal flex wrap text">
+		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 4px; max-width: 620px;">
+			<paper-tooltip>{{currentDefinition}}</paper-tooltip>
+		  <template is="dom-repeat" items="{{selected}}"  filter="">
+			<template is="dom-if" if="{{item.newPara}}">
+			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+			</template>
+			<a id$="A[[item.wordIndex]]" name="{{item.word}}" hidden$="{{item.is_transitionWord}}">{{item.word}}</a>
+		     <a id$="A[[item.wordIndex]]_transition" hidden$="{{!item.is_transitionWord}}" >{{item.word}}</a><!--style="background:green;"-->
+		  
+		  </template>
+
+		  <br class="line-numbers">
+		  <hr>
+		  <div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder"> Focused Coaching (c) 2016</div>
+		</article>
+		<!-- <code style="opacity: 0;">[[passageOneWordArray.0.passageType]]</code> -->
+	    </div>
+	    </div>
+	       </div>
+      
+		</div>   
+    </paper-header-panel>		 
+</template>
+<script>
+'use strict';
+
+    (function() {
+	class fcMcLightDisplay {
+	   get behaviors() { 
+	    return [
+		  Polymer.IronResizableBehavior, 
+		  FCBehaviors.FCFirepadBehavior,
+		  FCBehaviors.PassageDataBehavior,
+		  FCBehaviors.dictionaryBehavior	
+		  ];
+	   }
+	   beforeRegister() {
+
+		this.is = 'fc-mc-light-display';
+	    this.properties = {
+	  
+	    estimatedHeight: {
+		type: Number,
+		value: function(){
+		  var estimatedHeight=Math.ceil(screen.height*.895);
+		 return estimatedHeight;
+		},
+		notify: true,
+		reflectToAttribute: true 
+	    }, 
+	    
+	    lineNumberArray: {
+		  type: Array,
+		  computed: '_computeLineNumberArray(passageOneWordArray, lineNumbers)',
+		  notify: true
+		  },
+		  isFirePad: {
+		  	type: Boolean,
+		  	value: function(){
+		  		return true;
+
+		  	},
+		  	notify: true
+		  },
+
+	doublePassage: {
+	  type: Boolean,
+	  value: false,
+	  notify: true, 
+	  reflectToAttribute: true
+	},
+	secondPassage: {
+	  type: Boolean,
+	  value: false,
+	  notify: true,
+	  reflectToAttribute: true
+
+	},
+
+	shorterThan550:{
+	  type: Boolean,
+	  value: false, 
+	  notify: true,
+	  reflectToAttribute: true
+	}, 
+
+	lineNumbers: {
+		type: Number,
+		value: function(){
+		return 180;
+		},
+		notify: true
+	}, 
+	
+	hitSaveOne:{
+		type: Boolean,
+		value: function(){
+			return false;
+		},
+		notify: true
+	}
+	 
+		  
+		
+    };
+
+	  this.listeners = {'iron-resize': '_onIronResize'
+
+	
+	    };
+	   
+	
+
+	 
+	     }
+	 
+	  _computeLineNumberArray(passageOneWordArray, lineNumbers){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			 this.addEventListener("mouseover", this.setMeasureParams);
+     		this.notifyResize();
+			return this.arrayNums;
+			}
+     _computeValue(myValue){
+		return myValue;
+	  }
+
+	 _onIronResize(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     //console.log(ht);
+	     if(!isNaN(ht)){this.set("lineNumbers", ht);}
+
+	 }
+	  setMeasureParams(){
+	  this._computeLineNumberArray();
+
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     //console.log(ht);
+	     if(!isNaN(ht)){this.set("lineNumbers", ht) && this.this.removeEventListener("mouseover", this._onIronResize);}
+
+	  }
+
+	
+
+_theContentFilter(firstWordIndex, lastWordIndex) {
+	// if(!isNaN(lastWordIndex)){
+	//   return (item) =>{
+	// 	return (item.wordIndex >= firstWordIndex && item.wordIndex <= lastWordIndex);
+	//   };
+	// } else {
+	//   return (item) =>{
+		return true;
+	//   };
+	// }
+  }
+
+
+  _numberFilter(lineNumbers) {
+	return (item) =>{
+	  return (item.number <= lineNumbers);
+	    };
+	  } 
+	
+	}
+    Polymer(fcMcLightDisplay);
+ 
+  })();
+</script>
+</dom-module>

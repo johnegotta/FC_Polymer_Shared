@@ -1,0 +1,179 @@
+<dom-module id="fc-clobjid">
+<template>
+<style>
+</style>
+
+<section style="padding: 8px 4px 8px 4px; margin: 2px 2px 2px 2px; min-width: 214px;" class$="layout flex justified-around {{orientation}}">
+<template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
+	<fc-input-prime
+		input-type="{{item.inputType}}" 
+		label="{{item.label}}" 
+		name$="{{item.name}}"
+		min="{{item.min}}"
+		max="{{item.max}}"
+		value="{{item.value}}"
+		option-one="{{item.optionOne}}"
+        option-two="{{item.optionTwo}}"
+        option-three="{{item.optionThree}}"
+        option-four="{{item.optionFour}}"
+        option-five="{{item.optionFive}}"
+        option-six="{{item.optionSix}}"
+        option-seven="{{item.optionSeven}}"
+        option-eight="{{item.optionEight}}"
+        option-nine="{{item.optionNine}}"
+        option-ten="{{item.optionTen}}"
+        class$="{{item.class}}"
+        min="{{item.min}}"
+        max="{{item.max}}"
+        step="{{item.step}}"
+        fcid="{{item.fcid}}"
+        is-repeater-select="{{item.isRepeaterSelect}}"
+        select-items="{{item.selectItems}}"
+        on-keyup="handleInputChange"
+        on-change="handleInputChange"
+       >
+	</fc-input-prime>
+</template>
+</section>		
+</template>
+<script>
+FcClobjid=Polymer({
+	is:"fc-clobjid",
+	properties:{
+		dataobject: {
+			type: Object,
+			notify: true,
+            reflectToAttribute: true
+		},
+        orientation: {
+            type: String,
+            value: ""
+        }
+		// dataset:{
+		// 	type: Array,
+  //           value: [],
+            
+  //   		notify: true
+		// }
+	},
+
+	attached: function(){
+		console.log(this.dataobject);
+        console.log(this.orientation);
+        this.orientation = this.orientation==""? "vertical": this.orientation;
+	},
+
+    handleInputChange: function(e)
+    {
+        console.log(e.target, e.target.name, e.target.value);
+        if(e.target.nodeName == "SELECT")
+        {
+            console.log("I got a change in a select");
+            var selName = e.target.name + "Selected";
+            console.log(this.dataobject[selName], selName);
+            this.dataobject[selName].value = e.target.value;
+            var notifyString = "dataobject." + selName;
+            this.notifyPath(notifyString, e.target.value, false);
+        }
+        else
+        {
+            console.log(e.target.name);
+            this.dataobject[e.target.name].value = e.target.value;
+            var notifyString = "dataobject.";
+            notifyString += e.target.name;
+            this.notifyPath(notifyString, e.target.value, false);
+        }
+        //this.dataobject[e.target.name] = JSON.parse(JSON.stringify(this.dataobject[e.target.name]));
+        //this.dataobject = JSON.parse(JSON.stringify(this.dataobject));
+    },
+
+    handleInputChangex: function(e)
+    {
+        console.log("on change");
+    },
+
+    _computeDataset: function(dataobject)
+    {
+        console.log("onion", this.id, dataobject.value, dataobject);
+        if(dataobject.path == "dataobject" && Object.keys(dataobject.value).length === 0)
+        {
+            return [];
+        }
+        //if(!dataobject.value) return [];
+        var keys = Object.keys(this.dataobject);
+        var numKeys = keys.length;
+        console.log(numKeys);
+        //this.dataset = [];
+        var dataset = [];
+        for(var i = 0; i < numKeys; i++)
+        {
+            var val = this.dataobject[keys[i]];
+            console.log(keys[i], val, typeof val.value);
+            if((typeof val.value) == "object")
+            {
+                var subkeys = Object.keys(val.value);
+                var j = 0;
+                console.log("in sub object " + subkeys);
+                var numSubfields = subkeys.length;
+                for(j= 0; j < numSubfields; j++)
+                {
+                    var subkey = subkeys[j];
+                    var subval = val.value[subkeys[j]];
+                    console.log(subkey, subval);
+                    dataset.push({
+                        "value": subval.value,
+                        "name": subval.name, //keys[i], //"tenth",
+                        "label": subval.label?subval.label: subval.name[0], //keys[i][0], //"d",
+                        "inputType": subval.inputType, //"digit",
+                        "isRepeaterSelect": subval.isRepeaterSelect,
+                        "selectItems": subval.selectItems,
+                        "optionOne": "",
+                        "optionTwo": "",
+                        "optionThree": "",
+                        "optionFour": "",
+                        "optionFive": "",
+                        "optionSix": "",
+                        "optionSeven": "",
+                        "optionEight": "",
+                        "optionNine": "",
+                        "optionTen": "",
+                        "class": "",
+                        "min": subval.inputType == "digit"? 0: 0,
+                        "max": subval.inputType == "digit"? 9: 9999,
+                        "step":"",
+                        "fcid":""
+                    })
+                }
+            }
+            else
+            {
+                console.log(val);
+            dataset.push({
+                "value": val.value,
+                "name": val.name, //keys[i], //"tenth",
+                "label": val.label?val.label: val.name[0], //keys[i][0], //"d",
+                "inputType": val.inputType, //"digit",
+                "isRepeaterSelect": val.isRepeaterSelect,
+                "selectItems": val.selectItems,
+                "optionOne": "",
+                "optionTwo": "",
+                "optionThree": "",
+                "optionFour": "",
+                "optionFive": "",
+                "optionSix": "",
+                "optionSeven": "",
+                "optionEight": "",
+                "optionNine": "",
+                "optionTen": "",
+                "class": "",
+                "min": val.inputType == "digit"? 0: 0,
+                "max": val.inputType == "digit"? 9: 9999,
+                "step":"",
+                "fcid":""});
+            }
+        }
+        return dataset;
+    },
+});
+</script>
+</dom-module>

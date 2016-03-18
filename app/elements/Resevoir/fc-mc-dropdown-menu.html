@@ -1,0 +1,116 @@
+<dom-module id="fc-mc-dropdown-menu">
+<template>
+<style>
+:host{
+	height: 65px;
+	max-width: 660px;
+	min-width: 480px;
+	padding: 1px;
+}
+.inputclass{
+	height: 65px;
+	max-width: 620px;
+	min-width: 100px;
+	margin: 2px 4px 2px 4px;
+	padding: 4px;
+}
+paper-menu{
+	border: 4px double black;
+	z-index: 200px;
+}
+paper-dropdown-menu{width: 95%;}
+</style>
+
+					<paper-dropdown-menu name="{{menuName}}" class="inputclass" always-float-label label="{{selected.menuName}}">
+						<paper-menu id="passageListMenu" on-iron-select="toggleSelection" class="dropdown-content" class="inputclass" selected="{{menuSelection}}">
+							<template id="fcDropDownMenuRepeater" is="dom-repeat" items="{{dataSource}}">
+								<paper-item class="inputclass" value="{{item}}">{{item.menuItem}}</paper-item>
+								
+							</template>
+						</paper-menu>
+					</paper-dropdown-menu>
+
+</template>
+<script>
+Polymer({
+	is: 'fc-mc-dropdown-menu',
+	properties: {
+		returnItemKey:{
+			type: String,
+			computed:"_computeReturnItemKey(menuItemValue)",
+			notify: true
+		},
+		menuName: {
+			type: String,
+			value: function(){return "Your Menu Selections: ";},
+			notify: true,
+			reflectToAttribute: true
+		},
+		menuLabel: {
+			type: String,
+			value: function(){return "Your Selections: " ;},
+			notify: true,
+		},
+		menuItemValue: {
+			computed: "_computeMenuItemValue(selected, menuSelection)",
+			notify: true
+		},
+		selected: {
+			type: Array,
+			computed: '_computeSelected(menuSelection)',
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		menuSelection: {
+			type: Array, 
+			value: function(){
+				return 0;
+			},
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		dataSource: {
+			type: Array,
+			notify: true,
+			reflectToAttribute: true
+		},
+		filterId: {
+			type: String,
+			value: "newMenu",
+			notify: true,
+			reflectToAttribute: true
+		} 
+
+	},
+
+_computeMenuItemValue: function(selected, menuSelection){
+	var returnValue = (this.dataSource!=undefined)?this.dataSource[0].itemValueKey: " ";
+		//console.log(returnValue, "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key", "this is the value key");
+		return returnValue;
+
+},
+_computeReturnItemKey: function(menuItemValue){
+	//console.log(menuItemValue);
+return menuItemValue;
+
+},
+_computeSelected: function(menuSelection){
+	return menuSelection;
+},
+
+toggleSelection: function(e) {
+        var item = e.detail.item.value;
+     	this.set("menuSelection", item);
+      },
+        
+passageFilter: function(filterId)
+	{
+				return true;
+		
+	}
+
+});
+</script>
+</dom-module>

@@ -2,6 +2,10 @@
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FCFirepadBehavior = {
     properties: {
+    	location: {
+    		type: String,
+    		value: ""
+    	},
     	firepad: {
 			type:Object,
 			value:{},
@@ -42,12 +46,17 @@ FCBehaviors.FCFirepadBehavior = {
 extraRandomPads: function(){ 
 	this.set('nameOfPad', this.nameOfPad + "a");
 },
-loadFirepad: function(){
-		this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/firepad');
-  		this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
-  		this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
+
+loadFirepad: function(argLocation)
+{
+	this.location = argLocation + "firepad";
+	console.log(this.location, this.$.firepad);
+	this.firepadRef = new Firebase(this.location);//'https://focusedstaging1.firebaseio.com/firepad');
+  	this.codeMirror = CodeMirror(this.$.firepad, { lineWrapping: true });
+  	this.firepad = Firepad.fromCodeMirror(this.firepadRef, this.codeMirror,
       		{richTextShortcuts: true, richTextToolbar: true, defaultText: 'Welcome to the Focused Data Administrator' });
-	},
+},
+
 loadQuestionsFirepad: function()
 {
 	this.firepadRef = new Firebase('https://focusedstaging1.firebaseio.com/questionsFirepad');

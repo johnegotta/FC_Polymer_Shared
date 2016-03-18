@@ -1,0 +1,533 @@
+<dom-module id="fc-new-passage-display">
+<template>
+<style>
+:host {
+		padding-left: 12px;
+		margin-left: 6px;
+		position: relative;
+		top: 0px;
+		font-size: 16pt;
+		bottom: 0px;
+		height: 99vh;
+		right: 0px;
+		left: 0px;
+		display: flex;
+		min-width: 96%;
+		max-width: 99vw;
+    }
+    div.line-number {
+		width: 28px;
+		height: 20px;
+		line-height: 1.2;
+		font-size: 16pt;
+		/*font-size: 1.25em;*/
+		font-family: merriweather;
+		font-weight: 500;
+		font-style: italic;
+		padding: 2px 4px;
+		margin: 5px;
+    }
+    paper-textarea, paper-input{
+    	padding: 12px;
+    }
+    .blurb-class{
+    	max-width: 670px; 
+    	padding: 4px 0px 4px 8px; 
+    	font-size: 12pt; 
+    	line-height: 1.05;
+    	font-style: oblique;
+    }
+    .highlighted {
+		background: yellow;
+    }
+    .fc-highlighted {
+		color: red;
+	}
+    div.text {
+		line-height: 1.2;
+		font-size: 16pt;
+	     /* font-size: 1.25em;*/
+		font-family: merriweather;
+		font-weight: 500;
+		padding: 2px 4px 8px 4px;
+		margin: 5px;
+		min-height: 900px !important;
+		display: flex;
+		min-width: 300px !important;
+		max-width: 680px !important;
+    }
+</style>
+<paper-header-panel class="vertical layout flex" style="height: 93vh; margin:12px 10px; padding: 6px 6px 24px 6px; font-weight: 600; background: #fff; border: 3px solid silver; color: #000088;">
+	    <paper-material class="paper-header header-panel head horizontal layout" style="min-hieght: 60px; max-height: 90px; padding: 12px 6px 12px 6px; font-weight: 600; text-align: center; background: aliceblue; font-size: 20px; border-bottom: 1px solid #000088; color: #000088;">
+
+	    <section class="horizontal layout flex-2 nowrap">	
+			<!-- <array-selector 
+				id="selector" 
+				items="{{menuItemArray}}" 
+				selected="{{selected}}" 
+				multi 
+				toggle>
+			</array-selector>
+
+	    	<fc-dropdown-menu 
+	    		class="flex layout horizontal"							
+		  		style="min-width: 360px; max-width: 96%" 
+		  		on-select="toggleSelection"
+		  		id="passagesListFromDB"
+		  		data-source="{{menuItemArray}}" 
+		  		selected="{{selected}}"
+		  		return-item-key="{{selectedItemKey}}"
+		  		>
+		  	</fc-dropdown-menu>
+		  	-->
+		  	<select id="passageselector" hidden="[[hideSelect]]" on-change="handleChangePassageEvent" style="width:400px">
+		  		<option value="newpassage">Create New Passage</option>
+				<template is="dom-repeat" items="{{passageArray}}">
+					<option value="{{item.fcid}}">{{item.fcid}}</option>
+				</template>
+			</select>
+		</section>
+	  </paper-material>
+	   <div class="layout vertical flex" style="height: 1900px;">
+	   			<a id="defff"></a><paper-tooltip position="bottom" for="defff">{{currentDefinition}}</paper-tooltip>
+	     		<section class="blurb-class">
+	     			<p>[[passage.passageBlurb]]</p>
+	     			<template is="dom-if" if="[[passage.hasCharts]]">
+	     				<div style="width:90%;height:200px;border:2px blue solid"></div>
+	     			</template>
+	       		</section>
+
+		<div class="layout horizontal flex nowrap container" style="min-height: 5000px; padding: 2px 0px 6px 8px;">
+		<div id="lineNumbers" class="layout vertical line-number">
+		  <div class="line-numbers" id="linesA1">Lines</div>
+		    <template is="dom-repeat" items="{{lineNumberArray}}" filter="{{_numberFilter(lineNumbers)}}">
+			  <span hidden="{{!item.show}}" id$="LN{{item.number}}">{{item.number}}</span>
+			  <span hidden="{{item.show}}">&nbsp</span>
+		    </template> 
+		  </div>
+			  <!--passage-1-column-1 container-->
+	    <div id="firstColumn" class="layout horizontal flex wrap text">
+		<article id="textColumnOne" style="margin: 2px 2px 2px 2px; padding: 0ps 3px 0px 8px; max-width: 600px;">
+	
+		  <template is="dom-repeat" items="{{passage.wordArray}}" id="aDarnedTemplate2" filter="">
+			<template is="dom-if" if="{{item.newPara}}">
+			  <br><span>&nbsp&nbsp&nbsp&nbsp</span>
+			</template>
+			<a id$="A[[item.wordIndex]]" class="{{_computeAnchorClasses(item, selectedQuestion)}}" name$="[[item.questionNumberClasses]]">{{item.word}}</a>
+		  
+		  	</template>
+		  	<br class="line-numbers">
+		  	<hr>
+			  	<div id="focusedMark" class="right-justified line-numbers" style="float:right; text-align: right;" id="singleColumnBounder">
+			  			<span style="color:white">|</span><span hidden="{{!passage.isFocused}}">Focused Coaching (c) 2016</span>
+		  		</div>
+		</article>
+	    </div>
+	    </div>
+	  </div>
+	  </paper-header-panel> 
+	</template><!--the arrays below should contain useful subPropertieslike their length;-->
+<script>
+
+function fcMCPassage(argDBObj){
+	this.title = {type: "text", value: argDBObj.title, formIndex: 4, label:"Title", propname: "title"};
+	this.blurb = {type: "text", value: argDBObj.passageBlurb, formIndex: 1, label:"Blurb", propname:"blurb"};
+	this.numParagraphs = {type: "number", value: argDBObj.numParagraphs, formIndex: 2, label: "Number of Paragraphs", propname:"numParagraphs"};
+	this.isDouble = {type: "checkbox", value: argDBObj.isDouble, formIndex: 3, propname:"isDouble", label: "Is Double Passage?"};
+}
+
+Polymer({
+	is: "fc-new-passage-display",
+	behaviors: [Polymer.IronResizableBehavior,
+				//FCBehaviors.MetaObjectSavingBehavior,
+				//FCBehaviors.FcPassageLocalDataBehavior,
+				FCBehaviors.FcMCSingleColumnLineNumberBehavior,
+				FCBehaviors.dictionaryBehavior,
+				FCBehaviors.dataManagerBehavior
+				],
+	listeners: {'iron-resize': '_onIronResize',
+				'notifyResize': 'setMeasureParams'},
+	properties: {
+	 
+		estimatedHeight: {
+			type: Number,
+			value: function(){
+			  var estimatedHeight=Math.ceil(screen.height*.795);
+		 	return estimatedHeight;
+			},
+			notify: true,
+	    }, 
+
+	    passageRootPath: {
+	    	type: String,
+	    	value: "https://amber-inferno-3827.firebaseio.com/", /*function() {
+				return 'https://amber-inferno-3827.firebaseio.com/';
+			},*/
+			notify: true,
+			reflectToAttributes: true
+	    },
+
+	    passagesPath: {
+	    	type: String,
+	    	value: "reading/newpassages",
+	    	notify:true,
+	    	reflectToAttributes: true
+	    },
+
+	    passageId: {
+			type: String,
+			value: 'T00001S1P1',
+			notify: true,
+			reflectToAttributes: true
+		},
+
+		passagesFullPath: {
+			type: String,
+			notify: true,
+			computed: "computePassageFullPath(passagesPath, passageId)",
+			reflectToAttributes: true
+		},
+
+	    passages: {
+	    	type: Object,
+	    	value: {}
+	    },
+
+	    passage: {
+	    	type: Object,
+	    	value: {},
+	    	observer: "logPassage",
+	    	notify: true,
+	    	reflectToAttributes: true
+	    },
+
+	    passageArray: {
+	    	type: Array,
+	    	value: [],
+	    	notify: true
+	    },
+	    
+	    hideSelect: {
+	    	type: Boolean,
+	    	value: false
+	    },
+
+	    mcPassage: {
+	    	type: Object,
+	    	value: {}
+	    }
+	    
+	
+	// lineNumberArray: {
+	// 	  type: Array,
+	// 	  computed: '_computeLineNumberArray(menuItemArray)',
+	// 	  notify: true
+	// 	  },
+    // passageObject: {
+    // 	type: Object,
+    // 	 notify: true
+    // },
+  	// sharedSelection: {
+  	// 	type: String,
+  	// 	notify: true, 
+  	// 	observer: "coincideChange",
+  	// 	computed: "_computeSharedSelection(selected)",
+  	// },
+  
+}, //end of properties
+
+	attached: function(){
+
+		//var crap = new FcReadingPassageQuestion("T00001");
+		//console.log(crap);
+	 	this.addEventListener("mouseover", this.setMeasureParams);
+		var self=this;
+		this.passageArray = [];
+		this.passages = {};
+
+		this.setDataStrategy("firebaseOnly");
+		this.setFirebaseLocation(this.passageRootPath);
+		console.log(this.passagesPath, this);
+		this.getData(this.passagesPath, function(snap)
+		{
+			console.log(snap);
+			self.passages = snap;
+			if(self.passages != null)
+			{
+				self.changePassage(self.passages[self.passageId]);
+				console.log(self.passage);
+				var keys = Object.keys(self.passages);
+				var numP = keys.length;
+				self.set("passageArray", []);
+				for(i=0;i<numP;i++)
+				{
+					self.push("passageArray", self.passages[keys[i]]);
+				}
+				console.log(self.passageArray);
+				console.log(self.$.passageselector.options.selectedIndex, self.$.passageselector.options);
+				//self.$.passageselector.options.selectedIndex = 1;
+				console.log(self.$.passageselector.selected);
+			}
+			//console.log(self.passage);
+		});
+
+	},
+
+	findLineNums: function(argQuestionPartFcid)
+	{
+		var results = [];
+		var selector; // = "[name*='" + argQuestionFcid + "']";
+		//var altSel = "[name='" + argQuestionFcid + "']";
+		//console.log(selector);
+		var anchors; // = this.querySelectorAll(altSel); //"[name='" + argQuestionFcid + "']");
+		//console.log(anchors);
+		var numAnchors; // = anchors.length;
+		var counter = 0;
+		//if(numAnchors != 0)
+		for(i=0; i<3; i++)
+		{
+			selector = "[name*='" + argQuestionPartFcid + i + "']";
+			anchors = this.querySelectorAll(selector);
+			numAnchors = anchors.length;
+			console.log(anchors, selector, numAnchors);
+			if(numAnchors != 0)
+			{
+				var start = Math.floor((anchors[0].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+				var end = Math.floor((anchors[numAnchors-1].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+				results.push({start:start, end:end});
+			}
+		}
+		return results;
+		/*
+		while(counter < numAnchors)
+		{
+			var location = Math.floor((anchors[counter].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+			var newLoc;
+			if(numAnchors == 1)
+			{
+				results.push({start:location, end: location});
+				return results;
+			}
+			else
+			{
+				var start = location;
+				newLoc = location + 1;
+				counter++;
+				newLoc = Math.floor((anchors[counter].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+				while(newLoc == (location + 1) && ++counter < numAnchors)
+				{
+					location = newLoc;
+					newLoc = Math.floor((anchors[counter].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+				}
+				if(counter == numAnchors)
+				{
+					results.push({start:start, end: newLoc});
+					return results;
+				}
+				else
+				{
+					results.push({start:start, end: newLoc});
+					start = newLoc;
+				}
+			}
+
+			results.push({start: location});
+			do
+			{
+				counter++;
+				newLoc = Math.floor((anchors[counter].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+			}while(newLoc == (location+1) && counter < numAnchors)
+			if(newLoc == (location+1))
+			{
+				results[resultIndex].end = newLoc;
+			}
+			else
+			{
+				results[resultIndex].end = location;
+				results.push({start:newLoc});
+			}
+
+
+		    result.start = Math.floor((anchors[0].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+		    result.end = Math.floor((anchors[numAnchors-1].getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.linesA1.getBoundingClientRect().height);
+		}
+
+		return result;
+		*/
+	},
+
+	logPassage: function(newVal, oldVal)
+	{
+		console.log(newVal, oldVal);
+	},
+
+	revertPassage: function()
+	{
+		var self = this;
+		this.getData(this.passagesPath, function(snap)
+		{
+			console.log(snap);
+			self.passages = snap;
+			self.set("passage", self.passages[self.passageId]);
+			console.log(self.passage);
+			//self.$.inputgen.absorbObject(self.passage);
+			var keys = Object.keys(self.passages);
+			var numP = keys.length;
+			self.set("passageArray", []);
+			for(i=0;i<numP;i++)
+			{
+				self.push("passageArray", self.passages[keys[i]]);
+			}
+			console.log(self.passageArray);
+			self.fire("passage-change", {passage: self.passage});
+			//console.log(self.passage);
+		});
+	},
+
+	handleChangePassageEvent: function(e)
+	{
+		var fcid = e.target.value;
+		if(e.target.value == "newpassage")
+		{
+			var keys = Object.keys(this.passages);	
+			var numP = keys.length;
+			if(numP != 0)
+			{				
+				var lastTest = this.passages[keys[numP-1]];
+				console.log(lastTest);
+				var lastFcid = lastTest.fcid;
+				var lastTestNum = lastFcid.split("S")[0].replace("T", "");
+				var newTestNum = (parseInt(lastTestNum) + 1).toString();
+				fcid = "0000" + newTestNum;
+				fcid = "T" + fcid.slice(-5) + "S1P1";
+				console.log(fcid);
+			}
+			else
+			{
+				fcid = "T00001S1P1";
+			}
+			this.passages[fcid] = {fcid:fcid};
+		}
+		this.changePassage(this.passages[fcid]);
+	},
+
+	stagePassage: function(argPassage)
+	{
+		this.passage = {};
+		this.passage = argPassage;
+		this.passageId = this.passage.fcid;
+		console.log(this.passage);
+	},
+
+	changePassage: function(argPassage)
+	{
+		//console.log(e.target.value);
+		console.log(argPassage);
+		this.anchorsWired = false; //recalculate dictionary listeners for new passage
+		this.currentDefinition = "Word Not Found";
+		this.passage = argPassage; //this.passages[e.target.value];
+		this.passageId = argPassage.fcid; //e.target.value;
+		this.fire("passage-change", {passage: this.passage});
+		console.log(this.passage);
+		this.setMeasureParams();
+	},
+
+	savePassage: function(argPassage)
+	{
+		this.passages[argPassage.fcid] = argPassage;
+		this.passage = this.passages[this.passageId];
+		var keys = Object.keys(this.passages);
+		var numP = keys.length;
+		this.set("passageArray", []);
+		for(i=0;i<numP;i++)
+		{
+			this.push("passageArray", this.passages[keys[i]]);
+		}
+	},
+
+	computePassageFullPath: function(argPassagesPath, argPassageId)
+	{
+		return argPassagesPath + "/" + argPassageId;
+	},
+
+	highlightQuestion: function(e)
+	{
+		this.selectedQuestion = e.target.value;
+		//console.log(e.target.value);
+	},
+
+	_computeAnchorClasses: function(argItem, argSel)
+	{
+		//console.log(argItem, this.selectedQuestion);
+		if(argItem.questionNumberClasses == null || argItem.questionNumberClasses.indexOf(this.selectedQuestion) < 0)
+		{
+			return "carrot";
+		}
+		else
+		{
+			return "fc-highlighted";
+		}
+	},
+
+/*
+	_computeSelectedQuestions: function (selected){
+		var returnValue = selected.relatedItemKey; 
+		return returnValue;
+	},
+
+	toggleSelection: function(e){
+		console.log(e.details.item);
+		
+		console.log(bound, "I am bound, iron bound");
+		console.log(JSON.stringify(e.details.item));
+	},
+	// coincideChange: function(){
+	// 	if(this.menuItemArray==undefined){this._getAndSetLocalOrDatabase();}
+	// 	var counter = this.menuItemArray.length;
+	// 	for(var i=0; i<counter; i++){
+	// 		var bound = this.menuItemArray[i]+"Qs";
+	// 		if(bound ==this.sharedSelection)
+	// 		{	//alert("We have a match");
+	// 			this.set("selectedItem", this.menuItemArray[i]);
+	// 			this.set("selected", this.selectedItem);
+	// 			this.set("sharedSelection", bound);
+	// 		}
+	// 	}
+	// },
+	// shareChange: function(){
+	// 	this.coincideChange();
+
+	// },
+	_computeSharedSelection:function(selected){
+	 		var returnValue = this.menuItemArray.questionItemKey;
+	 		return returnValue; 
+	 },
+	 */
+	ready: function(){
+		//this._getAndSetLocalOrDatabase();
+		this.passagesPath = "reading/newpassages";
+		this.passageId = "T00001S1P1";
+		//this.passagesFullPath = this.passagesPath + "/" + this.passageId;
+		console.log(this.passagesPath, this);
+	},
+	
+
+_theContentFilter: function(firstWordIndex, lastWordIndex) {
+	// if(!isNaN(lastWordIndex)){
+	//   return (item) =>{
+	// 	return (item.wordIndex >= firstWordIndex && item.wordIndex <= lastWordIndex);
+	//   };
+	// } else {
+	//   return (item) =>{
+		return true;
+	//   };
+	// }
+  },
+  _numberFilter: function(lineNumbers) {
+	return (item) =>{
+	  return (item.number <= lineNumbers);
+	    };
+	  } 			
+});
+</script>
+</dom-module>
