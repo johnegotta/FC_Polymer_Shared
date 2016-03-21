@@ -1,0 +1,316 @@
+<script>
+FocusedEvent.summerCourseTimeSets=FcCourse.getSummerCourseTimeSets();
+		FocusedEvent.summerCourseSchedule=FcCourse.getSummerCourseSchedules();
+		FocusedEvent.summerCourseDaySets=FcCourse.getSummerCourseDaySets();		
+		FocusedEvent.courseTypes= FcCourse.getCourseTypes();
+		FocusedEvent.testDates=FcCourse.getTestDates();
+		FocusedEvent.getFcCalendarDay();
+
+
+
+
+
+
+
+
+
+this.weekdays4Array=[
+					"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
+					];
+
+this.months4Array=[
+					"January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"
+					];
+
+/*****Properties To Build Types of Useful HTML Elements and Tool Oriented JS objects*********/
+this.eventInputData={
+				"name":"",
+				"inputType": "",
+				"header":"",
+				"labelA":"",
+				"labelB":"",
+				"isRepeaterSelect":true,
+				"selectItems":[],
+				"style":"",
+				"class":"",
+				"asside":{	"noteOne:": "",
+							"noteTwo:": "",
+							"noteThree": ""
+						}
+				};
+this.labelToCamelCaseName=function(Label2)
+	{
+	var name = label2;
+		name =name.charAt(0).toLowerCase() + name.slice(1);
+		console.log(name);
+		name=name.replace(/\s/g,'');
+	return name;
+}, 
+//Has some parts that would be useful in making larger parsers for other tasks//
+function courseFcidGenerator(testDate, coachFcid, location, meetingDays, practiceTestDay, startTime, endTime, eventDateArray){
+	var len =eventDateArray.length;
+	var weekdays="";
+	var mdays= meetingDays.replace(/\s/g,'');
+	var arr=mdays.split(',');
+	var len = arr.length;
+	for(var i=0;i<len; i++){
+	weekdays += arr[i][2];
+	}
+	startTime=startTime.replace(":", "");
+	endTime=endTime.replace(":","");
+	console.log(endTime);
+	var fcid= dayStamp(testDate)+"_"+coachFcid+location+startTime+weekdays+endTime+"_"+len.toString()+practiceTestDay;
+	console.log(fcid);
+	return fcid;
+}
+/*******tells length of a class or course (duration), based on a stringTime*****//
+function duration(timeOne, timeTwo){
+	var startHrs = stringTime(timeOne);
+	var endHrs = stringTime(timeTwo);
+	var tot=endHrs-startHrs;
+	console.log(tot);
+	return tot;	
+}
+/****Billing for Teacher Classes by the hours used based on cost of time and experience//fairly accurate***/
+function costGenerator(numberOfHours, tiered, coachYearsExp)
+{
+	var cost = (numberOfHours<50)?numberOfHours*60:(numberOfHours<75&&numberOfHours>50)?numberOfHours*55:numberOfHours*50;
+		if(coachYearsExp>5){coachYearsExp=5;(tiered){for(i=0:i<coachYearsExp;++){cost*1.05;}}}
+	return cost;	
+}
+/***** Gives Military time for Hours and digital/Hundreths of an hour for minutes from AMPM STRING******/
+function timeFromStringTime(time)
+{
+	var start = parseInt(time);
+	console.log(start);
+	var len = time.length;
+	var ampm = (start!==12 && time.charAt(len-2)=="P")?12: 0;
+	ampm=parseInt(ampm);
+	var hoursStart = ampm+start;
+	console.log(hoursStart, ampm, start);
+	var minStart =(parseInt(time.charAt(len-4))*10)+parseInt(time.charAt(len-3));
+	var minHundreds =minStart/60;
+	console.log(minStart, minHundreds);
+	var tot=hoursStart +minHundreds;
+	console.log(tot);
+	return tot;
+}
+/***creates milliSeconds to Midnight of date for REQUIRES DATE calendarDay grouping of items and unique ID-ing of calendar cards. Also useful to have for reducing an array of dates, using a sort feature like array.sort(function(a,b){return a-b}; this will place the dayStamps in Order, show place duplicates easily identifiable, mergable or removable: example below;*****/
+
+function dayStamp(someDate){
+			 var date = new Date(someDate);
+	 	var year= date.getFullYear(); 
+	var month= date.getMonth();
+	var day = date.getDate();
+    var date= Date.UTC(year, month, day);
+		return date;	
+	}
+
+var FcCalendarDay={};
+
+FcCalendarDay=function(  ){
+
+
+
+
+
+
+
+
+
+
+Class = FcCourseEvent{
+		constructor(){
+	myEventArray=[];
+	 myEventArray=yourEvent.reverse();
+		var myCourse=[];
+		myCourse = yourCourse.reverse();
+		var myTests=[];
+		myTests= testSet.reverse();
+		console.log(myTests, myCourse);
+	var numberOfpTests=myTests.length;
+	var numberOfClasses = myCourse.length;
+	console.log(numberOfClasses, numberOfpTests);
+	var totalCourseHours=numberOfClasses*dur;
+	console.log(totalCourseHours);
+	var days = day1+ ", " + day2 + ", " + day3;
+	var cost=costGenerator(totalCourseHours);
+	var classfcid = courseFcidGenerator(myTestDate, "FrazzanoJason00001", "focusedNJ00002", days, practiceTestDay, startTime, endTime, myEventArray);
+	this.event=new FcCourse();
+		this.event.testDate = myTestDate;
+		this.event.courseType = courseType;
+		this.event.courseLength= weeks+" weeks"; 
+		this.event.practiceTestDay= practiceTestDay;
+		this.event.presetCoursePattern="none";
+		this.event.numberOfMeetings=numberOfClasses;
+		this.event.numberOfPracticeTests=numberOfpTests;
+		this.event.startTime=startTime;
+		this.event.endTime= endTime;
+		this.event.eventLocation=location; 
+		this.event.associatedCoaches=associatedCoach;
+		this.event.courseSize=courseSize;
+		this.event.courseMeetingDays = day1+ ", " + day2 + ", " + day3;
+		this.event.coach = coach;
+		this.event.eventArray = myEventArray;
+		this.event.practiceTestArray = myTests;
+		this.event.courseMeetingArray = myCourse;
+		this.event.fcid = classfcid;
+		this.event.currentEnrollment=courseSize;
+		this.event.price="$"+cost;
+		this.event.meetingLength=dur;
+		this.event.hoursTotal=totalCourseHours;
+	console.log(this.event);
+		return this.event;
+		}
+	};
+
+
+	calendarCreator: function(start, end, units)
+	{	this.monthsArray=null;
+		this.monthsArray=[];
+		var currDate;
+		if (units!=undefined && units!=null){this.set("units", units);} 
+		var startDate=(start!=null)?start:(new Date()).addDays(0);
+		var endDate = (end!=null)?end:(new Date()).addDays(120);
+		var i=0;
+		if(endDate<=startDate)
+			{
+				var startDateHolder=startDate;
+				startDate=[];
+				startDate=endDate;
+				endDate=[];
+				endDate=startDateHolder; 
+			}//date crossing condition
+
+		
+			while(startDate.getDay() !== 0)//filling beginning week of calendar
+			{
+				startDate = startDate.addDays(-1);
+				console.log(startDate);
+			
+			}
+			while(endDate.getDay() !== 6)
+			{
+				endDate = endDate.addDays(+1);
+
+			}
+		var finishedFirstMonth=false;
+		var testArray =[];
+		testArray = FcCourse.getTestDates();
+		console.log(testArray);
+		this.set('dateArr', getDates(startDate, endDate));
+		var numDays = this.dateArr.length;
+		var currentMonth = 0; 
+		for (i = 0; i < numDays; i++) 
+		{   var calendarDay={};
+			currDate=this.dateArr[i];
+			calendarDay.date=currDate; 
+			calendarDay.eventList=this.getTimes();
+			calendarDay.dateId=currDate.dayStamp();
+			calendarDay.showDate=currDate.toDateString();
+			calendarDay.dayOfMonth=currDate.getDate();
+			if(testArray[2].indexOf(calendarDay.showDate)>-1)
+			{
+				calendarDay.testDate=true; 
+			}
+			else{
+				calendarDay.testDate=false;
+			}
+			if(i==0)
+			{	
+				this.push("monthsArray", []);
+				this.monthsArray[currentMonth].push(calendarDay);
+				this.set("month", currDate.getFullMonth());
+			}
+			else if(i>0)
+			{
+				var yesterday = this.dateArr[i-1];
+				var dateYester = yesterday.toDateString();
+				var dateToday = calendarDay.showDate;
+				if(currDate.getFullMonth() != yesterday.getFullMonth() && this.units=="months")
+				{	
+					if(currentMonth==0 && finishedFirstMonth==false)
+						{
+							finishedFirstMonth =true;
+							this.monthsArray[currentMonth].push(calendarDay);
+						}
+					else{
+					currentMonth++;
+					this.monthsArray[currentMonth]=[];
+					this.monthsArray[currentMonth].push(calendarDay)
+					}
+				}
+				else {
+					this.monthsArray[currentMonth].push(calendarDay);
+				}
+			}
+		}
+			var monthIndex=0;
+		if(this.units==="months")
+		{
+		this.padMonths();
+		}
+		var today = new Date();
+		var todMonth = today.getMonth();
+		var todYear = today.getFullYear();
+		console.log(this.monthsArray[0][8]);
+		
+			if (todYear==this.monthsArray[0][15].date.getFullYear())
+				{console.log(this.monthsArray);
+					var counter =this.monthsArray.length-1;
+				for(i=0;i<counter; i++)
+					{
+					if(todMonth==this.monthsArray[i][15].date.getFullMonth())
+					{
+						this.set("displayedMonth", this.monthsArray[i]);
+						this.set("displayedMonthIndex",i);
+					}
+				}
+			}
+		
+		var lastMonthIndex=this.monthsArray.length-1;
+		this.set("lastMonthIndex", lastMonthIndex);
+	},//end of function
+
+padMonths: function(units)
+	{	if(units==="months"){
+		var month=[];
+		var i = 1;
+		var numMonths = this.monthsArray.length;
+		for(i=1; i < numMonths-1; i++)
+		{
+			month = this.monthsArray[i];
+			//console.log(month);
+			var lastMonth = this.monthsArray[i-1];
+			var numDaysPrevMonth = this.monthsArray[i-1].length;
+			var fillerDay = numDaysPrevMonth - 1;
+			while (month[0].date.getDay() != 0 && this.units=="months")
+			{
+			 	month.unshift(this.monthsArray[i-1][fillerDay--]);
+			 }
+			 
+		}
+		var count =numMonths-1;
+		for(i=0;i < count; i++)
+		{
+			month = this.monthsArray[i];
+			var lastDay=month[month.length-1];
+			 var firstDay=0;
+
+			 var d = lastDay.date;
+			 d = new Date(d);
+			while(d.getDay()!=6 & this.units=="months")
+			{	
+				d=new Date(d).addDays(+1);
+				
+				lastDay = this.calendarDayConstructor(d);
+				month.push(lastDay);
+			
+			}
+		}
+		var lastMonth=this.monthsArray.length-1;
+		},
+	}
+}
+</script>
+			

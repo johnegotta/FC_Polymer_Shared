@@ -1,7 +1,7 @@
 <dom-module id="fc-date-picker-proto">
 <style>
 :host{
-/*	position: fixed;*/
+	position: relative;
 	
 	background: white;
 	box-shadow: 4px 11px 21px 7px #9fafaf;
@@ -9,6 +9,13 @@
 	width: 320px;
 	margin-left: 12px;
 	margin-top: 12px;
+
+}
+.pretty{
+
+background: red;
+height: 11px;
+width: 30px;
 
 }
   .card{
@@ -28,9 +35,9 @@
 			<paper-material style="background: #008;  border-bottom: silver solid 2px; height:42px; width: 100%;">
 					<section class="layout horizontal">
 					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden="[[backHidden]]" style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
-					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]</span>
 	
-					<paper-icon-button on-tap="_forward" hidden="[[forwardHidden]]" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button>
+					<paper-icon-button on-tap="_forward" hidden="[[forwardHidden]]" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button> 
 					</section>
 			</paper-material>
 				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
@@ -41,12 +48,22 @@
 			</div>
 		<div class="vertical layout" style="width: 320px!important; background: white; overflow:scroll; height: 280px; min-height: 242px;">
 			<section class="horizontal flex layout wrap">
-				<template is="dom-repeat" class="horizontal layout wrap" items="{{displayedMonth}}">
-				<fc-date-mini class="card" id$="[[computeId(item)]]" in-month="[[computeNotInMonths(item)]]" toggle-days="{{toggleDays}}" in-selected-array="[[_computeInSelectedArray(selectedArrayName, selectedArray)]]" style="margin: 0px auto; [[computeNotInMonths(item)]];" mini-date="[[computeDate(item)]]">
-			
-					<a class="date" on-tap="_dateClick">[[computeDate(item)]]</a>
-				</fc-date-mini>
-			
+				<template 
+					is="dom-repeat" 
+					class="horizontal layout wrap" 
+					items="{{displayed}}" 
+					as="day">
+						<fc-date-mini
+						 	class="card" 
+						 	in-month="[[computeNotInMonths(day.date)]]"  
+						 	toggle-days="{{toggleDays}}" 
+						 	in-selected-array="[[_computeInSelectedArray(selectedArrayName, selectedArray)]]" 
+						 	style$="margin: 0px auto; [[computeNotInMonths(day.date)]];" calendar-day={{day}} id$={{day.dateId}} testDate={{day.testDate}} events="[[day.eventList]]">
+							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
+							<a class="date" on-tap="_dateClick">[[day.dayOfMonth]]</a>
+							<span class="[[compute(day)]]"></span>
+							
+						</fc-date-mini>	
 				</template>
 			</section>
 		</div>
@@ -71,15 +88,28 @@ FcDatePickerProto=Polymer({
 			value: false,
 			notify: true
 		},
-		displayedMonth:{
+		monthsArray: {
 			type: Array,
 			notify: true
 		},
+		
 		fcCourse:{
 			type: FcCourse,
 			value: function(){var course = new FcCourse(); return course;},
 			observer: "fcCourseObserver",
 			notify: true
+		},
+		monthIndex: {
+			type: Number,
+			value: function(){
+				var d = new Date();
+				d=d.getMonth();
+				console.log(d);
+				return d;
+			},
+			notify: true
+			}
+
 		},
 		days:{
 			type: Array,
@@ -102,21 +132,72 @@ FcDatePickerProto=Polymer({
 			notify: true
 
 		},
+		calandarDay:{
+			type: Object,
+			notify: true,
+			reflectToAttribute: true
+		},
+		calendarDayArray: {
+			type: Array,
+			value:[],
+			notify: true, 
+			reflectToAttribute: true
+		},
+		maxIndex:{
+			type: Number,
+			notify: true,
+		},
+		today:{
+			type: Date,
+			value: function(){var today = new Date();},
+			notify: true
+		},
+		calendarMonthsArray:{
+			type: Array,
+			value:[],
+			notify: true
+		},
+		displayedIndex:{
+			type:Number,
+			notify: true
+		},
+		displayed:{
+			type: Array,
+			computed: "computeDisplayed(displayedIndex)",
+			notify: true
+		},
+		units: {
+			type: String,
+			value: "months",
+			notify: true 
+
+		},
+		numberOfUnits:{
+			type: Number,
+			value: 1,
+			notify: true
+
+		},
 		forwardHidden:{
 			type: Boolean,
-			computed: "_computeForwardHidden(lastMonthIndex, displayedMonthIndex)",
+			value: false,
 			notify: true
 		},
 		backHidden:{
 			type: Boolean,
-			computed: "_computebackHidden(displayedMonthIndex)",
+			computed: false,
 			notify: true
 		},
 		day:{
 			type: Date,
 			notify: true
 		},
-		 animationConfig: {
+		viewMonth:{
+			type: String,
+			computed:"computeViewMonth(displayedIndex)",
+			notify: true
+		},
+	animationConfig: {
         type: Object,
         value: function() {
           return {
@@ -135,73 +216,223 @@ FcDatePickerProto=Polymer({
           };
         }
    
-      }
-    
-    },  
-		
-changesTheDays: function(e){
-
-
-},
-attached: function(){
-		var date=new Date(2016, 0, 1);
-		var dateEnd =new Date(2019, 11, 31)
-		 this.calendarCreator(date, dateEnd, "months");
+      },
+   ready: function(){
+   		var startYear =new Date().getFullYear();
+   		console.log(startYear);
+   		var endYear =startYear + 3;
+		var date=new Date(startYear, 0, 1);
+		var dateEnd =new Date(endYear, 11, 31);
+		var today = new Date();
+		this.today=today;
+		var index=today.getMonth();
+ 		this.set("displayedIndex",index);
+		this.calendarCreator(date, dateEnd, "months");
 		
 		},
-_computeForwardHidden: function(lastMonthIndex, displayedMonthIndex)
-{		var retVal=false;
-	if(this.displayedMonthIndex===this.lastMonthIndex)
+		compute: function(day){if(day.testDate){return "pretty";}},
+attached: function()
+{
+	
+		this.async(this.initialize, 700);
+
+},
+initialize:function(){
+ var counter=this.monthsArray.length;
+ 	this.set("maxIndex", counter-1);
+		var self=this;
+		this.calendarDayArray=[];
+		this.calendarMonthsArray=[];
+ for(var i=0;i<counter; i++)
+		 { 	
+		 	var array = this.monthsArray[i];
+		 	this.monthsArray.length;
+			self.push("calendarMonthsArray",array);
+			//console.log(this.calendarMonthsArray[i]);
+		 	array.forEach(function(item, index, arr){
+		   		self.push("calendarDayArray", {'monthIndex': i, "calendarDay": item,"date": item.date, "dayIndex":index});
+		 	});
+		}
+		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+},
+computeInClass: function(day, fcCourse)
+{
+if(day.testDate==true && this.fcCourse.testDate==day.date)
+	{return "test";}
+ //console.log("in datepicker", day, day.testDate, day.date, day.prettyDate);
+
+},
+computeDisplayed: function (displayedIndex)
+{
+	return calendarMonthsArray[displayedIndex];
+},
+computeInEventArray: function(fcCourse, item)
+{	if (this.fcCourse)
+	{
+		var d=this.fcCourse.testDate;
+		d=new Date(d);
+			if (d==item)
+				{
+					var retVal = "outline: red 3px solid"; return retVal;
+				}
+	}
+},
+
+
+_computeForwardHidden: function(lastMonthIndex, displayedIndex)
+{		
+	var retVal=false;
+	if(displayedIndex===lastMonthIndex)
 	{
 		retVal=true;
-		console.log(retVal, retVal, retVal);
-
 	}
 	return retVal;
-
 },
 
-fcCourseObserver: function(newval, oldval){
-	console.log(newval, oldval);
+fcCourseObserver: function(newval, oldval)
+{ if(newval.testDate){
+	var d= new Date(newval.testDate);
+	var p= new Date(newval.testDate);
+	var e= new Date(newval.testDate);
+	p=new Date(newval.testDate);
+	p = p.getFullYear;
+	diff=(p-this.today.getFullYear);
+	if(diff>0){
+		var currentYear = year.now+1;
 
+	d = d.getMonth();
+	console.log(d);
+	this.set("displayedIndex",d);
+	var pickle=[];
+	pickle=this.calendarMonthsArray[d];
+	this.set("displayed",pickle);
+	}
+	if(newval.testDate)
+	{  var testDate= new Date(newval.testDate);
+		var tester= new Date(newval.testDate);
 
+		console.log(testDate, tester);
+		var array={};
+		var year =testDate.getFullYear();
+		console.log(year);
+		var yearNow = this.today.getFullYear();
+		var diff=(year-yearNow);
+		var mvpcl = newval.presetCourseLength;
+		var arr=[]; var one =[]; var two=[]; var three =[]; var four=[];
+		if(newval.presetCourseLength){
+			if(newval.presetCourseLength<8)
+			{var weeks=(parseInt(newval.presetCourseLength)+2); var days=weeks*7}
+			var month= testDate.getMonth() +diff*12;
+	
+			arr=this.calendarMonthsArray[month].filter(function(item, index, array)
+				{if(index<=13 && item.testDate===true)return item;});
+				var count = arr.length;
+			two = this.calendarMonthsArray[month-2];
+			one = this.calendarMonthsArray[month-1]; 
+			two.push(one);
+			two.unshift(arr);
+			console.log(two);
+				for(var i=0;i<count;i++)
+				{
+					if(two[i].idDate!==two[i+1].idDate){four.push(two[i]);}
+					console.log()
+				}
+				
+				console.log()
+
+			var i=this.displayedIndex;
+			this.set("displayedIndex", month);
+			for(i;i<=month;i++)
+			{
+			this.set("displayed", this.calendarMonthsArray[i]);
+
+			this.fire("sendArray", {"detail":{}});
+			}
+		}
+
+	}		
+	}		
+	// 		console.log(this.displayed);
+	// 		var self=this;
+	// 		var i=0;
+	// 		if(this.displayed)
+	// 			{ 
+	// 				var helper=this.displayed[i].date;
+	// 				var len=this.displayed.length;
+	// 				for(i=0;i<len;i++)
+	// 				{	var nug=null;
+	// 					if(helper===tester)
+	// 					{
+	// 					while(nug==null)
+	// 						{
+	// 							nug=helper.eventList.forEach(function(item, index, array)
+	// 							{
+	// 							if(index<3)
+	// 								{array.push(item);}
+	// 							else if(index>2 && index<32)
+	// 								{array.push({"time":item, "event": "Real SAT Exam", "name": "Student Name?"});}
+	// 							else 
+	// 								{array.push(item);}
+	// 							})
+	// 							console.log(array);
+	// 						}
+	// 					}
+	// 				console.log(array);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// console.log(array);
+	// }
 },
-_computebackHidden: function(displayedMonthIndex)
-	{		var retVal=false;
-		if(this.displayedMonthIndex===0)
+_computebackHidden: function(displayedIndex)
+	{	if (this.displayed[7].date)
+ 	{
+		var retVal=false;
+		if(this.displayedIndex===0)
     	{
     		retVal=true;
     	}
     	else{retVal=false;}
     	return retVal;
-  	},
-
-_forward: function(){
-    	this._forwardOneMonth();
-    		
-    	
-    },
- _backOne: function(){
-    	this._backOneMonth();
-    	
-    		
-    },
-      _computeCalendarHeading: function(displayedMonth)
-  {
-  		if(displayedMonth[15])
-  		{
-
-  		return this.displayedMonth[15].getFullMonth();
-
-  		}
+  	}
   },
-  computeYear: function(displayedMonth)
-{	
-	if(displayedMonth[15])
-	{
-	return displayedMonth[15].getFullYear();
-	}
-},
+
+_forward: function()
+	{	if(this.displayedIndex ==this.maxIndex-1)
+ 		{
+ 			this.set("forwardHidden",true);
+ 		}
+ 		else
+ 		{	this.set("backHidden",false);
+ 			this.set("forwardHidden",false);
+    		this.set("displayedIndex", this.displayedIndex+1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    	}
+    },
+ _backOne: function()
+ 	{	if(this.displayedIndex ===0)
+ 		{
+ 			this.set("backHidden",true);
+ 		}
+ 		else
+ 		{	this.set("forwardHidden",false);
+ 			this.set("backHidden",false);
+    		this.set("displayedIndex", this.displayedIndex-1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+ 		}
+    },
+  
+  computeYear:function(displayed)
+  		{
+  		var	y =  new Date();
+  		y=y.getFullYear();
+  		var	m = new Date();
+
+  		
+  		var retVal=y+Math.floor((this.displayedIndex)/12);
+		return retVal;
+		},
 
 _dateClick: function(event) {
       var targetOne = event.target;
@@ -219,35 +450,34 @@ _dateClick: function(event) {
       });
     },
 
-computeDate: function(day){
-	var date = day.getDate();
-	return date;
-
-},
-computeId: function(date){
-	var theId=date.dayStamp().toString() +"_dateMini";
-	//console.log(theId);
+computeId: function(item){
+	var theId=item.dayStamp();//   .toString() +"_dateMini";
+	
 	return theId;
 },
 
 setDaysSelected: function(newVal, oldVal)
 {
-	console.log(newVal, oldVal, newVal, oldVal);
+
 
 
 },
-hideArrowBack: function(displayedMonthIndex)
+hideArrowBack: function(displayedIndex)
 		{
-			console.log(this.displayedMonthIndex);
+		//	console.log(this.displayedIndex);
 		},
-computeNotInMonths: function(date){
-	var retVal=(this.displayedMonth[15].getFullMonth()==date.getFullMonth());
+computeNotInMonths: function(item){
+	var retVal=(item.getFullMonth()==this.displayed[8].date.getFullMonth());
 	return retVal;
 },
-computeTemporaryEventArrays: function(fcCourse, displayedMonth)
-{
-},
-    
+computeViewMonth: function(displayedIndex){
+ var monArr =[];	
+ monArr=["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
+	return monArr[displayedIndex];
+
+	},
+
+
 computePrettyDay: function(day)
  	{
   		var result = day.toDateString();

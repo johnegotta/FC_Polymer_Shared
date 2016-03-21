@@ -7,9 +7,9 @@
 	line-height: 1.0;
 	margin-top: 12px;
 	background: white;
-
+	position:relative;
 	height: 420px;
-	right: 0px;
+	width: 330px;
 }
 paper-item {background: white;
     --paper-item-focused: {
@@ -25,9 +25,9 @@ paper-item {background: white;
 	background: #aedefe;
 /* 	margin-left: 290px; */
 /* 	border: gold ridge 22px; */
-	box-shadow: 4px 11px 21px 7px #9fafaf;
+/*	box-shadow: 4px 11px 21px 7px #9fafaf;
+}*/
 }
-
 .holder{
 	width: 320px;
 	height: 360px;
@@ -91,20 +91,26 @@ paper-item{
 }
 </style>
 <template is="dom-repeat" items="{{inputOptions}}" as="option">
+
 	<div class="vertical layout" style="margin-top: 3px; float: right;">
 		<section class="holder layout vertical" style="float: right;">
 			<section class="header-class layout horizontal">
 				<paper-icon-button on-tap="_backOneInput" icon="icons:arrow-back" style="color: white; left: 5px;padding-bottom: 8px; float: left;"></paper-icon-button>
-					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;">[[option.header]]</span>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;">[[option]]</span>
 					<paper-icon-button on-tap="_forwardOneInput" icon="icons:arrow-forward" style="color: white; float: right;" class="headerRight"></paper-icon-button> 
 			</section>
 			<paper-listbox class="layout vertical slides">
-				<template is="dom-repeat" items="{{option.selectItems}}" as="val">
+
+[[label]]
+
+				<template is="dom-repeat" items="{{option.selectItems}}" as="item">
+
+
 						<paper-item on-tap="soSelected" class="layout horizontal courseData" group="courseData" draggable=true>
 							<paper-item-body  class="layout vertical one" value$="{{val}}" two-line>
-								<div class="primary">{{val}}</div>
-								<div class="secondary">[[option.label]]</div>
-							</paper-item-body>   	
+								<div class="primary">{{item}}[[val]][[option]]</div>
+								<div class="secondary">[[option.label2]][[val.label2]]</div>
+							</paper-item-body>   	[[item.label]][[item.val]][[item.event]]
 							<paper-icon-button icon="star" on-tap="soUnSelected" value$="{{val}}" alt="favourite this!">
 							</paper-icon-button>
 			  			</paper-item>
@@ -120,24 +126,15 @@ paper-item{
 Polymer({
 	is:"fc-event-element",
 	properties:{
-		event: {
+		eventData:{
 			type: Object,
-			value: {
-				courseType: "",
-				testDate: "",
-				courseLength: "", 
-				practiceTestDay: "", 
-				presetCoursePattern: "",
-				endTime:"",
-				startTime:"", 
-				coach: ""
-			},
+			value: {},
 			notify: true, 
 			reflectToAttribute: true
 		},
 		inputIndex: {
 			type: Number,
-			value: 0,
+			value: 2,
 			notify: true
 		},	
 		fcCourse: {
@@ -153,7 +150,6 @@ Polymer({
 			type: Array,
 			value:[],
 			notify: true
-
 		},
 		valueOptions: {
 			type: Array, 
@@ -161,7 +157,7 @@ Polymer({
 			},
 		inputOptions: {
 			type: Array, 
-			computed:"selectInputs(inputs, inputIndex)",
+		 	computed:"selectInputs(inputs, inputIndex)",
 			notify: true,
 			reflectToAttribute: true
 		},
@@ -175,20 +171,48 @@ Polymer({
 			value: false,
 			notify: true
 		},
+
+		event: {
+			type: FcCourse,
+			value:function(){return new FcCourse();},
+			notify: true, 
+			reflectToAttribute: true
+		},
+
+		calendarDayArray:{
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttribute: true
+		},
+		summer:{
+			type: Boolean,
+			value: false,
+			notify: true
+
+		},
 	
 	},
 
 	ready()
+	{
+
+		var lincoln =new FcCourse();
+	
+		this.set("valueOptions", lincoln);
+
+		
+	
+		// this.set("inputOptions", lincoln);
+
+	},
+
+	attached()
 	{		
-		var testA= this.setTestDates();
-		console.log(testA);
-		this.set("testDates",testA);
-		var time = this.timeSlotsN();
-		this.set("timeSlotsArr", time);
-		var eventData = this.computeValueOptions(testA);
-		this.set("valueOptions", eventData);
-		var inputs = this.someComputedPropertiesFunction(testA, eventData);
-		this.set("inputs", inputs);
+		
+		// var inputO=this.someComputedPropertiesFunction(this.valueOptions);
+		// this.set("inputs", inputO);
+		// this.push("inputOptions", inputO);
 	},
 	_backOneInput()
 	{
@@ -199,57 +223,9 @@ Polymer({
 	{	
 		this.set("saveChoiceLocal", true);
 		this.set("inputIndex", this.inputIndex+1);
-		
-
-	},
-	timeSlotsN(){
-		var slotsArr = [];
-		var timeArr = [];
-        for(var i=36; i<=84;i++)
-        {
-              var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
-              if(hour<10){hour='0'+hour.toString();}
-              var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
-              var ampm=(i<48)?"AM":"PM";
-              var tobj = {"hour": hour,
-                          "minutes": minutes,
-                          "ampm": ampm, 
-                        };
-              var string=hour.toString() + ":" + minutes+ ampm;
-              timeArr.push(string);
-          }
- 			var obj1={"label": "Appointment Times"};
- 			var obj2={"label2": "Time Slots"};
- 			slotsArr.push(obj1);
- 			slotsArr.push(obj2);
- 			slotsArr.push(timeArr);
-          return(slotsArr);
-         },
-
-
-	setTestDates()
-	{
-					var d=new Date();
-					d.setDate(d.getDate(d + 6));
-					var allTestDates=[];
-					var tDay=[];
-					allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
-					var counter = allTestDates.length;
-					var i = 0;
-					for (i = 0; i < counter; i++)
-						{
-							var testDay = new Date(allTestDates[i]);
-							var testDayPretty = new Date(allTestDates[i]).toDateString();
 	
-							if(d<testDay)
-							{						
-							tDay.push(testDay);	
-							}	
-						}
-					var testArray=[];
-					testArray.push(tDay);
-					return testArray;
-				},
+	},
+
 
 	selectInputs(inputs, inputIndex)
 	{		
@@ -269,225 +245,57 @@ Polymer({
 	soSelected(e){
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.val;
-		console.log(e.model__data__, e);
 		var propertyString="event."+propertyName;
 		this.set(propertyString, val);
-		// this.event[propertyName]= val;
-		this.set("fcCourse", null);
+		this.fcCourse = new FcCourse(this.event);
 		this.set("fcCourse", this.event);
 		this.set("saveChoiceLocal",true);
+		if(propertyName=="presetCourseLength")
+		{   
+			var td = this.event.testDate;
+			var d=new Date(td);
+			//console.log(d, val);
+			this.fcCourse.setTestDate(d, val);
+		}
+		if(propertyName == "practiceTestDay")
+		{
+
+
 		this.set("inputIndex", this.inputIndex+1);
-	},
+	}
+},
 
 	computeValueOptions(testDates){
-					var tdObj = {};
-				tdObj=	{"label": "2016-2019 SAT Schedule"}; 
-				var tdObj2 = {};
-				tdObj2 = {"label2": "Test Date"};
-					testDates.unshift(tdObj2);
-					testDates.unshift(tdObj);
-				return[
-					[
-					 {"label": "Would you like to make a custom or standard course schedule?"},
-					{"label2":"Schedule Type"},
-					["Standard Schedule", "Custom Schedule"]
-					],
-					[
-
-
-					 {"label": "Standard Course Schedule"},
-					{"label2":"Course Type"},
-						["Focused 1600SAT Course",
-						 "Focused Study Group"
-						 ] 
-					],
-					 testDates,
-					  [
-					  {"label": "Will the Course be 3, 4, 5, 6 or 7 weeks long?"},
-					 {"label2": "Preset Course Length"},
-					 ["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days",]
-					 ],
-					 [
-					 {label: "Which Practice Test Day Suits Your Course?"},
-					 {"label2": "Practice Test Day"},
-					 ["Saturday Practice Tests","Sunday Practice Tests"]
-					 ],
-					 [
-					 {"label": "Which Course Paterns match your event?"},
-					 {"label2": "Preset Course Pattern"},
-					 ["Mon|Wed_6:00PM_9:00PM","Tues|Thurs_6:00PM_9:00PM","Mon|Wed|Fri_3:45PM_5:45PM", "M|W|F_Summer_9:00AM_12:30PM","Tues|Thurs_3:45PM_6:00PM", "M|W_Summer_9:00AM_12:30PM","T|Th_Summer_9:00AM_12:30PM","M|W_Summer_1:00PM_4:30PM","T|Th_Summer_1:00PM_4:30PM"
-					 ]
-					 ],
-					 [
-					{"label":"Confirm Start Time" },
-					{"label2": "Start Time" },
-					["9:00AM", "1:00PM", "3:45PM","6:00PM" ]
-					],
-					[{"label":"Confirm End Time" },
-					{"label2":"End Time" },
-					["12:30PM", "4:30PM", "5:45PM", "6:00PM", "9:00PM"]
-					],
-					[		
-				 	{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"],
-					],
-					[
-					 {"label": "Custom Course Design"},
-					 {"label2": "Custom Course Type"},
-					 ["Mini-Goup", "Private", "Elite Course"]
-					 ],
-					  // testDates,
-					 [
-					 {"label": "Weeks You Will Prepare Prior Your Test Date"},
-					 {"label2": "Course Length"},
-					 ["1 Week, 7 Days", "2 Weeks, 14 Days", "3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days", "14 Weeks, 98 Days", "15 Weeks, 105 Days", "16 Weeks, 112 Days"]
-					 ],
-					
-					[ {"label": "How Many Days Will you Select?"},
-					 {label2: "Course Meeting Days"},
-					 ["", "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-					],
-					
-					this.timeSlotsArr, 
-					[
-					{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"],
-					],
-					// [
-					// {"label":"START TIME" },
-					// {"label2": "Start Time" },
-					// ["9:00AM", "1:00PM", "3:45PM","6:00PM" ]
-					// ],
-					// [{"label":"END TIME:" },
-					// {"label2":"End Time" },
-					// ["12:30PM", "4:30PM", "5:45PM", "6:00PM", "9:00PM"]
-					// ],
-					// [{"label": "On the following Days holidays or staff schedules conflicted with your new events schedule: "},
-					// {"holidayConflicts": Date()},
-					// {"holidayConflicts": Date()},
-					// {/*have it build them '' on all above*/}
-					// ],
-
-
-					// [ "Private With John",
-						 // "Private With Stacy",
-						 // "Private With George",
-						 // "Private With Scott",
-						 // "Private With Jason",
-						 // "Private With Mustaffa",
-						 // "Private With Radika",
-						 // "Focused Young Scholars Reading",
-						 // "Focused Young Scholars Math", 
-						 // "Focused PSAT NMSQ", 
-						 // "Focused PSAT 9 10", 
-						 // "Focused PSAT 8 9" 
-					//   {"label": "If no pattern matches your needs, do any days recur in your event?"},
-					//   {"label2": "Do Days Repeat"},
-					//   ["True","False"]
-					// ],
 				
-					// ,
-					// [{"label":"Input The Location of your Meetings!" },
-					// {"label2":"Event Location" },
-					//  ["text-field","704 Ginesi Dr. Morganville New Jersey, 07754","Virginia","other specify Client home etc"]//get from address field?
-					// ],
-				 // 	[		
-				 // 	{"label": "Primary Course Coach"},
-					// {"label2": "Coach"},
-					// ["John Gotta",
-					// "Stacy Collerette",
-					// "George Rimakis",
-					// "Scott McKinley",
-					// "Jason Frazzano",
-					// "Mustaffa Raza",
-					// "Radika Patel"],
-					// ],
-					// [
-					// {"coachFcid":"GottaJohn00001"},
-					// {"coachFcid":"ColleretteStacy00001"},
-					// {"coachFcid":"RimakisGeorge00001"},//derive this
-					// {"coachFcid":"McKinleyScott00001"},
-					// {"coachFcid":"FrazzanoJason00001"},
-					// {"coachFcid":"RazaMustaffa00001"},
-					// {"coachFcid":"PatelRadika00001"},	
-					// ],
-					// [
-					// {"label": "Focused Courses often Have More than One Coach"},
-					// {"label2": "Associated Coaches"},
-					// ["John Gotta","Stacy Collerette","George Rimakis","Scott McKinley","Jason Frazzano","Mustaffa Raza","Radika Patel"
-					//  ]
-					//  ],
-					// [{"hoursTotal": ""}],//derived
-					// [{"date":""}],
-					// [{"dateArray":[]}],
-					// [{"fcid":""}],
-					// [{"fanOutDayStampId":""}],
-	  		// 		[{"dataBaseKey":""}],
-	  		// 		[{"occupancy":""}],
-	  		 		[
-	  		 		{"label": "Course Enrollment Limit"},
-					{"label2": "Course Size"},
-	  				["Mini-Group: 8",
-	  				"Mini-Group: 12",
-	  				"Mini-Group: 16",
-	  				"1600SAT Course: 18",
-	  				"1600SAT Course: 22",
-	  				"1600SAT Course: 25"]
-	  				]
-	  				// [
-
-
-
-
-
-	  				// ],
-	  		// 		[{"participantFcidArray":[]}],
-	  		// 		[{"participantProfiles":[{}]}],
-	  		// 		[{"price":"$2800.00"}],
-	  		// 		[{"paymentDates":""}],
-	  		// 		[{"paymentRecurrenceDates":""}],
-	  		// 		[{"courseInstances": []}], 
-					// [{"spanWeeks":""}],
-	  		// 		[{"lengthOfMeeting":""}],
-	  		// 		[{"associatedEvents": {}}],
-	  			];
 		},
+	
 
-	someComputedPropertiesFunction(testDates, valueOptions)
-	{		
+	someComputedPropertiesFunction(valueOptions)
+	{	
+		
 		var length=valueOptions.length;
 		 var derray=[];
 		for(i=0;i<length;i++)
 	 {	
 			var valarr = [];
 			valarr=valueOptions[i];
-			var counter = valarr.length;
-			console.log(length, valarr, counter);
+			
+		
 			var eventInput={
 				"name":"",
 				"inputType": "",
 				"header":"",
-				"label":"",
+				"labelA":"",
+				"labelB":"",
 				"isRepeaterSelect":true,
-				"selectItems":[]
+				"selectItems":[],
+				"style":"",
+				"class": "",
+				"asside":{	"noteOne:": "",
+							"noteTwo:": ""}
 			};
-
-				var name = valarr[1].label2;
-				
+				if(valarr && valarr.label2){
+				var name = valarr.label2;
 				name =name.charAt(0).toLowerCase() + name.slice(1);
 				console.log(name);
 				name=name.replace(/\s/g,'');
@@ -497,53 +305,10 @@ Polymer({
 			eventInput.header=valarr[0].label;
 			eventInput.label=valarr[1].label2;
 			eventInput.selectItems=valarr[2];
-			derray.push(eventInput);
 		}
-
-
-
-
-			// // for(j=0; j<counter; j++)
-			// // {
-			// 	var keys = Object.keys(valarr);
-			// 	var len = keys.length;
-			// 	if(len ===0)
-			// 	{
-			// 		eventInput.selectItems.push(valueOptions);
-			// 		eventInput.isRepeaterSelect=true;
-			// 		eventInput.inputType="select";
-			// 		eventInput.name="satTestsDates";
-			// 	}
-			// 	var isRepeat =false; 
-			// 	for(var k=0; k<len; k++)
-			// 	{ 
-			// 		var key = keys[k];
-			// 		if(key=="label")
-			// 		{
-			// 			eventInput.header=valarr[j].label;
-			// 		}
-					// else if(key=="label2")
-					// {
-					// 	eventInput.label=valarr[j].label2;
-					// }
-					// else if(j>0 && j<(counter-1) && (key== Object.keys(valarr[j+1])[0]))
-					// {
-					// 	eventInput.selectItems.push(valarr[j][key]);
-					// 	if (isRepeat==false )
-					// 	{
-					// 		isRepeat==true;
-					// 		eventInput.name=key;
-					// 		eventInput.isRepeaterSelect=true;
-					// 		eventInput.inputType="select";
-					// 	}
-					// }
-					// else if(j==(counter-1) && (key== Object.keys(valarr[j-1])[0]))
-					// {
-					// 	eventInput.selectItems.push(valarr[j][key]);
-					// }
-				// }
-			// }
-		// 	}derray.push(eventInput);
+			derray.push(eventInput);
+			
+		}
 		
 		 return derray;
 	},	

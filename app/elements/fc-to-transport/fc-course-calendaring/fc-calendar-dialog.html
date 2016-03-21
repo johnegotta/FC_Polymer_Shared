@@ -1,11 +1,11 @@
 <dom-module id="fc-calendar-dialog">
 <template>
 <style>
-:host{background: white;
+:host{
+background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;
-
-		display: flex;}
+display: fixed;}
 .selected{}
 </style>		
 <fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 360px;">
@@ -16,21 +16,25 @@ opacity: 1;
 		<paper-icon-button on-tap="_forward" icon="icons:arrow-forward" style="color: white; margin-bottom: 11px; position:absolute; right: 15px; top: 2px;" class="headerRight"></paper-icon-button>
 
  			<div class="horizontal flex layout center-justified">
+ 			<array-selector id="arrselector" items="{{FcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
 			<neon-animated-pages class="vertical flex-1 layout" id="pages" style="width: 320px; height:360px;" selected="0"> 
-				<fc-date-picker-proto fc-course="{{fcCourseObject}}" displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseSelectable}}" id="myCalendarCard">
+				<fc-date-picker-proto event-array="{{fcEvent}}" fc-course="{{fcEvent}}" displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" id="myCalendarCard">
 				<span class="headers">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
 				</fc-date-picker-proto>
-				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{{fcEvent}}" fc-courses="{{fcCourseSelectable}}">
+				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{FcCourseObject}}" fc-event="{{fcEvent}}" fc-courses="{{FcCourseSelectable}}">
 				</fc-tabbed-calendar-card>
 			</neon-animated-pages>
-			<fc-base-event-inputs class="horizontal flex-2 layout" fc-course="{{fcCourseObject}}" fc-event="{{fcEvent}}">
+			<fc-base-event-inputs class="horizontal flex-2 layout" fc-course="{{FcCourseObject}}" fc-cource="[[fc-course]]"fc-event="{{fcEvent}}">
 			</fc-base-event-inputs>
 			<div class="horizontal flex-1 layout" style="margin-left: 24px;">
-			<fc-event-element fc-course="{{fcEvent}}" class="calendarItem">
+			<fc-event-element fc-course="{{fcEvent}}" fc-course="{{FcCourseObject}}" fc-cource="[[fc-course]]"fc-event="{{fcEvent}}" class="calendarItem">
  			</fc-event-element>
  			</div>
+ 			
+ 			
 		<content select=".calendarItem"></content>
 		</div>
+		
 	 </fc-ddr-card>
 	
 </template>
@@ -43,6 +47,7 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
 	properties:{
 		FcCourseObject:{
 			type: FcCourse,
+			value: function(){var event = {}; event = new FcCourse(); return event;},
 			notify: true
 		},
 		displayedMonth:{
@@ -69,13 +74,13 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
 
 	fcEventObserver:function(newVal, oldVal)
 	{
-			console.log(newVal, oldVal);
+			//console.log(newVal, oldVal);
 
 	},
 
 	_dateSelected: function(event) {
       var targetOne = event.target;
-      console.log(event, event, event, "rubarb");
+      //console.log(event, event, event, "rubarb");
       while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
         targetOne = targetOne.parentNode;
        
@@ -83,6 +88,7 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
        if(targetOne.nodeName=="FC-DATE-MINI")
         {
         	this.set("event", targetOne.date);
+        	//console.log(this.event);
         
       
       // configure the page animation
@@ -95,14 +101,6 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
             this.$.pages.selected = 1;
            }
     },
-
-        //console.log(e.detail.item);
-    // this.$.viewProfile.setStudent(e.detail.item.fcid); 
-     //console.log(e.detail.item.fcid);
-    // console.log(this.studentSelectable, "here is selected");
-  
-  
-
     _forward: function(){
     	this.$.myCalendarCard._forwardOneMonth();
     },
@@ -122,18 +120,17 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
 
      _computeCalendarHeading: function(displayedMonth)
   {
-  		if(displayedMonth[15])
+  		if(this.displayedMonth[9]!=[])
   		{
 
-  		return this.displayedMonth[15].getFullMonth();
 
   		}
   },
   computeYear: function(displayedMonth)
 {	
-	if(displayedMonth[15])
+	if(this.displayedMonth[15])
 	{
-	return displayedMonth[15].getFullYear();
+	return displayedMonth[15].date.getFullYear();
 	}
 },
 });

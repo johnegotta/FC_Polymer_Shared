@@ -1,0 +1,392 @@
+<dom-module id="fc-event-element">
+<template>
+<style>
+:host{
+	font-family: merriweather;
+	font-size: 14px;
+	line-height: 1.0;
+	margin-top: 12px;
+	background: white;
+
+	height: 420px;
+	right: 0px;
+}
+paper-item {background: white;
+    --paper-item-focused: {
+      background: var(--paper-amber-100);
+      font-weight: bold;
+    };
+    
+  }
+#demo{
+	display: block;
+/* 	width: 1080px;
+	height: 900px; */
+	background: #aedefe;
+/* 	margin-left: 290px; */
+/* 	border: gold ridge 22px; */
+	box-shadow: 4px 11px 21px 7px #9fafaf;
+}
+
+.holder{
+	width: 320px;
+	height: 360px;
+	background: #aedefe;
+	margin-left: 2px;
+	border: gold ridge 1px;
+	box-shadow: 4px 11px 21px 7px #9fafaf;
+		display: block;
+	oveflow: hidden;
+	float: right;
+}
+.innerholder{
+	overflow-y: scroll;
+}
+.header-class{
+font-size: 18px;
+color: white;
+	background: #03A9F4;
+font-weight: 600;
+text-align: center;
+	padding: 12px 12px 20px 12px;
+height: 44px;
+}
+paper-item{
+	border: 1px solid #adadad;
+ --paper-item-focused: {
+      background: var(--paper-amber-500);
+      font-weight: bold;
+    };
+}
+.selected{background: var(--paper-amber-500);
+      font-weight: bold;}
+.primary{
+	color: #008;
+	font-weight:600;
+	font-size: 15.5px;
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 11px;
+}	
+.slides{overflow: hidden; overflow-y: scroll;}
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+	white-space: nowrap;
+	display: inline-block;
+}
+.two{
+	font-family: merriweather; 
+	display: inline-block;
+	width: 95px !important;
+	overflow: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+	font-size: 14px;
+}
+</style>
+<template is="dom-repeat" items="{{inputOptions}}" as="option">
+	<div class="vertical layout" style="margin-top: 3px; float: right;">
+		<section class="holder layout vertical" style="float: right;">
+			<section class="header-class layout horizontal">
+				<paper-icon-button on-tap="_backOneInput" icon="icons:arrow-back" style="color: white; left: 5px;padding-bottom: 8px; float: left;"></paper-icon-button>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;">[[option.header]]</span>
+					<paper-icon-button on-tap="_forwardOneInput" icon="icons:arrow-forward" style="color: white; float: right;" class="headerRight"></paper-icon-button> 
+			</section>
+			<paper-listbox class="layout vertical slides">
+				<template is="dom-repeat" items="{{option.selectItems}}" as="val">
+						<paper-item on-tap="soSelected" class="layout horizontal courseData" group="courseData" draggable=true>
+							<paper-item-body  class="layout vertical one" value$="{{val}}" two-line>
+								<div class="primary">{{val}}</div>
+								<div class="secondary">[[option.label]]</div>
+							</paper-item-body>   	
+							<paper-icon-button icon="star" on-tap="soUnSelected" value$="{{val}}" alt="favourite this!">
+							</paper-icon-button>
+			  			</paper-item>
+					</template>
+				</paper-listbox>	
+			</section>
+
+	</div>
+</template>
+</template>
+<script>
+"use-strict";
+Polymer({
+	is:"fc-event-element",
+	properties:{
+		eventData:{
+			type: Object,
+			value: {},
+			notify: true, 
+			reflectToAttribute: true
+		},
+		inputIndex: {
+			type: Number,
+			value: 0,
+			notify: true
+		},	
+		fcCourse: {
+			type: FcCourse,
+			value:function(){return new FcCourse();},
+			notify: true,
+		},
+		testDates: {
+			type: Array,
+			notify: true
+		},
+		timeSlotsArr:{
+			type: Array,
+			value:[],
+			notify: true
+		},
+		valueOptions: {
+			type: Array, 
+			notify: true
+			},
+		inputOptions: {
+			type: Array, 
+			computed:"selectInputs(inputs, inputIndex)",
+			notify: true,
+			reflectToAttribute: true
+		},
+		inputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		saveChoiceLocal:{
+			type: Boolean, 
+			value: false,
+			notify: true
+		},
+
+		event: {
+			type: FcCourse,
+			value:function(){return new FcCourse();},
+			notify: true, 
+			reflectToAttribute: true
+		},
+		courseEvent: {
+			type: FcCourseEvent,
+
+
+
+
+		},
+	
+		fcCourse: {
+			type: FcCourse,
+			value:function(){return new FcCourse();},
+			notify: true,
+		},
+		testDates: {
+			type: Array,
+			notify: true
+		},
+		timeSlotsArr:{
+			type: Array,
+			value:[],
+			notify: true
+
+		},
+		valueOptions: {
+			type: Array, 
+			value: [],
+			notify: true
+			},
+		inputOptions: {
+			type: Array, 
+			computed:"selectInputs(inputs, inputIndex)",
+			notify: true,
+			reflectToAttribute: true
+		},
+		calendarDayArray:{
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttribute: true
+		},
+		saveChoiceLocal:{
+			type: Boolean, 
+			value: false,
+			notify: true
+		},
+		summer:{
+			type: Boolean,
+			value: false,
+			notify: true
+
+		},
+	
+	},
+
+	ready()
+	{	
+
+		// var testA= this.setTestDates();
+		// console.log(testA);
+		// this.set("testDates",testA);
+		// var time = this.timeSlotsN();
+		// this.set("timeSlotsArr", time);
+		// var eventData = this.computeValueOptions(testA);
+		// this.set("valueOptions", eventData);
+		// var inputs = this.someComputedPropertiesFunction(testA, eventData);
+		// this.set("inputs", inputs);
+		// FocusedEvent.getLocation(); //necessary start point
+
+		// FocusedEvent.getCourseTypes();  //these would all be in input object property: INTRO
+		// FocusedEvent.getCourseSubTypes();
+		// FocusedEvent.getTestDates();
+		// FocusedEvent.getCourseLength();//boom moved calendar
+
+		// FocusedEvent.getFcCalendarDays(); //want to bold the S here because we are collecting or setting up to copy/compare/array method a set of days to update all appropriate users// /
+		// //**************************************************
+		// //**ARRAY METHODS HERE ARE SPEED VITAL!!!!!********//
+		// FocusedEvent.getPracticeTestDays();// based on current enrollment calculation // 
+		// //basically at 80 two weeks prior open sundays//open sundays always for october and summer
+
+		// FocusedEvent.getSummerCourseTimeSets();// object for summer crosses time path based on above choices// 
+		// FocusedEvent.getSummerCourseSchedules();// switching paths should be usual and easy with simpl string parse
+		// FocusedEvent.getSummerCourseDaySets();//WE JUST MUST REMAIN CONSISTENT
+		
+		// FocusedEvent.getCourseTimeSets();  //object for "summer path not crossed"
+		// FocusedEvent.getCourseSchedules();
+		// FocusedEvent.getCourseDaySets();
+
+		// FocusedEvent.computeNumberOfCourseMeetings();
+		// FocusedEvent.computeHoursPerCourseMeeting();//have a little programs for these
+		// FocusedEvent.computeTotalCourseMeetingHours();
+
+		// FocusedEvent.computeNumberOfPracticeTests();
+		// FocusedEvent.computeHoursPerPracticeTest();// have program for this
+		// FocusedEvent.computeTotalHoursPracticeTests();
+
+		// FocusedEvent.getCoach();
+		// FocusedEvent.getAssociatedCoach();
+		// FocusedEvent.getEnrollment();
+		// FocusedEvent.setRecomendedCostOfCourse();//have program for this/ relatively accurate..like real close because it was how i set prices
+		// FocusedEvent.setUpdateEnrollment();
+		// // 
+		// FocusedCourseEvent.setNewFocusedCourseEvents()
+	},
+
+	attached()
+	{		
+		
+		this.push("valueOptions", this.testDates);
+		var inputs=this.someComputedPropertiesFunction(this.valueOptions);
+		this.set("inputs", inputs);
+		this.set("inputOptions", this.optionValues);
+	},
+	_backOneInput()
+	{
+		this.set("saveChoiceLocal", true);
+		this.set("inputIndex", this.inputIndex-1);
+	},
+	_forwardOneInput()
+	{	
+		this.set("saveChoiceLocal", true);
+		this.set("inputIndex", this.inputIndex+1);
+	
+	},
+
+
+	selectInputs(inputs, inputIndex)
+	{		
+		var retVal = [];
+		if(this.inputIndex===0)	
+			{
+					retVal.push(inputs[0]);
+			}
+			else if(this.saveChoiceLocal===true)
+			{	
+				retVal.push(inputs[this.inputIndex]);
+				this.set("saveChoiceLocal", false);
+			}
+			return retVal;
+	},
+
+	soSelected(e){
+		var propertyName = e.model.__data__.option.name;
+		var val = e.model.__data__.val;
+		var propertyString="event."+propertyName;
+		this.set(propertyString, val);
+		this.fcCourse = new FcCourse(this.event);
+		this.set("fcCourse", this.event);
+		this.set("saveChoiceLocal",true);
+		if(propertyName=="presetCourseLength")
+		{   
+			var td = this.event.testDate;
+			var d=new Date(td);
+			//console.log(d, val);
+			this.fcCourse.setTestDate(d, val);
+		}
+		if(propertyName == "practiceTestDay")
+		{
+		this.set("inputIndex", this.inputIndex+1);
+	}
+},
+
+	computeValueOptions(testDates){		
+		},
+	someComputedPropertiesFunction(valueOptions)
+	{	
+		
+		var length=valueOptions.length;
+		 var derray=[];
+		for(i=0;i<length;i++)
+	 {	
+			var valarr = [];
+			valarr=valueOptions[i];
+				console.log(valarr);
+		
+			var eventInput={
+				"name":"",
+				"inputType": "",
+				"label":"",
+				"label2":"",
+				"label1":"",
+				"isRepeaterSelect":true,
+				"selectItems":[],
+				"style":"",
+				"class":"",
+				"asside":{	"noteOne:": "",
+							"noteTwo:": "",
+							"noteThree": ""
+						}
+				};
+			
+				var name = valarr.label2;
+				name =name.charAt(0).toLowerCase() + name.slice(1);
+				console.log(name);
+				name=name.replace(/\s/g,'');
+				console.log(name);
+			eventInput.name=name;
+			eventInput.inputType="select";
+			eventInput.header=valarr[0].label;
+			eventInput.label=valarr[1].label2;
+			eventInput.selectItems=valarr[2];
+			derray.push(eventInput);
+			
+		}
+		
+		 return derray;
+	},	
+	
+	
+	_displayIsClosed(isClosed){
+		var retVal;
+		if(isClosed=="CLOSED"){retVal="color: green; font-weight: 700; margin: 1px"; this.set("alert", "green");}
+		else if(isClosed=="OPEN"){retVal="color: red; font-weight: 700; margin: 1px"; this.set("alert", "red");}
+		return retVal;
+	}
+	
+});
+</script>
+</dom-module>
