@@ -6,6 +6,16 @@ background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;
 display: absolute;}
+.primary{
+	color: #008;
+	font-weight:600;
+	font-size: 15.5px;
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 13px;
+}	
 .header-class{min-height: 35px !important;}
 .selected{}
 </style>		
@@ -33,10 +43,10 @@ display: absolute;}
  			
 		<content select=".calendarItem"></content>
 		</div>
-<div class="horizontal layout center-justified"  style="width: 100%; margin: 20px; overflow-x: scroll;">
+<div class="horizontal layout center-justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
 <div class="horizontal layout" style="max-width: 22000px; min-width: 2400px; height: 420px; border: silver 2px solid;">
 <template is="dom-repeat" items="{{days}}" as="day">
-	<div class="vertical layout"  style="border: silver 2px solid; width:260px!important;">
+	<div class="vertical layout" draggable=true id="swipable" on-track="swipeNslide" style="border: silver 2px solid; width:260px!important;">
 		<section class="holder layout vertical"style="width:260px!important; height: 480px; ">
 			<section class="header-class layout vertical" style="height: 65px!important;color: white; font-size:18px; background: green; padding-top: 15px; text-align: center; font-family: merriweather;">
 					[[_computeDate(day.calendarDay.date)]]
@@ -48,7 +58,7 @@ display: absolute;}
 						<paper-item on-tap="soSelected" style="border: 1px #aeaeae solid" class="layout horizontal courseData" draggable=true>
 						
 							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
-								<div class="primary">[[slot.activity]]</div>
+								<div class="primary">[[computeSlots(slot)]]</div>
 								<div class="secondary">[[slot.time]]</div>
 							</paper-item-body>   	
 							<paper-icon-button icon="star" on-tap="" value$="{{val}}" alt="favourite this!">
@@ -118,6 +128,13 @@ FcCalendarDialog= Polymer({
 		 });
 	},
 
+	computeSlots: function(slot){
+		console.log(slot);
+		return slot.activity;
+
+
+	},
+
 attached: function()
 	{		
 		this.set("firstTime", false);
@@ -126,17 +143,46 @@ attached: function()
 		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
 		this.set("outputs", outputs);
 	},
+swipeNslide: function(e)
+{ var target=e.target;
+ e.preventDefault();
+          
+          switch(e.detail.state) {
+                case 'start':
+               
+                	target.style.left=e.detail.x;
+                	
+              		target.changeX=0;
+                 break;
+                case 'track':
+                  
+                  target.style.left=e.detail.dx + self.changeX;
+                   this.translate3d(target.changeX.toString() + 'px', 0, 0);
+                  
+                
+                  break;
+                case 'end':
+                this.translate3d(0,0,0);
+                 target.style.left=(e.detail.x).toString()+'px';
+                  Polymer.dom.flush();
+                  break;
+              }
+ 
+
+},
+
 fcCourseObjectObserver: function(newVal, oldVal)
 {
 console.log(newVal, oldVal);
 
 },
 _computeDate: function(date){
+	if(date){
 var result = date.toDateString();
   		// result = result.slice(0,10);
   		
   		return result;
-
+}
 },
 computeCourseDays:function(course)
 	{
