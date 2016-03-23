@@ -10,12 +10,12 @@ display: absolute;}
 </style>		
 <fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 360px;">
 	
-
+<section class="horizontal flex layout center-justified">
 	<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" style="margin-bottom: 11px; position: absolute; left: 15px;" class="headerLeft"></paper-icon-button>
 
 		<paper-icon-button on-tap="_forward" icon="icons:arrow-forward" style="color: white; margin-bottom: 11px; position:absolute; right: 15px; top: 2px;" class="headerRight"></paper-icon-button>
-
- 			<div class="horizontal flex layout center-justified">
+</section>
+ <div class="horizontal flex layout center-justified">
  			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
 			<neon-animated-pages class="vertical flex-1 layout" id="pages" style="width: 320px; height:360px;" selected="0"> 
 				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" id="myCalendarCard">
@@ -34,6 +34,34 @@ display: absolute;}
  			
 		<content select=".calendarItem"></content>
 		</div>
+<div class="horizontal flex layout center-justified" style="width: 100%; height: 480px; overflow-y: scroll; border: silver 2px solid;">
+<template is="dom-repeat" items="{{days}}">
+	<div class="vertical layout"  style="border: blue 3px solid; width:309px;">
+		<section class="holder layout vertical">
+			<section class="header-class layout horizontal"  style="border: green 2px solid;">
+				<paper-icon-button on-tap="_backOneInput" icon="icons:arrow-back" style="color: white; left: 5px;padding-bottom: 6px; float: left;"></paper-icon-button>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:14px; margin-top: 4px; text-align: center; font-family: merriweather;">[[day.date]]</span>
+					<span> [[day.username]]</span>
+					<paper-icon-button on-tap="_forwardOneInput" icon="icons:arrow-forward" style="color: white; float: right;" class="headerRight"></paper-icon-button> 
+			</section>
+			<paper-listbox class="layout vertical slides">
+				<template is="dom-repeat" items="{{slots}}">
+						<paper-item on-tap="soSelected" style="border: 1px #aeaeae solid" class="layout horizontal courseData" draggable=true>
+						
+							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
+								<div class="primary">[[slot.activity]]</div>
+								<div class="secondary">[[slot.time]]</div>
+							</paper-item-body>   	
+							<paper-icon-button icon="star" on-tap="" value$="{{val}}" alt="favourite this!">
+							</paper-icon-button>
+			  			</paper-item>
+				</template>
+				</paper-listbox>	
+			</section>
+		</div>
+</template>
+</div>	
+
 		
 	 </fc-ddr-card>
 	
@@ -63,6 +91,14 @@ FcCalendarDialog= Polymer({
 		outputs: {
 			type: Array,
 			value: [],
+			notify: true
+		},
+		days:{
+			type: Array,
+			notify: true,
+		},
+		slots:{
+			type: Array,
 			notify: true
 		},
 	
