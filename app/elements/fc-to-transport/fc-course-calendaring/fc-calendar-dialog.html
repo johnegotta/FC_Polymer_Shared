@@ -5,7 +5,7 @@
 background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;
-display: fixed;}
+display: absolute;}
 .selected{}
 </style>		
 <fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 360px;">
@@ -16,18 +16,18 @@ display: fixed;}
 		<paper-icon-button on-tap="_forward" icon="icons:arrow-forward" style="color: white; margin-bottom: 11px; position:absolute; right: 15px; top: 2px;" class="headerRight"></paper-icon-button>
 
  			<div class="horizontal flex layout center-justified">
- 			<array-selector id="arrselector" items="{{FcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
+ 			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
 			<neon-animated-pages class="vertical flex-1 layout" id="pages" style="width: 320px; height:360px;" selected="0"> 
-				<fc-date-picker-proto event-array="{{fcEvent}}" fc-course="{{fcEvent}}" displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" id="myCalendarCard">
+				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" id="myCalendarCard">
 				<span class="headers">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
 				</fc-date-picker-proto>
-				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{FcCourseObject}}" fc-event="{{fcEvent}}" fc-courses="{{FcCourseSelectable}}">
+				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{fcCourseObject}}" fc-event="{{fcEvent}}" fc-courses="{{FcCourse}}">
 				</fc-tabbed-calendar-card>
 			</neon-animated-pages>
-			<fc-base-event-inputs class="horizontal flex-2 layout" fc-course="{{FcCourseObject}}" fc-cource="[[fc-course]]"fc-event="{{fcEvent}}">
+			<fc-base-event-inputs class="horizontal flex-2 layout" value-options={{valueOptions}} output-options="{{outputs}}" fc-course="{{fcCourseObject}}">
 			</fc-base-event-inputs>
-			<div class="horizontal flex-1 layout" style="margin-left: 24px;">
-			<fc-event-element fc-course="{{fcEvent}}" fc-course="{{FcCourseObject}}" fc-cource="[[fc-course]]"fc-event="{{fcEvent}}" class="calendarItem">
+			<div class="horizontal flex-1 layout">
+			<fc-event-element fc-course="{{fcCourseObject}}" inputs="{{inputs}}"class="calendarItem">
  			</fc-event-element>
  			</div>
  			
@@ -40,58 +40,140 @@ display: fixed;}
 </template>
 <script>
 FcCalendarDialog= Polymer({
-is:"fc-calendar-dialog",
-behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
-		 // "Polymer.PaperDialogBehavior" ],
-		],
+	is:"fc-calendar-dialog",
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime
+		 // "Polymer.PaperDialogBehavior"
+		  ],
+	observers:['computeCourseDays(fcCourseObject*)'],
 	properties:{
-		FcCourseObject:{
+		fcCourseObject:{
 			type: FcCourse,
-			value: function(){var event = {}; event = new FcCourse(); return event;},
+			observer: "fcCourseObjectObserver",
 			notify: true
 		},
 		displayedMonth:{
 			type:Array,
 			notify: true
 		},
-		fcCourseSelectable:{
-
-
-		},
-		fcEvent:{
-			type: Object,
-			value: {
-			
+		valueOptions: {
+			type: Array, 
+			value: [],
+			notify: true
 			},
-			observer: "fcEventObserver",
-			notify: true 
+		outputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+	
+		inputs: {
+			type: Array,
+			value: [],
+			notify: true
 		}
-
-
-
-
+	},
+	ready: function()
+	{	
+		this.set("fcCourseObject", new FcCourse());
+		var self=this;
+		var valueArray=FcCourse.getMoreInputs().concat(FcCourse.getAllInputsAtOnce());
+		valueArray.forEach(function(item, index, array){
+			 self.push("valueOptions",item);
+		 });
 	},
 
-	fcEventObserver:function(newVal, oldVal)
+attached: function()
+	{		
+		this.set("firstTime", false);
+		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
+		this.set("inputs", inputO);	
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
+		this.set("outputs", outputs);
+	},
+fcCourseObjectObserver: function(newVal, oldVal)
+{
+console.log(newVal, oldVal);
+
+},
+computeCourseDays:function(course)
 	{
-			//console.log(newVal, oldVal);
-
+		//course.
 	},
 
-	_dateSelected: function(event) {
+_computeOutput: function(valueOptions, fcCourseObject)
+	{
+		var length=valueOptions.length;
+	 	 var outputArray=[];
+	 	for(i=0;i<length;i++)
+	  {
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	 		var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		var propertyName ="fcCourseObject."+name;
+	 		var eventOutput={
+	 			"name":name,
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"value": this.fcCourseObject[name] || ""
+	 		};
+	 		outputArray.push(eventOutput);
+	 	}
+	 	return outputArray;
+	},
+
+
+inputValueAndLabelSerialization: function(valueOptions)
+	 {	
+		var length=valueOptions.length;
+	 	 var derray=[];
+	 	for(i=0;i<length;i++)
+	  {	
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	
+	 		var eventInput={
+	 			"name":"",
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"labelB":"",
+	 			"isRepeaterSelect":true,
+	 			"selectItems":valarr[2],
+	 			"style":"",
+	 			"class": "",
+	 			"aside":{	"noteOne:": "",
+	 						"noteTwo:": ""}
+			};
+	 			var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		eventInput.name=name;
+	 		derray.push(eventInput);
+
+	 	}
+	 	 return derray;
+	 },	
+	
+	
+	
+
+
+_dateSelected: function(event) {
       var targetOne = event.target;
-      //console.log(event, event, event, "rubarb");
       while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
         targetOne = targetOne.parentNode;
        
       }
        if(targetOne.nodeName=="FC-DATE-MINI")
         {
-        	this.set("event", targetOne.date);
-        	//console.log(this.event);
+        	this.set("event", targetOne.calendarDay);
+        	
         
       
-      // configure the page animation
+    
       this.sharedElements = {
         'hero': this
       };
@@ -110,29 +192,21 @@ behaviors:["FCBehaviors.FcCalendarBehaviorPrime",
 
     _setPreviousCaller: function(e, detail)
     {
-        //console.log(e.detail);
-      //  this.set("studentSelectable", e.detail);
+      
     },
 
     _onClose: function() {
       this.$.pages.selected = 0;
     },
 
-     _computeCalendarHeading: function(displayedMonth)
-  {
-  		if(this.displayedMonth[9]!=[])
-  		{
-
-
-  		}
-  },
   computeYear: function(displayedMonth)
 {	
 	if(this.displayedMonth[15])
 	{
 	return displayedMonth[15].date.getFullYear();
 	}
-},
-});
+} 
+}
+);
   </script>
   </dom-module>

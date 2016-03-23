@@ -2,54 +2,25 @@
 <template>
 <style>
  :host {
-        max-width: 900px; max-height: 2200px;
-        @apply(--layout-vertical);
+        max-width: 1300px; max-height: 2200px;
+        @apply(--layout-horizontal);
         height: 480px;
         width: 360px;
         background: yellow;
         position: relative;
+        z-index:3300;
       }
       paper-tab{font-size: 12px;}
       .main {
-        width: 680px;
+        width: 1300px;
+        height: 560px;
         border: 1px solid green;
         background: white;
         @apply(--layout-flex);
         @apply(--layout-scroll);
         @apply(--shadow-elevation-5dp);
       }
-fc-input-prime{
-  max-width: 130px;
-  max-height: 42px;
-}
-.grid-box{
-  min-width: 340px;
-  min-height: 480px;
-  padding: 3px;
-  margin: 3px;
-  display: block;
-  color: black;
-  background: white;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
 
-.grid-image{
-    float: left;
-    padding: 3px;
-    height: 72px;
-    color: black;
-    width: 73px;
-    background: aliceblue;
-    display: block;
-
-}
-.grid-holder{
-  width: calc(95%-85px);
-  max-height: calc(98vh-64px);
-  overflow: scroll;
-  border: 2px solid red;
-}
 
 .selectedp{ 
 min-width: 660px;/*will change*/
@@ -104,25 +75,7 @@ border: 2px solid blue;
             </paper-tabs>
             <hr>
             <div class="vertical layout wrap" style="height: 78px;"> 
-                  <div class="grid-image">
-                        <img src="{{item.photo}}" height="68px" width="68px">
-                  </div>
-                  <div class="vertical layout wrap left justified" style="min-width: 240px; height: 108px; overflow-y: scroll; max-width: 720px;">      
-                        <section class="horizontal layout flex wrap" style="font-size: 12px; overflow-x: scroll;">
-                             <fc-input-prime input-type="tiny" style="width: 140px;"label="Student Name" class="tiny" value="{{FcStudent.profile.studentFullName}}"></fc-input-prime>
-                             <fc-input-prime input-type="tiny" label="Email" class="tiny" value="{{FcStudent.profile.studentEmail}}"></fc-input-prime>
-                             <fc-input-prime input-type="tiny" label="Phone" class="tiny" value="{{FcStudent.profile.studentTelephone}}"></fc-input-prime>
-                             <fc-input-prime input-type="tiny" label="[[FcStudent.profile.parent1FirstName]] [[FcStudent.profile.parent1LastName]]" class="tiny" value="{{FcStudent.profile.parent1Telephone}}, &nbsp; {{FcStudent.profile.parent1Email}}"></fc-input-prime>
-                                  
-                        </section>
-                        <section>
-                              Current Total: R/G 100    M: R/G 780 ^ 220 R: r/g 640 ^ 110
-                        </section>
-                  </div>
-            </div>
-            <hr>
-            <iron-pages id="pageHanger" class="horizontal row wrap layout" style="height: 100vh; padding:3px; overflow-y: scroll;" selected="{{selected}}">
-                  <div class="selectedp">
+                <div class="selectedp">
                      <template is="dom-repeat" items="{{daysEvents}}" as="yourEvents">
                          <event-list-two events="{{yourEvents}}">
                          </event-list-two> 
@@ -130,17 +83,26 @@ border: 2px solid blue;
                   </div>
                   <div class="selectedp" id="inquiries">
                       <hr>
+           
+            <hr>
             <iron-pages id="pageHanger" class="horizontal row wrap layout" style="height: 100vh; padding:3px; overflow-y: scroll;" selected="{{selected}}">
+                 
                   <div class="selectedp">
-                        <section style="line-height: 2.2; background: #c6dafc;" class="horizontal layout flex nowrap around-justified">
-                              <span style="font-weight: 700; color: #06a9f4;">PROFILE FOR: 
-                                    <u><span style="font-weight: 700; color: #008;">[[FcStudent.profile.studentFullName]]</span></u>
-                              </span>
-                              <span style="font-weight: 600; color: #008;">[[FcStudent.pastacademics.currentGrade]], [[FcStudent.pastacademics.currentSchool]]
-                              </span>
-                        </section>
-                        <fc-grid-table data-source$="{{FcStudent.profile}}"></fc-grid-table>
-                  </div>
+                   
+      <paper-listbox class="layout vertical slides">
+        <template is="dom-repeat" items="{{option.selectItems}}" as="value">
+            <paper-item on-tap="soSelected" class="layout horizontal courseData" group="courseData" draggable=true>
+              <paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
+                <div class="primary">[[value]]</div>
+                <div class="secondary">[[option.labelA]]</div>
+              </paper-item-body>    
+              <paper-icon-button icon="star" on-tap="soUnSelected" value$="{{val}}" alt="favourite this!">
+              </paper-icon-button>
+              </paper-item>
+          </template>
+        </paper-listbox>  
+      </section>
+        </div>
                   <div class="selectedp" id="inquiries">
                         Inquiries<br>
                         <template is="dom-repeat" items="{{_computeInquiryArray(FcStudent.inquiries)}}" as="inq">

@@ -21,16 +21,16 @@ function courseFcidGenerator(testDate, coachFcid, location, meetingDays, practic
 	}
 	startTime=startTime.replace(":", "");
 	endTime=endTime.replace(":","");
-	console.log(endTime);
+	//console.log(endTime);
 	var fcid= dayStamp(testDate)+"_"+coachFcid+location+startTime+weekdays+endTime+"_"+len.toString()+practiceTestDay;
-	console.log(fcid);
+	//console.log(fcid);
 	return fcid;
 }
 function duration(timeOne, timeTwo){
 	var startHrs = stringTime(timeOne);
 	var endHrs = stringTime(timeTwo);
 	var tot=endHrs-startHrs;
-	console.log(tot);
+	//console.log(tot);
 	return tot;	
 }
 
@@ -43,17 +43,17 @@ function costGenerator(numberOfHours)
 function stringTime(time)
 {
 	var start = parseInt(time);
-	console.log(start);
+	//console.log(start);
 	var len = time.length;
 	var ampm = (start!==12 && time.charAt(len-2)=="P")?12: 0;
 	ampm=parseInt(ampm);
 	var hoursStart = ampm+start;
-	console.log(hoursStart, ampm, start);
+	//console.log(hoursStart, ampm, start);
 	var minStart =(parseInt(time.charAt(len-4))*10)+parseInt(time.charAt(len-3));
 	var minHundreds =minStart/60;
-	console.log(minStart, minHundreds);
+	//console.log(minStart, minHundreds);
 	var tot=hoursStart +minHundreds;
-	console.log(tot);
+	//console.log(tot);
 	return tot;
 }
 
@@ -245,15 +245,23 @@ class FcCourse
 
 	constructor()
 	{
-		this.testDate = "";
+		this.scheduleType="",
+		this.customCourseType="",
 		this.courseType = "";
+		this.testDate = "";
+		this.startTime="";
+		this.endTime= "";
+		this.programLength="";
+		if(this.startTime!==""){
+		this.startAndEndTimes= this.startTime + " to " + this.endTime;}
+		this.courseMeetingDays="";
+		this.courseDaySets="";
+		this.summerMeetingDays="";
 		this.presetCourseLength= ""; 
 		this.practiceTestDay= "";
 		this.presetCoursePattern="";
 		this.numberOfMeetings="";
 		this.numberOfPracticeTests="";
-		this.startTime="";
-		this.endTime= "";
 		this.courseLocation=""; 
 		this.coach="";
 		this.associatedCoaches="";
@@ -265,11 +273,31 @@ class FcCourse
 		this.fcid = "";
 		this.currentEnrollment="";
 		this.price="";
+		this.summer=false;
 		this.courseLength="";
 		this.courseMeetingLength="";
 		this.hoursTotal=""; //FcCourse.getNewFcid();
+		this.courseCalendarDaysArray=[];
 	}
 
+	
+
+
+	static getCourseTypes()
+	{
+		return [{"label": "Would you like to make a custom or standard course schedule?"},
+				{"label2":"Schedule Type"},
+				["Standard Schedule", "Custom Schedule"]
+			];
+	}
+
+	static getCourseSubTypes()
+		{
+		return [ 	{"label": "Standard Course Schedule"},
+	  				{"label2":"Course Type"},
+					["Focused 1600SAT Course","Focused Study Group"] 
+				];
+		}
 	static getTestDates()
 	{	var tResult =[];
 		var result = [];
@@ -292,38 +320,23 @@ class FcCourse
 		return tResult;	
 	}
 
+	
 
-	static getCourseTypes()
+	static getPresetCourseLength()
 	{
-		return [{"label": "Would you like to make a custom or standard course schedule?"},
-				{"label2":"Schedule Type"},
-				["Standard Schedule", "Custom Schedule"]
-			];
+		return 	[{"label": "Select a Program Length between 3 & 13 weeks"},
+				{"label2": "Program Length"},
+				["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days"]
+			    ];	   
 	}
-
-	static getCourseSubTypes()
-		{
-		return [ 	{"label": "Standard Course Schedule"},
-	  				{"label2":"Course Type"},
-					["Focused 1600SAT Course","Focused Study Group"] 
-				];
-		}
 
 	static getCourseTimes()
 	{
 		return [
 				{"label":"Course Times"},
-				{"label2":"Start and End Times"},
+				{"label2":"Start And End Times"},
 				["3:45PM-5:45PM", "6:00PM-9:00PM", "9:00AM-12:30PM", "1:00PM-4:30PM", "5:00PM-8:30PM", "4:00PM-7:30PM"]
 				];
-	}
-
-	static getPresetCourseLengths()
-	{
-		return 	[{"label": "Select a Course Length between 3 & 8 weeks."},
-				{"label2": "Preset Course Length"},
-				["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days"]
-			    ];	   
 	}
 
 	static getPracticeTestDays()
@@ -390,8 +403,14 @@ static getSummerCourseSchedules()
 
 }
 
+static getMoreInputs()
+{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(),FcCourse.getCourseTimes(),FcCourse.getCourseEnrollment(),
+FcCourse.getCourseMeetingDays(),FcCourse.getCourseDaySets(), 
+FcCourse.getSummerCourseSchedules(),FcCourse.getCourseTimes()];
+}
 static getAllInputsAtOnce()
-{		return[		[
+{			return[	
+					[
 					 {"label": "Would you like to make a custom or standard course schedule?"},
 					{"label2":"Schedule Type"},
 					["Standard Schedule", "Custom Schedule"]
@@ -444,7 +463,7 @@ static getAllInputsAtOnce()
 					 {"label2": "Custom Course Type"},
 					 ["Mini-Goup", "Private", "Elite Course"]
 					 ],
-					  // testDates,
+				
 					 [
 					 {"label": "Weeks You Will Prepare Prior Your Test Date"},
 					 {"label2": "Course Length"},
@@ -454,52 +473,12 @@ static getAllInputsAtOnce()
 					[ {"label": "How Many Days Will you Select?"},
 					 {label2: "Course Meeting Days"},
 					 ["", "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-					],
-					
-				
-					[{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"]
 					]
 				];
 	}
-
-
-// static getCourseTimes(){this.getTimes();}
-
-static getTimes()
-	{	var slotsArr = [];
-		var timeArr = [];
-        for(var i=24; i<=84;i++)
-        {
-              var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
-              if(hour<10){hour='0'+hour.toString();}
-              var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
-              var ampm=(i<48)?"AM":"PM";
-              var tobj = {"hour": hour,
-                          "minutes": minutes,
-                          "ampm": ampm, 
-                        };
-              var string=hour.toString() + ":" + minutes+ ampm;
-              timeArr.push(string);
-          }
- 	var obj1={"label": "Scheduled Appointment Times"};
- 	var obj2={"label2": "Time Slots"};
- 	slotsArr.push(obj1);
- 	slotsArr.push(obj2);
- 	slotsArr.push(timeArr);
-          return(slotsArr);
-    }
-
 	
 
-	static getFirebaseLocation()
+getFirebaseLocation()
 	{
 		// return ("https://focused0ne.firebaseio.com/courses");
 	}
@@ -745,12 +724,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			},
 			notify: true
 		}, 
-		displayedIndex:{
-			type: Number,
-			value:function(){var d =new Date(); d.getMonth(); return d;},
-			notify:true,
-			reflectToAttribute: true
-		},
 		
 		month: {
 			type: String,
@@ -762,13 +735,12 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			value:"months",
 			notify: true
 		}, 
-		calendarDay: {
-			type: Object,
-			computed: "computeCalendarDay(displayedMonth, theDate)",
+	
+		calendarDaysArray: {
+			type: Array,
+			value: [],
 			notify: true
-
-
-		},
+		}
 
 	},
 
@@ -795,11 +767,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				endDate= new Date(startDateHolder);
 			}//date crossing condition
 
-		console.log(startDate);
+		//console.log(startDate);
 			while(startDate.getDay() !== 0)//filling beginning week of calendar
 			{
 				startDate = startDate.addDays(-1);
-				console.log(startDate);
+				//console.log(startDate);
 			
 			}
 			while(endDate.getDay() !== 6)
@@ -810,7 +782,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		var finishedFirstMonth=false;
 		var testArray =[];
 		testArray = FcCourse.getTestDates();
-		console.log(testArray);
+		//console.log(testArray);
 		this.set('dateArr', getDates(startDate, endDate));
 		var numDays = this.dateArr.length;
 		var currentMonth = 0; 
@@ -818,6 +790,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		{   var calendarDay={};
 			currDate=this.dateArr[i];
 			calendarDay.date=currDate; 
+			calendarDay.index=i;
+			calendarDay.background="maroon";
+			calendarDay.toggleDay=false;
+			calendarDay.isSelected=false;
+			calendarDay.inMonth=true;
 			calendarDay.eventList=this.getTimes();
 			calendarDay.dateId=currDate.dayStamp();
 			calendarDay.showDate=currDate.toDateString();
@@ -829,6 +806,8 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			else{
 				calendarDay.testDate=false;
 			}
+
+			this.push("calendarDaysArray", calendarDay);
 			if(i==0)
 			{	
 				this.push("monthsArray", []);
@@ -869,10 +848,10 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		var today = new Date();
 		var todMonth = today.getMonth();
 		var todYear = today.getFullYear();
-		console.log(this.monthsArray[0][8]);
+		//console.log(this.monthsArray[0][8]);
 		
 			if (todYear==this.monthsArray[0][15].date.getFullYear())
-				{console.log(this.monthsArray);
+				{//console.log(this.monthsArray);
 					var counter =this.monthsArray.length-1;
 				for(i=0;i<counter; i++)
 					{
@@ -884,7 +863,8 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				}
 			}
 		
-			else {alert(todYear);console.log("jkhjhjhh, ghghg hg ,jhuyu iuyt iugh uighu m")};
+			else {alert(todYear);}
+			//console.log("jkhjhjhh, ghghg hg ,jhuyu iuyt iugh uighu m")};
 		var lastMonthIndex=this.monthsArray.length-1;
 		this.set("lastMonthIndex", lastMonthIndex);
 	},//end of function
@@ -900,9 +880,12 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			var lastMonth = this.monthsArray[i-1];
 			var numDaysPrevMonth = this.monthsArray[i-1].length;
 			var fillerDay = numDaysPrevMonth - 1;
+
 			while (month[0].date.getDay() != 0 && this.units=="months")
-			{
-			 	month.unshift(this.monthsArray[i-1][fillerDay--]);
+			{	
+				var fill = this.monthsArray[i-1][fillerDay--];
+				var filler = this.calendarDayConstructor(fill.date)
+			 	month.unshift(filler);
 			 }
 			 
 		}
@@ -920,6 +903,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				d=new Date(d).addDays(+1);
 				
 				lastDay = this.calendarDayConstructor(d);
+				lastDay.inMonth=false;
 				month.push(lastDay);
 			
 			}
@@ -937,7 +921,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			"eventList":this.getTimes(),
 			"dateId":currDate.dayStamp(),
 			showDate:currDate.toDateString(),
-			"dayOfMonth":currDate.getDate()
+			"dayOfMonth":currDate.getDate(),
+			"inMonth": false,
+			"isSelected":false,
+			"toggleDay": false
+
 		};
 		return calendarDay;
 	},
@@ -963,7 +951,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 
 	_forwardOneMonth:function()
 	{
-		//console.log( "index", this.displayedMonthIndex, "year", this.year, "month0", this.displayedMonth[0], "length again", this.displayedMonth.length)
+	
 		if(this.displayedMonthIndex==this.monthsArray.length-1)
 		{
 			this.set("displayedMonth",this.monthsArray[0]);
@@ -974,7 +962,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			this.set("displayedMonth", this.monthsArray[diMore]);
 			this.displayedMonthIndex=diMore;	
 		}
-		console.log(this.displayedMonth);
+	
 		var length=this.displayedMonth.length-2;
 		var month = this.displayedMonth[7].date.getFullMonth();
 		var year = this.displayedMonth[7].date.getFullYear();
@@ -986,7 +974,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 	{
 		var mon=(displayedMonth==undefined || displayedMonth==[])? month:displayedMonth[displayedMonthIndex].toString().substring(4,7);
 		var returnVal =(mon=="Feb")?"February": (mon=="Mar")?"March":(mon=="Apr")?"April": (mon=="May")?"May":(mon=="Jun")?"June":(mon=="Jul")?"July":(mon=="Aug")?"August":(mon=="Sep")?"September":(mon=="Oct")?"October": (mon=="Nov")?"November":(mon=="Dec")?"December":"January";  
-		//console.log(returnVal);
+		
 		return returnVal;
 	},
 

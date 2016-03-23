@@ -54,14 +54,17 @@ width: 30px;
 					items="{{displayed}}" 
 					as="day">
 						<fc-date-mini
+							on-tap="_dateClick"
 						 	class="card" 
-						 	in-month="[[computeNotInMonths(day.date)]]"  
-						 	toggle-days="{{toggleDays}}" 
-						 	in-selected-array="[[_computeInSelectedArray(selectedArrayName, selectedArray)]]" 
-						 	style$="margin: 0px auto; [[computeNotInMonths(day.date)]];" calendar-day={{day}} id$={{day.dateId}} testDate={{day.testDate}} events="[[day.eventList]]">
+						 	in-month="[[computeNotInMonths(day.date, displayedIndex)]]"  
+						 	toggle-days="{{toggleDays}}"
+						 	day="{{day}}" 
+						 	selected-array="{{selectedArray}}"
+						 	style$="margin: 0px auto;" calendar-day={{day}} id$={{day.dateId}} testDate={{day.testDate}} events="[[day.eventList]]">
 							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
-							<a class="date" on-tap="_dateClick">[[day.dayOfMonth]]</a>
+							<a class="date" >[[day.dayOfMonth]]</a>
 							<span class="[[compute(day)]]"></span>
+				
 							
 						</fc-date-mini>	
 				</template>
@@ -82,35 +85,32 @@ FcDatePickerProto=Polymer({
 				Polymer.NeonAnimatableBehavior
 				],
 	listeners: {"catchTheCourse": "changesTheDays"},
+	observers:['courseObserver(fcCourse.*)'],
 	properties: {
+		day:{
+			type: Object, 
+			value: {},
+			notify: true
+		},
+		fcCourse:{
+			type: FcCourse,
+			notify: true
+		},
+
 		toggleDay:{
 			type: Boolean,
 			value: false,
 			notify: true
 		},
-		monthsArray: {
+		selectedArray:{
 			type: Array,
-			notify: true
-		},
-		
-		fcCourse:{
-			type: FcCourse,
-			value: function(){var course = new FcCourse(); return course;},
-			observer: "fcCourseObserver",
-			notify: true
-		},
-		monthIndex: {
-			type: Number,
-			value: function(){
-				var d = new Date();
-				d=d.getMonth();
-				console.log(d);
-				return d;
-			},
-			notify: true
-			}
+			value: [],
+			observer:"watchingSelectedArray",
+			notify: true,
+			reflectToAttribute: true
 
 		},
+		
 		days:{
 			type: Array,
 			value: function()
@@ -120,23 +120,6 @@ FcDatePickerProto=Polymer({
 			notify: true
 		},
 		
-		daySelected:{
-			type: Object,
-			observer: "setDaysSelected",
-			notify: true,
-			reflectToAttribute: true
-		},  
-		numWeeks:{
-			type: Number,
-			value: 6,
-			notify: true
-
-		},
-		calandarDay:{
-			type: Object,
-			notify: true,
-			reflectToAttribute: true
-		},
 		calendarDayArray: {
 			type: Array,
 			value:[],
@@ -163,8 +146,13 @@ FcDatePickerProto=Polymer({
 		},
 		displayed:{
 			type: Array,
-			computed: "computeDisplayed(displayedIndex)",
 			notify: true
+		},
+		displayedCalendarMonth:{
+			type: String,
+			computed: "computeViewMonth(displayedIndex)",
+			notify: true
+
 		},
 		units: {
 			type: String,
@@ -183,13 +171,14 @@ FcDatePickerProto=Polymer({
 			value: false,
 			notify: true
 		},
+		testHolder: {
+			type: Object,
+			value: {},
+			notify: true,
+		},
 		backHidden:{
 			type: Boolean,
 			computed: false,
-			notify: true
-		},
-		day:{
-			type: Date,
 			notify: true
 		},
 		viewMonth:{
@@ -215,11 +204,10 @@ FcDatePickerProto=Polymer({
             }]
           };
         }
-   
+   		}
       },
    ready: function(){
    		var startYear =new Date().getFullYear();
-   		console.log(startYear);
    		var endYear =startYear + 3;
 		var date=new Date(startYear, 0, 1);
 		var dateEnd =new Date(endYear, 11, 31);
@@ -230,7 +218,10 @@ FcDatePickerProto=Polymer({
 		this.calendarCreator(date, dateEnd, "months");
 		
 		},
-		compute: function(day){if(day.testDate){return "pretty";}},
+watchingSelectedArray: function(newVal, oldVal){console.log(newVal, oldVal)},
+compute: function(day){if(day.testDate){return "pretty";}},
+
+
 attached: function()
 {
 	
@@ -248,9 +239,8 @@ initialize:function(){
 		 	var array = this.monthsArray[i];
 		 	this.monthsArray.length;
 			self.push("calendarMonthsArray",array);
-			//console.log(this.calendarMonthsArray[i]);
 		 	array.forEach(function(item, index, arr){
-		   		self.push("calendarDayArray", {'monthIndex': i, "calendarDay": item,"date": item.date, "dayIndex":index});
+		   		self.push("calendarDayArray", {"calendarDay": item,"date": item.date, "dayIndex":index});
 		 	});
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
@@ -259,12 +249,12 @@ computeInClass: function(day, fcCourse)
 {
 if(day.testDate==true && this.fcCourse.testDate==day.date)
 	{return "test";}
- //console.log("in datepicker", day, day.testDate, day.date, day.prettyDate);
+ 
 
 },
 computeDisplayed: function (displayedIndex)
 {
-	return calendarMonthsArray[displayedIndex];
+	return this.calendarMonthsArray[displayedIndex];
 },
 computeInEventArray: function(fcCourse, item)
 {	if (this.fcCourse)
@@ -279,124 +269,104 @@ computeInEventArray: function(fcCourse, item)
 },
 
 
-_computeForwardHidden: function(lastMonthIndex, displayedIndex)
-{		
-	var retVal=false;
-	if(displayedIndex===lastMonthIndex)
-	{
-		retVal=true;
-	}
-	return retVal;
-},
 
-fcCourseObserver: function(newval, oldval)
-{ if(newval.testDate){
-	var d= new Date(newval.testDate);
-	var p= new Date(newval.testDate);
-	var e= new Date(newval.testDate);
-	p=new Date(newval.testDate);
-	p = p.getFullYear;
-	diff=(p-this.today.getFullYear);
-	if(diff>0){
-		var currentYear = year.now+1;
-
-	d = d.getMonth();
-	console.log(d);
-	this.set("displayedIndex",d);
-	var pickle=[];
-	pickle=this.calendarMonthsArray[d];
-	this.set("displayed",pickle);
-	}
-	if(newval.testDate)
-	{  var testDate= new Date(newval.testDate);
-		var tester= new Date(newval.testDate);
-
-		console.log(testDate, tester);
-		var array={};
-		var year =testDate.getFullYear();
-		console.log(year);
-		var yearNow = this.today.getFullYear();
-		var diff=(year-yearNow);
-		var mvpcl = newval.presetCourseLength;
-		var arr=[]; var one =[]; var two=[]; var three =[]; var four=[];
-		if(newval.presetCourseLength){
-			if(newval.presetCourseLength<8)
-			{var weeks=(parseInt(newval.presetCourseLength)+2); var days=weeks*7}
-			var month= testDate.getMonth() +diff*12;
+courseObserver: function(newval)
+{ 	
 	
-			arr=this.calendarMonthsArray[month].filter(function(item, index, array)
-				{if(index<=13 && item.testDate===true)return item;});
-				var count = arr.length;
-			two = this.calendarMonthsArray[month-2];
-			one = this.calendarMonthsArray[month-1]; 
-			two.push(one);
-			two.unshift(arr);
-			console.log(two);
-				for(var i=0;i<count;i++)
-				{
-					if(two[i].idDate!==two[i+1].idDate){four.push(two[i]);}
-					console.log()
-				}
-				
-				console.log()
-
-			var i=this.displayedIndex;
-			this.set("displayedIndex", month);
-			for(i;i<=month;i++)
-			{
-			this.set("displayed", this.calendarMonthsArray[i]);
-
-			this.fire("sendArray", {"detail":{}});
-			}
+	if(newval.path=="fcCourse.testDate")
+	{
+		var d= new Date(newval.value);
+		var p = d.getFullYear();
+		diff=(p-this.today.getFullYear());
+		var m = d.getMonth();
+		if(diff>0)
+		{
+			m+=12*diff;
 		}
+	
+		this.set("displayedIndex", m);
+		var testMonth=[];
+		var theTest=this.calendarDayArray.filter(function(currentValue, index, array){
+			if (currentValue.date===d){ currentValue.calendarDay.courseTestDate=true; currentValue.calendarDay.background==="gold"; return currentValue;}
 
-	}		
-	}		
-	// 		console.log(this.displayed);
-	// 		var self=this;
-	// 		var i=0;
-	// 		if(this.displayed)
-	// 			{ 
-	// 				var helper=this.displayed[i].date;
-	// 				var len=this.displayed.length;
-	// 				for(i=0;i<len;i++)
-	// 				{	var nug=null;
-	// 					if(helper===tester)
-	// 					{
-	// 					while(nug==null)
-	// 						{
-	// 							nug=helper.eventList.forEach(function(item, index, array)
-	// 							{
-	// 							if(index<3)
-	// 								{array.push(item);}
-	// 							else if(index>2 && index<32)
-	// 								{array.push({"time":item, "event": "Real SAT Exam", "name": "Student Name?"});}
-	// 							else 
-	// 								{array.push(item);}
-	// 							})
-	// 							console.log(array);
-	// 						}
-	// 					}
-	// 				console.log(array);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// console.log(array);
-	// }
-},
-_computebackHidden: function(displayedIndex)
-	{	if (this.displayed[7].date)
- 	{
-		var retVal=false;
-		if(this.displayedIndex===0)
-    	{
-    		retVal=true;
-    	}
-    	else{retVal=false;}
-    	return retVal;
-  	}
-  },
+		});
+		console.log(theTest, theTest, theTest, theTest);
+		this.set("testHolder", theTest);
+		testMonth=this.calendarMonthsArray[m];
+		this.set("displayed", testMonth);
+	}
+	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength")
+	{	this.set("fcCourse.presetCourseLength", newval.value);
+		var weeks = parseInt(newval.value);
+		console.log(weeks);
+		var daysOfProgram=(weeks*7);
+		var endDate= new Date(this.fcCourse.testDate);
+			console.log(endDate);
+		var startDate = endDate.addDays(-1-(daysOfProgram));
+		console.log(startDate, endDate);
+		var self=this;
+		var arrayHolder=[];
+		arrayHolder=this.calendarDayArray.filter(function(currentValue, index, array)
+		{  if(currentValue.calendarDay.inMonth===true && currentValue.calendarDay.date>startDate && currentValue.calendarDay.date<endDate)
+				{   console.log(currentValue);
+					currentValue.inCalendarDayArray=true;
+					currentValue.calendarDay.isSelected = true; 
+					currentValue.calendarDay.toggleDay = true;
+					currentValue.calendarDay.background= "#c6dafc";
+					return currentValue;
+				}
+		}); 
+		this.set("selectedArray",arrayHolder);
+		this.set("fcCourse.courseCalendarDaysArray", arrayHolder);
+		this.set("fcCourse.calendarDayArray", arrayHolder);
+	
+
+	}
+	else if(this.fcCourse.testDate && this.fcCourse.calendarDayArray && newval.path=="fcCourse.practiceTestDay")
+	{	var self = this;
+		var tempPracticeArray=[];
+		tempPracticeArray= this.fcCourse.calendarDayArray.filter(function(currentValue, index, array){
+			var day = newval.value.charAt(1);
+			var testVal;
+			if(day=="u"){testVal=0;}
+			else if(day=="a"){testVal=6;}
+			if(currentValue.calendarDay.date.getDay()==testVal){
+				currentValue.calendarDay.background="red";
+				return currentValue;}
+		});
+		console.log(tempPracticeArray);
+		this.set("fcCourse.practiceTestArray", tempPracticeArray);
+		this.set("fcCourse.numberOfPracticeTests", tempPracticeArray.length);
+	}
+	else if(this.fcCourse.testDate && this.fcCourse.calendarDayArray && this.fcCourse.practiceTestArray && newval.path=="fcCourse.courseDaySets")
+	{ 	console.log("am in the else");
+		var self = this;
+		var tempDayArray=[];
+		tempDayArray= this.fcCourse.calendarDayArray.filter(function(currentValue, index, array)
+		{ 	
+			var weekday = newval.value.charAt(3);
+			var test;
+			console.log(weekday);
+			if(weekday=="d" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3)){self.set("fcCourse.courseMeetingDays", "Monday & Wednesday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours"); self.set("fcCourse.endTime", "9:00PM");} currentValue.calendarDay.background = "green"; return currentValue;}
+			else if(weekday=="s"&&(currentValue.date.getDay()==2 || currentValue.date.getDay()==4)){self.set("fcCourse.courseMeetingDays", "Tuesday & Thursday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.endTime", "9:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours");} currentValue.calendarDay.background = "green"; return currentValue;}
+			else if(weekday =="|" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3 || currentValue.date.getDay()==5)){ self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "3:45PM"); self.set("fcCourse.endTime", "5:45PM");self.set("fcCourse.courseMeetingLength", "2 Hours");} currentValue.calendarDay.background = "green";return currentValue;}
+			//add a set for other related values here
+		});
+		console.log("array here", tempDayArray);
+		self.set("fcCourse.courseMeetingArray", tempDayArray);
+		var len=tempDayArray.length;
+		var hours = parseInt(this.fcCourse.courseMeetingLength);
+		var hoursTotal=(hours*len);
+		var cost=costGenerator(hoursTotal);
+		this.set("fcCourse.price", cost);
+		this.set("")
+		this.set("fcCourse.hoursTotal", hoursTotal.toString() + " Hrs");
+		self.set("fcCourse.numberOfMeetings",len);
+		console.log(this.courseMeetingArray);
+	}
+	// Polymer.updateStyles();
+},		
+	
 
 _forward: function()
 	{	if(this.displayedIndex ==this.maxIndex-1)
@@ -436,11 +406,10 @@ _forward: function()
 
 _dateClick: function(event) {
       var targetOne = event.target;
-      console.log(event.model.data, event.model.data, event.model.data, "rubarb");
-      while (targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL") {
+      while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") {
         targetOne = targetOne.parentNode;
       }
-      this.set("event", targetOne.data);
+      this.set("event", targetOne.calendarDay);
       // configure the page animation
       this.sharedElements = {
         'hero': this
@@ -462,12 +431,17 @@ setDaysSelected: function(newVal, oldVal)
 
 
 },
-hideArrowBack: function(displayedIndex)
-		{
-		//	console.log(this.displayedIndex);
-		},
-computeNotInMonths: function(item){
-	var retVal=(item.getFullMonth()==this.displayed[8].date.getFullMonth());
+
+computeNotInMonths: function(item, displayedIndex){
+	
+
+	var x=item.getFullMonth();
+	
+	var y=this.displayedCalendarMonth;
+	var retVal = (x===y);
+	
+	var len = this.displayed.length;
+
 	return retVal;
 },
 computeViewMonth: function(displayedIndex){
