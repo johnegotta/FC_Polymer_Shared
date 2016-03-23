@@ -6,19 +6,18 @@ background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;
 display: absolute;}
+.header-class{min-height: 35px !important;}
 .selected{}
 </style>		
-<fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 360px;">
+<fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 500px;">
 	
 <section class="horizontal flex layout center-justified">
-	<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" style="margin-bottom: 11px; position: absolute; left: 15px;" class="headerLeft"></paper-icon-button>
 
-		<paper-icon-button on-tap="_forward" icon="icons:arrow-forward" style="color: white; margin-bottom: 11px; position:absolute; right: 15px; top: 2px;" class="headerRight"></paper-icon-button>
 </section>
  <div class="horizontal flex layout center-justified">
  			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
 			<neon-animated-pages class="vertical flex-1 layout" id="pages" style="width: 320px; height:360px;" selected="0"> 
-				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" id="myCalendarCard">
+				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" selected-array={{days}} id="myCalendarCard">
 				<span class="headers">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
 				</fc-date-picker-proto>
 				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{fcCourseObject}}" fc-event="{{fcEvent}}" fc-courses="{{FcCourse}}">
@@ -34,18 +33,18 @@ display: absolute;}
  			
 		<content select=".calendarItem"></content>
 		</div>
-<div class="horizontal flex layout center-justified" style="width: 100%; height: 480px; overflow-y: scroll; border: silver 2px solid;">
-<template is="dom-repeat" items="{{days}}">
-	<div class="vertical layout"  style="border: blue 3px solid; width:309px;">
-		<section class="holder layout vertical">
-			<section class="header-class layout horizontal"  style="border: green 2px solid;">
-				<paper-icon-button on-tap="_backOneInput" icon="icons:arrow-back" style="color: white; left: 5px;padding-bottom: 6px; float: left;"></paper-icon-button>
-					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:14px; margin-top: 4px; text-align: center; font-family: merriweather;">[[day.date]]</span>
-					<span> [[day.username]]</span>
-					<paper-icon-button on-tap="_forwardOneInput" icon="icons:arrow-forward" style="color: white; float: right;" class="headerRight"></paper-icon-button> 
+<div class="horizontal layout center-justified"  style="width: 100%; margin: 20px; overflow-x: scroll;">
+<div class="horizontal layout" style="max-width: 22000px; min-width: 2400px; height: 420px; border: silver 2px solid;">
+<template is="dom-repeat" items="{{days}}" as="day">
+	<div class="vertical layout"  style="border: silver 2px solid; width:260px!important;">
+		<section class="holder layout vertical"style="width:260px!important; height: 480px; ">
+			<section class="header-class layout vertical" style="height: 65px!important;color: white; font-size:18px; background: green; padding-top: 15px; text-align: center; font-family: merriweather;">
+					[[_computeDate(day.calendarDay.date)]]
+					 [[day.username]]
+					
 			</section>
-			<paper-listbox class="layout vertical slides">
-				<template is="dom-repeat" items="{{slots}}">
+			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
+				<template is="dom-repeat" items="{{day.calendarDay.eventList.2}}" as="slot">
 						<paper-item on-tap="soSelected" style="border: 1px #aeaeae solid" class="layout horizontal courseData" draggable=true>
 						
 							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
@@ -61,6 +60,7 @@ display: absolute;}
 		</div>
 </template>
 </div>	
+</div>
 
 		
 	 </fc-ddr-card>
@@ -129,6 +129,13 @@ attached: function()
 fcCourseObjectObserver: function(newVal, oldVal)
 {
 console.log(newVal, oldVal);
+
+},
+_computeDate: function(date){
+var result = date.toDateString();
+  		// result = result.slice(0,10);
+  		
+  		return result;
 
 },
 computeCourseDays:function(course)
