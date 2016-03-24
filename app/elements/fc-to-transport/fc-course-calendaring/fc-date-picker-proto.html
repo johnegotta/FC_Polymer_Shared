@@ -59,11 +59,12 @@ width: 30px;
 						 	class="card" 
 						 	in-month="[[computeNotInMonths(day.date, displayedIndex)]]"  
 						 	toggle-days="{{toggleDays}}"
-						 	day="{{day}}" 
+						 	day="{{day}}"
+						 	event-list="{{day.eventList.0}}" 
 						 	selected-array="{{selectedArray}}"
 						 	style$="margin: 0px auto;" calendar-day={{day}} id$={{day.dateId}} testDate={{day.testDate}} events="[[day.eventList]]">
 							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
-							<a class="date" >[[day.dayOfMonth]]</a>
+							<a class="date">[[day.dayOfMonth]]</a>
 							<span class="[[compute(day)]]"></span>
 				
 							
@@ -215,13 +216,12 @@ FcDatePickerProto=Polymer({
 		var today = new Date();
 		this.today=today;
 		var index=today.getMonth();
- 		this.set("displayedIndex",index);
+ 		this.set("displayedIndex", index);
 		this.calendarCreator(date, dateEnd, "months");
 		
 		},
-watchingSelectedArray: function(newVal, oldVal){console.log(newVal, oldVal)
-	this.calendarDay
-
+watchingSelectedArray: function(newVal, oldVal){console.log(newVal, oldVal);
+	this.set("eventList", this.eventList)
 
 
 
@@ -311,6 +311,7 @@ courseObserver: function(newval)
 			console.log(endDate);
 		var startDate = endDate.addDays(-1-(daysOfProgram));
 		console.log(startDate, endDate);
+
 		var self=this;
 		var arrayHolder=[];
 		arrayHolder=this.calendarDayArray.filter(function(currentValue, index, array)
@@ -355,18 +356,33 @@ courseObserver: function(newval)
 			var test;
 			console.log(weekday);
 			if(weekday=="d" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3)){self.set("fcCourse.courseMeetingDays", "Monday & Wednesday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours"); self.set("fcCourse.endTime", "9:00PM");} currentValue.calendarDay.background = "green";for(var k =48; k<61;k++){ currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";} return currentValue;}
-			else if(weekday=="s"&&(currentValue.date.getDay()==2 || currentValue.date.getDay()==4)){self.set("fcCourse.courseMeetingDays", "Tuesday & Thursday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.endTime", "9:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours");} currentValue.calendarDay.background = "green";for(var k =48; k<61;k++){ currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";} return currentValue;}
-			else if(weekday =="|" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3 || currentValue.date.getDay()==5)){ self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "3:45PM"); self.set("fcCourse.endTime", "5:45PM");self.set("fcCourse.courseMeetingLength", "2 Hours");} currentValue.calendarDay.background = "green";for(var k =39; k<47;k++){currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";}  console.log(currentValue); return currentValue;}
+			else if(weekday=="s"&&(currentValue.date.getDay()==2 || currentValue.date.getDay()==4)){self.set("fcCourse.courseMeetingDays", "Tuesday & Thursday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.endTime", "9:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours");} currentValue.calendarDay.background = "green";for(var k =47; k<61;k++){ currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";} return currentValue;}
+			else if(weekday =="|" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3 || currentValue.date.getDay()==5)){ self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "3:45PM"); self.set("fcCourse.endTime", "5:45PM");self.set("fcCourse.courseMeetingLength", "2 Hours");} currentValue.calendarDay.background = "green";
+			for(var k =39; k<47;k++)
+			{
+
+
+		var propString=	"fcCourse.calendarDayArray[" + index + "].calendarDay.eventList[0][" + k + "]";
+		self.set(propString, 
+				{"activity": "Focused Elite 1600SAT Course",
+				"coach": "self.fcCourse.coach", 
+				"location": "704 Ginesi Dr. Morganville, New Jersey 07764"}); 
+		currentValue.calendarDay.eventList[0][k].activity= "Focused Elite 1600SAT Course";
+			}; return currentValue;}
+
 			//add a set for other related values here
 		});
+	
 		console.log("array here", tempDayArray);
 		self.set("fcCourse.courseMeetingArray", tempDayArray);
+		self.push("fcCourse.eventList", tempDayArray);
 		var len=tempDayArray.length;
 		var hours = parseInt(this.fcCourse.courseMeetingLength);
 		var hoursTotal=(hours*len);
 		var cost=costGenerator(hoursTotal);
 		this.set("fcCourse.price", cost);
 		this.set("")
+		this.fcCourse.calendarDayArray.eventList
 		this.set("fcCourse.hoursTotal", hoursTotal.toString() + " Hrs");
 		self.set("fcCourse.numberOfMeetings",len);
 		console.log(this.courseMeetingArray);
