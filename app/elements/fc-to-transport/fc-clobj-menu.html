@@ -37,7 +37,7 @@ width: 20px;
 }
 .blue-btn-class:hover, .blue-btn-class:active, .thefocus{
 	 display: inline-block;
- border:6px solid #2435C9;
+ border:4px solid #2435C9;
  color: #FFFFFF;
  border-radius: 180px 180px 180px 180px;
  -webkit-border-radius: 180px 180px 180px 180px;
@@ -60,19 +60,20 @@ width: 20px;
 }
 	</style>
 <section style="width:100%; min-height: 22px; font-size: 18px; color: #008; font-family: merriweather; font-weight: 600;">	{{app.title}}</section>
-<!-- <iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}"> -->
+<iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}">
 	<!-- <section on-tap="selectPrevious"><iron-icon icon="icons:chevron-left"></iron-icon></section> -->
 	<paper-tabs 
 			      		id="assistantMenu" 
 			      		scrollable="true"
-			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-tap="clickHandler"
+			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 180px; font-size: 18px;" on-tap="clickHandler"
 			      		bar="true"
 			      		hide-scroll-buttons="true" 
 			  			> 
 <section  class="horizontal layout around-justified nowrap" style="overflow-x: scroll; padding: 0px 0px;">
   				<template 
   				id="content5"
-					is='dom-repeat' 
+					is='dom-repeat'
+     					observe="type manager.type" 
 						class="horizontal layout flex nowrap justified" 
 						items="{{iconArrayA}}">
 						<section 
@@ -97,7 +98,7 @@ width: 20px;
 	</section>
 	</paper-tabs>
 		<!-- <section></section> on-tap="selectNext"><iron-icon icon="icons:chevron-right"></iron-icon -->
-<!-- 	</iron-selector> -->
+	</iron-selector> 
 
 </template>
 <script>
@@ -232,9 +233,7 @@ FcClobjMenu=Polymer({
        type: String,
        value: 'horizontal'
       },
-      /**
-       * If true, then the container will not allow swiping.
-       */
+      
       disabled: {
         type: Boolean,
         value: false
@@ -247,7 +246,7 @@ FcClobjMenu=Polymer({
        */
       widthRatio: {
        type: Number,
-       value: 3
+       value: 2.5
       },
       /**
        * The ratio of the total animation distance after which the opacity
@@ -282,6 +281,7 @@ FcClobjMenu=Polymer({
 				arr.push(iconArray[i]);
 				}
 			}
+			console.log(iconArray.length);
 			return arr;
 	},
 	computedStyle: function(determine){
@@ -298,8 +298,6 @@ FcClobjMenu=Polymer({
 		      this._transitionProperty = 'opacity, transform';
 		      this._slideComplete = false;
 		      this._direction = "horizontal";
-		      
-    
 		    },
 
 
@@ -309,12 +307,16 @@ FcClobjMenu=Polymer({
         console.log(elem.firstElementChild, elem.firstElementChild.nextSibling);
         var label=elem.attributes.label.value;
         this.set("app.title",label);
-        console.log(this.app.title);
+       console.log(this.app.title);
       var glowing= Polymer.dom(this.root).querySelectorAll(".thefocus");
-       var bss= Polymer.dom(this.root).querySelectorAll(".buttonSections");
+       var bss=[];
+       bss= Polymer.dom(this.root).querySelectorAll(".buttonSections");
       console.log(bss, "this is the nodelist");
-      	var len=glowing.length;
-        console.log(elemCon);
+      	var len=bss.length;
+      	var arr =[];
+      	arr=bss.unshift(bss.pop());
+
+       
       	var lastm = len-1;
         var count = bss.length;
         var lbss=count-1;
@@ -322,15 +324,20 @@ FcClobjMenu=Polymer({
         var firstbss=bss[0]
       	var last=glowing[lastm];
       	var first =glowing[0];
-      	var firstListener = this.addEventListener(firstbss);
+      	//var firstListener = this.addEventListener(firstbss);
       	
-      	var lastlistener = this.addEventListener(lastbss);
+      	//var lastlistener = this.addEventListener(lastbss);
       	
         var distanceR= elemCon.getBoundingClientRect().right;
       	var dist2L = elemCon.getBoundingClientRect().left;
       	var last2r= lastbss.getBoundingClientRect().right;
       	var first2= firstbss.getBoundingClientRect().left;
       	console.log("look here for distances", distanceR,dist2L,last2r,first2);
+      	bss.unshift(bss.pop());
+      	for(i=0;i<arr.length; i++){
+      		var pickle=arr[i].app.label;
+      	console.log(bss, arr, arr[i].app.label, pickle, i, i, i);
+      }
         // for(i=0; i<count; i++){
         // 		bss[i].classList.remove("thefocus");
      //  		if(glowing[i].b){}

@@ -6,6 +6,8 @@
 <section style="padding: 1px 8px 10px 4px; margin: 2px 2px 2px 2px; min-width: 214px;" class$="layout flex justified-around {{orientation}}"><!--padding and margin needed for the digits to remain square-->
 <template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
 	<fc-input-prime
+        clock-name="{{item.clockname}}"
+        hidden$="{{item.hidden}}"
 		input-type="{{item.inputType}}" 
 		label="{{item.label}}" 
 		name$="{{item.name}}"
@@ -30,6 +32,7 @@
         on-change="handleInputChange"
        >
 	</fc-input-prime>
+    
 </template>
 </section>		
 </template>
@@ -61,7 +64,11 @@ FcClobjidPrime=Polymer({
 
     _computeDataset: function(dataobject)
     {
-        //console.log(dataobject);
+     
+        if(dataobject){
+
+           
+        
         var keys = Object.keys(this.dataobject);
         var numKeys = keys.length;
         //this.dataset = [];
@@ -69,11 +76,12 @@ FcClobjidPrime=Polymer({
         for(var i = 0; i < numKeys; i++)
         {
             var val = this.dataobject[keys[i]];
-            //console.log(keys[i], val);
+           
             dataset.push({
                 "value": val.value,
                 "name": val.name, //keys[i], //"tenth",
-                "label": val.label?val.label: val.name[0], //keys[i][0], //"d",
+                "label": val.label?val.label: val.name, //keys[i][0], //"d",
+                "hidden": val.hidden,
                 "inputType": val.inputType, //"digit",
                 "optionOne": "",
                 "optionTwo": "",
@@ -89,8 +97,11 @@ FcClobjidPrime=Polymer({
                 "min": val.inputType == "digit"? 0: 0,
                 "max": val.inputType == "digit"? 9: 99,
                 "step":"",
-                "fcid":""})
-        }
+                "fcid":"", 
+                "colon":""
+                });
+            }
+       }
         return dataset;
     },
 });

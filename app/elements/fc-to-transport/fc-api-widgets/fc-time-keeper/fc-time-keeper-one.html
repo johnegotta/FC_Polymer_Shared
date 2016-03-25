@@ -20,7 +20,6 @@ paper-button{width: 58px!important; padding: 6px 2px; border: 1px ridge #aecdfe;
 -webkit-transition: width 1s, height 1s, display 1s, background-color 1s, -webkit-transform 1s;
     transition: width 1s, height 1s, background-color 1s, transform 1s, display 1s;
 }
-paper-button .pearl{ width: 100% height: 100%;  }
 .query-builder{opacity: 1;width: 12px;height: 12px;border-radius: 180px;padding: 2px;margin: 2px;border: #fff 1px solid;background: #aecdcd;color: white;  position: absolute;right: 3px;top: 3px;
 	}
 .clear{ width: 16px;height: 16px;border-radius: 180px;padding: 2px; margin: 2px;border: #fff 1px solid;background: red;color: white;  position: absolute;right: 0px;top: 0px; opacity: 2;}
@@ -40,26 +39,27 @@ paper-button .pearl{ width: 100% height: 100%;  }
 <div style="padding: 6px; border: 4px #efefef double; text-align: center;" class="layout vertical"  on-track="dragYes">
 	
 		<div style="border: 1px #008 solid; color:#008;" on-track="_focusedDraggable">
-			
-			<div style="padding: 4px; border: 1px #efefef solid; text-align: center;cursor:pointer; overflow-x: hidden; background: white;" class="layout vertical"  on-track="dragYes">
-
 			<iron-icon icon="icons:{{swapIcon}}" class$="{{swapIcon}}" on-tap="toggle">
 			</iron-icon>
+			<div style="padding: 4px; border: 1px #efefef solid; text-align: center;cursor:pointer; overflow-x: hidden; background: white;" class="layout vertical"  on-track="dragYes">
 							
 				<paper-material class="layout vertical" elevation="3">
 					<span draggable drags on-track="_focusedDraggable" class="slight">{{date}}</span>
-					<section id="theClock" on-click="opencollapse" class="timer">{{theTime}} </section>	
+					<section id="theClock" on-dblclick="opencollapse" class="timer">{{theTime}} </section>	
 				</paper-material>
 
 <iron-collapse id="collapser"  class="horizontal layout center-justified glass">
 	<iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}">
-		
+	<section style="margin-left: 25px;" on-tap="selectPrevious">
+			<iron-icon icon="icons:chevron-left">
+			</iron-icon>
+	</section>
 				<paper-tabs 
 			      		id="assistantMenu" 
 			      		scrollable="true"
 			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 180px; font-size: 18px;" on-tap="clickHandler"
 			      		bar="true"
-			      		hide-scroll-buttons="false" 
+			      		hide-scroll-buttons="true" 
 			  			> 
 				<section  class="horizontal layout around-justified nowrap" style="overflow-x: scroll; padding: 0px 0px;">
 					<paper-list-box class="horizontal layout flex nowrap" tyle="overflow: hidden;">
@@ -67,7 +67,7 @@ paper-button .pearl{ width: 100% height: 100%;  }
 							<paper-item  class="layout horizontal courseData clockinterfaces">
 									<paper-item-body  class="layout horizontal flex shrink">
 											<div class="primary">
-													<fc-clobjid-prime id="dsvs_{{clock.thours.value}}{{clock.thours.clockName}}" orientation="horizontal" dataobject="{{clock.0}}">
+													<fc-clobjid-prime id="dsvs_{{clock.thours.value}}{{clock.thours.clockName}}" orientation="horizontal" dataobject="{{currentClock}}">
 													</fc-clobjid-prime>
 											</div>
 									</paper-item-body>
@@ -76,7 +76,7 @@ paper-button .pearl{ width: 100% height: 100%;  }
 					</paper-list-box>
 				</section>
 			</paper-tabs>
-			<!-- <section style="position: absolute; right: 4px;" on-tap="selectNext"><iron-icon icon="icons:chevron-right"></iron-icon></section> -->
+			<section style="padding:25px; margin-right: 20px;" on-tap="selectNext"><iron-icon icon="icons:chevron-right"></iron-icon></section>
 			</iron-selector> 
 		</iron-collapse>
 		</div>
@@ -89,10 +89,8 @@ paper-button .pearl{ width: 100% height: 100%;  }
 						</fc-clobjid-prime>
 					</section>
 							<section class="horizontal layout flex center center-justified">
-					<section class="horizontal layout flex center center-justified" style="height: 24px; width: 100%; font-weight: 600; font-size: 18px; font-family: merriweather; color: #008; background: #fefefe; border: #afafaf 3px double;padding:2px;" on-tap="alterCurrentClock">
-					
+					<section class="horizontal layout flex center center-justified" style="height: 24px; width: 100%; font-weight: 600; font-size: 18px; font-family: merriweather; color: #008; background: #fefefe; border: #afafaf 3px double;padding:2px;"> 
 					[[computeClockType(clockName)]]
-					x&sup2;y
 					</section>
 					</section>
 					<section style="width: 100%; padding: 4px;">
@@ -109,8 +107,8 @@ paper-button .pearl{ width: 100% height: 100%;  }
 					</section>
 					<section class="horizontal flex layout nowrap center
 					 center-justified" style="width: 100%; font-size: 13px; font-weight:600; font-family: merriweather; color: #007; margin-left: 0px;">
-					<paper-button style="text-align: center;" class="horizontal layout flex center-justified" on-tap"stopAndView" >VIEW</paper-button>
-						<paper-button class="horizontal layout flex center-justified" on-tap="clear" style="text-align: center">CLEAR</paper-button>
+					<paper-button style="text-align: center;" class="horizontal layout flex center-justified">VIEW</paper-button>
+						<paper-button class="horizontal layout flex center-justified" style="text-align: center;">CLEAR</paper-button>
 
 					<paper-button style="text-align: center;" class="horizontal layout flex center-justified" style="text-align: center;">SAVE</paper-button>
 					</section>
@@ -135,13 +133,13 @@ function FcClockData(argType, argTenths, argHundredths, argObject, argFast)
 	this.hundredth={name: "hundredth",clockname:argType, value: 0, inputType: "digit", label:"s", colon:"","hidden":!argFast};
 	
 	this.convertFromTenths(argTenths);
-	this.convertFromHundredths(argHundredths);
 	
 };
 
 FcClockData.prototype.convertToTenths = function()
 {
 	var result = 0;
+	result += this.hundredth.value;
 	result += this.tenth.value * 1;
 	result += this.sec.value * 10;
 	result += this.tsec.value * 100;
@@ -152,72 +150,42 @@ FcClockData.prototype.convertToTenths = function()
 	return result;
 };
 
-FcClockData.prototype.convertToHundredths = function()
-{
-	var result = 0;
-	result += this.hundredth.value;
-	result += this.tenth.value * 10;
-	result += this.sec.value * 100;
-	result += this.tsec.value * 1000;
-	result += this.min.value * 6000;
-	result += this.tmin.value * 60000;
-	result += this.hours.value * 360000;
-	result += this.thours.value * 3600000;
-	return result;
-};
-
 
 	FcClockData.prototype.convertFromTenths = function(argTenths)
 {	
+	
 	this.tenth.value = argTenths % 10;
 	var fullsec = Math.floor(argTenths / 10) % 60;
 	this.sec.value = fullsec % 10;
 	this.tsec.value = Math.floor(fullsec / 10);
 	var fullmin = Math.floor(argTenths / 600) % 60;
 	this.min.value = fullmin % 10;
+	if(argTenths>35999 && argTenths<60001)
+	{
+	this.tmin.value = Math.floor(Math.floor(argTenths/6000) %100);
+	};
+	
+	
+	if(argTenths>35999 && argTenths< 60001)
+	{
 
-	this.tmin.value = Math.floor(fullmin / 10);
+	var fullhour = Math.floor(argTenths/60000);
+	this.hours.value=fullhour;
+		if(fullhour===1)
+			{
+				this.hours.value=1;
+				this.tmin.value =  4;
+				// this.hours.value = fullhour % 10;
+			}
+	}
+	else{
 	var fullhour = Math.floor(argTenths / 36000);
-	 this.hours.value = fullhour % 10;
-	 this.thours.value = Math.floor(fullhour / 10);
+	this.hours.value = fullhour%10;
+		}
+
+
 };
 
-	// if(argTenths>35999 && argTenths<60001)
-	// {
-	// this.tmin.value = Math.floor(Math.floor(argTenths/6000) %100);
-	// };
-	
-	
-	// if(argTenths>35999 && argTenths< 60001)
-	// {
-
-	// var fullhour = Math.floor(argTenths/60000);
-	// this.hours.value=fullhour;
-	// 	if(fullhour===1)
-	// 		{
-	// 			this.hours.value=1;
-	// 			this.tmin.value =  4;
-	// 			// this.hours.value = fullhour % 10;
-	// 		}
-	// }
-	// else{
-	// var fullhour = Math.floor(argTenths / 36000);
-	// this.hours.value = fullhour%10;
-	// 	}
-
-
-// };
-
-FcClockData.prototype.convertFromHundredths = function(argHundredths)
-{	this.hundredth.value=argHundredths % 10;
-	this.tenth.value = Math.floor(argHundredths /10)%10;
-	var fullsec = Math.floor(argHundredths /100);
-	this.sec.value = fullsec % 10;
-	this.tsec.value = Math.floor(argHundredths/1000)%6;
-	var fullmin = Math.floor(argHundredths /6000)%60;
-	this.min.value = fullmin % 10;
-	this.tmin.value =Math.floor(argHundredths/600000)%6;
-};
 FcClockData.prototype.setAlarm = function(argTime)
 {
 	if(argTime>this.now)
@@ -254,11 +222,6 @@ FcClockData.prototype.soundAlarm=function(argAlertTarget, argTime)
 FcClockObjPrime = Polymer({
 	is: "fc-clockObj-prime",
 	properties: {
-		clockArray2:{
-			type:FcClockData,
-			value: {},
-			notify:true
-		},
 		currentClock: {
 			type: FcClockData,
 			value: {},
@@ -275,7 +238,7 @@ FcClockObjPrime = Polymer({
 			notify: true,
 		},
 		clockArray: {
-			type: FcClockData,
+			type: Array,
 			value: [],
 			notify: true
 		},
@@ -408,20 +371,10 @@ FcClockObjPrime = Polymer({
         	type: String,
         	value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
       	}, 
-      	fastSwatch: {
-      		type: Object,
-      		value: null, 
-      		notify: true
-      	},		
       	now:{
       		type: Date, 
       		notify: true
       	},
-      	pressedFastSW:{
-      		type: Boolean, 
-      		value: false, 
-      		notify: true
-      	}
 	},
 	behaviors:[],
 
@@ -430,7 +383,6 @@ FcClockObjPrime = Polymer({
 
 		console.log(newVal, oldVal);
 	},
-
 
 	ready: function() {
 	  var nowish = new Date().getTime()+30000;
@@ -451,33 +403,18 @@ FcClockObjPrime = Polymer({
 	
 	  	
 	},
-startFastStopwatch: function(argThisHundredths)
-	{
-		var hundredths = this.currentClock.convertToHundredths();
-		hundredths++;
-		this.currentClock.convertFromHundredths(hundredths);
-		this.notifyPath("currentClock.hundredth.value", this.currentClock.hundredth.value);
-	},
-	startStopwatch: function(argThisTenths)
-	{
-		var tenths = this.currentClock.convertToTenths();
-		tenths++;
-		this.currentClock.convertFromTenths(tenths);
-		this.notifyPath("currentClock.tenth.value", this.currentClock.tenth.value);
-	},
-opencollapse:function()
+opencollapse: function()
 {
 this.$.collapser.opened=!this.$.collapser.opened;
 
 },
-
 
 functionLeft: function(e){
 if(this.nowUparrow===true){
 	this.otherWayNow();
 }
 else{
-	if(this.clockIndex>0)
+	if(this.clockOndex>0)
 	{var len =this.clockIndex-1;
 	this.set("currentClock", this.clockArray[len]);
 	
@@ -504,28 +441,16 @@ else{
 	else{
 		this.set("clockIndex", this.clockIndex +1);
 	}
-	this.set("swatch", null);
-	this.set("currentClock", null);
 	this.set("currentClock", this.clockArray[this.clockIndex]);
 	this.set("clockName", this.currentClock.hours.clockname);
-	this.currentClock = new FcClockData(); //remember to give the Clock a type and a set of names;
+	//this.set("clockType", this.clockName);
 	
  }
 console.log(e, this.currentClock);
 console.log(e);
 
 },
-  alterCurrentClock: function(e)
-{
-console.log(e, e.model, e.target);
-var choice=this.currentClock.sec.value;
-console.log(this.choice);
-
-
-this.otherWayNow();
-
-
- },
+  
     dragYes: function()
     {
     	this.drags=true;
@@ -536,13 +461,9 @@ this.otherWayNow();
 		console.log("goNow");
 		if(this.pressedSW==true && this.swatch==null)
 		{
-		 this.swatch=setInterval(this.startStopwatch.bind(this), 100,this);
+		 this.swatch=setInterval(this.startStopwatch.bind(this), 100, this);
 		}
-		else if(this.pressedFastSW==true && this.fastSwatch==null)
-		{
-				this.fastSwatch=setInterval(this.startFastStopwatch.bind(this),10,this);
-		}
-		else if(this.pressedCD==true && this.countDownFunc==null)
+		if(this.pressedCD==true && this.countDownFunc==null)
 		{
 			console.log("about to start Count Down");
 			this.countDownFunc=setInterval(this.countDown.bind(this),100,this);
@@ -550,13 +471,10 @@ this.otherWayNow();
 	},
 
 	otherWayNow:function(){
-		this.set("swatch", null);
+
 		clearInterval(this.swatch);
 		clearInterval(this.countDownFunc);
-		clearInterval(this.fastSwatch);
 		this.pressedCD==false;
-		this.set("pressedFastSW",false);
-		this.set("fastSwatch", null);
 		this.pressedSW==false;
 		this.pressedClock==false;
 		this.set("swatch", null);
@@ -576,7 +494,7 @@ this.otherWayNow();
 		this.set("clockName", clockname);
 		setInterval(this.updateClock, 1000, this);
 		console.log("attached");
-	
+		// 
 
 	},
 
@@ -608,37 +526,23 @@ this.otherWayNow();
 
 	},
 	switchClock: function(isPressed)
-	{this.push("currentClock", this.secondaryClockArray);
+	{
 
 
 
 	},
-clickHandler: function(e) {
-			console.log(e);
-			if(e.target.selected!=undefined){
-				var sel = e.target.selected;
-				this.set("app.selected", sel);
-			}
-		  var button = e.target;
-		  while (!button.hasAttribute('data-transition') && button!==document.body) {
-		    button = button.parentElement;
-		  }
-		  if (!button.hasAttribute('data-transition')) {
-		    return;
-		  }
-		  var id = button.getAttribute('data-transition');
-		  var dialog = document.getElementById(id);
-		  console.log(document.getElementById(id), id, "LOOOK HERE DUMMY", dialog);
-		  if (dialog) {
-		    dialog.open();
-		  }
-		},
 
-
-
-	_computeIsPressed: function(pressedCD, pressedSW,pressedFastSW,	 pressedClock)
+	startStopwatch:function(argThis)
 	{
-		var torf =(pressedCD===true || pressedSW===true || pressedClock === true|| pressedFastSW===true);
+		var tenths = this.currentClock.convertToTenths();
+		tenths++;
+		this.currentClock.convertFromTenths(tenths);
+		this.notifyPath("currentClock.tenth.value", this.currentClock.tenth.value);
+	},
+
+	_computeIsPressed: function(pressedCD, pressedSW, pressedClock)
+	{
+		var torf =(pressedCD==true || pressedSW==true || pressedClock == true);
 		return torf;
 	},
 
@@ -653,12 +557,6 @@ clickHandler: function(e) {
 		var retVal =(this.pressedSW==true)?false: true;
 		return retVal;
 	},
-	showFastStopWatch: function(pressedFastSW)
-	{
-		var retVal =(this.pressedFastSW===true)?false: true;
-		return retVal;
-	},
-
 
 	showCountdown: function(pressedCD)
 	{
@@ -677,15 +575,9 @@ clickHandler: function(e) {
 			this.pressedClock=!this.pressedClock;
 			this.showClock();
 		}
-		if(name=="Stopwatch"){
+		if(name=="Stopwatch" || name=="'Fast' Stopwatch"){
 			this.pressedSW=!this.pressedSW;
 			this.showStopwatch();
-		}
-		if(name=="'Fast' Stopwatch")
-		{
-			this.pressedFastSW=!this.pressedFastSW;
-			this.showFastStopWatch();
-
 		}
 		if(name=="Countdown" || name=="'SAT' Countdowns"){
 			this.pressedCD=!this.pressedCD;
@@ -714,14 +606,6 @@ clickHandler: function(e) {
 		self.set("theTime", time);
 		//console.log(update);
 		self.set("now",update);
-	},
-
-	clear: function(){
-		
-		this.set("clockName", this.currentClock.hours.clockname);
-		this.set("currentClock","null");
-		
-
 	},
 
 	_focusedDraggable:function(e)
