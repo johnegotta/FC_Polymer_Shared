@@ -207,9 +207,32 @@ Polymer({
 	soSelected(e){
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.value;
-		//console.log(e, e.model.__data__.value, e.model.__data__.option.name);
-		var propertyString="fcCourse."+propertyName;
-		this.set(propertyString, val);
+		console.log(e.model.__data__, propertyName, val);
+		if(propertyName == "testDate")
+		{
+			this.fcCourse.setTestDate(val);
+		}
+		else if(propertyName == "programLength")
+		{
+			this.fcCourse.setCourseLength(val);
+		}
+		else if(propertyName == "practiceTestDay")
+		{
+			this.fcCourse.setPracticeTestDay(val);
+		}
+		else if(propertyName == "presetCourseTimes")
+		{
+			this.fcCourse.setCourseMeetingDaysAndTimes(val);
+			this.set("fcCourse", JSON.parse(JSON.stringify(this.fcCourse)));
+		}
+		else
+		{
+			this.fcCourse[propertyName] = val;
+		}
+		
+			var propertyString="fcCourse."+propertyName;
+			this.notifyPath(propertyString, val);
+		
 		// if(propertyString=="fcCourse.programLength" && this.fcCourse.testDate!==""){var d=new Date(this.fcCourse.testDate);}
 		this.set("saveChoiceLocal",true);
 		this.set("inputIndex", this.inputIndex+1);

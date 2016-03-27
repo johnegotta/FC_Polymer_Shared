@@ -404,9 +404,7 @@ static getSummerCourseSchedules()
 }
 
 static getMoreInputs()
-{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(),FcCourse.getCourseTimes(),FcCourse.getCourseEnrollment(),
-FcCourse.getCourseMeetingDays(),FcCourse.getCourseDaySets(), 
-FcCourse.getSummerCourseSchedules(),FcCourse.getCourseTimes()];
+{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(), FcCourse.getCourseMeetingDays(), FcCourse.getSummerCourseSchedules(),FcCourse.getCourseTimes()];
 }
 static getAllInputsAtOnce()
 {			return[	
@@ -483,15 +481,21 @@ getFirebaseLocation()
 		// return ("https://focused0ne.firebaseio.com/courses");
 	}
 
-	
-
-	setTestDate(argDate, argCourseLength)
+	setCourseLength(argWeeks)
 	{
+		console.log("setCourseLength " + argWeeks);
+		this.courseLength = parseInt(argWeeks);
+	}
+
+	setTestDate(argDate)
+	{
+		console.log("setTestDate " + argDate);
 		this.testDate = argDate;
+		this.testDateDate = new Date(this.testDate);
 		this.eventArray = [];
 		this.practiceTestArray = [];
 		this.courseMeetingArray = [];
-		this.generateCourseCalendar(argCourseLength);
+		//this.generateCourseCalendar(argCourseLength);
 	}
 
 	generateCourseCalendar(weeks)
@@ -508,7 +512,7 @@ getFirebaseLocation()
 			console.log("ERROR: must set test date before practice test day");
 			return;
 		}
-		//console.log(this.courseMeetingArray);
+		console.log(this, argDay);
 		this.practiceTestDay = argDay;
 		this.practiceTestArray = [];
 		var i = 0;
@@ -522,19 +526,65 @@ getFirebaseLocation()
 				i--; numEvents--;
 			}
 		}
-		var currDate = this.testDate.addDays((argDay == "saturday")?(-42):(-41));
-		for(i=0; i<6;i++)
+		var currDate = this.testDateDate.addDays((argDay == "Saturday Practice Tests")?(-1 * this.courseLength * 7):(-1 * (this.courseLength * 7 - 1)) );
+		for(i=0; i<this.courseLength;i++)
 		{
 			var ptStart = new Date(currDate);
 			ptStart.setHours(9);
 			var ptEnd = new Date(currDate);
 			ptEnd.setHours(12);
 			ptEnd.setMinutes(30);
-			var ptEvent = new FcCourseEvent({courseId: this.fcid, startTime:ptStart, endTime: ptEnd, courseEventType: "practice test", testDate:this.testDate});
+			var ptEvent = new FcCourseEvent({courseId: this.fcid, startTime:ptStart, endTime: ptEnd, courseEventType: "practice test", testDate:this.testDateDate});
 			this.eventArray.push(ptEvent);
 			this.practiceTestArray.push(ptEvent);
 			currDate = currDate.addDays(7);
 		}
+		this.numberOfPracticeTests = this.practiceTestArray.length;
+		console.log(this.practiceTestArray);
+	}
+
+
+	setCourseMeetingDaysAndTimes(argDaysAndTimes)
+	{
+		console.log("setCourseMeetingDaysAndTimes " + argDaysAndTimes);
+		var parts = argDaysAndTimes.split(",");
+		var days = parts[1];
+		days = days.toLowerCase();
+		days = days.replace("for", "");
+		days = days.replace(/\s/g, "");
+		days = days.replace("tues", "tuesday");
+		days = days.replace("thurs", "thursday");
+		days = days.replace("mon", "monday");
+		days = days.replace("wed", "wednesday");
+		days = days.replace("fri", "friday");
+		days = days.replace(/\|/g, "/");
+		var times = parts[0];
+		times = times.replace("_", "-");
+		var start = times.split("-")[0];
+		start = start.replace("AM", "");
+		var pmIndex = start.indexOf("PM");
+		var hour, min;
+		if(pmIndex > -1)
+		{
+			start = start.replace("PM", "");
+			hour = parseInt(start.split(":")[0]);
+			min = start.split(":")[1];
+			start = (hour+12).toString() + ":" + min;
+		}
+		var end = times.split("-")[1];
+		end = end.replace("AM", "");
+		pmIndex = end.indexOf("PM");
+		if(pmIndex > -1)
+		{		
+			end = end.replace("PM", "");
+			hour = parseInt(end.split(":")[0]);
+			min = end.split(":")[1];
+			end = (hour+12).toString() + ":" + min;
+		}
+		times = start + "-" + end;
+		console.log(days, times);
+		this.setCourseMeetingDays(days);
+		this.setCourseMeetingTime(times);
 	}
 
 	setCourseMeetingDays(argDays)
@@ -556,29 +606,31 @@ getFirebaseLocation()
 				i--; numEvents--;
 			}
 		}
-		var currDate = this.testDate.addDays((argDays.indexOf("monday/wednesday") > -1)?(-40):(argDays == "tuesday/thursday")? (-39): 0);
-		for(i=0; i<6;i++)
+		var currDate = this.testDateDate.addDays((argDays.indexOf("monday/wednesday") > -1)?(-1 * (this.courseLength * 7 - 2)):(argDays == "tuesday/thursday")? (-1 * (this.courseLength * 7 - 3)): 0);
+		for(i=0; i<this.courseLength;i++)
 		{
 			var cmStart = new Date(currDate);
 			var cmEnd = new Date(currDate);
-			var cmEvent = new FcCourseEvent({courseId: this.fcid, startTime:cmStart, endTime: cmEnd, courseEventType: "course meeting", testDate:this.testDate});
+			var cmEvent = new FcCourseEvent({courseId: this.fcid, startTime:cmStart, endTime: cmEnd, courseEventType: "course meeting", testDate:this.testDateDate});
 			this.eventArray.push(cmEvent);
 			this.courseMeetingArray.push(cmEvent);
 			var cm2Start = new Date(cmStart.addDays(2));
 			var cm2End = new Date(cmEnd.addDays(2));
-			var cm2Event = new FcCourseEvent({courseId: this.fcid, startTime: cm2Start, endTime: cm2End, courseEventType: "course meeting", testDate:this.testDate});
+			var cm2Event = new FcCourseEvent({courseId: this.fcid, startTime: cm2Start, endTime: cm2End, courseEventType: "course meeting", testDate:this.testDateDate});
 			this.eventArray.push(cm2Event);
 			this.courseMeetingArray.push(cm2Event);
 			if(argDays == "monday/wednesday/friday")
 			{
 				var cm3Start = new Date(cm2Start.addDays(2));
 				var cm3End = new Date(cm2End.addDays(2));
-				var cm3Event = new FcCourseEvent({courseId: this.fcid, startTime: cm3Start, endTime: cm3End, courseEventType: "course meeting", testDate:this.testDate});
+				var cm3Event = new FcCourseEvent({courseId: this.fcid, startTime: cm3Start, endTime: cm3End, courseEventType: "course meeting", testDate:this.testDateDate});
 				this.eventArray.push(cm3Event);
 				this.courseMeetingArray.push(cm3Event);
 			}
 			currDate = currDate.addDays(7);
 		}
+		this.numberOfMeetings = this.courseMeetingArray.length;
+
 	}
 
 	setCourseMeetingTime(argTime)

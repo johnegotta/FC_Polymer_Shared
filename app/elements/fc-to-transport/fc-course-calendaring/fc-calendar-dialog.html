@@ -58,7 +58,7 @@ display: absolute;}
 						<paper-item on-tap="soSelected" style="border: 1px #aeaeae solid" class="layout horizontal courseData" draggable=true>
 						
 							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
-								<div class="primary">[[computeSlots(slot)]]</div>
+								<div class="primary">[[computeSlots(slot, day, fcCourseObject)]]</div>
 								<div class="secondary">[[slot.time]]</div>
 							</paper-item-body>   	
 							<paper-icon-button icon="star" on-tap="" value$="{{val}}" alt="favourite this!">
@@ -82,11 +82,11 @@ FcCalendarDialog= Polymer({
 	behaviors:[FCBehaviors.FcCalendarBehaviorPrime
 		 // "Polymer.PaperDialogBehavior"
 		  ],
-	observers:['computeCourseDays(fcCourseObject*)'],
+	observers:['fcCourseObjectObserver(fcCourseObject.*)'],
 	properties:{
 		fcCourseObject:{
 			type: FcCourse,
-			observer: "fcCourseObjectObserver",
+			//observer: "fcCourseObjectObserver",
 			notify: true
 		},
 		displayedMonth:{
@@ -122,16 +122,44 @@ FcCalendarDialog= Polymer({
 	{	
 		this.set("fcCourseObject", new FcCourse());
 		var self=this;
-		var valueArray=FcCourse.getMoreInputs().concat(FcCourse.getAllInputsAtOnce());
+		var valueArray=FcCourse.getMoreInputs(); //.concat(FcCourse.getAllInputsAtOnce());
 		valueArray.forEach(function(item, index, array){
 			 self.push("valueOptions",item);
 		 });
 	},
 
-	computeSlots: function(slot){
-		console.log(slot);
-		return slot.activity;
-
+	computeSlots: function(slot, day, argCourse){
+		var i = 0;
+		var numEvents = argCourse.eventArray.length;
+		//console.log(slot, numEvents, day, argCourse);
+		for(i=0; i < numEvents; i++)
+		{
+			var e = argCourse.eventArray[i];
+			var starty = new Date(e.startTime);
+			var q = new Date(starty.getFullYear(), starty.getMonth(), starty.getDate());
+			//console.log(d.toString(), q.toString(), day.date);
+			if(day.date == q.toString())
+			{
+				var hour = parseInt(slot.time.split(":")[0]);
+				if(slot.time.indexOf("PM") > -1)
+				{
+					hour += 12;
+				}
+				var slotto = slot.time.replace("AM", "");
+				slotto = slotto.replace("PM", "");
+				var min = parseInt(slotto.split(":")[1]);
+				var slotty = new Date(starty.getFullYear(), starty.getMonth(), starty.getDate(), hour, min);
+				var endy = new Date(e.endTime);
+				console.log(slotty, slotty.getTime(), slotty.toTimeString(), starty.getTime(), starty.toTimeString(), endy.getTime(), endy.toTimeString(), slot.time);
+				if(starty.getTime() <= slotty.getTime() && endy.getTime() >= slotty.getTime())
+				{
+					console.log("bazinga " + slotty);
+					return e.courseEventType;
+				}
+			}
+		}
+		return "nada";
+//		return .activity;
 
 	},
 
@@ -171,11 +199,11 @@ swipeNslide: function(e)
 
 },
 
-fcCourseObjectObserver: function(newVal, oldVal)
+fcCourseObjectObserver: function(newVal)
 {
-console.log(newVal, oldVal);
-
+	console.log(newVal);
 },
+
 _computeDate: function(date){
 	if(date){
 var result = date.toDateString();
