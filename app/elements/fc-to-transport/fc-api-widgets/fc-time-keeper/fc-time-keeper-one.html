@@ -36,20 +36,20 @@ paper-button{width: 58px!important; padding: 6px 2px; border: 1px ridge #aecdfe;
 </style>
 <template>
 <div style="padding: 4px; border: 4px double #008;">
-<div style="padding: 6px; border: 4px #efefef double; text-align: center;" class="layout vertical"  on-track="dragYes">
+<div style="padding: 6px; border: 4px #efefef double; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
 	
-		<div style="border: 1px #008 solid; color:#008;" on-track="_focusedDraggable">
+		<div style="border: 1px #008 solid; color:#008;">
 			<iron-icon icon="icons:{{swapIcon}}" class$="{{swapIcon}}" on-tap="toggle">
 			</iron-icon>
-			<div style="padding: 4px; border: 1px #efefef solid; text-align: center;cursor:pointer; overflow-x: hidden; background: white;" class="layout vertical"  on-track="dragYes">
+			<div style="padding: 4px; border: 1px #efefef solid; text-align: center;cursor:pointer; overflow-x: hidden; background: white;" class="layout vertical">
 							
 				<paper-material class="layout vertical" elevation="3">
-					<span draggable drags on-track="_focusedDraggable" class="slight">{{date}}</span>
-					<section id="theClock" on-dblclick="opencollapse" class="timer">{{theTime}} </section>	
+					<span draggable drags class="slight">{{date}}</span>
+					<section id="theClock" on-dblclick="opencollapser" class="timer">{{theTime}} </section>	
 				</paper-material>
 
 <iron-collapse id="collapser"  class="horizontal layout center-justified glass">
-	<iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}">
+	<iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{clockArray}}">
 	<section style="margin-left: 25px;" on-tap="selectPrevious">
 			<iron-icon icon="icons:chevron-left">
 			</iron-icon>
@@ -57,7 +57,7 @@ paper-button{width: 58px!important; padding: 6px 2px; border: 1px ridge #aecdfe;
 				<paper-tabs 
 			      		id="assistantMenu" 
 			      		scrollable="true"
-			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 180px; font-size: 18px;" on-tap="clickHandler"
+			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 180px; font-size: 18px;" 
 			      		bar="true"
 			      		hide-scroll-buttons="true" 
 			  			> 
@@ -76,23 +76,24 @@ paper-button{width: 58px!important; padding: 6px 2px; border: 1px ridge #aecdfe;
 					</paper-list-box>
 				</section>
 			</paper-tabs>
-			<section style="padding:25px; margin-right: 20px;" on-tap="selectNext"><iron-icon icon="icons:chevron-right"></iron-icon></section>
+			<section style="padding:25px; margin-right: 20px;" on-tap="selectNext">
+			<iron-icon icon="icons:chevron-right"></iron-icon></section>
 			</iron-selector> 
 		</iron-collapse>
 		</div>
 		<iron-collapse id="collapse"  class="horizontal layout center-justified glass">		
-			<div class="content" id="content" class="vertical layout center-justified" style="overflow-y: scroll; overflow-x: hidden; width: 360px; padding: 8px 4px;">
+			<div class="content" id="content" class="vertical layout center-justified" currentclock="[[currentClock]]" clockname="[[computeClockType(clockName)]]" style="overflow-y: scroll; overflow-x: hidden; width: 360px; padding: 8px 4px;">
 		
 					<section class="horizontal flex layout nowrap self-stretch" style="padding: 2px; margin: 2px 12px 2px -12px;">
 
 						<fc-clobjid-prime id="dsv" style="text-align: center;border: 2px #008 solid; text-size: 16px;" orientation="horizontal" dataobject="{{currentClock}}">
 						</fc-clobjid-prime>
 					</section>
-							<section class="horizontal layout flex center center-justified">
-					<section class="horizontal layout flex center center-justified" style="height: 24px; width: 100%; font-weight: 600; font-size: 18px; font-family: merriweather; color: #008; background: #fefefe; border: #afafaf 3px double;padding:2px;"> 
+				<section data-currentclock$="[[currentClock]]" data-clockname$="[[computeClockType(clockName)]]"  class="horizontal layout flex center center-justified" on-tap="startStopTapHandler">
+					<section data-currentclock$="[[currentClock]]" data-clockname$="[[computeClockType(clockName)]]" class="horizontal layout flex center center-justified" style="height: 24px; width: 100%; font-weight: 600; font-size: 18px; font-family: merriweather; color: #008; background: #fefefe; border: #afafaf 3px double;padding:2px;"> 
 					[[computeClockType(clockName)]]
 					</section>
-					</section>
+				</section>
 					<section style="width: 100%; padding: 4px;">
 					
 					</section>
@@ -395,15 +396,20 @@ FcClockObjPrime = Polymer({
 	  	this.clockArray.push(new FcClockData("Countdown", 39000, "",[]));
         this.clockArray.push(new FcClockData("Stopwatch", 0,0, this.argObjectSlow));
 	  	this.clockArray.push(new FcClockData("AlarmClock",ts, "", []));
-	  	this.clockArray.push(new FcClockData("'Fast' Stopwatch", 0,0,argObjectFast, true));
-	  	this.clockArray.push(new FcClockData("'SAT' Countdowns", [39000,25000,35000,25000,20000], "",{}, true));
+	  	//this.clockArray.push(new FcClockData("'Fast' Stopwatch", 0,0,argObjectFast, true));
+	  //	this.clockArray.push(new FcClockData("'SAT' Countdowns", [39000,25000,35000,25000,20000], "",{}, true));
 	  	this.set("currentClock", this.clockArray[0]);
 	  	console.log(this.currentClock.hours.clockname, "rubby"); 
 	
 	
 	  	
 	},
-opencollapse: function()
+startStopTapHandler: function(event){
+	console.log(event.target, event, event.target.attributes);
+
+
+},
+opencollapser: function()
 {
 this.$.collapser.opened=!this.$.collapser.opened;
 

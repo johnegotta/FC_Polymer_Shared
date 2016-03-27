@@ -1,4 +1,4 @@
-<dom-module id="fc-clock-redo">
+<dom-module id="fc-clockObj-prime">
 <style is="custom-style">
 .primary{
 	color: #008;
@@ -120,127 +120,144 @@ paper-button .pearl{ width: 100% height: 100%;  }
 </div>
 </template>
 <script>
+function FcClock
 
-// function FcClockData(argType, argIncriment, argElapsedTime, argTimeRemaining, argStartTime, argTenths, argHundredths, argInputType, argHasAlarm, argHasLinkedAlarms, argAlarmList)
-// {	var n; 
+function FcClockData(argType, argTime)
+{	
+this.FcClockData = {
+	"thours": argThours || 0, "hours": argHours || 0, "tmin": argTmin || 0, "min": argMin || 0, "tsec": argTsec || 0, "sec": 0, "tenth": 0, "hundredth": 0, 
+	"clockType": argType || "Stopwatch", 
+	clockname: argClockName || argType || this.dataTransition, 
+  	minInterval: argTime.minInterval || tenths,
+  	maxInterval: argTime.maxInterval || tenths,   
+	inputType: argInputType ||"digit", 
+	labels:["thours":"H","hours":"H","tmin":"M","min":"M","tsec":"S","sec":"S", "tenths":"s",         "hundredths": "s", thousandths: "s"],
+	"hidden":hiddenArg || false, 
+	"dataTransiton": argEntered || "Stopwatch",
+	"hasAlarm": argHasAlarm || false,
+	"hasLinkedAlarms": argHasLinkedAlarms, 
+	"linkedAlarmArray":argAlarmList || [],
+	};	
 	
-// 	this.FcClockData = {
-// 		"name": argType || "Stopwatch",
-// 		"thours.hidden":true,
-// 		"hours.hidden":true, 
-// 		"tmin": argStartTime.tmin || 0, 
-// 		"min": argStartTime.min || 0, 
-// 		"tsec": argStartTime.tsec || 0, 
-// 		"sec": argStartTime.sec || 0, 
-// 		"tenth": argStartTime.tenth || 0, 
-// 		"hundredth": argStartTime.hundredth || 0, 
-// 		"clockname": "Stopwatch",
-//   		"minInterval": 10,// ten milliseconds 
-// 		"maxInterval": 10,
-// 		"inputType": argInputType ||"digit", //discuss if working as travel agent//digit woers for this situation almost only;
-// 		"labels":{"tmin":"M","min":"M","tsec":"S","sec":"S", "tenths":"s","hundredths": "s"},
-// 	"dataTransiton": argType || "Stopwatch",
-// 	"hasAlarm": argHasAlarm || false,
-// 	"hasLinkedAlarms": argHasLinkedAlarms || false, 
-// 	"linkedAlarmArray":argAlarmList || [],
+	this.convertFromTenths(argTenths);
+	this.convertFromHundredths(argHundredths);
+	
+};
+
+FcClockData.prototype.convertToTenths = function()
+{
+	var result = 0;
+	result += this.tenth.value * 1;
+	result += this.sec.value * 10;
+	result += this.tsec.value * 100;
+	result += this.min.value * 600;
+	result += this.tmin.value * 6000;
+	result += this.hours.value * 36000;
+	result += this.thours.value * 360000;
+	return result;
+};
+
+FcClockData.prototype.convertToHundredths = function()
+{
+	var result = 0;
+	result += this.hundredth.value;
+	result += this.tenth.value * 10;
+	result += this.sec.value * 100;
+	result += this.tsec.value * 1000;
+	result += this.min.value * 6000;
+	result += this.tmin.value * 60000;
+	result += this.hours.value * 360000;
+	result += this.thours.value * 3600000;
+	return result;
+};
+
+
+	FcClockData.prototype.convertFromTenths = function(argTenths)
+{	
+	this.tenth.value = argTenths % 10;
+	var fullsec = Math.floor(argTenths / 10) % 60;
+	this.sec.value = fullsec % 10;
+	this.tsec.value = Math.floor(fullsec / 10);
+	var fullmin = Math.floor(argTenths / 600) % 60;
+	this.min.value = fullmin % 10;
+
+	this.tmin.value = Math.floor(fullmin / 10);
+	 	var fullhour = Math.floor(argTenths / 36000);
+	this.hours.value = fullhour % 10;
+	this.thours.value = Math.floor(fullhour / 10);
+};
+
+	// if(argTenths>35999 && argTenths<60001)
+	// {
+	// this.tmin.value = Math.floor(Math.floor(argTenths/6000) %100);
+	// };
 	
 	
-// 	this.convertFromTenths(argTenths);
-// 	this.convertFromHundredths(argHundredths);
+	// if(argTenths>35999 && argTenths< 60001)
+	// {
+
+	// var fullhour = Math.floor(argTenths/60000);
+	// this.hours.value=fullhour;
+	// 	if(fullhour===1)
+	// 		{
+	// 			this.hours.value=1;
+	// 			this.tmin.value =  4;
+	// 			// this.hours.value = fullhour % 10;
+	// 		}
+	// }
+	// else{
+	// var fullhour = Math.floor(argTenths / 36000);
+	// this.hours.value = fullhour%10;
+	// 	}
 
 
-
-// FcClockData.prototype.convertToTenths = function()
-// {
-// 	var result = 0;
-// 	result += this.tenth.value * 1;
-// 	result += this.sec.value * 10;
-// 	result += this.tsec.value * 100;
-// 	result += this.min.value * 600;
-// 	result += this.tmin.value * 6000;
-// 	result += this.hours.value * 36000;
-// 	result += this.thours.value * 360000;
-// 	return result;
 // };
 
-// FcClockData.prototype.convertToHundredths = function()
-// {
-// 	var result = 0;
-// 	result += this.hundredth.value;
-// 	result += this.tenth.value * 10;
-// 	result += this.sec.value * 100;
-// 	result += this.tsec.value * 1000;
-// 	result += this.min.value * 6000;
-// 	result += this.tmin.value * 60000;
-// 	result += this.hours.value * 360000;
-// 	result += this.thours.value * 3600000;
-// 	return result;
-// };
+FcClockData.prototype.convertFromHundredths = function(argHundredths)
+{	this.hundredth.value=argHundredths % 10;
+	this.tenth.value = Math.floor(argHundredths /10)%10;
+	var fullsec = Math.floor(argHundredths /100);
+	this.sec.value = fullsec % 10;
+	this.tsec.value = Math.floor(argHundredths/1000)%6;
+	var fullmin = Math.floor(argHundredths /6000)%60;
+	this.min.value = fullmin % 10;
+	this.tmin.value =Math.floor(argHundredths/600000)%6;
+};
+FcClockData.prototype.setAlarm = function(argTime)
+{
+	if(argTime>this.now)
+		{
+ 			var alarm = argTime.getTime();
+ 			var now = this.now.getTime();
+ 			var interval =alarm-now;
+ 			setInterval(this.soundAlarm, interval, this);
+		}
+};
 
 
-// 	FcClockData.prototype.convertFromTenths = function(argTenths)
-// {	
-// 	this.tenth.value = argTenths % 10;
-// 	var fullsec = Math.floor(argTenths / 10) % 60;
-// 	this.sec.value = fullsec % 10;
-// 	this.tsec.value = Math.floor(fullsec / 10);
-// 	var fullmin = Math.floor(argTenths / 600) % 60;
-// 	this.min.value = fullmin % 10;
-
-// 	this.tmin.value = Math.floor(fullmin / 10);
-// 	 	var fullhour = Math.floor(argTenths / 36000);
-// 	this.hours.value = fullhour % 10;
-// 	this.thours.value = Math.floor(fullhour / 10);
-// };
-
-
-// FcClockData.prototype.convertFromHundredths = function(argHundredths)
-// {	this.hundredth.value=argHundredths % 10;
-// 	this.tenth.value = Math.floor(argHundredths /10)%10;
-// 	var fullsec = Math.floor(argHundredths /100);
-// 	this.sec.value = fullsec % 10;
-// 	this.tsec.value = Math.floor(argHundredths/1000)%6;
-// 	var fullmin = Math.floor(argHundredths /6000)%60;
-// 	this.min.value = fullmin % 10;
-// 	this.tmin.value =Math.floor(argHundredths/600000)%6;
-// };
-// FcClockData.prototype.setAlarm = function(argTime)
-// {
-// 	if(argTime>this.now)
-// 		{
-//  			var alarm = argTime.getTime();
-//  			var now = this.now.getTime();
-//  			var interval =alarm-now;
-//  			setInterval(this.soundAlarm, interval, this);
-// 		}
-// };
-
-
-// FcClockData.prototype.soundAlarm=function(argAlertTarget, argTime)
-// {
+FcClockData.prototype.soundAlarm=function(argAlertTarget, argTime)
+{
 	
-// 	var numDate=argTime.getTime() +30000;
-// 	var self=this;
-// 	while(this.now<numDate)
-// 	{
-// 	var handle =setTimeOut(function(argAlertTarget) {
-// 	self.$$(argAlertTarget).style.background=(self.$$(argAlertTarget).style.background=="red")?"black":"red";
-// 	self.$$(argAlertTarget).style.color=(self.$$(argAlertTarget).style.color=="black")?"red":"black";
-// 	}, 2000);
-// 	handle=(handle!==null)?null:setTimeOut(function(argAlertTarget) {
-// 	self.$$(argAlertTarget).style.background=(self.$$(argAlertTarget).style.background=="red")?"black":"red";
-// 	self.$$(argAlertTarget).style.color=(self.$$(argAlertTarget).style.color=="black")?"red":"black";},
-// 		2000);
-// 	handle=null;
-// 	}
-// 	argAlertTarget.style.background="white";
-// 	argAlertTarget.style.background="#008";
-// }; 
-
-// };
+	var numDate=argTime.getTime() +30000;
+	var self=this;
+	while(this.now<numDate)
+	{
+	var handle =setTimeOut(function(argAlertTarget) {
+	self.$$(argAlertTarget).style.background=(self.$$(argAlertTarget).style.background=="red")?"black":"red";
+	self.$$(argAlertTarget).style.color=(self.$$(argAlertTarget).style.color=="black")?"red":"black";
+	}, 2000);
+	handle=(handle!==null)?null:setTimeOut(function(argAlertTarget) {
+	self.$$(argAlertTarget).style.background=(self.$$(argAlertTarget).style.background=="red")?"black":"red";
+	self.$$(argAlertTarget).style.color=(self.$$(argAlertTarget).style.color=="black")?"red":"black";},
+		2000);
+	handle=null;
+	}
+	argAlertTarget.style.background="white";
+	argAlertTarget.style.background="#008";
+}; 
 
 FcClockObjPrime = Polymer({
-	is: "fc-clock-redo",
+	is: "fc-clockObj-prime",
 	properties: {
 		clockArray2:{
 			type:FcClockData,
@@ -355,40 +372,24 @@ FcClockObjPrime = Polymer({
 
 
 	ready: function() {
-	setInterval(this.updateClock, 10, this);
-	console.log("ready");
 	  var nowish = new Date().getTime()+30000;
 	  console.log(nowish);
 	  var ts=nowish/100
 	  argObjectFast=[];
 	  
-        this.clockArray.push(new FcClockData("Stopwatch", 10, 0, 0, 0, 0, 0, "digit", false, false, []));
-	  	//this.clockArray.push(new FcClockData("AlarmClock",ts, "", []));
-	  	//this.clockArray.push(new FcClockData("'Fast' Stopwatch", 0,0,argObjectFast, true));
-	  	//this.clockArray.push(new FcClockData("'SAT' Countdowns", [39000,25000,35000,25000,20000], "",{}, true));
-	  	this.set("currentClock", this.clockArray[0]);
-	  	console.log(this.currentClock.clockname, "rubby");  	
-	},
-
-	updateClock: function(argThis)
-	{
-		var self=argThis;
-		var update = new Date();
-		var time = update.toLocaleTimeString();
-		self.set("theTime", time);
-		//console.log(update);
-		self.set("now",update);
-	},
-
-
-	attached: function()
-	{	var clockname=this.currentClock.hours.clockname; 
-		this.set("clockName", clockname);
+	  	
 		
+	  	this.clockArray.push(new FcClockData("Countdown", 39000, "",[]));
+        this.clockArray.push(new FcClockData("Stopwatch", 0,0, this.argObjectSlow));
+	  	this.clockArray.push(new FcClockData("AlarmClock",ts, "", []));
+	  	this.clockArray.push(new FcClockData("'Fast' Stopwatch", 0,0,argObjectFast, true));
+	  	this.clockArray.push(new FcClockData("'SAT' Countdowns", [39000,25000,35000,25000,20000], "",{}, true));
+	  	this.set("currentClock", this.clockArray[0]);
+	  	console.log(this.currentClock.hours.clockname, "rubby"); 
+	
+	
+	  	
 	},
-
-
-
 startFastStopwatch: function(argThisHundredths)
 	{
 		var hundredths = this.currentClock.convertToHundredths();
@@ -641,6 +642,15 @@ clickHandler: function(e) {
 		//this.set("clockName", nameplus);
 	},
 
+	updateClock: function(argThis)
+	{
+		var self=argThis;
+		var update = new Date();
+		var time = update.toLocaleTimeString();
+		self.set("theTime", time);
+		//console.log(update);
+		self.set("now",update);
+	},
 
 	clear: function(){
 		
