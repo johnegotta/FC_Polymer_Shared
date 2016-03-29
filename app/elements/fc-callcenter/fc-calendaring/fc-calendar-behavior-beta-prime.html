@@ -57,6 +57,22 @@ function stringTime(time)
 	return tot;
 }
 
+function stringTimeToDateTime(time, date)
+{
+	var start = parseInt(time);
+	//console.log(start);
+	var len = time.length;
+	var ampm = (start!==12 && time.charAt(len-2)=="P")?12: 0;
+	ampm=parseInt(ampm);
+	var hoursStart = ampm+start;
+	//console.log(hoursStart, ampm, start);
+	var minStart =(parseInt(time.charAt(len-4))*10)+parseInt(time.charAt(len-3));
+	var d=new Date(date);
+	d=d.setHours(hoursStart, minStart);
+	console.log(d);
+	return d;
+}
+
 /* Modifications to Date prototype*/
 Date.prototype.getFullMonth = function()
 {
@@ -92,12 +108,64 @@ function getDates(startDate, stopDate)
       }
       return dateArray;
 }
+function shortDayLabel(argDay, numChars)
+{	
+	var fullDaysArray=["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
+	var shortDaysArray = ["Su","M","Tu","W","Th","F","Sa"];
+	var singlesArray = ["M", "W", "F"];
+	var dayBlocks=["M|W|F","Tu|Th", "M|W"];
+ 	var md = argDay
+	if(numChars>2)
+	{
+	md=md.slice(0,numChars);
+	return md;
+	}
+	else
+	{
+		var letters = md.slice(0,2);
+		var lilLetters=md.slice(0,1);
+		if(shortDaysArray.indexOf(letters)!==-1)
+			{
+				var letterIndex = singlesArray.indexOf(lilLetters);
+				return singlesArray[letterIndex];
+			}
+		else {var retVal= shortDaysArray.indexOf(letters);
+			//console.log(shortDaysArray[retVal]);
+				return shortDaysArray[retVal];
+			}
+	}
+}
+function shortDaysLabel(argDays, NumChars)
+{
+	var counter =argDays.length;
+	for(var i=0;i<counter; i++)
+	{
+		var shortdaylabeltopush = shortDayLabel(argDays[i]);
+		var label=(i==counter-1)?shortdaylabeltopush:shortdaylabeltopush + "|";
+		label+=label; 
+
+	}
+	return label;
+
+}
+
+function dayAbbreviationsToDays(argAbbrev)
+{
+	argAbbrev = argAbbrev.toLowerCase();
+	if(argAbbrev.charAt(0)==="m"){return "Monday";}
+	else if(argAbbrev.charAt(0)==="w"){return "Wednesday";}
+	else if(argAbbrev.charAt(0)==="f"){return "Friday";}
+	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="u"){return "Sunday";}
+	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="a"){return "Saturday";}
+	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="u"){return "Tuesday";}
+	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="h"){return "Thursday";}
+}
 
 class FcEvent
 {
 	constructor(argEvent)
 	{
-		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.holiday, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid)
+		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid)
 	}
 
 	static getFirebaseLocation(theDate)
@@ -105,7 +173,7 @@ class FcEvent
 		return "https://focused0ne.firebaseio.com/events";
 	}
 
-  	build(name, startTime, endTime, holiday, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
+  	build(name, startTime, endTime, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
   	{
 	    this.name = name || ""; 
 	    this.startTime = new Date(startTime) || new Date();// console.log(this.startTime);
@@ -178,6 +246,534 @@ class FcCourseEvent extends FcEvent
 	}
 }//End of Class
 
+
+
+class FcCourse
+{
+
+	constructor()
+	{	this.starterDay=
+		this.isPrivateSchedule=false;
+		this.privateCoachingHours="";
+		this.scheduleType="",
+		this.customCourseType="",
+		this.courseType = "";
+		this.testDate = "";
+		this.startTime="";
+		this.endTime= "";
+		this.programLength="";
+	
+		this.startAndEndTimes= this.startTime + " to " + this.endTime;
+		this.courseMeetingDays="";
+		this.summerMeetingDays="";
+		this.practiceTestDay= "";
+		this.numberOfMeetings="";
+		this.numberOfPracticeTests="";
+		this.courseLocation=""; 
+		this.coach="";
+		this.associatedCoaches="";
+		this.courseSize="";
+		this.eventArray = [];
+		this.practiceTestArray = [];
+		this.courseMeetingArray = [];
+		this.fcid = "";
+		this.currentEnrollment="";
+		this.price="";
+		this.summer=false;
+		this.courseLength="";
+		this.courseMeetingLength="";
+		this.hoursTotal=""; //FcCourse.getNewFcid();
+		this.courseCalendarDaysArray=[];
+		this.calendarDaysArray=this.calendarDaysArray;
+		this.testDateDate=new Date(this.testDate);
+	}
+
+	
+
+
+	static getCourseTypes()
+	{
+		return [{"label": "Would you like to make a custom or standard course schedule?"},
+				{"label2":"Schedule Type"},
+				["Standard Schedule", "Custom Schedule"]
+			];
+	}
+
+	static getCourseSubTypes()
+		{
+		return [ 	{"label": "Standard Course Schedule"},
+	  				{"label2":"Course Type"},
+					["Focused 1600SAT Course","Focused Study Group"] 
+				];
+		}
+	static getTestDates()
+	{	var tResult =[];
+		var result = [];
+		var allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
+		var numDates = allTestDates.length;
+		var now = new Date();
+		for(var i = 0; i < numDates; i++)
+		{
+			var testdate = new Date(allTestDates[i]);
+			if(testdate.addDays(-28) >= now) //must be 28 days before test min
+			{
+				result.push(testdate.toDateString());
+			}
+		}
+		var obj1 = {"label":"2016-2019 SAT Test Dates"};
+		var obj2={"label2": "Test Date"};
+		tResult.push(obj1);
+		tResult.push(obj2);
+		tResult.push(result);
+		return tResult;	
+	}
+
+	static getPresetCourseLength()
+	{
+		return 	[{"label": "Select a Program Length between 3 & 13 weeks"},
+				{"label2": "Program Length"},
+				["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days"]
+			    ];	   
+	}
+
+static getCourseTimes()
+	{
+		return [
+				{"label":"Course Times"},
+				{"label2":"Start And End Times"},
+				["3:45PM-5:45PM", "6:00PM-9:00PM", "9:00AM-12:30PM", "1:00PM-4:30PM", "5:00PM-8:30PM", "4:00PM-7:30PM"]
+				];
+	}
+
+static getCourseTimeSets()
+	{	return  [{"label": "Course Times During School"},
+			  {"label2":"Course Meeting Sets"},
+			  ["Mon|Wed, 6:00PM_9:00PM", "Tues|Thurs, 6:00PM_9:00PM", "Mon|Wed|Fri, 3:45PM_5:45PM"]
+			  ];
+	}
+
+	static getPracticeTestDays()
+	{
+	 	return	[	{"label": "Which Practice Test Day Suits Your Course?"},
+		 			{"label2": "Practice Test Day"},
+					["Saturday Practice Tests","Sunday Practice Tests"]
+				];
+	}
+	static getCoaches()
+	{
+		return [{"label": "Primary Course Coach"},
+					{"label2": "Coach"},
+					["John Gotta",
+					"Stacy Collerette",
+					"George Rimakis",
+					"Scott McKinley",
+					"Jason Frazzano",
+					"Mustaffa Raza",
+					"Radika Patel"],
+					];//this should be a profile and be pulled from its own constructors.
+	}
+
+	static getCourseEnrollment()
+	{
+		  		 return [	{"label": "Course Enrollment Limit"},
+							{"label2": "Course Size"},
+	  						["1600SAT Course: 18","1600SAT Course: 22","1600SAT Course: 24"]
+	  					];
+	}
+
+	static getCourseMeetingDays()
+	{
+		return [{"label": "Which Days will your Course Meet on each Week?"},
+				{"label2": "Course Meeting Days"},
+				["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Select Days on your Calendar"]
+				];
+	}
+
+static getSummerCourseSchedules()
+{		return[{"label": "Summer Course Schedules!"},
+	{"label2": "Summer Meeting Days"},
+ 	["Mon|Wed, 9:00AM_12:30PM", "Tues|Thurs, 9:00AM_12:30PM", "Mon|Wed, 1:00PM_4:30PM", "Tues|Thurs, 1:00PM_4:30PM", "Mon|Wed, 5:30PM_8:30PM", "Tues|Thurs, 5:30PM_8:30PM", "Mon|Wed|Fri, 9:45AM_12:45PM"]
+ 	];
+
+}
+static getPrice()
+{
+	return[{"label": "Course Pricing"},
+	{"label2": "Price"},
+ 	["$2800.00", "$2400.00", "$2250.00", "$2100.00", "Other"]
+ 	];
+}
+
+static getConfirmAndSetCourse()
+{
+return[{"label": "Confirm Course Data"},
+	{"label2": "Confirmation"},
+ 	["Confirm", "Reject", "Edit Fields"]
+ 	];
+}
+static getCongradulations()
+{
+	return[{"label": "Congratulations! Course Complete"},
+	{"label2": "Course Creation Complete"},
+ 	["Exit and Add Students", "Return to Edit Course"]
+ 	];
+}
+static getCustomEventType()
+{
+return[{"label": "What Custom Event Type Are You Creating"},
+	{"label2": "Custom Event Type"},
+ 	["Private Coaching", "Custom Size and Schedule Courses"]
+ 	];
+}
+
+static getPrivateCoach()
+{
+		return [{"label": "Private Course Coach"},
+					{"label2": "Private Coach"},
+					["John Gotta, Price AVG",
+					"Stacy Collerette, Price AVG",
+					"George Rimakis, Price AVG",
+					"Scott McKinley, Price AVG",
+					"Jason Frazzano, Price AVG",
+					"Mustaffa Raza, Price AVG",
+					"Radika Patel, Price AVG"],
+					];//this should be a profile and be pulled from its own constructors.
+}
+static getPrivateCoachingPackageHours()
+{
+		return [{"label": "Private Coaching Hours Packages"},
+					{"label2": "Private Coaching Hours"},
+					["12 Hours, 4-6 Sessions, Price Total",
+					"18 Hours, 6-9 Sessions, Price Total",
+					"24 Hours, 8-12 Sessions, Price Total",
+					"36 Hours, 12-18 Sessions, Price Total",
+					"50 Hours, up to 25 Sessions, Price Total",
+					"100 Hours, up to 50 Sessions, Price Total", 
+					"Other, by approval only"
+					]
+					];//this should be a profile and be pulled from its own constructors.
+}
+
+static getStudentsForPrivatePackage()
+{
+		return [{"label": "Add The Student Interested In the Hours"},
+					{"label2": "Student Profile Link"},
+					["ADD STUDENT",
+					"ADD STUDENT"
+					]
+					];//this should be a profile and be pulled from its own constructors.
+}
+static getStudentsForPrivatePackage()
+{
+		return [{"label": "Add The Student Interested In the Hours"},
+					{"label2": "Student Profile Link"},
+					["ADD STUDENT",
+					"ADD STUDENT"
+					]
+					];//this should be a profile and be pulled from its own constructors.
+}
+static getDateForPrivateSession()
+{
+return [{"label": "Select a Date For A Session"},
+					{"label2": "Private Session Date"},
+					["ADD Date",
+					"ADD Date 2"
+					]
+					];
+
+
+}
+static getStartTimeForPrivateSession()
+{
+	return [{"label": "Set Start Time For Date One"},
+					{"label2": "Start Time Date One"},
+					["ADD START TIME 1",
+					""
+					]
+					];
+
+
+}
+static getEndTimeForPrivateSession()
+{
+	return [{"label": "Set End Time For Date One"},
+					{"label2": "End Time Date One"},
+					["ADD End TIME 1",
+					""
+					]
+					];
+
+
+}
+
+static getMoreInputs()
+{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(),FcCourse.getCoaches(),FcCourse.getPrice(),FcCourse.getConfirmAndSetCourse(), FcCourse.getCourseMeetingDays(),FcCourse.getCourseTimes(),FcCourse.getSummerCourseSchedules(),FcCourse.getCustomEventType(),FcCourse.getPrivateCoach(), FcCourse.getPrivateCoachingPackageHours(), FcCourse.getStudentsForPrivatePackage(),FcCourse.getDateForPrivateSession(), FcCourse.getStartTimeForPrivateSession(), FcCourse.getEndTimeForPrivateSession(), FcCourse.getCongradulations(),FcCourse.getCongradulations(),FcCourse.getCongradulations()];
+}
+
+setCourseCreatorNextInput(propertyName, val, inputIndex)
+	{	var indexOfNextInput=inputIndex+1;
+		if(propertyName == "scheduleType" && val!=="Standard Schedule")
+		{	indexOfNextInput=13;
+		}
+		else if(propertyName=="courseType" && val!=="Focused 1600SAT Course")
+			{indexOfNextInput=10;}
+		else if(propertyName=="testDate" && this.isPrivateSchedule===false && val.charAt(4)==="A")
+		{
+			{this.summer=true;}
+		}
+		else if(propertyName=="practiceTestDay" && this.summer===false)
+		 	{indexOfNextInput=inputIndex+1;}
+		else if(propertyName=="practiceTestDay" && this.summer===true)
+		 	{indexOfNextInput=12;}
+		else if(inputIndex===12 && this.summer===true)
+		{indexOfNextInput=6;}
+		else if(inputIndex===9 && val=="Confirm")
+			{indexOfNextInput=17;}
+		else if(propertyName=="customEventType" && val==="Private Coaching")
+			{this.isPrivateSchedule=true; indexOfNextInput=14;}//index 13
+		else if(inputIndex===14)
+			{indexOfNextInput=15;}
+		else if(inputIndex===15 && this.isPrivateSchedule===true)
+			{indexOfNextInput=2;}
+		else if(propertyName=="testDate"&& this.isPrivateSchedule===true)
+			{console.log(this.programLength);
+				this.setCourseLength(this.programLength);
+			}
+		else if(inputIndex===4)
+			{indexOfNextInput=16;}
+		
+
+		console.log(this.courseCalendarDaysArray);
+		return indexOfNextInput;
+	}
+	
+	setCourseLength(argWeeks)
+	{
+		console.log("setCourseLength " + argWeeks);
+		this.courseLength = parseInt(argWeeks);
+		var retVal = this.setCourseCalendar(this.courseLength);
+		this.programLength=parseInt(argWeeks) + " weeks";
+		return retVal;
+	}
+
+	setTestDate(argDate)
+	{
+		console.log("setTestDate " + argDate);
+		this.testDate = argDate;
+		this.testDateDate = new Date(this.testDate);
+		this.eventArray = [];
+		this.practiceTestArray = [];
+		this.courseMeetingArray = [];
+		console.log(this.calendarDayArray);
+		//this.generateCourseCalendar(argCourseLength);
+	}
+
+	setCourseCalendar(weeks)
+	{	var daysOfProgram=(weeks*7);
+		var endDate= new Date(this.testDate).addDays(+1);	
+			this.endDate= endDate;
+		var startDate = endDate.addDays(-1-(daysOfProgram));
+		console.log(startDate, endDate);
+		this.startDate = startDate;
+		var self=this;
+		var arrayHolder=[];
+		arrayHolder=this.calendarDayArray.filter(function(currentValue, index, array)
+		{  if(currentValue.calendarDay.inMonth===true && currentValue.calendarDay.date>startDate && currentValue.calendarDay.date<endDate)
+				{   console.log(currentValue, "look here");
+					currentValue.inCalendarDayArray=true;
+					currentValue.calendarDay.isSelected = true; 
+					currentValue.calendarDay.toggleDay = true;
+					currentValue.calendarDay.background= "#c6dafc";
+					currentValue.calendarDay.eventList.unshift({
+						activity: "InCourse: 00001",
+						coach: "Jason Frazzano",
+						date: currentValue.calendarDay.date,
+						endTime: "9:00PM",
+						fcid: "JasonCourse00001",
+						location:"704 Ginesi Drive, Morganville, NJ 07754",
+						room:"Room 1 of 3",
+						startTime: "9:00AM",
+						time: "ALL DAY",
+						color: "#c6dafc"
+					});
+				
+					return currentValue;
+
+
+				}
+				
+		}); 
+		this.courseCalendarDaysArray =arrayHolder;
+		this.calendarDayArray= arrayHolder;
+		return arrayHolder;
+		//this.calendarCreator(start, end);
+	}
+
+	setEvent(argEventObject)
+	{
+		
+
+	}
+	setPracticeTestDay(argDay)
+	{	var day = argDay.charAt(1);
+			var testVal;
+			if(day=="u"){testVal=0;}
+			else if(day=="a"){testVal=6;}
+			var weekendDay= argDay.split(" ");
+			var theDay=weekendDay[0];
+		var markedCalendarDayArray =[];
+		markedCalendarDayArray= this.courseCalendarDaysArray.filter(function(currentValue, index, array){
+			console.log(argDay.split(" "));
+			if(currentValue.calendarDay.date.getDay()==testVal){
+				currentValue.calendarDay.background="red";
+				currentValue.calendarDay.inPracticeTestArray=true;
+				currentValue.calendarDay.eventList.splice(1,0,{
+						activity: "Practice Test: 00001",
+						coach: "Jason Frazzano",
+						date: currentValue.calendarDay.date,
+						endTime: "12:45PM",
+						fcid: "JasonCourse00001",
+						location:"704 Ginesi Drive, Morganville, NJ 07754",
+						room:"Room 1 of 3",
+						startTime: "9:00AM",
+						time: "9:00AM",
+						color: "red"
+					});
+				}
+			 return currentValue;
+		});
+		this.calendarDayArray = markedCalendarDayArray;
+		this.courseCalendarDaysArray = markedCalendarDayArray;
+		this.practiceTestArray = [];
+		this.practiceTestArray = this.courseCalendarDaysArray.filter(function(currentValue, index, array){
+			if(currentValue.calendarDay.inPracticeTestArray===true)
+				{return currentValue;}
+		});
+		this.practiceTestDay=theDay;
+		this.numberOfPracticeTests=this.practiceTestArray.length;
+		return this.practiceTestArray;
+	}
+
+
+	setCourseMeetingDaysAndTimes(argDaysAndTimes)
+	{	var theDaySet ="";
+		var parts = argDaysAndTimes.split(",");
+		var days= parts[0].split("|");
+		var numDays=days.length;
+		console.log(numDays);
+		for(var i=0; i<numDays; i++)
+		{
+			var theDay =days[i];
+			theDaySet +=dayAbbreviationsToDays(theDay) + " ";
+		}
+		var times = parts[1];
+		times = times.split("_");
+		this.startTime=times[0];
+		this.endTime=times[1];
+		console.log(theDaySet);
+		this.startAndEndTimes = this.startTime + " to " + this.endTime;
+		var retVal=this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime);
+	 	return retVal;
+	}
+
+	setCourseMeetingEvents(argDays, argStartTime, argEndTime)
+	{
+		this.courseMeetingDays = argDays;
+		var arrayDays = argDays.split(" ");
+		var numMeetingDays=arrayDays.length;
+		console.log(numMeetingDays, arrayDays, "HERE LOOK HERE FOR NUMB DAYS TWO");
+		var testValArray=[];
+		arrayDays.forEach(function(item, index, array)
+			{	
+				var dayNumb = (item=="Sunday")?0:(item=="Monday")?1:(item=="Tuesday")?2:(item=="Wednesday")?3:(item=="Thursday")?4:(item=="Friday")?5:(item=="Saturday")?6: "";
+				console.log(dayNumb);
+				if(dayNumb!==""){
+					testValArray.push(dayNumb);
+				}
+		});
+		var meetingDays = this.courseCalendarDaysArray.filter(function(currentValue, index, array){
+				
+			var tester = currentValue.calendarDay.date.getDay(currentValue.calendarDay.date);
+			console.log(tester);
+			if(testValArray.indexOf(tester)>-1){
+				currentValue.calendarDay.background="aqua";
+				currentValue.calendarDay.isMeetingDay=true;
+				currentValue.calendarDay.eventList.splice(1,0,{
+						activity: "Course Meeting for 00001",
+						coach: "Jason Frazzano",
+						date: currentValue.calendarDay.date,
+						endTime: argEndTime,
+						fcid: "JasonCourse00001",
+						location:"704 Ginesi Drive, Morganville, NJ 07754",
+						room:"Room 1 of 3",
+						startTime: argStartTime,
+						time: argStartTime,
+						color: "aqua"
+					});
+				}
+			 return currentValue;
+		});
+		this.courseCalendarDaysArray = meetingDays;
+		this.courseMeetingArray=this.courseCalendarDaysArray.filter(function(currentValue, index, array){ if(currentValue.calendarDay.isMeetingDay=true){return currentValue;}});
+		this.numberOfMeetings = this.courseMeetingArray.length;
+		console.log(this.numberOfMeetings, this.courseMeetingArray, this.courseCalendarDaysArray, "here is the long list, enjoy");
+		return this.courseMeetingArray;
+		}
+
+		// var currDate = new Date(this.testDate).addDays(-1 * (this.courseLength * 7));
+		// console.log(currDate);
+		// var addOnsArray=[];
+		// var self=this;
+		// arrayDays.forEach(function(item, index, array){
+		// 	var addOn=(item=="Sunday")?1:(item=="Monday")?2:(item=="Tuesday")?3:(item=="Wednesday")?4:(item=="Thursday")?5:(item=="Friday")?6:(item=="Saturday")?0: 2;
+		// 		for(var i=0; i<self.courseLength; i++)
+		// 		{
+		// 			var date= currDate.addDays(addOn + 7*(i));
+		// 			var datetime = stringTimeToDateTime(argStartTime, date);
+		// 			var edatetime=stringTimeToDateTime(argStartTime, date);
+		// 			var cmStart= new Date(datetime);
+		// 			var cmEnd = new Date(edatetime);
+		// 			var cmEvent = new FcCourseEvent({courseId: self.fcid, startTime:cmStart, endTime: cmEnd, courseEventType: "course meeting", testDate:self.testDate, coach: self.coach});
+		// 		self.eventArray.push(cmEvent);
+		// 		self.courseMeetingArray.push(cmEvent);
+		// 		}
+		// 	});
+
+
+	setCoach(argCoach)
+	{
+		this.coach = argCoach;
+		var numEvents = this.eventArray.length;
+		for(i=0; i < numEvents; i++)
+		{
+			var ev = this.eventArray[i];
+			ev.coach = argCoach;
+		}
+	}
+
+	save()
+	{
+		var numEvents = this.eventArray.length;
+		var i = 0;
+		console.log(this.eventArray);
+		if(this.fcid=="")
+		{
+			var ref = new Firebase(FcCourse.getFirebaseLocation());
+    		var self= this;
+  			ref.child('counter').transaction(function(argCounter){return argCounter+1;}, 
+      				function(error, isSuccessful, finalVal)
+        				{ console.log(error, isSuccessful, finalVal.val());
+          						if(isSuccessful)
+            						{
+              							self.fcid=finalVal.val();
+              							var ref2=ref.child(self.fcid);
+              							ref2.update(self);
+            						}
+        				});
+		}
+	}
+
+}
 function generateRealSATEvents(startDate, endDate)
 {
 
@@ -240,475 +836,7 @@ function generateHolidayEvents(startDate, endDate)
    
 }
 
-class FcCourse
-{
 
-	constructor()
-	{
-		this.scheduleType="",
-		this.customCourseType="",
-		this.courseType = "";
-		this.testDate = "";
-		this.startTime="";
-		this.endTime= "";
-		this.programLength="";
-		if(this.startTime!==""){
-		this.startAndEndTimes= this.startTime + " to " + this.endTime;}
-		this.courseMeetingDays="";
-		this.courseDaySets="";
-		this.summerMeetingDays="";
-		this.presetCourseLength= ""; 
-		this.practiceTestDay= "";
-		this.presetCoursePattern="";
-		this.numberOfMeetings="";
-		this.numberOfPracticeTests="";
-		this.courseLocation=""; 
-		this.coach="";
-		this.associatedCoaches="";
-		this.courseSize="";
-		this.practiceTestDay = "";
-		this.eventArray = [];
-		this.practiceTestArray = [];
-		this.courseMeetingArray = [];
-		this.fcid = "";
-		this.currentEnrollment="";
-		this.price="";
-		this.summer=false;
-		this.courseLength="";
-		this.courseMeetingLength="";
-		this.hoursTotal=""; //FcCourse.getNewFcid();
-		this.courseCalendarDaysArray=[];
-	}
-
-	
-
-
-	static getCourseTypes()
-	{
-		return [{"label": "Would you like to make a custom or standard course schedule?"},
-				{"label2":"Schedule Type"},
-				["Standard Schedule", "Custom Schedule"]
-			];
-	}
-
-	static getCourseSubTypes()
-		{
-		return [ 	{"label": "Standard Course Schedule"},
-	  				{"label2":"Course Type"},
-					["Focused 1600SAT Course","Focused Study Group"] 
-				];
-		}
-	static getTestDates()
-	{	var tResult =[];
-		var result = [];
-		var allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
-		var numDates = allTestDates.length;
-		var now = new Date();
-		for(var i = 0; i < numDates; i++)
-		{
-			var testdate = new Date(allTestDates[i]);
-			if(testdate.addDays(-28) >= now) //must be 28 days before test min
-			{
-				result.push(testdate.toDateString());
-			}
-		}
-		var obj1 = {"label":"2016-2019 SAT Test Dates"};
-		var obj2={"label2": "Test Date"};
-		tResult.push(obj1);
-		tResult.push(obj2);
-		tResult.push(result);
-		return tResult;	
-	}
-
-	
-
-	static getPresetCourseLength()
-	{
-		return 	[{"label": "Select a Program Length between 3 & 13 weeks"},
-				{"label2": "Program Length"},
-				["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days"]
-			    ];	   
-	}
-
-	static getCourseTimes()
-	{
-		return [
-				{"label":"Course Times"},
-				{"label2":"Start And End Times"},
-				["3:45PM-5:45PM", "6:00PM-9:00PM", "9:00AM-12:30PM", "1:00PM-4:30PM", "5:00PM-8:30PM", "4:00PM-7:30PM"]
-				];
-	}
-
-	static getPracticeTestDays()
-	{
-	 	return	[	{"label": "Which Practice Test Day Suits Your Course?"},
-		 			{"label2": "Practice Test Day"},
-					["Saturday Practice Tests","Sunday Practice Tests"]
-				];
-	}
-	static getCoaches()
-	{
-		return [{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"],
-					];//this should be a profile and be pulled from its own constructors.
-	}
-
-	static getCourseEnrollment()
-	{
-		  		 return [	{"label": "Course Enrollment Limit"},
-							{"label2": "Course Size"},
-	  						["Mini-Group: 8","Mini-Group: 12","Mini-Group: 16","1600SAT Course: 18","1600SAT Course: 22","1600SAT Course: 25"]
-	  					];
-	}
-
-	static getCourseMeetingDays()
-	{
-		return [{"label": "Which Days will your Course Meet on each Week?"},
-				{"label2": "Course Meeting Days"},
-				["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Select Days on your Calendar"]
-				];
-	}
-
-	static getCourseDaySets()
-	{	return [{"label": "Select the Days and Related Times For Your Course!"},
-				{"label2": "Course Day Sets"},
-				["Monday & Wednesday (6PM_to_9PM)", "Tuesday & Thursday (6PM_to_9PM)", "Mon|Wed|Fri (Afternoon)"]
-			 ];
-	}
-	static getCourseTimeSets()
-	{	return  [{"label": "Course Times During School"},
-			  {"label2":"Preset Course Times"},
-			  ["6:00PM_9:00PM, for Mon|Wed", "6:00PM_9:00PM, for Tues|Thurs", "3:45PM_5:45PM, for Mon|Wed|Fri"]
-			  ];
-	}
-	static getSummerCourseDaySets()
-	{
-	return 	[{"label": "Summer Course Schedules!"},
-			{"label2": "Summer Course Day Sets"},
-		["Summer: Mon & Wed (Morning)", "Summer: Tues & Thurs (Morning)", "Summer: Mon & Wed (Afternoon)", "Summer: Tues & Thurs (Afternoon)", "Summer: Mon, Wed & Fri (Morning)", "Summer: Monday & Wednesday (Evening)", "Summer: Tuesday & Thursday (Evening)"]
-];
-}
-static getSummerCourseSchedules()
-{		return[{"label": "Summer Course Schedules!"},
-	{"label2": "Summer Meeting Days"},
- 	["Summer: 9:00AM_12:30PM M|W", "Summer: 9:00AM_12:30PM Tu|Th", "Summer: 1:00PM_4:30PM M|W", "Summer: 1:00PM_4:30PM Tu|Th", "Summer: 5:30PM_8:30PM M|W", "Summer: 5:30PM_8:30PM T|Th", "Summer: 9:45AM_12:45PM M|W|F"]
- 	];
-
-}
-
-static getMoreInputs()
-{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(), FcCourse.getCourseMeetingDays(), FcCourse.getSummerCourseSchedules(),FcCourse.getCourseTimes()];
-}
-static getAllInputsAtOnce()
-{			return[	
-					[
-					 {"label": "Would you like to make a custom or standard course schedule?"},
-					{"label2":"Schedule Type"},
-					["Standard Schedule", "Custom Schedule"]
-					],
-					[
-					 {"label": "Standard Course Schedule"},
-					{"label2":"Course Type"},
-						["Focused 1600SAT Course",
-						 "Focused Study Group"
-						 ] 
-					],
-					  [
-					  {"label": "Will the Course be 3, 4, 5, 6 or 7 weeks long?"},
-					 {"label2": "Preset Course Length"},
-					 ["3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days",]
-					 ],
-					 [
-					 {label: "Which Practice Test Day Suits Your Course?"},
-					 {"label2": "Practice Test Day"},
-					 ["Saturday Practice Tests","Sunday Practice Tests"]
-					 ],
-					 [
-					 {"label": "Which Course Paterns match your event?"},
-					 {"label2": "Preset Course Pattern"},
-					 ["Mon|Wed_6:00PM_9:00PM","Tues|Thurs_6:00PM_9:00PM","Mon|Wed|Fri_3:45PM_5:45PM", "M|W|F_Summer_9:00AM_12:30PM","Tues|Thurs_3:45PM_6:00PM", "M|W_Summer_9:00AM_12:30PM","T|Th_Summer_9:00AM_12:30PM","M|W_Summer_1:00PM_4:30PM","T|Th_Summer_1:00PM_4:30PM"
-					 ]
-					 ],
-					 [
-					{"label":"Confirm Start Time" },
-					{"label2": "Start Time" },
-					["9:00AM", "1:00PM", "3:45PM","6:00PM" ]
-					],
-					[{"label":"Confirm End Time" },
-					{"label2":"End Time" },
-					["12:30PM", "4:30PM", "5:45PM", "6:00PM", "9:00PM"]
-					],
-					[		
-				 	{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"],
-					],
-					[
-					 {"label": "Custom Course Design"},
-					 {"label2": "Custom Course Type"},
-					 ["Mini-Goup", "Private", "Elite Course"]
-					 ],
-				
-					 [
-					 {"label": "Weeks You Will Prepare Prior Your Test Date"},
-					 {"label2": "Course Length"},
-					 ["1 Week, 7 Days", "2 Weeks, 14 Days", "3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days", "14 Weeks, 98 Days", "15 Weeks, 105 Days", "16 Weeks, 112 Days"]
-					 ],
-					
-					[ {"label": "How Many Days Will you Select?"},
-					 {label2: "Course Meeting Days"},
-					 ["", "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-					]
-				];
-	}
-	
-
-getFirebaseLocation()
-	{
-		// return ("https://focused0ne.firebaseio.com/courses");
-	}
-
-	setCourseLength(argWeeks)
-	{
-		console.log("setCourseLength " + argWeeks);
-		this.courseLength = parseInt(argWeeks);
-	}
-
-	setTestDate(argDate)
-	{
-		console.log("setTestDate " + argDate);
-		this.testDate = argDate;
-		this.testDateDate = new Date(this.testDate);
-		this.eventArray = [];
-		this.practiceTestArray = [];
-		this.courseMeetingArray = [];
-		//this.generateCourseCalendar(argCourseLength);
-	}
-
-	generateCourseCalendar(weeks)
-	{	var numb = parseInt(weeks);
-		var start = new Date(this.testDate.addDays(-7*numb));
-		var end = new Date(this.testDate);
-		//this.calendarCreator(start, end);
-	}
-
-	setPracticeTestDay(argDay)
-	{
-		if(!this.testDate)
-		{
-			console.log("ERROR: must set test date before practice test day");
-			return;
-		}
-		console.log(this, argDay);
-		this.practiceTestDay = argDay;
-		this.practiceTestArray = [];
-		var i = 0;
-		var numEvents = this.eventArray.length;
-		for(i=0;i<numEvents;i++)
-		{
-			var ev = this.eventArray[i];
-			if(ev.courseEventType == "practice test")
-			{
-				this.eventArray.splice(i, 1);
-				i--; numEvents--;
-			}
-		}
-		var currDate = this.testDateDate.addDays((argDay == "Saturday Practice Tests")?(-1 * this.courseLength * 7):(-1 * (this.courseLength * 7 - 1)) );
-		for(i=0; i<this.courseLength;i++)
-		{
-			var ptStart = new Date(currDate);
-			ptStart.setHours(9);
-			var ptEnd = new Date(currDate);
-			ptEnd.setHours(12);
-			ptEnd.setMinutes(30);
-			var ptEvent = new FcCourseEvent({courseId: this.fcid, startTime:ptStart, endTime: ptEnd, courseEventType: "practice test", testDate:this.testDateDate});
-			this.eventArray.push(ptEvent);
-			this.practiceTestArray.push(ptEvent);
-			currDate = currDate.addDays(7);
-		}
-		this.numberOfPracticeTests = this.practiceTestArray.length;
-		console.log(this.practiceTestArray);
-	}
-
-
-	setCourseMeetingDaysAndTimes(argDaysAndTimes)
-	{
-		console.log("setCourseMeetingDaysAndTimes " + argDaysAndTimes);
-		var parts = argDaysAndTimes.split(",");
-		var days = parts[1];
-		days = days.toLowerCase();
-		days = days.replace("for", "");
-		days = days.replace(/\s/g, "");
-		days = days.replace("tues", "tuesday");
-		days = days.replace("thurs", "thursday");
-		days = days.replace("mon", "monday");
-		days = days.replace("wed", "wednesday");
-		days = days.replace("fri", "friday");
-		days = days.replace(/\|/g, "/");
-		var times = parts[0];
-		times = times.replace("_", "-");
-		var start = times.split("-")[0];
-		start = start.replace("AM", "");
-		var pmIndex = start.indexOf("PM");
-		var hour, min;
-		if(pmIndex > -1)
-		{
-			start = start.replace("PM", "");
-			hour = parseInt(start.split(":")[0]);
-			min = start.split(":")[1];
-			start = (hour+12).toString() + ":" + min;
-		}
-		var end = times.split("-")[1];
-		end = end.replace("AM", "");
-		pmIndex = end.indexOf("PM");
-		if(pmIndex > -1)
-		{		
-			end = end.replace("PM", "");
-			hour = parseInt(end.split(":")[0]);
-			min = end.split(":")[1];
-			end = (hour+12).toString() + ":" + min;
-		}
-		times = start + "-" + end;
-		console.log(days, times);
-		this.setCourseMeetingDays(days);
-		this.setCourseMeetingTime(times);
-	}
-
-	setCourseMeetingDays(argDays)
-	{
-		if(!this.testDate || !this.practiceTestDay)
-		{
-			console.log("ERROR: must set test date and practice test day before meeting days");
-			return;
-		}
-		this.courseMeetingDays = argDays;
-		this.courseMeetingArray = [];
-		var numEvents = this.eventArray.length;
-		for(i=0;i<numEvents;i++)
-		{
-			var ev = this.eventArray[i];
-			if(ev.courseEventType == "course meeting")
-			{
-				this.eventArray.splice(i, 1);
-				i--; numEvents--;
-			}
-		}
-		var currDate = this.testDateDate.addDays((argDays.indexOf("monday/wednesday") > -1)?(-1 * (this.courseLength * 7 - 2)):(argDays == "tuesday/thursday")? (-1 * (this.courseLength * 7 - 3)): 0);
-		for(i=0; i<this.courseLength;i++)
-		{
-			var cmStart = new Date(currDate);
-			var cmEnd = new Date(currDate);
-			var cmEvent = new FcCourseEvent({courseId: this.fcid, startTime:cmStart, endTime: cmEnd, courseEventType: "course meeting", testDate:this.testDateDate});
-			this.eventArray.push(cmEvent);
-			this.courseMeetingArray.push(cmEvent);
-			var cm2Start = new Date(cmStart.addDays(2));
-			var cm2End = new Date(cmEnd.addDays(2));
-			var cm2Event = new FcCourseEvent({courseId: this.fcid, startTime: cm2Start, endTime: cm2End, courseEventType: "course meeting", testDate:this.testDateDate});
-			this.eventArray.push(cm2Event);
-			this.courseMeetingArray.push(cm2Event);
-			if(argDays == "monday/wednesday/friday")
-			{
-				var cm3Start = new Date(cm2Start.addDays(2));
-				var cm3End = new Date(cm2End.addDays(2));
-				var cm3Event = new FcCourseEvent({courseId: this.fcid, startTime: cm3Start, endTime: cm3End, courseEventType: "course meeting", testDate:this.testDateDate});
-				this.eventArray.push(cm3Event);
-				this.courseMeetingArray.push(cm3Event);
-			}
-			currDate = currDate.addDays(7);
-		}
-		this.numberOfMeetings = this.courseMeetingArray.length;
-
-	}
-
-	setCourseMeetingTime(argTime)
-	{
-		if(!this.testDate || !this.practiceTestDay || !this.courseMeetingDays)
-		{
-			console.log("ERROR: must set test date, practice test day, and course meeting days before meeting time");
-			return;
-		}
-		this.courseMeetingTime = argTime;
-		var parts = argTime.split("-");
-		var start = parts[0];
-		var end = parts[1];
-		var startparts = start.split(":");
-		var starthours = parseInt(startparts[0]);
-		var startminutes = parseInt(startparts[1]);
-		var endparts = end.split(":");
-		var endhours = parseInt(endparts[0]);
-		var endminutes = parseInt(endparts[1]);
-		var numEvents = this.courseMeetingArray.length;
-		var i = 0;
-		for(i=0; i < numEvents; i++)
-		{
-			var ev = this.courseMeetingArray[i];
-			// var property = argIsStart?"startTime": "endTime";
-			ev.startTime.setHours(starthours);
-			ev.startTime.setMinutes(startminutes);
-			ev.endTime.setHours(endhours);
-			ev.endTime.setMinutes(endminutes);
-//			ev[property].setHours(hours);
-//			ev[property].setMinutes(minutes);
-			//ev[property].setSeconds(seconds);
-		}
-	}
-
-
-	setCoach(argCoach)
-	{
-		this.coach = argCoach;
-		var numEvents = this.eventArray.length;
-		for(i=0; i < numEvents; i++)
-		{
-			var ev = this.eventArray[i];
-			ev.coach = argCoach;
-		}
-	}
-
-	save()
-	{
-		var numEvents = this.eventArray.length;
-		var i = 0;
-		console.log(this.eventArray);
-		if(this.fcid=="")
-		{
-			var ref = new Firebase(FcCourse.getFirebaseLocation());
-    		var self= this;
-  			ref.child('counter').transaction(function(argCounter){return argCounter+1;}, 
-      				function(error, isSuccessful, finalVal)
-        				{ console.log(error, isSuccessful, finalVal.val());
-          						if(isSuccessful)
-            						{
-              							self.fcid=finalVal.val();
-              							var ref2=ref.child(self.fcid);
-              							ref2.update(self);
-            						}
-        				});
-		}/*
-		for(i=0; i < numEvents; i++)
-		{
-			this.eventArray[i].save();
-		}*/
-		//var ref = new Firebase(FcCourse.getFirebaseLocation());
-		// var courseObj = {};
-		// courseObj[this.fcid] = this;
-		// console.log(courseObj);
-		// ref.update(courseObj);
-	}
-}
 FcCourse.fcidCounter = 0;
 
 window.FCBehaviors = window.FCBehaviors || {};
@@ -1033,418 +1161,43 @@ FCBehaviors.FcCalendarBehaviorPrime = {
  getTimes: function()
 	{	var slotsArr = [];
 		var timeArr = [];
-        for(var i=24; i<=84;i++)
+		for(var i=8; i<=21;i++)
         {
-              var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
+              var hour=(i<13)?i:(i-12);
               if(hour<10){hour='0'+hour.toString();}
-              var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
-              var ampm=(i<48)?"AM":"PM";
+              var minutes="00";
+              var ampm=(i<12)?"AM":"PM";
               var tobj = {"hour": hour,
                           "minutes": minutes,
                           "ampm": ampm, 
                         };
               var string=hour.toString() + ":" + minutes+ ampm;
-              timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": ""});
+              timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":""});
           }
- 	var obj1={"label": "Scheduled Appointment Times"};
- 	var obj2={"label2": "activity.valueTOBEADDED"};
- 	slotsArr.push(obj1);
- 	slotsArr.push(obj2);
- 	slotsArr.push(timeArr);
-          return(slotsArr);
-    }
+          return(timeArr);
+	}
+
+        // for(var i=24; i<=84;i++)
+        // {
+        //       var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
+        //       if(hour<10){hour='0'+hour.toString();}
+        //       var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
+        //       var ampm=(i<48)?"AM":"PM";
+        //       var tobj = {"hour": hour,
+        //                   "minutes": minutes,
+        //                   "ampm": ampm, 
+        //                 };
+        //       var string=hour.toString() + ":" + minutes+ ampm;
+        //       timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":this.day });
+        //   }
+        //   return(timeArr);
+    
 
 
 
 };
 
 
-
-/*
-function fcCreateBaseLineEvents(startDate,stopDate){
-     var daysArray = [];
-	 daysArray=getDates(startDate,stopDate);
-	 var counter =argDays.length;
-	 var eventDaysArrayII=[];
-		for(var i=0;i<counter;i++)
-		{
-			var aDay= this.holidayEvents(argDays[i]);
-		 	var aDay2 =	this.satTestCourseEvents(aDay);
-		 	daysArray.push(aDay2);
-		}
-	}
-
- {"label": "Custom Course Design"},
-					 {"label2": "Custom Course Type"},
-					 ["Mini-Goup", "Private", "Elite Course"]
-					 ],
-					  // testDates,
-					 [
-					 {"label": "Weeks You Will Prepare Prior Your Test Date"},
-					 {"label2": "Course Length"},
-					 ["1 Week, 7 Days", "2 Weeks, 14 Days", "3 Weeks, 21 Days", "4 Weeks, 28 Days", "5 Weeks, 35 Days", "6 Weeks, 42 Days", "7 Weeks, 49 Days", "8 Weeks, 56 Days", "9 Weeks, 63 Days", "10 Weeks, 70 Days", "11 Weeks, 77 Days", "12 Weeks, 84 Days", "13 Weeks, 91 Days", "14 Weeks, 98 Days", "15 Weeks, 105 Days", "16 Weeks, 112 Days"]
-					 ],
-					
-					[ {"label": "How Many Days Will you Select?"},
-					 {label2: "Course Meeting Days"},
-					 ["", "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-					],
-					
-					this.timeSlotsArr, 
-					[
-					{"label": "Primary Course Coach"},
-					{"label2": "Coach"},
-					["John Gotta",
-					"Stacy Collerette",
-					"George Rimakis",
-					"Scott McKinley",
-					"Jason Frazzano",
-					"Mustaffa Raza",
-					"Radika Patel"],
-					],
-
-
-function holidayEvents(startDate,endDate){
-      var holidayArray = [];
-      holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13], "noBook": false}, 
-        {"name": "St. Patrick's Day", "holiday":[2016,3,17], "noBook": false},
-        {"name": "Palm Sunday", "holiday":[2016,3,20], "noBook": false}, 
-        {"name": "Passover Begins", "holiday": [2016,3,23], "noBook": false},
-        {"name": "Purim", "holiday": [2016,3,24], "noBook": false}, 
-        {"name": "Good Friday", "holiday": [2016,3,25], "noBook": false},
-        {"name": "Easter", "holiday": [2016,3,27], "noBook": true},
-        {"name": "Orthodox Good Friday", "holiday": [2016,4,29], "noBook": false},
-        {"name": "Last Day of Passover", "holiday": [2016,4,30], "noBook": false}, 
-        {"name": "Yom HaShoah", "holiday": [2016,5,4], "noBook": false}, 
-        {"name": "Isra and Mi'raj, Cinco Di Mayo", "holiday": [2016,5,5], "noBook": false}, 
-        {"name": "MOTHERS DAY!!!", "holiday": [2016,5,8], "noBook": true},
-        {"name": "Memorial Day", "holiday": [2016,5,30], "noBook": false},
-        {"name": "Ramadan Begins", "holiday": [2016,6,7], "noBook": false},
-        {"name": "Father's Day", "holiday": [2016,6,19], "noBook": true},
-        {"name": "Independence Day July 4", "holiday": [2016,7,4], "noBook": true},
-        {"name": "Labor Day", "holiday": [2016,9,5], "noBook": false},
-        {"name": "Rosh Hashana, Muharram", "holiday": [2016,10,3], "noBook": false},
-        {"name": "Columbus Day", "holiday": [2016,10,10], "noBook": false},
-        {"name": "Yom Kippur", "holiday": [2016,10,12], "noBook": false},
-        {"name": "Diwali", "holiday": [2016,10,29], "noBook": false},
-        {"name": "Halloween", "holiday": [2016,10,31], "noBook": false},
-        {"name": "Veterans Day", "holiday": [2016,11,11], "noBook": false},
-        {"name": "Thanksgiving Thursday", "holiday": [2016,11,24], "noBook": true},
-        {"name": "Thanksgiving Friday", "holiday": [2016,11,25], "noBook": true}, 
-        {"name": "Christmas Eve", "holiday": [2016,12,24], "noBook": true},
-        {"name": "Christmas", "holiday": [2016,12,25], "noBook": true},
-        {"name": "New Year's Eve", "holiday": [2016,12,31], "noBook": true}
-        ];
-  		
-      var counter = holidayArray.length;
-      for(i=0;i<counter;i++){
-      	var relHolidays=[];
-      	var noBookHolidays=[];
-        var holiday = new Date(holidayArray[i].holiday);
-        var holidaynumb = holiday.dayStamp();
-        holidayArray[i].dayStamp=holidaynumb;
-        if(holidaynum>=startDate && holidaynum<=endDate)
-        {	
-        	relHolidays.push(holidayArray[i]);
-        	if(holidayArray[i].noBook==true)
-        	{	holidayArray[i].alert="Alert No Booking!!";
-        		noBookHolidays.push(holidayArray[i]);
-        	}
-        }
-        var pushObj={
-        	"holidays":relHolidays,
-        	"alerts": noBookHolidays,
-        }
-      }
-      return pushObj;
-    }
-*/
-
-/*
-FcCourseBuilder.prototype.FcCourseCalendar=function(testDate)
-{
-	this.testDate = testDate || nextReasonableTestDate();	
-	var startDate = new Date(testDate);
-	this.startDate = startDate.setDate(startDate.getDate() - 49);
-	var calendarDaysArray=[];
-	var self=this;
-	console.log(this.startDate, this.testDate);
-	calendarDaysArray=	getDates(startDate, testDate);
-	var fcCourseCalendarObject={};
-	var counter =calendarDaysArray.length;
-	var i=0;
-	var day=i+1;
-	var number =counter;
-	this.fcCourseDayArray=[];
-	var endNum=counter-1;
-
-	for(i=0;i<counter; i++)
-	{ 	
-		var numbDate = dates.dayStamp = new Date(calendarDaysArray[i].dayStamp());
-		calendarDayObject={
-				date:calendarDaysArray[i],
-				startDate:self.startDate,
-				testDate: testDate,
-				daysdayStamp: numbDate,
-				endDate:"",
-				courseStartTime: "",
-				courseEndTime: "",
-				courseDaysOfWeek:"",
-				practiceTestDayOfWeek: "",
-				practiceTestStartTime: "",
-				practiceTestEndTime: "",
-				courseWorkDaySyllabus:"",
-				fcEventList:[],
-				fcCourseEventList: [],
-				fcCourseMeetingDayList:[],
-				fcPracticeTestDayList:[],
-				fcToTestCountDown:number,
-				fcCourseDay: day,
-				fcid:"",
-				coach:"",
-				coachID:"",
-				calendarUserFcid:"", 
-				studentFcids:[],
-				creatorFcis:"",
-				relatedFcids:[]
-			};
-
-		this.fcCourseDayArray.push(calendarDayObject);
-		var startdayStamp=this.fcCourseDayArray[0];
-		var enddayStamp=this.fcCourseDayArray[endNum];
- 			number--;
-		}
-		var startdayStamp=this.fcCourseDayArray[0];
-	var enddayStamp=this.fcCourseDayArray[endNum];
-	var holidayObjArrays ={};
-	holidayOnjArrays= setHolidays(startdayStamp,enddayStamp);
-		
-		return this.fcCourseDayArray;
-}
-
-
-var fcCourseBuilder =function(argObjectBuilder)
-{	
-	this.courseCalendar = this.FcCourseCalendar(testDate);
-	this.practiceTestMeetingsObject=this.practiceTestDays(argSetPracticeTestDays);
-	this.courseMeetingsObject =this.FcCourseMeetingDays(argMeetingDaysObject);
-
-
-}
-fcCourseBuilder.prototype.constructor=FcCourseBuilder;
-
-fcCourseBuilder.prototype.practiceTestDays=function(testDate, isPracticeTestSaturday)
-	{	
-		var practiceTestObjec={};
-		if(isPracticeTestSaturday)
-			{ 
-				for(i=0; i<7;i++)
-				{
-					var dayStamp=sunday.dayStamp();
-					var ptestArray=[];				
-					var saturday = testDate.setDate(testDate.getDate() - (49-(7*i)-7));
-						practiceTestObject={
-							startTime: "9:00AM",
-							endTime: "12:30PM",
-							practiceTestDayOfWeek: "Saturday",
-							date: saturday,
-							dayStamp: saturday
-						};
-					ptestArray.push[saturday];	
-				}
-
-			}
-		else {
-			for(i=0; i<7;i++)
-				{
-					var ptestArray=[];				
-					var sunday = testDate.setDate(testDate.getDate() - (49-(7*i)-6));
-						var dayStamp=sunday.dayStamp();
-						practiceTestObject={
-							startTime: "9:00AM",
-							endTime: "12:30PM",
-							practiceTestDayOfWeek: "Sunday",
-							date: sunday,
-							dayStamp: dayStamp
-						};
-					ptestArray.push[sunday];
-		}
-		this.FcCoursePracticeTestObjectArray =ptestObject; 
-	}
-}
-
-
-FcCourseBuilder.prototype.FcCourseMeetingDays = function(testDate, isMonWedCourse, isTueThuCourse, isMonWedFriCourse, isOtherDaySchedule, otherDayScheduleArray, numberOfWeeks)
-	{	var reverseCourseMeetingsArray=[];
-	  this.courseMeetingArrays=[];
-		this.otherDayScheduleArray=otherDayScheduleArray || [];
-	 	var courseMeetingArray=[];
-	 	var courseWeekDaysArray=(isMonWedCourse==true)?[3,5]: (isTueThuCourse==true)?[2,4]:(isMonWedFriCourse)?[1,3,5]:otherDayScheduleArray;
-	 	var dayBlocks=["M|W|F","Tu|Th", "M|W"];
-	 	var shortLabel = (isMonWedCourse==true)?dayBlocks[2]: (isTueThuCourse==true)?dayBlocks[1]:(isMonWedFriCourse)?dayBlocks[0]:(isOtherDaySchedule==true)?shortDaysLabel([otherDayScheduleArray], 2):"";// see functions shortDayLabel /shortDaysLabel below for solution
-	 	this.shortLabelA=shortLabel;
-	 	var mdl;
-		if(isMonWedCourse==true)
-			{
-				mdl=shortDaysLabel(["Monday", "Wednesday"], 3);
-			}
-		else if(isTueThuCourse==true)
-		{
-			mdl =shortDaysLabel(["Tuesday", "Thursday"], 3);
-		}
-		else if(isMonWedFriCourse)
-		{
-			mdl=shortDaysLabel(["Monday", "Wednesday", "Friday"], 3);
-		}
-		else if(isOtherDaySchedule==true)
-			{
-			mdl=shortDaysLabel([otherDayScheduleArray], 3);
-			}
-		else {mdl= "Mon, Wed"};
-		(isTueThuCourse==true)?shortDaysLabel(["Tuesday", "Thursday"], 3):(isMonWedFriCourse)?shortDaysLabel(["Monday", "Wednesday", "Friday"], 3):(isOtherDaySchedule==true)?shortDaysLabel([otherDayScheduleArray], 3): "";
-	 	var medLabelA = "Course schedule for the " + mdl; 
-	 	var medLabelB = "Focused 1600SAT Course, leading up to the " + testDate.toDateString() + " SAT."
-	 	this.mediumLabelA=medLabelA;
-	 	this.mediumLabelB=medLabelB;
-	 	var longDays = (isMonWedCourse==true)?"Monday, Wednesday":(isTueThuCourse==true)?"Tuesday,Thursday":(isMonWedFriCourse)?"Monday, Wednesday, Friday":otherDayScheduleArray.toString();
-	 	this.longLabelA = "Class Schedule for the " + longDays; 
-	 	this.longLabelB = "Focused 1600SAT Course: this course is designed to prepare students for the SAT scheduled on " + testDate + "."
-	 	var counter = courseWeekDaysArray.length;	
-	 	var j = 0;
-		var singleCourseMeetingsArray =[];
-		
-		for (j = 0; j < numberOfWeeks; j++) 
-		{
-				for(var i=0;i<counter;i++)
-				{ 	var courseMeetingDay =new Date(testDate);
-					var dates={};
-					var numb = courseWeekDaysArray[i];
-					console.log(numb);
-					var less = (j*7)+numb;
-					console.log(less);
-					console.log(courseMeetingDay);
-					courseMeetingDay.setDate(courseMeetingDay.getDate() - less);
-				var cmd=courseMeetingDay;	
-				 	dates.dayStamp = new Date(courseMeetingDay.dayStamp());
-					dates.prettyDate = cmd.toDateString();
-					dates.localeDate = cmd.toLocaleString();
-					dates.date =courseMeetingDay;
-					dates.startTime="";
-					dates.endTime="";
-					dates.shortLabelA = this.shortLabelA;
-					dates.shortLabelB = this.shortLabelB;
-					dates.mediumLabelA = this.mediumLabelA;
-					dates.mediumLabelB = this.mediumLabelB;
-					dates.longLabelA = this.longLabelA;
-					dates.longLabelB = this.longLabelB;
-					dates.hasDays=true;
-					reverseCourseMeetingsArray.push(dates);
-		 		// dates={};
-		 console.log(reverseCourseMeetingsArray);
-				}	
-		}
-		this.courseMeetingsArray=reverseCourseMeetingsArray.reverse();
-		console.log(this.courseMeetingArray);
-		this.hasDays=true;
-	return this;
-	}
-
-FcCourseMeetingDays.prototype.fcCourseMeetingTimes=function(isSixToNineCourse, isAfternoonCourse, is900AmCourse, is100PMCourse, isOtherTimeCourse, otherStartTime, otherEndTime)
-	{   fcCourseMeetingDays.call(this);
-		if(this.hasDays)
-			{	var time={};
-			var	sixToNine={}; 
-				sixToNine.startTime= "6:00PM";
-				sixToNine.startNumHrsArray=[18,0,0];
-				sixToNine.endTime="9:00PM";
-				sixToNine.endNumHrsArray=[21,0,0];
-				sixToNine.short="_6_9PM_SAT"
-				sixToNine.full=sixToNine.startTime + "-" +sixToNine.endTime;				
-			var	afternoon={};
-			afternoon.full = "3:45PM-5:45PM";
-			afternoon.startTime="3:45PM";
-			afternoon.short="_345_545PM_SAT"
-			afternoon.endTime="5:45PM";
-			afternoon.startNumHrsArray=[15,45,0];
-			afternoon.endNumHrsArray=[17,45,0];
-			var	nineAm = {};
-			nineAm.startTime="9:00AM";
-			nineAm.endTime="12:30PM";
-			nineAm.short="9AM_1230PM";
-			nineAm.full=nineAm.startTime + "-"+nineAm.endTime;
-			nineAm.startNumHrsArray=[9,0,0];
-			nineAm.endNumHrsArray=[12,30,0];
-			var	onePM = {};
-			onePM.full="1:00PM-4:30PM";
-			onePM.startTime="1:00PM";
-			onePM.endTime="4:30PM";
-			onePM.short="_1_430PM_SAT";
-			onePM.startNumHrsArray=[13,0,0];
-			onePM.endNumHrsArray=[17,30,0];
-
-			time=(isSixToNineCourse==true)?sixToNine: (isAfternoonCourse==true)?afternoon:(is900AmCourse)?NineAm:(is100PMCourse==true)?onePM: otherStartTime;
-			time.classType="_1600SAT";
-
-			var numberTime = this.courseMeetingsArray[0].dayStamp;
-			var startNumberTime = new Date(item.dayStamp).setHours(18,0,0);
-
-			var courseObj={};
-			var cmt=[];
-			this.courseMeetingsArray.forEach(function(item, index, array)
-			{	time.snt = new Date(item.numberTime).setHours(time.startNumHrsArray);
-				time.ent = new Date(item.numberTime).setHours(time.endNumHrsArray);
-				courseObj={
-					"dayStamp":item.dayStamp,
-					"prettyDate":item.prettyDate,
-					"localeDate":item.localeDate,
-					"date":item.date,
-					"startTime":item.startTime,
-					"endTime":item.endTime,
-					"shortLabel":item.shortLabelA + time.short+ item.shortLabelB,
-					"mediumLabel": item.mediumLabelA + time.full + item.mediumLabelB,					
-					"longLabel":item.longLabelA + time.full + item.longLabelB,
-					"hasDays":item.hasDays,
-					"startTime":time.startTime,
-					"endTime":time.endTime,
-					"short":time.short,
-					"full":time.full,
-					"startNumberTime": time.snt, 
-					"endNumberTime": time.ent, 
-					"FcidAB": item.dayStamp + "_" + time.snt +"_",
-				};
-				cmt.push(courseObj);
-				console.log(time.snt);
-				console.log(time.ent);
-				courseObj={};
-			});
-
-			this.courseBuilderData=[];
-			this.courseBuilderData=cmt;
-			console.log(cmt);
-			return this.CourseBuilderData;
-			}
-
-		}
-
-
-
-
-class FcCourse2
-{
-	constructor(argCourse)
-	 {
-	 	this.buildCourse( argCourse.hasExtraCoach, argCourse.extraCoach, fcid);
-	 }
-	 buildCourse(testDate, isMonWedCourse, isTueThuCourse, isMonWedFriCourse, isOtherDaySchedule, otherDayScheduleArray, isSixToNineCourse, isAfternoonCourse, is900AmCourse, is100PMCourse, isOtherSchedule, hasSaturdayTests, hasSundayTests, hasExtraCoach, extraCoach, fcid)
-	 {
-	 	// this.otherDayScheduleArray=otherDayScheduleArray || [];
-	 	// var courseMeetingArray=[];
-	 	// courseMeetingArray=(isMonWedCourse==true)?[5,3]: (isTueThuCourse==true)?[4,2]:(isMonWedFriCourse?[5,3,1]:[];
-
-	 	// this.courseMeetings= 
-	 }
-}
-*/
 function nextReasonableTestDate()
 	{
 		var d=new Date();
@@ -1528,6 +1281,18 @@ function shortDaysLabel(argDays, NumChars)
 	}
 	return label;
 
+}
+
+function dayAbbreviationsToDays(argAbbrev)
+{
+	argAbbrev = argAbbrev.toLowerCase();
+	if(argAbbrev.charAt(0)==="m"){return "Monday";}
+	else if(argAbbrev.charAt(0)==="w"){return "Wednesday";}
+	else if(argAbbrev.charAt(0)==="f"){return "Friday";}
+	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="u"){return "Sunday";}
+	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="a"){return "Saturday";}
+	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="u"){return "Tuesday";}
+	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="h"){return "Thursday";}
 }
 
 </script>

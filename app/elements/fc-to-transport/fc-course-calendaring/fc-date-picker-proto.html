@@ -251,6 +251,7 @@ initialize:function(){
 		 	});
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+		this.set("fcCourse.calendarDayArray", this.calendarDayArray);
 },
 computeInClass: function(day, fcCourse)
 {
@@ -279,7 +280,7 @@ computeInEventArray: function(fcCourse, item)
 
 courseObserver: function(newval)
 { 	
-	
+	this.set("fcCourse.calendarDayArray", this.calendarDayArray);
 	if(newval.path=="fcCourse.testDate")
 	{
 		var d= new Date(newval.value);
@@ -302,77 +303,14 @@ courseObserver: function(newval)
 		testMonth=this.calendarMonthsArray[m];
 		this.set("displayed", testMonth);
 	}
-	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength")
-	{	this.set("fcCourse.presetCourseLength", newval.value);
-		var weeks = parseInt(newval.value);
-		console.log(weeks);
-		var daysOfProgram=(weeks*7);
-		var endDate= new Date(this.fcCourse.testDate);
-			console.log(endDate);
-		var startDate = endDate.addDays(-1-(daysOfProgram));
-		console.log(startDate, endDate);
-		var self=this;
-		var arrayHolder=[];
-		arrayHolder=this.calendarDayArray.filter(function(currentValue, index, array)
-		{  if(currentValue.calendarDay.inMonth===true && currentValue.calendarDay.date>startDate && currentValue.calendarDay.date<endDate)
-				{   console.log(currentValue);
-					currentValue.inCalendarDayArray=true;
-					currentValue.calendarDay.isSelected = true; 
-					currentValue.calendarDay.toggleDay = true;
-					currentValue.calendarDay.background= "#c6dafc";
-					return currentValue;
-				}
-		}); 
-		this.set("selectedArray",arrayHolder);
-		this.set("fcCourse.courseCalendarDaysArray", arrayHolder);
-		this.set("fcCourse.calendarDayArray", arrayHolder);
-	
-
-	}
-	else if(this.fcCourse.testDate && this.fcCourse.calendarDayArray && newval.path=="fcCourse.practiceTestDay")
-	{	var self = this;
-		var tempPracticeArray=[];
-		tempPracticeArray= this.fcCourse.calendarDayArray.filter(function(currentValue, index, array){
-			var day = newval.value.charAt(1);
-			var testVal;
-			if(day=="u"){testVal=0;}
-			else if(day=="a"){testVal=6;}
-			if(currentValue.calendarDay.date.getDay()==testVal){
-				currentValue.calendarDay.background="red";
-				return currentValue;}
-		});
-		console.log(tempPracticeArray);
-		this.set("fcCourse.practiceTestArray", tempPracticeArray);
-		this.set("fcCourse.numberOfPracticeTests", tempPracticeArray.length);
-	}
-	else if(this.fcCourse.testDate && this.fcCourse.calendarDayArray && this.fcCourse.practiceTestArray && newval.path=="fcCourse.courseDaySets")
-	{ 	console.log("am in the else");
-		var self = this;
-		var tempDayArray=[];
-		tempDayArray= this.fcCourse.calendarDayArray.filter(function(currentValue, index, array)
-		{ 	
-			var weekday = newval.value.charAt(3);
-			var test;
-			console.log(weekday);
-			if(weekday=="d" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3)){self.set("fcCourse.courseMeetingDays", "Monday & Wednesday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours"); self.set("fcCourse.endTime", "9:00PM");} currentValue.calendarDay.background = "green";for(var k =48; k<61;k++){ currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";} return currentValue;}
-			else if(weekday=="s"&&(currentValue.date.getDay()==2 || currentValue.date.getDay()==4)){self.set("fcCourse.courseMeetingDays", "Tuesday & Thursday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "6:00PM"); self.set("fcCourse.endTime", "9:00PM"); self.set("fcCourse.courseMeetingLength", "3 Hours");} currentValue.calendarDay.background = "green";for(var k =48; k<61;k++){ currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";} return currentValue;}
-			else if(weekday =="|" && (currentValue.date.getDay()==1 || currentValue.date.getDay()==3 || currentValue.date.getDay()==5)){ self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); self.set("fcCourse.courseMeetingDays", "Monday, Wednesday & Friday"); if(self.fcCourse.summer===false){self.set("fcCourse.startTime", "3:45PM"); self.set("fcCourse.endTime", "5:45PM");self.set("fcCourse.courseMeetingLength", "2 Hours");} currentValue.calendarDay.background = "green";for(var k =39; k<47;k++){currentValue.calendarDay.eventList[2][k].activity="Focused Elite 1600SAT Course";}  console.log(currentValue); return currentValue;}
-			//add a set for other related values here
-		});
-		console.log("array here", tempDayArray);
-		self.set("fcCourse.courseMeetingArray", tempDayArray);
-		var len=tempDayArray.length;
-		var hours = parseInt(this.fcCourse.courseMeetingLength);
-		var hoursTotal=(hours*len);
-		var cost=costGenerator(hoursTotal);
-		this.set("fcCourse.price", cost);
-		this.set("")
-		this.set("fcCourse.hoursTotal", hoursTotal.toString() + " Hrs");
-		self.set("fcCourse.numberOfMeetings",len);
-		console.log(this.courseMeetingArray);
+	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength" && this.fcCourse.CalendarDaysArray!==[])
+	 {	
+	 	console.log(this.fcCourse.calendarDayArray, this.fcCourse.courseCalendarDaysArray, "LOOK HERE TO SEE IF THINGS WERE PASSED FROM THE COURSE");
+		this.set("selectedArray", this.fcCourse.courseCalendarDaysArray);
+				
 	}
 
-	// Polymer.updateStyles();
+
 },		
 	
 

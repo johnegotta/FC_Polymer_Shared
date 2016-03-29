@@ -208,34 +208,72 @@ Polymer({
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.value;
 		console.log(e.model.__data__, propertyName, val);
-		if(propertyName == "testDate")
+		
+		if(propertyName == "testDate" && this.isPrivateSchedule===false)
 		{
 			this.fcCourse.setTestDate(val);
 		}
 		else if(propertyName == "programLength")
 		{
-			this.fcCourse.setCourseLength(val);
+			var pickle= this.fcCourse.setCourseLength(val);
+			this.push("fcCourse.eventArray",pickle);
 		}
 		else if(propertyName == "practiceTestDay")
 		{
-			this.fcCourse.setPracticeTestDay(val);
+			var arrayEve=this.fcCourse.setPracticeTestDay(val);
+			this.push("fcCourse.eventArray",arrayEve);
 		}
-		else if(propertyName == "presetCourseTimes")
+		else if(propertyName == "courseMeetingSets")
 		{
-			this.fcCourse.setCourseMeetingDaysAndTimes(val);
-			this.set("fcCourse", JSON.parse(JSON.stringify(this.fcCourse)));
+			var eventArr= this.fcCourse.setCourseMeetingDaysAndTimes(val);
+			this.fcCourse[propertyName] = val;
+			this.set("fcCourse.summerMeetingDays", "Not Applicable");
+			this.push("fcCourse.eventArray",eventArr);
+
+		}
+		else if(propertyName == "summerMeetingDays")
+		{	var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val);
+			this.fcCourse[propertyName] = val;
+			this.set("fcCourse.courseMeetingSets", val);
+			this.push("fcCourse.eventArray",eventArr);
+		}
+		else if(propertyName=="privateCoach")
+			{	this.set("fcCourse.courseType", "Private Coaching"); 
+				this.set("fcCourse.coach", val);
+				this.set("fcCourse.courseSize", 1);
+			this.fcCourse[propertyName] = val;}
+		else if(propertyName=="privateCoachingHours")
+		{ 
+			this.set("fcCourse.privateCoachingHours", val);
+			var retVal = (val=="12 Hours, 4-6 Sessions, Price Total")?"3 Weeks": (val == "18 Hours, 6-9 Sessions, Price Total")?"4 Weeks": (val == "24 Hours, 8-12 Sessions, Price Total")?"5 Weeks": (val == "36 Hours, 12-18 Sessions, Price Total")?"6 Weeks": (val == "50 Hours, up to 25 Sessions, Price Total")?"10 Weeks": "13 Weeks";
+			this.set("fcCourse.programLength", retVal);
+			console.log(val);
+			
+
+		}
+		else if(propertyName == "testDate" && this.fcCourse.isPrivateSchedule===true)
+		{
+			this.fcCourse.setTestDate(val);
+			this.fcCourse.setCourseLength(this.fcCourse.programLength);
+
 		}
 		else
 		{
 			this.fcCourse[propertyName] = val;
 		}
-		
+			this.fcCourse[propertyName] = val;
 			var propertyString="fcCourse."+propertyName;
 			this.notifyPath(propertyString, val);
 		
 		// if(propertyString=="fcCourse.programLength" && this.fcCourse.testDate!==""){var d=new Date(this.fcCourse.testDate);}
-		this.set("saveChoiceLocal",true);
-		this.set("inputIndex", this.inputIndex+1);
+
+		console.log(this.fcCourse.eventArray, "here is a mush of the events");
+		
+	    var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, this.inputIndex);
+	    console.log("is too a function");
+	    this.set("saveChoiceLocal",true);
+		this.set("inputIndex", indexOfNextInput);
+
 	
 },
 

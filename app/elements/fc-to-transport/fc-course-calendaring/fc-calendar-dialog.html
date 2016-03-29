@@ -4,18 +4,30 @@
 :host{
 background: white;
 padding: 0px 3px 4px 8px;
-opacity: 1;
-display: absolute;}
+opacity: 1;}
 .primary{
+
 	color: #008;
 	font-weight:600;
-	font-size: 15.5px;
+	font-size: 13.5px;
+	width: 197px;
+	
 }
 .secondary{
 		color: grey;
 	font-weight:500;
-	font-size: 13px;
+	font-size: 11px;
+	margin-top: 11px;
+	padding: 0 4px;
+	width: 50px;
+
+
 }	
+iron-icon .small {
+	height: 16px!important;
+	width:16px!important;
+}
+.scheduling{padding: 0px 5px;}
 .header-class{min-height: 35px !important;}
 .selected{}
 </style>		
@@ -44,8 +56,8 @@ display: absolute;}
 		<content select=".calendarItem"></content>
 		</div>
 <div class="horizontal layout center-justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
-<div class="horizontal layout" style="max-width: 22000px; min-width: 2400px; height: 420px; border: silver 2px solid;">
-<template is="dom-repeat" items="{{days}}" as="day">
+<div class="horizontal layout left-justified" style="max-width: 22000px; min-width: 2400px; height: 420px; border: silver 2px solid; margin-left: 140px; padding-left: 900px;">
+<template is="dom-repeat" initial-count="7" items="{{days}}" as="day">
 	<div class="vertical layout" draggable=true id="swipable" on-track="swipeNslide" style="border: silver 2px solid; width:260px!important;">
 		<section class="holder layout vertical"style="width:260px!important; height: 480px; ">
 			<section class="header-class layout vertical" style="height: 65px!important;color: white; font-size:18px; background: green; padding-top: 15px; text-align: center; font-family: merriweather;">
@@ -54,15 +66,20 @@ display: absolute;}
 					
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				<template is="dom-repeat" initial-count="7" items="{{day.calendarDay.eventList.2}}" as="slot">
-						<paper-item on-tap="soSelected" style="border: 1px #aeaeae solid" class="layout horizontal courseData" draggable=true>
+				<template is="dom-repeat" id="eventList" initial-count="6" items="{{day.calendarDay.eventList}}" observer="activity, slot.activity" as="slot">
+						<paper-item on-tap="selectedTwo"  style$="border: 1px #aeaeae solid; background: [[slot.color]];" class="layout horizontal scheduling" draggable=true>
 						
-							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
-								<div class="primary">[[computeSlots(slot, day, fcCourseObject)]]</div>
-								<div class="secondary">[[slot.time]]</div>
+							<paper-item-body style$="background: [[slot.color]];" class="layout horizontal" value$="{{value}}">
+								<div class="secondary layout horizontal flex-1 self-shrink" style="background: [[slot.color]];" >
+								<fc-input-prime style="width: 65px; font-size: 10px; margin-left: -8px;" label="TIME" name="{{slot.name}}" input-type="tiny" label-hidden="false" value="{{slot.time}}"></fc-input-prime>
+								</div>
+								<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[slot.color]];"><fc-input-prime style="width: 189px;" input-type="text" label="[[slot.activity]]" name="{{option.name}}" label-hidden="true" value="{{slot.activity}}"></fc-input-prime> &nbsp; &nbsp;</div>
+								
+							<section class="blue-btn-class" on-tap="addItem">
+	   								<iron-icon class="small" style="height: 16px!important;width:16px!important;" icon="icons:add-circle-outline">
+	   								</iron-icon>
+	   						</section>
 							</paper-item-body>   	
-							<paper-icon-button icon="star" on-tap="" value$="{{val}}" alt="favourite this!">
-							</paper-icon-button>
 			  			</paper-item>
 				</template>
 				</paper-listbox>	
@@ -82,7 +99,8 @@ FcCalendarDialog= Polymer({
 	behaviors:[FCBehaviors.FcCalendarBehaviorPrime
 		 // "Polymer.PaperDialogBehavior"
 		  ],
-	observers:['fcCourseObjectObserver(fcCourseObject.*)'],
+	observers:['fcCourseObjectObserver(fcCourseObject.courseCalendarDaysArray.*)', 
+	'letsWatchCalendarDays(days.*)'],
 	properties:{
 		fcCourseObject:{
 			type: FcCourse,
@@ -118,6 +136,7 @@ FcCalendarDialog= Polymer({
 			notify: true
 		}
 	},
+	
 	ready: function()
 	{	
 		this.set("fcCourseObject", new FcCourse());
@@ -127,41 +146,32 @@ FcCalendarDialog= Polymer({
 			 self.push("valueOptions",item);
 		 });
 	},
+	selectedTwo: function(event){
 
-	computeSlots: function(slot, day, argCourse){
-		var i = 0;
-		var numEvents = argCourse.eventArray.length;
-		//console.log(slot, numEvents, day, argCourse);
-		for(i=0; i < numEvents; i++)
-		{
-			var e = argCourse.eventArray[i];
-			var starty = new Date(e.startTime);
-			var q = new Date(starty.getFullYear(), starty.getMonth(), starty.getDate());
-			//console.log(d.toString(), q.toString(), day.date);
-			if(day.date == q.toString())
-			{
-				var hour = parseInt(slot.time.split(":")[0]);
-				if(slot.time.indexOf("PM") > -1)
-				{
-					hour += 12;
-				}
-				var slotto = slot.time.replace("AM", "");
-				slotto = slotto.replace("PM", "");
-				var min = parseInt(slotto.split(":")[1]);
-				var slotty = new Date(starty.getFullYear(), starty.getMonth(), starty.getDate(), hour, min);
-				var endy = new Date(e.endTime);
-				console.log(slotty, slotty.getTime(), slotty.toTimeString(), starty.getTime(), starty.toTimeString(), endy.getTime(), endy.toTimeString(), slot.time);
-				if(starty.getTime() <= slotty.getTime() && endy.getTime() >= slotty.getTime())
-				{
-					console.log("bazinga " + slotty);
-					return e.courseEventType;
-				}
-			}
-		}
-		return "nada";
-//		return .activity;
+
+
+
 
 	},
+
+	letsWatchCalendarDays: function(days)
+	{
+
+		console.log(days);
+	},
+
+	addItem: function(event) {
+		  	event.preventDefault();
+		  	this.ref.push({
+		    	'done': false,
+		    	'text': this.newItemValue,
+		    	'timeline': this.timeline,
+		    	'startDate': this.dateStarted,
+		    	'notes': this.notes,
+		  	});
+		  	this.newItemValue = '';
+		},
+
 
 attached: function()
 	{		
@@ -201,7 +211,7 @@ swipeNslide: function(e)
 
 fcCourseObjectObserver: function(newVal)
 {
-	console.log(newVal);
+	console.log(newVal, newVal);
 },
 
 _computeDate: function(date){
@@ -323,7 +333,6 @@ _dateSelected: function(event) {
 	return displayedMonth[15].date.getFullYear();
 	}
 } 
-}
-);
-  </script>
-  </dom-module>
+});
+</script>
+</dom-module>
