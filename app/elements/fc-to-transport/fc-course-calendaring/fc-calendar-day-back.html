@@ -1,0 +1,134 @@
+<dom-module id="fc-calendar-day-back">
+<template>
+<style>
+.primary{
+
+	color: #008;
+	font-weight:600;
+	font-size: 13.5px;
+	width: 197px;
+	
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 11px;
+	margin-top: 11px;
+	padding: 0 4px;
+	width: 50px;
+
+
+}	
+iron-icon .small {
+	height: 14px!important;
+	width:14px!important;
+}
+.scheduling{padding: 0px 5px;}
+.header-class{min-height: 35px !important; max-height: 55px !important;}
+.selected{}
+</style>
+	<div class="vertical layout" id="swipable" style="border: silver 2px solid; height: 380px; width:260px!important;">
+			<section class="header-class layout vertical" style="height: 44px!important;color: white; font-size:18px; font-weight: 600; background: #008; padding-top: 6px; text-align: center; font-family: merriweather;">
+					[[_computeDate(calendarDay.date)]]
+					 [[day.username]]	
+			</section>
+			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
+				
+				<content group="group" class="pickle group handle" ></content>
+
+			</paper-listbox>	
+		</div>
+</template>
+<script>
+FcCalendarDayBack=Polymer({
+	is:"fc-calendar-day-back",
+	behaviors:
+		[
+			"FCBehaviors.FcCalendarBehaviorPrime"
+		],
+	observers:[],
+	listeners:{},
+	properties:
+	{
+		fcCourse:{
+			type: FcCourse, 
+			value: function()
+			{
+				var course = {};
+				course = new FcCourse();
+				return course;
+			},
+			notify: true,
+		},
+		calendarDay:{
+			type: Object,
+			observer: "observeCalendarDay",
+			notify: true
+
+		},
+		courseEventLists:{
+			type: Array,
+			computed: 'computeEventLists(fcCourse.courseCalendarDaysArray)',
+			notify: true
+		},
+		eventList: {
+			type: Array,
+			notify: true	
+		},
+
+
+	},
+
+	ready: function(){},
+	attached:function(){},
+	computeEventList: function(cDay){
+		if(cDay.calendarDay){
+			//console.log(cDay.calendarDay.eventList);
+			
+			// this.set("calendarDay.calendardDay.eventList", this.calendarDay.calendarDay.eventList);
+			// this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
+			return cDay.calendarDay.eventList.base;
+		}
+		//this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
+
+	},
+	computeEventLists: function(calDayArray)
+	{
+	 var courseEventList=[];	
+		courseEventList=calDayArray.filter(function(currentValue, index, array)
+			{
+				var date=currentValue.date;
+				var eventList=currentValue.calendarDay.eventList;
+				var eventObject={
+					"date":date,
+					"eventList": eventList
+					};
+				return eventObject;
+
+			});
+		//console.log(courseEventList)
+		return courseEventList;
+
+
+	},
+	observeCalendarDay: function(nval, oval)
+	{
+		//console.log(nval, "oldvalue: ", oval);
+		if(nval.calendarDay)
+		{
+			//console.log(nval.calendarDay.eventList, "actual value: ", this.calendarDay.calendarDay.eventList);
+			this.set("calendarDay.calendarDay.eventList", this.calendarDay.calendarDay.eventList);
+				this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
+		}
+	},
+	_computeDate: function(date){
+		if(date)
+		{
+			var result = date.toDateString();
+  			// result = result.slice(0,10);
+  			return result;
+		}
+	},
+});
+</script>
+</dom-module>

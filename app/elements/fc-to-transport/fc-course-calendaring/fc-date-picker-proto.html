@@ -71,7 +71,7 @@ width: 30px;
 				</template>
 			</section>
 		</div>
-		
+		<content class="horizontal layout flex center-justified" select=".footer"></content>
 		
 	
 </template>
@@ -124,8 +124,8 @@ FcDatePickerProto=Polymer({
 		calendarDayArray: {
 			type: Array,
 			value:[],
-			notify: true, 
-			reflectToAttribute: true
+			notify: true,
+			observer: "watchTheCDA", 
 		},
 		maxIndex:{
 			type: Number,
@@ -187,6 +187,13 @@ FcDatePickerProto=Polymer({
 			computed:"computeViewMonth(displayedIndex)",
 			notify: true
 		},
+		event:{
+			type: Array,
+			value: [],
+			notify: true
+
+
+		},
 	animationConfig: {
         type: Object,
         value: function() {
@@ -226,6 +233,13 @@ watchingSelectedArray: function(newVal, oldVal){console.log(newVal, oldVal)
 
 
 },
+
+watchTheCDA: function(newVal, oldVal){
+	console.log(newVal, oldVal);
+
+
+
+},
 compute: function(day){if(day.testDate){return "pretty";}},
 
 
@@ -251,7 +265,10 @@ initialize:function(){
 		 	});
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
-		this.set("fcCourse.calendarDayArray", this.calendarDayArray);
+		var calendar =[];
+		calendar = this.calendarDayArray;
+		this.set("fcCourse.primaryCalendar", calendar);
+		this.set("fcCourse.calendarDayArray", calendar);
 },
 computeInClass: function(day, fcCourse)
 {
@@ -280,7 +297,7 @@ computeInEventArray: function(fcCourse, item)
 
 courseObserver: function(newval)
 { 	
-	this.set("fcCourse.calendarDayArray", this.calendarDayArray);
+	
 	if(newval.path=="fcCourse.testDate")
 	{
 		var d= new Date(newval.value);
@@ -298,15 +315,14 @@ courseObserver: function(newval)
 			if (currentValue.date===d){ currentValue.calendarDay.courseTestDate=true; currentValue.calendarDay.background==="gold"; return currentValue;}
 
 		});
-		console.log(theTest, theTest, theTest, theTest);
 		this.set("testHolder", theTest);
 		testMonth=this.calendarMonthsArray[m];
 		this.set("displayed", testMonth);
 	}
-	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength" && this.fcCourse.CalendarDaysArray!==[])
+	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength" && this.fcCourse.courseCalendarDaysArray==[])
 	 {	
-	 	console.log(this.fcCourse.calendarDayArray, this.fcCourse.courseCalendarDaysArray, "LOOK HERE TO SEE IF THINGS WERE PASSED FROM THE COURSE");
-		this.set("selectedArray", this.fcCourse.courseCalendarDaysArray);
+	 	this.set("fcCourse.calendarDayArray", this.calendarDayArray); 
+	 	this.set("selectedArray", this.fcCourse.courseCalendarDaysArray);
 				
 	}
 
@@ -357,7 +373,11 @@ _dateClick: function(event) {
         targetOne = targetOne.parentNode;
       }
         if(targetOne.nodeName=="FC-DATE-MINI")
-      this.set("event", targetOne.calendarDay.eventList[2]);
+        {for(var i=0; i<4;i++){
+      this.set("event."+i, targetOne.calendarDay.eventList[i]);
+     	}
+     }
+
       // configure the page animation
       this.sharedElements = {
         'hero': this

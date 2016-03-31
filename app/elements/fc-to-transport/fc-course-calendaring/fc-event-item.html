@@ -1,0 +1,133 @@
+<dom-module id="fc-event-item">
+<template>
+<style>
+
+	.primary{
+
+	color: #008;
+	font-weight:600;
+	font-size: 13.5px;
+	width: 197px;
+	
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 11px;
+	margin-top: 11px;
+	padding: 0 3px;
+	width: 50px;
+
+
+}	
+iron-icon .small {
+	height: 14px!important;
+	width:14px!important;
+}
+.scheduling{padding: 0px 5px;}
+.header-class{min-height: 35px !important; max-height: 55px !important;}
+.selected{}	
+</style>				
+	<paper-item on-tap="selectedTwo" style$="border: 1px #aeaeae solid; background:[[event.color]];" class="layout horizontal scheduling" draggable=true>
+		<paper-item-body style$="background: [[event.color]];" class="layout horizontal" value$="{{value}}">
+			<div class="secondary layout horizontal flex-1 self-shrink" style="background: [[event.color]];" >
+				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="TIME" name="{{event.sTime}}" input-type="tiny" label-hidden="true" value="{{event.time}}"></fc-input-prime>
+			</div>
+			<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[event.color]];"><fc-input-prime style="width: 183px;" input-type="text" label="[[event.activity]]" name="{{event.name}}" label-hidden="true" value="{{event.activity}}"></fc-input-prime> &nbsp; &nbsp;</div>
+			<div class="layout vertical" style="padding-left: 5px;">
+				<section class="buttons" on-tap="changeEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 20px!important;width:20px!important; border-radius:180px; color: white; background: #4285f4" icon="icons:add-circle-outline">
+					</iron-icon>
+			</section>
+				<content select=".buttons">
+				</content>
+	   		</div>
+		</paper-item-body>   	
+	</paper-item>
+	<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="eventDialog" style="height: 480px; width: 380px;"exit-animation="fade-out-animation">
+		<h2>Event Card: {{event.date}}</h2>
+  		<paper-dialog-scrollable style="height: 340px; overflow-y: scroll; width: 345px;">
+    		<fc-input-prime value={{event.activity}} label="Event Name"></fc-input-prime><br>
+    		<fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
+    		<fc-input-prime value={{event.startTime}} label="Start Time"></fc-input-prime><br>
+    		<fc-input-prime value={{event.endTime}} label="End Time"></fc-input-prime><br>
+    		<fc-input-prime value={{event.location}} label="Location"></fc-input-prime><br>
+    		<fc-input-prime value={{event.duration}} label="Duration"></fc-input-prime><br>
+    		<fc-input-prime value={{event.totalTime}} label="Hours in Package or Course"></fc-input-prime><br>
+    		<fc-input-prime value={{event.coachFcid}} label="Coach's Id"></fc-input-prime><br>
+    		<fc-input-prime value={{event.fcid}} label="Event Id"></fc-input-prime><br>
+    		<fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
+    		<fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
+    		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
+    		<fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
+    		<fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
+    		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime>
+    		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br><hr>
+ 			</paper-dialog-scrollable>
+  		<div class="buttons" style="height: 75px;">
+    			<paper-button dialog-dismiss>Cancel</paper-button>
+   				<paper-button dialog-confirm>Accept</paper-button>
+ 		 	</div>
+	</paper-dialog>
+</template>
+<script>
+FcEventItem=Polymer({
+	is:"fc-event-item", 
+	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"], 
+	properties: 
+	{
+		event:{
+			type: Object,
+			notify: true,
+			observer: "lookattheEvent",
+		},
+		height:  "",
+		duration: "",
+		calendar: "", 
+		calendarDay: {
+			type: Object, 
+			value: {},
+			observer: "observeCalendarDay",
+			notify: true
+		},
+		eventList:{
+			type:Array, 
+			value: [],
+			observer: "observeEventList",
+			notify: true
+		},
+		date: {
+			type: Date,
+			notify: true
+		},
+
+
+
+
+
+	},
+	changeEvent: function(event) {
+		  	event.preventDefault();
+		  	this.$.eventDialog.opened=!this.$.eventDialog.opened;  
+		},
+	ready: function(){},
+	observeEventList: function(newVal, oldVal)
+	{//console.log("eventList", newVal, oldVal);
+	},
+	observeCalendarDay: function(newVal, oldVal)
+	{
+		//console.log("calendarDay", newVal, oldVal);
+	},
+	lookattheEvent: function(newVal, oldVal)
+	{
+		console.log(newVal, oldVal);
+
+	},
+	selectedTwo: function(event){
+		console.log(event.target);
+	}
+
+
+});
+</script>
+</dom-module>

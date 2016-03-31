@@ -5,100 +5,66 @@
 background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;}
-.primary{
-
-	color: #008;
-	font-weight:600;
-	font-size: 13.5px;
-	width: 197px;
-	
+.calendarItem{height: 380px!important;}
+.fbutton{text-align: center; width: 99.6%;border: #afafaf 1px solid; border-radius: 3px; z-index: 7; box-shadow: 3px 7px 11px 4px #efefef; padding: 5px 0px; cursor: pointer;}
+.fbutton:active{
+	border:4px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+ width: 98.6%
 }
-.secondary{
-		color: grey;
-	font-weight:500;
-	font-size: 11px;
-	margin-top: 11px;
-	padding: 0 4px;
-	width: 50px;
-
-
-}	
-iron-icon .small {
-	height: 16px!important;
-	width:16px!important;
-}
-.scheduling{padding: 0px 5px;}
-.header-class{min-height: 35px !important;}
-.selected{}
 </style>		
 <fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="flex layout vertical" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 500px;">
 	
-<section class="horizontal flex layout center-justified">
+<section class="flex layout horizontal center-justified">
 
 </section>
- <div class="horizontal flex layout center-justified">
+ <div class="flex layout horizontal center-justified">
  			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
-			<neon-animated-pages class="vertical flex-1 layout" id="pages" style="width: 320px; height:360px;" selected="0"> 
+			<neon-animated-pages class="layout vertical flex-1" id="pages" style="width: 320px; height:360px;" selected="0"> 
 				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" selected-array={{days}} id="myCalendarCard">
 				<span class="headers">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
+				<section class="footer fbutton" on-tap="createEvents">Create Events from Selected Days</section>
 				</fc-date-picker-proto>
 				<fc-tabbed-calendar-card on-close="_onClose" fc-course="{{fcCourseObject}}" fc-event="{{fcEvent}}" fc-courses="{{FcCourse}}">
 				</fc-tabbed-calendar-card>
 			</neon-animated-pages>
 			<fc-base-event-inputs class="horizontal flex-2 layout" value-options={{valueOptions}} output-options="{{outputs}}" fc-course="{{fcCourseObject}}">
 			</fc-base-event-inputs>
-			<div class="horizontal flex-1 layout">
-			<fc-event-element fc-course="{{fcCourseObject}}" inputs="{{inputs}}"class="calendarItem">
+			<div class="horizontal layout flex-1">
+			<fc-event-element fc-course="{{fcCourseObject}}" inputs="{{inputs}}" class="calendarItem">
  			</fc-event-element>
  			</div>
  			
  			
 		<content select=".calendarItem"></content>
 		</div>
-<div class="horizontal layout center-justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
-<div class="horizontal layout left-justified" style="max-width: 22000px; min-width: 2400px; height: 420px; border: silver 2px solid; margin-left: 140px; padding-left: 900px;">
-<template is="dom-repeat" initial-count="7" items="{{days}}" as="day">
-	<div class="vertical layout" draggable=true id="swipable" on-track="swipeNslide" style="border: silver 2px solid; width:260px!important;">
-		<section class="holder layout vertical"style="width:260px!important; height: 480px; ">
-			<section class="header-class layout vertical" style="height: 65px!important;color: white; font-size:18px; background: green; padding-top: 15px; text-align: center; font-family: merriweather;">
-					[[_computeDate(day.calendarDay.date)]]
-					 [[day.username]]
-					
-			</section>
-			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				<template is="dom-repeat" id="eventList" initial-count="6" items="{{day.calendarDay.eventList}}" observer="activity, slot.activity" as="slot">
-						<paper-item on-tap="selectedTwo"  style$="border: 1px #aeaeae solid; background: [[slot.color]];" class="layout horizontal scheduling" draggable=true>
-						
-							<paper-item-body style$="background: [[slot.color]];" class="layout horizontal" value$="{{value}}">
-								<div class="secondary layout horizontal flex-1 self-shrink" style="background: [[slot.color]];" >
-								<fc-input-prime style="width: 65px; font-size: 10px; margin-left: -8px;" label="TIME" name="{{slot.name}}" input-type="tiny" label-hidden="false" value="{{slot.time}}"></fc-input-prime>
-								</div>
-								<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[slot.color]];"><fc-input-prime style="width: 189px;" input-type="text" label="[[slot.activity]]" name="{{option.name}}" label-hidden="true" value="{{slot.activity}}"></fc-input-prime> &nbsp; &nbsp;</div>
-								
-							<section class="blue-btn-class" on-tap="addItem">
-	   								<iron-icon class="small" style="height: 16px!important;width:16px!important;" icon="icons:add-circle-outline">
-	   								</iron-icon>
-	   						</section>
-							</paper-item-body>   	
-			  			</paper-item>
-				</template>
-				</paper-listbox>	
-			</section>
-		</div>
-</template>
-</div>	
-</div>
-
-		
-	 </fc-ddr-card>
+		<paper-tabs id="calendarTabs" scrollable="true" style="padding: 2px 0px; height: 420px; outline: 0px;" class="horizontal layout flex scroll" bar="true" hide-scroll-buttons="true"> 
+				<div class="horizontal layout justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
+					<template is="dom-repeat" limit-to="14" items="{{computeCalendarDays(fcCourseObject.courseCalendarDaysArray.*)}}" as="day">
+						<fc-calendar-day-back calendar-day="{{day}}">
+							<template is="dom-repeat" limit-to="14"  items="{{computeEventList(day.calendarDay.eventList.*)}}" as="slot">
+								<fc-event-item event="{{slot}}" calendar-day="{{day.calendarDay}}" date="{{day.date}}" event-list="{{day.calendarDay.eventList}}">
+								</fc-event-item>
+							</template>
+						</fc-calendar-day-back>
+					</template>
+				</div>
+		</paper-tabs>
+</fc-ddr-card>
 	
 </template>
 <script>
 FcCalendarDialog= Polymer({
 	is:"fc-calendar-dialog",
-	behaviors:[FCBehaviors.FcCalendarBehaviorPrime
+	behaviors:["FCBehaviors.FcCalendarBehaviorPrime", 
+	"fcDraggableDataBehavior"
 		 // "Polymer.PaperDialogBehavior"
 		  ],
+    listeners: {"on-tap": "createEvents(days.*)"},
 	observers:['fcCourseObjectObserver(fcCourseObject.courseCalendarDaysArray.*)', 
 	'letsWatchCalendarDays(days.*)'],
 	properties:{
@@ -123,11 +89,19 @@ FcCalendarDialog= Polymer({
 		},
 		days:{
 			type: Array,
+			value: [],
 			notify: true,
 		},
-		slots:{
+		slot:{
 			type: Array,
+			value:[],
 			notify: true
+		},
+		event:{
+			type: Array, 
+			value: [],
+			notify: true,
+
 		},
 	
 		inputs: {
@@ -146,6 +120,16 @@ FcCalendarDialog= Polymer({
 			 self.push("valueOptions",item);
 		 });
 	},
+
+	computeDays: function(cEvent)
+	{
+		console.log(cEvent);		
+		return cEvent.base;
+
+
+
+	},
+
 	selectedTwo: function(event){
 
 
@@ -154,23 +138,49 @@ FcCalendarDialog= Polymer({
 
 	},
 
+	createEvents: function(event){
+		console.log(event.target);
+		console.log(this.days);
+		this.set("fcCourseObject.courseCalendarDaysArray", this.days);
+		var len=this.fcCourseObject.courseCalendarDaysArray.length;
+		var dadays=this.fcCourseObject.courseCalendarDaysArray;
+
+		for(var i=0;i<len;i++){
+			this.set("fcCourseObject.courseCalendarDaysArray."+i+".eventList."+ 0, dadays[i].eventList[0]);
+			this.set("fcCourseObject.courseCalendarDaysArray."+i+".eventList."+ 1, dadays[i].eventList[1]);
+			this.set("fcCourseObject.courseCalendarDaysArray."+i+".eventList."+ 2, dadays[i].eventList[2]);
+			this.set("fcCourseObject.courseCalendarDaysArray."+i+".eventList."+ 3, dadays[i].eventList[3]);
+		}
+		console.log(this.fcCourseObject.courseCalendarDaysArray);
+
+
+
+	},
+	computeEventList: function(eList)
+	{
+		if(this.fcCourseObject.courseCalendarDaysArray)
+		{
+			console.log(eList);
+			return eList.base;
+		}
+		else {return []};
+	},
+	computeCalendarDays: function(courseCalendarDaysArray)
+	{
+		if(courseCalendarDaysArray)
+			{
+				console.log(courseCalendarDaysArray);
+
+				return this.fcCourseObject.courseCalendarDaysArray;
+			}
+		else{return [];}
+	},
 	letsWatchCalendarDays: function(days)
 	{
 
-		console.log(days);
+		console.log(days.base);
 	},
 
-	addItem: function(event) {
-		  	event.preventDefault();
-		  	this.ref.push({
-		    	'done': false,
-		    	'text': this.newItemValue,
-		    	'timeline': this.timeline,
-		    	'startDate': this.dateStarted,
-		    	'notes': this.notes,
-		  	});
-		  	this.newItemValue = '';
-		},
 
 
 attached: function()
@@ -211,7 +221,8 @@ swipeNslide: function(e)
 
 fcCourseObjectObserver: function(newVal)
 {
-	console.log(newVal, newVal);
+	console.log(newVal, newVal.value);
+
 },
 
 _computeDate: function(date){
@@ -317,10 +328,6 @@ _dateSelected: function(event) {
     	this.$.myCalendarCard._backOneMonth();
     },
 
-    _setPreviousCaller: function(e, detail)
-    {
-      
-    },
 
     _onClose: function() {
       this.$.pages.selected = 0;
