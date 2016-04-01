@@ -31,7 +31,7 @@ function courseFcidGenerator(testDate, coachFcid, location, meetingDays, practic
 	//console.log(fcid);
 	return fcid;
 }
-function duration(timeOne, timeTwo){
+function Duration(timeOne, timeTwo){
 	var startHrs = stringTime(timeOne);
 	var endHrs = stringTime(timeTwo);
 	var tot=endHrs-startHrs;
@@ -49,10 +49,13 @@ function stringTime(time)
 {
 	var start = parseInt(time);
 	//console.log(start);
+	if(time){
 	var len = time.length;
+	time=time.toString();
 	var ampm = (start!==12 && time.charAt(len-2)=="P")?12: 0;
 	ampm=parseInt(ampm);
 	var hoursStart = ampm+start;
+	
 	//console.log(hoursStart, ampm, start);
 	var minStart =(parseInt(time.charAt(len-4))*10)+parseInt(time.charAt(len-3));
 	var minHundreds =minStart/60;
@@ -60,6 +63,7 @@ function stringTime(time)
 	var tot=hoursStart +minHundreds;
 	//console.log(tot);
 	return tot;
+	}
 }
 
 function stringTimeToDateTime(time, date)
@@ -67,6 +71,7 @@ function stringTimeToDateTime(time, date)
 	var start = parseInt(time);
 	//console.log(start);
 	var len = time.length;
+	time=time.toString();
 	var ampm = (start!==12 && time.charAt(len-2)=="P")?12: 0;
 	ampm=parseInt(ampm);
 	var hoursStart = ampm+start;
@@ -74,7 +79,7 @@ function stringTimeToDateTime(time, date)
 	var minStart =(parseInt(time.charAt(len-4))*10)+parseInt(time.charAt(len-3));
 	var d=new Date(date);
 	d=d.setHours(hoursStart, minStart);
-	console.log(d);
+	//console.log(d);
 	return d;
 }
 
@@ -166,23 +171,66 @@ function dayAbbreviationsToDays(argAbbrev)
 	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="h"){return "Thursday";}
 }
 
+
+class FcCoach
+{
+	constructor(argCoach)
+	{
+		this.build(argCoach.firstName, argCoach.lastName, argCoach.telephoneNumber, argCoach.email, argCoach.addressLine1, argCoach.addressLine2, argCoach.fullName, argCoach.fcid, argCoach.specialty, argCoach.bio, argCoach.experience, argCoach.photograph, argCoach.calendarCode, argCoach.location, argCoach.range, argCoach.rate)
+	}
+	static getFirebaseLocation(coachesfcids)
+	{
+		return "https://focusedOne.firebaseio.com/coaches";
+	}
+		build(firstName, lastName, telephoneNumber, email, addressLine1, addressLine2, fullName, fcid, specialty, bio, experience, photograph, calendarCode, location, range, rate)
+		{
+
+		this.counter="00001";	
+		this.firstName=firstName || "The";
+		this.lastName=lastName || "Focused Coach" + this.counter;
+		this.fullName=this.firstName + " " + this.lastName;
+		this.telephoneNumber=telephoneNumber || "732-671-1834";
+		this.email = email || "focus@focusedCoaching.com";
+		this.addressLine1= addressLine1 || "Suite 143, 331 Newman Springs Rd., Red Bank, New Jersey 07701";
+		this.addressLine2=addressLine2 || "Red Bank, New Jersey 07701";
+		this.fcid=this.lastName+this.firstName+this.counter;
+		this.specialty=specialty||"anerobic intellectualization";
+		this.bio=bio||"no bio";
+		this.experience =experience || "2 years training with Focused";
+		this.photograph=photograph || "no photo";
+		var testDate=nextReasonableTestDate();
+		this.calendarCode=this.lastName.slice(0,2)+this.firstName.slice(0,2)+testDate+"_Focused1600_"+"days"+"time"+this.location.replace(" ","").slice(0,6);
+		this.location=location || "704 Ginesi Dr. Morganville, New Jersey 07754";
+		this.range=range || "30 miles";
+		this.rate=rate || "$200.00";
+		this.courseCost=costGenerator(numberOfHours);
+		}
+	}
+
+
 class FcEvent
 {
 	constructor(argEvent)
 	{
-		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.fcid, argEvent.location, argEvent.completed, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid)
+		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.duration,argEvent.location, argEvent.coach, argEvent.coachFcid, argEvent.activity, argEvent.fcid,   argEvent.calendarTotalTime, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.studentFcids, argEvent.studentNames, argEvent.color, argEvent.isChangeNotificationNeeded, argEvent.reasonForEventModification, argEvent.reasonEventNotInACalendar, argEvent.completed, argEvent.date)
 	}
+
 
 	static getFirebaseLocation(theDate)
 	{
 		return "https://focused0ne.firebaseio.com/events";
 	}
 
-  	build(name, startTime, endTime, fcid, location, completed, relatedFcids,  parentEventName, parentEventFcid)
+  	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date)
   	{
 	    this.name = name || ""; 
-	    this.startTime = new Date(startTime) || new Date();// console.log(this.startTime);
-	    this.endTime = new Date(endTime) || ""; 
+	    this.startTime = startTime|| "6:00PM";// console.log(this.startTime);
+	    this.endTime =  endTime|| "9:00PM";
+	    this.duration= new Duration(this.startTime, this.endTime);
+	    this.location = location || "704 Ginesi Dr. Morganville, New Jersey 07754";
+	    this.coach = coach || "";
+	    this.coachFcid=coachFcid || "ColleretteStacy00001";
+	    this.activity = activity || "";
 	    if(fcid)
 	    {
 	    	this.fcid=fcid
@@ -191,16 +239,22 @@ class FcEvent
 	    { 
 	    	this.fcid="";
 	    }
-	    this.location = location || "704 Ginesi Dr. Morganville, New Jersey 07754"; 
 	    this.completed = completed || false;
 	    this.relatedFcids = relatedFcids || "";  
 	    this.parentEventName = parentEventName || ""; 
 	    this.parentEventFcid = parentEventFcid || "";
-	    //this.dayStamp = this.startTime.dayStamp();	
-	    if(this.startTime) this.dayStamp = this.startTime.dayStamp();
-	   // console.log(this.dayStamp);
-	}
+	    this.calendarTotalTime=calendarTotalTime || "writeAlgorithmSTRUCTURE DATA ALREADY";
+	    this.studentFcids=studentFcids || ""; 
+	    this.studentNames=studentNames || "";
+	    this.color = color || "white";
+	    this.isChangeNotificationNeeded = isChangeNotificationNeeded || true;
+	    this.reasonForEventModification = reasonForEventModification || "conflict or holiday";
+	    this.reasonEventNotInACalendar = reasonEventNotInACalendar || "none! All events should be in calendars!";
+	    this.completed = completed || false;
+	//     if(this.startTime){ this.dayStamp = this.startTime.dayStamp();}
+	// }
 
+}
 	save()
 	{
 		if(this.fcid=="")
@@ -257,7 +311,7 @@ class FcCourse
 {
 
 	constructor()
-	{	this.starterDay=
+	{	this.starterDay=0;
 		this.isPrivateSchedule=false;
 		this.privateCoachingHours="";
 		this.scheduleType="",
@@ -276,6 +330,11 @@ class FcCourse
 		this.numberOfPracticeTests="";
 		this.courseLocation=""; 
 		this.coach="";
+		if(this.coach){
+				var cucumber = self.coach.split(" ");
+				var coachId=cucumber[1]+cucumber[0]+"00001";
+				this.coachFcid =coachId;
+		}
 		this.associatedCoaches="";
 		this.courseSize="";
 		this.eventArray = [];
@@ -542,7 +601,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		else if(inputIndex===15 && this.isPrivateSchedule===true)
 			{indexOfNextInput=3;}
 		else if(propertyName=="testDate"&& this.isPrivateSchedule===true)
-			{console.log(this.programLength);
+			{//console.log(this.programLength);
 				this.setCourseLength(this.programLength);
 			}
 		else if(inputIndex===5)
@@ -555,7 +614,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 	
 	setCourseLength(argWeeks)
 	{   this.courseCalendarDaysArray=[];
-		console.log("setCourseLength " + argWeeks);
+		//console.log("setCourseLength " + argWeeks);
 		this.courseLength = parseInt(argWeeks);
 		var retVal = this.setCourseCalendar(this.courseLength);
 		this.programLength=parseInt(argWeeks) + " weeks";
@@ -564,7 +623,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 
 	setTestDate(argDate)
 	{
-		console.log("setTestDate " + argDate);
+		//console.log("setTestDate " + argDate);
 		this.testDate = argDate;
 		this.testDateDate = new Date(this.testDate);
 		this.eventArray = [];
@@ -603,18 +662,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 					currentValue.calendarDay.isSelected = true; 
 					currentValue.calendarDay.toggleDay = true;
 					currentValue.calendarDay.background= "#c6dafc";
-					currentValue.calendarDay.eventList.unshift({
-						activity: "InCourse: 00001",
-						coach: "Jason Frazzano",
-						date: currentValue.calendarDay.date,
-						endTime: "9:00PM",
-						fcid: "JasonCourse00001",
-						location:"704 Ginesi Drive, Morganville, NJ 07754",
-						room:"Room 1 of 3",
-						startTime: "9:00AM",
-						time: "ALL DAY",
-						color: "#c6dafc"
-					});
+					
 					return currentValue;
 
 		});
@@ -642,17 +690,17 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 			if(currentValue.calendarDay.date.getDay()==testVal){
 				currentValue.calendarDay.background="red";
 				currentValue.calendarDay.inPracticeTestArray=true;
-				currentValue.calendarDay.eventList.splice(1,1,{
+				currentValue.calendarDay.eventList.splice(0,1,{
 						activity: "Practice Test: 00001",
-						coach: "Jason Frazzano",
+						coach: "Joseph Zirkel",
 						date: currentValue.calendarDay.date,
 						endTime: "12:45PM",
-						fcid: "JasonCourse00001",
+						fcid: "JoesPracticeTest00001",
 						location:"704 Ginesi Drive, Morganville, NJ 07754",
 						room:"Room 1 of 3",
 						startTime: "9:00AM",
 						time: "9:00AM",
-						color: "red"
+						color: "orange"
 					});
 				}
 			 return currentValue;
@@ -671,7 +719,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		var parts = argDaysAndTimes.split(",");
 		var days= parts[0].split("|");
 		var numDays=days.length;
-		console.log(numDays);
+		//console.log(numDays);
 		for(var i=0; i<numDays; i++)
 		{
 			var theDay =days[i];
@@ -687,14 +735,14 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 	 	return retVal;
 	}
 
-	setCourseMeetingEvents(argDays, argStartTime, argEndTime)
+	setCourseMeetingEvents(argDays, argStartTime, argEndTime, argCoach, argActivity)
 	{	
 		var event={};
 		
 		this.courseMeetingDays = argDays;
 		var arrayDays = argDays.split(" ");
 		var numMeetingDays=arrayDays.length;
-		console.log(numMeetingDays, arrayDays, "HERE LOOK HERE FOR NUMB DAYS TWO");
+		//console.log(numMeetingDays, arrayDays, "HERE LOOK HERE FOR NUMB DAYS TWO");
 		var testValArray=[];
 		var self=this;
 		arrayDays.forEach(function(item, index, array)
@@ -705,49 +753,67 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 					testValArray.push(dayNumb);
 				}
 		});
+		var self=this;
 		var meetingDays = this.courseCalendarDaysArray.filter(function(currentValue, index, array){
-				event={
-					activity: "Course Meeting for 00001",
-					coach: "Jason Frazzano",
-					date: currentValue.calendarDay.date,
-					endTime: argEndTime,
-					fcid: "JasonCourse00001",
-					location:"704 Ginesi Drive, Morganville, NJ 07754",
-					room:"Room 1 of 3",
-					startTime: argStartTime,
-					time: argStartTime,
-					color: "#4285f4"
-				};
+				
 			var tester = currentValue.calendarDay.date.getDay(currentValue.calendarDay.date);
-			//console.log(tester);
+			console.log(tester);
 			if(testValArray.indexOf(tester)>-1)
-			{
+			{	console.log("in course meeting");
 				currentValue.calendarDay.background="#4285f4";
 				currentValue.calendarDay.isCourseMeeting=true;
 				currentValue.calendarDay.isMeetingDay=true;
+				
+				var name = self.coach + "Course";
+				name = name.replace(" ", "");
+				var cucumber = self.coach.split(" ");
+				var coachId=cucumber[1]+cucumber[0]+"00001";
+				var event = new FcEvent({
+						name: (self.coach).replace(" ","") + "Course", 
+						startTime: self.startTime,
+						endTime: self.endTime,
+						duration:"", 
+						location: "704 Ginesi Drive, Morganville, NJ 07754",
+						coach: self.coach, 
+						coachFcid: coachId, 
+						activity:  (self.coach).replace(" ","") + "Course",
+						fcid: (self.coach).replace(" ","") + "Course"+"00001", 
+						calendarTotalTime: "", 
+						relatedFcids: "",
+						parentEventName: "", 
+						parentEventFcid:"", 
+						studentFcids:[], 
+						studentNames: [], 
+						color: "#4285f4",  
+						isChangeNotificationNeeded: true,
+						reasonForEventModification: "", 
+						reasonEventNotInACalendar: "In Calendar", 
+						completed: false,
+						room:"Room 1 of 3",
+						date: currentValue.calendarDay.date
+					});
 				var elist = currentValue.calendarDay.eventList;
-				currentValue.calendarDay.courseMeetingArray.push({"date": currentValue.calendarDay.date, "startTime":argStartTime, "endTime":argEndTime, "coach": self.coach, "fcid":self.fcid});
 				var len = elist.length;
 					for(var i=0; i<len; i++)
 					{
 							//console.log(elist[i].time);
 							var start=stringTime(argStartTime);
-							var time=stringTime(elist[i].time);
-						if(start==time)
+							var time=stringTime(elist[i].startTime);
+						if(start==time && elist[i].name=="holderEvent")
 						{
-							elist[i]=event;
-							console.log(elist[i]);
-							i=len;
+							elist.splice(i,1,event);
+							//console.log(elist[i]);
+							 return currentValue;
 						}
 						else if(start<time && i>0)
 							{
 								elist.splice(i,0,event);
-								i=len;
+								 return currentValue;
 							}
 						else if(start<time && i==0)
 						{
 								elist.splice(0,0,event);
-								i=len;
+								 return currentValue;
 
 						}
 						
@@ -759,7 +825,6 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		this.courseMeetingArray=this.courseCalendarDaysArray.filter(function(currentValue, index, array){ if(currentValue.calendarDay.isMeetingDay===true){return currentValue;}});
 		this.numberOfMeetings = this.courseMeetingArray.length;
 
-		//console.log(this.numberOfMeetings, this.courseMeetingArray, this.courseCalendarDaysArray, "here is the long list, enjoy");
 		return this.courseMeetingArray;
 		}
 
@@ -778,7 +843,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 	{
 		var numEvents = this.eventArray.length;
 		var i = 0;
-		console.log(this.eventArray);
+		//console.log(this.eventArray);
 		if(this.fcid=="")
 		{
 			var ref = new Firebase(FcCourse.getFirebaseLocation());
@@ -797,10 +862,40 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 	}
 
 }
-function generateRealSATEvents(startDate, endDate)
-{
 
-}
+function getTimes(holiday, date)
+	{	
+		var slotsArr = [];
+		var timeArr = [];
+		for(var i=9; i<=22;i++)
+        {
+              var hour=(i<13)?i:(i-12);
+              if(hour<10){hour=hour.toString();}
+              var minutes="00";
+              if(i==12){minutes="30";}
+              if(i===15){minutes="45"}
+              var ampm=(i<12)?"AM":"PM";
+              var tobj = {"hour": hour,
+                          "minutes": minutes,
+                          "ampm": ampm, 
+                        };
+              var string=hour.toString() + ":" + minutes+ ampm;
+              if(holiday)
+              {
+              	timeArr.push(new FcEvent({"startTime": holiday.startTime, "activity": holiday.name, "name": holiday.name,"coach":"focus on rest", "location": "focus on vacation", "time":"nobook", "endTime": "holiday.endTime", "fcid": "", "date":date, showDate: date.toDateString(), "color": "gold"}));
+              }
+              else
+              	{
+              		timeArr.push(new FcEvent({"startTime": string, "name": "holderEvent", "coach":"", "location": "","activity":"", "time":"", "endTime": "", "fcid": "", "showDate":date.toDateString(), "date":date,  "color": "white"}));
+          		}
+              if(i!==16){i=i+2;}
+              else if(i===16){i=17;}
+          	}
+          return(timeArr);
+	}
+
+
+
 
 function generateHolidayEventsIndependant(startDate, endDate)
 {
@@ -836,6 +931,7 @@ function generateHolidayEventsIndependant(startDate, endDate)
     var numHolidays = holidayArray.length;
     var eventPushObject = {};
     var ev = {};
+    var retVal=[];
   	for(i=0;i<numHolidays;i++){
       	var relHolidays=[];
       	var noBookHolidays=[];
@@ -851,12 +947,56 @@ function generateHolidayEventsIndependant(startDate, endDate)
         							startTime: startTime,
         							endTime: endTime,
         							completed: false,
+        							timestamp: holidayTimeStamp,
+        							date: new Date(holidayTimeStamp),
         							relatedFcids: holidayArray[i].noBook? "*": ""});
         	//eventPushObject[ev.fcid] = ev;  
-        	ev.save();      
+        	retVal.push(ev)     
         }
     }
+    return retVal;
    
+}
+function FcCalendarDay(date)
+{	var holiday = [];
+	holiday=new GenerateHolidayEventsIndependant(date, date);
+	var t=date;
+	var holi=(holiday.length>0);
+	var d= new Date();
+ 	var p	= d.setTime(t.getTime());
+ 	console(t,d,p);
+	var calendarDay={};	
+	calendarDay={
+				date:date,
+				dateCopy:d,
+				index: "", 
+				background: "#008", 
+				toggleDay: false,
+				isSelected: false,
+				inMonth:true,
+				inCourseCalendar: false,
+				isCourseMeeting:false,
+				isPracticeTestDay: false,
+				courseMeetingArray:[],
+				dateId:date.getTime(),
+				showDate: date.toDateString(),
+				resetDate: function(date, d){
+					date.setTime(d.getTime());
+					var date=new Date(date);
+					return date;
+				},
+				freshDate: this.resetDate(date, d),
+				dayOfMonth: date.getDate(),
+				isHoliday: holi,
+				eventList: getTimes(holiday,date),
+			
+			
+			
+			
+	};
+
+
+
 }
 
 
@@ -969,7 +1109,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		var i=0;
 		var arrArg=[];
 		arrArg=this.generateHolidayEvents(startDate, endDate);
-		console.log(arrArg);
+		//console.log(arrArg);
 		this.set("holidays", arrArg);
 		if(endDate<=startDate)
 			{
@@ -1026,6 +1166,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				if(this.holidays[o].showDate.indexOf(calendarDay.showDate)>-1)
 				{
 				calendarDay.isHoliday= true;
+				calendarDay.holiday=this.holidays[o].name;
 				}
 			}
 			if(testArray[2].indexOf(calendarDay.showDate)>-1)
@@ -1215,7 +1356,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 	{	
 		var slotsArr = [];
 		var timeArr = [];
-		for(var i=9; i<=20;i++)
+		for(var i=9; i<=22;i++)
         {
               var hour=(i<13)?i:(i-12);
               if(hour<10){hour=hour.toString();}
@@ -1230,11 +1371,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
               var string=hour.toString() + ":" + minutes+ ampm;
               if(isHoliday==true)
               {
-              	timeArr.push({"time": "NO BOOK", "activity": "HOLIDAY!", "coach":"HOLIDAY", "location": "HOLIDAY", "startTime":"", "endTime": "", "fcid": "", "date":"", "background": "gold"});
+              	timeArr.push(new FcEvent({"startTime": "NO BOOK", "activity": calendarDay.holiday, "name": calendarDay.holiday,"coach":"HOLIDAY", "location": "HOLIDAY", "time":"nobook", "endTime": "nobook", "fcid": "", "date":calendarDay.showDate, "color": "gold"}));
               }
               else
               	{
-              		timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":calendarDay.showDate});
+              		timeArr.push(new FcEvent({"startTime": string, "name": "holderEvent", "coach":"", "location": "","activity":"", "time":"", "endTime": "", "fcid": "", "date":calendarDay.date.toDateString()}));
           		}
               if(i!==16){i=i+2;}
               else if(i===16){i=17;}

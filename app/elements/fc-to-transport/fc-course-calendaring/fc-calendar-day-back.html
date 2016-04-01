@@ -24,17 +24,30 @@ iron-icon .small {
 	width:14px!important;
 }
 .scheduling{padding: 0px 5px;}
-.header-class{min-height: 35px !important; max-height: 55px !important;}
+.header-class{min-height: 35px !important; max-height: 55px !important; height: 100%;}
 .selected{}
 </style>
 	<div class="vertical layout" id="swipable" style="border: silver 2px solid; height: 380px; width:260px!important;">
-			<section class="header-class layout vertical" style="height: 44px!important;color: white; font-size:18px; font-weight: 600; background: #008; padding-top: 6px; text-align: center; font-family: merriweather;">
-					[[_computeDate(calendarDay.date)]]
+			<section class="header-class layout horizontal" style="height: 44px!important;color: white; font-size:18px; font-weight: 600; background: #008; padding-top: 6px; text-align: center; font-family: merriweather;">
+					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: red;"icon="icons:remove-circle">
+						</iron-icon>
+					</section>
+					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 6px;">
+					[[_computeDate(calDay)]]		
 					 [[day.username]]	
+					 </section>
+					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;"icon="icons:add-circle-outline">
+						</iron-icon>
+					</section>
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				
-				<content group="group" class="pickle group handle" ></content>
+				<template is="dom-repeat" limit-to="7"  items="{{calDay.calendarDay.eventList}}" as="slot">
+								<fc-event-item event="{{slot}}" cal-day="{{calDay.calendarDay}}" date="{{calDay.calendarDay.date}}" event-list="{{calDay.calendarDay.eventList}}">
+								</fc-event-item>
+							</template>
+				<!-- <content group="group" class="pickle group handle" ></content> -->
 
 			</paper-listbox>	
 		</div>
@@ -60,8 +73,8 @@ FcCalendarDayBack=Polymer({
 			},
 			notify: true,
 		},
-		calendarDay:{
-			type: Object,
+		calDay:{
+			type: FcCalendarDay,
 			observer: "observeCalendarDay",
 			notify: true
 
@@ -71,10 +84,7 @@ FcCalendarDayBack=Polymer({
 			computed: 'computeEventLists(fcCourse.courseCalendarDaysArray)',
 			notify: true
 		},
-		eventList: {
-			type: Array,
-			notify: true	
-		},
+		
 
 
 	},
@@ -83,13 +93,8 @@ FcCalendarDayBack=Polymer({
 	attached:function(){},
 	computeEventList: function(cDay){
 		if(cDay.calendarDay){
-			//console.log(cDay.calendarDay.eventList);
-			
-			// this.set("calendarDay.calendardDay.eventList", this.calendarDay.calendarDay.eventList);
-			// this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
 			return cDay.calendarDay.eventList.base;
-		}
-		//this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
+		};
 
 	},
 	computeEventLists: function(calDayArray)
@@ -97,12 +102,10 @@ FcCalendarDayBack=Polymer({
 	 var courseEventList=[];	
 		courseEventList=calDayArray.filter(function(currentValue, index, array)
 			{
-				var date=currentValue.date;
+				var date=currentValue.calendarDay.date;
 				var eventList=currentValue.calendarDay.eventList;
-				var eventObject={
-					"date":date,
-					"eventList": eventList
-					};
+				console.log(date, eventList, currentValue);
+				var eventObject={"date":date, "eventList":eventList, "calendarDay":currentValue};
 				return eventObject;
 
 			});
@@ -113,18 +116,18 @@ FcCalendarDayBack=Polymer({
 	},
 	observeCalendarDay: function(nval, oval)
 	{
-		//console.log(nval, "oldvalue: ", oval);
-		if(nval.calendarDay)
+		if(nval)
 		{
-			//console.log(nval.calendarDay.eventList, "actual value: ", this.calendarDay.calendarDay.eventList);
-			this.set("calendarDay.calendarDay.eventList", this.calendarDay.calendarDay.eventList);
-				this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
+			console.log(nval, "actual value: " + this.calDay.calendarDay.eventList[0].activity);
+			//this.set("calendarDay.calendarDay.eventList", this.calendarDay.calendarDay.eventList);
+			//	this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
 		}
 	},
-	_computeDate: function(date){
-		if(date)
-		{
-			var result = date.toDateString();
+	_computeDate: function(cDay){
+		
+		if(cDay)
+		{	console.log(cDay);
+			var result = cDay.calendarDay.showDate;
   			// result = result.slice(0,10);
   			return result;
 		}

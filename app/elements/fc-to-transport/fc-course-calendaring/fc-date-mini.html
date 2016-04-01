@@ -88,6 +88,7 @@ Polymer({
 		isSelected: {
 			type: Boolean,
 			value: false,
+			observer: "observeIsSelected",
 			notify: true
 		},
 
@@ -96,6 +97,29 @@ Polymer({
 
 		this.set("calendarDay.toggleDay", this.toggleDay);
   		this.set("calendarDay.isSelected", this.isSelected);
+	},
+	observeIsSelected: function(newVal,oldVal){
+		if(newVal===true && oldVal===false)
+		{
+			if(!this.event.courseCalendarDaysArray)
+			{
+				this.event.courseCalendarDaysArray=[];
+			}
+			if(!this.calendarDay)
+			{
+				this.set("calendarDay", new FcCalendarDay());}
+				this.push("event.courseCalendarDaysArray", this.calendarDay);
+			this.event.courseCalendarDaysArray.sort(function(a,b)
+			{
+					var retVal =(a.dateId-b.dateId);
+					console.log(retVal);
+					return retVal;
+
+			});
+
+
+		}
+
 	},
 
 	computeMiniDate: function(calendarDay){

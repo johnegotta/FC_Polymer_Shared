@@ -14,7 +14,7 @@
 paper-item {
 	border: 1px solid #adadad;
 		background: white;
-    --paper-item-focused: {
+    --paper-item-focus: {
       background: var(--paper-amber-500);
       font-weight: 600;
     };
@@ -213,21 +213,19 @@ Polymer({
 	soSelected(e){
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.value;
-		console.log(e.model.__data__, propertyName, val);
 		var self=this;
-		
 		if(propertyName == "testDate")
 		{
-			
 			var cat=this.fcCourse.courseCalendarDaysArray.filter(function(one, two, three){
-				one.calendarDay.eventList=[];
-				one.calendarDay.eventList=self.getTimes(one.calendarDay.isHoliday, one.calendarDay.showDate);
+
+				console.log(one);
+				//one.calendarDay.eventList=[];
+				//one.calendarDay.eventList=self.getTimes(one.calendarDay.isHoliday, one.calendarDay.showDate);
 				return one;
 			});
 
 			this.set("fcCourse.courseCalendarDaysArray", null);
 			this.fcCourse.setTestDate(val);
-			console.log(this.fcCourse.courseCalendarDaysArray, cat);
 			this.async(function(){this.set("courseCalendarDaysArray", cat);}, 200);
 		}
 		else if(propertyName == "programLength")
@@ -251,7 +249,6 @@ Polymer({
 			this.fcCourse.numberOfPracticeTests=this.fcCourse.practiceTestArray.length;
 			}
 			this.push("fcCourse.eventArray",this.fcCourse.practiceTestArray);
-			//this.set("fcCourse.courseCalendarDaysArray", this.fcCourse.courseCalendarDaysArray);
 		}
 		else if(propertyName == "courseMeetingSets")
 		{
@@ -259,7 +256,6 @@ Polymer({
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.summerMeetingDays", "Not Applicable");
 			this.push("fcCourse.eventArray",eventArr);
-			this.set("fcCourse.courseCalendarDaysArray", this.fcCourse.courseCalendarDaysArray);
 			var self=this;
 			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
 		{	var len=currentValue.calendarDay.eventList.length;
@@ -276,7 +272,6 @@ Polymer({
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.courseMeetingSets", val);
 			this.push("fcCourse.eventArray",eventArr);
-			this.set("fcCourse.courseCalendarDaysArray", this.fcCourse.courseCalendarDaysArray);
 			var self = this;
 			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
 		{	var len=currentValue.calendarDay.eventList.length;
@@ -296,7 +291,7 @@ Polymer({
 			this.set("fcCourse.privateCoachingHours", val);
 			var retVal = (val=="12 Hours, 4-6 Sessions, Price Total")?"3 Weeks": (val == "18 Hours, 6-9 Sessions, Price Total")?"4 Weeks": (val == "24 Hours, 8-12 Sessions, Price Total")?"5 Weeks": (val == "36 Hours, 12-18 Sessions, Price Total")?"6 Weeks": (val == "50 Hours, up to 25 Sessions, Price Total")?"10 Weeks": "13 Weeks";
 			this.set("fcCourse.programLength", retVal);
-			console.log(val);
+			//console.log(val);
 			
 
 		}
@@ -309,24 +304,19 @@ Polymer({
 		else
 		{
 			this.fcCourse[propertyName] = val;
-		}
-			this.fcCourse[propertyName] = val;
 			var propertyString="fcCourse."+propertyName;
 			this.notifyPath(propertyString, val);
 		
-		// if(propertyString=="fcCourse.programLength" && this.fcCourse.testDate!==""){var d=new Date(this.fcCourse.testDate);}
+		}
 		var self= this;
-		console.log(this.fcCourse.eventArray, "here is a mush of the events");
-		//this.set("fcCourse.courseCalendarDaysArray", this.fcCourse.courseCalendarDaysArray);
 	    var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, this.inputIndex);
-	    console.log("is too a function");
 	    this.set("saveChoiceLocal",true);
 		this.set("inputIndex", indexOfNextInput);
 
 	
 },
 
-getTimes: function(isHoliday)
+getTimes: function(isHoliday, showdate)
 	{	
 		var slotsArr = [];
 		var timeArr = [];
@@ -345,11 +335,11 @@ getTimes: function(isHoliday)
               var string=hour.toString() + ":" + minutes+ ampm;
               if(isHoliday==true)
               {
-              	timeArr.push({"time": "NO BOOK", "activity": "HOLIDAY!", "coach":"HOLIDAY", "location": "HOLIDAY", "startTime":"", "endTime": "", "fcid": "", "date":"", "background": "gold"});
+              	timeArr.push({"time": "NO BOOK", "activity": "HOLIDAY!", "name": "","coach":"HOLIDAY", "location": "HOLIDAY", "startTime":"", "endTime": "", "fcid": "", "date":calendarDay.showDate, "color": "gold"});
               }
               else
               	{
-              		timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":""});
+              		timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":calendarDay.showDate, "name": ""});
           		}
               if(i!==16){i=i+2;}
               else if(i===16){i=17;}
