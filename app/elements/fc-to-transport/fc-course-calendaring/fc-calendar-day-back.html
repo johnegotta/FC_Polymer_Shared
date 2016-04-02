@@ -34,7 +34,7 @@ iron-icon .small {
 						</iron-icon>
 					</section>
 					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 6px;">
-					[[_computeDate(calDay)]]		
+					[[_computeDate(calDay.showDate)]]	[[_computeDate(calDay.calendarDay.showDate)]]	
 					 [[day.username]]	
 					 </section>
 					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
@@ -44,7 +44,7 @@ iron-icon .small {
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
 				<template is="dom-repeat" limit-to="7"  items="{{calDay.calendarDay.eventList}}" as="slot">
-								<fc-event-item event="{{slot}}" cal-day="{{calDay.calendarDay}}" date="{{calDay.calendarDay.date}}" event-list="{{calDay.calendarDay.eventList}}">
+								<fc-event-item event="{{slot}}" calendar-day="{{calDay.calendarDay}}" date="{{calDay.calendarDay.date}}" event-list="{{calDay.calendarDay.eventList}}">
 								</fc-event-item>
 							</template>
 				<!-- <content group="group" class="pickle group handle" ></content> -->
@@ -73,9 +73,15 @@ FcCalendarDayBack=Polymer({
 			},
 			notify: true,
 		},
-		calDay:{
+		calendarDay:{
 			type: FcCalendarDay,
 			observer: "observeCalendarDay",
+			notify: true
+
+		},
+		calDay:{
+			type: FcCalendarDay,
+			observer: "observeCalendarDay2",
 			notify: true
 
 		},
@@ -100,17 +106,17 @@ FcCalendarDayBack=Polymer({
 	computeEventLists: function(calDayArray)
 	{
 	 var courseEventList=[];	
-		courseEventList=calDayArray.filter(function(currentValue, index, array)
-			{
-				var date=currentValue.calendarDay.date;
-				var eventList=currentValue.calendarDay.eventList;
-				console.log(date, eventList, currentValue);
-				var eventObject={"date":date, "eventList":eventList, "calendarDay":currentValue};
-				return eventObject;
+		// courseEventList=calDayArray.filter(function(currentValue, index, array)
+		// 	{
+		// 		var date=currentValue.date;
+		// 		var eventList=currentValue.eventList;
+		// 		console.log(date, eventList, currentValue);
+		// 		var eventObject={"date":date, "eventList":eventList, "calendarDay":currentValue};
+		// 		return currentValue;
 
-			});
-		//console.log(courseEventList)
-		return courseEventList;
+		// 	});
+		// //console.log(courseEventList)
+		// return courseEventList;
 
 
 	},
@@ -118,18 +124,23 @@ FcCalendarDayBack=Polymer({
 	{
 		if(nval)
 		{
-			console.log(nval, "actual value: " + this.calDay.calendarDay.eventList[0].activity);
+			console.log(nval, "actual value: " + this.calendarDay.eventList[0].activity);
 			//this.set("calendarDay.calendarDay.eventList", this.calendarDay.calendarDay.eventList);
 			//	this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
 		}
+	},
+	observeCalendarDay2:function(newVal, oldb){
+		console.log(newVal, oldb);	
+
+
 	},
 	_computeDate: function(cDay){
 		
 		if(cDay)
 		{	console.log(cDay);
-			var result = cDay.calendarDay.showDate;
+			var result = cDay;
   			// result = result.slice(0,10);
-  			return result;
+  			return cDay;
 		}
 	},
 });

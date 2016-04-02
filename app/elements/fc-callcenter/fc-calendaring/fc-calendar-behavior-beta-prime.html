@@ -212,7 +212,7 @@ class FcEvent
 {
 	constructor(argEvent)
 	{
-		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.duration,argEvent.location, argEvent.coach, argEvent.coachFcid, argEvent.activity, argEvent.fcid,   argEvent.calendarTotalTime, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.studentFcids, argEvent.studentNames, argEvent.color, argEvent.isChangeNotificationNeeded, argEvent.reasonForEventModification, argEvent.reasonEventNotInACalendar, argEvent.completed, argEvent.date)
+		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.duration,argEvent.location, argEvent.coach, argEvent.coachFcid, argEvent.activity, argEvent.fcid,   argEvent.calendarTotalTime, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.studentFcids, argEvent.studentNames, argEvent.color, argEvent.isChangeNotificationNeeded, argEvent.reasonForEventModification, argEvent.reasonEventNotInACalendar, argEvent.completed, argEvent.date, argEvent.timestamp, argEvent.isHoliday)
 	}
 
 
@@ -221,16 +221,16 @@ class FcEvent
 		return "https://focused0ne.firebaseio.com/events";
 	}
 
-  	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date)
+  	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date, timestamp)
   	{
-	    this.name = name || ""; 
-	    this.startTime = startTime|| "6:00PM";// console.log(this.startTime);
-	    this.endTime =  endTime|| "9:00PM";
+	    this.name = name; 
+	    this.startTime = startTime;// console.log(this.startTime);
+	    this.endTime =  endTime;
 	    this.duration= new Duration(this.startTime, this.endTime);
 	    this.location = location || "704 Ginesi Dr. Morganville, New Jersey 07754";
-	    this.coach = coach || "";
-	    this.coachFcid=coachFcid || "ColleretteStacy00001";
-	    this.activity = activity || "";
+	    this.coach = coach;
+	    this.coachFcid=coachFcid;
+	    this.activity = activity;
 	    if(fcid)
 	    {
 	    	this.fcid=fcid
@@ -243,7 +243,7 @@ class FcEvent
 	    this.relatedFcids = relatedFcids || "";  
 	    this.parentEventName = parentEventName || ""; 
 	    this.parentEventFcid = parentEventFcid || "";
-	    this.calendarTotalTime=calendarTotalTime || "writeAlgorithmSTRUCTURE DATA ALREADY";
+	    this.calendarTotalTime=calendarTotalTime;
 	    this.studentFcids=studentFcids || ""; 
 	    this.studentNames=studentNames || "";
 	    this.color = color || "white";
@@ -251,6 +251,9 @@ class FcEvent
 	    this.reasonForEventModification = reasonForEventModification || "conflict or holiday";
 	    this.reasonEventNotInACalendar = reasonEventNotInACalendar || "none! All events should be in calendars!";
 	    this.completed = completed || false;
+	    this.date=date;
+	    this.timestamp=timestamp;
+	    this.isHoliday=false;
 	//     if(this.startTime){ this.dayStamp = this.startTime.dayStamp();}
 	// }
 
@@ -657,7 +660,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 
 
 		arrayHolder=this.courseCalendarDaysArray.filter(function(currentValue, index, array){
-					currentValue.inCalendarDayArray=true;
+					currentValue.calendarDay.inCalendarDayArray=true;
 					currentValue.calendarDay.inCourseCalendar=true;
 					currentValue.calendarDay.isSelected = true; 
 					currentValue.calendarDay.toggleDay = true;
@@ -769,8 +772,9 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 				var cucumber = self.coach.split(" ");
 				var coachId=cucumber[1]+cucumber[0]+"00001";
 				var event = new FcEvent({
-						name: (self.coach).replace(" ","") + "Course", 
-						startTime: self.startTime,
+						
+						name: name || (self.coach).replace(" ","") + "Course", 
+						startTime: self.startTime || self.startTime,
 						endTime: self.endTime,
 						duration:"", 
 						location: "704 Ginesi Drive, Morganville, NJ 07754",
@@ -790,8 +794,10 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 						reasonEventNotInACalendar: "In Calendar", 
 						completed: false,
 						room:"Room 1 of 3",
-						date: currentValue.calendarDay.date
-					});
+						date: currentValue.calendarDay.date,
+						timestamp: currentValue.calendarDay.dateId,
+						isHoliday: false,
+											});
 				var elist = currentValue.calendarDay.eventList;
 				var len = elist.length;
 					for(var i=0; i<len; i++)
@@ -863,41 +869,8 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 
 }
 
-function getTimes(holiday, date)
-	{	
-		var slotsArr = [];
-		var timeArr = [];
-		for(var i=9; i<=22;i++)
-        {
-              var hour=(i<13)?i:(i-12);
-              if(hour<10){hour=hour.toString();}
-              var minutes="00";
-              if(i==12){minutes="30";}
-              if(i===15){minutes="45"}
-              var ampm=(i<12)?"AM":"PM";
-              var tobj = {"hour": hour,
-                          "minutes": minutes,
-                          "ampm": ampm, 
-                        };
-              var string=hour.toString() + ":" + minutes+ ampm;
-              if(holiday)
-              {
-              	timeArr.push(new FcEvent({"startTime": holiday.startTime, "activity": holiday.name, "name": holiday.name,"coach":"focus on rest", "location": "focus on vacation", "time":"nobook", "endTime": "holiday.endTime", "fcid": "", "date":date, showDate: date.toDateString(), "color": "gold"}));
-              }
-              else
-              	{
-              		timeArr.push(new FcEvent({"startTime": string, "name": "holderEvent", "coach":"", "location": "","activity":"", "time":"", "endTime": "", "fcid": "", "showDate":date.toDateString(), "date":date,  "color": "white"}));
-          		}
-              if(i!==16){i=i+2;}
-              else if(i===16){i=17;}
-          	}
-          return(timeArr);
-	}
 
-
-
-
-function generateHolidayEventsIndependant(startDate, endDate)
+function GenerateHolidayEventsIndependant(startDate, endDate)
 {
 	var holidayArray = [{"name": "Daylight Saving Time", "holiday":[2016,3,13], "noBook": false}, 
         {"name": "St. Patrick's Day", "holiday":[2016,3,17], "noBook": false},
@@ -932,42 +905,108 @@ function generateHolidayEventsIndependant(startDate, endDate)
     var eventPushObject = {};
     var ev = {};
     var retVal=[];
-  	for(i=0;i<numHolidays;i++){
+  	for(i=0;i<numHolidays;i++)
+  	{
       	var relHolidays=[];
       	var noBookHolidays=[];
-        var startTime = new Date(holidayArray[i].holiday);
-        var endTime = new Date(holidayArray[i].holiday);
-        endTime.setHours(23);
-        endTime.setMinutes(59);
-        var holidayTimestamp = startTime.dayStamp();
-        holidayArray[i].dayStamp=holidayTimestamp;
-        if(holidayTimestamp >= startDate && holidayTimestamp <= endDate && holidayArray[i].noBook)
-        {	
-        	ev = new FcEvent({name: holidayArray[i].name, 
-        							startTime: startTime,
-        							endTime: endTime,
+        var holidayDate = new Date(holidayArray[i].holiday);
+        var holiday=holidayArray[i];
+
+       if(startDate<=holidayDate && holidayDate<=endDate && holiday.noBook===true)
+       {
+        		var holidayObj={	
+        							activity: holiday.name,
+        							name: holiday.name,
+        							time: "NoBooK", 
+        							startTime: "NoBook",
+        							endTime: "NoBook",
         							completed: false,
-        							timestamp: holidayTimeStamp,
-        							date: new Date(holidayTimeStamp),
-        							relatedFcids: holidayArray[i].noBook? "*": ""});
-        	//eventPushObject[ev.fcid] = ev;  
-        	retVal.push(ev)     
+        							date: holidayDate,
+        							showDate: holidayDate.toDateString(),
+        							timestamp: new Date(holidayDate).getTime(),
+        							color: "goldenrod",
+        							relatedFcids: holidayArray[i].noBook? "*": ""
+        						};
+        	retVal.push(holidayObj);     
         }
     }
-    return retVal;
-   
+    return retVal;   
 }
+
+function getTimes(holiday, date)
+	{	var d = new Date(date);
+        	console.log(holiday, holiday, holiday, holiday, "LOOK HERE FOR ANSWERS");
+		var slotsArr = [];
+		var timeArr = [];
+		for(var i=9; i<=22;i++)
+        {		
+              var hour=(i<13)?i:(i-12);
+              if(hour<10){hour=hour.toString();}
+              var minutes="00";
+              if(i==12){minutes="30";}
+              if(i===15){minutes="45"}
+              var ampm=(i<12)?"AM":"PM";
+              var tobj = {"hour": hour,
+                          "minutes": minutes,
+                          "ampm": ampm, 
+                        };
+              var string=hour.toString() + ":" + minutes+ ampm;
+              if(holiday.length!==0)
+              { console.log(holiday);
+              	timeArr.push(new FcEvent(holiday[0]));
+      //         			"name": holiday.name,
+      //         			"startTime": holiday.startTime, 
+      //         			"location": "focus on vacation", 
+      //         			"coach":"focus on rest",
+      //         			"endTime": holiday.endTime,
+      //         			"time": "NoBooK",
+						// "activity":  holiday.name,
+						// "fcid": "", 
+						// "calendarTotalTime": "", 
+						// "relatedFcids": "",
+						// "parentEventName": "", 
+						// parentEventFcid:"", 
+						// studentFcids:[], 
+						// studentNames: [], 
+						// color: "gold",  
+						// isChangeNotificationNeeded: true,
+						// reasonForEventModification: "", 
+						// reasonEventNotInACalendar: "In Calendar", 
+						// completed: false,
+						// room:"Room 3 of 3",
+						// "date": holiday.date,
+						// "timestamp": holiday.dateId,
+						// "showDate": holiday.showDate, 
+						// "isHoliday": true
+					// }));
+              }
+
+              else
+              	{
+              		//console.log(date, d);
+              		timeArr.push(new FcEvent({"startTime": string, "name": "holderEvent", "coach":"", "location": "","activity":"", "time":"", "endTime": "", "fcid": "", "showDate":d.toDateString(), "date":date,  "color": "white"}));
+          		}
+              if(i!==16){i=i+2;}
+              else if(i===16){i=17;}
+          	}
+          return(timeArr);
+	}
 function FcCalendarDay(date)
 {	var holiday = [];
-	holiday=new GenerateHolidayEventsIndependant(date, date);
-	var t=date;
-	var holi=(holiday.length>0);
+
+	var t=new Date(date);
+	
 	var d= new Date();
  	var p	= d.setTime(t.getTime());
- 	console(t,d,p);
+ 	
+ 	var date2=new Date(date);
 	var calendarDay={};	
+	//console.log(t,d,p,date, date2);
+	holiday= new GenerateHolidayEventsIndependant(date, date2);
+	var holi=(holiday.length>0);
+	if(holiday){console.log(holiday,holiday, holiday,holiday,holiday);}
 	calendarDay={
-				date:date,
+				date:date2,
 				dateCopy:d,
 				index: "", 
 				background: "#008", 
@@ -978,23 +1017,24 @@ function FcCalendarDay(date)
 				isCourseMeeting:false,
 				isPracticeTestDay: false,
 				courseMeetingArray:[],
-				dateId:date.getTime(),
-				showDate: date.toDateString(),
-				resetDate: function(date, d){
-					date.setTime(d.getTime());
-					var date=new Date(date);
-					return date;
+				dateId:p,
+				showDate: d.toDateString(),
+				resetDate: function(){
+					date.setTime(p);
+					var dateNew =new Date(date);
+					return dateNew;
 				},
-				freshDate: this.resetDate(date, d),
-				dayOfMonth: date.getDate(),
+				freshDate: t,
+				dayOfMonth: t.getDate(),
 				isHoliday: holi,
-				eventList: getTimes(holiday,date),
+				eventList: getTimes(holiday, date2),
 			
 			
 			
 			
 	};
-
+	//console.log(calendarDay)
+	return calendarDay;
 
 
 }
@@ -1035,6 +1075,11 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		testDateObjects:{
 
 
+
+		},
+		calendarDay:
+		{		type: FcCalendarDay,
+				notify: true
 
 		},
 		dayOfWeek: {
@@ -1132,9 +1177,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				endDate = endDate.addDays(+1);
 
 			}
-		
-		
-		
 		var finishedFirstMonth=false;
 		var testArray =[];
 		testArray = FcCourse.getTestDates();
@@ -1145,39 +1187,9 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		for (i = 0; i < numDays; i++) 
 		{   var calendarDay={};
 			currDate=this.dateArr[i];
-			calendarDay.date=currDate; 
-			calendarDay.index=i;
-			calendarDay.background="#008";
-			calendarDay.toggleDay=false;
-			calendarDay.isSelected=false;
-			calendarDay.inMonth=true;
-			calendarDay.inCourseCalendar=false;
-			
-			calendarDay.courseMeetingArray=[];
-			calendarDay.isCourseMeeting=false;
-			calendarDay.isPracticeTestDay=false;
-			calendarDay.dateId=currDate.dayStamp();
-			calendarDay.showDate=currDate.toDateString();
-			calendarDay.dayOfMonth=currDate.getDate();
-			var hollen =this.holidays.length;
-			calendarDay.isHoliday=false;
-			for(var o=0;o<hollen;o++)
-			{	//console.log(hollen, this.holidays[o].showDate, calendarDay.showDate);
-				if(this.holidays[o].showDate.indexOf(calendarDay.showDate)>-1)
-				{
-				calendarDay.isHoliday= true;
-				calendarDay.holiday=this.holidays[o].name;
-				}
-			}
-			if(testArray[2].indexOf(calendarDay.showDate)>-1)
-			{
-				calendarDay.testDate=true; 
-			}
-			else{
-				calendarDay.testDate=false;
-			}
-			calendarDay.eventList=this.getTimes(calendarDay.isHoliday, calendarDay);
+			var calendarDay = new FcCalendarDay(currDate);
 			this.push("calendarDayArray", calendarDay);
+			//console.log(calendarDay);
 			if(i==0)
 			{	
 				this.push("monthsArray", []);
@@ -1371,7 +1383,7 @@ FCBehaviors.FcCalendarBehaviorPrime = {
               var string=hour.toString() + ":" + minutes+ ampm;
               if(isHoliday==true)
               {
-              	timeArr.push(new FcEvent({"startTime": "NO BOOK", "activity": calendarDay.holiday, "name": calendarDay.holiday,"coach":"HOLIDAY", "location": "HOLIDAY", "time":"nobook", "endTime": "nobook", "fcid": "", "date":calendarDay.showDate, "color": "gold"}));
+              	timeArr.push(new FcEvent({"name": holiday.name, "startTime": "NO BOOK", "activity": holiday.activity, "name": calendarDay.holiday,"coach":"HOLIDAY", "location": "HOLIDAY", "time":"nobook", "endTime": "nobook", "fcid": "", "date":calendarDay.showDate, "color": "gold"}));
               }
               else
               	{
@@ -1385,15 +1397,31 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 
 
 
+//
+			// for(var o=0;o<hollen;o++)
+			// {	//console.log(hollen, this.holidays[o].showDate, calendarDay.showDate);
+			// 	if(this.holidays[o].showDate.indexOf(calendarDay.showDate)>-1)
+			// 	{
+			// 	calendarDay.isHoliday= true;
+			// 	calendarDay.holiday=this.holidays[o].name;
+			// 	}
+			// }
+			// if(testArray[2].indexOf(calendarDay.showDate)>-1)
+			// {
+			// 	calendarDay.testDate=true; 
+			// }
+			// else{
+			// 	calendarDay.testDate=false;
+			// }
+			// calendarDay.eventList=this.getTimes(calendarDay.isHoliday, calendarDay);
 
-
-        // for(var i=24; i<=84;i++)
-        // {
-        //       var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
-        //       if(hour<10){hour='0'+hour.toString();}
-        //       var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
-        //       var ampm=(i<48)?"AM":"PM";
-        //       var tobj = {"hour": hour,
+   //      // for(var i=24; i<=84;i++)
+   //      // {
+   //      //       var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
+   //      //       if(hour<10){hour='0'+hour.toString();}
+   //      //       var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
+   //      //       var ampm=(i<48)?"AM":"PM";
+   //      //       var tobj = {"hour": hour,
         //                   "minutes": minutes,
         //                   "ampm": ampm, 
         //                 };

@@ -25,7 +25,7 @@ opacity: 1;}
  <div class="flex layout horizontal center-justified">
  			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
 			<neon-animated-pages class="layout vertical flex-1" id="pages" style="width: 320px; height:360px;" selected="0"> 
-				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" selected-array={{days}} id="myCalendarCard">
+				<fc-date-picker-proto displayed-month="{{displayedMonth}}" on-dblclick="_dateSelected" fc-course="{{fcCourseObject}}" selected-array={{fcCourseObject.courseCalendarDaysArray}} id="myCalendarCard">
 				<span class="headers">[[_computeCalendarHeading(displayedMonth)]] [[computeYear(displayedMonth)]]</span>
 				<section class="footer fbutton" on-tap="createEvents">Create Events from Selected Days</section>
 				</fc-date-picker-proto>
@@ -45,7 +45,7 @@ opacity: 1;}
 		<paper-tabs id="calendarTabs" scrollable="true" style="padding: 2px 0px; height: 420px; outline: 0px;" class="horizontal layout flex scroll" bar="true" hide-scroll-buttons="true"> 
 				<div class="horizontal layout justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
 					<template is="dom-repeat" limit-to="7" items="{{computeCalendarDays(fcCourseObject.courseCalendarDaysArray.*)}}" as="day">
-						<fc-calendar-day-back cal-day="{{day}}">
+						<fc-calendar-day-back course-calendar-days-array="{{computeCalendarDays(fcCourseObject.courseCalendarDaysArray.*)}}" fc-course={{fcCourseObject}} cal-day="{{day}}">
 						</fc-calendar-day-back>
 					</template>
 				</div>
@@ -104,7 +104,20 @@ FcCalendarDialog= Polymer({
 			type: Array,
 			value: [],
 			notify: true
-		}
+		},
+		calendarDay:{
+				type: FcCalendarDay,
+				computed: "computeCalendarDay(day)",
+				notify: true
+			},
+		day: {
+				type: Object,
+				value:{},
+				notify: true
+				}
+	
+
+
 	},
 	
 	ready: function()
@@ -125,6 +138,14 @@ FcCalendarDialog= Polymer({
 
 
 	},
+
+		computeCalendarDay: function(day)
+		{
+ 				var burger=new FcCalendarDay(day);
+ 					return burger;
+
+
+		},
 
 	selectedTwo: function(event){
 
