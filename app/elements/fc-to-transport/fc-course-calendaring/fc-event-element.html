@@ -216,14 +216,11 @@ Polymer({
 		var self=this;
 		if(propertyName == "testDate")
 		{
-			var cat=this.fcCourse.courseCalendarDaysArray.filter(function(one, two, three){
-
-				console.log(one);
-				//one.calendarDay.eventList=[];
-				//one.calendarDay.eventList=self.getTimes(one.calendarDay.isHoliday, one.calendarDay.showDate);
+			var cat=this.fcCourse.courseCalendarDaysArray.filter(function(one, two, three)
+			{
+				console.log(one, one, one);
 				return one;
 			});
-
 			this.set("fcCourse.courseCalendarDaysArray", null);
 			this.fcCourse.setTestDate(val);
 			this.async(function(){this.set("courseCalendarDaysArray", cat);}, 200);
@@ -251,21 +248,20 @@ Polymer({
 			this.push("fcCourse.eventArray",this.fcCourse.practiceTestArray);
 		}
 		else if(propertyName == "courseMeetingSets")
-		{
+		{			
 			var eventArr= this.fcCourse.setCourseMeetingDaysAndTimes(val);
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.summerMeetingDays", "Not Applicable");
 			this.push("fcCourse.eventArray",eventArr);
 			var self=this;
 			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
-		{	var len=currentValue.calendarDay.eventList.length;
-			for(var i=0; i<len;i++)
-			{
-			self.notifyPath("fcCourse.courseCalendarDaysArray." + index + ".calendarDay.eventList." + i, currentValue.calendarDay.eventList[i]);
-			}
-		});
-
-
+				{	var len=currentValue.eventList.length;
+					for(var i=0; i<len;i++)
+						{
+							self.notifyPath("fcCourse.courseCalendarDaysArray.calendarDay.eventList." + i, currentValue.eventList[i]);
+							self.notifyPath("fcCourse.courseCalendarDaysArray.eventList." + i, currentValue.eventList[i]);
+						}
+				});
 		}
 		else if(propertyName == "summerMeetingDays")
 		{	var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val);
@@ -274,12 +270,11 @@ Polymer({
 			this.push("fcCourse.eventArray",eventArr);
 			var self = this;
 			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
-		{	var len=currentValue.calendarDay.eventList.length;
-			for(var i=0; i<len;i++)
-			{
-			self.notifyPath("fcCourse.courseCalendarDaysArray." + index + ".calendarDay.eventList." + i, currentValue.calendarDay.eventList[i]);
-			}
-		});
+				{
+				var len=currentValue.calendarDay.eventList.length;
+					for(var i=0; i<len;i++)
+					{self.notifyPath("fcCourse.courseCalendarDaysArray." + index + ".calendarDay.eventList." + i, currentValue.calendarDay.eventList[i])};
+				});
 		}
 		else if(propertyName=="privateCoach")
 			{	this.set("fcCourse.courseType", "Private Coaching"); 
@@ -292,8 +287,6 @@ Polymer({
 			var retVal = (val=="12 Hours, 4-6 Sessions, Price Total")?"3 Weeks": (val == "18 Hours, 6-9 Sessions, Price Total")?"4 Weeks": (val == "24 Hours, 8-12 Sessions, Price Total")?"5 Weeks": (val == "36 Hours, 12-18 Sessions, Price Total")?"6 Weeks": (val == "50 Hours, up to 25 Sessions, Price Total")?"10 Weeks": "13 Weeks";
 			this.set("fcCourse.programLength", retVal);
 			//console.log(val);
-			
-
 		}
 		else if(propertyName == "testDate" && this.fcCourse.isPrivateSchedule===true)
 		{

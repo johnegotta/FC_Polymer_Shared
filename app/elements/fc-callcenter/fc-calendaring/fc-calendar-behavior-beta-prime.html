@@ -159,6 +159,47 @@ function shortDaysLabel(argDays, NumChars)
 
 }
 
+function nextReasonableTestDate()
+	{
+		var d=new Date();
+		d.setDate(d.getDate(d +49));
+		var allTestDates=[];
+		allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
+		var counter = allTestDates.length;
+		var i = 0;
+		for (i = 0; i < counter; i++)
+		{
+			var testDay = new Date(allTestDates[i]);
+			//console.log(d.toLocaleString, testDate.toLocaleString);
+			if(d<testDay){return testDay;}
+		}
+	
+	}
+
+function TimeSlots(){
+				var timeArr = [];
+        		for(var i=18; i<=42;i++){
+              var hour=(Math.floor(i/2) <13)?Math.floor(i/2):(Math.floor(i/2)-12);
+              var j=false;
+              j=(i>47)?true:false;
+              if(hour<10){hour='0'+hour.toString();}
+              var space=(i<20)?true: false;
+              var halfhour=(i%2==0)?0:3;
+              var ampm=(i<24)?"am":(j==true)?"am":"pm";
+              var tobj = {"hour": hour,
+                          "halfhour": halfhour,
+                          "ampm": ampm, 
+                          "space": space
+                        };
+              var string=hour.toString() + ":" + halfhour.toString() + "0"+ ampm;
+              var obj2={"label": string, "val": "open", "name": string};
+              timeArr.push(obj2);
+          }
+          return timeArr;
+         }
+
+
+
 function dayAbbreviationsToDays(argAbbrev)
 {
 	argAbbrev = argAbbrev.toLowerCase();
@@ -354,6 +395,7 @@ class FcCourse
 		this.calendarDaysArray=[];
 		this.testDateDate=new Date(this.testDate);
 		this.counter=0;
+		this.activity="course" || "";
 	}
 
 	
@@ -657,14 +699,12 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 					return currentValue;
 				}
 		}); 
-
-
-		arrayHolder=this.courseCalendarDaysArray.filter(function(currentValue, index, array){
-					currentValue.calendarDay.inCalendarDayArray=true;
-					currentValue.calendarDay.inCourseCalendar=true;
-					currentValue.calendarDay.isSelected = true; 
-					currentValue.calendarDay.toggleDay = true;
-					currentValue.calendarDay.background= "#c6dafc";
+		arrayHolder=this.courseCalendarDaysArray.filter(function(currentValue, index, array){	console.log(currentValue);
+					currentValue.inCalendarDayArray=true;
+					currentValue.inCourseCalendar=true;
+					currentValue.isSelected = true; 
+					currentValue.toggleDay = true;
+					currentValue.background= "#c6dafc";
 					
 					return currentValue;
 
@@ -732,71 +772,66 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		times = times.split("_");
 		this.startTime=times[0].replace(" ", "");
 		this.endTime=times[1];
-		//console.log(theDaySet);
 		this.startAndEndTimes = this.startTime + " to " + this.endTime;
-		var retVal=this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime);
+		var retVal=this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime, this.coach, this.activity);
 	 	return retVal;
 	}
 
 	setCourseMeetingEvents(argDays, argStartTime, argEndTime, argCoach, argActivity)
 	{	
 		var event={};
-		
-		this.courseMeetingDays = argDays;
+		var self=this;
+		console.log(argDays, argStartTime, argEndTime, argCoach, argActivity);
+		self.courseMeetingDays = argDays;
 		var arrayDays = argDays.split(" ");
 		var numMeetingDays=arrayDays.length;
-		//console.log(numMeetingDays, arrayDays, "HERE LOOK HERE FOR NUMB DAYS TWO");
-		var testValArray=[];
-		var self=this;
-		arrayDays.forEach(function(item, index, array)
-			{	
-				var dayNumb = (item=="Sunday")?0:(item=="Monday")?1:(item=="Tuesday")?2:(item=="Wednesday")?3:(item=="Thursday")?4:(item=="Friday")?5:(item=="Saturday")?6: "";
-				console.log(dayNumb);
-				if(dayNumb!==""){
-					testValArray.push(dayNumb);
-				}
-		});
-		var self=this;
-		var meetingDays = this.courseCalendarDaysArray.filter(function(currentValue, index, array){
-				
-			var tester = currentValue.calendarDay.date.getDay(currentValue.calendarDay.date);
-			console.log(tester);
-			if(testValArray.indexOf(tester)>-1)
-			{	console.log("in course meeting");
-				currentValue.calendarDay.background="#4285f4";
-				currentValue.calendarDay.isCourseMeeting=true;
-				currentValue.calendarDay.isMeetingDay=true;
-				
+		var mDays=arrayDays.filter(function(item){if(item && item!="" && item!=" "){return item;}});
+		console.log(mDays);
+		var newArray = mDays.map(function(item, index, array)
+			{	console.log(item);
+				var element=(item=="Sunday")?0:(item=="Monday")?1:(item=="Tuesday")?2:(item=="Wednesday")?3:(item=="Thursday")?4:(item=="Friday")?5:(item=="Saturday")?6: "";
+				return element;
+				});
+		console.log(newArray);
+		console.log(self.courseCalendarDaysArray);
+		var meetingDays = self.courseCalendarDaysArray.filter(function(currentValue, index, array){	
+			var tester = currentValue.date.getDay(currentValue.date);
+			console.log(tester, currentValue);
+			if(newArray.indexOf(tester)>-1)
+				{console.log("in course meeting");
+				currentValue.background="#4285f4";
+				currentValue.isCourseMeeting=true;
+				currentValue.isMeetingDay=true;
 				var name = self.coach + "Course";
 				name = name.replace(" ", "");
 				var cucumber = self.coach.split(" ");
 				var coachId=cucumber[1]+cucumber[0]+"00001";
+
 				var event = new FcEvent({
-						
-						name: name || (self.coach).replace(" ","") + "Course", 
-						startTime: self.startTime || self.startTime,
-						endTime: self.endTime,
-						duration:"", 
-						location: "704 Ginesi Drive, Morganville, NJ 07754",
-						coach: self.coach, 
-						coachFcid: coachId, 
-						activity:  (self.coach).replace(" ","") + "Course",
-						fcid: (self.coach).replace(" ","") + "Course"+"00001", 
-						calendarTotalTime: "", 
-						relatedFcids: "",
-						parentEventName: "", 
-						parentEventFcid:"", 
-						studentFcids:[], 
-						studentNames: [], 
-						color: "#4285f4",  
-						isChangeNotificationNeeded: true,
-						reasonForEventModification: "", 
-						reasonEventNotInACalendar: "In Calendar", 
-						completed: false,
-						room:"Room 1 of 3",
-						date: currentValue.calendarDay.date,
-						timestamp: currentValue.calendarDay.dateId,
-						isHoliday: false,
+							name: name || (self.coach).replace(" ","") + "Course", 
+							startTime: self.startTime || self.startTime,
+							endTime: self.endTime,
+							duration:"", 
+							location: "704 Ginesi Drive, Morganville, NJ 07754",
+							coach: self.coach, 
+							coachFcid: coachId, 
+							activity:  (self.coach).replace(" ","") + "Course",
+							fcid: (self.coach).replace(" ","") + "Course"+"00001", 
+							calendarTotalTime: "", 
+							relatedFcids: "",
+							parentEventName: "", 
+							parentEventFcid:"", 
+							studentFcids:[], 
+							studentNames: [], 
+							color: "#4285f4",  
+							isChangeNotificationNeeded: true,
+							reasonForEventModification: "", 
+							reasonEventNotInACalendar: "In Calendar", 
+							completed: false,
+							room:"Room 1 of 3",
+							date: currentValue.calendarDay.date,
+							timestamp: currentValue.calendarDay.dateId,
+							isHoliday: false,
 											});
 				var elist = currentValue.calendarDay.eventList;
 				var len = elist.length;
@@ -867,8 +902,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		}
 	}
 
-}
-
+};
 
 function GenerateHolidayEventsIndependant(startDate, endDate)
 {
@@ -935,7 +969,7 @@ function GenerateHolidayEventsIndependant(startDate, endDate)
 
 function getTimes(holiday, date)
 	{	var d = new Date(date);
-        	console.log(holiday, holiday, holiday, holiday, "LOOK HERE FOR ANSWERS");
+        	//console.log(holiday, holiday, holiday, holiday, "LOOK HERE FOR ANSWERS");
 		var slotsArr = [];
 		var timeArr = [];
 		for(var i=9; i<=22;i++)
@@ -952,33 +986,8 @@ function getTimes(holiday, date)
                         };
               var string=hour.toString() + ":" + minutes+ ampm;
               if(holiday.length!==0)
-              { console.log(holiday);
+              { //console.log(holiday);
               	timeArr.push(new FcEvent(holiday[0]));
-      //         			"name": holiday.name,
-      //         			"startTime": holiday.startTime, 
-      //         			"location": "focus on vacation", 
-      //         			"coach":"focus on rest",
-      //         			"endTime": holiday.endTime,
-      //         			"time": "NoBooK",
-						// "activity":  holiday.name,
-						// "fcid": "", 
-						// "calendarTotalTime": "", 
-						// "relatedFcids": "",
-						// "parentEventName": "", 
-						// parentEventFcid:"", 
-						// studentFcids:[], 
-						// studentNames: [], 
-						// color: "gold",  
-						// isChangeNotificationNeeded: true,
-						// reasonForEventModification: "", 
-						// reasonEventNotInACalendar: "In Calendar", 
-						// completed: false,
-						// "room":"Room 3 of 3",
-						// "date": holiday.date,
-						// "timestamp": holiday.dateId,
-						// "showDate": holiday.showDate, 
-						// "isHoliday": true
-					// }));
               }
 
               else
@@ -1004,7 +1013,7 @@ function FcCalendarDay(date)
 	//console.log(t,d,p,date, date2);
 	holiday= new GenerateHolidayEventsIndependant(date, date2);
 	var holi=(holiday.length>0);
-	if(holiday){console.log(holiday,holiday, holiday,holiday,holiday);}
+	if(holiday){//console.log(holiday,holiday, holiday,holiday,holiday);}
 	calendarDay={
 				date:date2,
 				dateCopy:d,
@@ -1034,10 +1043,11 @@ function FcCalendarDay(date)
 			
 	};
 	//console.log(calendarDay)
-	return calendarDay;
+	return calendarDay;Wednesday
 
 
-}
+	}
+  }
 
 
 FcCourse.fcidCounter = 0;
@@ -1395,40 +1405,6 @@ FCBehaviors.FcCalendarBehaviorPrime = {
           return(timeArr);
 	},
 
-
-
-//
-			// for(var o=0;o<hollen;o++)
-			// {	//console.log(hollen, this.holidays[o].showDate, calendarDay.showDate);
-			// 	if(this.holidays[o].showDate.indexOf(calendarDay.showDate)>-1)
-			// 	{
-			// 	calendarDay.isHoliday= true;
-			// 	calendarDay.holiday=this.holidays[o].name;
-			// 	}
-			// }
-			// if(testArray[2].indexOf(calendarDay.showDate)>-1)
-			// {
-			// 	calendarDay.testDate=true; 
-			// }
-			// else{
-			// 	calendarDay.testDate=false;
-			// }
-			// calendarDay.eventList=this.getTimes(calendarDay.isHoliday, calendarDay);
-
-   //      // for(var i=24; i<=84;i++)
-   //      // {
-   //      //       var hour=(Math.floor(i/4) <13)?Math.floor(i/4):(Math.floor(i/4)-12);
-   //      //       if(hour<10){hour='0'+hour.toString();}
-   //      //       var minutes=(i%4==0)?"00":(i%4==1)?"15":(i%4==2)?"30":"45";
-   //      //       var ampm=(i<48)?"AM":"PM";
-   //      //       var tobj = {"hour": hour,
-        //                   "minutes": minutes,
-        //                   "ampm": ampm, 
-        //                 };
-        //       var string=hour.toString() + ":" + minutes+ ampm;
-        //       timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":this.day });
-        //   }
-        //   return(timeArr);
     
 generateHolidayEvents: function(startDate, endDate)
 {
@@ -1464,7 +1440,8 @@ generateHolidayEvents: function(startDate, endDate)
     var numHolidays = holidayArray.length;
     var eventPushArr = [];
     var ev = {};
-  	for(i=0;i<numHolidays;i++){
+  	for(i=0;i<numHolidays;i++)
+  	{
       	var relHolidays=[];
       	var noBookHolidays=[];
         var startTime = new Date(holidayArray[i].holiday);
@@ -1477,121 +1454,21 @@ generateHolidayEvents: function(startDate, endDate)
         var d=new Date(holidayTimestamp);
         if(holidayTimestamp >= startDate && holidayTimestamp <= endDate && holidayArray[i].noBook)
         {	
-        	ev =			{name: holidayArray[i].name, 
-        							startTime: startTime,
-        							endTime: endTime,
-        							completed: false,
-        							relatedFcids: holidayArray[i].noBook? "*": "",
-        							dayStamp: holidayTimestamp,
-        							showDate: startTime.toDateString()};
+		ev ={	name: holidayArray[i].name, 
+				startTime: startTime,
+				endTime: endTime,
+				completed: false,
+				relatedFcids: holidayArray[i].noBook? "*": "",
+				dayStamp: holidayTimestamp,
+				showDate: startTime.toDateString()
+			};
         	eventPushArr.push(ev);  
            
         }
     }
     //console.log(eventPushArr);
    return eventPushArr;
-}
-
-
-};
-
-
-function nextReasonableTestDate()
-	{
-		var d=new Date();
-		d.setDate(d.getDate(d +49));
-		var allTestDates=[];
-		allTestDates=[[2016, 5, 7],[2016, 6, 4],[2016, 8, 6],[2016,10,1],[2016,11,5],[2016,12,3],[2017,1,28],[2017,3,11],[2017, 5, 6], [2017, 6, 3],[2017, 8, 26],[2017, 10, 7],[2017,11,4],[2017, 12, 2],[2018,3, 10],[2018, 5, 5], [2018, 6, 2], [2018, 8, 25], [2018, 10, 6],[2018,11,3],[2018,12,1],[2019,3, 9],[2019,5,4],[2019, 6, 1]];
-		var counter = allTestDates.length;
-		var i = 0;
-		for (i = 0; i < counter; i++)
-		{
-			var testDay = new Date(allTestDates[i]);
-			//console.log(d.toLocaleString, testDate.toLocaleString);
-			if(d<testDay){return testDay;}
-		}
-	
-	}
-
-function TimeSlots(){
-				var timeArr = [];
-        		for(var i=18; i<=42;i++){
-              var hour=(Math.floor(i/2) <13)?Math.floor(i/2):(Math.floor(i/2)-12);
-              var j=false;
-              j=(i>47)?true:false;
-              if(hour<10){hour='0'+hour.toString();}
-              var space=(i<20)?true: false;
-              var halfhour=(i%2==0)?0:3;
-              var ampm=(i<24)?"am":(j==true)?"am":"pm";
-              var tobj = {"hour": hour,
-                          "halfhour": halfhour,
-                          "ampm": ampm, 
-                          "space": space
-                        };
-              var string=hour.toString() + ":" + halfhour.toString() + "0"+ ampm;
-              var obj2={"label": string, "val": "open", "name": string};
-              timeArr.push(obj2);
-          }
-          return timeArr;
-         }
-
-
-  
-
-
-	
-function shortDayLabel(argDay, numChars)
-{	
-	var fullDaysArray=["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
-	var shortDaysArray = ["Su","M","Tu","W","Th","F","Sa"];
-	var singlesArray = ["M", "W", "F"];
-	var dayBlocks=["M|W|F","Tu|Th", "M|W"];
- 	var md = argDay
-	if(numChars>2)
-	{
-	md=md.slice(0,numChars);
-	return md;
-	}
-	else
-	{
-		var letters = md.slice(0,2);
-		var lilLetters=md.slice(0,1);
-		if(shortDaysArray.indexOf(letters)!==-1)
-			{
-				var letterIndex = singlesArray.indexOf(lilLetters);
-				return singlesArray[letterIndex];
-			}
-		else {var retVal= shortDaysArray.indexOf(letters);
-			//console.log(shortDaysArray[retVal]);
-				return shortDaysArray[retVal];
-			}
 	}
 }
-function shortDaysLabel(argDays, NumChars)
-{
-	var counter =argDays.length;
-	for(var i=0;i<counter; i++)
-	{
-		var shortdaylabeltopush = shortDayLabel(argDays[i]);
-		var label=(i==counter-1)?shortdaylabeltopush:shortdaylabeltopush + "|";
-		label+=label; 
-
-	}
-	return label;
-
-}
-
-function dayAbbreviationsToDays(argAbbrev)
-{
-	argAbbrev = argAbbrev.toLowerCase();
-	if(argAbbrev.charAt(0)==="m"){return "Monday";}
-	else if(argAbbrev.charAt(0)==="w"){return "Wednesday";}
-	else if(argAbbrev.charAt(0)==="f"){return "Friday";}
-	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="u"){return "Sunday";}
-	else if(argAbbrev.charAt(0)==="s" && argAbbrev.charAt(1)==="a"){return "Saturday";}
-	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="u"){return "Tuesday";}
-	else if(argAbbrev.charAt(0)==="t" && argAbbrev.charAt(1)==="h"){return "Thursday";}
-}
-
 </script>
 	

@@ -43,8 +43,8 @@ iron-icon .small {
 					</section>
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				<template is="dom-repeat" limit-to="7"  items="{{calDay.eventList}}" as="slot">
-								<fc-event-item event="{{slot}}" calendar-day="{{_computeCalendarDay(calDay.*)}}" date="{{_computeDate(calDay.*)}}" event-list="{{_computeItems(calDay.*)}}">
+				<template is="dom-repeat" limit-to="7"  items="{{computeItems(calDay.*)}}" as="slot">
+								<fc-event-item event="{{slot}}" calendar-day={{calDay}} date="{{calDay.date}}" event-list="{{calDay.*}}">
 								</fc-event-item>
 							</template>
 				<!-- <content group="group" class="pickle group handle" ></content> -->
@@ -104,16 +104,18 @@ FcCalendarDayBack=Polymer({
 
 	_computeItems: function(calDay)
 	 {
+
+	 	console.log(calDay);
 	  if(calDay.eventList)
 	  {
 		return calDay.eventList;
 		}
 	else if(calDay.calendarDay)
 		{
-		if(calDay.calendarDay.eventlist)
+		if(calDay.calendarDay.base.eventlist)
 		{
 		console.log(calDay.calendarDay.eventList);
-		return calDay.calendarDay.eventList;
+		return calDay.calendarDay.base.eventlist;
 		}
 	   }
 	},
