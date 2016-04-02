@@ -1,0 +1,114 @@
+<dom-module id="fc-event-item">
+<template>
+<style>
+</style>
+
+<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="eventDialog" style="height: 480px; width: 380px;"exit-animation="fade-out-animation">
+		<h2>Event Card: {{event.date}}</h2>
+  		<paper-dialog-scrollable style="height: 340px; overflow-y: scroll; width: 345px;">
+        <template is="template-repeat" items="{{computed"
+    		<fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
+    		<fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
+    		<fc-input-prime value={{event.startTime}} label="Start Time"></fc-input-prime><br>
+    		<fc-input-prime value={{event.activity}} label="Activity"></fc-input-prime><br>
+    		<fc-input-prime value={{event.endTime}} label="End Time"></fc-input-prime><br>
+    		<fc-input-prime value={{event.location}} label="Location"></fc-input-prime><br>
+    		<fc-input-prime value={{event.duration}} label="Duration"></fc-input-prime><br>
+    		<fc-input-prime value={{event.totalTime}} label="Hours in Package or Course"></fc-input-prime><br>
+    		<fc-input-prime value={{event.coachFcid}} label="Coach's Id"></fc-input-prime><br>
+    		<fc-input-prime value={{event.fcid}} label="Event Fcid"></fc-input-prime><br>
+    		<fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
+    		<fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
+    		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
+    		<fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
+    		<fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
+    		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime>
+    		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br><hr>
+ 			</paper-dialog-scrollable>
+  		<div class="buttons" style="height: 75px;">
+    			<paper-button dialog-dismiss>Cancel</paper-button>
+   				<paper-button dialog-confirm>Accept</paper-button>
+ 		 	</div>
+	</paper-dialog>
+</template>
+<script>
+FcEventInputGenerator=Polymer({
+    is:"fcEventInputGenerator",
+    behaviors: {"FCBehaviors.FcCalendarBehaviorPrime"},
+    properties:{
+        dataobject: {
+            type: FcEvent,
+            compute:"computeFcEventInputs(colorProperties)",
+            notify: true
+        },
+        colorProperties:{
+            type: Object,
+            value: function(){return {"input-type":"color", "type":"color"};},
+            notify: true
+        },
+        orientation: {
+            type: String,
+            value: ""
+        }
+    
+    },
+
+    attached: function(){
+        console.log(this.dataobject);
+        console.log(this.orientation);
+        this.orientation = this.orientation==""? "vertical": this.orientation;
+    },
+
+    computeFcEventInputs: function(colorProperties)
+    {
+       var event = new FcEvent(colorProperties);
+       console.log(event);
+
+
+
+
+    },
+
+    handleInputChange: function(e)
+    {
+        //console.log(e.target);
+        this.dataobject[e.target.name].value = e.target.value;
+    },
+
+    _computeDataset: function(dataobject)
+    {
+        //console.log(dataobject);
+
+        var keys = Object.keys( );
+        var numKeys = keys.length;
+        //this.dataset = [];
+        var dataset = [];
+        for(var i = 0; i < numKeys; i++)
+        {
+            var val = this.dataobject[keys[i]];
+            //console.log(keys[i], val);
+            dataset.push({
+                "value": val.value,
+                "name": val.name, //keys[i], //"tenth",
+                "label": val.label?val.label: val.name[0], //keys[i][0], //"d",
+                "inputType": val.inputType, //"digit",
+                "optionOne": "",
+                "optionTwo": "",
+                "optionThree": "",
+                "optionFour": "",
+                "optionFive": "",
+                "optionSix": "",
+                "optionSeven": "",
+                "optionEight": "",
+                "optionNine": "",
+                "optionTen": "",
+                "class": "",
+                "min": val.inputType == "digit"? 0: 0,
+                "max": val.inputType == "digit"? 9: 99,
+                "step":"",
+                "fcid":""})
+        }
+        return dataset;
+    },
+});
+

@@ -43,8 +43,8 @@ iron-icon .small {
 					</section>
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				<template is="dom-repeat" limit-to="7"  items="{{calDay.calendarDay.eventList}}" as="slot">
-								<fc-event-item event="{{slot}}" calendar-day="{{calDay.calendarDay}}" date="{{calDay.calendarDay.date}}" event-list="{{calDay.calendarDay.eventList}}">
+				<template is="dom-repeat" limit-to="7"  items="{{calDay.eventList}}" as="slot">
+								<fc-event-item event="{{slot}}" calendar-day="{{_computeCalendarDay(calDay.*)}}" date="{{_computeDate(calDay.*)}}" event-list="{{_computeItems(calDay.*)}}">
 								</fc-event-item>
 							</template>
 				<!-- <content group="group" class="pickle group handle" ></content> -->
@@ -83,42 +83,69 @@ FcCalendarDayBack=Polymer({
 			type: FcCalendarDay,
 			observer: "observeCalendarDay2",
 			notify: true
-
 		},
 		courseEventLists:{
 			type: Array,
 			computed: 'computeEventLists(fcCourse.courseCalendarDaysArray)',
 			notify: true
 		},
-		
-
-
 	},
 
 	ready: function(){},
 	attached:function(){},
 	computeEventList: function(cDay){
-		if(cDay.calendarDay){
-			return cDay.calendarDay.eventList.base;
-		};
+	
 
 	},
 	computeEventLists: function(calDayArray)
 	{
 	 var courseEventList=[];	
-		// courseEventList=calDayArray.filter(function(currentValue, index, array)
-		// 	{
-		// 		var date=currentValue.date;
-		// 		var eventList=currentValue.eventList;
-		// 		console.log(date, eventList, currentValue);
-		// 		var eventObject={"date":date, "eventList":eventList, "calendarDay":currentValue};
-		// 		return currentValue;
+	},
 
-		// 	});
-		// //console.log(courseEventList)
-		// return courseEventList;
-
-
+	_computeItems: function(calDay)
+	 {
+	  if(calDay.eventList)
+	  {
+		return calDay.eventList;
+		}
+	else if(calDay.calendarDay)
+		{
+		if(calDay.calendarDay.eventlist)
+		{
+		console.log(calDay.calendarDay.eventList);
+		return calDay.calendarDay.eventList;
+		}
+	   }
+	},
+	_computeCalendarDay: function(calDay)
+	 {
+	   if(calDay)
+	   {
+			if(calDay.calendarDay)
+			{
+				return calDay.calendarDay;
+			}
+			else 
+			{
+				return calDay;
+			}
+				
+		}
+	},
+	_computeDate:function(calDay)
+	{
+	   if(calDay)
+	   {
+			console.log(calDay);
+				if(calDay.date)
+				{
+			 		return calDay.date;
+			 	}
+			 	else
+			 	{
+			 		return calDay.calendarDay.date;
+			 	}
+		}
 	},
 	observeCalendarDay: function(nval, oval)
 	{
