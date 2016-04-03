@@ -1,29 +1,17 @@
-<dom-module id="fc-event-item">
+<dom-module id="fc-event-input-generator">
 <template>
 <style>
 </style>
+<div on-tap="opendialog" style="width: 100px; height: 50px; border: 5px edged silver">
+Open Dialog
+</div>
 
 <paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="eventDialog" style="height: 480px; width: 380px;"exit-animation="fade-out-animation">
 		<h2>Event Card: {{event.date}}</h2>
   		<paper-dialog-scrollable style="height: 340px; overflow-y: scroll; width: 345px;">
-        <template is="template-repeat" items="{{computed"
-    		<fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
-    		<fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
-    		<fc-input-prime value={{event.startTime}} label="Start Time"></fc-input-prime><br>
-    		<fc-input-prime value={{event.activity}} label="Activity"></fc-input-prime><br>
-    		<fc-input-prime value={{event.endTime}} label="End Time"></fc-input-prime><br>
-    		<fc-input-prime value={{event.location}} label="Location"></fc-input-prime><br>
-    		<fc-input-prime value={{event.duration}} label="Duration"></fc-input-prime><br>
-    		<fc-input-prime value={{event.totalTime}} label="Hours in Package or Course"></fc-input-prime><br>
-    		<fc-input-prime value={{event.coachFcid}} label="Coach's Id"></fc-input-prime><br>
-    		<fc-input-prime value={{event.fcid}} label="Event Fcid"></fc-input-prime><br>
-    		<fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
-    		<fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
-    		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
-    		<fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
-    		<fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
-    		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime>
-    		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br><hr>
+        <template is="template-repeat" items="{{computedEventDate(dataobject)}}" as="event">
+    		<fc-input-prime value={{event.value}} name="{{event.name}}"  type="{{event.type}}" input-type="{{event.inputType}}" label="Event {{event.label}}"></fc-input-prime><br>
+    	</template>
  			</paper-dialog-scrollable>
   		<div class="buttons" style="height: 75px;">
     			<paper-button dialog-dismiss>Cancel</paper-button>
@@ -63,7 +51,15 @@ FcEventInputGenerator=Polymer({
     {
        var event = new FcEvent(colorProperties);
        console.log(event);
+       return event;
 
+
+
+
+    },
+
+    opendialog: function(e){
+        this.$.eventDialog.opened=!this.$.eventDialog.opened;
 
 
 
@@ -77,7 +73,7 @@ FcEventInputGenerator=Polymer({
 
     _computeDataset: function(dataobject)
     {
-        //console.log(dataobject);
+        console.log(dataobject);
 
         var keys = Object.keys( );
         var numKeys = keys.length;
