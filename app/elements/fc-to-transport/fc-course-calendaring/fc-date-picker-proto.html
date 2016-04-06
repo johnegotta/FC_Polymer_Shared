@@ -32,9 +32,9 @@ width: 30px;
 <template>
 
 	
-			<div class="horizontal flex layout wrap" style="background: white; margin-top:3px; width: 320px !important;">
+		<div class="horizontal flex layout wrap" style="background: white; margin-top:3px; width: 320px !important;">
 			<paper-material style="background: #008;  border-bottom: silver solid 2px; height:42px; width: 100%;">
-					<section class="layout horizontal">
+				<section class="layout horizontal">
 					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden="[[backHidden]]" style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
 					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]</span>
 	
@@ -56,15 +56,23 @@ width: 30px;
 					as="day">
 						<fc-date-mini
 							on-tap="_dateClick"
-						 	class="card" 
+						 	class="card"
+						 	cd-index="{{day.cdIndex}}"
 						 	in-month="[[computeNotInMonths(day.date, displayedIndex)]]"
 						 	toggle-days="{{toggleDays}}"
-						 	day="{{day}}" 
+						 	day="{{day}}"
+						 	is-practice-test-day="{{day.isPracticeTestDay}}"
+						 	is-course-meeting="{{day.isCourseMeeting}}"
 						 	selected-array="{{selectedArray}}"
-						 	style$="margin: 0px auto;" calendar-day={{day}} id$={{day.dateId}} testDate={{day.testDate}} events="[[day.eventList]]">
+						 	style$="margin: 0px auto;" 
+						 	calendar-day={{day}} 
+						 	id$={{day.dateId}} 
+						 	testDate={{day.testDate}} 
+						 	events="[[day.eventList]]"
+						 	event="{{fcCourse}}">
 							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
 							<a class="date" >[[day.dayOfMonth]]</a>
-							<span class="[[compute(day)]]"></span>
+							<span class="[[computeDay(day)]]"></span>
 				
 							
 						</fc-date-mini>	
@@ -79,14 +87,12 @@ width: 30px;
 FcDatePickerProto=Polymer({
 	is: "fc-date-picker-proto",
 	behaviors:[
-				Polymer.PaperInputBehavior,
-			 	Polymer.IronFormElementBehavior,
 				FCBehaviors.FcCalendarBehaviorPrime,
 				Polymer.NeonSharedElementAnimatableBehavior,
 				Polymer.NeonAnimatableBehavior
 				],
 	listeners: {"catchTheCourse": "changesTheDays"},
-	observers:['courseObserver(fcCourse.*)'],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*, fcCourse.eventArray.*)', "observeLength(fcCourse.courseLength, fcCourse.courseCalendarDaysArray.*)", "observePracticeTests(fcCourse.practiceTestDay)"],
 	properties: {
 		day:{
 			type: Object, 
@@ -111,7 +117,6 @@ FcDatePickerProto=Polymer({
 			reflectToAttribute: true
 
 		},
-		
 		days:{
 			type: Array,
 			value: function()
@@ -120,13 +125,7 @@ FcDatePickerProto=Polymer({
 			},
 			notify: true
 		},
-		
-		calendarDayArray: {
-			type: Array,
-			value:[],
-			notify: true,
-			observer: "watchTheCDA", 
-		},
+	
 		maxIndex:{
 			type: Number,
 			notify: true,
@@ -136,11 +135,7 @@ FcDatePickerProto=Polymer({
 			value: function(){var today = new Date();},
 			notify: true
 		},
-		calendarMonthsArray:{
-			type: Array,
-			value:[],
-			notify: true
-		},
+	
 		displayedIndex:{
 			type:Number,
 			notify: true
@@ -182,11 +177,6 @@ FcDatePickerProto=Polymer({
 			computed: false,
 			notify: true
 		},
-		viewMonth:{
-			type: String,
-			computed:"computeViewMonth(displayedIndex)",
-			notify: true
-		},
 		event:{
 			type: Array,
 			value: [],
@@ -212,8 +202,8 @@ FcDatePickerProto=Polymer({
             }]
           };
         }
-   		}
-      },
+    }
+   },
    ready: function(){
    		var startYear =new Date().getFullYear();
    		var endYear =startYear + 3;
@@ -226,22 +216,14 @@ FcDatePickerProto=Polymer({
 		this.calendarCreator(date, dateEnd, "months");
 		},
 watchingSelectedArray: function(newVal, oldVal){//console.log(newVal, oldVal)
-	//this.calendarDay
-
-
-
-
+ if(this.fcCourse){//console.log(newVal, oldVal, this.fcCourse.courseCalendarDaysArray);
+ }
 },
 
-watchTheCDA: function(newVal, oldVal){
-	//console.log(newVal, oldVal);
-
-
+computeDay: function(day){if(day.testDate){return "pretty";}
+ 
 
 },
-computeDay: function(day){if(day.testDate){return "pretty";}},
-
-
 attached: function()
 {
 	
@@ -260,7 +242,7 @@ initialize:function(){
 		 	this.monthsArray.length;
 			self.push("calendarMonthsArray",array);
 		 	array.forEach(function(item, index, arr){
-		   		self.push("calendarDayArray", {"calendarDay": item});
+		   		self.push("calendarDayArray", item);
 		 	});
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
@@ -269,11 +251,9 @@ initialize:function(){
 		this.set("fcCourse.primaryCalendar", calendar);
 		this.set("fcCourse.calendarDayArray", calendar);
 },
+
 computeInClass: function(day, fcCourse)
 {
-if(day.testDate==true && this.fcCourse.testDate==day.date)
-	{return "test";}
- 
 
 },
 computeDisplayed: function (displayedIndex)
@@ -292,14 +272,12 @@ computeInEventArray: function(fcCourse, item)
 	}
 },
 
-
-
-courseObserver: function(newval)
+courseObserver: function(test,ccda, course)
 { 	
-	
-	if(newval.path=="fcCourse.testDate")
+	console.log(ccda, course);
+	if(test)
 	{
-		var d= new Date(newval.value);
+		var d= new Date(test);
 		var p = d.getFullYear();
 		diff=(p-this.today.getFullYear());
 		var m = d.getMonth();
@@ -310,27 +288,30 @@ courseObserver: function(newval)
 	
 		this.set("displayedIndex", m);
 		var testMonth=[];
-		var theTest=this.calendarDayArray.filter(function(currentValue, index, array){
-			if (currentValue.date===d){ currentValue.calendarDay.courseTestDate=true; currentValue.calendarDay.background==="gold"; return currentValue;}
-
-		});
-		this.set("testHolder", theTest);
 		testMonth=this.calendarMonthsArray[m];
 		this.set("displayed", testMonth);
 	}
-	else if(this.fcCourse.testDate && newval.path=="fcCourse.programLength" && this.fcCourse.courseCalendarDaysArray==[])
-	 {	
-	 	this.set("fcCourse.calendarDayArray", this.calendarDayArray); 
-	 	this.set("selectedArray", this.fcCourse.courseCalendarDaysArray);
-				
+	
+	else if(course&& course.length>2){
+		console.log(course);
+		var subtractor= Math.ceil((ccda.courseLendth*7)/28);
+		var dind = Math.floor(this.displayedIndex-1);
+		this.set("displayedIndex", dind);
+		this.set("displayed",  this.calendarMonthsArray[dind]);
 	}
-
-
+	
+	},
+observeLength:function(length, ccda) {
+//console.log(length, length, length, ccda);
 },		
+observePracticeTests: function(ptd)
+{
+//	console.log(ptd);
+},
 	
 
 _forward: function()
-	{	if(this.displayedIndex ==this.maxIndex-1)
+	{	if(this.displayedIndex ==this.maxIndex)
  		{
  			this.set("forwardHidden",true);
  		}
@@ -359,30 +340,38 @@ _forward: function()
   		var	y =  new Date();
   		y=y.getFullYear();
   		var	m = new Date();
-
-  		
   		var retVal=y+Math.floor((this.displayedIndex)/12);
 		return retVal;
 		},
 
 _dateClick: function(event) {
       var targetOne = event.target;
-      //console.log(event.model.day.eventList[2]);
-      while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") {
+      console.log(event.model);
+      while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") 
+      {
         targetOne = targetOne.parentNode;
       }
         if(targetOne.nodeName=="FC-DATE-MINI")
-        {for(var i=0; i<4;i++){
-      this.set("event."+i, targetOne.calendarDay.eventList[i]);
-     	}
-     }
+        { console.log("I am ready to fire sir");
+        	
+       		var day=event.model.__data__.day;
+      		var elist = event.model.__data__.day.eventList;
+      		var dataObj={
+      				"day": day,
+      				"eventList": elist,
+      				"date": day.showDate,
+      				"background": day.background,
+      				"color": day.color,
+      				"displayedArray": this.displayed,
+      			};
 
-      // configure the page animation
-      this.sharedElements = {
-        'hero': this
-      };
-      this.fire('on-date-click', {//this is where we pass data... we do not have a click yet... it will be on another level likely
-        item: targetOne.data
+      			console.log(dataObj);
+      		}
+      // this.sharedElements = {
+      //   'hero': this
+      // };
+      this.fire('on-date-click', {
+        day: dataObj
       });
     },
 

@@ -43,17 +43,18 @@ iron-icon .small {
 .scheduling{padding: 0px 5px;}
 .header-class{min-height: 35px !important; max-height: 55px !important;}
 .selected{}	
-</style>				
+</style>
+<!-- <template is="dom-repeat" items="{{_computeEvents(eventList)}}" as="event"> -->
 	<paper-item on-tap="selectedTwo" style$="border: 1px #aeaeae solid; background:[[event.color]];" class="layout horizontal scheduling" draggable=true>
 		<paper-item-body style$="background: [[event.color]];" class="layout horizontal" value$="{{value}}">
 			<div class="secondary layout horizontal flex-1 self-shrink" style="background: [[event.color]];" >
-				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="TIME" name="{{event.sTime}}" input-type="tiny" label-hidden="true" value="{{event.startTime}}"></fc-input-prime>
+				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="TIME" name$="{{event.sTime}}" input-type="tiny" label-hidden="true" value$="{{event.startTime}}"></fc-input-prime>
 			</div>
 			<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[event.color]];">
 					<span class="two">
-			<fc-input-prime style="width: 183px;" input-type="text" label="[[event.activity]]" name="{{event.name}}" label-hidden="true" style="border: 0px white dashed;" value="{{event.activity}}"></fc-input-prime> &nbsp; &nbsp;</span></div>
+			<fc-input-prime style="width: 183px;" input-type="text" label$="[[event.activity]]" name$="{{event.name}}" label-hidden="true" style="border: 0px white dashed;" value$="{{event.activity}}"></fc-input-prime> &nbsp; &nbsp;</span></div>
 			<div class="layout vertical" style="padding-left: 5px;">
-				<section class="buttons" on-tap="changeEvent" style="border-radius:180px;">
+				<section class="buttons" on-tap="openD" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
 					</iron-icon>
 			</section>
@@ -62,7 +63,8 @@ iron-icon .small {
 	   		</div>
 		</paper-item-body>   	
 	</paper-item>
-	<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="eventDialog" style="height: 480px; width: 380px;"exit-animation="fade-out-animation">
+<!-- </template> -->
+<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="eventDialog" style="height: 480px; width: 380px;"exit-animation="fade-out-animation">
 		<h2>Event Card: {{event.date}}</h2>
   		<paper-dialog-scrollable style="height: 340px; overflow-y: scroll; width: 345px;">
     		<fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
@@ -80,21 +82,31 @@ iron-icon .small {
     		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
     		<fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
     		<fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
-    		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime>
-    		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br><hr>
+    		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime><br>
+    		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br>
  			</paper-dialog-scrollable>
   		<div class="buttons" style="height: 75px;">
     			<paper-button dialog-dismiss>Cancel</paper-button>
    				<paper-button dialog-confirm>Accept</paper-button>
  		 	</div>
 	</paper-dialog>
+
+	
+
 </template>
 <script>
 FcEventItem=Polymer({
 	is:"fc-event-item", 
-	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"], 
+	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"],
+	observer: ["calendarObserver(fcCourse.courseCalendarDaysArray.*.eventList, fcCourse.eventList.*)"], 
 	properties: 
-	{
+	{		
+		fcCourse:{
+			type: FcCourse,
+			value: function(){var retVal = new FcCourse(); return retVal;},
+			observer:"observeCourse",
+			notify: true
+		},
 		event:{
 			type: Object,
 			notify: true,
@@ -104,47 +116,79 @@ FcEventItem=Polymer({
 		duration: "",
 		calendar: "", 
 		calDay: {
-			type: Object, 
-			value: {},
+			type: FcCalendarDay, 
 			observer: "observeCalendarDay",
 			notify: true
 		},
 		eventList:{
 			type:Array, 
-			value: [],
-			observer: "observeEventList",
 			notify: true
+		},
+		eventList2:{
+			type: Array, 
+			computed: "computeEventList2(eventList, fcCourse.courseCalendarDayArray.*)",
+			notify: true
+
+
 		},
 		date: {
 			type: Date,
 			notify: true
 		},
 
-
-
-
-
 	},
-	changeEvent: function(event) {
-		  	event.preventDefault();
-		  	this.$.eventDialog.opened=!this.$.eventDialog.opened;  
-		},
+
+	openD: function(){
+		this.$.eventDialog.opened=!this.$.eventDialog.opened;	
+	},
+	observeCalendarDay:function(n,v){
+		//console.log(n,v);
+	},
+	
 	ready: function(){},
-	observeEventList: function(newVal, oldVal)
-	{//console.log("eventList", newVal, oldVal);
-	},
-	observeCalendarDay: function(newVal, oldVal)
-	{
-		console.log("calendarDay", newVal, oldVal);
-	},
-	lookattheEvent: function(newVal, oldVal)
-	{
-		console.log(newVal, oldVal);
 
+	computeEventList2: function(above, core){
+		//	console.log("material from above", above,"core material", core);
+			return above.value;
+
+	},
+	_computeEvents: function(eventlist){
+		//	console.log(eventlist);
+			return eventlist;
+
+	},
+	
+	observeCourse: function(newVal, oldVal)
+	{
+			//console.log(newVal);
+	},
+	calendarObserver: function(calday, eventlist)
+	{
+			//console.log(calday,"loook here", eventlist);
+
+
+	},
+	calDayObserved: function(calDay){
+			console.log(calDay, "dont know if its the stuff we want but damn well sure in the right place");
+			var sandwhich=this.event;
+			this.set("event",null);
+			var self=this;
+			console.log(sandwhich, sandwhich);
+			this.async(function(){self.set("event", sandwhich);}, 300);
 	},
 	selectedTwo: function(event){
 		//console.log(event.target);
-	}
+	},
+	lookattheEvent:function(newval, oldVal){
+			//console.log(newval, oldVal);
+
+	},
+	observCourse: function(newVal, oldVal){
+		//console.log(newVal);
+
+
+
+	},
 
 
 });

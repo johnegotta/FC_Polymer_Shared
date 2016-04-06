@@ -2,32 +2,34 @@
 <template>
 <style>
  :host {
-        max-width: 1300px; max-height: 2200px;
-        @apply(--layout-horizontal);
-        height: 480px;
-        width: 360px;
-        background: yellow;
-        position: relative;
-        z-index:3300;
-      }
-      paper-tab{font-size: 12px;}
-      .main {
-        width: 1300px;
-        height: 560px;
-        border: 1px solid green;
+        max-width: 348px;
+        @apply(--layout-vertical);
+        height: 480px!important;
+        min-width: 310px;
         background: white;
-        @apply(--layout-flex);
-        @apply(--layout-scroll);
-        @apply(--shadow-elevation-5dp);
+        position: relative;
+        margin: 14px 8px 12px 8px;
+        z-index:3;
       }
+      paper-tab{font-size: 12px; margin-left: -10px;}
+      
+.main{
 
+
+
+
+}
 
 .selectedp{ 
-min-width: 660px;/*will change*/
-min-height: 560px;
-max-height: 100%;
-max-width: 900px;
-border: 2px solid blue;
+  margin-left: 4px;
+  padding: 0px;
+min-width: 312px;/*will change*/
+min-height: 340px;
+max-height: 348px;
+max-width: 338px;
+border: 1px solid blue;
+background: white;
+padding: 4px 4px 4px 10px;
 
 }
  .circle{
@@ -50,107 +52,89 @@ border: 2px solid blue;
       }
 
 </style>
- <firebase-collection 
+ <!-- <firebase-collection 
       id='student' 
       location="https://focused0ne.firebaseio.com/students"
       order-by-child="fcid"
       equal-to="{{fcid}}" 
       data="{{studlist}}">
-</firebase-collection> 
+</firebase-collection>  -->
 <div 
       class="circle" 
       id="button" 
       on-click="_onClearButtonClick">
 </div>
-<div id="main" class="vertical layout wrap main">
+<div class="vertical layout wrap">
       <div class=" horizontal layout wrap">
-      <paper-material elevation="2" class="grid-box">    
-            <paper-tabs id="studenttabs" selected="{{selected}}" style="line-height:.6; background: #aecdfe;" scrollable>
-                  <paper-tab>Courses Calendars</paper-tab>
-                  <paper-tab>Teacher Calendars</paper-tab>
-                  <paper-tab>Course Syllabi</paper-tab>
-                  <paper-tab>Student Calendar</paper-tab>
-                  <paper-tab>n</paper-tab>
-                  <paper-tab>m</paper-tab>
+      <paper-material elevation="2">    
+            <paper-tabs selected="{{selected}}" style="line-height:.6; width: 345px;background: #aecdfe;" scrollable>
+                  <paper-tab>Day Events</paper-tab>
+                  <paper-tab>Event Inputs</paper-tab>
             </paper-tabs>
-            <hr>
-            <div class="vertical layout wrap" style="height: 78px;"> 
-                <div class="selectedp">
-                     <template is="dom-repeat" items="{{daysEvents}}" as="yourEvents">
-                         <event-list-two events="{{yourEvents}}">
-                         </event-list-two> 
-                      </template>
-                  </div>
-                  <div class="selectedp" id="inquiries">
-                      <hr>
-           
-            <hr>
-            <iron-pages id="pageHanger" class="horizontal row wrap layout" style="height: 100vh; padding:3px; overflow-y: scroll;" selected="{{selected}}">
+      </paper-material>
+            <iron-pages id="pageHanger" class="horizontal layout" style="overflow-y: scroll;" selected="{{selected}}">
                  
-                  <div class="selectedp">
-                   
-      <paper-listbox class="layout vertical slides">
-        <template is="dom-repeat" items="{{option.selectItems}}" as="value">
-            <paper-item on-tap="soSelected" class="layout horizontal courseData" group="courseData" draggable=true>
-              <paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
-                <div class="primary">[[value]]</div>
-                <div class="secondary">[[option.labelA]]</div>
-              </paper-item-body>    
-              <paper-icon-button icon="star" on-tap="soUnSelected" value$="{{val}}" alt="favourite this!">
-              </paper-icon-button>
-              </paper-item>
-          </template>
-        </paper-listbox>  
-      </section>
-        </div>
-                  <div class="selectedp" id="inquiries">
-                        Inquiries<br>
-                        <template is="dom-repeat" items="{{_computeInquiryArray(FcStudent.inquiries)}}" as="inq">
-                              <fc-inquiry inquiry="{{inq}}">
-                              </fc-inquiry>
-                        </template>
+    <div id="main" class="selectedp main">
+        <paper-tabs 
+            id="calendarTabs" 
+            scrollable="true" 
+            style="padding: 2px 0px; height: 380px; outline: 0px;" 
+            class="horizontal layout flex scroll" 
+            bar="true" 
+            hide-scroll-buttons="false"> 
+          <div 
+              class="horizontal layout justified" 
+              style="width: 330px; margin: 8px; overflow-x: scroll;">
+            
+        <fc-cal-day-events-list
+            event-list="{{eventList}}"
+            cal-day="{{calDay}}"
+            fc-course="{{fcCourse}}"
+            >
+            </fc-cal-day-events-list>
+          </div>
+          </paper-tabs>
+      </div>
+      <div class="selectedp" id="eventInputs" style="background: white;" >
+            <h4>Event Card: {{event.date}}</h4>
+      <paper-dialog-scrollable style="height: 280px; overflow-y: scroll; width: 310px; background:white;">
+        <fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
+        <fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
+        <fc-input-prime value={{event.startTime}} label="Start Time"></fc-input-prime><br>
+        <fc-input-prime value={{event.activity}} label="Activity"></fc-input-prime><br>
+        <fc-input-prime value={{event.endTime}} label="End Time"></fc-input-prime><br>
+        <fc-input-prime value={{event.location}} label="Location"></fc-input-prime><br>
+        <fc-input-prime value={{event.duration}} label="Duration"></fc-input-prime><br>
+        <fc-input-prime value={{event.totalTime}} label="Hours in Package or Course"></fc-input-prime><br>
+        <fc-input-prime value={{event.coachFcid}} label="Coach's Id"></fc-input-prime><br>
+        <fc-input-prime value={{event.fcid}} label="Event Id"></fc-input-prime><br>
+        <fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
+        <fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
+        <fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
+        <fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
+        <fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
+        <fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime>
+        <fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br>
+      </paper-dialog-scrollable>
+                        
                   </div>
                <div class="selectedp">
                      <div>
-                          <div style="overflow-x: scroll;  min-width: 320px; max-width: 900px;">
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Pretest</b>: <span>[[potato.scoresPreTest]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 1</b>: <span>[[potato.scoresTest1]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 2</b>: <span>[[potato.scoresTest2]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 3</b>: <span>[[potato.scoresTest3]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 4</b>: <span>[[potato.scoresTest4]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 5</b>: <span>[[potato.scoresTest5]]</span></span><br><br>
-                         <span><b style="font-size: 16px; color: #000066; font-weight: 700;">Test 6</b>: <span>[[potato.scoresTest6]]</span></span><br><br>
-                         <span style="font-size: 16px; color: #000066; font-weight: 700;">REAL SAT: <span>[[potato.realSAT]]</span></span><br><br>
-                    </div>
+                        
                </div>
           </div>
         <div class="selectedp">
            Past Academics<br>
          
-          <fc-grid-table data-source$="{{FcStudent.pastacademics}}"></fc-grid-table>
+         
          
       </div>
         <div class="selectedp">
-        Account<br>
-        </div>
-        
-        <div class="selectedp">
-        ROI<br>
-       
-        
-          <b>Courses Taken: </b><span>{{ro.coursesTaken}}</span><br>
-          <b>FcValueAtCompletion70Percent: </b><span>{{ro.FcValueAtCompletion70Percent}}</span><br>
-        
-        </div>
 
-    <div class="selectedp">
-        Past Academics<br>
-        
-          <b>Graduates: </b><span>{{pa.graduates}}</span><br>
-          <b>School: </b><span>{{pa.school}}</span><br>
-        
-        </div>
 
+
+
+        </div>
         
         </iron-pages>
   
@@ -172,68 +156,56 @@ border: 2px solid blue;
 FcTabbedCalendarCard=Polymer({
    	is: 'fc-tabbed-calendar-card',
      behaviors: [
-      Polymer.NeonAnimatableBehavior,
-      fcDraggableDataBehavior, 
-      Polymer.NeonAnimationRunnerBehavior,
-      Polymer.NeonAnimationRunnerBehavior
+      "Polymer.NeonAnimatableBehavior",
+      "fcDraggableDataBehavior",
+      "FCBehaviors.FcCalendarBehaviorPrime",
+      "Polymer.NeonAnimationRunnerBehavior"
     ],
   observers: [
-    'studentChanged(studlist.splices)'
+    'calendarDayChanged(event.splices)'
   ],
+  listeners:{'on-pass-click': 'catchdate'},
   properties: {
-    studlist:{
-      type: Array,
-      notify: true
-    },
-    student: {
-      value: Object,
-      notify: true
-    },
-    accountDetails: {
+   fcCourse:{
+    type: FcCourse, 
+    value:function(){return new FcCourse();},
+    notify: true
+   },
+   courseCalendarDaysArray: {
       type: Array,
       value: [],
-      notify: true,
-    },
-    syllabus: {
-      type: Array, 
-      value: [],
       notify: true
-    },
-    defaultPath: "",
-    gridType: String, 
-    fcid: {
-      type: String, 
-      value:'',
-      notify: true,
-      reflectToAttributes: true
-    },
-    fcids: {
-      type: Array,
-      notify: true,
-      value: [],
-      reflectToAttributes: true
-    },
-    scores: {
-      type: Array,
-      value: [],
-      notify: true,
-      reflectToAttributes: true
-      },
-    gridImageOne: '',
-    gridImageTwo: '',
-    selected: {
-    	type: Number,
-    	value: 0,
-    	notify: true,
-    	reflectToAttributes: true
-    },
-    FcStudent:{
-      type: Object, 
-      value: {},
+   },
+   calendarDay: {
+    type: FcCalendarDay,
+    value: function(){return new FcCalendarDay();},
+    notify: true
+   },
+   goodCatch:{
+      type: Object,
+      value:{},
+      observer:"watchGoodCatch",
       notify: true
-    },
-   
-    layoutClasses: {},
+
+
+   },
+   eventList: {
+      type: Array,
+      value:[],
+      notify: true
+   },
+
+   event:{
+    type: FcEvent,
+    value: function(){new FcEvent({});},
+    notify: true
+   },
+    calDay: {
+    type: FcCalendarDay,
+    value: function(){return new FcCalendarDay();},
+    notify: true
+   },
+    
     sharedElements: {
         type: Object,
         value: function() {
@@ -270,19 +242,23 @@ FcTabbedCalendarCard=Polymer({
     _onClearButtonClick: function() {
       this.fire('close');
     },
-    // setProfile:function(data){
-    //   this.set("data", data);
-    //   console.log("in profile card", this.data);
+
+    catchdate: function(e){
+      console.log(e.detail, e, e.detail.calDay);
 
 
-    // },
- 
-    setStudent: function(argFcid){
-      console.log(argFcid, this.studlist);
-      this.set("fcid", argFcid);
-     
 
-    },
+
+     },
+     watchGoodCatch:function(newVal, oldVal){
+      console.log(newVal);
+      if(newVal){if(newVal.day){this.set("calDay", newVal.day);if(newVal.eventList){ this.set("eventList", newVal.eventList); this.set("calDay.background", newVal.background); this.set("calDay.color", newVal.color);}}
+      }
+
+
+     },
+
+
     ready: function (){
      
      console.log(this.studlist);

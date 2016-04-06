@@ -216,19 +216,24 @@ Polymer({
 		var self=this;
 		if(propertyName == "testDate")
 		{
-			var cat=this.fcCourse.courseCalendarDaysArray.filter(function(one, two, three)
+			this.fcCourse.setTestDate(val);
+			var cat=this.fcCourse.courseCalendarDaysArray.map(function(one, two, three)
 			{
 				console.log(one, one, one);
 				return one;
 			});
-			this.set("fcCourse.courseCalendarDaysArray", null);
+			this.push("fcCourse.courseCalendarDaysArray", new FcCalendarDay(val));
 			this.fcCourse.setTestDate(val);
-			this.async(function(){this.set("courseCalendarDaysArray", cat);}, 200);
+			
+			this.push("fcCourse.eventArray", {"testDate": val});
+
 		}
 		else if(propertyName == "programLength")
 		{
 			var pickle= this.fcCourse.setCourseLength(val);
-			this.push("fcCourse.eventArray",pickle);
+			console.log(pickle);
+			this.push("fcCourse.eventArray",{"courseCalendar":pickle});
+		 // pickle.forEach(function(item, index, array){console.log(item); self.push("fcCourse.courseCalendarDaysArray",item);});
 		}
 		else if(propertyName == "practiceTestDay")
 		{
@@ -236,45 +241,61 @@ Polymer({
 			arrayEve=this.fcCourse.setPracticeTestDay(val);
 			if(arrayEve[0]===true)
 			{
-				this.fcCourse.practiceTestArray = [];
-				this.fcCourse.practiceTestArray = this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
+				this.set("fcCourse.practiceTestArray", [null]);;
+				var ptests = this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
 				{
-					if(currentValue.calendarDay.inPracticeTestArray===true)
-					{return currentValue;}
+					if(currentValue.inPracticeTestArray===true)
+					{return true;}
 				});
-			this.fcCourse.practiceTestDay=arrayEve[1];
-			this.fcCourse.numberOfPracticeTests=this.fcCourse.practiceTestArray.length;
+			this.set("fcCourse.practiceTestArray",[]);
+			this.set("fcCourse.practiceTestArray", ptests);
+			this.set("fcCourse.practiceTestDay", arrayEve[1]);
+			this.set("fcCourse.numberOfPracticeTests",ptests.length);
+			ptest=[];
 			}
-			this.push("fcCourse.eventArray",this.fcCourse.practiceTestArray);
+			this.push("fcCourse.eventArray",{"practiceTestArray": this.fcCourse.practiceTestArray});
+			//this.set("fcCourse.courseCalendarDaysArray", arrayEve[3]);
+			// console.log(this.fcCourse.eventArray, this.fcCourse.numberOfPracticeTests, this.practiceTestArray, this.practiceTestDay, arrayEve);
 		}
 		else if(propertyName == "courseMeetingSets")
 		{			
 			var eventArr= this.fcCourse.setCourseMeetingDaysAndTimes(val);
+			console.log(eventArr, "look here, right number in array?");
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.summerMeetingDays", "Not Applicable");
-			this.push("fcCourse.eventArray",eventArr);
 			var self=this;
-			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
-				{	var len=currentValue.eventList.length;
-					for(var i=0; i<len;i++)
-						{
-							self.notifyPath("fcCourse.courseCalendarDaysArray.calendarDay.eventList." + i, currentValue.eventList[i]);
-							self.notifyPath("fcCourse.courseCalendarDaysArray.eventList." + i, currentValue.eventList[i]);
-						}
-				});
-		}
+			var array=[];
+			this.set("fcCourse.courseCalendarDaysArray", eventArr);
+		// 	array=this.fcCourse.courseCalendarDaysArray.map(function(currentValue, index, array)
+		// 		{	
+		// 					self.set("fcCourse.courseCalendarDaysArray." + index + ".eventList", currentValue.eventList);
+		// 					return currentValue;
+		// 		});
+		// 	var len=this.fcCourse.courseCalendarDaysArray;
+		// 	for(var i=0; i<len; i++)
+		// 	{	var count = this.fcCourse.courseCalendarDaysArray[i].length;
+		// 		for(var j=0;j<count;j++)
+		// 		{
+		// 		this.notifyPath("fcCourse.courseCalendarDaysArray."+i+"eventList."+j.toString(), array[i].eventList[j]);
+		// 		}
+		// 	}
+		// }
+	}
 		else if(propertyName == "summerMeetingDays")
 		{	var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val);
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.courseMeetingSets", val);
 			this.push("fcCourse.eventArray",eventArr);
 			var self = this;
-			this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
+			var meetings =this.fcCourse.courseCalendarDaysArray.map(function(currentValue, index, array)
 				{
-				var len=currentValue.calendarDay.eventList.length;
-					for(var i=0; i<len;i++)
-					{self.notifyPath("fcCourse.courseCalendarDaysArray." + index + ".calendarDay.eventList." + i, currentValue.calendarDay.eventList[i])};
+			
+					self.set("fcCourse.courseCalendarDaysArray." + index,currentValue);
+				return true;
 				});
+			console.log(meetings);
+			
+			
 		}
 		else if(propertyName=="privateCoach")
 			{	this.set("fcCourse.courseType", "Private Coaching"); 

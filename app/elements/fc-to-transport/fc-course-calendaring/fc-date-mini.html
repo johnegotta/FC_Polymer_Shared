@@ -10,35 +10,47 @@ width: 30px;
 }
 .test {height: 100px; width: 100px; background: red;}
 </style>
-		<section class="vertical layout flex self-shrink" on-tap="toggleDays" style="background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]  {{calendarDay.background}}; border: 1px solid #afafaf; border-top: 1px solid #afafaf; border-bottom: 3px solid {{calendarDay.background}} ;margin: 1px 1px 1px 0px;height: 100%;"><content select=".pretty"></content>
-			<section class="horizontal layout" style="font-size:8px;font-weight: 600; width: 100%;background: [[computeWhite(inMonth, calendarDay.isSelected)]]; border-bottom: {{calendarDay.background}} 6px solid; border-right: 2px solid #afafaf; text-align: center;" >
-				<content class="horizontal layout flex" select=".test"></content>
+		<section class="vertical layout flex self-shrink" on-tap="toggleDays" style="background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]  {{calendarDay.background}}; border: 1px solid #afafaf; border-top: 2px solid #afafaf; border-bottom: 3px solid {{calendarDay.background}} ;margin: 1px 1px 1px 0px;height: 100%;"><content select=".pretty"></content>
+			<section class="horizontal layout" style="font-size:8px;font-weight: 600; width: 100%;background: [[computeWhite(inMonth, calendarDay.isSelected)]]; border-bottom: [[calendarDay.background]] 6px solid; border-right: 2px solid #afafaf; text-align: center;" >
+				
 			</section>
 			<content select=".hwk"></content>
-			<span class="horizontal layout flex center-justified"style="margin: auto; height: 25px; width: 25px; border-radius: 180px; font-size: 18px; cursor: pointer; border: 3px solid [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected)]];"> <content select=".date"></content> </span>
+			<span class="horizontal layout flex center-justified"style="margin: 2px auto 1px auto; height: 20px; width: 20px; border-radius: 180px; font-size: 15px; cursor: pointer; border: 1px solid [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]];"> <content select=".date"></content></span>
+			<span style="font-size:10px; font-weight: 600; font-style: merriweather; color: #008; height: 10px;">[[computeDayNotes(calendarDay)]]</span>  
 		</section>
 </template>
 <script>
 Polymer({
 	is:"fc-date-mini",
 	behaviors: [FCBehaviors.FcCalendarBehaviorPrime],
-	observer:["observeBackground(calendarDay.background)"],
+	observer:["observeBackground(calendarDay.*)"],
 	properties: {
 		day:{
-			type: Object,
+			type: FcCalendarDay,
 			value:{},
+			observer: "observeTheDays",
 			notify: true
 		},
-		inCalendarDayArray:{
+		inCourseCalendarDaysArray:{
 			type: Boolean,
-			value: false,
+			computed: "computeInCourseCalendarDaysArray(calendarDay)",
 			notify: true
 		},
 		calendarDay:{
-			type: Object,
+			type: FcCalendarDay,
 			value:{},
 			notify: true
 		}, 
+		isCourseMeeting: {
+			type: Boolean,
+			value:false,
+			notify: true
+		},
+		isPracticeTestDay:{
+			type: Boolean, 
+			value: false,
+			notify: true
+		},
 		miniDate:{
 			type: Date, 
 			computed: "computeMiniDate(calendarDay)",
@@ -61,6 +73,11 @@ Polymer({
 			 reflectToAttribute: true,
 			 notify: true
 		}, 
+		dayId:{
+			type: Number, 
+			computed:"computeDayId(calendarDay)",
+			notify: true
+		},
 		events:{
 			type: Array,
 			observer: "isEvents",
@@ -74,6 +91,12 @@ Polymer({
 			type: Number,
 			notify:true,
 			reflectToAttribute: true
+		},
+		cdIndex:{
+			type: Number,
+			value: -1,
+			notify: true,
+
 		},
 	
 		selectedArray:{
@@ -95,8 +118,30 @@ Polymer({
 	},
 	ready: function(){
 
-		this.set("calendarDay.toggleDay", this.toggleDay);
-  		this.set("calendarDay.isSelected", this.isSelected);
+	},
+	computeInCourseCalendarDaysArray: function(calendarDay){
+		if(calendarDay.inCourseCalendar===true){return true;}
+		else {return false;}
+	},
+	computeDayNotes:function(calendarDay){
+		var retVal=(calendarDay.isTestDate)?calendarDay.dateText: (calendarDay.isCourseMeeting)?calendarDay.meetingText: (calendarDay.isPracticeTestDay)?calendarDay.practiceTestText:"";
+		return retVal;
+	},
+	observeTheDays: function(newVal,oldVal){
+
+		if(oldVal && newVal!=oldVal)
+		{
+		//	console.log(oldVal, newVal);
+		}
+
+
+
+	},
+	computeDayId:function(calDay)
+	{	//console.log(calDay.dateId);
+		return calDay.dateId;
+
+
 	},
 	observeIsSelected: function(newVal,oldVal){
 		if(newVal===true && oldVal===false)
@@ -107,19 +152,25 @@ Polymer({
 			}
 			if(!this.calendarDay)
 			{
-				this.set("calendarDay", new FcCalendarDay());}
+				this.set("calendarDay", new FcCalendarDay());
 				this.push("event.courseCalendarDaysArray", this.calendarDay);
-			this.event.courseCalendarDaysArray.sort(function(a,b)
-			{
-					var retVal =(a.dateId-b.dateId);
-					console.log(retVal);
-					return retVal;
-
-			});
-
-
+			}
 		}
+		var sortedCalDays= this.event.courseCalendarDaysArray.sort(function(a,b){
+			if (a.dateId > b.dateId) {
+    		return 1;
+  			}
+  			if (a.dateId < b.dateId) {
+   	 		return -1;
+  			}
+  			if (a.dateId ===b.dateId){
+  			  return 0;
+			}
+		});
+		return sortedCalDays;
 
+
+		
 	},
 
 	computeMiniDate: function(calendarDay){
@@ -150,8 +201,8 @@ Polymer({
   	},
   	isEvents: function(newVal, oldVal)
   	{
-  		//console.log(newVal, oldVal);
-  		this.set("events", this.events);
+  		console.log(newVal, oldVal);
+  		//this.set("events", this.events);
 
 
 
@@ -172,12 +223,22 @@ Polymer({
 	  		if(this.calendarDay.isSelected===true)
 	  			{	
 	  				this.push("selectedArray", this.calendarDay);
+	  				//console.log(this.event.courseCalendarDaysArray);
 	  			}
-	  		else{ var newArray= this.selectedArray.filter(function(value, index, array)
-	  					{ return (value!==self.calendarDay);  	
+	  		else{ var newArray= this.event.courseCalendarDaysArray.filter(function(value, index, array)
+	  					{ 	var trfs=(value.date!=self.calendarDay.date);
+	  						//console.log(value.date, self.calendarDay.date, trfs);
+	  						return (value.date!=self.calendarDay.date);  	
 						});
+	  				this.set("selectedArray", null);
 	  				this.set("selectedArray", newArray);
 	  			}
+	  			this.set("event.courseCalendarDaysArray", null);
+	  			this.set("event.courseCalendarDaysArray",this.selectedArray);
+	  			//console.log(this.inCourseCalendarDaysArray);
+	  			this.inCourseCalendarDayArray=!this.inCourseCalendarDaysArray;
+	  			//console.log(this.inCourseCalendarDaysArray);
+
 	  	}
 	  		
   	},
@@ -192,13 +253,13 @@ Polymer({
   			return "#dfdfdf";
   		}
   	},
-  	computePickedDaysWhite: function(inMonth, calendarDay){
-  		if(inMonth===true)
+  	computePickedDaysWhite: function(inMonth, calendarDay, testDate){
+  		if(inMonth)
   		{
-  			var retVal=(calendarDay===true)?"white": "#008";
+  			var retVal=(calendarDay===true)?"white":(testDate===true)? "red; font-weight: 700": "#008";
   			return retVal;
   		}
-  		else 
+  		else if(inMonth==false) 
   		{
   			
   			return "#efefef";

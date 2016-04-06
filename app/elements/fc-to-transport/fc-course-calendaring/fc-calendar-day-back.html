@@ -27,6 +27,8 @@ iron-icon .small {
 .header-class{min-height: 35px !important; max-height: 55px !important; height: 100%;}
 .selected{}
 </style>
+<div class="horizontal layout">
+<template is="dom-repeat" class="horizontal layout flex" items="{{_computeDays(fcCourse.courseCalendarDaysArray.*)}}" as="day">
 	<div class="vertical layout" id="swipable" style="border: silver 2px solid; height: 380px; width:260px!important;">
 			<section class="header-class layout horizontal" style="height: 44px!important;color: white; font-size:18px; font-weight: 600; background: #008; padding-top: 6px; text-align: center; font-family: merriweather;">
 					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
@@ -34,8 +36,8 @@ iron-icon .small {
 						</iron-icon>
 					</section>
 					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 6px;">
-					[[_computeDate(calDay.showDate)]]	[[_computeDate(calDay.calendarDay.showDate)]]	
-					 [[day.username]]	
+					[[day.showDate]] 	
+					 [[day.calendarDay.showDate]]	
 					 </section>
 					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;"icon="icons:add-circle-outline">
@@ -43,14 +45,24 @@ iron-icon .small {
 					</section>
 			</section>
 			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-				<template is="dom-repeat" limit-to="7"  items="{{computeItems(calDay.*)}}" as="slot">
-								<fc-event-item event="{{slot}}" calendar-day={{calDay}} date="{{calDay.date}}" event-list="{{calDay.*}}">
-								</fc-event-item>
-							</template>
-				<!-- <content group="group" class="pickle group handle" ></content> -->
-
-			</paper-listbox>	
+			<template is="dom-repeat" items="{{_computeEvents(day.*)}}" as="event">
+			<fc-event-item 
+				event="{{event}}"
+				event-list="{{eventList}}" 
+				date="{{date}}"
+				cal-day="{{calDay}}"
+				fc-course="{{fcCourse}}"
+				date-id="[[dateId]]"
+			>
+	<content select=".buttons">
+				</content>
+				</fc-event-item>
+			</template>
+			</paper-listbox>
 		</div>
+
+</template>
+</div>
 </template>
 <script>
 FcCalendarDayBack=Polymer({
@@ -59,7 +71,7 @@ FcCalendarDayBack=Polymer({
 		[
 			"FCBehaviors.FcCalendarBehaviorPrime"
 		],
-	observers:[],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)'],
 	listeners:{},
 	properties:
 	{
@@ -67,111 +79,58 @@ FcCalendarDayBack=Polymer({
 			type: FcCourse, 
 			value: function()
 			{
-				var course = {};
-				course = new FcCourse();
-				return course;
+			return new FcCourse();
 			},
 			notify: true,
 		},
-		calendarDay:{
-			type: FcCalendarDay,
-			observer: "observeCalendarDay",
+		hook:{
+			type: Object,
+			value: {},
 			notify: true
-
 		},
+	
 		calDay:{
 			type: FcCalendarDay,
-			observer: "observeCalendarDay2",
+			observer: "observeCalDay",
 			notify: true
 		},
-		courseEventLists:{
+		eventList:{
 			type: Array,
-			computed: 'computeEventLists(fcCourse.courseCalendarDaysArray)',
+			value:[],
 			notify: true
 		},
+		courseCalendarDays:{
+			type: Array,
+			observer: "observeCalDays",
+			notify: true,
+		},
+	
 	},
 
 	ready: function(){},
 	attached:function(){},
-	computeEventList: function(cDay){
-	
+	_computeEventList: function(daylist){
+		if(!this.courseEventLists){this.courseEventLists=[];}
+		//this.push("courseEventLists", cDay.base.eventList);
+		console.log(daylist);
+	},
+	observeCalDays: function(newv, oldv){console.log(newv, oldv);}, 
+	observeCalDay: function(newv, oldv){console.log(newv, oldv);}, 
+	courseObserver: function(testDate, ccda){
+		console.log(testDate, ccda);
 
 	},
-	computeEventLists: function(calDayArray)
-	{
-	 var courseEventList=[];	
-	},
-
-	_computeItems: function(calDay)
-	 {
-
-	 	console.log(calDay);
-	  if(calDay.eventList)
-	  {
-		return calDay.eventList;
-		}
-	else if(calDay.calendarDay)
-		{
-		if(calDay.calendarDay.base.eventlist)
-		{
-		console.log(calDay.calendarDay.eventList);
-		return calDay.calendarDay.base.eventlist;
-		}
-	   }
-	},
-	_computeCalendarDay: function(calDay)
-	 {
-	   if(calDay)
-	   {
-			if(calDay.calendarDay)
-			{
-				return calDay.calendarDay;
-			}
-			else 
-			{
-				return calDay;
-			}
-				
-		}
-	},
-	_computeDate:function(calDay)
-	{
-	   if(calDay)
-	   {
-			console.log(calDay);
-				if(calDay.date)
-				{
-			 		return calDay.date;
-			 	}
-			 	else
-			 	{
-			 		return calDay.calendarDay.date;
-			 	}
-		}
-	},
-	observeCalendarDay: function(nval, oval)
-	{
-		if(nval)
-		{
-			console.log(nval, "actual value: " + this.calendarDay.eventList[0].activity);
-			//this.set("calendarDay.calendarDay.eventList", this.calendarDay.calendarDay.eventList);
-			//	this.notifyPath("calendarDay.calendarDay.eventlist", this.calendarDay.calendarDay.eventList);
-		}
-	},
-	observeCalendarDay2:function(newVal, oldb){
-		console.log(newVal, oldb);	
-
-
-	},
-	_computeDate: function(cDay){
+	_computeDays: function (ccd){
+		// console.log(ccd, ccd.base, "I am about to return this data");
+		return ccd.base;
+	}, 
+	_computeEvents: function(daylist){
+		console.log(daylist)
+		return daylist.base.eventList;
 		
-		if(cDay)
-		{	console.log(cDay);
-			var result = cDay;
-  			// result = result.slice(0,10);
-  			return cDay;
-		}
-	},
+			}
+
+
 });
 </script>
 </dom-module>
