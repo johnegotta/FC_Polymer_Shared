@@ -232,30 +232,50 @@ Polymer({
 		{
 			var pickle= this.fcCourse.setCourseLength(val);
 			console.log(pickle);
-			this.push("fcCourse.eventArray",{"courseCalendar":pickle});
-		 // pickle.forEach(function(item, index, array){console.log(item); self.push("fcCourse.courseCalendarDaysArray",item);});
+			pickle.forEach(function(item, index, array){console.log(item); self.push("fcCourse.courseCalendarDaysArray",item);});
+			var d= new Date(this.fcCourse.testDate);
+			this.push("fcCourse.courseCalendarDaysArray", new FcCalendarDay(d));	
+			this.push("fcCourse.eventArray",{"courseCalendar":pickle});	 
 		}
 		else if(propertyName == "practiceTestDay")
 		{
 			var arrayEve=[];
 			arrayEve=this.fcCourse.setPracticeTestDay(val);
-			if(arrayEve[0]===true)
-			{
-				this.set("fcCourse.practiceTestArray", [null]);;
-				var ptests = this.fcCourse.courseCalendarDaysArray.filter(function(currentValue, index, array)
-				{
-					if(currentValue.inPracticeTestArray===true)
-					{return true;}
-				});
-			this.set("fcCourse.practiceTestArray",[]);
-			this.set("fcCourse.practiceTestArray", ptests);
-			this.set("fcCourse.practiceTestDay", arrayEve[1]);
-			this.set("fcCourse.numberOfPracticeTests",ptests.length);
-			ptest=[];
-			}
+				this.set("fcCourse.practiceTestArray", arrayEve);
+			this.set("fcCourse.practiceTestDay", val);
+			this.set("fcCourse.numberOfPracticeTests",this.fcCourse.practiceTestArray.length);
 			this.push("fcCourse.eventArray",{"practiceTestArray": this.fcCourse.practiceTestArray});
-			//this.set("fcCourse.courseCalendarDaysArray", arrayEve[3]);
-			// console.log(this.fcCourse.eventArray, this.fcCourse.numberOfPracticeTests, this.practiceTestArray, this.practiceTestDay, arrayEve);
+			var self=this;
+			var array=[];
+			var self = this;
+			var calDays=self.fcCourse.courseCalendarDaysArray;
+			var len = calDays.length;
+			console.log(arrayEve);
+			arrayEve.forEach(function(curr, index, array){	
+				if(curr.cdIndex!=-1){
+					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"red");
+					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,
+				"isPracticeTestDay"],true);
+					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,
+				"inPracticeTestArray"],true);
+						 var elist = curr.eventList;
+						 console.log(curr.cdIndex, "MONKEY");
+						 var calList= calDays[curr.cdIndex].eventList;
+						 console.log(elist, calList, "look here for the changes");
+						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
+						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);
+									var money = self.fcCourse.courseCalendarDaysArray;
+						self.set("fcCourse.courseCalendarDaysArray", []);
+						self.async(function(){self.set("fcCourse.courseCalendarDaysArray", money);});
+
+
+					// 	elist.forEach(function(current, indexA, arrayA){
+					// self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
+					// 	});
+
+						console.log(elist, calList, "look here for the changes");
+				}
+				});
 		}
 		else if(propertyName == "courseMeetingSets")
 		{			
@@ -265,38 +285,55 @@ Polymer({
 			this.set("fcCourse.summerMeetingDays", "Not Applicable");
 			var self=this;
 			var array=[];
-			this.set("fcCourse.courseCalendarDaysArray", eventArr);
-		// 	array=this.fcCourse.courseCalendarDaysArray.map(function(currentValue, index, array)
-		// 		{	
-		// 					self.set("fcCourse.courseCalendarDaysArray." + index + ".eventList", currentValue.eventList);
-		// 					return currentValue;
-		// 		});
-		// 	var len=this.fcCourse.courseCalendarDaysArray;
-		// 	for(var i=0; i<len; i++)
-		// 	{	var count = this.fcCourse.courseCalendarDaysArray[i].length;
-		// 		for(var j=0;j<count;j++)
-		// 		{
-		// 		this.notifyPath("fcCourse.courseCalendarDaysArray."+i+"eventList."+j.toString(), array[i].eventList[j]);
-		// 		}
-		// 	}
-		// }
-	}
+			var self = this;
+			var calDays=self.fcCourse.courseCalendarDaysArray;
+			var len = calDays.length;
+			console.log(eventArr);
+			this.set("fcCourse.courseMeetingArray", eventArr);
+			eventArr.forEach(function(curr, index, array){
+				if(curr.cdIndex!==-1){
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"#4285f4");
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isCourseMeeting"],true);
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isMeetingDay"],true);
+						 var elist = curr.eventList;
+						 var calList= calDays[curr.cdIndex].eventList;
+						 console.log(elist, calList, "look here for the changes");
+						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], []);
+						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], elist);
+						 console.log(elist, calList, "look here for the changes");
+					console.log(curr.eventList);
+					}
+				});
+
+			
+			
+			}
 		else if(propertyName == "summerMeetingDays")
 		{	var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val);
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.courseMeetingSets", val);
-			this.push("fcCourse.eventArray",eventArr);
+			this.push("fcCourse.eventArray",eventArr);			
 			var self = this;
-			var meetings =this.fcCourse.courseCalendarDaysArray.map(function(currentValue, index, array)
-				{
-			
-					self.set("fcCourse.courseCalendarDaysArray." + index,currentValue);
-				return true;
+			var calDays=self.fcCourse.courseCalendarDaysArray;
+			var len = calDays.length;
+			this.set("fcCourse.courseMeetingArray", eventArr);
+			console.log(eventArr, "chimp");
+			eventArr.forEach(function(curr, index, array){
+				if(curr.cdIndex!==-1){
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"#4285f4");
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isCourseMeeting"],true);
+				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isMeetingDay"],true);
+						 var elist = curr.eventList;
+						 var calList= calDays[curr.cdIndex].eventList;
+						 console.log(elist, calList, "look here for the changes");
+						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], []);
+						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], elist);
+						 console.log(elist, calList, "look here for the changes");
+						 console.log(curr.eventList);
+						}
 				});
-			console.log(meetings);
-			
-			
 		}
+
 		else if(propertyName=="privateCoach")
 			{	this.set("fcCourse.courseType", "Private Coaching"); 
 				this.set("fcCourse.coach", val);

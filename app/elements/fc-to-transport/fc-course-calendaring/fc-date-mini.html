@@ -31,6 +31,12 @@ Polymer({
 			observer: "observeTheDays",
 			notify: true
 		},
+		eventList:{
+			type: Array,
+			value:[],
+			notify: true
+
+		},
 		inCourseCalendarDaysArray:{
 			type: Boolean,
 			computed: "computeInCourseCalendarDaysArray(calendarDay)",
@@ -56,7 +62,7 @@ Polymer({
 			computed: "computeMiniDate(calendarDay)",
 			notify: true,
 		},
-		event:{
+		fcCourse:{
 			type: FcCourse,
 			value: function(){var retVal = new FcCourse(); return retVal;},
 			notify: true
@@ -93,8 +99,8 @@ Polymer({
 			reflectToAttribute: true
 		},
 		cdIndex:{
-			type: Number,
-			value: -1,
+			type: String,
+			value: "-1",
 			notify: true,
 
 		},
@@ -146,17 +152,17 @@ Polymer({
 	observeIsSelected: function(newVal,oldVal){
 		if(newVal===true && oldVal===false)
 		{
-			if(!this.event.courseCalendarDaysArray)
+			if(!this.fcCourse.courseCalendarDaysArray)
 			{
-				this.event.courseCalendarDaysArray=[];
+				this.fcCourse.courseCalendarDaysArray=[];
 			}
 			if(!this.calendarDay)
 			{
 				this.set("calendarDay", new FcCalendarDay());
-				this.push("event.courseCalendarDaysArray", this.calendarDay);
+				this.push("fcCourse.courseCalendarDaysArray", this.calendarDay);
 			}
 		}
-		var sortedCalDays= this.event.courseCalendarDaysArray.sort(function(a,b){
+		var sortedCalDays= this.fcCourse.courseCalendarDaysArray.sort(function(a,b){
 			if (a.dateId > b.dateId) {
     		return 1;
   			}
@@ -201,7 +207,14 @@ Polymer({
   	},
   	isEvents: function(newVal, oldVal)
   	{
-  		console.log(newVal, oldVal);
+  		var self=this;
+  		newVal.forEach(function(val, index, array){
+  				var count=self.events.length;
+  				for(var i=0;i<count; i++)
+  					{self.set("eventList."+i, val);	
+  					self.set("events."+i, val);
+  						}
+  					})		
   		//this.set("events", this.events);
 
 
@@ -225,7 +238,7 @@ Polymer({
 	  				this.push("selectedArray", this.calendarDay);
 	  				//console.log(this.event.courseCalendarDaysArray);
 	  			}
-	  		else{ var newArray= this.event.courseCalendarDaysArray.filter(function(value, index, array)
+	  		else{ var newArray= this.fcCourse.courseCalendarDaysArray.filter(function(value, index, array)
 	  					{ 	var trfs=(value.date!=self.calendarDay.date);
 	  						//console.log(value.date, self.calendarDay.date, trfs);
 	  						return (value.date!=self.calendarDay.date);  	
@@ -233,8 +246,8 @@ Polymer({
 	  				this.set("selectedArray", null);
 	  				this.set("selectedArray", newArray);
 	  			}
-	  			this.set("event.courseCalendarDaysArray", null);
-	  			this.set("event.courseCalendarDaysArray",this.selectedArray);
+	  			this.set("fcCourse.courseCalendarDaysArray", null);
+	  			this.set("fcCourse.courseCalendarDaysArray",this.selectedArray);
 	  			//console.log(this.inCourseCalendarDaysArray);
 	  			this.inCourseCalendarDayArray=!this.inCourseCalendarDaysArray;
 	  			//console.log(this.inCourseCalendarDaysArray);

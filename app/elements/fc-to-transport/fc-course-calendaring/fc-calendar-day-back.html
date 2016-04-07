@@ -30,7 +30,7 @@ iron-icon .small {
 <div class="horizontal layout">
 <template is="dom-repeat" class="horizontal layout flex" items="{{_computeDays(fcCourse.courseCalendarDaysArray.*)}}" as="day">
 	<div class="vertical layout" id="swipable" style="border: silver 2px solid; height: 380px; width:260px!important;">
-			<section class="header-class layout horizontal" style="height: 44px!important;color: white; font-size:18px; font-weight: 600; background: #008; padding-top: 6px; text-align: center; font-family: merriweather;">
+			<section class="header-class layout horizontal" style="height: 44px!important; font-size:18px; background: [[_computeHeaderBackGround(day.*)]]; padding-top: 6px; text-align: center; font-family: merriweather;">
 					 <section class="buttons flex-1" on-tap="changeEvent" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: red;"icon="icons:remove-circle">
 						</iron-icon>
@@ -44,21 +44,19 @@ iron-icon .small {
 						</iron-icon>
 					</section>
 			</section>
-			<paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-			<template is="dom-repeat" items="{{_computeEvents(day.*)}}" as="event">
+	
 			<fc-event-item 
-				event="{{event}}"
-				event-list="{{eventList}}" 
-				date="{{date}}"
-				cal-day="{{calDay}}"
+				event-list="{{day.eventList}}" 
+				date="[[day.date]]"
+				color-two="{{day.background}}"
+				cal-day="{{day}}"
 				fc-course="{{fcCourse}}"
-				date-id="[[dateId]]"
+				date-id="[[day.dateId]]"
 			>
-	<content select=".buttons">
-				</content>
-				</fc-event-item>
-			</template>
-			</paper-listbox>
+			<content select=".buttons">
+			</content>
+			</fc-event-item>
+	
 		</div>
 
 </template>
@@ -71,7 +69,7 @@ FcCalendarDayBack=Polymer({
 		[
 			"FCBehaviors.FcCalendarBehaviorPrime"
 		],
-	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)'],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', 'eventListChanged(eventList.splices)'],
 	listeners:{},
 	properties:
 	{
@@ -97,6 +95,7 @@ FcCalendarDayBack=Polymer({
 		eventList:{
 			type: Array,
 			value:[],
+			observer: "eventListObserver",
 			notify: true
 		},
 		courseCalendarDays:{
@@ -109,6 +108,41 @@ FcCalendarDayBack=Polymer({
 
 	ready: function(){},
 	attached:function(){},
+	_computeHeaderBackGround: function(daylist){
+			if(daylist.base && daylist.base.isTestDate===true)
+		{
+			return "gold; color: #008; font-weight: 700";
+
+		}
+		else{ return "#008; color: white; font-weight: 600";} 
+
+
+	},
+	computeColorTwo: function(dayb){
+			console.log(dayb);
+		return dayb;
+	},
+	eventListChanged:function(changeRecord){
+			console.log(changeRecord);
+
+	},
+	_computeTestDayEvents:function(dayList){
+	if(daylist.base.isTestDate===true)
+		{
+			return "SAT TEST DATE";
+
+		}
+		else{ return "#008; color: white; font-weight: 600";} 
+
+
+	},
+	computeDuh: function(elist){
+		console.log(elist);
+		return elist.base;
+	},
+	eventListObserver: function(newVal, oldVal){
+			console.log(newVal, oldVal);
+			},
 	_computeEventList: function(daylist){
 		if(!this.courseEventLists){this.courseEventLists=[];}
 		//this.push("courseEventLists", cDay.base.eventList);
@@ -126,6 +160,12 @@ FcCalendarDayBack=Polymer({
 	}, 
 	_computeEvents: function(daylist){
 		console.log(daylist)
+		if(daylist.isTestDate===true)
+		{
+
+
+
+		}
 		return daylist.base.eventList;
 		
 			}

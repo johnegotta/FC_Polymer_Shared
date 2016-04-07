@@ -1,3 +1,5 @@
+<link href="http:localhost:3000/elements/fc-callcenter/fc-calendaring/fc-calendar-behavior-beta-prime.html">
+
 <dom-module id="fc-course">
 <style>
   :host {
@@ -5,41 +7,35 @@
   }
 </style>
 <template>
-<div style="height: 50px; width: 50px; background: blue;">
+<<!-- div style="height: 50px; width: 50px; background: blue;">
 <section style="height:25px; width: 40px; background:purple; border-radius: 180px;">
 </section>
-</div>
+</div> -->
 </template>
 
 <script>
 (function(){
   'use strict';
-
-  let MyBehavior = {"FCBehaviors.FcCalendarBehaviorPrime"
-//  					, "FCBehaviors.FcStringTimeDateBehavior"
-
-
-				};
+   
 
   class FcCourse {
 
     get behaviors() {
-      return ["FCBehaviors.FcCalendarBehaviorPrime"];
-    }
+      return [FCBehaviors.FcCalendarBehaviorPrime];
+    };
     // Element setup goes in beforeRegister instead of createdCallback.
     beforeRegister() {
       this.is = 'fc-course';
       // Define the properties object in beforeRegister.
       this.properties = {
       	fcCourse:{
-      		type: FcCourse,
-      		value: function(){return new FcCourse();},
+      		type: Object,
+      		value: function(){return {};},
       		notify: true
       	},
         starterDay:{
         	type:Number,
         	value: function(){return 0;},
-        	observer:"",
         	notify: true
         },
         endDate: {
@@ -53,9 +49,8 @@
         	notify: true
         },
 		isPrivateSchedule:{
-			type:Boolean
+			type:Boolean,
 			value: function(){return false;},
-			observer:"",
 			notify: true
 		},
 		privateCoachingHours:{
@@ -67,50 +62,42 @@
 				else
 					{return 0;}
 			},
-			observer:"",
 			notify: true
 		},
 		scheduleType:{
 			type: String,
 			value: function(){return"Standard Schedule";},
-			observer:"",
 			notify: true
 		},
 		customCourseType:{
 			type: String,
 			value: function(){return "not applicable";},
-			observer:"",
 			notify: true
 		},
 		courseType :{
 			type: String, 
 			value: function(){return "Focused 1600SAT Course";},
-			observer:"",
 			notify: true
 		},
 		testDate :{
 			type:Date,
 			value: function(){return {};},
-			observer:"",
 			notify: true
 
 		},
 		startTime:{
 			type: String,
 			value: function(){return "";},
-			observer:"",
 			notify: true
 		},
 		endTime:{
 			type: String,
 			value: function(){return "";},
-			observer:"",
 			notify: true
 		},
 		programLength:{
 			type: String,
 			value: function(){return "";},
-			observer:"",
 			notify: true
 		},
 		theDaySet: {
@@ -121,24 +108,20 @@
 		primaryCalendar:{
 			type: Array,
 			value: function(){return [];},
-			observer:"",
 			notify: true
 		},
 		calendarDayArray:{
 			type: Array,
 			value: function(){return [];},
-			observer:"",
 			notify: true
 		},
 		startAndEndTimes:{
 			type: String,
-			observer:"",
 			notify: true
 		},
 		courseMeetingDays:{
 			type:String, 
 			value: function(){return "Monday & Wednesday";},
-			observer:"",
 			notify: true
 		},
 		calendarFcid:{
@@ -150,146 +133,122 @@
 		summerMeetingDays:{
 			type: String,
 			value: function(){return "Mon, Wed, & Fri";},
-			observer:"",
 			notify: true
 		},
 		practiceTestDay:{
 			type: String,
 			value: function(){return "Saturday";},
-			observer:"",
 			notify: true
 		},
 		numberOfMeetings:{
 			type: Number,
 			computed: "_computeNumberOfMeetings(courseMeetingArray)",
-			observer:"",
 			notify: true
 		},
 		numberOfPracticeTests:{
 			type: Number,
 			computed: "_computeNumberOfPracticeTests(practiceTestArray)",
-			observer:"",
 			notify: true
 		},
 		courseLocation:{
 			type: String, 
 			value: function(){return"";},
-			observer:"",
 			notify: true
 		},
 		coach:{
 			type: String,
 			value: function(){return "";},
-			observer:"",
 			notify: true
 		},
 		coachFcid :{
 			type: String,
 			computed: "_computeCoachFcid(coach)",
-			observer:"",
 			notify: true
 		},
 		associatedCoaches:{
 			type: Array, 
 			value: function(){return [];},
-			observer:"",
 			notify: true
 		},
 		courseSize:{
 			type: Number, 
 			value: function(){return 22;},
-			observer:"",
 			notify: true
 		},
 		eventArray :{
 			type: Array,
 			computed: "_computeEventArray(practiceTestArray, courseMeetingArray)",
-			observer:"",
 			notify: true
 		},
 		practiceTestArray :{
 			type: Array,
 			value: "_computePracticeTestArray(courseCalendar, practiceTestDay)",
-			observer:"",
 			notify: true
 
 		},
 		courseMeetingArray :{
 			type:Array,
 			value: function(){return [];},
-			observer:"",
 			notify: true
 		},
 		fcid :{
 			type: String, 
 			value: function(){return "";},
-			observer:"",
 			notify: true
 		},
 		currentEnrollment:{
 			type: Number,
-			observer:"",
 			notify: true
 
 		},
 		price:{
 			type: String,
 			value: function(){},
-			observer:"",
 			notify: true
 		},
 		summer:{
 			type: Boolean,
 			value: function(){return false;},
-			observer:"",
 			notify: true
 		},
 		courseLength:{
 			type: String,
 			value: function(){return "7 weeks";},
-			observer:"",
 			notify: true
 		},
 		courseMeetingLength:{
 			type: String,
 			computed: "_computeCourseMeetingLength(startTime, endTime)",
-			observer:"",
 			notify: true
 		},
 		hoursTotal:{
 			type: String,
-			computed:"_computeHoursTotalForCourse(courseMeetingLength, NumberOfMeetings),"
-			observer:"",
+			computed:"_computeHoursTotalForCourse(courseMeetingLength, NumberOfMeetings)",
 			notify: true
 		}, 
 		courseCalendarDaysArray:{
 			type: Array,
-			computed: "_computeCourseCalendarDaysArray(calendarDaysArray,practiceTestDay, courseMeetingDays)",
-			observer:"",
+			// computed: "_computeCourseCalendarDaysArray(calendarDaysArray,practiceTestDay, courseMeetingDays)",
 			notify: true
 		},
 		courseCalendar:{
 			type: Array,
 			computed: "_computeCourseCalendar(courseLength,testDate)", 
-			observer:"",
 			notify: true
 		},
 		testDateDate:{
 			type: Date,
 			computed: "_computeTestDateDate(testDate)",
-			observer:"",
 			notify: true
 		},
 		counter:{
 			type: Number,
 			value: function(){return 0;},
-			observer:"",
 			notify: true
 		},
 		activity:{
 			type: "String",
 			value: function(){return "course";},
-			observer:"",
 			notify: true
 		}
         
@@ -347,12 +306,13 @@
 						time: "9:00AM",
 						color: "orange"
 					});
+				var value=currentValue.eventList[0];
 				this.notifySplices('courseCalendar.'+ index + ".eventList", 
 					[{
 						index: 0, 
 						removed: {"startTime": "9:00AM", "name": "holderEvent", "coach":"", "location": "","activity":"", "time":"", "endTime": "", "fcid": "", "showDate":currentValue.date.toDateString(), "date":new Date(currentValue.date),  "color": "white"},
 						addedCount: 1, 
-						FcEvent:{currentValue.eventList[0]}, type: 'splice' }]);
+						FcEvent:{value}, type: 'splice' }]);
 				}
 			 return currentValue;
 		});
@@ -365,9 +325,9 @@
 		return arrayPtds;
 	}
 	_computeEventArray(pta, cma){
-		var eventArray = pta.concat(cma);
-		var sortedEventArray [];
-		sortedEventArray= eventArray.sort(function(a,b){
+		var eventArray = [];
+		eventArray.join(pta.concat(cma));
+		var sortedEventArray = eventArray.sort(function(a,b){
 			if (a.dateId > b.value) {
     		return 1;
   			}
@@ -428,7 +388,7 @@
 							completed: false,
 							room:"Room 1 of 3",
 							date: currentValue.date,
-							timestamp: currentValue.dateId,
+							//timestamp: currentValue.dateId,
 							isHoliday: false,
 											});
 				var elist = currentValue.eventList;
@@ -474,8 +434,8 @@
 
 	}
 	_computeCourseMeetingLength(startTime, endTime){
-		var duration = duration(startTime, endTime);
-		return duration;
+//var duration = duration(startTime, endTime);
+//return duration;
 	}
 
 	_computeHoursTotalForCourse(courseMeetingLength,NumberOfMeetings){
@@ -485,7 +445,7 @@
 	}
 	
 	_computeCourseCalendar(courseLength,testDate){   
-		let weeks parseInt(courseLength);
+		let weeks = parseInt(courseLength);
 		let arrayHolder=[];
 		let self=this;
 		let daysOfProgram=(weeks*7);
@@ -855,6 +815,9 @@
         				});
 		}
 	}
-}//end class
+//end class
+}
 Polymer(FcCourse);
 })();
+</script>
+</dom-module>

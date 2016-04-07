@@ -69,7 +69,8 @@ width: 30px;
 						 	id$={{day.dateId}} 
 						 	testDate={{day.testDate}} 
 						 	events="[[day.eventList]]"
-						 	event="{{fcCourse}}">
+						 	event-list="[[day.eventList]]"
+						 	fc-course="{{fcCourse}}">
 							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
 							<a class="date" >[[day.dayOfMonth]]</a>
 							<span class="[[computeDay(day)]]"></span>
@@ -92,11 +93,16 @@ FcDatePickerProto=Polymer({
 				Polymer.NeonAnimatableBehavior
 				],
 	listeners: {"catchTheCourse": "changesTheDays"},
-	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*, fcCourse.eventArray.*)', "observeLength(fcCourse.courseLength, fcCourse.courseCalendarDaysArray.*)", "observePracticeTests(fcCourse.practiceTestDay)"],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', "observeMeetings(fcCourse.courseMeetingArray)", "observePracticeTests(fcCourse.practiceTestArray)"],
 	properties: {
 		day:{
 			type: Object, 
 			value: {},
+			notify: true
+		},
+		counter:{
+			type: Number,
+			value: 0,
 			notify: true
 		},
 		fcCourse:{
@@ -215,9 +221,14 @@ FcDatePickerProto=Polymer({
  		this.set("displayedIndex",index);
 		this.calendarCreator(date, dateEnd, "months");
 		},
-watchingSelectedArray: function(newVal, oldVal){//console.log(newVal, oldVal)
- if(this.fcCourse){//console.log(newVal, oldVal, this.fcCourse.courseCalendarDaysArray);
- }
+watchingSelectedArray: function(newVal, oldVal)
+{
+ 		if(this.fcCourse)
+ 			{
+ 				console.log(newVal, oldVal);
+ 				this._backOne();
+				this._forward();
+ 			}
 },
 
 computeDay: function(day){if(day.testDate){return "pretty";}
@@ -254,7 +265,7 @@ initialize:function(){
 
 computeInClass: function(day, fcCourse)
 {
-
+//console.log(fcCourse);
 },
 computeDisplayed: function (displayedIndex)
 {
@@ -269,14 +280,18 @@ computeInEventArray: function(fcCourse, item)
 				{
 					var retVal = "outline: red 3px solid"; return retVal;
 				}
+	this._backOne();
+	this._forward();
 	}
 },
 
-courseObserver: function(test,ccda, course)
+courseObserver: function(test,ccda)
 { 	
-	console.log(ccda, course);
-	if(test)
-	{
+	// console.log(this.displayed);
+	if(test && this.counter<5)
+	{ 	this.counter++;
+		console.log("in time")
+		console.log("in time after counter");
 		var d= new Date(test);
 		var p = d.getFullYear();
 		diff=(p-this.today.getFullYear());
@@ -285,28 +300,37 @@ courseObserver: function(test,ccda, course)
 		{
 			m+=12*diff;
 		}
-	
 		this.set("displayedIndex", m);
 		var testMonth=[];
+		var b = m-1;
 		testMonth=this.calendarMonthsArray[m];
+		var resetMonth = this.calendarMonthsArray[b];
 		this.set("displayed", testMonth);
+		this._backOne();
+		this._forward();
+		
 	}
 	
-	else if(course&& course.length>2){
-		console.log(course);
-		var subtractor= Math.ceil((ccda.courseLendth*7)/28);
-		var dind = Math.floor(this.displayedIndex-1);
-		this.set("displayedIndex", dind);
-		this.set("displayed",  this.calendarMonthsArray[dind]);
-	}
+		
+			
 	
 	},
-observeLength:function(length, ccda) {
-//console.log(length, length, length, ccda);
+observeMeetings:function(meetings) {
+	// console.log(meetings, "MEETINGDAYS");
+	if(meetings.length>1){
+			console.log("I am in the if MEETING DAYS");
+		this.async(function(){this._backOne();}, 2);
+		this._forward();
+	}
 },		
-observePracticeTests: function(ptd)
-{
-//	console.log(ptd);
+observePracticeTests: function(pta)
+{// console.log( pta, pta.length);
+		if(pta.length>1){
+			console.log("I am in the if");
+		
+		this.async(function(){this._backOne();}, 2);
+		this._forward();
+	}
 },
 	
 
@@ -346,13 +370,13 @@ _forward: function()
 
 _dateClick: function(event) {
       var targetOne = event.target;
-      console.log(event.model);
+      // console.log(event.model);
       while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") 
       {
         targetOne = targetOne.parentNode;
       }
         if(targetOne.nodeName=="FC-DATE-MINI")
-        { console.log("I am ready to fire sir");
+         {// console.log("I am ready to fire sir");
         	
        		var day=event.model.__data__.day;
       		var elist = event.model.__data__.day.eventList;
@@ -365,11 +389,11 @@ _dateClick: function(event) {
       				"displayedArray": this.displayed,
       			};
 
-      			console.log(dataObj);
+      			// console.log(dataObj);
       		}
       // this.sharedElements = {
       //   'hero': this
-      // };
+    //  };
       this.fire('on-date-click', {
         day: dataObj
       });
