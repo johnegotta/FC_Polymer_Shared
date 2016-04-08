@@ -45,12 +45,12 @@ iron-icon .small {
 .selected{}	
 </style>
 <paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-<template is="dom-repeat" id="mymeantemplate" items="{{computeDuh(eventList.*)}}" as="event">
+<template is="dom-repeat" sort="_sortSlots" id="mymeantemplate" items="{{computeDuh(eventList.*)}}" as="event">
 <div>
 	<paper-item on-tap="selectedTwo" style$="border: 1px #aeaeae solid; background:[[_computeColor(event.color)]];" class="layout horizontal scheduling" draggable=true>
 		<paper-item-body style$="background: [[_computeColor(event.color)]];" class="layout horizontal" value$="{{value}}">
 			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: [[_computeColor(event.color)]];" >
-				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="TIME" name$="[[_computeTime(event.time)]]" input-type="tiny" label-hidden="true" value$="[[_computeStartTime(event.startTime)]]"></fc-input-prime>
+				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="Start Time" name$="[[_computeTime(event.startTime)]]" input-type="tiny" label-hidden="true" value$="[[_computeStartTime(event.startTime)]]"></fc-input-prime>
 			</div>
 			<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[color]];">
 					<span class="two">
@@ -63,9 +63,10 @@ iron-icon .small {
 	   		</div>
 		</paper-item-body>   	
 	</paper-item>
-
-<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="myeventDialogue" class="dialog" style$="height: 480px; width: 380px;" exit-animation="fade-out-animation">
-		<h2>Event Card: {{event.date}}</h2>
+</template>
+			</paper-listbox>
+<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="myeventDialogue" class="dialog" style$="height: 480px; width: 440px;" exit-animation="fade-out-animation">
+		<h2>Event Card: {{calDay.date}}</h2>
   		<paper-dialog-scrollable style$="height: 340px; overflow-y: scroll; width: 345px;">
     		<fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
     		<fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
@@ -91,15 +92,15 @@ iron-icon .small {
  		 	</div>
 	</paper-dialog>
 		</div>
-		</template>
-			</paper-listbox>
+		
 
 </template>
 <script>
 FcEventItem=Polymer({
 	is:"fc-event-item", 
 	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"],
-	observer: ["calendarObserver(fcCourse.courseCalendarDaysArray.*.eventList, fcCourse.eventList.*)"], 
+	observer: ['calendarObserver(fcCourse.courseCalendarDaysArray.*)',
+  'eventAddedOrRemoved(event.splices)'], 
 	properties: 
 	{		
 		fcCourse:{
@@ -165,12 +166,20 @@ FcEventItem=Polymer({
 			return eventList.base;
 	},
 
-_computeColor:function(event){return event;},
-_computeTime:function(event){this.set("time", event); return event;},
-_computeStartTime:function(event){this.set("startTime", event);return event;},
-_computeName:function(event){this.set("name", event); return event;},
-_computeActivity:function(event){this.set("activity", event); return event;},
-_computeLabel: function(event){this.set("label", event); return event;},
+ _sortSlots: function(a,b){
+ 	console.log("SORTING SORTING", a, b);
+			var ao = stringTime(a.startTime);
+			var bo= stringTime(b.startTime); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+		},
 
 	openup: function(){
 	this.$.myeventDialogue.opened=!this.$.myeventDialogue.opened;	
@@ -178,17 +187,19 @@ _computeLabel: function(event){this.set("label", event); return event;},
 	observeCalendarDay:function(n,v){
 		//console.log(n,v);
 	},
+	eventAddedOrRemoved: function(changeRecord){
+		console.log(changeRecord);
+	},
 	
 	ready: function(){},
 
 	computeEventList2: function(above, core){
-		//	console.log("material from above", above,"core material", core);
-			//return above.value;
+		
 
 	},
 	_computeEvents: function(eventlist){
-		//	console.log(eventlist);
-			return eventlist.base;
+	
+			return eventlist.value;
 
 	},
 	
@@ -198,31 +209,28 @@ _computeLabel: function(event){this.set("label", event); return event;},
 	},
 	calendarObserver: function(calday, eventlist)
 	{
-			//console.log(calday,"loook here", eventlist);
-
 
 	},
 	calDayObserved: function(calDay){
 			console.log(calDay, "dont know if its the stuff we want but damn well sure in the right place");
 			var sandwhich=this.event;
-			//this.set("event",null);
-			var self=this;
-			//console.log(sandwhich, sandwhich);
-			//this.async(function(){self.set("event", sandwhich);}, 300);
-	},
+				},
 	selectedTwo: function(event){
 		//console.log(event.target);
 	},
 	lookattheEvent:function(newval, oldVal){
 			console.log(newval, oldVal);
-
 	},
 	observCourse: function(newVal, oldVal){
-		//console.log(newVal);
-
-
-
+		console.log(newVal);
 	},
+	_computeColor:function(event){return event;},
+_computeTime:function(event){this.set("time", event); return event;},
+_computeStartTime:function(event){this.set("startTime", event);return event;},
+_computeName:function(event){this.set("name", event); return event;},
+_computeActivity:function(event){this.set("activity", event); return event;},
+_computeLabel: function(event){this.set("label", event); return event;},
+
 
 
 });

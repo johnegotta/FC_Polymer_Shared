@@ -264,18 +264,16 @@ Polymer({
 						 console.log(elist, calList, "look here for the changes");
 						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
 						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);
-									var money = self.fcCourse.courseCalendarDaysArray;
-						self.set("fcCourse.courseCalendarDaysArray", []);
-						self.async(function(){self.set("fcCourse.courseCalendarDaysArray", money);});
 
-
-					// 	elist.forEach(function(current, indexA, arrayA){
-					// self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
-					// 	});
+					self.async(function(){
+					elist.forEach(function(current, indexA, arrayA){
+					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
+					});
 
 						console.log(elist, calList, "look here for the changes");
+				},50);
 				}
-				});
+			});
 		}
 		else if(propertyName == "courseMeetingSets")
 		{			
@@ -298,12 +296,17 @@ Polymer({
 						 var elist = curr.eventList;
 						 var calList= calDays[curr.cdIndex].eventList;
 						 console.log(elist, calList, "look here for the changes");
-						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], []);
-						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], elist);
-						 console.log(elist, calList, "look here for the changes");
-					console.log(curr.eventList);
-					}
-				});
+						 self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
+						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);
+
+				self.async(function(){
+					elist.forEach(function(current, indexA, arrayA){
+					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
+					});
+
+						console.log(elist, calList, "look here for the changes");
+				},100);
+			}});
 
 			
 			
@@ -326,11 +329,18 @@ Polymer({
 						 var elist = curr.eventList;
 						 var calList= calDays[curr.cdIndex].eventList;
 						 console.log(elist, calList, "look here for the changes");
-						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], []);
+				
 						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], elist);
-						 console.log(elist, calList, "look here for the changes");
-						 console.log(curr.eventList);
-						}
+						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
+						self.async(function(){self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);},100);
+
+
+					elist.forEach(function(current, indexA, arrayA){
+					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
+					});
+
+						console.log(elist, calList, "look here for the changes");
+				}
 				});
 		}
 

@@ -218,8 +218,19 @@ function TimeSlots(){
           }
           return timeArr;
          }
+function getColor(){
+	var rndmcolor= ["lightskyblue","orange", "wheat", "oldlace", "palegoldenrod", "papayawhip","peachpuff","mistyrose","red", "aliceblue", "lemonchiffon", "khaki", "lightgoldenrod", "honeydew", "thistle","lavenderblush","lavender","slategrey", "ghostwhite", "mint"];	
+						  var index= Math.ceil((Math.random())*20);
+						 
+						  return rndmcolor[index];
+			}
 
 
+function randomSixty(){
+	var r  = Math.floor((Math.random())*58);
+	console.log(r);
+	return r;
+}
 
 function dayAbbreviationsToDays(argAbbrev)
 {
@@ -278,18 +289,20 @@ class FcEvent
 	}
 
 
-
+	
 
   	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date, timestamp)
-  	{
-	    this.name = name || ""; 
-	    this.startTime = startTime || "";// console.log(this.startTime);
-	    this.endTime =  endTime || "";
+  	{ 	var myColor=getColor();
+		var rnd= randomSixty();
+
+	    this.name = name || "Open Time Slot"; 
+	    this.startTime = startTime || "7:" +  rnd + "AM";// console.log(this.startTime);
+	    this.endTime =  endTime || "8:" + rnd + "AM";
 	    this.duration= new Duration(this.startTime, this.endTime);
 	    this.location = location || "704 Ginesi Dr. Morganville, New Jersey 07754";
 	    this.coach = coach || "";
 	    this.coachFcid=coachFcid || "";
-	    this.activity = activity || "";
+	    this.activity = activity || "Focused Time";
 	    if(fcid)
 	    {
 	    	this.fcid=fcid
@@ -305,14 +318,15 @@ class FcEvent
 	    this.calendarTotalTime=calendarTotalTime || "";
 	    this.studentFcids=studentFcids || ""; 
 	    this.studentNames=studentNames || "";
-	    this.color = color || "white";
+	    this.color = myColor || color || "lightslateblue";
 	    this.isChangeNotificationNeeded = isChangeNotificationNeeded || true;
 	    this.reasonForEventModification = reasonForEventModification || "conflict or holiday";
-	    this.reasonEventNotInACalendar = reasonEventNotInACalendar || "none! All events should be in calendars!";
+	    this.reasonEventNotInACalendar = reasonEventNotInACalendar || "All events should be calendared.";
 	    this.completed = completed || false;
 	    this.date=date || "";
-	    this.timestamp=timestamp || "";
+	    this.timestamp=new Date(this.date).getTime() || "";
 	    this.isHoliday=false;
+	    this.time=this.startTime || this.endTime || "";
  		}
 
 
@@ -382,6 +396,7 @@ class FcCourse
 		this.startTime="";
 		this.endTime= "";
 		this.programLength="";
+		this.courseCalendarTemp=[];
 		//this.primaryCalendar="";
 		//this.calendarDayArray=""; 
 		this.startAndEndTimes= this.startTime + " to " + this.endTime || "";
@@ -996,7 +1011,7 @@ function getTimes(holiday, date)
         	//console.log(holiday, holiday, holiday, holiday, "LOOK HERE FOR ANSWERS");
 		var slotsArr = [];
 		var timeArr = [];
-		for(var i=9; i<=17;i++)
+		for(var i=9; i<=21;i++)
         {		
               var hour=(i<13)?i:(i-12);
               if(hour<10){hour=hour.toString();}
@@ -1010,23 +1025,20 @@ function getTimes(holiday, date)
                         };
               var string=hour.toString() + ":" + minutes+ ampm;
               if(holiday.length!==0)
-              { //console.log(holiday);
+              {
+             
+          			timeArr.push(new FcEvent(holiday[0]));
               	
               }
 
               else
               	{
               		
-              		timeArr.push({"startTime":string, "name": "", "coach":"", "location": "","activity":"null", "time":"", "endTime": "", "fcid": "", "showDate":d.toDateString(), "date":date,  "color": "white"});
+               		timeArr.push( new FcEvent({"startTime":string, "name": "fc-slot", "coach":"", "location": "","activity":"time-slot", "time":"", "endTime": "", "fcid": "", "showDate":d.toDateString(), "date":date,  "color": "lightskyblue"}));
           		}
-              if(i!==16){i=i+2;}
-              else if(i===16){i=17;}
+               if(i!==16){i=i+2;}
+               else if(i===16){i=17;}
           	}
-          if(holiday.length!==0)
-              { 
-          	timeArr.push(new FcEvent(holiday[0]));
-          }
-          
           return(timeArr);
 	}
 function IsTestDate(date)
@@ -1101,7 +1113,6 @@ function FcCalendarDay(date)
 				eventList: getTimes(holiday, date2), 
 	
 	};
-	//console.log(calendarDay)
 	return calendarDay;
   }
 
