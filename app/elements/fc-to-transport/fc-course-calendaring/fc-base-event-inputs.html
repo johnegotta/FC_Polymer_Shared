@@ -5,7 +5,8 @@
 
 	:host{
 		margin: 12px 20px;
-		height: 420px;
+		height: 400px;
+		width: 680px!important;
 			
 		}
 	.one{
@@ -13,8 +14,9 @@
 		font-weight: 600;
 		height: 30px !important;
 		padding-top: 12px;
-		min-width: 125px;
-		max-width: 137px;
+		padding-left: 4px;
+		min-width: 124px;
+		max-width: 129px;
 		border-left: solid 4px green;
 		color: #080808;
 		font-size: 12px;
@@ -32,23 +34,23 @@
 		color: brown;
 		font-weight: 600;
 		min-width: 170px;
-		max-width: 198px;
+		max-width: 188px;
 		overflow: hidden;
 		white-space: nowrap;
 			font-size: 12px;
 	}
 
 </style>
-<div class="vertical flex layout nowrap" style="height: 100%; border: 3px solid #008; width: 697px; margin: 1px 4px 1px 1px; padding: 1px;overflow-y: scroll; ">
-<section class="vertical layout nowrap center" style="height: 50px; width: 100%; text-align: center;font-size: 20px; font-weight: 600; background: #008; color: white;">
-Course Selections
+<div class="vertical flex layout nowrap" style="height: 100%; border: 3px solid #008; width: 670px!important; margin: 1px 2px 1px 2px; padding: 1px;overflow-y: scroll; ">
+<section class="vertical layout nowrap center" style="height: 50px; width: 670px; text-align: center;font-size: 20px; font-weight: 600; background: #008; color: white;">
+<span style="padding: 12px;">Course Selections</span>
 </section>
-<div class="vertical flex layout nowrap" style="height: 920px; border: 3px solid #008; width: 697px; margin: 1px 4px 1px 1px; padding: 1px; overflow: hidden;  overflow-y: scroll;">
-	<div class="horizontal flex layout wrap" style="border:3px solid #afafaf; margin: 1px 4px 1px 1px; padding: 1px; overflow: hidden;  overflow-y: scroll; width: 720px!important; width: 100%;">
+<div class="vertical flex layout nowrap" style="height: 440px; border: 3px solid #008; width: 660px!important; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll;">
+	<div class="horizontal flex layout wrap" style="border:3px solid #afafaf; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll; width: 660px!important;">
 
-	<template is="dom-repeat" id="courseValues" class="horizontal layout wrap" style="width: 329px!important;" items="{{outputOptions}}" as="option">
+	<template is="dom-repeat" id="courseValues" class="horizontal layout wrap" style="width: 322px!important;" items="{{outputOptions}}" as="option">
 	<form>
-			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; width: 160px!; font-family: merriweather; font-size: 14px; border-bottom: 2.4px solid [[alert]]; padding: 1px; overflow: hidden;">  
+			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; width: 155px!; font-family: merriweather; font-size: 14px; border-bottom: 2.4px solid [[alert]]; padding: 1px; overflow: hidden;">  
 				<span class="one">[[option.labelA]]:</span>
 				<span class="two">
 					<fc-input-prime input-type="text" name="{{option.name}}" label-hidden="true" value="{{option.value}}"></fc-input-prime> &nbsp; &nbsp;
@@ -59,7 +61,7 @@ Course Selections
 	
 	</div>
 	</div>
-<paper-button elevation="3" style="border: 3px solid #afafaf;" on-tap="confirmCalculate">CONFIRM</paper-button>
+<paper-button elevation="3" style="max-width: 670px; border: 3px solid #afafaf;" on-tap="confirmCalculate">CONFIRM</paper-button>
 </div>
 	
 			
@@ -76,8 +78,7 @@ Polymer({
 			type: Array,
 			value:"",
 			notify: true
-		},
-		
+		},	
 		valueOptions: {
 			type: Array,
 			value: [],
@@ -94,26 +95,14 @@ Polymer({
 			notify: true
 		}
 		
-		
-
-	},
-	
-	ready()
-	{	
-	
 	},
 	
 fcCourseObserver(fcCourse){
-	//console.log(fcCourse, this.valueOptions);
 	this._computeCourse(this.valueOptions, this.fcCourse);
-	 
-
-
 },
 
 _computeCourse(valueOptions, fcCourse)
 	{
-		//console.log(valueOptions);
 		var length=valueOptions.length;
 	 	 var outputArray=[];
 	 	for(i=0;i<length;i++)
@@ -135,24 +124,19 @@ _computeCourse(valueOptions, fcCourse)
 	 		outputArray.push(eventOutput);
 	
 	 	}
-this.set("outputOptions", outputArray);
-	 			//console.log(fcCourse, outputArray);
-	 	
+		this.set("outputOptions", outputArray);
 	 	return outputArray;
-
 	},
 
-
-	
 confirmCalculate(){
 	console.log(this.fcCourse);
 	
 	this.fcCourse.save();
 	
 	this.fire("catchTheCourse", {theCourse: this.fcCourse});
-	event = JSON.stringify(event);
-	//console.log(event, event.eventArray);
-	localStorage.setItem("New_Course", event); 
+	event = JSON.stringify(this.fcCourse);
+	console.log(event);
+ 		localStorage.setItem("New_Course", event); 
 },
 
 	

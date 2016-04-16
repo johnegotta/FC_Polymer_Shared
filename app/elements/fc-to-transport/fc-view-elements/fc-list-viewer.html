@@ -1,0 +1,148 @@
+<dom-module id="fc-list-viewer">
+
+<template>
+<style>
+:host{
+	min-height: 1000px;
+height: 100%;
+};
+#table{border: solid 2px #008;}
+#thead{border: solid 2px #008;}
+#tr{border: solid 2px #008;}
+#th{border: solid 2px #008;}
+</style>
+<fc-ddr-card drags="{{drags}}" is-resizing="true" class="horizontal layout flex">
+
+<button on-click="addDay">Add Day</button>
+    <button on-click="addEvent">Add Event to Monday</button>
+    <button on-click="log">Log</button>
+   <paper-tabs id="calendarTabs" scrollable="true" style="padding: 2px 0px; height: 370px; outline: 0px;" class="horizontal layout flex scroll" bar="true" hide-scroll-buttons="false">  
+	<div class="horizontal layout justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
+    <template is="dom-repeat" items="{{course.dayList}}" as="day">
+      
+     <fc-calendar-day-back>
+            <th>Name: {{day.name}}</th>
+        
+            
+          <template is="dom-repeat" sort="_sortSlots" items="{{day.eventList}}" as="event" index-as="elistIndex">
+          <fc-event-item event={{event}}>
+            <tr>
+              <td>Event: {{event.name}}</td>
+              <td>time: {{event.startTime}}</td>         
+            </tr>
+           </fc-event-item>
+          </template>
+      
+      	</fc-calendar-day-back>
+     </template>
+     </div>
+     </paper-tabs>
+
+</fc-ddr-card>
+</template>
+<script>
+var course={};
+	course.dayList = [
+    {
+     name: "Monday",
+     eventList: [{name: "Breakfast", time: "9:00AM"}, {name: "Tutoring", time: "10:00AM"}]
+    },
+    {
+      name: "Tuesday",
+      eventList: [{name: "Dentist", time: "9:00AM"}, {name: "Code Meeting", time: "10:00AM"}]
+    }
+    ];
+FcListViewer=Polymer({
+is:"fc-list-viewer",
+properties:{
+	fcCourse:{
+		type: Object, 
+		value:{},
+		notify: true
+	},
+	drags:{
+	  type: Boolean, 
+	  value: false,
+	  reflectToAttribute: true,
+	  notify: true
+
+
+	}, 
+	isResizing:{
+		type: Boolean, 
+		value: false, 
+		reflectToAttribute: true,
+		notify: true
+
+	},
+	course:{
+	 type: Object,
+	 value:{},
+	 notify: true
+	},
+    // dayList: {
+    //     type: Array,
+    //     value: ["huh"],
+    //     notify: true
+    //         },
+    categories: {
+        type: Array,
+        value: [],
+        notify: true
+            },
+},
+	 sortEntries: function (a,b) {
+            return b.num - a.num;
+        },
+
+        attached: function () {
+            console.log("Ready!");
+            this.set("course.dayList", course.dayList);
+        },
+      log: function()
+      {
+         console.log(this.dayList);
+      },
+      addDay: function()
+      {
+      	var dday={name:"Wednesday", calendarType:"coachCalendar", eventList:[{name:"timeTohaveTime", time: "1:30PM"}, {name: "stuff", time: "10:00AM"}]}
+        this.push("course.dayList",dday);
+      },
+      addEvent: function()
+      {
+        this.push(["course.dayList", 0, "eventList"], {name: "D&D", time: "9:00PM"});
+      },
+     
+      computeDays: function(argChangeRecord)
+      {
+        console.log(argChangeRecord);
+        if(argChangeRecord.path == "outer.#0.inner")
+          {
+            console.log("hooray");
+            var self = this;
+            var temp = this.outer[0].inner;
+            //this.set("outer.#0.inner", []);
+            //this.async(function(){self.set("outer.#0.inner", temp);});
+          }
+        return this.dayList;
+      },
+      	_sortSlots: function(a,b){
+			var ao = stringTime(a.time);
+			var bo= stringTime(b.time); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+		},
+
+
+});
+</script>
+</dom-module>
+
+S

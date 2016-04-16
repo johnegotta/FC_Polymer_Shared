@@ -2,13 +2,12 @@
 <style>
 :host{
 	position: relative;
-	
+		height: 425px;
 	background: white;
 	box-shadow: 4px 11px 21px 7px #9fafaf;
 		display: block;
 	width: 320px;
-	margin-left: 12px;
-	margin-top: 12px;
+	margin: 12px;
 
 
 }
@@ -55,25 +54,30 @@ width: 30px;
 					items="{{displayed}}" 
 					as="day">
 						<fc-date-mini
-							on-tap="_dateClick"
+							
 						 	class="card"
 						 	cd-index="{{day.cdIndex}}"
 						 	in-month="[[computeNotInMonths(day.date, displayedIndex)]]"
 						 	toggle-days="{{toggleDays}}"
 						 	day="{{day}}"
+						 	day-id="{{day.dayId}}"
 						 	is-practice-test-day="{{day.isPracticeTestDay}}"
 						 	is-course-meeting="{{day.isCourseMeeting}}"
 						 	selected-array="{{selectedArray}}"
 						 	style$="margin: 0px auto;" 
-						 	calendar-day={{day}} 
+						 	calendar-day={{day}}
+						 	mini-date="{{day.date}}"
+						 	index={{day.index}} 
 						 	id$={{day.dateId}} 
 						 	testDate={{day.testDate}} 
-						 	events="[[day.eventList]]"
-						 	event-list="[[day.eventList]]"
+						 	event-list="{{day.eventList}}"
 						 	fc-course="{{fcCourse}}">
 							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
-							<a class="date" >[[day.dayOfMonth]]</a>
+							<a class="date" id="button" >[[day.dayOfMonth]]</a>
 							<span class="[[computeDay(day)]]"></span>
+							<template class="date" is="dom-repeat" items="{{day.eventList}}" as="event">
+									{{event.eventType}}
+							</template>
 				
 							
 						</fc-date-mini>	
@@ -93,7 +97,7 @@ FcDatePickerProto=Polymer({
 				Polymer.NeonAnimatableBehavior
 				],
 	listeners: {"catchTheCourse": "changesTheDays"},
-	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', "observeMeetings(fcCourse.courseMeetingArray)", "observePracticeTests(fcCourse.practiceTestArray)"],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', "observeMeetings(fcCourse.courseMeetingArray)", "observePracticeTests(fcCourse.practiceTestArray.*)"],
 	properties: {
 		day:{
 			type: Object, 
@@ -114,6 +118,11 @@ FcDatePickerProto=Polymer({
 			type: Boolean,
 			value: false,
 			notify: true
+		},
+		calendarStartIndex:{
+				type: Number,
+				value:-1,
+				notify: true,
 		},
 		selectedArray:{
 			type: Array,
@@ -210,17 +219,7 @@ FcDatePickerProto=Polymer({
         }
     }
    },
-   ready: function(){
-   		var startYear =new Date().getFullYear();
-   		var endYear =startYear + 3;
-		var date=new Date(startYear, 0, 1);
-		var dateEnd =new Date(endYear, 11, 31);
-		var today = new Date();
-		this.today=today;
-		var index=today.getMonth();
- 		this.set("displayedIndex",index);
-		this.calendarCreator(date, dateEnd, "months");
-		},
+
 watchingSelectedArray: function(newVal, oldVal)
 {
  		if(this.fcCourse)
@@ -231,13 +230,38 @@ watchingSelectedArray: function(newVal, oldVal)
  			}
 },
 
-computeDay: function(day){if(day.testDate){return "pretty";}
+computeDay: function(day){if(day){return "pretty";}
  
 
 },
+computeCalendar: function(displayed, ccda){
+	if(ccda.base && ccda.base.length<95 && ccda.base[2]){
+		console.log(ccda.base, displayed)
+	 var display=displayed.map(function(day, index, array){
+	 			var ind=ccda.base.indexOf(day.displayIndex);
+	 			var retVal;
+	 		if(day.inMonth ===true && ind>-1 && ccda.base[ind].dateId==day.dateId){ retVal=ccda.base[ind];}
+	 		else{retVal=day;}
+	 		console.log(retVal, "returning from ccda");
+	 		return retVal;
+	 },this);
+	 console.log(display, "returning the mapped CCDA");
+	 return display;
+	}
+	else {return displayed;}
+},
+
 attached: function()
 {
-	
+		var startYear =new Date().getFullYear();
+   		var endYear =startYear + 3;
+		var date=new Date(startYear, 0, 1);
+		var dateEnd =new Date(endYear, 11, 31);
+		var today = new Date();
+		this.today=today;
+		var index=today.getMonth();
+		this.async(function(){this.calendarCreator(date, dateEnd, "months")});
+ 		this.set("displayedIndex",index);
 		this.async(this.initialize, 400);
 
 },
@@ -253,19 +277,20 @@ initialize:function(){
 		 	this.monthsArray.length;
 			self.push("calendarMonthsArray",array);
 		 	array.forEach(function(item, index, arr){
+
 		   		self.push("calendarDayArray", item);
 		 	});
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
 		var calendar =[];
 		calendar = this.calendarDayArray;
-		this.set("fcCourse.primaryCalendar", calendar);
+		this.set("fcCourse.courseCalendarDaysArray", calendar);
 		this.set("fcCourse.calendarDayArray", calendar);
+		this.set("fcCourse.courseCalendarDaysArray", []);
 },
 
 computeInClass: function(day, fcCourse)
 {
-//console.log(fcCourse);
 },
 computeDisplayed: function (displayedIndex)
 {
@@ -287,8 +312,8 @@ computeInEventArray: function(fcCourse, item)
 
 courseObserver: function(test,ccda)
 { 	
-	// console.log(this.displayed);
-	if(test && this.counter<5)
+
+	if(test && this.counter<3)
 	{ 	this.counter++;
 		console.log("in time")
 		console.log("in time after counter");
@@ -303,32 +328,29 @@ courseObserver: function(test,ccda)
 		this.set("displayedIndex", m);
 		var testMonth=[];
 		var b = m-1;
+		var isetter=new Date(test).getTime();
 		testMonth=this.calendarMonthsArray[m];
-		var resetMonth = this.calendarMonthsArray[b];
-		this.set("displayed", testMonth);
+		var testday=testMonth.filter(function(day, i, month){
+			return (day.dateId==isetter);
+		},this);
+		
 		this._backOne();
 		this._forward();
-		
 	}
 	
-		
-			
-	
-	},
+},
 observeMeetings:function(meetings) {
-	// console.log(meetings, "MEETINGDAYS");
 	if(meetings.length>1){
 			console.log("I am in the if MEETING DAYS");
-		this.async(function(){this._backOne();}, 2);
+		this.async(function(){this._backOne();}, 5);
 		this._forward();
 	}
 },		
 observePracticeTests: function(pta)
-{// console.log( pta, pta.length);
-		if(pta.length>1){
+{ console.log( pta, pta.base.length);
+		if(pta.base.length>0){
 			console.log("I am in the if");
-		
-		this.async(function(){this._backOne();}, 2);
+		this._backOne();
 		this._forward();
 	}
 },
@@ -368,36 +390,36 @@ _forward: function()
 		return retVal;
 		},
 
-_dateClick: function(event) {
-      var targetOne = event.target;
-      // console.log(event.model);
-      while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") 
-      {
-        targetOne = targetOne.parentNode;
-      }
-        if(targetOne.nodeName=="FC-DATE-MINI")
-         {// console.log("I am ready to fire sir");
+// _dateClick: function(event) {
+//       var targetOne = event.target;
+//       // console.log(event.model);
+//       while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") 
+//       {
+//         targetOne = targetOne.parentNode;
+//       }
+//         if(targetOne.nodeName=="FC-DATE-MINI")
+//          {// console.log("I am ready to fire sir");
         	
-       		var day=event.model.__data__.day;
-      		var elist = event.model.__data__.day.eventList;
-      		var dataObj={
-      				"day": day,
-      				"eventList": elist,
-      				"date": day.showDate,
-      				"background": day.background,
-      				"color": day.color,
-      				"displayedArray": this.displayed,
-      			};
+//        		var day=event.model.__data__.day;
+//       		var elist = event.model.__data__.day.eventList;
+//       		var dataObj={
+//       				"day": day,
+//       				"eventList": elist,
+//       				"date": day.showDate,
+//       				"background": day.background,
+//       				"color": day.color,
+//       				"displayedArray": this.displayed,
+//       			};
 
-      			// console.log(dataObj);
-      		}
-      // this.sharedElements = {
-      //   'hero': this
-    //  };
-      this.fire('on-date-click', {
-        day: dataObj
-      });
-    },
+//       			// console.log(dataObj);
+//       		}
+//       // this.sharedElements = {
+//       //   'hero': this
+//     //  };
+//       this.fire('on-date-click', {
+//         day: dataObj
+//       });
+//     },
 
 computeId: function(item){
 	var theId=item.dayStamp();//   .toString() +"_dateMini";

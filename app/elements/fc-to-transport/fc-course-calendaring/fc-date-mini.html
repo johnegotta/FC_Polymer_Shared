@@ -16,30 +16,23 @@ width: 30px;
 			</section>
 			<content select=".hwk"></content>
 			<span class="horizontal layout flex center-justified"style="margin: 2px auto 1px auto; height: 20px; width: 20px; border-radius: 180px; font-size: 15px; cursor: pointer; border: 1px solid [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]];"> <content select=".date"></content></span>
-			<span style="font-size:10px; font-weight: 600; font-style: merriweather; color: #008; height: 10px;">[[computeDayNotes(calendarDay)]]</span>  
+			<span style="font-size:10px; font-weight: 600; font-style: merriweather; color: #008; height: 10px;">[[computeDayNotes(calendarDay, eventList)]]</span>  
 		</section>
 </template>
 <script>
 Polymer({
 	is:"fc-date-mini",
 	behaviors: [FCBehaviors.FcCalendarBehaviorPrime],
-	observer:["observeBackground(calendarDay.*)"],
 	properties: {
 		day:{
 			type: FcCalendarDay,
 			value:{},
-			observer: "observeTheDays",
 			notify: true
 		},
 		eventList:{
 			type: Array,
 			value:[],
-			notify: true
-
-		},
-		inCourseCalendarDaysArray:{
-			type: Boolean,
-			computed: "computeInCourseCalendarDaysArray(calendarDay)",
+			observer: "isEvents",
 			notify: true
 		},
 		calendarDay:{
@@ -59,14 +52,12 @@ Polymer({
 		},
 		miniDate:{
 			type: Date, 
-			computed: "computeMiniDate(calendarDay)",
 			notify: true,
 		},
 		fcCourse:{
 			type: FcCourse,
 			value: function(){var retVal = new FcCourse(); return retVal;},
 			notify: true
-
 		},
 		toggleDay:{
 			type: Boolean,
@@ -81,12 +72,7 @@ Polymer({
 		}, 
 		dayId:{
 			type: Number, 
-			computed:"computeDayId(calendarDay)",
-			notify: true
-		},
-		events:{
-			type: Array,
-			observer: "isEvents",
+			value:"",
 			notify: true
 		},
 		displayedMonth:{
@@ -125,33 +111,32 @@ Polymer({
 	ready: function(){
 
 	},
-	computeInCourseCalendarDaysArray: function(calendarDay){
-		if(calendarDay.inCourseCalendar===true){return true;}
-		else {return false;}
+
+	computeDayNotes:function(calendarDay,elist){
+		var retVal;
+		if(calendarDay.isTestDate) {return calendarDay.dateText;} 
+		else{
+			elist.forEach(function(ev, ind, arr){
+				if(ev.eventType=="course meeting")
+				{
+					retVal=calendarDay.meetingText;
+				}
+				else if(ev.eventType=="practice test")
+				{
+					retVal=calendarDay.practiceTestText;
+				}
+			},this);
+			return retVal;
+			}
 	},
-	computeDayNotes:function(calendarDay){
-		var retVal=(calendarDay.isTestDate)?calendarDay.dateText: (calendarDay.isCourseMeeting)?calendarDay.meetingText: (calendarDay.isPracticeTestDay)?calendarDay.practiceTestText:"";
-		return retVal;
-	},
-	observeTheDays: function(newVal,oldVal){
 
-		if(oldVal && newVal!=oldVal)
-		{
-		//	console.log(oldVal, newVal);
-		}
-
-
-
-	},
 	computeDayId:function(calDay)
-	{	//console.log(calDay.dateId);
+	{
 		return calDay.dateId;
-
-
 	},
 	observeIsSelected: function(newVal,oldVal){
 		if(newVal===true && oldVal===false)
-		{
+		{ console.log(newVal);
 			if(!this.fcCourse.courseCalendarDaysArray)
 			{
 				this.fcCourse.courseCalendarDaysArray=[];
@@ -159,35 +144,17 @@ Polymer({
 			if(!this.calendarDay)
 			{
 				this.set("calendarDay", new FcCalendarDay());
-				this.push("fcCourse.courseCalendarDaysArray", this.calendarDay);
 			}
 		}
-		var sortedCalDays= this.fcCourse.courseCalendarDaysArray.sort(function(a,b){
-			if (a.dateId > b.dateId) {
-    		return 1;
-  			}
-  			if (a.dateId < b.dateId) {
-   	 		return -1;
-  			}
-  			if (a.dateId ===b.dateId){
-  			  return 0;
-			}
-		});
-		return sortedCalDays;
-
-
-		
 	},
 
 	computeMiniDate: function(calendarDay){
 		return calendarDay.date;
 
-
 	},
 	observeBackground: function(calendarDay){
-		//console.log(calendarDay, calendarDay.practiceTestArray, calendarDay.meetingDayArray, this.inMonth)
-
-
+		
+		console.log(calendarDay);
 	},
 
 	
@@ -207,56 +174,38 @@ Polymer({
   	},
   	isEvents: function(newVal, oldVal)
   	{
-  		var self=this;
-  		newVal.forEach(function(val, index, array){
-  				var count=self.events.length;
-  				for(var i=0;i<count; i++)
-  					{self.set("eventList."+i, val);	
-  					self.set("events."+i, val);
-  						}
-  					})		
-  		//this.set("events", this.events);
-
-
-
+  		console.log(newVal, oldVal);
+  	
   	},
 
   	toggleDays: function(e)
-  	{	
+  	{	console.log(e);
   		if(this.inMonth===true)
   		{	
   			if(!this.selectedArray)
   				{	
   					this.set("selectedArray", []);
   				}
-			this.toggleDay=!this.toggleDay;
-	  		this.isSelected = !this.isSelected;
-	 		this.set("calendarDay.toggleDay",!this.calendarDay.toggleDay);
-		  	this.set("calendarDay.isSelected", !this.calendarDay.isSelected);
-			var timestamp =new Date();
-			timestamp=timestamp.getTime();
-			var self=this;
-
-	  		if(this.calendarDay.isSelected===true)
+  			if(this.toggleDay==false)
+  			{
+					this.toggleDay=!this.toggleDay;
+			  		this.isSelected = !this.isSelected;
+			 		this.set("calendarDay.toggleDay",!this.calendarDay.toggleDay);
+				  	this.set("calendarDay.isSelected", !this.calendarDay.isSelected);
+				  	this.set("calendarDay.inCourseCalendar", !this.calendarDay.inCourseCalendar);
+					var timestamp =new Date();
+			}
+		var eList=this.calendarDay.eventList;
+		console.log(eList);
+					
+	  		if(this.calendarDay.isSelected===true || this.calendarDay.inCourseCalendar===true)
 	  			{	
 	  				this.push("selectedArray", this.calendarDay);
-	  				//console.log(this.event.courseCalendarDaysArray);
+	  				
 	  			}
-	  		else{ var newArray= this.fcCourse.courseCalendarDaysArray.filter(function(value, index, array)
-	  					{ 	var trfs=(value.date!=self.calendarDay.date);
-	  						//console.log(value.date, self.calendarDay.date, trfs);
-	  						return (value.date!=self.calendarDay.dateId);  	
-						});
-	  				this.set("selectedArray", null);
-	  				this.set("selectedArray", newArray);
-	  			}
-	  			this.set("fcCourse.courseCalendarDaysArray", null);
-	  			this.set("fcCourse.courseCalendarDaysArray",this.selectedArray);
-	  			//console.log(this.inCourseCalendarDaysArray);
-	  			this.inCourseCalendarDayArray=!this.inCourseCalendarDaysArray;
-	  			//console.log(this.inCourseCalendarDaysArray);
-
+	  		
 	  	}
+	  	
 	  		
   	},
   	computeWhite: function(inMonth, calendarDay)

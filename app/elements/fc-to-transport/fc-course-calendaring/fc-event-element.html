@@ -8,7 +8,7 @@
 	margin-top: 12px;
 	background: white;
 	position:relative;
-	height: 420px;
+	height: 440px;
 	width: 330px;
 }
 paper-item {
@@ -26,7 +26,7 @@ paper-item {
 }
 .holder{
 	width: 320px;
-	height: 360px;
+	height: 400px;
 	background: #aedefe;
 	margin-left: 2px;
 	border: gold ridge 1px;
@@ -44,17 +44,9 @@ color: white;
 	background: #03A9F4;
 font-weight: 600;
 text-align: center;
-	padding: 12px 12px 20px 12px;
-min-height: 44px;
+	padding: 12px;
+height: 60px!important;
 }
-/*paper-item{
-
-	border: 1px solid #adadad;
- --paper-item-focused: {
-      background: var(--paper-amber-500);
-      font-weight: bold;
-    };
-}*/
 .selected{background: var(--paper-amber-500);
       font-weight: bold;}
 .primary{
@@ -66,7 +58,26 @@ min-height: 44px;
 		color: grey;
 	font-weight:500;
 	font-size: 11px;
-}	
+
+}
+.headerLeft{
+height: 42px; width: 42px; color: white; float: left;
+top: 10px;
+
+}
+.headerRight{
+	height: 42px; width: 42px; color: white; float: right;
+top: 10px;
+}
+.footerclass{
+	height: 32px;
+	padding: 14px;
+	color: white;
+	background: #03A9F4;
+	font-weight: 600;
+	text-align: center;
+	font-size: 11px;
+}
 .slides{overflow: hidden; overflow-y: scroll;}
 
 .one{
@@ -74,47 +85,78 @@ min-height: 44px;
 	font-weight: 600;
 	color: #080808;
 	font-size: 14px;
+
 	white-space: nowrap;
 	display: inline-block;
 }
-.two{
-	font-family: merriweather; 
-	display: inline-block;
-	width: 95px !important;
-	overflow: hidden;
-	overflow-x: scroll;
-	white-space: nowrap;
-	font-size: 14px;
+.courseData{
+	height: 72px!important;
+
 }
 </style>
-<div class="layout vertical slides" style="margin-top: 3px; float: right;">
-<template is="dom-repeat" items="{{inputOptions}}" as="option">
-	
-	
-		<section class="holder layout vertical">
+<div class="layout vertical" style="margin-top: 3px; float: right;height: 420px!important;">
+	<section class="holder layout vertical">
+		<template 
+			is="dom-repeat" 
+			items="{{inputOptions}}" 
+			as="option"
+		>
+<!--HEADER-->
 			<section class="header-class layout horizontal">
-				<paper-icon-button on-tap="_backOneInput" icon="icons:arrow-back" style="color: white; left: 5px;padding-bottom: 8px; float: left;"></paper-icon-button>
-					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;">[[option.header]]</span>
-					<paper-icon-button on-tap="_forwardOneInput" icon="icons:arrow-forward" style="color: white; float: right;" class="headerRight"></paper-icon-button> 
+				<paper-icon-button 
+					on-tap="_backOneInput" 
+					icon="icons:arrow-back"
+					class="headerLeft"
+					>
+				</paper-icon-button>
+				<span 
+						class="flex layout horizontal nowrap center center-justified" 
+						style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;"
+				>
+					[[option.header]]
+				</span>
+				<paper-icon-button 
+						on-tap="_forwardOneInput" 
+						icon="icons:arrow-forward" 
+						class="headerRight" >
+				</paper-icon-button> 
 			</section>
-			<paper-listbox class="layout vertical scroll" style="overflow: hidden; overflow-y: scroll;">
-				<template is="dom-repeat" class="layout vertical flex scroll" style="max-height: 170px; overflow: hidden; overflow-y: scroll;" items="{{option.selectItems}}" as="value">
-						<paper-item on-tap="soSelected" class="layout horizontal courseData">
-							<paper-item-body  class="layout vertical one" value$="{{value}}" two-line>
-								<div class="primary">[[value]]</div>
-								<div class="secondary">[[option.labelA]]</div>
+<!--END HEADER-->
+			<paper-listbox 
+					class="layout vertical scroll" 
+					style="overflow: hidden; overflow-y: scroll;height: 240px!important;">
+				<template 
+						is="dom-repeat" 
+						items="{{option.selectItems}}" 
+						as="value">
+						<paper-item 
+							on-tap="soSelected" 
+							class="layout-horizontal courseData">
+							<paper-item-body  
+										class="layout vertical one" value$="{{value}}">
+									<div 
+										class="primary">
+										[[value]]
+									</div>
+									<div 
+										class="secondary">
+										[[option.labelA]]
+									</div>
 							</paper-item-body>   	
-							<paper-icon-button icon="star" on-tap="soUnSelected" value$="{{val}}" alt="favourite this!">
+							<paper-icon-button 
+									icon="star" 
+									on-tap="soUnSelected" 
+									value$="{{val}}" 
+									alt="favourite this!">
 							</paper-icon-button>
-			  			</paper-item>
+				  		</paper-item>
 					</template>
 				</paper-listbox>
-				<section  class="header-class layout horizontal">
+				<section  
+				class="footerclass layout horizontal">
 				</section>	
-			</section>
-
-
-</template>
+			</template>
+</section>
 </div>
 </template>
 <script>
@@ -150,6 +192,12 @@ Polymer({
 			notify: true,
 			reflectToAttribute: true
 		},
+		courseCalendarDaysArray:{
+			type: Array,
+			value: [],
+			notify: true
+
+		},
 		inputs: {
 			type: Array,
 			value: [],
@@ -159,13 +207,6 @@ Polymer({
 			type: Boolean, 
 			value: false,
 			notify: true
-		},
-
-		event: {
-			type: FcCourse,
-			value:function(){return new FcCourse();},
-			notify: true, 
-			reflectToAttribute: true
 		},
 
 		calendarDayArray:{
@@ -211,139 +252,72 @@ Polymer({
 	},
 
 	soSelected(e){
+		console.log(new Date().getTime());
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.value;
 		var self=this;
 		if(propertyName == "testDate")
 		{
 			this.fcCourse.setTestDate(val);
-			var cat=this.fcCourse.courseCalendarDaysArray.map(function(one, two, three)
-			{
-				console.log(one, one, one);
-				return one;
-			});
-			this.push("fcCourse.courseCalendarDaysArray", new FcCalendarDay(val));
+			 var testDay = new FcCalendarDay(val);
+			 testDay.eventList=[];
+			 testDay.eventList.push(new FcEvent({activity: "SAT Test Date",name:"SAT Test Date", startTime: "7:30AM", "endTime": "3:45PM", time: "7:30AM", duration: "8.75 Hours", coach: "Focused Coaching", "location": "Check Your Registration", color: "gold",isTestDate: true }));
+			this.set("fcCourse.courseCalendarDaysArray", []);
+			this.push("fcCourse.courseCalendarDaysArray",testDay);
 			this.fcCourse.setTestDate(val);
+			this.push("fcCourse.eventArray", testDay);
 			
-			this.push("fcCourse.eventArray", {"testDate": val});
+
+		}
+		else if(propertyName =="coach"){
+			console.log("inCoach", val);
+			this.set("fcCourse.coach", val);
+			console.log(val);
+			
+			var coachObj = new FcCoach({fullName: val});
+			this.set("fcCourse.coachObject",coachObj);
+				var cucumber = this.fcCourse.coach.split(" ");
+				var coachId=cucumber[1]+cucumber[0]+"00001";
+				this.set("fcCourse.coachId",coachId);
 
 		}
 		else if(propertyName == "programLength")
-		{
-			var pickle= this.fcCourse.setCourseLength(val);
-			console.log(pickle);
-			pickle.forEach(function(item, index, array){console.log(item); self.push("fcCourse.courseCalendarDaysArray",item);});
-			var d= new Date(this.fcCourse.testDate);
-			this.push("fcCourse.courseCalendarDaysArray", new FcCalendarDay(d));	
-			this.push("fcCourse.eventArray",{"courseCalendar":pickle});	 
+		{	var self=this;	
+			this.splice("fcCourse.courseCalendarDaysArray",0,1);
+			this.fcCourse.setCourseLength(val, self);
+			var testDay;
+			testDay=this.shift("fcCourse.eventArray");
+			this.push("fcCourse.courseCalendarDaysArray", testDay);	
+			this.push("fcCourse.eventArray",testDay);
+			 
 		}
 		else if(propertyName == "practiceTestDay")
-		{
-			var arrayEve=[];
-			arrayEve=this.fcCourse.setPracticeTestDay(val);
-				this.set("fcCourse.practiceTestArray", arrayEve);
-			this.set("fcCourse.practiceTestDay", val);
-			this.set("fcCourse.numberOfPracticeTests",this.fcCourse.practiceTestArray.length);
-			this.push("fcCourse.eventArray",{"practiceTestArray": this.fcCourse.practiceTestArray});
+		{	
 			var self=this;
-			var array=[];
-			var self = this;
-			var calDays=self.fcCourse.courseCalendarDaysArray;
-			var len = calDays.length;
-			console.log(arrayEve);
-			arrayEve.forEach(function(curr, index, array){	
-				if(curr.cdIndex!=-1){
-					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"red");
-					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,
-				"isPracticeTestDay"],true);
-					self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,
-				"inPracticeTestArray"],true);
-						 var elist = curr.eventList;
-						 console.log(curr.cdIndex, "MONKEY");
-						 var calList= calDays[curr.cdIndex].eventList;
-						 console.log(elist, calList, "look here for the changes");
-						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
-						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);
+			var practiceTestDays=[];
+			var practiceTestDayArray=[];
+			this.fcCourse.setPracticeTestDay(val, self);
+		
 
-					self.async(function(){
-					elist.forEach(function(current, indexA, arrayA){
-					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
-					});
-
-						console.log(elist, calList, "look here for the changes");
-				},50);
-				}
-			});
 		}
 		else if(propertyName == "courseMeetingSets")
 		{			
-			var eventArr= this.fcCourse.setCourseMeetingDaysAndTimes(val);
-			console.log(eventArr, "look here, right number in array?");
-			this.fcCourse[propertyName] = val;
-			this.set("fcCourse.summerMeetingDays", "Not Applicable");
 			var self=this;
-			var array=[];
-			var self = this;
-			var calDays=self.fcCourse.courseCalendarDaysArray;
-			var len = calDays.length;
-			console.log(eventArr);
-			this.set("fcCourse.courseMeetingArray", eventArr);
-			eventArr.forEach(function(curr, index, array){
-				if(curr.cdIndex!==-1){
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"#4285f4");
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isCourseMeeting"],true);
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isMeetingDay"],true);
-						 var elist = curr.eventList;
-						 var calList= calDays[curr.cdIndex].eventList;
-						 console.log(elist, calList, "look here for the changes");
-						 self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
-						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);
-
-				self.async(function(){
-					elist.forEach(function(current, indexA, arrayA){
-					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
-					});
-
-						console.log(elist, calList, "look here for the changes");
-				},100);
-			}});
-
+			var courseMeetings= this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
+			this.set("fcCourse.courseMeetingSets",val);
+			this.set("fcCourse.summerMeetingDays", "Not Applicable");
+			console.log(new Date().getTime());
 			
-			
-			}
+
+		}
 		else if(propertyName == "summerMeetingDays")
-		{	var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val);
+		{	var self=this;
+			var eventArr = this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
 			this.fcCourse[propertyName] = val;
 			this.set("fcCourse.courseMeetingSets", val);
-			this.push("fcCourse.eventArray",eventArr);			
-			var self = this;
-			var calDays=self.fcCourse.courseCalendarDaysArray;
-			var len = calDays.length;
-			this.set("fcCourse.courseMeetingArray", eventArr);
-			console.log(eventArr, "chimp");
-			eventArr.forEach(function(curr, index, array){
-				if(curr.cdIndex!==-1){
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"background"],"#4285f4");
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isCourseMeeting"],true);
-				self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"isMeetingDay"],true);
-						 var elist = curr.eventList;
-						 var calList= calDays[curr.cdIndex].eventList;
-						 console.log(elist, calList, "look here for the changes");
-				
-						 self.set(["fcCourse.courseCalendarDaysArray",curr.cdIndex,"eventList"], elist);
-						self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, null);
-						self.async(function(){self.set("fcCourse.courseCalendarDaysArray."+curr.cdIndex, curr);},100);
-
-
-					elist.forEach(function(current, indexA, arrayA){
-					self.push("fcCourse.courseCalendarDaysArray." + curr.cdIndex + ".eventList", current);
-					});
-
-						console.log(elist, calList, "look here for the changes");
-				}
-				});
+			console.log(this.fcCourse.eventArray);			
+			
 		}
-
 		else if(propertyName=="privateCoach")
 			{	this.set("fcCourse.courseType", "Private Coaching"); 
 				this.set("fcCourse.coach", val);
@@ -373,40 +347,10 @@ Polymer({
 	    var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, this.inputIndex);
 	    this.set("saveChoiceLocal",true);
 		this.set("inputIndex", indexOfNextInput);
+		console.log(new Date().getTime());
 
 	
-},
-
-getTimes: function(isHoliday, showdate)
-	{	
-		var slotsArr = [];
-		var timeArr = [];
-		for(var i=9; i<=20;i++)
-        {
-              var hour=(i<13)?i:(i-12);
-              if(hour<10){hour=hour.toString();}
-              var minutes="00";
-              if(i==12){minutes="30";}
-              if(i===15){minutes="45"}
-              var ampm=(i<12)?"AM":"PM";
-              var tobj = {"hour": hour,
-                          "minutes": minutes,
-                          "ampm": ampm, 
-                        };
-              var string=hour.toString() + ":" + minutes+ ampm;
-              if(isHoliday==true)
-              {
-              	timeArr.push({"time": "NO BOOK", "activity": "HOLIDAY!", "name": "","coach":"HOLIDAY", "location": "HOLIDAY", "startTime":"", "endTime": "", "fcid": "", "date":calendarDay.showDate, "color": "gold"});
-              }
-              else
-              	{
-              		timeArr.push({"time": string, "activity": "", "coach":"", "location": "", "startTime":"", "endTime": "", "fcid": "", "date":calendarDay.showDate, "name": ""});
-          		}
-              if(i!==16){i=i+2;}
-              else if(i===16){i=17;}
-          	}
-          return(timeArr);
-	},
+}
 
 });
 </script>

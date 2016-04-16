@@ -45,29 +45,36 @@ iron-icon .small {
 .selected{}	
 </style>
 <paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
-<template is="dom-repeat" sort="_sortSlots" id="mymeantemplate" items="{{computeDuh(eventList.*)}}" as="event">
-<div>
-	<paper-item on-tap="selectedTwo" style$="border: 1px #aeaeae solid; background:[[_computeColor(event.color)]];" class="layout horizontal scheduling" draggable=true>
-		<paper-item-body style$="background: [[_computeColor(event.color)]];" class="layout horizontal" value$="{{value}}">
-			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: [[_computeColor(event.color)]];" >
-				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="Start Time" name$="[[_computeTime(event.startTime)]]" input-type="tiny" label-hidden="true" value$="[[_computeStartTime(event.startTime)]]"></fc-input-prime>
+<div draggable="true">
+	<paper-item draggable="true" style$="border: 1px #aeaeae solid; background:{{event.color}};" class="layout horizontal scheduling" draggable="true">
+		<paper-item-body style$="background: {{event.color}};" class="layout horizontal" value$="{{value}}">
+		<!-- <content></content> -->
+			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: {{event.color}};" >
+				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="Start Time" name$="{{event.startTime}}" input-type="tiny" label-hidden="true" value$="{{event.startTime}}"></fc-input-prime>
 			</div>
-			<div class="primary layout horizontal flex-4 self-stretch" style$="background: [[color]];">
+			<div class="primary layout horizontal flex-4 self-stretch" style$="background: {{event.color}};">
 					<span class="two">
-			<fc-input-prime style="width: 183px;" input-type="text" label$="[[activity]]" name$="[[_computeName(event.name)]]" label-hidden="false" style="border: 0px white dashed;" value$="[[_computeActivity(event.activity)]]"></fc-input-prime> &nbsp; &nbsp;</span></div>
+			<fc-input-prime style="width: 183px;" input-type="text" label$="[[activity]]" name$="{{event.name)}}" label-hidden="false" style="border: 0px white dashed;" value$="{{event.name}}"></fc-input-prime> &nbsp; &nbsp;</span></div>
+			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: {{event.color}};" >
+				<fc-input-prime style="width: 60px; font-size: 10px; margin-left: -8px;" label="End Time" name$="{{event.endTime}}" input-type="tiny" label-hidden="true" value$="{{event.endTime}}"></fc-input-prime>
+			</div>
 			<div class="layout vertical" style="padding-left: 5px;">
 				<section class="buttons" on-tap="openup" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
 					</iron-icon>
+				</section>
+				<section class="buttons" hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" on-tap="deleteEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: red; background: silver;" icon="icons:add-circle-outline">
+					</iron-icon>
 			</section>
-	   		</div>
+	   		</div> 
 		</paper-item-body>   	
 	</paper-item>
-</template>
+
 			</paper-listbox>
-<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="myeventDialogue" class="dialog" style$="height: 480px; width: 440px;" exit-animation="fade-out-animation">
-		<h2>Event Card: {{calDay.date}}</h2>
-  		<paper-dialog-scrollable style$="height: 340px; overflow-y: scroll; width: 345px;">
+<paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="myeventDialogue" class="dialog" style$="height: 400px; width: 480px;" exit-animation="fade-out-animation">
+		<h2>Event Card: {{event.date}}</h2>
+  		<paper-dialog-scrollable style$="height: 300px; overflow-y: scroll; width: 325px;">
     		<fc-input-prime value={{event.name}} label="Event Name"></fc-input-prime><br>
     		<fc-input-prime value={{event.coach}} label="Coach"></fc-input-prime><br>
     		<fc-input-prime value={{event.startTime}} label="Start Time"></fc-input-prime><br>
@@ -80,13 +87,14 @@ iron-icon .small {
     		<fc-input-prime value={{event.fcid}} label="Event Id"></fc-input-prime><br>
     		<fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
     		<fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
-    		<fc-input-prime value={{color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
+    		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
     		<fc-input-prime value={{event.parentEventName}}  input-type="text" label="Parent Event Name"></fc-input-prime><br>
     		<fc-input-prime value={{event.parentEventNameFcid}}  input-type="text" label="Parent Event FCID"></fc-input-prime><br>
     		<fc-input-prime value={{event.isChangeNotificationNeeded}} label="Is Notification Of Event Change Required"></fc-input-prime><br>
     		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br>
  			</paper-dialog-scrollable>
   		<div class="buttons" style="height: 75px;">
+    			<paper-button style="float: left;" hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" on-tap="deleteEvent" dialog-dismiss>Delete Event</paper-button> 
     			<paper-button dialog-dismiss>Cancel</paper-button>
    				<paper-button dialog-confirm>Accept</paper-button>
  		 	</div>
@@ -99,14 +107,11 @@ iron-icon .small {
 FcEventItem=Polymer({
 	is:"fc-event-item", 
 	behaviors: ["FCBehaviors.FcCalendarBehaviorPrime"],
-	observer: ['calendarObserver(fcCourse.courseCalendarDaysArray.*)',
-  'eventAddedOrRemoved(event.splices)'], 
 	properties: 
 	{		
 		fcCourse:{
 			type: FcCourse,
 			value: function(){var retVal = new FcCourse(); return retVal;},
-			observer:"observeCourse",
 			notify: true
 		},
 		event:{
@@ -114,123 +119,95 @@ FcEventItem=Polymer({
 			value: function(){return new FcEvent({});},
 			notify: true,
 			observer: "lookattheEvent",
-		},
-		color:{
-			type: String, 
-			computed:"_computeColor(event.color)",
-			notify: true
-		},
-		activity: {
-			type: String, 
-			value: "_computedActivity(event.activity)",
-			notify: true
-		}, 
-		label: {
-			type: String, 
-			value: "Stringy Work",
-			notify: true
-		}, 		 		
+		},		 		
 		duration: "",
 		calendar: "", 
 		calDay: {
 			type: FcCalendarDay, 
-			observer: "observeCalendarDay",
+			notify: true
+		},
+		dragData:{
+			type: Object, 
+			value: {},
 			notify: true
 		},
 		colorTwo:{
 			type: String,
 			value: "silver",
 			notify: true
-
 		},
 		eventList:{
 			type:Array, 
+			value:[],
 			notify: true
-		},
-		eventList2:{
-			type: Array, 
-			computed: "computeEventList2(eventList, fcCourse.courseCalendarDayArray.*)",
-			notify: true
-
-
 		},
 		date: {
 			type: Date,
 			notify: true
 		},
+		days:{
+			type: Array,
+			value: [],
+			notify: true
 
-	},
-	computeDuh: function(eventList){
-			console.log(eventList);
-			this.$.mymeantemplate.render();	
-			return eventList.base;
-	},
 
- _sortSlots: function(a,b){
- 	console.log("SORTING SORTING", a, b);
-			var ao = stringTime(a.startTime);
-			var bo= stringTime(b.startTime); 
-		if (ao> bo) {
-    		return 1;
-  			}
-  		if (ao < bo) {
-   	 		return -1;
-  			}
-  		if (ao ===bo){
-  			  return 0;
-			}
 		},
+
+
+	},
+	attached: function(){
+		if(this.event){
+			var ev=this.event;
+			ev.evId=this.event.evId+1;
+	 	this.set("dragData", ev);
+
+	 	console.log(this.dragData);
+	 }
+	 	else console.log("the shit wont work"); 
+	},
+
+	
+
 
 	openup: function(){
 	this.$.myeventDialogue.opened=!this.$.myeventDialogue.opened;	
 	},
-	observeCalendarDay:function(n,v){
-		//console.log(n,v);
+	computeHideDelete: function(isHoliday, activity){
+		return (activity=="SAT Test Date" || isHoliday==true);
 	},
-	eventAddedOrRemoved: function(changeRecord){
-		console.log(changeRecord);
+	deleteEvent: function(e){
+		var targ = e.target;
+		while(targ.nodeName!="FC-EVENT-ITEM" && targ.nodeName!="BODY")
+		{
+					targ=targ.parentNode;
+		}
+		if(targ.nodeName=="FC-EVENT-ITEM")
+		{
+			var counter=0;
+			var eve=targ.event;
+			console.log(eve, event);
+			var cdi=e.target.dataHost.__data__.calDay.cdIndex;
+			var evLen = e.target.dataHost.__data__.calDay.eventList.length;
+			var eventList=e.target.dataHost.__data__.calDay.eventList;
+			this.set(["fcCourse.courseCalendarDaysArray",cdi,"eventList"], []);
+			eventList.forEach(function(ev, index, arr)
+			{
+				if(ev.evId==eve.evId && ev.startTime==eve.startTime)
+				{
+					console.log(ev, eve);
+				}
+				else
+				{ ev.evIndex=counter;
+				 this.push(["fcCourse.courseCalendarDaysArray",cdi,"eventList"], ev);
+				 counter++;
+				 }
+			}, this);
+		}
 	},
-	
-	ready: function(){},
 
-	computeEventList2: function(above, core){
-		
-
-	},
-	_computeEvents: function(eventlist){
-	
-			return eventlist.value;
-
-	},
-	
-	observeCourse: function(newVal, oldVal)
-	{
-			//console.log(newVal);
-	},
-	calendarObserver: function(calday, eventlist)
-	{
-
-	},
-	calDayObserved: function(calDay){
-			console.log(calDay, "dont know if its the stuff we want but damn well sure in the right place");
-			var sandwhich=this.event;
-				},
-	selectedTwo: function(event){
-		//console.log(event.target);
-	},
 	lookattheEvent:function(newval, oldVal){
-			console.log(newval, oldVal);
+			console.log(new Date().getTime());
 	},
-	observCourse: function(newVal, oldVal){
-		console.log(newVal);
-	},
-	_computeColor:function(event){return event;},
-_computeTime:function(event){this.set("time", event); return event;},
-_computeStartTime:function(event){this.set("startTime", event);return event;},
-_computeName:function(event){this.set("name", event); return event;},
-_computeActivity:function(event){this.set("activity", event); return event;},
-_computeLabel: function(event){this.set("label", event); return event;},
-
 
 
 });

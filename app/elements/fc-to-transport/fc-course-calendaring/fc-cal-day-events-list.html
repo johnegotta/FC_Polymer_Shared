@@ -6,17 +6,19 @@
 <paper-listbox class="layout vertical slides" style="overflow-y: scroll;">
 <template is="dom-repeat" items="{{eventList}}" as="event">			
 		<fc-event-item 
-				event="{{event}}" 
-				date="{{date}}" 
+				draggable="true"
+				on-dragstart="handleDragStart"
+				event="{{event}}"
+				event-list="{{day.eventList}}" 
+				date="[[day.date]]"
+				color-two="{{day.background}}"
+				cal-day="{{day}}"
 				fc-course="{{fcCourse}}"
-				event-list="{{dayEvents}}"
-				date-id="[[dateId]]"
+				date-id="[[day.dateId]]"
 			>
-	<content select=".buttons">
-				</content>
-
-
-		</fc-event-item>
+			<content select=".buttons">
+			</content>
+			</fc-event-item>
 </template>				
 </paper-listbox>
 </template>
@@ -24,41 +26,36 @@
 FcCalDayEventsList=Polymer({
 is: "fc-cal-day-events-list",
 properties: {
+		fcCourse:{
+			type: FcCourse,
+			value: function(){return new FcCourse({});},
+			notify: true
+		},
 		eventList: {
 			type: Array,
 			value: [],
 			notify: true
 		},
-		dayEvents:{
-			type: Array,
-			observer: "observeEventList",
-			value: [],
-			notify: true
-		},
+		
 		date: {
 			type: Date,
 			notify: true,
 		},
+		day:{
+			type: FcCalendarDay,
+			value: function(){return new FcCalendarDay({});},
+			notify: true
+		},
 		dateId: {
 			type: Number, 
 			notify: true
-		}, 
-
-
-},
-
-_computeDayEvents:function (dateId, eventList){
-	console.log(eventList, dateId);
-return eventList;
+		} 
 
 },
-observeEventList: function(newv, oldv){
-	console.log(newv, oldv);
-}, 
-computeItems:function(eventlist){
-	console.log(eventlist);
-	return eventlist.base;
-}
+// observeEventList: function(newv, oldv){
+// 	console.log(newv, oldv);
+// }, 
+
 
 
 });
