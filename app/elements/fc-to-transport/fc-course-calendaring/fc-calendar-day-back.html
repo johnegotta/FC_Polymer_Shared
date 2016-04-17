@@ -6,7 +6,7 @@
 	color: #008;
 	font-weight:600;
 	font-size: 13.5px;
-	width: 197px;
+	width: 167px;
 	
 }
 .secondary{
@@ -52,24 +52,29 @@ iron-icon .small {
       on-click="_onClearButtonClick"
       hidden$="{{!isSingle}}">
 </div>
-<template is="dom-repeat" initial-count="7" class="horizontal layout flex" items="{{fcCourse.courseCalendarDaysArray}}" as="day">
-	<div class="vertical layout" id="swipable" style="margin: 3px; border: silver 2px solid; height: 380px; width:320px!important;">
-			<section class="header-class layout horizontal" style="height: 44px!important; font-size:18px; background: [[_computeHeaderBackGround(day.*)]]; padding-top: 6px; text-align: center; font-family: merriweather;">
-					 <section class="buttons flex-1" style="border-radius:180px;">
-					<!-- <iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: red;"icon="icons:remove-circle">
-						</iron-icon> -->
-					</section>
+<!-- <template is="dom-repeat" initial-count="7" class="horizontal layout flex" items="{{fcCourse.courseCalendarDaysArray}}" as="day"> -->
+	<div class="vertical layout" id="swipable" style="margin: 3px; border: silver 2px solid; height: {{backHeight}}; width:{{backWidth}};">
+			<section class="header-class layout horizontal" style="height: 44px!important; font-size:18px; background: [[_computeHeaderBackGround(calDay.*)]]; padding-top: 6px; text-align: center; font-family: merriweather;">
+					
 					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 6px;">
-					[[day.showDate]]
+					[[calDay.showDate]]
 					
 					 </section>
+				<div class="vertical layout flex nowrap">
 					 <section class="buttons flex-1" on-tap="addEvent" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
 						</iron-icon>
 					</section>
+					 <section class="buttons flex-1" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: red;"icon="icons:remove-circle">
+						</iron-icon>
+					</section>
+				</div>
 			</section>
-<div  on-dragover="allowDrop" style="height: 320px; width: 320px;" on-drop="handleDrop"><content></content>
-<template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
+		<paper-list-box style="min-height: 240px; overflow-y: scroll;">
+<div  on-dragover="allowDrop" style="max-height: 320px; max-width: 320px; overflow-y: scroll;" on-drop="handleDrop">
+<content></content>
+<!-- <template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
 	
 			<fc-event-item 
 				drag-data="{{dragData}}"
@@ -79,16 +84,18 @@ iron-icon .small {
 				fc-course="{{fcCourse}}"
 				event-list="{{day.eventList}}" 
 				date="[[day.date]]"
+				back-width={{backWidth}}
 				cal-day="{{day}}"
 				date-id="[[day.dateId]]"
 			>
 			<content select=".buttons">
 			</content>
 			</fc-event-item>
-	</template>
+	</template> -->
 		</div>
+		</paper-list-box>
 </div>
-</template>
+<!-- </template> -->
 </div>
 </template>
 <script>
@@ -113,6 +120,16 @@ FcCalendarDayBack=Polymer({
 		isSingle:{
 			type: Boolean,
 			value: false,
+			notify: true
+		},
+		backHeight: {
+			type: String, 
+			value: "380px",
+			notify: true
+		},
+		backWidth:{
+			type: String,
+			value: "320px",
 			notify: true
 		},
 	
@@ -300,8 +317,12 @@ FcCalendarDayBack=Polymer({
 
 	},
 
-	observeCalDays: function(newv, oldv){console.log(newv, oldv);}, 
-	observeCalDay: function(newv, oldv){console.log(newv, oldv);}, 
+	observeCalDays: function(newv, oldv){
+	//	console.log(newv, oldv);
+	}, 
+	observeCalDay: function(newv, oldv){
+		// console.log(newv, oldv);
+	}, 
 	courseObserver: function(changeRecord){
 		if(changeRecord){ if(changeRecord.base){
 						changeRecord.base.forEach(function(ind, index, array) {

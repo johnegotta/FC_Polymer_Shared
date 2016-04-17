@@ -5,6 +5,50 @@
 background: white;
 padding: 0px 3px 4px 8px;
 opacity: 1;}
+.primary{
+	color: #008;
+	font-weight:600;
+	font-size: 15.5px;
+}
+.secondary{
+		color: brown;
+	font-weight:500;
+	font-size: 11px;
+
+}
+.headerLeft{
+height: 42px; width: 42px; color: white; float: left;
+top: 10px;
+
+}
+.headerRight{
+	height: 42px; width: 42px; color: white; float: right;
+top: 10px;
+}
+.footerclass{
+	height: 32px;
+	padding: 14px;
+	color: white;
+	background: #03A9F4;
+	font-weight: 600;
+	text-align: center;
+	font-size: 11px;
+}
+.slides{overflow: hidden; overflow-y: scroll;}
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
+.courseData{
+	height: 72px!important;
+
+}
 .calendarItem{height: 380px!important;}
 .fbutton{text-align: center; width: 99.6%;border: #afafaf 1px solid; border-radius: 3px; z-index: 7; box-shadow: 3px 7px 11px 4px #efefef; padding: 5px 0px; cursor: pointer;}
 .fbutton:active{
@@ -16,21 +60,31 @@ opacity: 1;}
  background-color: #5DD7FC;
  width: 98.6%
 }
+.courseItem{
+	border: silver 2 solid;
+	font-size: 16px;
+	color: black;
+
+}
+
 </style>		
-<fc-ddr-card drags="true" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 1000px!important;">
+<fc-ddr-card drags="true" id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 1000px!important;" current-width="{{computedWidth}}" current-height="{{computedHeight}}">
 	<div class="horizontal layout flex nowrap">
-<section class="vertical layout flex-5">
-
-
- <div class="flex layout horizontal center-justified">
- 			<array-selector id="arrselector" items="{{fcCourseObject.eventArray}}" selected="{{selected}}" multi toggle></array-selector>
+		<section class="vertical layout flex-5">
+ 		<div class="flex layout horizontal center-justified">
+ 			<array-selector 
+ 					id="arrselector" 
+ 					items="{{fcCourseObject.eventArray}}" selected="{{selected}}" 
+ 					multi 
+ 					toggle>
+ 			</array-selector>
 			<neon-animated-pages 
 				class="layout vertical flex-3" 
 				id="pages" 
 				style="width: 320px; 
 				height:400px;" 
-				selected="1">
-		
+				selected="1"
+			>
 				<fc-calendar-day-back
 					id="dayBack"
 					is-single="true"
@@ -39,8 +93,9 @@ opacity: 1;}
 					cal-day="{{hook}}"
 					event-list="{{hook.eventList}}"
 					course-calendar-days="{{fcCourseObject.courseCalendarDaysArray}}" 
-					fc-course={{fcCourseObject}}>
-						</fc-calendar-day-back>
+					fc-course={{fcCourseObject}}
+				>
+				</fc-calendar-day-back>
 				<fc-date-picker-proto 
 					displayed-month="{{displayedMonth}}" 
 					on-tap="_dateSelected" 
@@ -72,34 +127,151 @@ opacity: 1;}
  				</fc-event-element>
  			</div>
  		</div>
- 		<paper-tabs id="calendarTabs" scrollable="true" style="padding: 2px 0px; height: 400px; outline: 0px; overflow: hidden; overflow-x: scroll;" class="horizontal layout" bar="true" hide-scroll-buttons="false">  
-			<div class="horizontal layout justified" style="width: 100%; margin: 20px; overflow-x: scroll;">
-					
-						<fc-calendar-day-back course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}" fc-course={{fcCourseObject}}>
-						</fc-calendar-day-back>
+ 		<div id="widthBasis" class="layout horizontal flex" style="margin-top: 8px; padding: 10px;">
+ 		<fc-input-prime 
+ 				value="{{displayType}}"
+ 				input-type="select"
+ 				selected-value="{{displayType}}" 
+ 				is-repeater-select="true" 
+ 				select-items="{{displayOptionArray}}" 
+ 				label="Calendar Day View"
+ 				style="max-width: 520px; color: #008;">
+ 		</fc-input-prime>
+ 		W: {{computedWidth}} H: {{computedHeight}}
+ 		</div>
+ 		<paper-tabs 
+ 			id="calendarTabs" 
+ 			scrollable="true" 
+ 			style="padding: 2px 0px; height: 400px; outline: 0px; overflow: hidden; overflow-x: scroll;" 
+ 			class="horizontal layout" 
+ 			bar="true" 
+ 			hide-scroll-buttons="false">  
+			<div 
+				class="horizontal layout justified" 
+				style="width: 100%; margin: 9px; overflow-x: scroll;">
+			<template is="dom-repeat" initial-count="7" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}" as="day">		
+				<fc-calendar-day-back 
+						back-width="{{backWidth}}"
+						back-height="{{}}"
+						course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}" 
+						fc-course={{fcCourseObject}}
+						cal-day="{{day}}"
+						>
+	<template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
+			<fc-event-item 
+				draggable="true"
+				on-dragstart="handleDragStart"
+				event="{{event}}"
+				fc-course="{{fcCourseObject}}"
+				event-list="{{day.eventList}}" 
+				date="[[day.date]]"
+				back-width={{backWidth}}
+				cal-day="{{day}}"
+				date-id="[[day.dateId]]"
+			>
+			<content select=".buttons">
+			</content>
+			</fc-event-item>
+	</template>
+				</fc-calendar-day-back>
+				</template>
 			</div>
 		 </paper-tabs> 
 	</section>
-	<section class="vertical layout flex-1">
-	<div style="height: 810px; width: 100%; width: 280px; margin: 4px; border: 6px silver ridge;">
-	</div>
-	<!-- <fc-list-viewer fc-course="{{fcCourseObject}}" days-array="{{fcCourseObject.courseCalendarDaysArray}}" drags="false" is-resizing="true" class="vertcal layout flex">
-	</fc-list-viewer> -->
-	</section>
-	</div>
-</fc-ddr-card>
+	<section 
+			class="vertical layout flex-1" 
+			style="overflow-y: scroll;"
+			>
+	<paper-button style="background: silver; color: #008; font-weight: 700; border: 1px solid #008;" on-tap="clearCalendar"> Clear Current Calendar</paper-button>
+	<div style="max-height: 900px; min-height: 800px; width: 100%; width: 280px; margin: 4px 14px 4px 2px; border: 6px silver ridge; overflow-y: scroll;">
+	<paper-list-box style="overflow-y: scroll;">
+			<template 
+				is="dom-repeat" 
+				items="{{courses}}" 
+				as="course"
+			>
+				<paper-item 
+					on-tap="setCourse" 
+					class="layout-horizontal courseItem"
+					style="border: silver 1px solid;"
+				>
+					<paper-item-body  
+						class="layout vertical one"
+					>
+						<div 
+							class="primary">
+							{{course.coach}} {{course.fcid}}
+						</div>
+						<div 
+							class="secondary">
+							[[course.courseMeetingSets]], {{course.numberOfMeetings}} Classes<br>
+							Test:{{course.testDate}}, {{course.programLength}}, {{course.price}}
+						</div>
+					</paper-item-body>   	
+					<paper-icon-button 
+							icon="star" 
+							style="color: {{course.coachObject.color}}"
+							alt="favourite this!">
+					</paper-icon-button>
+		  		</paper-item>
+			</template>
+	</paper-list-box>
+
+ 		</div>
+	<paper-button style="max-width: 420px; border: 1px silver solid; background: red; color: white; font-weight: 700;" on-tap="deleteCalendar">Delete Current Calendar</paper-button>
 	
+	</section>
+</div>
+</fc-ddr-card>	
 </template>
 <script>
 FcCalendarDialog= Polymer({
 	is:"fc-calendar-dialog",
-	behaviors:["FCBehaviors.FcCalendarBehaviorPrime"
+	behaviors:[
+			"FCBehaviors.FcCalendarBehaviorPrime",
+			"Polymer.IronResizableBehavior"
 		 // "Polymer.PaperDialogBehavior"
 		  ],
 	observers:[],
 	properties:{
 		fcCourseObject:{
 			type: FcCourse,
+			notify: true
+		},
+		computedWidth: {
+			type: String, 
+			notify: true,
+		},
+		computedHeight: {
+			type: String, 
+			notify: true
+		},
+		displayOptionArray:{
+			type: Array,
+			value: function(){
+				return [
+						"All Days That Fit Horizontal Scroll",
+						"All Days That Fit Vertical Scroll", 
+						"Two Weeks At A Time",
+						"One Week At A Time",
+						"A Four Day Schedule",
+						"One Day At A Time"];
+			},
+			notify: true
+		},
+		displayType: {
+			type: String,
+			value: "All Days That Fit Horizontal Scroll",
+			notify: true
+		},
+		backWidth:{
+			type: String, 
+			computed: "_computeBackWidth(displayType, computedWidth)",
+			notify: true
+		},
+		backHeight: {
+			type: String,
+			computed: "_computeBackHeight(displayType)",
 			notify: true
 		},
 		counter: {
@@ -137,6 +309,11 @@ FcCalendarDialog= Polymer({
 			type: Array,
 			value: [],
 			notify: true
+		}, 
+		courses: {
+			type: Array, 
+			value: [],
+			notify: true
 		}
 
 	
@@ -151,6 +328,62 @@ FcCalendarDialog= Polymer({
 			 self.push("valueOptions",item);
 		 });
 	},
+	_sortSlots: function(a,b){
+			var ao = stringTime(a.startTime);
+			var bo= stringTime(b.startTime); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+		},
+	_computeBackWidth: function(displayType, computedWidth)
+	{
+		
+		if(displayType=="One Week At A Time"){
+			var width = Math.floor((5*parseInt(computedWidth))/45);
+			console.log(width);
+			return width.toString()+"px";
+		}
+		"A Four Day Schedule",
+		"One Day At A Time"
+
+	},
+	_computeBackHeight: function(displayType)
+	{
+
+	},
+	clearCalendar: function(){
+		var	cda=[];
+		var course={};
+		
+		course= new FcCourse();
+		course.calendarDayArray=this.fcCourseObject.calendarDayArray;
+		console.log(this.fcCourseObject.calendarDayArray);
+
+		this.set("fcCourseObject",course);
+		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
+		console.log(this.fcCourseObject.calendarDayArray);
+	},
+
+	setCourse: function(e){
+		console.log(e);
+			this.set("fcCourseObject",e.model.course);
+	},
+	deleteCalendar: function(){
+		var fcid=this.fcCourseObject.fcid;
+		var partRef=FcCourse.getFirebaseLocation();
+		var firebase=partRef+"/"+fcid;
+		var deleteRef=new Firebase(firebase);
+		deleteRef.remove();
+		this.set("fcCourseObject", new FcCourse({}));
+
+
+	}, 
 	
 	createCalendar: function(){
 		var sortedCalDays= this.fcCourseObject.courseCalendarDaysArray.sort(function(a,b){
@@ -177,6 +410,8 @@ attached: function()
 		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
 		this.set("outputs", outputs);
 		console.log(this.fcCourseObject.courseCalendarDaysArray);
+		this.getFireBaseCourses();
+		console.log(this.courses);
 	},
 
 
@@ -266,7 +501,24 @@ _dateSelected: function(event) {
 	{
 	return displayedMonth[15].date.getFullYear();
 	}
-} 
+},
+
+ getFireBaseCourses: function(){
+ 		var self=this;
+ 		var ref = new Firebase(FcCourse.getFirebaseLocation());
+
+ 		ref.on("child_added", function(snapshot, prevChildKey) {
+  				var course = snapshot.val();
+  				if(snapshot.key()!="counter")
+  				{
+  					self.push("courses", course);
+  				}
+  			});
+
+
+ },
+
+
 });
 </script>
 </dom-module>

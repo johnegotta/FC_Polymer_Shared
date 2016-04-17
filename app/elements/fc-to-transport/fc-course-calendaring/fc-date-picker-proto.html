@@ -51,7 +51,7 @@ width: 30px;
 				<template 
 					is="dom-repeat" 
 					class="horizontal layout wrap" 
-					items="{{displayed}}" 
+					items="{{computeCalendar(displayed, fcCourse.courseCalendarDaysArray.*)}}" 
 					as="day">
 						<fc-date-mini
 							
@@ -340,24 +340,22 @@ courseObserver: function(test,ccda)
 	
 },
 observeMeetings:function(meetings) {
-	if(meetings.length>1){
+	if(meetings){if(meetings.length>1){
 			console.log("I am in the if MEETING DAYS");
-		this.async(function(){this._backOne();}, 5);
-		this._forward();
+		
 	}
+}
 },		
 observePracticeTests: function(pta)
-{ console.log( pta, pta.base.length);
-		if(pta.base.length>0){
-			console.log("I am in the if");
+{ 
 		this._backOne();
 		this._forward();
-	}
 },
 	
 
 _forward: function()
-	{	if(this.displayedIndex ==this.maxIndex)
+	{if(this.displayedIndex && this.calendarMonthsArray){
+		if(this.displayedIndex ==this.maxIndex)
  		{
  			this.set("forwardHidden",true);
  		}
@@ -367,9 +365,11 @@ _forward: function()
     		this.set("displayedIndex", this.displayedIndex+1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
     	}
+    }
     },
  _backOne: function()
- 	{	if(this.displayedIndex ===0)
+ 	{	if(this.displayedIndex && this.calendarMonthsArray){
+ 		if(this.displayedIndex ===0)
  		{
  			this.set("backHidden",true);
  		}
@@ -379,6 +379,7 @@ _forward: function()
     		this.set("displayedIndex", this.displayedIndex-1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
  		}
+ 	}
     },
   
   computeYear:function(displayed)
@@ -390,36 +391,6 @@ _forward: function()
 		return retVal;
 		},
 
-// _dateClick: function(event) {
-//       var targetOne = event.target;
-//       // console.log(event.model);
-//       while (targetOne.nodeName!=="FC-DATE-MINI" && targetOne.nodeName!=="BODY") 
-//       {
-//         targetOne = targetOne.parentNode;
-//       }
-//         if(targetOne.nodeName=="FC-DATE-MINI")
-//          {// console.log("I am ready to fire sir");
-        	
-//        		var day=event.model.__data__.day;
-//       		var elist = event.model.__data__.day.eventList;
-//       		var dataObj={
-//       				"day": day,
-//       				"eventList": elist,
-//       				"date": day.showDate,
-//       				"background": day.background,
-//       				"color": day.color,
-//       				"displayedArray": this.displayed,
-//       			};
-
-//       			// console.log(dataObj);
-//       		}
-//       // this.sharedElements = {
-//       //   'hero': this
-//     //  };
-//       this.fire('on-date-click', {
-//         day: dataObj
-//       });
-//     },
 
 computeId: function(item){
 	var theId=item.dayStamp();//   .toString() +"_dateMini";

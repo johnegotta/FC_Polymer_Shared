@@ -414,7 +414,8 @@ class FcCourse
 {
 
 	constructor()
-	{	this.starterDay=0;
+{	
+		this.starterDay=0;
 		this.isPrivateSchedule=false;
 		this.privateCoachingHours="";
 		this.scheduleType="",
@@ -426,7 +427,7 @@ class FcCourse
 		this.programLength="";
 		this.courseCalendarTempArray=[];
 		//this.primaryCalendar="";
-		this.calendarDayArray=""; 
+		this.calendarDayArray=  []; 
 		this.startAndEndTimes= this.startTime + " to " + this.endTime || "";
 		this.courseMeetingDays="";
 		this.summerMeetingDays="";
@@ -686,7 +687,8 @@ static getEndTimeForPrivateSession()
 }
 
 static getMoreInputs()
-{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getCoaches(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(),FcCourse.getPrice(),FcCourse.getConfirmAndSetCourse(), FcCourse.getCourseMeetingDays(),FcCourse.getCourseTimes(),FcCourse.getSummerCourseSchedules(),FcCourse.getCustomEventType(),FcCourse.getPrivateCoach(), FcCourse.getPrivateCoachingPackageHours(), FcCourse.getStudentsForPrivatePackage(), FcCourse.getEndTimeForPrivateSession(), FcCourse.getCongradulations()];}
+{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getCoaches(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(),FcCourse.getPrice(),FcCourse.getConfirmAndSetCourse(), FcCourse.getCourseMeetingDays(),FcCourse.getCourseTimes(),FcCourse.getSummerCourseSchedules(),FcCourse.getCustomEventType(),FcCourse.getPrivateCoach(), FcCourse.getPrivateCoachingPackageHours(), FcCourse.getStudentsForPrivatePackage(), FcCourse.getEndTimeForPrivateSession(), FcCourse.getCongradulations()];
+}
 
 setCourseCreatorNextInput(propertyName, val, inputIndex)
 	{	var indexOfNextInput=inputIndex+1;
@@ -751,18 +753,22 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		var startDate = endDate.addDays(-(daysOfProgram)+1);
 		this.startDate = new Date(startDate);
 		var counter=0;
+		var color=this.coachObject.color;
 		var datesArray=getDates(startDate, endDate);
-
-		var daysIwant=this.calendarDayArray.filter(function(day, index, arr){
-				return (day.date>=this.startDate && day.date<=this.endDate && day.inMonth===true);
+			console.log(self.fcCourse.calendarDayArray);
+		var daysIwant=self.fcCourse.calendarDayArray.filter(function(day, index, arr){
+					let date=new Date(day.date);
+				return (date>=this.startDate && date<=this.endDate && day.inMonth===true);
 		}, this).map(function(curr,index, array){
-					curr.showDate=new Date(curr.date).toDateString();
+					let date =new Date(curr.date);
+					curr.date=date;
+					curr.showDate=new Date(date).toDateString();
 					curr.cdIndex=index;
 					curr.inCourseCalendarDayArray=true;
 					curr.inCourseCalendar=true;
 					curr.isSelected = true; 
 					curr.toggleDay = true;
-					curr.background= "#aedefe";
+					//curr.background= "#aedefe";
 					curr.isMeetingDay=false;
 					curr.isPracticeTestDay=false;
 					counter ++;
@@ -770,8 +776,9 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 
 		});
 		self.set("fcCourse.courseCalendarDaysArray",daysIwant);
-
+			console.log(daysIwant);
 		return daysIwant;
+
 	}
 
 	setEvent(argEventObject)
@@ -786,6 +793,8 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 			else if(day=="a"){testVal=6;}
 			var weekendDay= argDay.split(" ");
 			var theDay=weekendDay[0];
+			var val=this.courseCalendarDaysArray.length-1;
+			this.courseCalendarDaysArray[val].cdIndex=val;
 		var markedCalendarDayArray= this.courseCalendarDaysArray.map(function(currentValue, index, array){
 			var ted=new Date(currentValue.date).getDay();
 			if(ted===testVal && currentValue.dateId !=new Date(this.testDate).getTime()){
@@ -794,7 +803,6 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 				currentValue.inPracticeTestArray=true;
 				var norman= new FcEvent({
 						activity: "Practice Test: 00001",
-						evIndex: currentValue.eventList.length || 0,
 						name: "Practice Test: 00001",
 						coach:  this.coach,
 						date: currentValue.date,
@@ -842,7 +850,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		this.startTime=times[0].replace(" ", "");
 		this.endTime=times[1];
 		this.startAndEndTimes = this.startTime + " to " + this.endTime;
-		var retVal=this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime, this.coach, this.activity, self);
+		this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime, this.coach, this.activity, self);
 	 	console.log(new Date().getTime());
 	}
 
@@ -859,17 +867,19 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 				var element=(item=="Sunday")?0:(item=="Monday")?1:(item=="Tuesday")?2:(item=="Wednesday")?3:(item=="Thursday")?4:(item=="Friday")?5:(item=="Saturday")?6: "";
 				return element;
 			});
+		console.log(new Date().getTime());
 		var name = this.coach + "Course";
 				name = name.replace(" ", "");
 				var cucumber = this.coach.split(" ");
 				var coachId=cucumber[1]+cucumber[0]+"00001";
 				var duration = durationTime(this.startTime, this.endTime) || "";
 
-				
+				var color=this.coachObject.color;
+				console.log(new Date().getTime());
 		this.courseCalendarDaysArray.forEach(function(day, index, array){	 var tester = new Date(day.date).getDay();
 			if(newArray.indexOf(tester)>=0)
 			{
-				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"background"],"#4285f4");
+				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"background"],color);
 				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"isCourseMeeting"],true);
 				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"isMeetingDay"],true);
 				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"coach"], this.coach);
@@ -889,31 +899,31 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 							parentEventFcid:"", 
 							studentFcids:[], 
 							studentNames: [], 
-							color: this.coachObject.color, 
+							color: color, 
 							isChangeNotificationNeeded: true,
 							reasonForEventModification: "", 
 							reasonEventNotInACalendar: "In Calendar", 
 							completed: false,
 							room:"Room 1 of 3",
-							// date: day.date,
-							// dateId: day.dateId || "",
+							date: day.date,
+							dateId: day.dateId || "",
 							isHoliday: false,
-							eventType:"course meeting"
+							eventType:"course meeting",
 											});
 				var eventId=stringTimeToDateTime(this.startTime, day.date);
-					event.date=day.date;
-					event.dateId=day.dateId || "";
 					event.evId=eventId;
-					event.evIndex = day.eventList.length || 0,
+
 				 self.push(["fcCourse.courseCalendarDaysArray",day.cdIndex,"eventList"],event);
 				 self.push("fcCourse.courseMeetingArray", day);
 					if(index==0){
 						self.set("fcCourse.courseMeetingEvent", event);
 					}
+					console.log(new Date().getTime());
 			
 		}
 
 		}, this);
+		console.log(new Date().getTime());
 		}
 
 	setCoach(argCoach, argColor)
@@ -947,6 +957,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
             						}
         				});
 		}
+		else{}
 	}
 
 };
@@ -1017,7 +1028,6 @@ function generateHolidayEventsIndependant(startDate, endDate)
 
 function getTimes(holiday, date)
 	{	var d = new Date(date);
-        	//console.log(holiday, holiday, holiday, holiday, "LOOK HERE FOR ANSWERS");
 		var slotsArr = [];
 		var timeArr = [];
 		for(var i=0; i<1;i++)
