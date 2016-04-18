@@ -4,9 +4,9 @@
  :host{
           margin: 7px 8px 8px 8px;
           min-width: 42px;
-          max-width: 1780px;
+          max-width: 1880px;
           min-height: 64px;
-          max-height: 1300px;
+          max-height: 1900px;
           position: absolute;
           background: white;
           padding: 8px;
@@ -14,9 +14,8 @@
         }
      paper-header-panel {
     
-        max-width: 1780px;
+        max-width: 1850px;
         min-width: 98%;
-        max-height: 1280px;
         min-height: 52px;
         margin: 4px;
          position: relative; 
@@ -80,9 +79,9 @@
 		
 </style>
 
-
+  
 <!-- on-track="_focusedDraggable" -->
-  <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" id$="{{relId}}" class$="[[headClass]] [[verticalClass]] layout flex around-justified">
+  <paper-header-panel id="myPanel" drags="true" style$="height: [[currentHeight]]; width: [[currentWidth]];" class$="[[headClass]] [[verticalClass]] layout flex around-justified">
   <div class="paper-header layout horizontal center-justified"  on-track="_focusedDraggable" style$="text-align: center; height: [[computeHeadHeight(isMini, isPage, isColumn, isCard, isCounter, isPicker)]]">
   <iron-icon 
             icon="icons:highlight-off" 
@@ -120,9 +119,9 @@
            	
 		</div>
 
-      <span on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 8px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></span>  
+    
  </paper-header-panel>    
-       
+      <section on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: 0px; right: 0px; height: 8px; width: 100%; max-width: 1850px; padding: 4px; border: 2px white solid; border-radius:180px; background: aqua;"></section>     
 </template>
     <script>
     
@@ -141,6 +140,11 @@ FcDdrCard=Polymer({
       reflectToAttribute: true,
       notify: true
     },
+    focusedPlanner: {
+      type: Boolean, 
+      value: false,
+      notify: true
+    },
     headClass:{
       type: String,
       value: "blue",
@@ -157,11 +161,6 @@ FcDdrCard=Polymer({
       notify: true,
       reflectToAttribute: true
     },
-    // isDateCard:{
-    //   type: Boolean,
-    //   computed: "computeSize(headClass, widthCounter)",
-    //   notify: true
-    // },
     attachContent: {
       type: Array,
       value: [],
@@ -230,7 +229,6 @@ FcDdrCard=Polymer({
       },
       currentHeight: {
           type: String, 
-     	    value:function(){ return "100%";},
           notify: true, 
           reflectToAttribute: true
       },
@@ -263,7 +261,8 @@ FcDdrCard=Polymer({
 
     },
     ready: function(){
-      
+      this._computeCurrentHeight();
+      this.startWidth();
     },
      attached: function(){
    
@@ -284,7 +283,16 @@ FcDdrCard=Polymer({
     },
    
      startWidth: function(){
-          
+      var target=this;
+      var oneW=target.getBoundingClientRect().width;
+     var sWidth =window.getComputedStyle(this, null).getPropertyValue("width");
+         console.log(sWidth,"window inner", window.innerWidth, "hhoooooj", oneW);
+         if(this.focusedPlanner){
+          var widthN=(Math.floor(.85*window.innerWidth)<1900)?(Math.floor(.85*window.innerWidth)).toString()+"px":"1850px";
+          this.set("currentWidth", widthN);
+         } 
+         
+      
          
         },
      startHeight: function(){
@@ -296,11 +304,13 @@ FcDdrCard=Polymer({
       // this.notifyResize();
     },
    
-    _computeCurrentHeight: function(drags){
-    	var ht="450px";
-    	if(currentHeight==undefined) {return ht;}
-    	else{ this._resize(e);
-    	}
+    _computeCurrentHeight: function(){
+    	var ht=window.screen.height;
+      ht=.88*(ht);
+      ht=ht.toString()+"px";
+    	if(this.currentHeight==undefined) {this.set("currentHeight", ht);}
+    	
+    	
     },
     _computeId: function(theId, day){
     	//console.log(theId, day, day, day, day, theId);
@@ -375,6 +385,7 @@ FcDdrCard=Polymer({
   	// console.log("we tried to drag");
   	 if(this.drags==true){
       Polymer.dom(this).setAttribute("style.position", "fixed");
+        
         var self=this;
         e.preventDefault();
         //console.log(e, e.detail);

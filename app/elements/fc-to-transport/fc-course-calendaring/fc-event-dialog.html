@@ -1,7 +1,5 @@
-<dom- module id="fc-event-dialog">
+<dom-module id="fc-event-dialog">
 <template>
-<style>
-</style>
 <paper-dialog entry-animation="scale-up-animation" no-cancel-on-outside-click id="myeventDialogue" class="dialog" style$="height: 400px; width: 480px;" exit-animation="fade-out-animation">
 		<h2>Event Card: {{event.date}}</h2>
   		<paper-dialog-scrollable style$="height: 300px; overflow-y: scroll; width: 325px;">
@@ -15,6 +13,7 @@
     		<fc-input-prime value={{event.totalTime}} label="Hours in Package or Course"></fc-input-prime><br>
     		<fc-input-prime value={{event.coachFcid}} label="Coach's Id"></fc-input-prime><br>
     		<fc-input-prime value={{event.fcid}} label="Event Id"></fc-input-prime><br>
+                <fc-input-prime value={{event.evId}} label="Event TimeId"></fc-input-prime><br>
     		<fc-input-prime value={{event.studentNames}} label="Name of Related Student or Students"></fc-input-prime><br>
     		<fc-input-prime value={{event.studentFcids}} label="Related Student FCIDs"></fc-input-prime><br>
     		<fc-input-prime value={{event.color}} type="color" input-type="color" label="Event Color"></fc-input-prime><br>
@@ -24,14 +23,15 @@
     		<fc-input-prime value={{event.reasonForEventModification}} label="Reason For Event Modification"></fc-input-prime><br>
  		</paper-dialog-scrollable>
   		<div class="buttons" style="height: 75px;">
-    			<paper-button style="float: left;" hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" on-tap="deleteEvent" dialog-dismiss>Delete Event</paper-button> 
+    			<paper-button style="float: left;"  on-tap="deleteEvent" dialog-dismiss>Delete Event</paper-button> 
+                <!-- hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" -->
     			<paper-button dialog-dismiss>Cancel</paper-button>
    				<paper-button dialog-confirm on-tap="saveEvent">Accept</paper-button>
  		 	</div>
 	</paper-dialog> 
 </template>
 <script>
-FcEventDialog=Polymer({
+Polymer({
 is:"fc-event-dialog",
 properties: {
     event: {
@@ -41,9 +41,16 @@ properties: {
     },
 },
 
-saveEvent:function(){
+saveEvent:function(e){
+    console.log(e);
+    var evObj=e.target.dataHost.__data__.event;
+    this.set("event", {});
+    this.set("event", evObj);
+},
+openDi: function(){
+this.$.myeventDialogue.opened=!this.$.myeventDialogue.opened;
 
-}
+},
 
 
 

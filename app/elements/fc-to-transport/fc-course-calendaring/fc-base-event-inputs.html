@@ -4,9 +4,8 @@
 
 
 	:host{
-		margin: 12px 20px;
-		height: 400px;
-		width: 680px!important;
+		margin: 12px 6px 8px 6px;
+		height: 420px;
 			
 		}
 	.one{
@@ -34,23 +33,24 @@
 		color: brown;
 		font-weight: 600;
 		min-width: 170px;
-		max-width: 188px;
+		max-width: 212px;
 		overflow: hidden;
 		white-space: nowrap;
 			font-size: 12px;
 	}
 
 </style>
-<div class="vertical flex layout nowrap" style="height: 100%; border: 3px solid #008; width: 670px!important; margin: 1px 2px 1px 2px; padding: 1px;overflow-y: scroll; ">
-<section class="vertical layout nowrap center" style="height: 50px; width: 670px; text-align: center;font-size: 20px; font-weight: 600; background: #008; color: white;">
+
+<div class="vertical flex layout nowrap" style$="height: 100%; border: 3px solid #008; {{_computedWidth(windowWidth)}}; margin: 1px 2px 1px 2px; padding: 1px;overflow-y: scroll;">
+<section class="vertical layout nowrap center" style$="height: 50px; {{_computedWidth(windowWidth)}}; text-align: center;font-size: 20px; font-weight: 600; background: #008; color: white;">
 <span style="padding: 12px;">Course Selections</span>
 </section>
-<div class="vertical flex layout nowrap" style="height: 440px; border: 3px solid #008; width: 660px!important; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll;">
-	<div class="horizontal flex layout wrap" style="border:3px solid #afafaf; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll; width: 660px!important;">
+<div class="vertical flex layout nowrap" style$="height: 440px; border: 3px solid #008;{{_computedWidthMinusTen(windowWidth)}}; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll;">
+	<div class="horizontal flex layout wrap" style$="border:3px solid #afafaf; margin: 1px 2px 1px 2px; padding: 1px; overflow: hidden;  overflow-y: scroll;{{_computedWidth(windowWidth)}};">
 
-	<template is="dom-repeat" id="courseValues" class="horizontal layout wrap" style="width: 322px!important;" items="{{outputOptions}}" as="option">
+	<template is="dom-repeat" id="courseValues" class="horizontal layout wrap" style$="{{_computedTemplate(windowWidth)}}" items="{{outputOptions}}" as="option">
 	<form>
-			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; width: 155px!; font-family: merriweather; font-size: 14px; border-bottom: 2.4px solid [[alert]]; padding: 1px; overflow: hidden;">  
+			<section class="horizontal layout nowrap" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; border-bottom: 2.4px solid [[alert]]; padding: 1px; overflow: hidden;">  
 				<span class="one">[[option.labelA]]:</span>
 				<span class="two">
 					<fc-input-prime input-type="text" name="{{option.name}}" label-hidden="true" value="{{option.value}}"></fc-input-prime> &nbsp; &nbsp;
@@ -61,7 +61,7 @@
 	
 	</div>
 	</div>
-<paper-button elevation="3" style="max-width: 670px; border: 3px solid #afafaf;" on-tap="confirmCalculate">CONFIRM</paper-button>
+<paper-button elevation="3" style$="{{_computedWidth(windowWidth)}}; border: 3px solid #afafaf;" on-tap="confirmCalculate">CONFIRM</paper-button>
 </div>
 	
 			
@@ -78,6 +78,10 @@ Polymer({
 			type: Array,
 			value:"",
 			notify: true
+		},
+		windowWidth:{
+			type: Number,
+			notify: true,
 		},	
 		valueOptions: {
 			type: Array,
@@ -100,7 +104,18 @@ Polymer({
 fcCourseObserver(fcCourse){
 	this._computeCourse(this.valueOptions, this.fcCourse);
 },
-
+_computedTemplate(windowWidth){
+if(parseInt(windowWidth)<1440){return "min-width: 342px!important";}
+else{return "width: 348px!important";}
+},
+_computedWidth(windowWidth){
+if(parseInt(windowWidth)<1440){return "max-width: 340px!important";}
+else{return "width: 710px!important";}
+},
+_computedWidthMinusTen(windowWidth){
+if(parseInt(windowWidth)<1440){return "max-width: 338px!important";}
+else{return "width: 701px!important";}
+},
 _computeCourse(valueOptions, fcCourse)
 	{
 		var length=valueOptions.length;

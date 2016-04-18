@@ -29,10 +29,11 @@ paper-item {
 	height: 400px;
 	background: #aedefe;
 	margin-left: 2px;
-	border: gold ridge 1px;
+	border: gold ridge 3px;
 	box-shadow: 4px 11px 21px 7px #9fafaf;
 		display: block;
 	oveflow: hidden;
+	padding: 3px;
 	float: right;
 }
 .innerholder{
@@ -94,11 +95,20 @@ top: 10px;
 
 }
 </style>
+{{currentArray}}{{inputIndex}}
+{{valueOptions.2.0.labelA}}, {{valueOptions.2.1.labelA}},
+{{valueOptions.2.2.labelA}}, {{valueOptions.2.3.labelA}}
+<array-selector 
+ 	id="eventArraySelector" 
+ 	items="{{inputArrays}}" 
+ 	selected="{{selected}}"  
+ 	toggle>
+</array-selector>
 <div class="layout vertical" style="margin-top: 3px; float: right;height: 420px!important;">
 	<section class="holder layout vertical">
 		<template 
 			is="dom-repeat" 
-			items="{{inputOptions}}" 
+			items="{{inputArrays}}" 
 			as="option"
 		>
 <!--HEADER-->
@@ -171,6 +181,16 @@ Polymer({
 			notify: true, 
 			reflectToAttribute: true
 		},
+		inputArrays:{
+			type: Array,
+			computed: "setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex)",			
+			notify: true
+		},
+		selected: {
+			type: Array,
+			value: [],
+			notify: true
+		},
 		
 		fcCourse: {
 			type: FcCourse,
@@ -221,9 +241,83 @@ Polymer({
 			notify: true
 
 		},
+		currentArray:{
+			type: Number,
+			value: 1,
+			notify: true
+		},
+		propertyName:{
+			type: String, 
+			value: "", 
+			notify: true,
+		}, 
+		val: {
+			type: String,
+			value: '',
+			notify: true,
+
+
+		}
 	
 	},
 
+	setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex){	
+		var curra=1;
+		var retArray=[];
+		var retVal;
+		var self=this;
+		var i=self.inputIndex;
+		this.vfunc=function(i, curra)
+			{
+					var retV= valueOptions[curra][i]; 
+					return retV;
+				}
+			this.saveChoiceLocal===true
+		switch(true) {
+			    case self.inputIndex===0 && propertyName=="" || propertyName==undefined:
+			        curra=1;
+			   		retVal=this.vfunc(i, curra);
+			   		retArray.push(retVal);
+			     return retArray;
+			        break;
+			    case (propertyName=="scheduleType" && val==!"Standard Schedule" && this.saveChoiceLocal===true):
+			        curra=3;
+			        retVal= self.vfunc(i, curra);
+			        retArray.push(retVal);
+			   		        break;
+			    case (propertyName=="courseType" && val!="Focused 1600SAT Course" && this.saveChoiceLocal===true):
+			       curra=4;
+			      retVal= self.vfunc(i, curra);
+			      retArray.push(retVal);
+			     return retArray;
+			        break;
+			    case (propertyName=="testDate" && this.fcCourse.isPrivateSchedule===false && val.charAt(4)=="A" && this.saveChoiceLocal===true):
+			        this.set("fcCourse.summer", true);
+			        curra=2;
+			        retVal=self.vfunc(i, curra);
+			        retArray.push(retVal);
+			        return retArray;
+			        break;
+			    case (propertyName=="coach" && this.fcCourse.summer===true && this.saveChoiceLocal===true):
+			        curra=2;
+			        retVal=self.vfunc(i, curra);
+			       	 retArray.push(retVal);
+			        return retArray;
+			        break;
+			    default: 
+			    	curra=1;
+			    	retVal=self.vfunc(i, curra);
+			    	retArray.push(retVal);
+			    	}
+			    	console.log(retVal, JSON.stringify(retVal));
+			this.saveChoiceLocal=false;
+    return retArray;
+	},
+	
+
+	attached(){
+		this._computeInputArrays(this.inputs);	
+	},
 	_backOneInput()
 	{
 		this.set("saveChoiceLocal", true);
@@ -250,11 +344,49 @@ Polymer({
 			}
 			return retVal;
 	},
+	
+	_computeInputArrays(inputs){
+		var retArray=new Array();
+		retArray.push(this.inputs);//array inputArrays[0][0]
+		var arrayOne=this.inputs.filter(function(item, index, array){
+			console.log(item);
+			return(index<10);
+		}, this);
+		retArray.push(arrayOne);
+		var arrayTwo=[];
+		for(var i=0; i<6;i++){
+			arrayTwo.push(this.inputs[i]);
+			if(i==5)
+			{
+				arrayTwo.push(this.inputs[12]);
+				arrayTwo.push(this.inputs[7]);
+				arrayTwo.push(this.inputs[8]);
+				arrayTwo.push(this.inputs[9]);
+			}
+		}
+		retArray.push(arrayTwo);
+		var miniArr=[0, 2, 13, 14, 4, 5, 10, 11, 17, 16, 14]/*adjust 11, 17, 16 needs Push a set linkag, */
+		var arrayThree=miniArr.map(function(elem, index){
+			return this.inputs[elem];
+		}, this);
+		retArray.push(arrayThree);
+		var arrayFour=[];
+		var miniArr2=[0,1,2, 3, 4, 5, 10,11,13, 14, 16, 17]; //set schedules
+		arrayFour= miniArr2.map(function(elem, index){
+			return this.inputs[elem];
+		}, this);
+		retArray.push(arrayFour);
+			this.set("valueOptions", retArray);
+			console.log(this.valueOptions);
+	},
 
 	soSelected(e){
 		console.log(new Date().getTime());
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.__data__.value;
+		var indexOfNextInput=this.inputIndex+1;
+		this.set("propertyName", propertyName);
+		this.set("val", val);
 		var self=this;
 		if(propertyName == "testDate")
 		{
@@ -268,16 +400,8 @@ Polymer({
 			this.push("fcCourse.eventArray", testDay);
 		}
 		else if(propertyName =="coach"){
-			console.log("inCoach", val);
-			this.set("fcCourse.coach", val);
-			console.log(val);
 			
-			var coachObj = new FcCoach({fullName: val});
-			this.set("fcCourse.coachObject",coachObj);
-				var cucumber = this.fcCourse.coach.split(" ");
-				var coachId=cucumber[1]+cucumber[0]+"00001";
-				this.set("fcCourse.coachId",coachId);
-
+			this.fcCourse.setCoach({fullName: val}, self);
 		}
 		else if(propertyName == "programLength")
 		{	var self=this;	
@@ -337,8 +461,8 @@ Polymer({
 			this.notifyPath(propertyString, val);
 		
 		}
-		var inputIndex =self.inputIndex;
-	    var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, inputIndex);
+		// var inputIndex =self.inputIndex;
+	    //var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, inputIndex);
 	    this.set("saveChoiceLocal",true);
 		this.set("inputIndex", indexOfNextInput);
 		console.log(new Date().getTime());

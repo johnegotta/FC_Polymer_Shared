@@ -34,10 +34,10 @@ width: 30px;
 		<div class="horizontal flex layout wrap" style="background: white; margin-top:3px; width: 320px !important;">
 			<paper-material style="background: #008;  border-bottom: silver solid 2px; height:42px; width: 100%;">
 				<section class="layout horizontal">
-					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden="[[backHidden]]" style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
+					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden={{backHidden}} style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
 					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]</span>
 	
-					<paper-icon-button on-tap="_forward" hidden="[[forwardHidden]]" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button> 
+					<paper-icon-button on-tap="_forward" hidden="{{forwardHidden}}" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button> 
 					</section>
 			</paper-material>
 				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
@@ -57,7 +57,7 @@ width: 30px;
 							
 						 	class="card"
 						 	cd-index="{{day.cdIndex}}"
-						 	in-month="[[computeNotInMonths(day.date, displayedIndex)]]"
+						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
 						 	toggle-days="{{toggleDays}}"
 						 	day="{{day}}"
 						 	day-id="{{day.dayId}}"
@@ -96,7 +96,6 @@ FcDatePickerProto=Polymer({
 				Polymer.NeonSharedElementAnimatableBehavior,
 				Polymer.NeonAnimatableBehavior
 				],
-	listeners: {"catchTheCourse": "changesTheDays"},
 	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', "observeMeetings(fcCourse.courseMeetingArray)", "observePracticeTests(fcCourse.practiceTestArray.*)"],
 	properties: {
 		day:{
@@ -153,6 +152,7 @@ FcDatePickerProto=Polymer({
 	
 		displayedIndex:{
 			type:Number,
+			value: 0,
 			notify: true
 		},
 		displayed:{
@@ -189,7 +189,7 @@ FcDatePickerProto=Polymer({
 		},
 		backHidden:{
 			type: Boolean,
-			computed: false,
+			value: false,
 			notify: true
 		},
 		event:{
@@ -224,9 +224,8 @@ watchingSelectedArray: function(newVal, oldVal)
 {
  		if(this.fcCourse)
  			{
- 				console.log(newVal, oldVal);
- 				this._backOne();
-				this._forward();
+ 			
+ 			
  			}
 },
 
@@ -236,36 +235,37 @@ computeDay: function(day){if(day){return "pretty";}
 },
 computeCalendar: function(displayed, ccda){
 	if(ccda.base && ccda.base.length<95 && ccda.base[2]){
-		console.log(ccda.base, displayed)
 	 var display=displayed.map(function(day, index, array){
 	 			var ind=ccda.base.indexOf(day.displayIndex);
 	 			var retVal;
 	 		if(day.inMonth ===true && ind>-1 && ccda.base[ind].dateId==day.dateId){ retVal=ccda.base[ind];}
 	 		else{retVal=day;}
-	 		console.log(retVal, "returning from ccda");
 	 		return retVal;
 	 },this);
-	 console.log(display, "returning the mapped CCDA");
 	 return display;
 	}
 	else {return displayed;}
 },
 
-attached: function()
-{
-		var startYear =new Date().getFullYear();
-   		var endYear =startYear + 3;
-		var date=new Date(startYear, 0, 1);
-		var dateEnd =new Date(endYear, 11, 31);
+ready: function()
+{	
 		var today = new Date();
 		this.today=today;
 		var index=today.getMonth();
-		this.async(function(){this.calendarCreator(date, dateEnd, "months")});
  		this.set("displayedIndex",index);
-		this.async(this.initialize, 400);
-
+		this.async(this.initialize, 40);
 },
-initialize:function(){
+initialize:function(days){
+	var startYear =new Date().getFullYear();
+   	var endYear =startYear + 3;
+	var date=new Date(startYear, 0, 1);
+	var dateEnd =new Date(endYear, 11, 31);
+	if(days){
+	this.calendarCreator(date, dateEnd, "months", days);
+	}
+	else{
+		this.calendarCreator(date, dateEnd, "months");
+	}
  var counter=this.monthsArray.length;
  	this.set("maxIndex", counter-1);
 		var self=this;
@@ -305,8 +305,7 @@ computeInEventArray: function(fcCourse, item)
 				{
 					var retVal = "outline: red 3px solid"; return retVal;
 				}
-	this._backOne();
-	this._forward();
+	
 	}
 },
 
@@ -348,13 +347,12 @@ observeMeetings:function(meetings) {
 },		
 observePracticeTests: function(pta)
 { 
-		this._backOne();
-		this._forward();
+		
 },
 	
 
-_forward: function()
-	{if(this.displayedIndex && this.calendarMonthsArray){
+_forward: function(){
+	
 		if(this.displayedIndex ==this.maxIndex)
  		{
  			this.set("forwardHidden",true);
@@ -365,12 +363,10 @@ _forward: function()
     		this.set("displayedIndex", this.displayedIndex+1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
     	}
-    }
     },
- _backOne: function()
- 	{	if(this.displayedIndex && this.calendarMonthsArray){
- 		if(this.displayedIndex ===0)
- 		{
+ _backOne: function(){	
+ 		if(this.displayedIndex===0)
+ 		{ 
  			this.set("backHidden",true);
  		}
  		else
@@ -379,7 +375,7 @@ _forward: function()
     		this.set("displayedIndex", this.displayedIndex-1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
  		}
- 	}
+ 	
     },
   
   computeYear:function(displayed)
@@ -408,7 +404,7 @@ setDaysSelected: function(newVal, oldVal)
 computeNotInMonths: function(item, displayedIndex){
 	
 
-	var x=item.getFullMonth();
+	var x=new Date(item).getFullMonth();
 	
 	var y=this.displayedCalendarMonth;
 	var retVal = (x===y);

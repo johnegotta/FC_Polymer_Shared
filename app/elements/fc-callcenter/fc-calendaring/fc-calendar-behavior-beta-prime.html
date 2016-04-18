@@ -226,9 +226,9 @@ function dayAbbreviationsToDays(argAbbrev)
 
 class FcCoach
 {
-	constructor(argCoach)
+	constructor(argCoach, self)
 	{
-		this.build(argCoach.fullName)
+		this.build(argCoach.fullName, self)
 	}
 	static getFirebaseLocation(argFcid)
 	{
@@ -236,11 +236,11 @@ class FcCoach
 		return "https://focusedOne.firebaseio.com/coaches";
 			}
 	}
-		build(fullName)
+		build(fullName,meetingDays, startTime, ptDay, self)
 		{
 		var coachColor=getColor();
 		var color=(fullName=="Stacy Collerette")? "rgb(231,123,231)":(fullName=="Scott McKinley")?"rgb(0,128,0)": (fullName=="George Rimakis")?"rgb(128,255,255)":(fullName=="Jason Frazzano")?"rgb(0,128,255)": (fullName=="John Gotta")?"rgb(39,242, 34)": (fullName=="Joseph Zirkel")?"rgb(255, 165, 0)": (fullName=="Radika Patel")? "rgb(179,113,223)": (fullName=="Mustaffa Raza")?"rgb(141,143,57)": coachColor;
-		
+
 		this.counter="00001";
 		this.fullName=fullName;	
 		if(fullName){
@@ -248,6 +248,7 @@ class FcCoach
 			console.log(arr[0], arr[1], arr[2]);
 		this.firstName=arr[0];
 		this.lastName=arr[1];
+		this.meetingName= "";
 		this.telephoneNumber= "732-671-1834";
 		this.email = "focus@focusedCoaching.com";
 		this.addressLine1= "Suite 143, 331 Newman Springs Rd., Red Bank, New Jersey 07701";
@@ -258,10 +259,7 @@ class FcCoach
 		this.location= "704 Ginesi Dr. Morganville, New Jersey 07754";
 		this.experience = "2 years training with Focused";
 		this.photograph= "no photo";
-		var testDate= nextReasonableTestDate();
-		testDate=testDate.getTime();
-		this.calendarCode=this.lastName.slice(0,2)+this.firstName.slice(0,2)+testDate+"_Focused1600_"+"days"+"time"+this.location.replace(" ","").slice(0,6);
-		
+
 		this.range= "30 miles";
 		this.rate= "$200.00";
 		this.courseCost=costGenerator(45);// number of hourse
@@ -306,13 +304,13 @@ class FcEvent
 {
 	constructor(argEvent)
 	{
-		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.duration,argEvent.location, argEvent.coach, argEvent.coachFcid, argEvent.activity,argEvent.evIndex, argEvent.fcid,   argEvent.calendarTotalTime, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.studentFcids, argEvent.studentNames, argEvent.color, argEvent.isChangeNotificationNeeded, argEvent.reasonForEventModification, argEvent.reasonEventNotInACalendar, argEvent.completed, argEvent.date, argEvent.timestamp, argEvent.isHoliday, argEvent.time, argEvent.eventType, argEvent.evId)
+		this.build(argEvent.name, argEvent.startTime, argEvent.endTime, argEvent.duration,argEvent.location, argEvent.coach, argEvent.coachFcid, argEvent.activity,argEvent.evIndex, argEvent.fcid,   argEvent.calendarTotalTime, argEvent.relatedFcids, argEvent.parentEventName, argEvent.parentEventFcid, argEvent.studentFcids, argEvent.studentNames, argEvent.color, argEvent.isChangeNotificationNeeded, argEvent.reasonForEventModification, argEvent.reasonEventNotInACalendar, argEvent.completed, argEvent.date, argEvent.timestamp, argEvent.isHoliday, argEvent.time, argEvent.eventType, argEvent.eventId)
 	}
 
 
 	
 
-  	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, evIndex, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date, timestamp, isHoliday, time, eventType, evId)
+  	build(name, startTime, endTime, duration, location, coach, coachFcid, activity, evIndex, fcid, calendarTotalTime, relatedFcids, parentEventName, parentEventFcid, studentFcids, studentNames, color, isChangeNotificationNeeded, reasonForEventModification, reasonEventNotInACalendar, completed, date, timestamp, isHoliday, time, eventType, eventId)
   	{ 	var myColor=getColor();
 		
 		var rnd= randomSixty();
@@ -321,12 +319,11 @@ class FcEvent
 	    this.startTime = startTime || "7:" +  rnd + "AM";// console.log(this.startTime);
 	    this.endTime =  endTime || "8:" + rnd + "AM";
 	    var duration = durationTime(this.startTime, this.endTime);
-	    this.duration= duration || "";
+	    this.duration= duration.toString() +"Hrs." || "";
 	    this.location = location || "704 Ginesi Dr. Morganville, New Jersey 07754";
 	    this.coach = coach || "";
 	    this.coachFcid=coachFcid || "";
 	    this.activity = activity || "New Event";
-	    this.evIndex= evIndex || 0;
 	    if(fcid)
 	    {
 	    	this.fcid=fcid
@@ -356,7 +353,7 @@ class FcEvent
 	    if(startTime){
 	    var timeId=stringTimeToDateTime(startTime, date);
 			}
-	    this.evId=evId || timeId || '';
+	    this.eventId=eventId || timeId || '';
  		}
 
 
@@ -425,7 +422,6 @@ class FcCourse
 		this.startTime="";
 		this.endTime= "";
 		this.programLength="";
-		this.courseCalendarTempArray=[];
 		//this.primaryCalendar="";
 		this.calendarDayArray=  []; 
 		this.startAndEndTimes= this.startTime + " to " + this.endTime || "";
@@ -459,6 +455,7 @@ class FcCourse
 		if(this.coach){
 		this.coachObject= new FcCoach(this.coach) || {};
 		}
+		this.courseMeetingEvent={};
 		this.testDateDate=(this.testDate)?(new Date(this.testDate)):"";
 		this.counter=0;
 		
@@ -687,7 +684,7 @@ static getEndTimeForPrivateSession()
 }
 
 static getMoreInputs()
-{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getCoaches(), FcCourse.getTestDates(),FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(),FcCourse.getPrice(),FcCourse.getConfirmAndSetCourse(), FcCourse.getCourseMeetingDays(),FcCourse.getCourseTimes(),FcCourse.getSummerCourseSchedules(),FcCourse.getCustomEventType(),FcCourse.getPrivateCoach(), FcCourse.getPrivateCoachingPackageHours(), FcCourse.getStudentsForPrivatePackage(), FcCourse.getEndTimeForPrivateSession(), FcCourse.getCongradulations()];
+{		return[	FcCourse.getCourseTypes(), FcCourse.getCourseSubTypes(), FcCourse.getTestDates(),FcCourse.getCoaches(), FcCourse.getPresetCourseLength(),FcCourse.getPracticeTestDays(), FcCourse.getCourseTimeSets(),FcCourse.getCourseEnrollment(),FcCourse.getPrice(),FcCourse.getConfirmAndSetCourse(), FcCourse.getCourseMeetingDays(),FcCourse.getCourseTimes(),FcCourse.getSummerCourseSchedules(),FcCourse.getCustomEventType(),FcCourse.getPrivateCoach(), FcCourse.getPrivateCoachingPackageHours(), FcCourse.getStudentsForPrivatePackage(), FcCourse.getEndTimeForPrivateSession(), FcCourse.getCongradulations()];
 }
 
 setCourseCreatorNextInput(propertyName, val, inputIndex)
@@ -697,7 +694,7 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		}
 		else if(propertyName=="courseType" && val!=="Focused 1600SAT Course")
 			{indexOfNextInput=10;}
-		else if(propertyName=="testDate" && this.isPrivateSchedule===false && val.charAt(4)==="A")
+		else if(propertyName=="testDate" && this.isPrivateSchedule===false && val.charAt(4)=="A")
 		{
 			{this.summer=true;}
 		}
@@ -755,7 +752,6 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		var counter=0;
 		var color=this.coachObject.color;
 		var datesArray=getDates(startDate, endDate);
-			console.log(self.fcCourse.calendarDayArray);
 		var daysIwant=self.fcCourse.calendarDayArray.filter(function(day, index, arr){
 					let date=new Date(day.date);
 				return (date>=this.startDate && date<=this.endDate && day.inMonth===true);
@@ -768,24 +764,67 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 					curr.inCourseCalendar=true;
 					curr.isSelected = true; 
 					curr.toggleDay = true;
-					//curr.background= "#aedefe";
+					curr.background= "#aedefe";
 					curr.isMeetingDay=false;
+					curr.coach=this.coach;
+					curr.color=this.coachObject.color;
 					curr.isPracticeTestDay=false;
 					counter ++;
 				return curr;
 
-		});
+		}, this);
 		self.set("fcCourse.courseCalendarDaysArray",daysIwant);
-			console.log(daysIwant);
 		return daysIwant;
 
 	}
 
-	setEvent(argEventObject)
-	{
-		
+	setCourseMeetingEvent(self)
+	{	var duration = durationTime(this.startTime, this.endTime) || "";
+		var event = new FcEvent({
+			name: (this.coach).replace(" ","") + "Course Meeting" || "", 
+			startTime: this.startTime || "",
+			endTime: this.endTime || "",
+			duration: duration + "Hours" || "", 
+			location: "704 Ginesi Drive, Morganville, NJ 07754",
+			coach: this.coach || "", 
+			coachFcid: this.coachObject.fcid || "", 
+			activity: (this.coach).replace(" ","") + "Course" || "",
+			fcid: (this.coach).replace(" ","") + "CME_"+"00001", 
+			calendarTotalTime: "", 
+			relatedFcids: [],
+			parentEventName: this.fcid || "", 
+			parentEventFcid:this.fcid || "", 
+			studentFcids:[], 
+			studentNames: [], 
+			color: this.coachObject.color,
+			background: "white" || this.coachObject.color2 || "", 
+			isChangeNotificationNeeded: true,
+			reasonForEventModification: "", 
+			reasonEventNotInACalendar: "In Calendar", 
+			completed: false,
+			room:"Room 1 of 3",
+			date: {},
+			eventId: "",//daytimeId+_location+_coachid+_
+			isHoliday: false,
+			eventType:"courseMeeting",
+							});
+		self.set("fcCourse.courseMeetingEvent", event);
+		return event;
+	}
+	setPracticeTestEvent(argPte, self){
+
+
 
 	}
+	setPrivateSessionEvent(argPse, self){
+
+
+
+
+
+	}
+
+	
 	setPracticeTestDay(argDay, self)
 	{	var day = argDay.charAt(1);
 			var testVal;
@@ -850,93 +889,97 @@ setCourseCreatorNextInput(propertyName, val, inputIndex)
 		this.startTime=times[0].replace(" ", "");
 		this.endTime=times[1];
 		this.startAndEndTimes = this.startTime + " to " + this.endTime;
-		this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime, this.coach, this.activity, self);
+		var cme = this.setCourseMeetingEvent(self);
+		this.setCourseMeetingEvents(theDaySet, this.startTime, this.endTime, this.coach, cme, self);
 	 	console.log(new Date().getTime());
 	}
 
-	setCourseMeetingEvents(argDays, argStartTime, argEndTime, argCoach, argActivity, self)
-	{	
-		var event={};
-
+	setCourseMeetingEvents(argDays, argStartTime, argEndTime, argCoach, argCme, self){	
+		
+		var j=0;
 		this.courseMeetingDays = argDays;
 		var arrayDays = argDays.split(" ");
+		var k=new Date().getTime();
 		var numMeetingDays=arrayDays.length;
-		var mDays=arrayDays.filter(function(item){if(item && item!="" && item!=" "){return item;}});
-		var newArray = mDays.map(function(item, index, array)
-			{	console.log(item);
+		console.log(k);
+		this.courseMeetingEvent=argCme;
+		var mDays=arrayDays.filter(function(item)
+			{
+				return(item && item!="" && item!=" "&& item!="  ");
+			},this).map(function(item, index, array)
+			{	
+				console.log(item);
 				var element=(item=="Sunday")?0:(item=="Monday")?1:(item=="Tuesday")?2:(item=="Wednesday")?3:(item=="Thursday")?4:(item=="Friday")?5:(item=="Saturday")?6: "";
 				return element;
 			});
-		console.log(new Date().getTime());
-		var name = this.coach + "Course";
-				name = name.replace(" ", "");
-				var cucumber = this.coach.split(" ");
-				var coachId=cucumber[1]+cucumber[0]+"00001";
-				var duration = durationTime(this.startTime, this.endTime) || "";
-
-				var color=this.coachObject.color;
-				console.log(new Date().getTime());
-		this.courseCalendarDaysArray.forEach(function(day, index, array){	 var tester = new Date(day.date).getDay();
-			if(newArray.indexOf(tester)>=0)
-			{
-				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"background"],color);
-				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"isCourseMeeting"],true);
-				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"isMeetingDay"],true);
-				self.set(["fcCourse.courseCalendarDaysArray",day.cdIndex,"coach"], this.coach);
-				var event = new FcEvent({
-							name: name || (this.coach).replace(" ","") + "Course", 
-							startTime: this.startTime || "",
-							endTime: this.endTime || "",
-							duration: duration || "", 
-							location: "704 Ginesi Drive, Morganville, NJ 07754",
-							coach: this.coach || "", 
-							coachFcid: coachId || "", 
-							activity: (this.coach).replace(" ","") + "Course" || "",
-							fcid: (this.coach).replace(" ","") + "Course"+"00001", 
-							calendarTotalTime: "", 
-							relatedFcids: [],
-							parentEventName: "", 
-							parentEventFcid:"", 
-							studentFcids:[], 
-							studentNames: [], 
-							color: color, 
-							isChangeNotificationNeeded: true,
-							reasonForEventModification: "", 
-							reasonEventNotInACalendar: "In Calendar", 
-							completed: false,
-							room:"Room 1 of 3",
-							date: day.date,
-							dateId: day.dateId || "",
-							isHoliday: false,
-							eventType:"course meeting",
-											});
-				var eventId=stringTimeToDateTime(this.startTime, day.date);
-					event.evId=eventId;
-
-				 self.push(["fcCourse.courseCalendarDaysArray",day.cdIndex,"eventList"],event);
-				 self.push("fcCourse.courseMeetingArray", day);
-					if(index==0){
-						self.set("fcCourse.courseMeetingEvent", event);
-					}
-					console.log(new Date().getTime());
-			
-		}
-
+		let b=new Date().getTime();
+		var eventMap=new Map();
+		var eventArrayThree=[];
+		console.log(k, b, b-k, "time for the parsing of days");
+		var argArray = this.courseCalendarDaysArray.filter(function(d, i, array)
+		{	 
+			var tester = new Date(d.date).getDay();
+			var event=argCme;
+				let a=new Date().getTime();
+				 return(mDays.indexOf(tester)>-1);
+				},this).map(function(day, id, arr){
+				day.color=this.coachObject.color;
+				day.isCourseMeeting=true;
+				day.isMeetingDay=true;
+				day.coach=this.coach;
+				this.courseMeetingEvent.date=day.date;
+				let b=new Date().getTime();
+				this.courseMeetingEvent.dateId=stringTimeToDateTime(this.startTime, day.date);
+				let c=new Date().getTime();
+				var event = new FcEvent(this.courseMeetingEvent);
+				event.cdIndex=day.cdIndex;
+				event.isCourseMeeting=true;
+				 let d=new Date().getTime();
+			self.unshift(["fcCourse.courseCalendarDaysArray",day.cdIndex,"eventList"], event);
+				return event;
 		}, this);
-		console.log(new Date().getTime());
+				self.set("courseMeetingArray",argArray);
+		var arb=this.eventArray.concat(argArray);
+		self.set("fcCourse.eventArray", arb);
+		//console.log(self.fcCourse.eventArray, this.eventArray);
+		let jjj=this.courseMeetingArray.length;
+		self.set("fcCourse.numberOfMeetings",jjj);
+		var h=new Date().getTime();
+		console.log("grand total", h-k);
 		}
 
-	setCoach(argCoach, argColor)
-	{
-		this.coach = argCoach;
-		this.coachObject =new FcCoach(argCoach, argColor);
-		var numEvents = this.eventArray.length;
-		for(i=0; i < numEvents; i++)
-		{
-			var ev = this.eventArray[i];
-			ev.coach = argCoach;
-		}
+	setCoach(argCoach, self){
+	// {	argCoach.days= this.courseMeetingDays;
+	// 	argCoach.times= this.startTime;
+	// 	argCoach.ptest=this.practiceTestDay;
+		this.coachObject =new FcCoach(argCoach, self);
+		console.log(this.coachObject);
+		self.set("fcCourse.coach", argCoach.fullName);
+		self.set("fcCourse.coachObject", this.coachObject);
 	}
+
+	setCourseFcid(testDate, coachFcid, location, meetingDays, practiceTestDay, startTime, endTime, eventDateArray) {
+	var len = eventDateArray.length;
+	var weekdays = "";
+	var mdays = meetingDays.replace(/\s/g, '');
+	var arr = mdays.split(',');
+	var len = arr.length;
+	for (var i = 0; i < len; i++) {
+		weekdays += arr[i][2];
+	}
+	startTime = startTime.replace(":", "");
+	endTime = endTime.replace(":", "");
+	console.log(endTime);
+	var fcid = dayStamp(testDate) + "_" + coachFcid + location + startTime + weekdays + endTime + "_" + len.toString() + practiceTestDay;
+	console.log(fcid);
+	return fcid;
+
+		// this.calendarCode=this.lastName.slice(0,2)+this.firstName.slice(0,2)+self.fcCourse.testDate+"_Focused1600_CourseMeetingOn_"+days.toString()+pTest.toString()+time.toString()+this.location.replace(" ","").slice(0,6);
+		// console.log(this.calendarCode, this.calendarCode);
+		// var array=[];
+		// array.push(this.calendarCode);
+		// this.calendars=array;
+}
 
 	save()
 	{
@@ -1086,7 +1129,7 @@ function FcCalendarDay(date)
 
 	var t=new Date(date);
 	var d= new Date();
- 	var p	= d.setTime(t.getTime());
+ 	var p= d.setTime(t.getTime());
  	var testEvent=[];
  	var te={name: "SAT Test Date", activity: "SAT Test Date", startTime:"7:30AM", endTime:"3:45PM", courseID:"allFCIDs00001", fcid:"", date: t, showDate: t.toDateString(), coach: "Joseph Zirkel", location: "see your registration ticket", color: "gold", background: "gold", isHoliday: false, isTestDate: true, time: "7:30AM", completed: false, timestamp: new Date(t).getTime("7:30AM")};
  	testEvent.push(te);
@@ -1133,7 +1176,7 @@ function FcCalendarDay(date)
 				practiceTestText: "Test",
 				dateText: dateText,
 				freshDate: t,
-				dayOfMonth: t.getDate(),
+				dayOfMonth: d.getDate(),
 				isHoliday: holi,
 				isTestDate: testD.val,
 				eventList: (holi)?getTimes(holiday, date2):(testD.val)?getTimes(testEvent, date2): [],
@@ -1263,9 +1306,12 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 	dayObject: function(date, FcEvent){},
 
 	
-	calendarCreator: function(start, end, units)
+	calendarCreator: function(start, end, units, cda)
 	{	var currDate;
 		if (units!=undefined && units!=null){this.set("units", units);} 
+		else{this.set("units", months);}
+		if(!cda)
+		{
 		var startDate=(start!=null)?start:new Date().addDays(0);
 		var endDate = (end!=null)?end:new Date().addDays(365);
 		var arrArg=[];
@@ -1284,12 +1330,16 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 				return calendarDay;	
 			});
 			this.set("calendarDayArray", calArray);
+		}
+		else{var calendarM=cda.filter(function(day,index,array){
+			return(day.inMonth);
+		}, this);
+			this.set("calendarDayArray",calendarM);}
 		if(this.units=="months" || this.units=="Months")
 		{
 			this.setMonths(this.calendarDayArray);
+			this.setDisplayedMonth();
 		}
-
-		this.setDisplayedMonth();
 	},
 	setMonths: function(calDaysArray){ 
 		this.monthsArray=null;
@@ -1301,20 +1351,24 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 		var endArray=[];
 		var month =new Array();
 		month= [];
-		var startDate= new Date(calDaysArray[0].date);
+		var startDate= new Date(this.calendarDayArray[0].date);
+		console.log(startDate,startDate,startDate,startDate);
 	for (i = 0; i < numDays; i++) 
 	{	
 		if(i==0)
 			{	
 				var newMonth=true;
-				startDate=new Date(this.calendarDayArray[i].date);
+				startDate=new Date(this.calendarDayArray[0].date);
 				this.monthsArray[currentMonth]=[];
+				console.log(startDate);
 			}
-		while(startDate.getDay()!== 0 && newMonth==true)//filling beginning of month
+		while(newMonth===true && new Date(startDate).getDay()!==0)//filling beginning of month
 			{	
-				startDate = startDate.addDays(-1);
+				startDate = new Date(startDate).addDays(-1);
+				console.log(startDate);
 				var cday= this.calendarDayConstructor(startDate);
-		month.unshift(cday);	
+				month.unshift(cday);
+				console.log(startDate);	
 			}
 		if(newMonth===true)
 		{
@@ -1324,8 +1378,8 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			month=null;
 			month=[];
 			var calendarDay=this.calendarDayArray[i];
-			var yesterday = (i>0)?this.calendarDayArray[i-1].date:"";	
-			if(i>0 && calendarDay.date.getFullMonth() != yesterday.getFullMonth())
+			var yesterday = (i>0)?new Date(this.calendarDayArray[i-1].date):"";	
+			if(i>0 && new Date(calendarDay.date).getFullMonth() != yesterday.getFullMonth()||i==(numDays-1))
 			{
 				this.monthsArray[currentMonth]
 				var lastDay=new Date(yesterday);
@@ -1335,11 +1389,13 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 					var endDay= this.calendarDayConstructor(lastDay);
 					this.monthsArray[currentMonth].push(endDay);
 				}
+				if(i!=(numDays-1)){
 				currentMonth++;
 				this.monthsArray[currentMonth]=[];
 				this.monthsArray[currentMonth].push(calendarDay)
 				startDate=this.calendarDayArray[i].date;
 				newMonth=true;
+			}
 			}
 		else {
 				this.monthsArray[currentMonth].push(calendarDay);
@@ -1378,13 +1434,12 @@ FCBehaviors.FcCalendarBehaviorPrime = {
 			"dateId":currDate.dayStamp(),
 			showDate:currDate.toDateString(),
 			"dayOfMonth":currDate.getDate(),
+			"dayIndex": currDate.getDay(),
 			"inMonth": false,
 			"isSelected":false,
 			"toggleDay": false,
-			"inCourseCalendar":false,
-			"courseMeetingArray":[],
-			"isCourseMeeting":false,
-			"isPracticeTestDay":false,
+			"inCourseCalendar":false
+			
 		};
 		return calendarDay;
 	},

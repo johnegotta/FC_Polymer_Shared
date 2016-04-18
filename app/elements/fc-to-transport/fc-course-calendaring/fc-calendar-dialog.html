@@ -66,11 +66,15 @@ top: 10px;
 	color: black;
 
 }
+paper-button{max-width: 357px;}
 
 </style>		
-<fc-ddr-card drags="true" id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important; height: 1000px!important;" current-width="{{computedWidth}}" current-height="{{computedHeight}}">
+<fc-ddr-card drags="true" focused-planner="true" id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;" current-width="{{computedWidth}}" current-height="{{computedHeight}}">
+
+<fc-event-dialog event="{{dialogEvent}}" id="eventDialog">
+</fc-event-dialog>
 	<div class="horizontal layout flex nowrap">
-		<section class="vertical layout flex-5">
+		<section class="vertical layout flex-4">
  		<div class="flex layout horizontal center-justified">
  			<array-selector 
  					id="arrselector" 
@@ -79,7 +83,7 @@ top: 10px;
  					toggle>
  			</array-selector>
 			<neon-animated-pages 
-				class="layout vertical flex-3" 
+				class="layout vertical flex-1" 
 				id="pages" 
 				style="width: 320px; 
 				height:400px;" 
@@ -96,7 +100,8 @@ top: 10px;
 					fc-course={{fcCourseObject}}
 				>
 				</fc-calendar-day-back>
-				<fc-date-picker-proto 
+				<fc-date-picker-proto
+					id="datePickerPro" 
 					displayed-month="{{displayedMonth}}" 
 					on-tap="_dateSelected" 
 					calendar-day-array="{{calendarDayArray}}"
@@ -111,13 +116,14 @@ top: 10px;
 				</fc-date-picker-proto>
 			</neon-animated-pages>
 			<fc-base-event-inputs 
-				class="horizontal flex-5 layout" 
+				class="horizontal flex-2 layout" 
 				value-options={{valueOptions}} 
 				output-options="{{outputs}}" 
-				fc-course="{{fcCourseObject}}">
+				fc-course="{{fcCourseObject}}"
+				window-width="{{computedWidth}}">
 			</fc-base-event-inputs>
 			
-			<div class="horizontal layout flex-3">
+			<div class="horizontal layout flex-1">
 				<fc-event-element 
 					fc-course="{{fcCourseObject}}" 
 					inputs="{{inputs}}" 
@@ -127,7 +133,7 @@ top: 10px;
  				</fc-event-element>
  			</div>
  		</div>
- 		<div id="widthBasis" class="layout horizontal flex" style="margin-top: 8px; padding: 10px;">
+ 		<div id="widthBasis" class="layout horizontal flex" style="margin-top: 8px; padding: 10px;padding-bottom: 0px;">
  		<fc-input-prime 
  				value="{{displayType}}"
  				input-type="select"
@@ -135,7 +141,7 @@ top: 10px;
  				is-repeater-select="true" 
  				select-items="{{displayOptionArray}}" 
  				label="Calendar Day View"
- 				style="max-width: 520px; color: #008;">
+ 				style="max-width: 320px; color: #008;">
  		</fc-input-prime>
  		W: {{computedWidth}} H: {{computedHeight}}
  		</div>
@@ -149,14 +155,19 @@ top: 10px;
 			<div 
 				class="horizontal layout justified" 
 				style="width: 100%; margin: 9px; overflow-x: scroll;">
-			<template is="dom-repeat" initial-count="7" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}" as="day">		
+			<template is="dom-repeat" initial-count="12" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}" as="day">		
 				<fc-calendar-day-back 
 						back-width="{{backWidth}}"
 						back-height="{{}}"
 						course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}" 
 						fc-course={{fcCourseObject}}
 						cal-day="{{day}}"
-						>
+						on-dragover="allowDrop" 
+						on-drop="handleDrop">
+						<section class="headerButton flex-1" on-tap="addEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
+						</iron-icon>
+					</section>
 	<template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
 			<fc-event-item 
 				draggable="true"
@@ -169,8 +180,10 @@ top: 10px;
 				cal-day="{{day}}"
 				date-id="[[day.dateId]]"
 			>
-			<content select=".buttons">
-			</content>
+			<section class="dialogButton" on-tap="openup" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
+					</iron-icon>
+				</section>
 			</fc-event-item>
 	</template>
 				</fc-calendar-day-back>
@@ -180,10 +193,16 @@ top: 10px;
 	</section>
 	<section 
 			class="vertical layout flex-1" 
-			style="overflow-y: scroll;"
+			style="overflow-y: scroll; 
+			max-height: 880px;
+			border: double 1px #008;
+			padding: 12px;
+			outline: silver;"
 			>
-	<paper-button style="background: silver; color: #008; font-weight: 700; border: 1px solid #008;" on-tap="clearCalendar"> Clear Current Calendar</paper-button>
-	<div style="max-height: 900px; min-height: 800px; width: 100%; width: 280px; margin: 4px 14px 4px 2px; border: 6px silver ridge; overflow-y: scroll;">
+	<paper-button style="background: green; color: white; font-weight: 700; border: 2px double silver;" on-tap="newCalendar">New Calendar</paper-button>
+	<paper-button on-tap="clearWorkArea" style="background: yellow; color: brown; font-weight: 700; border: 1px double brown;"> Clear Work</paper-button>
+	<paper-button style="background: silver; color: #008; font-weight: 700; border: 1px solid #008;" on-tap="loadToDayCalendar">set primary</paper-button>
+	<div style="max-height: 900px; min-height: 700px; width: 100%; width: 340px; margin: 4px 14px 4px 2px; border: 6px silver ridge; overflow-y: scroll;">
 	<paper-list-box style="overflow-y: scroll;">
 			<template 
 				is="dom-repeat" 
@@ -222,6 +241,7 @@ top: 10px;
 	
 	</section>
 </div>
+
 </fc-ddr-card>	
 </template>
 <script>
@@ -232,7 +252,7 @@ FcCalendarDialog= Polymer({
 			"Polymer.IronResizableBehavior"
 		 // "Polymer.PaperDialogBehavior"
 		  ],
-	observers:[],
+	observers:["observeEventTypes(dialogEvent.*, event.*)"],
 	properties:{
 		fcCourseObject:{
 			type: FcCourse,
@@ -249,19 +269,18 @@ FcCalendarDialog= Polymer({
 		displayOptionArray:{
 			type: Array,
 			value: function(){
-				return [
-						"All Days That Fit Horizontal Scroll",
-						"All Days That Fit Vertical Scroll", 
+				return ["A Five Day Schedule",
+						"Horizontal Scroll",
+						"Vertical Scroll", 
 						"Two Weeks At A Time",
 						"One Week At A Time",
-						"A Four Day Schedule",
 						"One Day At A Time"];
 			},
 			notify: true
 		},
 		displayType: {
 			type: String,
-			value: "All Days That Fit Horizontal Scroll",
+			value: "A Five Day Schedule",
 			notify: true
 		},
 		backWidth:{
@@ -281,6 +300,11 @@ FcCalendarDialog= Polymer({
 		},
 		displayedMonth:{
 			type:Array,
+			notify: true
+		},
+		event: {
+			type: Object,
+			value: {},
 			notify: true
 		},
 		valueOptions: {
@@ -314,9 +338,12 @@ FcCalendarDialog= Polymer({
 			type: Array, 
 			value: [],
 			notify: true
-		}
-
-	
+		},
+		dialogEvent:{
+			type: Object,
+			value: {},
+			notify: true
+		}	
 	},
 	
 	ready: function()
@@ -327,6 +354,16 @@ FcCalendarDialog= Polymer({
 		valueArray.forEach(function(item, index, array){
 			 self.push("valueOptions",item);
 		 });
+	},
+
+	observeEventTypes: function(dev, ev){
+	if(dev){console.log(dev, dev.base, dev.value);} 
+	if(ev){console.log(ev, ev.base, ev.value);}
+	},
+	newCalendar: function(){
+		course= new FcCourse();
+		this.set("fcCourseObject",course);
+		this.$.datePickerPro.initialize();
 	},
 	_sortSlots: function(a,b){
 			var ao = stringTime(a.startTime);
@@ -341,37 +378,116 @@ FcCalendarDialog= Polymer({
   			  return 0;
 			}
 		},
+
+handleDragStart: function(e){
+     var cucumber =JSON.stringify(e.model.__data__.event);
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.__data__.event));
+      var pickle=localStorage.setItem("cucumber", cucumber);
+    },
+	handleDrop: function(e){
+		e.preventDefault();
+		var index = e.model.__data__.day.cdIndex;
+      var strData=(e.dataTransfer.getData("fcdata"));
+      var edata = JSON.parse(strData);
+        var ev=new FcEvent(edata);
+     	var p = new Date();
+     	p=p.getMilliseconds();
+     	ev.date=e.model.__data__.day.date;
+		var pickle =ev.evId;
+		pickle=pickle+p;
+		ev.evId=pickle;
+		if(!this.fcCourseObject.courseCalendarDaysArray[index].eventList){
+			this.set(["fcCourseObject.courseCalendarDaysArray", index, "eventList"], []);
+		}
+		this.push(["fcCourseObject.courseCalendarDaysArray", index, "eventList"], ev);
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+    },
+    addEvent:function(e){
+			console.log(e);
+			var index=e.model.day.cdIndex;
+				var model = event.model;
+				var day=model.day
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourseObject;
+				
+
+			if(index==-1)
+			{	var model = event.model;
+				var day=model.day;
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourseObject;
+				var index=this.fcCourseObject.courseCalendarDaysArray.length;
+				day.cdIndex=index;
+				day.inCourseCalendarDayArray=true;
+				day.color="#008";
+				//day.background="#aecefe";
+				day.eventType="private course meeting";
+				day.dateText="Session";
+			var modelPst=new FcCourseEvent({activity: "Private Course Meeting", name: "Private Course Meeting", color: "purple", cdIndex: index, eventType: day.eventType, courseEventType: day.eventType, date: day.date, showDate: day.showDate, coach: this.fcCourseObject.coach, coachId: this.fcCourseObject.fcid});
+				this.push("fcCourseObject.courseCalendarDaysArray",day);
+			}
+			else{
+			var evId =stringTimeToDateTime(this.fcCourseObject.startTime, day.date);
+			var pst=new FcEvent({activity: "new event", date: day.date, showDate: day.showDate, coach: this.fcCourseObject.coach, coachId: this.fcCourseObject.fcid, evId: evId});
+			if(this.fcCourseObject.courseCalendarDaysArray[index].eventList){
+			this.push(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], pst);
+			}
+			else{this.set(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], []);
+				this.push(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], pst);
+				}
+			}
+},
+
+    openup: function(e){
+    		console.log(e);
+    		var event=e.model.__data__.event;
+    		this.$.eventDialog.openDi();
+    		console.log(this.$.eventDialog, event);
+    		this.set("dialogEvent", event);
+    		console.log(this.$.eventDialog, event, this.dialogEvent);
+
+    },
 	_computeBackWidth: function(displayType, computedWidth)
 	{
 		
 		if(displayType=="One Week At A Time"){
-			var width = Math.floor((5*parseInt(computedWidth))/45);
-			console.log(width);
+			var width = Math.floor(parseInt(computedWidth)/9);
 			return width.toString()+"px";
 		}
-		"A Four Day Schedule",
-		"One Day At A Time"
+		else if(displayType=="A Five Day Schedule"){
+			var width = Math.floor(parseInt(computedWidth)/6.6);
+			return width.toString()+"px";
+		}
+	
+		// "One Day At A Time"
+
+	},
+	clearWorkArea: function(){
+		var	cda=[];
+		var course={};
+		course= new FcCourse();
+		course.calendarDayArray=this.fcCourseObject.calendarDayArray;
+		console.log(course.calendarDayArray);
+		this.set("fcCourseObject",course);
+		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
 
 	},
 	_computeBackHeight: function(displayType)
 	{
 
 	},
-	clearCalendar: function(){
-		var	cda=[];
-		var course={};
-		
-		course= new FcCourse();
-		course.calendarDayArray=this.fcCourseObject.calendarDayArray;
-		console.log(this.fcCourseObject.calendarDayArray);
-
-		this.set("fcCourseObject",course);
+	loadToDayCalendar: function(){
+		var calendarDayArray=this.fcCourseObject.calendarDayArray;
 		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
-		console.log(this.fcCourseObject.calendarDayArray);
+		console.log(course.calendarDayArray);
+		this.$.datePickerPro.initialize(calendarDayArray);
 	},
 
 	setCourse: function(e){
-		console.log(e);
 			this.set("fcCourseObject",e.model.course);
 	},
 	deleteCalendar: function(){
@@ -381,8 +497,6 @@ FcCalendarDialog= Polymer({
 		var deleteRef=new Firebase(firebase);
 		deleteRef.remove();
 		this.set("fcCourseObject", new FcCourse({}));
-
-
 	}, 
 	
 	createCalendar: function(){
@@ -474,8 +588,7 @@ inputValueAndLabelSerialization: function(valueOptions)
 _dateSelected: function(event) {
       var targetOne = event.target;
       while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
-        targetOne = targetOne.parentNode;
-       
+        targetOne = targetOne.parentNode; 
        }
        if(targetOne.nodeName=="FC-DATE-MINI")
          {

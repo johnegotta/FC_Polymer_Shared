@@ -1,0 +1,345 @@
+<dom-module id="fc-calendar-day-back">
+<template>
+<style>
+.primary{
+
+	color: #008;
+	font-weight:600;
+	font-size: 13.5px;
+	width: 167px;
+	
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 11px;
+	margin-top: 11px;
+	padding: 0 4px;
+	width: 50px;
+
+
+}	
+.circle{
+        border-radius: 180px;
+        position: absolute; 
+        top: 1px; 
+        left: 8px;
+        z-index: 180;
+        width: 12px;
+        height: 12px;
+        z-index: 28;
+        background: red;
+        border: 2px solid white;
+        padding: 2px;
+        margin: 0px 2px 2px 2px;
+        cursor: pointer;
+      
+        @apply(--shadow-elevation-8dp);
+
+      }
+iron-icon .small {
+	height: 14px!important;
+	width:14px!important;
+}
+.scheduling{padding: 0px 5px;}
+.header-class{min-height: 35px !important; max-height: 55px !important; height: 100%;}
+.selected{}
+</style>
+<div class="horizontal layout" id="main">
+<div 
+      class="circle" 
+      id="button" 
+      on-click="_onClearButtonClick"
+      hidden$="{{!isSingle}}">
+</div>
+<!-- <template is="dom-repeat" initial-count="7" class="horizontal layout flex" items="{{fcCourse.courseCalendarDaysArray}}" as="day"> -->
+	<div class="vertical layout" id="swipable" style="margin: 3px; border: silver 2px solid; height: {{backHeight}}; width:{{backWidth}};">
+			<section class="header-class layout horizontal" style="height: 44px!important; font-size:18px; background: [[_computeHeaderBackGround(calDay.*)]]; padding-top: 6px; text-align: center; font-family: merriweather;">
+					
+					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 6px;">
+					[[calDay.showDate]]
+					
+					 </section>
+				<div class="vertical layout flex nowrap">
+				<content select=".headerButton"></content>
+					 <!-- <section class="buttons flex-1" on-tap="addEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
+						</iron-icon>
+					</section> -->
+					 <section class="buttons flex-1" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: red;"icon="icons:remove-circle">
+						</iron-icon>
+					</section>
+				</div>
+			</section>
+		<paper-list-box style="min-height: 240px; overflow-y: scroll;">
+<!-- <div  on-dragover="allowDrop" style="max-height: 320px; max-width: 320px; overflow-y: scroll;" on-drop="handleDrop"> -->
+<content></content>
+<!-- <template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
+	
+			<fc-event-item 
+				drag-data="{{dragData}}"
+				draggable="true"
+				on-dragstart="handleDragStart"
+				event="{{event}}"
+				fc-course="{{fcCourse}}"
+				event-list="{{day.eventList}}" 
+				date="[[day.date]]"
+				back-width={{backWidth}}
+				cal-day="{{day}}"
+				date-id="[[day.dateId]]"
+			>
+			<content select=".buttons">
+			</content>
+			</fc-event-item>
+	</template> -->
+		<!-- </div> -->
+		</paper-list-box>
+</div>
+<!-- </template> -->
+</div>
+</template>
+<script>
+FcCalendarDayBack=Polymer({
+	is:"fc-calendar-day-back",
+	behaviors:
+		[
+			"FCBehaviors.FcCalendarBehaviorPrime"
+		],
+	observers:['courseObserver(fcCourse.courseCalendarDaysArray.*)'],
+	listeners:{'on-passclick': 'catchdate'},
+	properties:
+	{
+		fcCourse:{
+			type: FcCourse, 
+			value: function()
+			{
+			return new FcCourse();
+			},
+			notify: true,
+		},
+		isSingle:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		backHeight: {
+			type: String, 
+			value: "380px",
+			notify: true
+		},
+		backWidth:{
+			type: String,
+			value: "320px",
+			notify: true
+		},
+	
+		calDay:{
+			type: FcCalendarDay,
+			observer: "observeCalDay",
+			notify: true
+		},
+		eventList:{
+			type: Array,
+			value:[],
+			computed: "computeEventList(calDay)",
+			notify: true
+		},
+		courseCalendarDaysArray:{
+			type: Array,
+			value:[],
+			observer: "observeCalDays",
+			notify: true,
+		},
+
+   	hook: {
+   		type: Array,
+		value: [],
+		notify: true
+	},
+    sharedElements: {
+        type: Object,
+        value: function() {
+          return {
+            'hero': this.$.main
+          };
+        }
+      },
+    animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'scale-down-animation',
+              node: this.$.main,
+              transformOrigin: '50% 50%',
+              axis: 'y'
+            }]
+          }
+        }
+      }
+    },
+    _onClearButtonClick: function() {
+      this.fire('close');
+    },
+
+    catchdate: function(e){
+      console.log(e.item, e, "HERE I AM");
+
+
+
+
+     },
+
+
+	
+	computeEventList: function(calDay){
+		console.log(calDay.eventList);
+			return calDay.eventList;
+	},
+	_computeHeaderBackGround: function(daylist){
+			if(daylist.base && daylist.base.isTestDate===true)
+		{
+			return "gold; color: #008; font-weight: 700";
+
+		}
+		else{ return "#008; color: white; font-weight: 600";} 
+
+
+	},
+	// handleDragStart: function(e){
+ //     var cucumber =JSON.stringify(e.model.__data__.event);
+ //      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.__data__.event));
+ //      var pickle=localStorage.setItem("cucumber", cucumber);
+    
+ //    },
+	// handleDrop: function(e){
+	// 	e.preventDefault();
+	// 	var index = e.model.__data__.day.cdIndex;
+ //      var strData=(e.dataTransfer.getData("fcdata"));
+ //      var edata = JSON.parse(strData);
+ //        var ev=new FcEvent(edata);
+ //     	var p = new Date();
+ //     	p=p.getMilliseconds();
+ //     	ev.date=e.model.__data__.day.date;
+	// 	ev.evIndex=this.fcCourse.courseCalendarDaysArray[index].eventList.length;
+	// 	var pickle =ev.evId;
+	// 	pickle=pickle+p;
+	// 	ev.evId=pickle;
+	// 	this.push(["fcCourse.courseCalendarDaysArray", index, "eventList"], ev);
+ //      },
+ //    allowDrop: function (e) {
+ //      e.preventDefault();
+ //    },
+	
+	// _sortSlots: function(a,b){
+	// 		var ao = stringTime(a.startTime);
+	// 		var bo= stringTime(b.startTime); 
+	// 	if (ao> bo) {
+ //    		return 1;
+ //  			}
+ //  		if (ao < bo) {
+ //   	 		return -1;
+ //  			}
+ //  		if (ao ===bo){
+ //  			  return 0;
+	// 		}
+	// 	},
+	
+	
+	setDay: function(hday){
+		this.set("hook", hday);
+		},
+
+// 	addEvent:function(event){
+// 			console.log(event);
+// 			var index=event.model.__data__.day.cdIndex;
+
+// 			if(index==-1)
+// 			{	var model = event.model;
+// 				var day=model.__data__.day
+// 				var elist=day.eventList;
+// 				var len= elist.len;
+// 				var dateId=day.dateId;
+// 				console.log(len);
+// 				var course=model.__data__.fcCourse;
+// 				var index=this.fcCourse.courseCalendarDaysArray.length;
+// 				day.cdIndex=index;
+// 				day.inCourseCalendarDayArray=true;
+// 				day.color="#008";
+// 				day.background="#aecefe";
+// 				day.eventType="private course meeting";
+// 				day.dateText="Session";
+// 			var modelPst=new FcCourseEvent({activity: "Private Course Meeting", name: "Private Course Meeting", color: "purple", evIndex: len, eventType: day.eventType, courseEventType: day.eventType, date: day.date, showDate: day.showDate});
+	
+// 				this.push("fcCourse.courseCalendarDaysArray",day);
+
+// 			}
+// 			else{
+
+// 			var count=this.fcCourse.courseCalendarDaysArray[index].eventList.length;
+// 				var eventLi = this.fcCourse.courseCalendarDaysArray[index].eventList;
+// 				for(var i=0;i<count; i++)
+// 				{
+// 					this.set(["fcCourse.courseCalendarDaysArray", index,"eventList", i, "event.evIndex"], i);
+// 				}
+// 			var pst=new FcEvent({activity: "new event", evIndex: count});
+// 			this.push(["fcCourse.courseCalendarDaysArray",index,"eventList"], pst);
+// 			}
+// },
+
+	computeColorTwo: function(dayb){
+			// console.log(dayb);
+		return dayb;
+	},
+	eventListChanged:function(changeRecord){
+			// console.log(changeRecord);
+
+	},
+	_computeTestDayEvents:function(dayList){
+	if(daylist.base.isTestDate===true)
+		{
+			return "SAT TEST DATE";
+
+		}
+		else{ return "#008; color: white; font-weight: 600";} 
+
+
+	},
+
+	observeCalDays: function(newv, oldv){
+	//	console.log(newv, oldv);
+	}, 
+	observeCalDay: function(newv, oldv){
+		// console.log(newv, oldv);
+	}, 
+	courseObserver: function(changeRecord){
+		if(changeRecord){ if(changeRecord.base){
+						changeRecord.base.forEach(function(ind, index, array) {
+        				// console.log(ind.eventList);
+				});
+			}
+		}
+	},
+	_computeDays: function (ccd, single, hook){
+		if(!single){
+		return ccd.base;
+		}
+		else{ return hook;}
+	}, 
+
+
+});
+</script>
+</dom-module>
