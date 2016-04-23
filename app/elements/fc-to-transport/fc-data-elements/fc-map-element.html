@@ -1,0 +1,156 @@
+<dom-module id="fc-map-element">
+<template>
+<style is-custom-style>
+paper-card {
+  position: absolute;
+  bottom: 25px;
+  left: 25px;
+  z-index: 1;
+}
+paper-input{
+  width: 100%;
+  height: 65px;
+  
+}
+
+      google-map {
+        height: 500px;
+      }
+
+
+ paper-tabs {
+      --paper-tabs-selection-bar-color: #0D47A1;
+      margin-top: 16px;
+    }
+    paper-tab {
+      --paper-tab-ink: #BBDEFB;
+    }
+
+    paper-tab iron-icon {
+      margin-right: 10px;
+    }
+    paper-tab.iron-selected {
+      background: rgb(66, 133, 244);
+      color: white;
+    }
+</style>
+<div style="height: 750px; width: 1000px; position: fixed; top: 100px; left: 120px; border: silver 6px solid;">
+<google-map 
+        map="{{map}}" 
+        latitude="{{latitude}}" 
+        longitude="{{longitude}}" 
+        api-key="AIzaSyAd52WilQ0mCDinKptUAWABW8tEEL7zIz8"
+        disable-default-ui zoom="13">
+<!--       <google-map-marker 
+            map="{{map}}"
+            latitude="{{latitude}}" 
+            longitude="{{longitude}}"
+            title="Event Location" 
+            draggable="true">
+      </google-map-marker> -->
+    </google-map>
+    <google-map-directions map="{{map}}"
+        start-address="{{start}}"
+        end-address="{{end}}"
+        travel-mode="[[travelMode]]">
+     </google-map-directions>
+
+    <paper-card elevation="2">
+    <paper-icon-item>
+        <iron-icon icon="search" item-icon></iron-icon>
+        <paper-input label="Start" value="{{start}}"></paper-input>
+    </paper-icon-item>
+    <paper-icon-item>
+        <iron-icon icon="search" item-icon></iron-icon>
+        <paper-input label="End" value="{{end}}"></paper-input>
+    </paper-icon-item>
+    <paper-tabs selected="{{travelMode}}" attr-for-selected="label">
+  <paper-tab label="driving">
+    <iron-icon icon="maps:directions-car"></iron-icon>
+    <span>DRIVING</span>
+  </paper-tab>
+  <paper-tab label="walking">
+    <iron-icon icon="maps:directions-walk"></iron-icon>
+    <span>WALKING</span>
+  </paper-tab>
+  <paper-tab  label="bicycling">
+    <iron-icon icon="maps:directions-bike"></iron-icon>
+    <span>BICYCLING</span>
+  </paper-tab>
+  <paper-tab  label="transit">
+    <iron-icon icon="maps:directions-transit"></iron-icon>
+    <span>TRANSIT</span>
+  </paper-tab>
+</paper-tabs>
+    </paper-card>
+</div>
+
+
+
+</template>
+
+<script>
+"use strict";
+Polymer({
+	is:"fc-map-element", 
+	properties:{
+
+		travelMode: {
+			type: String, 
+			notify: true
+		},
+		start: {
+			type: String, 
+			value: "704 Ginesi Drive, New Jersey, 07751",
+			notify: true,
+		}, 
+		end: {
+			type: String, 
+			value: "704 Ginesi Drive, New Jersey, 07751",
+			notify: true
+		},
+    map:{
+      type: Object,
+      notify: true
+    },
+    latitude: {
+      notify: true
+    },
+    longitude: {
+      notify: true
+    }
+	}, 
+
+
+
+});
+</script>
+</dom-module>
+
+
+// intakeMap:{
+// 			type: Map, 
+// 			computed: "computeIntakeMap(keys, vals)",
+// 			notify: true, 
+// 			},
+// 		key: {
+// 			type: Array, 
+// 			computed: "computeIntakeMap(minute,location)", 
+// 			notify: true
+// 		},
+// 		keys:{
+// 			type: Array, 
+// 			notify: true
+// 		}, 
+// 		valueInput: {
+// 			notify: true,
+// 		},
+// 		val: {
+// 			type: Array,
+// 			notify: true, 
+// 		},
+// 		vals: {
+// 			type: Array, 
+// 			computed: "_computeVals()", 
+// 			notify: true,
+// 		},    

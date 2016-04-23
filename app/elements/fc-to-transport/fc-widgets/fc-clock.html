@@ -1,0 +1,617 @@
+<dom-module id="fc-clock">
+<style is="custom-style">
+.primary{
+	color: #008;
+	font-weight:600;
+	font-size: 15.5px;
+}
+.secondary{
+		color: grey;
+	font-weight:500;
+	font-size: 11px;
+}	
+.scroller{overflow-x: scroll;}
+:host{position: absolute;background: #fefefe; top: 8px;left: 8px;width: 240px; z-index:93;};
+
+paper-material{opacity: 1;position: relative;background: #ffffff;border: 3px ridge #aecdfe;padding: 6px 4px;margin: 20px;display: block;@apply(--horizontal-layout);@apply(--nowrap-layout);
+}
+paper-button{width: 58px!important; padding: 6px 2px; border: 1px ridge #aecdfe; margin:22px 0px 2px 0px; elevation: 3; }
+.arrows{opacity: 1;font-size: 22px; margin: 5px 8px 2px 8px; width: 24px; height: 24px;
+-webkit-transition: width 1s, height 1s, display 1s, background-color 1s, -webkit-transform 1s;
+    transition: width 1s, height 1s, background-color 1s, transform 1s, display 1s;
+}
+paper-button .pearl{ width: 100% height: 100%;  }
+.query-builder{opacity: 1;width: 12px;height: 12px;border-radius: 180px;padding: 2px;margin: 2px;border: #fff 1px solid;background: #aecdcd;color: white;  position: absolute;right: 3px;top: 1px;
+	}
+.clear{ width: 16px;height: 16px;border-radius: 180px;padding: 2px; margin: 2px;border: #fff 1px solid;background: red;color: white;  position: absolute;right: 0px;top: 0px; opacity: 2;}
+/*.glass{background: white;opacity: .7; }*/
+.ironOne{opacity: 2;width: 24px;height: 24px;border-radius: 180px;padding: 3px 5px 5px 5px;margin: 2px 7px;border: #008 3px solid;color: #008; background: #5DD7FC;color: white;box-shadow: 3px 14px 11px 4px #9fafaf;
+ -webkit-transition: width 1s, display 1s, height 1s, background-color 1s, -webkit-transform 1s;
+    transition: width 1s, height 1s, background-color 1s, transform 1s, display 1s;
+}
+.ironOne:active{ opacity: 1; color: gold; box-shadow: 0px;border: gold 5px solid; opacity: 2;}
+.ironTwo{width: 16px; opacity: 1; height: 16px;border-radius: 180px;padding: 5px;margin: 2px 7px;background: #5DD7FC;color: gold; box-shadow: 0px;border: #007 3px solid;}
+.timer{font-size: 17px; opacity: 1; font-weight: 600; font-family: merriweather; color: #007; padding: 6px 4px 2px 4px; border: .4px solid #efefef;}
+.slight{font-size: 14px; font-family: merriweather; opacity: 1; color: #008; font-weight: 400;}
+.slides{overflow: hidden; overflow-x: scroll;}
+</style>
+<template>
+<div style="padding: 4px; border: 4px double #008;" on-track="_focusedDraggable" draggable drags>
+<div style="padding: 6px; border: 4px #efefef double; cursor: move; text-align: center;" class="layout vertical"  on-track="dragYes">
+						<iron-icon 
+							icon="icons:query-builder" 
+							style="padding: 0px; cursor:cell; border-radius: 180px; height: 16px; width: 16px; position: absolute; right: 24px; top: 24px;" 
+							on-tap="toggle">
+						</iron-icon>
+	
+			<div style="padding: 1px; border: 1px #efefef solid; text-align: center;cursor:; overflow-x: hidden; background: white;" class="layout vertical"  on-track="dragYes">			
+				<paper-material class="layout vertical" elevation="3">
+					<span draggable drags class="slight">	
+						{{date}}		
+					</span>
+					<section id="theClock" on-click="opencollapse" class="timer">
+						{{theTime}} 
+					</section>	
+				</paper-material>
+
+<iron-collapse id="collapser"  class="horizontal layout center-justified glass">
+	<iron-selector selected="{{selected}}" class="horizontal layout center-justified nowrap" items="{{iconArrayA}}">
+		
+				<paper-tabs 
+			      		id="assistantMenu" 
+			      		scrollable="true"
+			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 180px; font-size: 18px;" on-tap="clickHandler"
+			      		bar="true"
+			      		hide-scroll-buttons="false" 
+			  			> 
+				<section  class="horizontal layout around-justified nowrap" style="overflow-x: scroll; padding: 0px 0px;">
+					<paper-list-box class="horizontal layout flex nowrap" tyle="overflow: hidden;">
+					<template is="dom-repeat" items="{{clockArray}}" as="clock" class="horizontal layout flex nowrap" style="overflow:hidden; overflow-x: scroll; width: 2200px;">
+							<paper-item  class="layout horizontal courseData clockinterfaces">
+									<paper-item-body  class="layout horizontal flex shrink">
+											<div class="primary">
+													<fc-ri-one id="dsvs_{{clock.thours.value}}{{clock.thours.clockName}}" orientation="horizontal" dataobject="{{clock.0}}">
+													</fc-ri-one>
+											</div>
+									</paper-item-body>
+							</paper-item>
+						</template>
+					</paper-list-box>
+				</section>
+			</paper-tabs>
+			</iron-selector> 
+		</iron-collapse>
+		</div>
+		<iron-collapse id="collapse"  class="horizontal layout center-justified glass">		
+			<div class="content" id="content" class="vertical layout center-justified" style="overflow-y: scroll; overflow-x: hidden; width: 360px; padding: 8px 4px;">
+		
+					<section class="horizontal flex layout nowrap self-stretch" style="padding: 2px; margin: 2px 12px 2px -12px;">
+
+						<fc-ri-one id="dsv" style="text-align: center;border: 2px #008 solid; text-size: 16px;" orientation="horizontal" data-transition="[[computeClockType(clockName)]]"  dataobject="{{currentClock}}">
+						</fc-ri-one>
+					</section>
+							<section class="horizontal layout flex center center-justified">
+					<section class="horizontal layout flex center center-justified" style="height: 24px; width: 100%; font-weight: 600; font-size: 18px; font-family: merriweather; color: #008; background: #fefefe; border: #afafaf 3px double;padding:2px;" data-transition="[[computeClockType(clockName)]]" on-tap="alterCurrentClock">
+					
+					[[computeClockType(clockName)]]
+				
+					</section>
+					</section>
+					<section style="width: 100%; padding: 4px;">
+					
+					</section>
+
+					<section class="horizontal flex layout nowrap center-justified" style="padding: 4px; margin-left: 2px;">
+						<span class="arrows" style="padding: 6px; color:white; border-radius: 180px; background: red; border: white 3px solid;width: 24px; height: 24px;box-shadow: 3px 14px 11px 4px #9fafaf;-webkit-transition: width 1s, display 1s, height 1s, background-color 1s, -webkit-transform 1s;transition: width 1s, height 1s, background-color 3s, transform 1s, display 3s;" on-tap="functionLeft">{{uparrow}}<iron-icon icon="icons:arrow-back" style="padding-bottom: 4px;" hidden$="{{nowUparrow}}"></iron-icon></span>
+							
+
+					<iron-icon class="ironOne" name="[[computeClockType(clockName)]]" on-tap="pressed" icon="device:add-alarm"></iron-icon>
+
+						<span class="arrows" style="padding: 6px; color:white; border-radius: 180px; background: green; border: white 3px solid;width: 24px; height: 24px;box-shadow: 3px 14px 11px 4px #9fafaf;-webkit-transition: width 1s, display 1s, height 1s, background-color 1s, -webkit-transform 1s;transition: width 1s, height 1s, background-color 1s, transform 1s, display 1s;" on-tap="functionRight">{{uparrow}} <iron-icon icon="icons:arrow-forward" hidden$="{{nowUparrow}}"></iron-icon></span>
+					</section>
+					<section class="horizontal flex layout nowrap center
+					 center-justified" style="width: 100%; font-size: 13px; font-weight:600; font-family: merriweather; color: #007; margin-left: 0px;">
+					<paper-button style="text-align: center;" class="horizontal layout flex center-justified" on-tap"stopAndView" >VIEW</paper-button>
+						<paper-button class="horizontal layout flex center-justified" on-tap="clear" style="text-align: center">CLEAR</paper-button>
+
+					<paper-button style="text-align: center;" class="horizontal layout flex center-justified" style="text-align: center;">SAVE</paper-button>
+					</section>
+				</div> 
+		</iron-collapse>
+	</div>
+</div>
+</template>
+<script>
+
+
+function FcClockData(argType, argSeconds)
+{
+	//this.clockType = argType;
+	this.thours = {name: "thours", value: 0, inputType: "digit", label:""};
+	this.hours = {name: "hours", value: 0, inputType: "digit", label: "H:"};
+	this.tmin = {name: "tmin", value: 0, inputType: "digit"};
+	this.min = {name: "min", value: 0, inputType: "digit", label: "M:"};
+	this.tsec = {name: "tsec", value: Math.floor(argSeconds / 10), inputType: "digit", label:"s"};
+	this.sec = {name: "sec", value: argSeconds % 10, inputType: "digit", label: "S"};
+	this.tenth = {name: "tenth", value: 0, inputType: "digit"};
+}
+
+FcClockData.prototype.convertToTenths = function()
+{
+	var result = 0;
+	result += this.tenth.value;
+	result += this.sec.value * 10;
+	result += this.tsec.value * 100;
+	result += this.min.value * 600;
+	result += this.tmin.value * 6000;
+	result += this.hours.value * 36000;
+	result += this.thours.value * 360000;
+	return result;
+};
+
+FcClockData.prototype.convertFromTenths = function(argTenths)
+{
+	this.tenth.value = argTenths % 10;
+	var fullsec = Math.floor(argTenths / 10) % 60;
+	this.sec.value = fullsec % 10;
+	this.tsec.value = Math.floor(fullsec / 10);
+	var fullmin = Math.floor(argTenths / 600) % 60;
+	this.min.value = fullmin % 10;
+	this.tmin.value = Math.floor(fullmin / 10);
+	var fullhour = Math.floor(argTenths / 36000);
+	this.hours.value = fullhour % 10;
+	this.thours.value = Math.floor(fullhour / 10);
+};
+
+
+
+FcClock = Polymer({
+	is: "fc-clock",
+	properties: {
+		clockArray2:{
+			type:FcClockData,
+			value: {},
+			notify:true
+		},
+		clockArray: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		currentClock: {
+			type: FcClockData,
+			value: {},
+			notify: true,
+		},
+		
+		clockType: {
+			type: String, 
+			computed:"computeClockType(clockName)",
+			notify: true,
+		},
+		
+		nowUparrow:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		drags:{
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		dragCounter:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		
+		theTime:{
+			type: String,
+			value:function(){
+				var newtime = new Date();
+				var update = newtime.toLocaleTimeString();
+				return update;
+			},
+			notify: true
+		}, 
+		uparrow:{
+			type: String,
+			value:"",
+			notify: true
+		},
+		downarrow:{
+			type: String,
+			value: "",
+			notify: true
+		}, 
+		clockName:{
+			type: String,
+			value: "",
+			observer:"clockwatcher",
+			notify: true
+		},
+		
+		clockIndex: {
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		isPressed:{
+			type: Boolean,
+			computed: "_computeIsPressed(pressedCD, pressedSW, pressedClock)",
+			notify: true
+		},
+		date:{
+			type: Date,
+			value:function(){
+				var d=new Date();
+				return d.toDateString();
+			},
+			notify: true
+		},
+		
+		slideStyle: {
+       		type: String,
+       		value: 'horizontal'
+      	},
+	
+	    transition: {
+        	type: String,
+        	value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+      	}, 
+      	fastSwatch: {
+      		type: Object,
+      		value: null, 
+      		notify: true
+      	},		
+      	now:{
+      		type: Date, 
+      		notify: true
+      	},
+      	
+	},
+	behaviors:[],
+
+	clockwatcher: function(newVal, oldVal){
+
+
+		console.log(newVal, oldVal);
+	},
+
+
+	ready: function() {
+	setInterval(this.updateClock, 10, this);
+
+	  var nowish = new Date().getTime()+30000;
+	  console.log(nowish);
+	  var ts=nowish/100
+	  argObjectFast=[];
+	  
+        this.clockArray.push(new FcClockData("Stopwatch", 10, 0, 0, 0, 0, 0, "digit", false, false, []));
+	  	this.set("currentClock", this.clockArray[0]);
+	  	console.log(this.currentClock.clockname, "rubby");  	
+	},
+
+	updateClock: function(argThis)
+	{
+		var self=argThis;
+		var update = new Date();
+		var time = update.toLocaleTimeString();
+		self.set("theTime", time);
+		//console.log(update);
+		self.set("now",update);
+	},
+
+
+	attached: function()
+	{	var clockname=this.currentClock.hours.clockname; 
+		this.set("clockName", clockname);
+		
+	},
+
+
+
+startFastStopwatch: function(argThisHundredths)
+	{
+		var hundredths = this.currentClock.convertToHundredths();
+		hundredths++;
+		this.currentClock.convertFromHundredths(hundredths);
+		this.notifyPath("currentClock.hundredth.value", this.currentClock.hundredth.value);
+	},
+	startStopwatch: function(argThisTenths)
+	{
+		var tenths = this.currentClock.convertToTenths();
+		tenths++;
+		this.currentClock.convertFromTenths(tenths);
+		this.notifyPath("currentClock.tenth.value", this.currentClock.tenth.value);
+	},
+opencollapse:function()
+{
+this.$.collapser.opened=!this.$.collapser.opened;
+
+},
+
+
+functionLeft: function(e){
+if(this.nowUparrow===true){
+	this.otherWayNow();
+}
+else{
+	if(this.clockIndex>0)
+	{var len =this.clockIndex-1;
+	this.set("currentClock", this.clockArray[len]);
+	
+	}
+	else{
+		var len=this.clockArray.length-1;
+	this.set("currentClock", this.clockArray[len]);
+	
+	}
+	this.set("clockName", this.currentClock.hours.clockname);
+	this.set("clockIndex", len);
+	//this.set("clockType", this.clockName);
+	}
+},
+functionRight: function(e){
+if(this.nowUparrow===true){
+	this.goNow();
+	 }
+else{
+	var len=this.clockArray.length -1;
+	if(this.clockIndex===len){
+		this.set("clockIndex", 0);
+	}
+	else{
+		this.set("clockIndex", this.clockIndex +1);
+	}
+
+	this.set("currentClock", this.clockArray[this.clockIndex]);
+	this.set("clockName", this.currentClock.hours.clockname);
+	this.currentClock = new FcClockData();	
+ }
+console.log(e, this.currentClock);
+console.log(e);
+
+},
+  alterCurrentClock: function(e)
+{
+console.log(e, e.model, e.target);
+var choice=this.currentClock.sec.clockname;
+console.log(this.choice);
+
+
+this.otherWayNow();
+
+
+ },
+    dragYes: function()
+    {
+    	this.drags=true;
+    	//this._focusedDraggable();
+    },
+  
+	goNow:function(){
+		console.log("goNow");
+		if(this.pressedSW==true && this.swatch==null)
+		{
+		 this.swatch=setInterval(this.startStopwatch.bind(this), 100,this);
+		}
+		else if(this.pressedFastSW==true && this.fastSwatch==null)
+		{
+				this.fastSwatch=setInterval(this.startFastStopwatch.bind(this),10,this);
+		}
+		else if(this.pressedCD==true && this.countDownFunc==null)
+		{
+			console.log("about to start Count Down");
+			this.countDownFunc=setInterval(this.countDown.bind(this),100,this);
+		}
+	},
+
+	otherWayNow:function(){
+		//this.set("swatch", null);
+		clearInterval(this.swatch);
+		clearInterval(this.countDownFunc);
+		clearInterval(this.fastSwatch);
+		this.pressedCD==false;
+		this.set("pressedFastSW",false);
+		this.pressedSW==false;
+		this.pressedClock==false;
+	},
+
+	toggle: function(e)
+	{	
+		this.$.collapse.opened=!this.$.collapse.opened;
+		var setVal = this.swapIcons=="query-builder"?"clear":"query-builder";
+		this.set("swapicons", setVal);
+	},
+
+	attached: function()
+	{	var clockname=this.currentClock.hours.clockname; 
+		this.set("clockName", clockname);
+		setInterval(this.updateClock, 1000, this);
+		console.log("attached");
+	
+
+	},
+
+	countDown: function(argThis)
+	{
+		var tenths = this.currentClock.convertToTenths();
+		if(tenths != 0)
+		{
+			tenths--;
+			this.currentClock.convertFromTenths(tenths);
+			this.notifyPath("currentClock.tenth.value", this.currentClock.tenth.value);
+		}
+		else
+		{
+			alert("done");
+			clearInterval(this.countDownFunc);
+			this.set("countDownFunc", null);
+		}
+	},
+	computeClockType: function(clockName){
+		console.log(clockName);
+		return clockName;
+
+		
+		
+
+
+
+
+	},
+	switchClock: function(isPressed)
+	{this.push("currentClock", this.secondaryClockArray);
+
+
+
+	},
+clickHandler: function(e) {
+			console.log(e);
+			if(e.target.selected!=undefined){
+				var sel = e.target.selected;
+				this.set("app.selected", sel);
+			}
+		  var button = e.target;
+		  while (!button.hasAttribute('data-transition') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-transition')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-transition');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id, "LOOOK HERE DUMMY", dialog);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		},
+
+
+
+	_computeIsPressed: function(pressedCD, pressedSW,pressedFastSW,	 pressedClock)
+	{
+		var torf =(pressedCD===true || pressedSW===true || pressedClock === true|| pressedFastSW===true);
+		return torf;
+	},
+
+	showClock: function(pressedClock)
+	{
+		var retVal =(this.pressedClock==true)?false: true;
+		return retVal;
+	},
+
+	showStopwatch: function(pressedSW)
+	{
+		var retVal =(this.pressedSW==true)?false: true;
+		return retVal;
+	},
+	showFastStopWatch: function(pressedFastSW)
+	{
+		var retVal =(this.pressedFastSW===true)?false: true;
+		return retVal;
+	},
+
+
+	showCountdown: function(pressedCD)
+	{
+		var retVal =(this.pressedCD==true)?false: true;
+		return retVal;
+	},
+
+	pressed:function(e)
+	{
+		var button = e.target;
+		console.log(e, e.target); 
+		var name=e.target.name;
+		if(this.isPressed==true){Polymer.dom(button).classList.remove("ironTwo");}
+		else{Polymer.dom(button).classList.add("ironTwo");}
+		if(name=="AlarmClock"){
+			this.pressedClock=!this.pressedClock;
+			this.showClock();
+		}
+		if(name=="Stopwatch"){
+			this.pressedSW=!this.pressedSW;
+			this.showStopwatch();
+		}
+		if(name=="'Fast' Stopwatch")
+		{
+			this.pressedFastSW=!this.pressedFastSW;
+			this.showFastStopWatch();
+
+		}
+		if(name=="Countdown" || name=="'SAT' Countdowns"){
+			this.pressedCD=!this.pressedCD;
+			this.showCountdown();
+		}
+		var buttons = this.querySelectorAll(".ironOne");
+		var counter=buttons.length;
+		for(var i=0; i<counter; i++){
+			if(buttons[i]!=button && buttons[i].hidden==false){buttons[i].hidden=true;}
+			else{buttons[i].hidden=false;}
+			} 
+		this.nowUparrow=!this.nowUparrow;
+		var retVal = this.uparrow ==""? '▲': "";
+		this.set("uparrow", retVal);
+		var detVal = this.downarrow ==""? '▼': ""; 
+		this.set("downarrow", detVal);
+		//var nameplus = (this.clockName=="")?"Set " + name:"";
+		//this.set("clockName", nameplus);
+	},
+
+
+	clear: function(){
+		
+		this.set("clockName", this.currentClock.hours.clockname);
+		this.set("currentClock","null");
+		
+
+	},
+
+	_focusedDraggable:function(e)
+	{
+	  	// console.log("we tried to drag");
+	  	if(this.drags==true){
+	        var self=this;
+	        e.preventDefault();
+			switch(e.detail.state)
+			{
+	          case 'start':
+	            // console.log('START NoWayAreWe Draggin');
+	            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+	            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+	            console.log('top distance differenced?' + self._topprime);
+	            // }
+	            self.changeX=0;
+	            self.changeY=0;
+	            Polymer.dom.flush();
+	            break;
+	          case 'track':
+	            self.changeX=e.detail.ddx + self.changeX;
+	            self.changeY=e.detail.ddy + self.changeY;
+	            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+	            break;
+	          case 'end':
+	            console.log(self._topprime);
+	            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+	            self._bottom = self.getBoundingClientRect().top;
+	            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+	            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+	            self.translate3d(0, 0, 0);
+
+	            console.log("ENDING", self._x);
+	            self.style.left=self._x.toString()+'px';
+	            self.style.top=self._y.toString()+'px';
+	            console.log('y: ' + e.detail.y);
+	            self.dragging=false;
+	            Polymer.dom.flush();
+	            break;
+	        }
+	    }
+	}
+
+});
+</script>
+</dom-module>

@@ -8,12 +8,12 @@ opacity: 1;}
 .primary{
 	color: #008;
 	font-weight:600;
-	font-size: 15.5px;
+	font-size: 16.5px;
 }
 .secondary{
 		color: brown;
 	font-weight:500;
-	font-size: 11px;
+	font-size: 13px;
 
 }
 .headerLeft{
@@ -133,7 +133,7 @@ paper-button{max-width: 357px;}
  				</fc-event-element>
  			</div>
  		</div>
- 		<div id="widthBasis" class="layout horizontal flex" style="margin-top: 8px; padding: 10px;padding-bottom: 0px;">
+ 		<div id="widthBasis" class="layout horizontal flex-2" style="margin-top: 8px; padding: 10px;padding-bottom: 0px;">
  		<fc-input-prime 
  				value="{{displayType}}"
  				input-type="select"
@@ -148,14 +148,14 @@ paper-button{max-width: 357px;}
  		<paper-tabs 
  			id="calendarTabs" 
  			scrollable="true" 
- 			style="padding: 2px 0px; height: 400px; outline: 0px; overflow: hidden; overflow-x: scroll;" 
+ 			style="padding: 2px 0px; height: 450px; outline: 0px; overflow: hidden; overflow-x: scroll;" 
  			class="horizontal layout" 
  			bar="true" 
  			hide-scroll-buttons="false">  
 			<div 
 				class="horizontal layout justified" 
 				style="width: 100%; margin: 9px; overflow-x: scroll;">
-			<template is="dom-repeat" initial-count="12" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}" as="day">		
+			<template is="dom-repeat" initial-count="16" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}" as="day">		
 				<fc-calendar-day-back 
 						back-width="{{backWidth}}"
 						back-height="{{}}"
@@ -248,10 +248,12 @@ paper-button{max-width: 357px;}
 FcCalendarDialog= Polymer({
 	is:"fc-calendar-dialog",
 	behaviors:[
-			"FCBehaviors.FcCalendarBehaviorPrime",
+			// "FCBehaviors.FcCalendarBehaviorPrime",
 			"Polymer.IronResizableBehavior"
 		 // "Polymer.PaperDialogBehavior"
 		  ],
+
+	listeners: {"mywidth": "reportsize", "click": "myclickgetter"},
 	observers:["observeEventTypes(dialogEvent.*, event.*)"],
 	properties:{
 		fcCourseObject:{
@@ -350,12 +352,31 @@ FcCalendarDialog= Polymer({
 	{	
 		this.set("fcCourseObject", new FcCourse());
 		var self=this;
-		var valueArray=FcCourse.getMoreInputs();
+		var valueArray=FcCourse.getInputs();
 		valueArray.forEach(function(item, index, array){
 			 self.push("valueOptions",item);
+
 		 });
 	},
 
+	attached: function()
+	{		
+		this.set("firstTime", false);
+		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
+		this.set("inputs", inputO);	
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
+		this.set("outputs", outputs);
+		console.log(this.fcCourseObject.courseCalendarDaysArray);
+		this.getFireBaseCourses();
+		console.log(this.courses);
+	},
+
+	reportsize:function(e){
+		console.log(e, e.model, e.target);
+	},
+	myclickgetter: function(e){
+		console.log(e.target, e.parent, e);
+	},
 	observeEventTypes: function(dev, ev){
 	if(dev){console.log(dev, dev.base, dev.value);} 
 	if(ev){console.log(ev, ev.base, ev.value);}
@@ -513,19 +534,6 @@ handleDragStart: function(e){
 		});
 		
 		 this.set("fcCourseObject.courseCalendarDaysArray", sortedCalDays);
-	},
-
-
-attached: function()
-	{		
-		this.set("firstTime", false);
-		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
-		this.set("inputs", inputO);	
-		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
-		this.set("outputs", outputs);
-		console.log(this.fcCourseObject.courseCalendarDaysArray);
-		this.getFireBaseCourses();
-		console.log(this.courses);
 	},
 
 

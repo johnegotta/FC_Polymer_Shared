@@ -7,31 +7,51 @@
 	color: #008;
 	font-weight:600;
 	font-size: 13.5px;
-	/*width: 197px;*/
+	width: 187px;
 	
 }
+paper-item{padding: 2px;}
+paper-item-body{padding: 2px;}
+paper-icon-button{
+	float: right;
+	margin-right: -8px;
+	padding: 0px;
+	height: 16px!important;
+	width: 16px!important;
+}
 fc-input-prime{
-			height: 24px !important;
-			top-margin: -8px;
+			height: 42px !important;
+		
+
+
 	}
+	.buttons{height: 24px; width: 24px; border-radius: 180px;}
+	.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
 		.two{
 		font-family: merriweather; 
 		display: inline-block;
-		height: 30px !important;
+		height: 38px !important;
 		color: brown;
 		font-weight: 600;
-		/*min-width: 170px;*/
+		min-width: 170px;
 		max-width: 198px;
 		overflow: hidden;
 		white-space: nowrap;
-			font-size: 12px;
+			font-size: 15px;
 	}
 .secondary{
 		color: grey;
 	font-weight:500;
-	font-size: 11px;
-	margin-top: 11px;
-	padding: 0 3px;
+	font-size: 12px;
+	padding: 0px;
 	/*width: 50px;*/
 
 
@@ -40,32 +60,47 @@ iron-icon .small {
 	height: 14px!important;
 	width:14px!important;
 }
-.scheduling{padding: 0px 2px;}
-.header-class{min-height: 35px !important; max-height: 55px !important;}
+.scheduling{padding: 0px;}
+.header-class{min-height: 22px !important; max-height: 48px !important;}
 .selected{}	
 </style>
-<div draggable="true" style="width: {{computeItemWidth(backWidth)}};">
-	<paper-item draggable="true" style$="border: 1px #aeaeae solid; background:{{event.color}}; width: {{computeItemWidth(backWidth)}};" class="layout horizontal scheduling" draggable="true">
-		<paper-item-body style$="background: {{event.color}};" class="layout horizontal" value$="{{value}}">
-		<!-- <content></content> -->
-			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: {{event.color}};" >
-				<fc-input-prime style$="width: {{computeWidthTime(backWidth)}}; font-size: 10px; margin-left: -8px;" label="Start Time" name$="{{event.startTime}}" input-type="tiny" label-hidden="true" value$="{{event.startTime}}"></fc-input-prime>
-			</div>
-			<div class="primary layout horizontal flex-4 self-stretch" style$="background: {{event.color}};">
-					<span class="two">
-			<fc-input-prime style$="width: {{computeWidthText(backWidth)}};" input-type="text" label$="[[activity]]" name$="{{event.name)}}" label-hidden="false" style="border: 0px white dashed; margin-left: -12px;" value$="{{event.name}}"></fc-input-prime> &nbsp; &nbsp;</span></div>
-			<div class="secondary layout horizontal flex-1 self-shrink" style$="background: {{event.color}};" >
-				<fc-input-prime style$="width: [[computeWidthTime(backWidth)]]; font-size: 10px; margin-left: -8px;" label="End Time" name$="{{event.endTime}}" input-type="tiny" label-hidden="true" value$="{{event.endTime}}"></fc-input-prime>
-			</div>
-			<div class="layout vertical" style="padding-left: 2px;">
-				<content select=".dialogButton"></content>
-				<section class="buttons" hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" on-tap="deleteEvent" style="border-radius:180px;">
+<div draggable="true" 
+style="width: {{computeItemWidth(backWidth)}}; border: silver 1.5px solid;">
+	<paper-item 
+		on-tap=""
+		on-drag="" 
+		class="layout-horizontal courseData"
+	>
+	<paper-item-body  
+		class="vertical layout flex-4 one">
+		<div 
+			class="primary layout horizontal self-stretch two" 
+			style$="background: white; color:{{event.color}};">
+			<!-- <fc-input-prime 
+					input-type="text" 
+					label$="[[event.activity]]" 
+					name$="{{event.name)}}" 
+					label-hidden="true" 
+					style$="border: 0px white dashed;margin-left: -6px; width: {{computeWidthText(backWidth)}};" 
+					value$="{{event.name}}">
+			</fc-input-prime> -->
+			{{event.name}}: {{event.price}}
+		</div>
+		<div 
+			class="secondary">
+			{{event.startTime}} --	{{event.endTime}}
+		</div>
+	</paper-item-body>
+	<section class="vertical layout flex-1">  	
+	<content select=".dialogButton">
+	</content>
+	<section class="buttons" hidden$="[[computeHideDelete(event.isHoliday, event.activity)]]" on-tap="deleteEvent" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: red; background: silver;" icon="icons:add-circle-outline">
 					</iron-icon>
 			</section>
-	   		</div> 
-		</paper-item-body>   	
-	</paper-item>
+	</section>
+</paper-item>
+
 		</div>
 		
 
@@ -145,9 +180,7 @@ FcEventItem=Polymer({
 		w=w.toString()+"px";
 		return w;
 	},
-	openup: function(){
-	this.$.myeventDialogue.opened=!this.$.myeventDialogue.opened;	
-	},
+
 	computeHideDelete: function(isHoliday, activity){
 		return (activity=="SAT Test Date" || isHoliday==true);
 	},

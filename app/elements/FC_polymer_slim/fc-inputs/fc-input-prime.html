@@ -366,7 +366,7 @@ input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-f
 			hidden$="{{!unlessSelect}}"
 			is="iron-input" 
 			id="fcinput"
-			
+			style$="{{inputStyle}}"
 			bind-value="{{value}}"
 			checked="{{checkedProp::change}}"
 			inputValue="{{bindValue}}"
@@ -460,6 +460,11 @@ FcInputPrime=Polymer({
 		'uncheck':"_radioUncheck"
 	},
 	properties:{
+		inputStyle: {
+			type: String,
+			notify: true,
+			reflectToAttribute: true
+		},
 		myInputeName:{
 			type:String,
 			value: "",
@@ -650,6 +655,11 @@ FcInputPrime=Polymer({
 			type: String,
 			notify: true //local option is the type the use and the count in the page element--we are going to map the mother f
 		},
+		cuTimeSet:{
+			type: String,
+			computed: "_computeSetCurrentTime(inputType, currentTime, isCurrentTime)",
+			notify: true,
+		},
 		isTight: {
 			type: Boolean,
 			value: false, 
@@ -701,6 +711,11 @@ FcInputPrime=Polymer({
 			notify: true,
 		
 		},
+		isCurrentTime: {
+				type: Boolean, 
+				value: false,
+				notify: true
+		}, 
 		myChecked: {
 			type: Boolean,
 			value: function(){
@@ -725,7 +740,7 @@ FcInputPrime=Polymer({
 		},
 		inputName:{
 			type: String,
-			computed: "_computeInputName(inputType, name, )",//localName Could be replaced with inputId
+			computed: "_computeInputName(inputType, name)",//localName Could be replaced with inputId
 			notify: true
 		},
 		inputDefaultValue: {
@@ -948,6 +963,19 @@ _computeRepeater: function(isRepeaterSelect){
 			 this.set("inputValue", returnVal);
 			 this.set("bindValue", returnVal);
 			 this.set("readonly", true);
+			 //console.log("value time");
+			  return returnVal;
+			}
+		},
+	_computeSetCurrentTime:function(inputType, currentTime, isCurrentTime)
+		{ ////console.log("value time");
+			if(inputType=="datetime-local" && this.doAgain>0 && isCurrentTime==
+				true){//console.log("dateTime-local", this.isTimeStamp);
+			 var returnVal=currentTime.toInputDateTimeLocal;
+			 this.set("value", returnVal);
+			 this.set("inputValue", returnVal);
+			 this.set("bindValue", returnVal);
+			 this.set("readonly", false);
 			 //console.log("value time");
 			  return returnVal;
 			}
