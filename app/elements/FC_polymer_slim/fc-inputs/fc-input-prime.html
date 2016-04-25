@@ -64,15 +64,16 @@ section: {
 	font-weight: 600;
 
 }
-input.text:focus, input.datetime-local:focus, input.date:focus,  input.range:focus,  .number:focus, input.tel:focus,  input.email:focus {
+input.text:focus, input.text, input.datetime-local, input.datetime-local:focus, input.date:focus,  input.range:focus,  .number:focus, input.tel:focus,  input.email:focus {
 	border: 0px dashed #fff;
 	outline: 0px;
 	box-shadow:0px;
-	border-bottom:1px solid blue;
+	border-bottom:1px solid #008;
 	color:  brown;
 	font-weight: 600;
 
 }
+
 input[type=datetime-local]{
 	line-height: .85;
 }
@@ -240,9 +241,9 @@ span.digit{display: none;}
 iron-icon.digit{display: none;}
 section.digit{max-width: 28px; max-height: 32px; padding: 2px; margin: 0px; outline:0px; display: block; @apply(--horizontal-layout);@appy(--layout--flex-none);@apply(--layout-block);};
 label.digit{font-size: 12px; margin-left: -3px;color:#009;font-family: merriweather; font-weight: 500;}
-input.digit{height: 23px; border: 0px; font-size: 20px; font-weight: 600; font-family: roboto; outline:0px; color: #008; @apply(--layout-block);
+input.digit{height: 23px; border: 0px; font-size: 18px; font-weight: 600; font-family: roboto; outline:0px; color: #008; @apply(--layout-block);
 }
-label.datetime-local{margin-bottom: 0px; margin-top: 2px; font-weight: 600; line-height: .75;}
+label.datetime-local{margin-bottom: 0px; margin-top: 2px; margin-left: -2px; font-weight: 600; line-height: .75;}
 select{max-height: 75px; padding: 4px; font-weight: 600; font-family: merriweather; font-size: 16px; font-color: brown;}
 
 section.range{ 
@@ -292,6 +293,23 @@ select {outline: 0px solid white; border: 0px solid white; background: inherit;,
 /*input.select{opacity: .2;}*/
 label.tiny{ background: inherit; padding: 1px; font-size: 10px; font-weight: 600; font-family: merriweather;color: #008;}
 input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-family: merriweather; background: inherit;}
+@import "compass/css3";
+input[type=datetime-local].display{text-align: center; margin: auto; padding: 0px;}
+input[type=datetime-local].display::after{content:  '▲';}
+input[type=datetime-local].display::-webkit-outer-spin-button, /* Removes arrows */
+input[type=datetime-local].display::-webkit-inner-spin-button, /* Removes arrows */
+input[type=datetime-local].display::-webkit-clear-button { /* Removes blue cross */
+  -webkit-appearance: none;
+  margin: 0;
+  width: 0px;
+  padding: 0px;
+  display: none;
+}
+input[type=datetime-local].display::-webkit-calendar-picker-indicator {
+    -webkit-appearance: none;
+  margin: 0;
+}
+ 
 </style>
 <template>
 
@@ -328,7 +346,8 @@ input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-f
 		<label
 			name$="[[labelName]]"
 			hidden$="[[labelHidden]]" 
-			id$="[[labelId]]" 
+			id$="[[labelId]]"
+			style$="[[labelStyle]]" 
 			for$="[[inputId]]" 
 			class$="[[inputType]] [[isTest]]"
 			>
@@ -400,7 +419,7 @@ input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-f
         	results$="[[results]]"
         	accept$="[[accept]]"
 			name="{{name}}" 
-			class$="[[inputType]]"
+			class$="[[inputType]] [[_computeTdClass(isTimeDisplay, inputType)]]"
 			label$="{{item.inputLabelB}}"
 			 type$="[[_computeType(inputType)]]" 
 			list$="[[list]]"  	
@@ -755,6 +774,11 @@ FcInputPrime=Polymer({
 			notify: true	
 
 		},
+		timeBind: {
+			type: Date,
+			observer: "makeTime",
+			notify: true
+		},
 		inputName:{
 			type: String,
 			computed: "_computeInputName(inputType, name)",//localName Could be replaced with inputId
@@ -763,6 +787,11 @@ FcInputPrime=Polymer({
 		inputDefaultValue: {
 			type: String,
 			value:"text",
+			notify: true
+		},
+		isTimeDisplay:{
+			type: Boolean,
+			value: false,
 			notify: true
 		},
 		isTimeStamp:{
@@ -776,6 +805,10 @@ FcInputPrime=Polymer({
 			value: function(){return false;},
 			notify: true, 
 			reflectToAttribute: true
+		},
+		labelStyle:{
+			type: String,
+			notify: true
 		},
 		maxlength:{
 			type: Number,
@@ -827,6 +860,13 @@ _computeRepeater: function(isRepeaterSelect){
 
 
 	},
+	_computeTdClass: function(is){
+		if(is && this.inputType=="datetime-local"){
+			return "display";
+		}
+
+
+	},
 	
 _computeIsDigit: function(it){
 	console.log(it);
@@ -842,14 +882,13 @@ _computeIsDigit: function(it){
 		if(inputType=="digit"){
 		this.$.fcinput.name=this.name;
 		this.set("type", "text");
-		this.set("pattern", "[0-9]{1}")
-		this.set("allowedPattern", "[0-9]{1}");
+		this.set("pattern", "[0-9AP]{1}")
+		this.set("allowedPattern", "[0-9AP]{1}");
 		this.set("preventInvalidInput", true);
 		this.set("class", "digit");
-		this.set("title", "A digit between 0 and 9, inclusive.");
+		this.set("title", "Input a digit between 0 and 9, inclusive.");
 		this.set("maxlength", 1);
-		// this.set("min", 0); 
-		// this.set("max", 9);
+
 		}
 	},
 	computeSection1Layout: function (inputType){
@@ -878,6 +917,16 @@ _computeIsDigit: function(it){
 				//console.log("IN CHECKOBSERVER", this);
 				}
 		}
+	},
+	makeTime:function(newVal, oldVal){
+			if(newVal && this.inputType=="datetime-local")
+			{
+				var time= this.dateTimeInputs(newVal);
+				this.set("bindValue", time.toInputDateTimeLocal);
+				console.log(time, time);
+				this.set("value",time.toInputDateTimeLocal);
+				console.log(this.value);
+			}
 	},
 	trackRanger: function(e){
 		if(this.inputType=="range"){
@@ -935,7 +984,13 @@ _computeIsDigit: function(it){
 	
 	_computeCurrentTime: function(inputType, doAgain){
 		if(inputType=="datetime-local"){
-			var theDate = new Date();	
+			var theDate = this.dateTimeInputs();
+			return theDate;
+		}
+	},
+
+dateTimeInputs: function(dateObj){
+			var theDate = (dateObj)?new Date(dateObj): new Date();	
 			var yearNjs = theDate.getYear();
 			var yearN = (yearNjs + 1900);
 			var year = yearN.toString();
@@ -945,7 +1000,7 @@ _computeIsDigit: function(it){
 			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
 			var hoursN = theDate.getHours();
 			var ampm = hoursN >= 12? "PM": "AM"; 
-			//done her for convenience comparison: do right way later//
+
 			var minutesN = theDate.getMinutes();
 			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
 			var secondsN = theDate.getSeconds();
@@ -968,6 +1023,7 @@ _computeIsDigit: function(it){
 				"minutes":minutes, 
 				"seconds":seconds, 
 				"milliseconds":milliseconds,
+				"ampm": ampm,
 				"yearN": yearN,
 				"monthN": monthN,
 				"dateN": dateN,
@@ -982,11 +1038,7 @@ _computeIsDigit: function(it){
 
 									};
 			return holderObject;
-		}
-	},
-
-	updateTime: function(){
-		this.doAgain++;
+		
 	},
 
 	_computeTimeStamp: function(inputType, currentTime, isTimeStamp)
@@ -1045,23 +1097,6 @@ _computeIsDigit: function(it){
 				this.set("isIcon2", true);
 		}
 		if(this.inputType=="tight") {this.set("type", "text");}
-		// console.log("attached");
-		// this.counter=0;
-		// this.counter++;
-		// var d = new Date();
-		// console.log(d);
-		// console.log(interval);
-		// var interval = d.setMinutes(+65, 00, 00)- d.getMinutes();
-		// while(interval>0 && this.counter<30000){
-		// 	console.log(interval, this.counter, interval);
-		// 	this.counter+=this.counter;
-		// var interval = d.setMinutes(+65, 00, 00)- d.getMinutes();
-		// 	console.log(interval, this.counter, interval);
-		// }		
-	
-
-		// this.counter+=this.counter;
-		
 
 	},
 	_computeHorizontal: function (inputType){

@@ -92,8 +92,8 @@ fc-input-prime{
 
 <template>
 <div style="padding: 2px; border: 1px #efefef solid; width: 240px; outline: 3px solid #efefef">
-	<div style="padding: 2px; border: 2px #008 double; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
-		<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" class="layout vertical">
+<div style="padding: 2px; border: 2px #008 double; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
+			<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" class="layout vertical">
 			<template is="dom-repeat" items="{{soundingAlarms}}" as="alarm">
 					<paper-item two-line class="animatedalert" style="border: silver 1px solid; font-size: 12px; max-height: 20px!important;" on-tap="alarmoff">
 							<paper-item-body>
@@ -105,60 +105,81 @@ fc-input-prime{
 								</div>
 							</paper-item-body>
 					</paper-item>
-			</template>
-			<div class="layout horizontal flex center-justified">
+				</template>
+					<div class="layout horizontal flex center-justified">
+					
+
 				<paper-material style$="width: 165px; margin: 24px 20px {{toggleMargin}} 20px;" class="layout vertical" elevation="3">
 					<span draggable drags on-tap="toggle" class="slight">{{date}}</span>
 					<section id="theClock" cursor:pointer; on-dblclick="opencollapser" class="timer">{{theTime}} </section>	
 				</paper-material>
-			</div>
-  			<iron-collapse id="collapser"  class="vertical layout center-justified glass"> 
- 				<div class="layout vertical flex center-justified nowrap">
-					<section style="font-weight: 600; font-size: 16px;" class="horizontal layout flex nowrap center-justified">	
-						<section class="layout horizontal flex-2">
-							<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85" on-tap="selectPrevious" icon="icons:chevron-left">
-							</iron-icon>
-						</section>
-						<section class="layout horizontal flex-10 center-justified" style="cursor:pointer;">
-							<span class="clockname">
-								<span on-tap="selectApi">{{currentClock.clockType}}</span>{{computeTheSes(currentClock.clockType)}}
-							</span>
-						</section>
-						<section class="layout horizontal flex-2">
-							<iron-icon icon="icons:chevron-right" on-tap="selectNext" style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85">
-							</iron-icon>
-						</section>		
-					</section>
-					<div class="layout vertical flex center-justified nowrap" style="max-width: 235px!important; min-height: 52px; padding-right: 0px;">
-						<section class="layout horizontal flex nowrap center-justified">
-							<section class="layout horizontal flex nowrap center-justified" style="align-self: center;">
+				</div>
+  <iron-collapse id="collapser"  class="vertical layout center-justified glass"> 
+ <div class="layout horizontal flex center-justified nowrap">
+	<iron-selector selected="{{selected}}" class="vertical layout center-justified nowrap" items="{{clockArray}}" as="clock">
+	<section style="font-weight: 600; font-size: 16px;" class="horizontal layout flex nowrap center-justified"
+	>
+	<section class="layout horizontal flex-2">
+<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85" on-tap="selectPrevious" icon="icons:chevron-left">
+			</iron-icon>
+			</section>
+<section class="layout horizontal flex-10  center-justified" style="cursor:pointer;">
+<span class="clockname"><span on-tap="selectApi">{{currentClock.clockType}}</span>{{computeTheSes(currentClock.clockType)}}</span>
+</section>
+
+<section class="layout horizontal flex-2">
+<iron-icon icon="icons:chevron-right" 
+on-tap="selectNext" 
+style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85">
+</iron-icon>
+</section>
+		
+	</section>
+	<div class="horizontal layout flex center-justified nowrap" style="max-width: 235px;">
+	<section on-tap="selectPrevious" style="">
+			
+	</section>
+	
+				<section  hidden$="{{clockPrimarySwitch}}" class="vertical layout around-justified nowrap" style="max-width: 230px!important; padding-right: 0px;">
+						<section class="horizontal flex layout nowrap self-shrink">
+							<section class="horizontal layout nowrap" style="overflow-x: scroll;">
 								<fc-clobjid-prime 
 									id="dsv"
-									input-style="text-align: left; margin-left: 1px; margin-left: -5px; padding: 0px 1px; border: 1px silver solid; font-weight: 600;min-width: 7px;max-width: 15px;" 
+									input-style="text-align: left; margin-left: 1px; margin-left: -3px; padding: 0px 1px; border: 1px silver solid; font-weight: 600;min-width: 6px;max-width: 13px;{{computeFontSize(currentClock.clockData)}};" 
 									orientation="horizontal" 
-									dataobject="{{currentClock.allClockData}}"
+									dataobject="{{currentClock.clockData}}"
 									>
 								</fc-clobjid-prime>
-								<iron-icon on-tap="reset" hidden="{{_computeCalendar(currentClock.alarmName, currentClock)}}" style="background: white; padding: 0px; margin: 0px; color: #5DD7FC;" icon="icons:today"></iron-icon>
+							</section>
 								</section>
-						</section>
 						<paper-button 
-							class="horizontal flex layout nowrap center-justified self-stretch startbutton" 
+							class="horizontal flex layout nowrap center-justified startbutton" 
 							style$="color:{{onOffColor}};"
 							on-tap="toggleRunning">
-									[[currentClock.clockName]][[currentClock.alarmName]]
+									[[currentClock.clockName]]
 						</paper-button>
-					</div>
-						
- 							
- 						<iron-collapse id="collapse" class="vertical layout flex"> 
+					
+						</section>
+						<div style="min-height: 50px; max-width: 230px!important;" hidden$="{{!clockPrimarySwitch}}">
+
+ 								<fc-input-prime
+ 									input-type="datetime-local"
+ 									input-style="text-align: center; font-size: 16px;"
+ 									label="{{currentClock.alarmName}}"
+ 									is-time-display="true" 
+ 									time-bind="{{currentClock.alarmTime}}"
+ 									readonly="true"
+ 									label-style="color: #4285f4;  text-transform: uppercase;">
+ 								</fc-input-prime>
+ 							<iron-collapse id="collapse" class="vertical layout flex">
  							<audio loop id="myAlarmNoise" style="border: green 2px solid; width: 220px; height: 35px;">
   									<source src="fc-clock/beep-06.mp3" type="audio/mp3">
   										<source src="fc-clock/beep-10.mp3" type="audio/mp3">
 											Your browser does not support the audio element.
 							</audio>
-								
-									<!-- <fc-input-prime input-type="datetime-local" 
+								<form>
+									<fc-input-prime 
+										input-type="datetime-local" 
 										value="{{alarmTime}}" 
 										label="Set Alarm Date & Time"
 										style="text-align: left;"
@@ -166,65 +187,62 @@ fc-input-prime{
 										input-style="text-align: right; font-size: 14px; padding: 1px; margin: 0px; line-height: .8"; 
 										is-current-time="true">
 									</fc-input-prime>
-									<fc-input-prime style="text-align: left;"
+									<fc-input-prime 
+										style="text-align: left;"
 										input-type="text"
 										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
 										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
 										label="Alarm Name" 
 										value="{{alarmName}}">
-									</fc-input-prime> -->
-								<paper-tabs 
-		      						id="assistantMenu" 
-						      		scrollable="true"
-						      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-down="dragsOff" on-up="dragsOn"   on-tap="clickHandler"
-						      		bar="true"
-						      		hide-scroll-buttons="true"> 
+									</fc-input-prime>
+									<paper-tabs 
+			      		id="assistantMenu" 
+			      		scrollable="true"
+			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-down="dragsOff" on-up="dragsOn"   on-tap="clickHandler"
+			      		bar="true"
+			      		hide-scroll-buttons="true" 
+			  			> 
 									<!-- <section class="horizontal layout flex" style="overflow-x: scroll;width: 320px;"> -->
 									<paper-icon-button on-tap="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button>
-									<paper-icon-button on-tap="addAlarm" style="color: #4285f4;" icon="device:add-alarm"></paper-icon-button>
+									<paper-icon-button on-tap="addNewAlarm" style="color: #4285f4;" icon="device:add-alarm"></paper-icon-button>
 									<paper-icon-button on-tap="deleteAlarm" style="color: #C87533;" icon="icons:delete"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:restore"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:view-list"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:date-range"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:swap-vertical-circle"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="notification:event-available"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="social:notifications-active"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="notification:event-busy"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="notification:event-note"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="social:notifications-off"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:swap-horiz"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:alarm-off"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:gavel"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="social:person-add"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:language"></paper-icon-button>
-									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="maps:local-library"></paper-icon-button>
-									
-								</paper-tabs>
-								
-					</iron-collapse>
- 				</div>
-			<section class="horizontal flex layout nowrap center
+									</paper-tabs>
+								</form>
+							</iron-collapse>
+ 						</div>
+		</div>
+				
+			</iron-selector>
+		
+</div>
+		<section class="horizontal flex layout nowrap center
 					 center-justified" style="width: 100%; font-size: 13px; font-weight:600; font-family: merriweather; color: #007; margin-left: 0px;">
 					<paper-button style="text-align: center; border: 2px solid #efefef;" on-tap="addNewAlarm" class="horizontal layout flex center-justified">Add</paper-button>
 						<paper-button class="horizontal layout flex center-justified" style="text-align: center;border: 2px solid #efefef;" on-tap="resetCurrentClock">[[_computeResetButton(currentClock.isRunning)]]</paper-button>
 
 					<paper-button class="horizontal layout flex center-justified" style="text-align: center; border: 2px solid #efefef;" on-tap="alarmoff">off</paper-button>
-			</section>
-		</iron-collapse>
-		</div>
-		</div>
-		</div>
-		</template>
+		</section>
+	</iron-collapse>
 
+	</div>
+
+
+</div>
+</div>
+</template>
 <script>
 
 
 
-function FcClockData(argTenths, argFirstDigit, argLastDigit, argDateTime)
+function FcClockData(argTenths, argFirstDigit, argLastDigit, argInputObject)
 {	
 	var firstDigit = argFirstDigit || 0;
 	var lastDigit = argLastDigit || 7;
-	if(!argDateTime){
+	if(!argInputObject){
 	var digitArray = [
 		{name: "thours", value: 0, inputType: "digit", label:" "+" H"},
 		{name: "hours", value: 0, inputType: "digit", label:"H", colon:":"},
@@ -248,122 +266,619 @@ function FcClockData(argTenths, argFirstDigit, argLastDigit, argDateTime)
 	
 	this.convertFromTenths(argTenths);
 	}
-	if(argDateTime){
-		this.alarmDate=argDateTime;
-		this.getAlarmData(argDateTime);
+	if(argInputObject){
+		this.alarmData=argInputObject;
+		this.setAlarmData();
 
 	}
 }
-FcClockData.prototype.getAlarmData=function(argDateTime)
+FcClockData.prototype.setAlarmData=function()
 {	
-	var timeArray = [
-		{name: "thours", value: 0, inputType: "digit", label:"H"},
-		{name: "hours", value: 0, inputType: "digit", label:"H", colon:":"},
-		{name: "tmin", value: 0, inputType: "digit", label:"M"},
-		{name: "min",value: 0, inputType: "digit", label:"M", colon:":"},
-		{name: "tsec",value:0, inputType: "digit", label:"S"},
-		{name: "sec",value: 0, inputType: "digit", label:"S", colon:":"},
-		{name: "tenth", value: "", inputType: "digit", label:"s"},
-		{name: "hundredth", value: "M", inputType: "digit", label:"s"}
-	];
-	for(var i = 0; i < 8; i++)
-	{var obj = timeArray[i];
-		this[obj.name] = obj;
-	}
-	this.timeArray=timeArray;
-	this.alarmData=this.convertFromDateToPropertyValues(argDateTime);
-	this.setAlarmData();
-};
-FcClockData.prototype.setAlarmData=function(){
 	this.hundredth.value ="M";
 	var ampm= this.alarmData.ampm.split("");
 	var ap= (ampm[0]=="a" || ampm[0]=="A")?"A": "P";
 	console.log(ap);
 	this.tenth.value = ap;
 	this.sec.value = this.alarmData.secondsN%10;
-	this.tsec.value = Math.floor(this.alarmData.secondsN/10);
+	this.tsec.value = Math.floor(this.alarmData.secondsN);
 	this.min.value =this.alarmData.minutesN%10;
 	this.tmin.value =Math.floor(this.alarmData.minutesN/10);
 	this.hours.value =this.alarmData.hoursN%10;
 	this.thours.value =Math.floor(this.alarmData.hoursN/10);
-	this.monthN=this.alarmData.monthN;
-	this.yearN=this.alarmData.yearN;
-	this.dayOmonthN=this.alarmData.dateN;
-	this.toDateTimeLocalInput=this.alarmData.toInputDateTimeLocal;
-	console.log(this.timeArray);
-	
-	var nd = this.convertedFromInputToDate();
-	this.dateObject=nd;//dtl datetimelocal Date Object
-	this.calendarDate=new Date(this.yearN, this.monthN-1, this.dayOmonthN);
-};
-FcClockData.prototype.convertedFromInputToDate=function()
-{
-		var dtl = this.toDateTimeLocalInput.split("T");
-		var dpart=dtl[0].split("-");
-		var year = dpart[0];
-		var month=parseInt(dpart[1])-1;
-		var day=dpart[2];
-		var timepart= dtl[1].split(":");
-		var hours=timepart[0];
-		var minutes=timepart[1];
-		var atime = new Date(year, month, day, hours, minutes);
-		return atime;
-};
-FcClockData.prototype.convertFromDateToPropertyValues=function(argDateTime)
-{
-			var theDate = new Date(this.alarmDate);	
-			var yearNjs = theDate.getYear();
-			var yearN = (yearNjs + 1900);
-			var year = yearN.toString();
-			var monthN = theDate.getMonth() + 1;
-			var month = (monthN<10)? "0" + monthN.toString(): monthN.toString();
-			var dateN = theDate.getDate();
-			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
-			var hoursN = theDate.getHours();
-			var ampm = hoursN >= 12? "PM": "AM"; 
+	this.month.value=
 
-			var minutesN = theDate.getMinutes();
-			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
-			var secondsN = theDate.getSeconds();
-			var seconds =secondsN<10 && secondsN>0? "0" + secondsN.toString():secondsN==0? "0" +"0": secondsN.toString();
-			var millisecondsN = theDate.getMilliseconds();
-			var milliseconds = millisecondsN ==0? "0" + "0" + "0":millisecondsN >0 && millisecondsN<10? "0" +"0" + millisecondsN.toString(): millisecondsN >=10 && millisecondsN<100? "0" + millisecondsN.toString(): millisecondsN.toString(); 
-			var milliseconds = millisecondsN.toString();
-			var hoursNUS= hoursN>0 && hoursN>12? (hoursN-12): hoursN == 0? 12: hoursN;
-			var hours = hoursNUS <10? "0" + hoursNUS.toString(): hoursNUS.toString();
-			var hours24 = hoursN == 0? "0" + "0": hoursN<10 && hoursN>0?"0" + hoursN.toString(): hoursN.toString();
 
-			var timeNow = year+"-"+month+"-"+date+" "+hours+":"+minutes+" "+ampm;
-			var timeNowTwo = "Date: " + month + "/"+date+"/"+year+" Time: "+hours+":" + minutes+":"+ seconds+" " + ampm;
-			var toInputDateTimeLocal = year+"-"+month+"-"+date+"T"+hours24+":"+minutes;
-			var holderObject={
-				"year":year, 
-				"month":month, 
-				"date":date, 
-				"hours":hours, 
-				"minutes":minutes, 
-				"seconds":seconds, 
-				"milliseconds":milliseconds,
-				"ampm": ampm,
-				"yearN": yearN,
-				"monthN": monthN,
-				"dateN": dateN,
-				"hoursN": hoursN,
-				"minutesN": minutesN,
-				"secondsN": secondsN,
-				"millisecondsN": millisecondsN, 
-				"yearNjs": yearNjs, 
-				"timeNow": timeNow,
-				"timeNowTwo":timeNowTwo,
-				"toInputDateTimeLocal":toInputDateTimeLocal
-									};
-			return holderObject;
-};
-FcClockData.prototype.convertToTenths = function()
-{
-	var result = 0;
-	result += this.tenth.value;
-	result += this.sec.value * 10;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sec.value * 10;
 	result += this.tsec.value * 100;
 	result += this.min.value * 600;
 	result += this.tmin.value * 6000;
@@ -371,7 +886,6 @@ FcClockData.prototype.convertToTenths = function()
 	result += this.thours.value * 360000;
 	return result;
 };
-
 
 
 FcClockData.prototype.convertFromTenths = function(argTenths)
@@ -415,15 +929,15 @@ class FcClock
 		this.isRunning = false;
 		this.firstDigit = argFirstDigit;
 		this.lastDigit = argLastDigit;
-		this.allClockData = new FcClockData(argTenths, argFirstDigit, argLastDigit);
+		this.clockData = new FcClockData(argTenths, argFirstDigit, argLastDigit);
 	}
 	convertFromTenths(argTenths)
 	{
-		this.allClockData.convertFromTenths(argTenths);
+		this.clockData.convertFromTenths(argTenths);
 	}
 	convertToTenths()
 	{
-		return this.allClockData.convertToTenths();
+		return this.clockData.convertToTenths();
 	}
 	toggleRunning()
 	{
@@ -431,54 +945,16 @@ class FcClock
 		if(this.isRunning)
 		{
 			this.lastTurnedOff = d;
-			this.lastTurnedOffTenths = this.allClockData.convertToTenths();
+			this.lastTurnedOffTenths = this.clockData.convertToTenths();
 		}
 		else
 		{
 			this.lastTurnedOn = d;
-			this.lastTurnedOnTenths = this.allClockData.convertToTenths();
+			this.lastTurnedOnTenths = this.clockData.convertToTenths();
 		}
 		this.isRunning = !this.isRunning;
 	}
-};
-class FcAlarmClock {
-constructor(argName, argDateTime)
-	{
-		this.alarmName = argName;
-		this.clockType = "Alarmclock";
-		this.startTenths = 0;
-		this.firstDigit = 0;
-		this.lastDigit = 7;
-		this.clockData = new FcClockData(0, 0, 7, argDateTime);
-		var dataSet=this.clockData.convertFromDateToPropertyValues(argDateTime);
-		this.alarmData=dataSet;
-		this.alarmTime = new Date(argDateTime);
-		var now = new Date();
-		var active = (now < this.alarmTime);
-		this.isActive=active;
-		this.allClockData=this.setAlarmClockTimeDisplay();
-		this.dateObject=this.clockData.dateObject;
-		this.calendarDate=this.clockData.calendarDate;
-	}	
-	convertFromDateToProperties(argDateTime)
-	{
-		return this.clockData.convertFromDateToPropertyValues(argDateTime);
-	}
-	convertFromInputToDate()
-	{
-	return this.clockData.convertFromInputToDate();
-	}
-	getAlarmData()
-	{
-		return this.clockData.getAlarmData();
-	}
-	setAlarmSubData(){
-		this.clockData.setAlarmData();
-	}
-	setAlarmClockTimeDisplay(){
-		return this.clockData.timeArray;
-	}
-};
+}
 
 Polymer({
 	is: "fc-clock",
@@ -510,7 +986,7 @@ Polymer({
 		},
 		displayedArray:{
 			type: Array,
-			computed: "_computeDisplayedArray(fcClockArray, clockApi, openingArray,alarmArray)",
+			computed: "_computeDisplayedArray(fcClockArray, clockApi, openingArray)",
 			observer: "watchDisplayed",
 			notify: true
 		},
@@ -524,8 +1000,8 @@ Polymer({
 			value:function(){
 				return ["Countdown",
 						"Stopwatch",
-						"Alarmclock"
-						
+						"Alarmclock",
+						"Alltimers"
 							];
 			},
 			notify: true
@@ -653,7 +1129,7 @@ Polymer({
 				this.set("onOffColor", "green");
 		}
 		else{
-		this.set("currentClock.allClockData", new FcClockData(this.currentClock.startTenths, this.currentClock.firstDigit, this.currentClock.lastDigit));
+		this.set("currentClock.clockData", new FcClockData(this.currentClock.startTenths, this.currentClock.firstDigit, this.currentClock.lastDigit));
 		this.set("displayedArray." + this.currentIndex, this.currentClock);
 		}
 	},
@@ -665,30 +1141,24 @@ Polymer({
 	_computeDisplayedArray: function(fcClockArray, api, openingArray){
 		if(fcClockArray!==[] && this.openingArray!==[])
 			{
-				if(api!=="Alarmclock")
+				if(api!=="Alarmclock" && api!="Alltimers")
 				{
 					var retVal = fcClockArray.filter(function(val, index, arr){
 						return (val.clockType==api);
 						});
-					console.log(retVal, api, "heeeeeereeeee");
+					console.log(retVal, api);
 		
 					return retVal;
 				}
 				else if(api=="Alarmclock" && this.alarmArray)
-				{    console.log(api, this.alarmArray, this.displayedArray);
+				{    console.log(api, this.alarmArray);
 					return this.alarmArray;
 				}
 				else{return openingArray;}
 			}
 	}, 
 
-	_computeDataObject: function(one, two, three, four){
-		console.log(one, two, three, four)
-
-		if(one=="Alarmclock"){return three;}
-		else{return two;}
-
-	},
+	
 	computeFontSize: function(ccd){
 		console.log(ccd, ccd,ccd,ccd);
 	}, 
@@ -760,7 +1230,6 @@ this.set("toggleMargin",tm);
 	},
 	switchClock: function(num){	if(this.displayedArray && this.clockApi!="Alarmclock"){
 		this.set("clockIndex", num);
-		console.log(this.clockIndex, this.clockApi);
 		this.set("currentClock", this.displayedArray[num]);
 		this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
 		this.set("onOffColor", this.currentClock.isRunning?"red":"green");
@@ -769,8 +1238,8 @@ this.set("toggleMargin",tm);
 			if(!num){num=0;}
 			this.set("clockIndex", num);
 			this.set("currentClock", this.alarmArray[num]);
-			this.set("onOffIcon", this.currentClock.isActive?"icons:close":"icons:forward");
-			this.set("onOffColor", this.currentClock.isActive?"red":"green");
+			this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
+			this.set("onOffColor", this.currentClock.isRunning?"red":"green");
 		}
 		// else{this.set("clockApi", this.clockApi);}
 	},
@@ -815,11 +1284,11 @@ this.set("toggleMargin",tm);
 	    }
 	},
 	setClockConstructor:function(){
-		var nowish = (new Date()).getTime() + 50000;
-		var laterish = (new Date()).getTime() + 90000;
+		var nowish = (new Date()).getTime()+50000;
+		var laterish = (new Date()).getTime()+ 90000;
 		this.alarmArray = [];
-		this.addAlarm("NOW-ISH",nowish);
-		this.addAlarm("LATER-ISH", laterish);
+		this.addAlarm(nowish, "nowish");
+		this.addAlarm(laterish, "laterish");
 		this.fcClockArray = [];
 	  	this.push("fcClockArray", new FcClock("Reading Countdown", "Countdown", 39000, 0, 7));
 	 	this.push("fcClockArray", new FcClock("Writing Countdown", "Countdown", 21000, 0, 7));
@@ -835,7 +1304,6 @@ this.set("toggleMargin",tm);
 	  		return(val.clockType=="Countdown");
 	  	})
 	  	this.set("openingArray", temp);
-	  	console.log(this.openingArray, this.currentClock);
 	},
 
 	initializeClocks:function(){
@@ -873,9 +1341,9 @@ this.set("toggleMargin",tm);
 					if(self.currentClock.clockType!="Alarmclock")
 					{
 						clock.convertFromTenths(newTenths);
-						var path = "currentClock.allClockData.tenth.value";
-						var pathlight = "fcClockArray." + i + ".allClockData";
-						self.notifyPath(path, self.currentClock.allClockData.tenth.value);
+						var path = "currentClock.clockData.tenth.value";
+						var pathlight = "fcClockArray." + i + ".clockData";
+						self.notifyPath(path, self.currentClock.clockData.tenth.value);
 					}
 
 				}
@@ -883,11 +1351,10 @@ this.set("toggleMargin",tm);
 			for(i = 0; i < numAlarms; i++)
 			{
 				var alarm = self.alarmArray[i];
-				//console.log(self.alarmArray);
 				var alarmTime = alarm.alarmTime;
 				if(alarm.isActive && (currentTime.getTime() > alarmTime.getTime()) )
 				{
-					//console.log("Alarm went off at " + currentTime, alarm);
+					console.log("Alarm went off at " + currentTime, alarm);
 					self.ringAlarm(alarm);
 					alarm.isActive = false;
 					self.notifyPath("alarmArray." + i + ".isActive", false);
@@ -922,23 +1389,26 @@ this.set("toggleMargin",tm);
 			return `${time.toLocaleString()}`;
 		}
 	},
-	// addNewAlarm: function(e){
-	// 	console.log(this.alarmTime);
-	// 	var dtl = this.alarmTime.split("T");
-	// 	var dpart=dtl[0].split("-");
-	// 	var year = dpart[0];
-	// 	var month=parseInt(dpart[1])-1;
-	// 	var day=dpart[2];
-	// 	var timepart= dtl[1].split(":");
-	// 	var hours=timepart[0];
-	// 	var minutes=timepart[1];
-	// 	var atime = new Date(year, month, day, hours, minutes);
-	// 		this.addAlarm(this.alarmName, atime);
-	// }, 
+	addNewAlarm: function(e){
+		console.log(this.alarmTime);
+		var dtl = this.alarmTime.split("T");
+		var dpart=dtl[0].split("-");
+		var year = dpart[0];
+		var month=parseInt(dpart[1])-1;
+		var day=dpart[2];
+		var timepart= dtl[1].split(":");
+		var hours=timepart[0];
+		var minutes=timepart[1];
+		var atime = new Date(year, month, day, hours, minutes);
+			this.addAlarm(atime, this.alarmName);
+	}, 
 
-	addAlarm: function(argName, argTime)
-	{	var newAlarm=new FcAlarmClock(argName, argTime);
-		this.push("alarmArray", newAlarm);
+	addAlarm: function(argTime, argName)
+	{		console.log(argTime);
+		var alarmTime = new Date(argTime);
+		var now = new Date();
+		var active = (now < alarmTime);
+		this.push("alarmArray", {alarmName: argName, clockName: argName, clockType: "Alarmclock", isRunning: active, clockData: alarmTime, alarmTime: alarmTime, isActive:active});
 		
 	},
 

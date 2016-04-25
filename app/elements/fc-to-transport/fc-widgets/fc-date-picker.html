@@ -1,0 +1,435 @@
+<dom-module id="fc-date-picker">
+<style>
+:host{
+	position: relative;
+		height: 425px;
+	background: white;
+	box-shadow: 4px 11px 21px 7px #9fafaf;
+		display: block;
+	width: 320px;
+	margin: 12px;
+
+
+}
+.pretty{
+
+background: red;
+height: 11px;
+width: 30px;
+
+}
+  .card{
+  	border-top: 1px solid silver;
+  	text-align: center; 
+  	width:calc(100%/7.3); 
+  	margin: auto;
+  	margin-bottom: 4px; 
+  	margin-top: 2px; 
+  	height: 97%;
+  } 
+</style>
+<template>
+
+	
+		<div class="horizontal flex layout wrap" style="background: white; margin-top:3px; width: 320px !important;">
+			<paper-material style="background: #008;  border-bottom: silver solid 2px; height:42px; width: 100%;">
+				<section class="layout horizontal">
+					<paper-icon-button on-tap="_backOne" icon="icons:arrow-back" hidden={{backHidden}} style="position: absolute; top: 4px; color: white; left: 5px;padding-bottom: 8px" class="headerLeft"></paper-icon-button>
+					<span class="flex layout horizontal nowrap center center-justified" style="color: white; font-size:20px; margin-top: 8px; font-weight: 600;text-align: center; font-family: merriweather;">[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]</span>
+	
+					<paper-icon-button on-tap="_forward" hidden="{{forwardHidden}}" icon="icons:arrow-forward" style="color: white; position:absolute; top: 4px;  right: 8px; " class="headerRight"></paper-icon-button> 
+					</section>
+			</paper-material>
+				<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
+					<paper-material style="border-right: 1px solid white;text-align: center; padding-right:1px; width:calc(100%/7.5)!important; font-size: 9px; font-weight: 600; max-width: 37px; margin: auto; margin-top: 3px; border-top: 2px solid #afafaf; margin-bottom: 3px; background: white;">
+					{{item}}
+					</paper-material>
+				</template>
+			</div>
+		<div class="vertical layout" style="width: 320px!important; background: white; overflow:scroll; height: 320px; min-height: 242px;">
+			<section class="horizontal flex layout wrap">
+				<template 
+					is="dom-repeat" 
+					class="horizontal layout wrap" 
+					items="{{computeCalendar(displayed, fcCourse.courseCalendarDaysArray.*)}}" 
+					as="day">
+						<fc-date-mini
+							
+						 	class="card"
+						 	cd-index="{{day.cdIndex}}"
+						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
+						 	toggle-days="{{toggleDays}}"
+						 	day="{{day}}"
+						 	day-id="{{day.dayId}}"
+						 	is-practice-test-day="{{day.isPracticeTestDay}}"
+						 	is-course-meeting="{{day.isCourseMeeting}}"
+						 	selected-array="{{selectedArray}}"
+						 	style$="margin: 0px auto;" 
+						 	calendar-day={{day}}
+						 	mini-date="{{day.date}}"
+						 	index={{day.index}} 
+						 	id$={{day.dateId}} 
+						 	testDate={{day.testDate}} 
+						 	event-list="{{day.eventList}}"
+						 	fc-course="{{fcCourse}}">
+							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
+							<a class="date" id="button" >[[day.dayOfMonth]]</a>
+							<span class="[[computeDay(day)]]"></span>
+							<template class="date" is="dom-repeat" items="{{day.eventList}}" as="event">
+									{{event.eventType}}
+							</template>
+				
+							
+						</fc-date-mini>	
+				</template>
+			</section>
+		</div>
+		<content class="horizontal layout flex center-justified" select=".footer"></content>
+		
+	
+</template>
+<script>
+FcDatePicker=Polymer({
+	is: "fc-date-picker",
+	behaviors:[
+				FCBehaviors.FcCalendarBehaviorPrime,
+				Polymer.NeonSharedElementAnimatableBehavior,
+				Polymer.NeonAnimatableBehavior
+				],
+	observers:['courseObserver(fcCourse.testDate, fcCourse.courseCalendarDaysArray.*)', "observeMeetings(fcCourse.courseMeetingArray)", "observePracticeTests(fcCourse.practiceTestArray.*)"],
+	properties: {
+		day:{
+			type: Object, 
+			value: {},
+			notify: true
+		},
+		counter:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		fcCourse:{
+			type: FcCourse,
+			notify: true
+		},
+
+		toggleDay:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		calendarStartIndex:{
+				type: Number,
+				value:-1,
+				notify: true,
+		},
+		selectedArray:{
+			type: Array,
+			value: [],
+			observer:"watchingSelectedArray",
+			notify: true,
+			reflectToAttribute: true
+
+		},
+		days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+			},
+			notify: true
+		},
+	
+		maxIndex:{
+			type: Number,
+			notify: true,
+		},
+		today:{
+			type: Date,
+			value: function(){var today = new Date();},
+			notify: true
+		},
+	
+		displayedIndex:{
+			type:Number,
+			value: 0,
+			notify: true
+		},
+		displayed:{
+			type: Array,
+			notify: true
+		},
+		displayedCalendarMonth:{
+			type: String,
+			computed: "computeViewMonth(displayedIndex)",
+			notify: true
+
+		},
+		units: {
+			type: String,
+			value: "months",
+			notify: true 
+
+		},
+		numberOfUnits:{
+			type: Number,
+			value: 1,
+			notify: true
+
+		},
+		forwardHidden:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		testHolder: {
+			type: Object,
+			value: {},
+			notify: true,
+		},
+		backHidden:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		event:{
+			type: Array,
+			value: [],
+			notify: true
+
+
+		},
+	animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        }
+    }
+   },
+
+watchingSelectedArray: function(newVal, oldVal)
+{
+ 		if(this.fcCourse)
+ 			{
+ 			
+ 			
+ 			}
+},
+
+computeDay: function(day){if(day){return "pretty";}
+ 
+
+},
+computeCalendar: function(displayed, ccda){
+	if(ccda.base && ccda.base.length<95 && ccda.base[2]){
+	 var display=displayed.map(function(day, index, array){
+	 			var ind=ccda.base.indexOf(day.displayIndex);
+	 			var retVal;
+	 		if(day.inMonth ===true && ind>-1 && ccda.base[ind].dateId==day.dateId){ retVal=ccda.base[ind];}
+	 		else{retVal=day;}
+	 		return retVal;
+	 },this);
+	 return display;
+	}
+	else {return displayed;}
+},
+
+ready: function()
+{	
+		var today = new Date();
+		this.today=today;
+		var index=today.getMonth();
+ 		this.set("displayedIndex",index);
+		this.async(this.initialize, 40);
+},
+initialize:function(days){
+	var startYear =new Date().getFullYear();
+   	var endYear =startYear + 3;
+	var date=new Date(startYear, 0, 1);
+	var dateEnd =new Date(endYear, 11, 31);
+	if(days){
+	this.calendarCreator(date, dateEnd, "months", days);
+	}
+	else{
+		this.calendarCreator(date, dateEnd, "months");
+	}
+ var counter=this.monthsArray.length;
+ 	this.set("maxIndex", counter-1);
+		var self=this;
+		this.calendarDayArray=[];
+		this.calendarMonthsArray=[];
+ for(var i=0;i<counter; i++)
+		 { 	
+		 	var array = this.monthsArray[i];
+		 	this.monthsArray.length;
+			self.push("calendarMonthsArray",array);
+		 	array.forEach(function(item, index, arr){
+
+		   		self.push("calendarDayArray", item);
+		 	});
+		}
+		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+		var calendar =[];
+		calendar = this.calendarDayArray;
+		this.set("fcCourse.courseCalendarDaysArray", calendar);
+		this.set("fcCourse.calendarDayArray", calendar);
+		this.set("fcCourse.courseCalendarDaysArray", []);
+},
+
+computeInClass: function(day, fcCourse)
+{
+},
+computeDisplayed: function (displayedIndex)
+{
+	return this.calendarMonthsArray[displayedIndex];
+},
+computeInEventArray: function(fcCourse, item)
+{	if (this.fcCourse)
+	{
+		var d=this.fcCourse.testDate;
+		d=new Date(d);
+			if (d==item)
+				{
+					var retVal = "outline: red 3px solid"; return retVal;
+				}
+	
+	}
+},
+
+courseObserver: function(test,ccda)
+{ 	
+
+	if(test && this.counter<3)
+	{ 	this.counter++;
+		console.log("in time")
+		console.log("in time after counter");
+		var d= new Date(test);
+		var p = d.getFullYear();
+		diff=(p-this.today.getFullYear());
+		var m = d.getMonth();
+		if(diff>0)
+		{
+			m+=12*diff;
+		}
+		this.set("displayedIndex", m);
+		var testMonth=[];
+		var b = m-1;
+		var isetter=new Date(test).getTime();
+		testMonth=this.calendarMonthsArray[m];
+		var testday=testMonth.filter(function(day, i, month){
+			return (day.dateId==isetter);
+		},this);
+		
+		this._backOne();
+		this._forward();
+	}
+	
+},
+observeMeetings:function(meetings) {
+	if(meetings){if(meetings.length>1){
+			console.log("I am in the if MEETING DAYS");
+		
+	}
+}
+},		
+observePracticeTests: function(pta)
+{ 
+		
+},
+	
+
+_forward: function(){
+	
+		if(this.displayedIndex ==this.maxIndex)
+ 		{
+ 			this.set("forwardHidden",true);
+ 		}
+ 		else
+ 		{	this.set("backHidden",false);
+ 			this.set("forwardHidden",false);
+    		this.set("displayedIndex", this.displayedIndex+1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    	}
+    },
+ _backOne: function(){	
+ 		if(this.displayedIndex===0)
+ 		{ 
+ 			this.set("backHidden",true);
+ 		}
+ 		else
+ 		{	this.set("forwardHidden",false);
+ 			this.set("backHidden",false);
+    		this.set("displayedIndex", this.displayedIndex-1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+ 		}
+ 	
+    },
+  
+  computeYear:function(displayed)
+  		{
+  		var	y =  new Date();
+  		y=y.getFullYear();
+  		var	m = new Date();
+  		var retVal=y+Math.floor((this.displayedIndex)/12);
+		return retVal;
+		},
+
+
+computeId: function(item){
+	var theId=item.dayStamp();//   .toString() +"_dateMini";
+	
+	return theId;
+},
+
+setDaysSelected: function(newVal, oldVal)
+{
+
+
+
+},
+
+computeNotInMonths: function(item, displayedIndex){
+	
+
+	var x=new Date(item).getFullMonth();
+	
+	var y=this.displayedCalendarMonth;
+	var retVal = (x===y);
+	
+	var len = this.displayed.length;
+
+	return retVal;
+},
+computeViewMonth: function(displayedIndex){
+ var monArr =[];	
+ monArr=["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
+	return monArr[displayedIndex];
+
+	},
+
+
+computePrettyDay: function(day)
+ 	{
+  		var result = day.toDateString();
+  		result = result.slice(0,10);
+  		
+  		return result;
+ 	},
+
+
+});
+</script>
+</dom-module>
