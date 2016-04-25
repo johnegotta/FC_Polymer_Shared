@@ -1,20 +1,43 @@
 <dom-module id="fc-clobjid-prime">
 <template>
 <style>
+.newclass::after{
+    font-weight: 600;
+    font-family: roboto;
+    margin-left: 2px;
+    content: ":";
+}
+.subclass::after{
 
+    font-family: roboto;
+    font-weight: 600;
+
+content: "."; 
+}
+.digitsmall{
+     font-weight: 600;
+    font-family: roboto;
+    font-size: 12px;
+}
 input::-webkit-inner-spin-button {
 
 div#spin{max-width: 6px!important;}
 };
+fc-input-prime{
+    @apply(--horizontal-layout);
+    @apply(--layout-flex);
+    display: flex;
+}
 </style>
 
-<section style="padding: 1px 2px 10px 2px; margin: 2px 2px 2px -4px; min-width: 196px;" class$="{{orientation}} layout flex center justified-center"><!--padding and margin needed for the digits to remain square-->
+<section style="padding: 1px 2px 10px 3px; margin: 2px; max-width: 210px;" class$="{{orientation}} layout flex center justified-center"><!--padding and margin needed for the digits to remain square-->
 <template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
-    <fc-input-prime
+  <fc-input-prime
         input-type="{{item.inputType}}" 
         label="{{item.label}}"
         input-style="{{inputStyle}}"
         hidden$="{{item.hidden}}"
+        label-hidden="true"
         name$="{{item.name}}"
         min="{{item.min}}"
         max="{{item.max}}"
@@ -29,14 +52,15 @@ div#spin{max-width: 6px!important;}
         option-eight="{{item.optionEight}}"
         option-nine="{{item.optionNine}}"
         option-ten="{{item.optionTen}}"
-        class$="{{item.class}}"
+        class$="{{item.class}} {{item.newclass}}"
         min="{{item.min}}"
         max="{{item.max}}"
         step="{{item.step}}"
         fcid="{{item.fcid}}"
         on-change="handleInputChange"
        >
-    </fc-input-prime>  
+    </fc-input-prime>
+   
 </template>
 </section>      
 </template>
@@ -81,13 +105,19 @@ FcClobjidPrime=Polymer({
         for(var i = 0; i < numKeys; i++)
         {
             var val = this.dataobject[keys[i]];
-            //console.log(keys[i], val);
+            var newclass="";
+            if(val.label=="s"){newclass="digitsmall"; var styl="text-align: left; font-size:14px; margin: 1px; margin-left: -3px; padding: 1px; font-weight: 600;min-width: 6px;max-width: 8px;"}
+            
+            else if(val.label=="S" && val.colon==":"){ newclass="subclass"; var styl=""}
+            else if(val.colon==":"){newclass="newclass";}
+            
             dataset.push({
                 "value": val.value,
                 "name": val.name, //keys[i], //"tenth",
                 "label": val.label?val.label: val.name[0], //keys[i][0], //"d",
                 "hidden": val.hidden,
-                "inputType": val.inputType, //"digit",
+                "inputType": val.inputType,
+                "inputStyle":styl, //"digit",
                 "optionOne": "",
                 "optionTwo": "",
                 "optionThree": "",
@@ -102,7 +132,10 @@ FcClobjidPrime=Polymer({
                 "min": val.inputType == "digit"? 0: 0,
                 "max": val.inputType == "digit"? 9: 99,
                 "step":"",
-                "fcid":""})
+                "fcid":"",
+                "colon": val.colon, 
+                "newclass": newclass, 
+                })
         }
         return dataset;
     },

@@ -239,8 +239,8 @@ select.digit{
 span.digit{display: none;}
 iron-icon.digit{display: none;}
 section.digit{max-width: 28px; max-height: 32px; padding: 2px; margin: 0px; outline:0px; display: block; @apply(--horizontal-layout);@appy(--layout--flex-none);@apply(--layout-block);};
-label.digit{font-size: 13px; color:#009; margin-right: 4px; padding-right: 2px; font-family: merriweather; font-weight: 500;}
-input.digit{width: 26px; height: 23px; border: 0px; font-size: 20px; font-weight: 600; font-family: merriweather; outline:0px; margin: 2px 4px 2px 4px; padding:2px 4px 2px 4px; color: #008; @apply(--layout-block);
+label.digit{font-size: 12px; margin-left: -3px;color:#009;font-family: merriweather; font-weight: 500;}
+input.digit{height: 23px; border: 0px; font-size: 20px; font-weight: 600; font-family: roboto; outline:0px; color: #008; @apply(--layout-block);
 }
 label.datetime-local{margin-bottom: 0px; margin-top: 2px; font-weight: 600; line-height: .75;}
 select{max-height: 75px; padding: 4px; font-weight: 600; font-family: merriweather; font-size: 16px; font-color: brown;}
@@ -290,7 +290,6 @@ padding: 2px 12px;
 }
 select {outline: 0px solid white; border: 0px solid white; background: inherit;, float: top; border-bottom: 1px solid #006; margin-bottom: 26px;}
 /*input.select{opacity: .2;}*/
-label{padding-left: 4px;}
 label.tiny{ background: inherit; padding: 1px; font-size: 10px; font-weight: 600; font-family: merriweather;color: #008;}
 input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-family: merriweather; background: inherit;}
 </style>
@@ -415,6 +414,7 @@ input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-f
 			results$="[[item.results]]"
 			tab-index='{{item.tabIndexB}}' 
 			>
+
 			<!-- </section> -->
 			<!-- data-input-type$=[[]]
 			data-layout$=[[]]
@@ -434,7 +434,6 @@ input.tiny{ border: 0px; font-size: 11px; padding: 1px; font-weight: 600; font-f
 			class$="[[inputType]]" 
 			>
 		<span id="span3" hidden$="{{isNotRange}}">
-		{{value}}
 		</span>
 			<iron-icon 
 
@@ -519,6 +518,11 @@ FcInputPrime=Polymer({
 			computed: "computeUnlessSelected(inputType)",
 			notify: true
 		},
+		pattern:{
+			type: String,
+			value:"",
+			notify: true
+		},
 		min: {
 			type: Number,
 			notify: true
@@ -549,6 +553,11 @@ FcInputPrime=Polymer({
 			value: function(){return "";},
 			notify: true
 		},
+		title:{
+			type: String,
+			value:"",
+			notify: true,
+		},
 		autocomplete:{
 			type: String,
 			value: function(){return "on";},
@@ -566,7 +575,15 @@ FcInputPrime=Polymer({
 			notify: true,
 			
 		},
-		
+		alloweedPattern:{
+			type: String,
+			notify: true
+		},
+		preventInvalidInput:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
 		inputType:{
 			type: String,
 			observer: '_triggerInputTransformation',
@@ -759,6 +776,10 @@ FcInputPrime=Polymer({
 			value: function(){return false;},
 			notify: true, 
 			reflectToAttribute: true
+		},
+		maxlength:{
+			type: Number,
+			notify: true
 		},		
 		isCallback:{
 			type: Boolean,
@@ -802,19 +823,33 @@ _computeRepeater: function(isRepeaterSelect){
 	return retVal;
 },
 
-	_computeType: function(inputType){ var returnVal = inputType=="digit"? "number": inputType; return returnVal;
+	_computeType: function(inputType){ var returnVal = inputType=="digit"? "text": inputType; return returnVal;
 
 
 	},
 	
+_computeIsDigit: function(it){
+	console.log(it);
+	if(it=="digit"){
+		return true;
+	}
+	else {return false;}
 
+
+
+},
 	_computeDigit: function(inputType){
 		if(inputType=="digit"){
 		this.$.fcinput.name=this.name;
-		this.set("type", "number"); 
-		this.set("class", "digit"); 
-		this.set("min", 0); 
-		this.set("max", 9);
+		this.set("type", "text");
+		this.set("pattern", "[0-9]{1}")
+		this.set("allowedPattern", "[0-9]{1}");
+		this.set("preventInvalidInput", true);
+		this.set("class", "digit");
+		this.set("title", "A digit between 0 and 9, inclusive.");
+		this.set("maxlength", 1);
+		// this.set("min", 0); 
+		// this.set("max", 9);
 		}
 	},
 	computeSection1Layout: function (inputType){
