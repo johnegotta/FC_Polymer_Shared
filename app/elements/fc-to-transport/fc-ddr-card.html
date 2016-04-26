@@ -1,39 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <dom-module id="fc-ddr-card">
  <template>
 <style>
@@ -166,6 +131,7 @@ FcDdrCard=Polymer({
 	behaviors:[
      "Polymer.IronFitBehavior", 
       "Polymer.IronResizableBehavior",
+      "FCBehaviors.DraggableBehavior"
 
     ],
 
@@ -422,69 +388,7 @@ FcDdrCard=Polymer({
 
        },
 
-  _focusedDraggable:function(e){
-  	// console.log("we tried to drag");
-  	 if(this.drags==true){
-      Polymer.dom(this).setAttribute("style.position", "fixed");
-        
-        var self=this;
-        e.preventDefault();
-        //console.log(e, e.detail);
-        switch(e.detail.state) {
-          case 'start':
-          if (this.dragCounter<1){
-              //console.log('top distance differenced?' + e.detail.y);
-              //console.log('left distance' + self._leftprime, e.detail.x);
-              self.style.left=0;
-              self.style.top=0;
-            
-              self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-         //console.log(self._leftprime);
-            // self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y-e.detail.y;
-              //console.log(self._topprime);
-              this.dragCounter++;
-            }
-            else{
-              self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-         //console.log(self._leftprime);
-              self._topprime =  self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-            }
-              // self.style.left=e.detail.x;
-              // self.style.top=e.detail.y;
-             
-            
-            //console.log('top distance differenced?' + self._topprime);
-            // }
-            self.changeX=0;
-            self.changeY=0;
-            Polymer.dom.flush();
-            break;
-          case 'track':
-            self.changeX=e.detail.ddx + self.changeX;
-            self.changeY=e.detail.ddy + self.changeY;
-            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
-            break;
-          case 'end':
-            //console.log(self._topprime);
-            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
-            self._bottom = self.getBoundingClientRect().bottom;
-            self._x= ((self._leftprime+e.detail.x)>=0)?(self._leftprime+e.detail.x):e.detail.x;
-            self._y=((self._topprime)+e.detail.y>=0)?(self._topprime+e.detail.y):e.detail.y;
-            self.translate3d(0, 0, 0);
-
-            //console.log("ENDING", self._x);
-            self.style.left=self._x.toString()+'px';
-            self.style.top=self._y.toString()+'px';
-            //console.log('y: ' + e.detail.y);
-            self.dragging=false;
-
-            Polymer.dom.flush();
-            break;
-        }
-      }
-    }
-
+ 
 });
 </script>
 </dom-module>

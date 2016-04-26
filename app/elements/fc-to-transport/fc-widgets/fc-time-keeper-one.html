@@ -71,6 +71,41 @@ fc-input-prime{
 	content: " Tap to Change Clock Type";
 
 }
+@keyframes yellowalert{
+	from {background-color: white;}
+	to{background-color: orange;}
+}
+.blinkyellow{
+	width: 14px;
+	height: 14px;
+	background-color: white;
+	animation-name: yellowalert;
+	animation-duration: .45s;
+	animation-iteration-count: 240;
+	animation-direction: alternate;
+}
+.blinkyellow:hover::after{
+	display: flex;
+	font-size: 7px;
+	color: #008;
+	content: " Click to Visit Calendar";
+}
+.small{
+	display: block;
+	width: 8px;
+	height: 8px;
+}
+.small:hover, .small:active{
+	width: 24px;
+	height: 24px;
+	}
+.small.hover::after, .small.active::after{
+	font-size: 10px;
+	color: #C87533;
+	display: block;
+	content: " Click to Visit Calendar";
+}
+.inviso{display: none; width: 0px; height: 0px; opacity: 0;}
 
 @keyframes redalert {
     from {background-color: #dfdfdf;}
@@ -82,7 +117,7 @@ fc-input-prime{
     animation-name: redalert;
     animation-duration: .3s;
     animation-iteration-count: infinite;
-    animation-direction: alternate
+    animation-direction: alternate;
 }
 
 
@@ -91,21 +126,14 @@ fc-input-prime{
 </style>
 
 <template>
-<div style="padding: 2px; border: 1px #efefef solid; width: 240px; outline: 3px solid #efefef">
-	<div style="padding: 2px; border: 2px #008 double; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
-		<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" class="layout vertical">
-			<template is="dom-repeat" items="{{soundingAlarms}}" as="alarm">
-					<paper-item two-line class="animatedalert" style="border: silver 1px solid; font-size: 12px; max-height: 20px!important;" on-tap="alarmoff">
-							<paper-item-body>
-								<div class="primary">
-										<span style="color:#008; font-size: 14px; font-weight: 600;">[[alarm.alarmName]] </span><span style="color: #008; font-weight: 600;"> [[computeSoundingAlarm(alarm.alarmTime)]]</span>
-								</div>
-								<div class="secondary">
-								[[alarm.notes]]
-								</div>
-							</paper-item-body>
-					</paper-item>
-			</template>
+<div style="padding: 0px; width: 240px; outline: 1px solid #efefef">
+	<div style="padding: 2px; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
+		<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" class="layout vertical" on-tap="alarmoff">
+		<section class="vertical layout block" style="overflow-y: scroll;">
+		<template is="dom-repeat" items="{{soundingAlarms}}" as="alarm">
+				<span class="horizontal-layout flex nowrap" style="border: 1px silver solid; font-size: 12px; height: 14px; overflow-x: scroll;margin: 0px; padding: 0px;">[[alarm.alarmName]]  [[computeSoundingAlarm(alarm.alarmTime)]]</span>
+		</template>
+		</section>
 			<div class="layout horizontal flex center-justified">
 				<paper-material style$="width: 165px; margin: 24px 20px {{toggleMargin}} 20px;" class="layout vertical" elevation="3">
 					<span draggable drags on-tap="toggle" class="slight">{{date}}</span>
@@ -125,11 +153,11 @@ fc-input-prime{
 							</span>
 						</section>
 						<section class="layout horizontal flex-2">
-							<iron-icon icon="icons:chevron-right" on-tap="selectNext" style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85">
+							<iron-icon icon="icons:chevron-right" on-tap="selectNext" style="width: 24px; height: 24px;z-index: 22; color: silver; opacity: .85">
 							</iron-icon>
 						</section>		
 					</section>
-					<div class="layout vertical flex center-justified nowrap" style="max-width: 235px!important; min-height: 52px; padding-right: 0px;">
+					<div class="layout vertical flex center-justified nowrap" style="max-width: 240px!important; min-height: 52px; padding-right: 0px;">
 						<section class="layout horizontal flex nowrap center-justified">
 							<section class="layout horizontal flex nowrap center-justified" style="align-self: center;">
 								<fc-clobjid-prime 
@@ -139,7 +167,10 @@ fc-input-prime{
 									dataobject="{{currentClock.allClockData}}"
 									>
 								</fc-clobjid-prime>
-								<iron-icon on-tap="reset" hidden="{{_computeCalendar(currentClock.alarmName, currentClock)}}" style="background: white; padding: 0px; margin: 0px; color: #5DD7FC;" icon="icons:today"></iron-icon>
+						
+								<iron-icon on-tap="displayDatePicker" style$="position: absolute; right: 6px; background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;" class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, alarmArray)}}" icon="icons:today">
+								</iron-icon>
+							
 								</section>
 						</section>
 						<paper-button 
@@ -157,8 +188,8 @@ fc-input-prime{
   										<source src="fc-clock/beep-10.mp3" type="audio/mp3">
 											Your browser does not support the audio element.
 							</audio>
-								
-									<!-- <fc-input-prime input-type="datetime-local" 
+							
+									 <fc-input-prime input-type="datetime-local" 
 										value="{{alarmTime}}" 
 										label="Set Alarm Date & Time"
 										style="text-align: left;"
@@ -172,7 +203,7 @@ fc-input-prime{
 										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
 										label="Alarm Name" 
 										value="{{alarmName}}">
-									</fc-input-prime> -->
+									</fc-input-prime>
 								<paper-tabs 
 		      						id="assistantMenu" 
 						      		scrollable="true"
@@ -181,7 +212,7 @@ fc-input-prime{
 						      		hide-scroll-buttons="true"> 
 									<!-- <section class="horizontal layout flex" style="overflow-x: scroll;width: 320px;"> -->
 									<paper-icon-button on-tap="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button>
-									<paper-icon-button on-tap="addAlarm" style="color: #4285f4;" icon="device:add-alarm"></paper-icon-button>
+									<paper-icon-button on-tap="addNewAlarm" style="color: #4285f4;" icon="device:add-alarm"></paper-icon-button>
 									<paper-icon-button on-tap="deleteAlarm" style="color: #C87533;" icon="icons:delete"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:restore"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:view-list"></paper-icon-button>
@@ -284,8 +315,8 @@ FcClockData.prototype.setAlarmData=function(){
 	this.tsec.value = Math.floor(this.alarmData.secondsN/10);
 	this.min.value =this.alarmData.minutesN%10;
 	this.tmin.value =Math.floor(this.alarmData.minutesN/10);
-	this.hours.value =this.alarmData.hoursN%10;
-	this.thours.value =Math.floor(this.alarmData.hoursN/10);
+	this.hours.value =(this.alarmData.hoursN<13)?this.alarmData.hoursN%10:(this.alarmData.hoursN-12)%10;
+	this.thours.value =(this.alarmData.hoursN<13)?Math.floor(this.alarmData.hoursN/10):Math.floor((this.alarmData.hoursN-12)/10);
 	this.monthN=this.alarmData.monthN;
 	this.yearN=this.alarmData.yearN;
 	this.dayOmonthN=this.alarmData.dateN;
@@ -482,7 +513,8 @@ constructor(argName, argDateTime)
 
 Polymer({
 	is: "fc-clock",
-	listeners:{"on-tap": "addNewAlarm"},
+	listeners:{"on-tap": "addAlarm", "buttNew.tap": 'displayDatePicker'},
+
 	properties: {
 		currentClock: {
 			type: FcClock,
@@ -530,6 +562,10 @@ Polymer({
 			},
 			notify: true
 
+		},
+		calendarButton:{
+			type: Boolean,
+			notify: true
 		},
 		muteButton:{
 			type: String,
@@ -621,7 +657,12 @@ Polymer({
 	},
 	behaviors:[],
 
-	
+	 displayDatePicker: function(e){
+		console.log(e, e.target, "I am tapping");
+		this.set("calendarButton", !this.calendarButton);
+		this.$.collapse.opened=!this.$.collapse.opened;	
+
+	},
 	clockwatcher: function(newVal, oldVal)
 	{
 		console.log(newVal, oldVal);
@@ -633,7 +674,6 @@ Polymer({
 	},
 	attached: function()
 	{	
-		
 		this.initializeClocks();
 		this.$.myAlarmNoise.muted=true;
 	},
@@ -689,9 +729,7 @@ Polymer({
 		else{return two;}
 
 	},
-	computeFontSize: function(ccd){
-		console.log(ccd, ccd,ccd,ccd);
-	}, 
+
 	selectApi: function(e){
 		console.log(e, e.target, e);
 		var compareVal=e.target.firstChild.data;
@@ -725,7 +763,15 @@ computeTheSes: function(clockType){
 	{
 		return argActive?"green":"red";
 	},
-
+_computeCalendarNeeded: function(ctype, cc, alarmArray){
+	var now=new Date().getTime();
+	if(ctype!="Alarmclock"){return "inviso";}
+		var tester=alarmArray.some(function(val, index){
+	return (((val.alarmTime.getTime()-now)/1000)<86000)});
+		console.log(tester);
+		var retVal=(tester)?"blinkyellow": "small";
+		return retVal;
+},
 
 opencollapser: function()
 {
@@ -897,20 +943,19 @@ this.set("toggleMargin",tm);
 
 
 	},
+	deleteAlert:function(){this.splice("soundingAlarms", 0,1);},
 	ringAlarm: function(alarm){
 		this.$.myAlarmNoise.play();
 		this.push("soundingAlarms", alarm);
 	},
 	alarmoff: function(){
 		this.$.myAlarmNoise.pause();
-		this.splice("soundingAlarms", 0,1);
 	},
 	muteAlarm: function(){
 			var muted = this.$.myAlarmNoise.muted;
 			this.$.myAlarmNoise.muted=!this.$.myAlarmNoise.muted;
 			var setVal=(muted)?"av:volume-up": "av:volume-off";
 			this.set("muteButton",setVal);
-
 	},
 	computeSoundingAlarm: function(alarmTime){
 			return alarmTime.toLocaleString();
@@ -922,19 +967,19 @@ this.set("toggleMargin",tm);
 			return `${time.toLocaleString()}`;
 		}
 	},
-	// addNewAlarm: function(e){
-	// 	console.log(this.alarmTime);
-	// 	var dtl = this.alarmTime.split("T");
-	// 	var dpart=dtl[0].split("-");
-	// 	var year = dpart[0];
-	// 	var month=parseInt(dpart[1])-1;
-	// 	var day=dpart[2];
-	// 	var timepart= dtl[1].split(":");
-	// 	var hours=timepart[0];
-	// 	var minutes=timepart[1];
-	// 	var atime = new Date(year, month, day, hours, minutes);
-	// 		this.addAlarm(this.alarmName, atime);
-	// }, 
+	addNewAlarm: function(e){
+		console.log(this.alarmTime);
+		var dtl = this.alarmTime.split("T");
+		var dpart=dtl[0].split("-");
+		var year = dpart[0];
+		var month=parseInt(dpart[1])-1;
+		var day=dpart[2];
+		var timepart= dtl[1].split(":");
+		var hours=timepart[0];
+		var minutes=timepart[1];
+		var atime = new Date(year, month, day, hours, minutes);
+			this.addAlarm(this.alarmName, atime);
+	}, 
 
 	addAlarm: function(argName, argTime)
 	{	var newAlarm=new FcAlarmClock(argName, argTime);

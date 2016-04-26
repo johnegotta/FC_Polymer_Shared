@@ -10,6 +10,11 @@ FCBehaviors.DraggableBehavior = {
           },
         notify: true
       },
+      lameDragCounter:{
+          type: Number,
+          value: 0,
+          notify: true
+      },
       offSet:{
         type: Number,
         computed: 'computeOffSet(noOffset)',
@@ -40,7 +45,11 @@ FCBehaviors.DraggableBehavior = {
       switch(e.detail.state) {
         case 'start':
           console.log('START');
-          console.log(e);
+          if (this.lameDragCounter<1){
+              self.style.left=0;
+              self.style.top=0;
+              this.lameDragCounter++;
+            }
           self._leftprime = parseInt(window.getComputedStyle(this, null).getPropertyValue("left"))-e.detail.x;
           self._topprime = this.getBoundingClientRect().top-e.detail.y;
           console.log('top distance differenced' + self._topprime);

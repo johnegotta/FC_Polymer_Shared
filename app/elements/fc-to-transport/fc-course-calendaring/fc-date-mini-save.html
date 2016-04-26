@@ -1,6 +1,7 @@
 <dom-module id="fc-date-mini">
 <template>
 <style>
+:host;
 .pretty{
 
 background: red;
@@ -8,15 +9,20 @@ height: 11px;
 width: 37px;
 
 }
+.test {height: 100px; width: 100px; background: red;}
 </style>
-		<section class="vertical layout flex self-shrink" on-tap="toggleDays">
-		<content select=".pretty" ></content>
-			
-			<span class="horizontal layout flex center-justified" style="[[_computeSizeStyle(sizeWanted)]] [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]]; {{circleSelect}};"> 
-			<content select=".date"></content></span>
+		<section class="vertical layout flex self-shrink" on-tap="toggleDays" style$="background:[[computePickedDaysDark(inMonth, calendarDay.isSelected)]]  {{calendarDay.background}}; border: 1px solid #afafaf;margin: 0px 1px 1px 0px; max-height:21px!important;">
+				<content select=".pretty" ></content>
+		<section class="horizontal layout" style="font-size:6px;font-weight: 600; width: 100%;background:[[computeWhite(inMonth, calendarDay.isSelected)]]; text-align: center;" >
+			{{date}} {{day.date}}
 			</section>
-			<span hidden$="{{_calculateHideNotes(sizeWanted)}}"style="{{dateCardMiniNotesStyle}};">[[computeDayNotes(calendarDay, eventList)]]</span>   
-		
+			<content select=".hwk"></content>
+			<section class="horizontal layout flex center-justified" style="margin: 1px auto; max-height: 24px!important; max-width: 20px!important; border-radius: 50% font-size: 15px; cursor: pointer; border: 3px solid [[computeWhite(inMonth, calendarDay.isSelected)]]; outline: 3px #aecdfd solid; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]];"> 
+
+			<content select=".date"></content>
+
+			</section>
+		</section>
 </template>
 <script>
 Polymer({
@@ -28,38 +34,12 @@ Polymer({
 			value:{},
 			notify: true
 		},
-		hideNotes:{
-			type: Boolean,
-value: false,
-			notify: true
-		},
 		eventList:{
 			type: Array,
 			value:[],
 			observer: "isEvents",
 			notify: true
 		},
- 		dateMiniStyles: {
- 			type: String, 
- 			computed: "_computeSizeStyle(sizeWanted)",
- 			notify: true
- 		},
- 		circleSelect: {
- 			type: String,
- 			computed:"_computeCircleSelectStyle(sizeWanted)",
- 			notify: true
- 		},
- 		sizeWanted:{
- 			type: String,
- 			value:"medium",
- 			notify: true
- 		},
- 		dateCardMiniNotesStyle: {
- 				type: String,
- 				value: function(){return "font-size:8px; font-weight: 500; font-style: merriweather; color: #008; height: 9px;"},
- 				notify: true
- 		},
-
 		calendarDay:{
 			type: FcCalendarDay,
 			value:{},
@@ -136,30 +116,6 @@ value: false,
 	ready: function(){
 
 	},
-	_computeSizeStyle: function(size){
-		if(size=="" || size =="medium" || size=="normal"){
-			this.set("dateCardMiniNotesStyle",  "font-size:8px; font-weight: 500; font-style: merriweather; color: #008;");
-				return "margin: 1px; padding:4px 4px 8px 4px;font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid";
-				}
-		else if(size=="small" || size=="datePicker" || size=="datepicker"){
-			return "padding:1px 1px 1px 1px; margin-bottom: 0px; font-size: 12px; font-weight: 600; cursor: pointer;";
-
-		}
-
-		},
-
-		_calculateHideNotes: function(size){
-				if(size=="small" || size=="datePicker" || size=="datepicker"){
-						var ret= true;
-						}
-				else{var ret= false;}
-				console.log(ret);
-					return ret;
-		},
-		_computeCircleSelectStyle: function(size){
-					return "border-radius:50%";
-
-		},
 
 	computeDayNotes:function(calendarDay,elist){
 		var retVal;
@@ -178,7 +134,7 @@ value: false,
 			return retVal;
 			}
 	},
-			
+
 	computeDayId:function(calDay)
 	{
 		return calDay.dateId;
@@ -212,7 +168,7 @@ value: false,
   		if(inMonth===true)
   		{ 
 
-  			var retVal =(calendarDay===true)?"#008; border: 1px #008 solid":"white";
+  			var retVal =(calendarDay===true)?"#008":"white";
   			return retVal;
   		}
   		else
