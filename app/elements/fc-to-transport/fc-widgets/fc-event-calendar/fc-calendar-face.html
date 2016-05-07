@@ -1,0 +1,323 @@
+<dom-module id="fc-calendar-face">
+<template>
+<style>
+:host{
+	position: relative;
+		background: white;
+	box-shadow: 4px 11px 21px 7px #9fafaf;
+		display: block;
+	margin: 2px;
+
+}
+.calendarheader{
+	border-right: 1px solid white;
+	text-align: center; 
+	padding-right:1px; 
+	width:calc(100%/7.5)!important; 
+	font-size: 9px; 
+	font-weight: 600; 
+	max-width: 25px; 
+	margin: auto; 
+	margin-top: 3px; 
+	border-top: 1px solid #afafaf; 
+	margin-bottom: 3px; 
+	background: white;
+	max-width: 32px;
+}
+.calendarcontainer{
+background: white; 
+width: 210px !important;
+
+}
+.calendarborder{
+	background: #008; 
+	max-height: 38px!important; 
+	border-bottom: silver solid 2px; 
+	width: 100%;
+}
+.pretty{
+
+background: red;
+height: 9px;
+width: 30px;
+
+}
+.headerArrowLeft{
+	position: absolute; 
+	top: 0px; 
+	color: white; 
+	left: 2px;
+}
+.headerMonthYear{
+	margin: 0 auto;
+	text-align: center;
+	color: white; 
+	font-size:16px; 
+	font-weight: 500;
+	padding: 6px 6px;
+	
+	
+	}
+.headerTop{
+min-height: 38px;
+
+}
+.headerArrowRight{
+	 color: white; 
+	 position:absolute; 
+	 right: 2px;
+}
+  .card{
+  	border-top: 1px solid silver;
+  	text-align: center; 
+  	width:calc(100%/7.5); 
+  	margin: 1px; 
+  	display: flex;
+  	min-height: 32px!important;
+  	max-height: 32px!important;
+  	@apply(--self-shrink);
+  } 
+  .cardcontainer{
+  	width: 210px!important;
+  	background: white; 
+  	overflow:scroll; 
+  	height: 225px; 
+  	min-height: 180px;
+  }
+  .cardcontainer2{
+	width: 210px!important;
+  	background: white;
+	padding: 6px 0px; 
+	height: 225px;
+  	overflow:scroll; 
+  	min-height: 180px;
+  }
+</style>
+		<div class="vertical layout flex wrap calendarcontainer">
+			<paper-material class="horizontal layout flex calendarborder">
+				<span class="horizontal layout flex center-justify headerTop" style="align-items: center;">
+					<paper-icon-button 
+						on-tap="_backOne" 
+						icon="icons:chevron-left" 
+						hidden={{backHidden}} 
+						class="headerArrowLeft layout horizontal flex-2 self-shrink">
+					</paper-icon-button>
+					<span class="layout horizontal flex-7 nowrap headerMonthYear" style="padding-left: 22%;">
+					[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
+					</span>
+					<paper-icon-button 
+						on-tap="_forward" 
+						hidden="{{forwardHidden}}" 
+						icon="icons:chevron-right" 
+						class="headerArrowRight layout horizontal flex-2 self-shrink">
+					</paper-icon-button>
+					</span> 
+			</paper-material>
+			<section class="horizontal layout flex">
+			<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
+			<!--example of stupid-->
+				<paper-material class="calendarheader">
+					{{item}}
+				</paper-material><!--days of week header-->
+			</template>
+			</section>
+		</div>
+		<div class="vertical layout cardcontainer" >
+			<section class="horizontal flex layout wrap cardcontainer2">
+				<template 
+					is="dom-repeat" 
+					class="horizontal layout wrap" 
+					items="{{displayed}}" 
+					as="day">
+						<fc-date-mini
+						 	class="card"
+						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
+						 	day="{{day}}"
+						 	day-id="{{day.dayId}}"
+						 	style$="margin: 0px auto; font-size: 13px" 
+						 	calendar-day={{day}}
+						 	mini-date="{{day.date}}"
+						 	index={{day.index}} 
+						 	id$={{day.dateId}} 
+						 	testDate={{day.testDate}} 
+						 	event-list="{{day.eventList}}"
+						 	fc-course="{{fcCourse}}">
+							<a class="date" id="button" >[[day.dayOfMonth]]</a>
+						</fc-date-mini>	
+				</template>
+			</section>
+		</div>
+		<section style="height: 22px; background: silver; border-bottom: 6px solid #008;">
+		<span style="background: #aedefe; height: 16px; width: 100%;"></span>
+		</section>
+</template>
+<script>
+FcCalendarFace=Polymer({
+	is: "fc-calendar-face",
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,
+			 FCBehaviors.DraggableBehavior],
+	observers:[],
+	properties: {
+		day:{
+			type: Object, 
+			value: {},
+			notify: true
+		},
+		fcCourse:{
+			type: FcCourse,
+			value: function(){return new FcCourse({});},
+			notify: true
+		},
+		
+		days:{
+			type: Array,
+			value: function()
+			{
+					return ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
+			},
+			notify: true
+		},
+	
+		maxIndex:{
+			type: Number,
+			notify: true,
+		},
+		displayedIndex:{
+			type:Number,
+			value: 0,
+			notify: true
+		},
+		displayed:{
+			type: Array,
+			notify: true
+		},
+		displayedCalendarMonth:{
+			type: String,
+			computed: "computeViewMonth(displayedIndex)",
+			notify: true
+		},
+		units: {
+			type: String,
+			value: "months",
+			notify: true 
+		},
+		forwardHidden:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		backHidden:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		event:{
+			type: Array,
+			value: [],
+			notify: true
+		}
+   },
+
+
+computeDay: function(day){if(day){return "pretty";}
+},
+ready: function()
+{	
+		var today = new Date();
+		var index=today.getMonth();
+ 		this.set("displayedIndex",index);
+		this.async(this.initialize, 40);
+},
+initialize:function(days){
+	var startYear =new Date().getFullYear();
+   	var endYear =startYear + 3;
+	var date=new Date(startYear, 0, 1);
+	var dateEnd =new Date(endYear, 11, 31);
+	if(days){
+	this.calendarCreator(date, dateEnd, "months", days);
+	}
+	else{
+		this.calendarCreator(date, dateEnd, "months");
+	}
+ var counter=this.monthsArray.length;
+ 	this.set("maxIndex", counter-1);
+		var self=this;
+		this.calendarDayArray=[];
+		this.calendarMonthsArray=[];
+ for(var i=0;i<counter; i++)
+		 { 	
+		 	var array = this.monthsArray[i];
+		 	this.monthsArray.length;
+			self.push("calendarMonthsArray",array);
+		 	array.forEach(function(item, index, arr){
+		   		self.push("calendarDayArray", item);
+		 	});
+		}
+		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+		var calendar =[];
+		calendar = this.calendarDayArray;
+		this.set("fcCourse.courseCalendarDaysArray", calendar);
+		this.set("fcCourse.calendarDayArray", calendar);
+},
+
+computeDisplayed: function (displayedIndex)
+{
+	return this.calendarMonthsArray[displayedIndex];
+},
+_forward: function(){
+		if(this.displayedIndex ==this.maxIndex)
+ 		{
+ 			this.set("forwardHidden",true);
+ 		}
+ 		else
+ 		{	this.set("backHidden",false);
+ 			this.set("forwardHidden",false);
+    		this.set("displayedIndex", this.displayedIndex+1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    	}
+    },
+ _backOne: function(){	
+ 		if(this.displayedIndex===0)
+ 		{ 
+ 			this.set("backHidden",true);
+ 		}
+ 		else
+ 		{	this.set("forwardHidden",false);
+ 			this.set("backHidden",false);
+    		this.set("displayedIndex", this.displayedIndex-1);
+    		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+ 		}
+ 	
+    },
+  
+  computeYear:function(displayed)
+  		{
+  		var	y =  new Date();
+  		y=y.getFullYear();
+  		var	m = new Date();
+  		var retVal=y+Math.floor((this.displayedIndex)/12);
+		return retVal;
+		},
+
+computeNotInMonths: function(item, displayedIndex){
+	var x=new Date(item).getFullMonth();
+	var y=this.displayedCalendarMonth;
+	var retVal = (x===y);
+	var len = this.displayed.length;
+	return retVal;
+},
+computeViewMonth: function(displayedIndex){
+ var monArr =[];	
+ monArr=["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
+	return monArr[displayedIndex];
+	},
+
+computePrettyDay: function(day)
+ 	{
+  		var result = day.toDateString();
+  		result = result.slice(0,10);  		
+  		return result;
+ 	},
+});
+</script>
+</dom-module>

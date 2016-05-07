@@ -43,14 +43,14 @@
 		font-weight: 400;
 	}
 	.startbutton{
-		margin-top: -8px; 
+		margin: 1px; 
 		border: 2px solid #efefef;  
 		/*box-shadow: 3px 7px 17px 2px #dedede; */
-		font-size: 14px; 
+		font-size: 12px; 
 		font-weight: 600; 
-		text-align: center;
-		max-height: 25!important; 
-	/*	padding-bottom: 5px; */
+		text-align: center; 
+		/*padding: 2px; */
+		/*margin-bottom: 5px; */
 		/*width: 100%;*/
 	}
 	.startbutton:hover{ 
@@ -95,17 +95,6 @@
 	    background-color: #f9f9f9;
 	    min-width: 160px;
 	 
-	}
-	@keyframes tocirclesmooth{
-		from {background-color: white;}
-		to{background-color: orange;}
-	}
-	.tocircle{
-		 border-radius: 50%; 
-		 padding: 28px; 
-		 min-width: 170px; 
-		 height: 150px; 
-		 border: 12px red solid;
 	}
 
 	.dropdown-content {
@@ -158,49 +147,57 @@
 						background-color: #dfdfdf;
 						border: 3px solid #008;
 					}
-    .glass{
-    	border: 1px #009 solid;
-    	box-shadow: 3px 14px 29px 2px #afafaf;
-
-
-    }
 </style>
 <div style="padding: 0px; width: 320px; border: 1px ridge #efefef">
 	<div style="padding: 2px; text-align: center; {{makeCircle}}" class="layout vertical" on-track="_focusedDraggable">
-			<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white; width: 300;"  drags class="layout vertical flex center-justified">
-				<paper-material style$="width: 280px; padding: 8px; margin: 8px; z-index:90001000100100100100100;" draggable drags class="slight layout vertical flex no wrap" elevation="3"><span style="position: absolute; left: 4px;" on-tap="resetAnimation">{{date}}</span>
-			<span style="position: absolute; right: 4px;" on-tap="opencollapser">{{theTime}}</span>
-				<div on-tap="alarmoff" class$="layout vertical flex nowrap center-justified clockDisplay {{toCircle}}" id="theClock"  style="align-self: center; cursor:pointer;">
-					<section class="horizontal layout flex">
-						<iron-icon  on-tap="selectApi" class="layout flex-9" style="color: #008; font-size: 16px; cursor:pointer; min-height: 32px; min-width: 24px;" icon="{{computeHeaderIcon(currentClock)}}">
-						</iron-icon>
-					</section>
-					<section style="max-width:260px!important;" on-dblclick="opencollapser" class="horizontal layout flex center-justified">
-						<fc-clobjid-prime class="layout flex-11" input-style=" margin-left: -4.5px; padding: 0px; border: 0px silver solid; font-weight: 600; font-size: 22px; min-width: 10px;max-width: 19px; min-height: 30px; text-align: left;" orientation="horizontal" dataobject="{{currentClock.clockData}}">
+
+		<div style="padding: 2px;  text-align: center; overflow: hidden; overflow-y: scroll background: white; width: 300;"  drags class="layout vertical">	
+			<div class="layout vertical flex center-justified">
+				<paper-material style$="width: 280px; padding: 8px; margin: 16px; z-index:90001000100100100100100; border-radius: 180;" draggable drags class="slight layout vertical flex no wrap" elevation="3">
+				<!--
+					<section class="horizontal layout center-center justified">
+						<span class="flex-4" style="font-size: 12px; text-align: left;">{{date}}
+						</span>
+						<section  on-tap="selectApi" class="flex-7" style="color: #008; font-size: 16px; cursor:pointer;{{makeCircle}}">
+								<iron-icon icon="{{computeHeaderIcon(currentClock)}}" style$="color:{{computeHeaderIconColor(currentClock)}}; height: 29px; width: 29px;">
+								</iron-icon>
+						</section>	
+						<span class="flex-5" style="font-size: 12px; text-align: right;{{makeCircle}}">{{theTime}}
+						</span>
+					</section> -->
+					<!-- <section style="font-size: 12px; color: brown;{{makeCircle}}; color:{{whiteOrBlue}}"> 
+					</section>	 -->			
+					<section on-tap="alarmoff" class="layout horizontal flex nowrap center-justified clockDisplay" id="theClock"  style="align-self: center; cursor:pointer;">
+						<section class="layout horizontal flex-2 silent" >
+							<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; left: 4px; bottom: 46%;" on-tap="selectPrevious" icon="icons:chevron-left">
+							</iron-icon>
+						</section>
+						<section class="vertical layout flex" style="border-radius: 50%; padding: 28px; min-width: 140px; height: 120px; z-index: 111111111111111111111111111; border: 12px red solid;">
+						<paper-icon-button  on-tap="selectApi" style="color: #008; font-size: 16px; cursor:pointer; min-height: 32px; min-width: 32px;" icon="{{computeHeaderIcon(currentClock)}}">
+							</paper-icon-button>
+						<fc-clobjid-prime input-style="text-align: left; margin-left: -4.5px; padding: 0px; border: 0px silver solid; font-weight: 600; font-size: 22px; min-width: 8px;max-width: 18px;" orientation="horizontal" dataobject="{{currentClock.clockData}}">
 						</fc-clobjid-prime>
-						<section 
-							style$="position: absolute; right: 6px; bottom: 46% background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;"
-							class="dropdown">
-							<iron-icon 
-								class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, clockArray)}} dropbtn" 
-								icon="icons:today"style=" width: 26px; height: 26px; position: absolute; z-index: 999909090909;"
-								on-tap="toggleDatePicker" hidden="{{computeHiddenCalendarIcon(currentClock.clockType)}}">
+						<paper-button class="horizontal flex layout nowrap center-justified startbutton" elevation="0" style$="color:{{onOffColor}};"on-tap="toggleRunning">[[currentClock.clockName]]
+						</paper-button>
+						</section>
+						<section style$="position: absolute; right: 6px; background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;"class="dropdown">
+							<iron-icon class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, clockArray)}} dropbtn" icon="icons:today"style="position: absolute; z-index: 999909090909;"on-tap="toggleDatePicker" hidden="{{computeHiddenCalendarIcon(currentClock.clockType)}}">
+							</iron-icon>
+						</section>
+	      				<section class="layout horizontal flex-2 silent" on-tap="selectNext" >
+							<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; right: 4px; bottom: 46%;" icon="icons:chevron-right">
 							</iron-icon>
 						</section>
 					</section>
-					<paper-button class="center-justified startbutton" elevation="0" style$="color:{{onOffColor}}; font-size: 12px;"on-tap="toggleRunning">&nbsp;[[currentClock.clockName]]&nbsp;
-					</paper-button>
-				</div>
-	      				<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; z-index: 999909090909; right: 4px; bottom: 40%;" on-tap="selectNext" icon="icons:chevron-right">
-							</iron-icon>
-						<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; z-index: 999909090909; left: 4px; bottom: 40%;" on-tap="selectPrevious"  icon="icons:chevron-left">
-							</iron-icon>
-
-					
-						<!--  <paper-icon-button on-click="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button> -->
+					<section style="font-weight: 600; font-size: 12px; width: 100%;" class="horizontal layout flex nowrap center-justified">
+						<!-- <span style="border-radius: 180; background: gold; border: 2px solid #008"><iron-icon style="width: 32px; height: 32px;" icon="icons:chevron-left"></iron-icon></span> -->
+						 <paper-icon-button on-click="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button>
+						
+					<!-- 	<span style="border-radius: 180; background: gold; border: 2px solid #008"><iron-icon style="width: 32px; height: 32px;" icon="icons:chevron-right"></iron-icon></span> -->
+					</section>
 				</paper-material>
 			</div>
-			<fc-datepicker-dropdown id="friend" class="dropdown-content" on-tap="dateTimeSetter" style="max-width: 191px;position: absolute; z-index: 99998798797987987897; padding: 1px;right: 12px; top: 142px;" hidden="{{!calendarButton}}">
+			<fc-datepicker-dropdown id="friend" class="dropdown-content" style="max-width: 191px;position: absolute; z-index: 99990909091111109; padding: 1px;right: 12px; top: 142px;" hidden="{{!calendarButton}}">
 			</fc-datepicker-dropdown>
 			
 	  		<audio loop id="myAlarmNoise" style="border: green 2px solid; width: 220px; height: 35px;">
@@ -208,99 +205,36 @@
   				<source src="fc-clock/beep-10.mp3" type="audio/mp3">
 			</audio>
 		</div>
-	</div>
-	<iron-collapse id="collapser"  class="vertical layout center-justified">
-		<div class="vertical layout block  glass" style=" height: 320px;overflow-y: scroll;">
-			<neon-animated-pages class="flex" id="pages" selected="[[selected]]" on-tap="_clickHandler">
-		        <fc-hero-animated-main-page>
-		        <section class="horizontal layout flex wrap" style="overflow-y: scroll;max-height: 420px; min-height: 340px; max-width: 260px;padding: 2px 12px;">	
-					<template is="dom-repeat" items="{{iconArray}}">	
-					<section class="layout center center-justified" style="background: #aedefe; width: 36px; height: 36px; padding: 6px;margin: 8px auto;  border-radius: 50%; border: #009 solid 4px; align-items: center; box-shadow:4px 11px 19px 3px #adadad; ">
-						<iron-icon data-target$="{{item.dataTarget}}" style="color: white; height:36px; width: 36px;" icon="{{item.newIcon}}"></iron-icon>
-						</section>
-					</template>
+			<!-- <paper-tabs id="timeKeeperMenu" scrollable="true" style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 320px;" on-down="dragsOff" on-up="dragsOn" on-tap="clickHandler" bar>  -->
+				<!-- <section class="horizontal layout flex wrap" style="overflow-x: scroll;min-width: 320px;">									
+				<paper-icon-button on-click="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}">
+				</paper-icon-button>
+				<template is="dom-repeat" items="{{iconArray}}">	<section>
+					<paper-icon-button data-tap="{{item.onTap}}" style="color: {{item.newStyle}};" icon="{{item.newIcon}}"></paper-icon-button>
 					</section>
-		        </fc-hero-animated-main-page>
-		        <fc-hero-animated-page id="hero1">
-		        	<fc-animated-list-page id="clockArraylist" data-array="{{clockArray}}" applied-style-object="{{clockArrayAppliedStylesObject}}">
-		        	</fc-animated-list-page>
-		          </fc-hero-animated-page>
-		        <fc-hero-animated-page id="hero2">	
-		        	<div id="addClocks">
-		        		<form>
-								<fc-input-prime
- 									input-type="datetime-local"
- 									input-style="text-align: right; font-size: 20px; width: 100%;"
- 									label="{{currentClock.clockType}}:&nbsp;{{currentClock.clockName}} &nbsp;"
- 									is-time-display="true" 
- 									time-bind="{{currentClock.alarmTime}}"
- 									label-style="color: #4285f4;  text-transform: uppercase;">
- 								</fc-input-prime>
-									<fc-input-prime 
-										style="text-align: left;"
-										input-type="text"
-										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
-										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="{{currentClock.clockType}} Name" 
-										value="{{currentClock.clockName}}">
-									</fc-input-prime>
-									<fc-input-prime 
-										style="text-align: left;"
-										input-type="text"
-										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
-										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="Sub-Type: {{currentClock.subType}} &nbsp; " 
-										value="{{currentClock.subType}}">
-									</fc-input-prime>
-									<fc-input-prime 
-										style="text-align: left;"
-										input-type="text"
-										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
-										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="Date & Time: {{showTime}} &nbsp; " 
-										value="{{currentClock.alarmTime}}">
-									</fc-input-prime>
-									<section class="horizontal layout flex">
-										<section class="vertical layout flex-3 center center-justified" on-tap="_addNewClock"> 
-											<iron-icon icon="icons:alarm-add">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Add</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:save">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Save</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:delete">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Delete</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:cloud-upload">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Upload</span>
-										</section>
-									</section>
-								</form>
-		        	</div>
-		          </fc-hero-animated-page>
-		        <fc-hero-animated-page id="hero3">	
-		        	<fc-animated-list-page id="activeAlerts" data-array="{{activeAlertsArray}}" applied-style-object="{{clockArrayAppliedStylesObject}}">
-		        	</fc-animated-list-page>
-		         </fc-hero-animated-page>
-		         <fc-hero-animated-page id="hero4">
-		        	<fc-animated-list-page id="soundingAlarms" data-array="soundingAlarms" applied-style-object="{{clockArrayAppliedStylesObject}}">
-		        	</fc-animated-list-page>
-		        </fc-hero-animated-page>
-		        <fc-hero-animated-page id="hero5">
-		        	<fc-animated-list-page id="acknowledgedAlerts" data-array="{{acknowledgedAlerts}}" applied-style-object="{{clockArrayAppliedStylesObject}}">
-		        	</fc-animated-list-page>
-		        </fc-hero-animated-page>
-		    </neon-animated-pages>
+				</template>
+				</section> -->
+		<!-- 	</paper-tabs>	 -->	
 		</div>
-	</iron-collapse>
+		<div class="vertical layout block" style=" height: 320px;overflow-y: scroll;">
+		<neon-animated-pages class="flex" id="pages" selected="[[selected]]" on-tap="_clickHandler">
+	        <fc-hero-animated-main-page>
+	       
+	        <section class="horizontal layout flex wrap" style="overflow-y: scroll;max-height: 420px; min-height: 340px; max-width: 280px;">	
+				<template is="dom-repeat" items="{{iconArray}}">	
+				<section class="layour center center-justified" style="background: #aedefe; width: 42px; height: 42px; padding: 6px;margin: 3px auto;  border-radius: 50%; border: #009 solid 4px; align-items: center; box-shadow:4px 11px 19px 3px #adadad; ">
+					<iron-icon data-target$="{{item.dataTarget}}" style$="{{item.newStyle}}" icon="{{item.newIcon}}"></iron-icon>
+					</section>
+				</template>
+				</section>
+	        </fc-hero-animated-main-page>
+	        <fc-hero-animated-page id="hero1">
+	        	<fc-animated-list-page id="clockArraylist" data-array="{{clockArray}}" applied-style-object="{{clockArrayAppliedStylesObject}}">
+	        	</fc-animated-list-page>
+	        </fc-hero-animated-page>
+	    </neon-animated-pages>
 	</div>
+</div>
 </template>
 <script>
 "use strict";
@@ -323,7 +257,7 @@ function FcClockData(argTenths, argType, argDateTime)
 		var obj = digitArray[i];
 		this[obj.name] = obj;
 	}
-	// this.digitArray=digitArray;
+	this.digitArray=digitArray;
 	if(argType=="Countdown" || argType=="Stopwatch")
 	{
 		this.convertFromTenths(argTenths);
@@ -395,10 +329,6 @@ FcClockData.prototype.convertToTenths = function()
 	result += this.hours.value * 36000;
 	result += this.thours.value * 360000;
 	return result;
-};
-FcClockData.prototype.setAlarmFromDisplay=function(){
-
-
 };
 FcClockData.prototype.convertedFromInputToDate=function()
 {
@@ -485,15 +415,12 @@ class FcClock
 	convertFromSeconds(argSeconds){
 		this.clockData.convertFromSeconds(argSeconds);
 	}
-	setClock()
+	setClock(argSelf)
 	{
 		return this.clockData.setClock();
 	}
 	setAlarm(argDateTimeObject){
 		return this.clockData.setAlarm(argDateTimeObject);
-	}
-	inputAlarm(){
-		 this.clockData.convertToTenths();
 	}
 	toggleRunning()
 	{
@@ -513,13 +440,12 @@ class FcClock
 };
 Polymer({
 	is: "fc-time-keeper",
-	listeners:{"on-tap": "_addNewClock", "buttNew.tap": 'displayDatePicker'},
+	listeners:{"on-tap": "addAlarm", "buttNew.tap": 'displayDatePicker'},
 
 	properties: {
 		currentClock: {
 			type: FcClock,
 			value: {},
-			observer:"currentClockObserver",
 			notify: true,
 		},
 		openingArray:{
@@ -567,8 +493,8 @@ Polymer({
 			value:function(){
 				var retVal={
 					changeProperty: "alarmOn",
-    	 			values:[false,true, undefined],
-    				itemClass:["classA","classB", "classA"],
+    				values:[false,true, undefined],
+       				itemClass:["classA","classB", "classA"],
     				itemStyle:["","",""],
     				leftIcon:["av:volume-off","icons:alarm-on","av:volume-on",],
     				leftIconClass:["classA","classB", "classA"],
@@ -580,11 +506,7 @@ Polymer({
     		},
     		notify: true
 		},
-		toCircle:{
-			type:String,
-			value: " ",
-			notify: true,
-			},
+
 		calendarButton:{
 			type: Boolean,
 			value: false,
@@ -611,69 +533,80 @@ Polymer({
 			},
 			notify: true
 		}, 
-		showTime: {
-			type: String,
-			computed: "computeShowTime(currentClock.dto)",
-			notify: true
-		},
-		
 		iconArray:{
 			type:Array,
 			value:function(){ return[
 
 				{	
 					dataTarget:1,
-			 		newIcon:"device:access-time"
-				},
+			 		newStyle: "color: white; height:42px; width: 42px;", 
+				 	newIcon:"device:access-time"
+				 },
 				{ 		
 						dataTarget: 2, 						
-				 		newIcon: "icons:alarm-add"
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
+				 		newIcon: "device:access-alarm"
 				 },
 				
 				{ 		dataTarget:3,
+				  		newStyle:"color: white; height:42px; width: 42px;", 
 				  		newIcon: "icons:alarm-off"
 				},
 				 		
 				 {		dataTarget: 4, 
+				 		newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 				 		 newIcon: "device:access-time"
 				},
 				{		dataTarget: 5, 
+						newStyle:"color: white; height:42px; width: 42px;",
 						newIcon: "icons:date-range",
 				},		
 				{		dataTarget: 6, 
+						newStyle:"color: white; height:42px; width: 42px;",
 						newIcon: "icons:swap-vertical-circle"
 				},	
 				{		dataTarget: 7, 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "notification:event-available"
 				},		
 				{		dataTarget: 8, 
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 						 newIcon: "social:notifications-active"
 				},	
 				{		dataTarget: 9, 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "notification:event-busy"		
 				},
 				{		dataTarget: 10, 
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 						newIcon: "notification:event-note"				},		
-				{		dataTarget: 11, 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "social:notifications-off"
 				},				
-				{		dataTarget: 12, 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 						 newIcon: "icons:swap-horiz"
 				},	
-				{		dataTarget: 13, 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "icons:alarm-off"
 				},	
-				{		onMyTap: 14, 
+				{		onMyTap: "reset", 
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 						newIcon: "icons:gavel"
 				},
 						
-				{		dataTarget: 15, 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "social:person-add"
 				},
-				{		dataTarget: "tocircle", 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; border: 0px white solid; height:42px; width: 42px;",
 						 newIcon: "icons:language",
 				},
-				{		dataTarget: "toCircle", 
+				{		dataTarget: "reset", 
+						newStyle:"color: white; height:42px; width: 42px;",
 						 newIcon: "maps:local-library"
 				}];
 			},
@@ -715,7 +648,7 @@ Polymer({
 			notify: true
 		},
 		alarmTime:{
-				type: Number,
+				type: String,
 				notify: true,
 		},
 		theTime:{
@@ -768,7 +701,7 @@ Polymer({
       	}, 
       	muted: {
       		type: Boolean,
-      		value: "_computeMute(clockArray,currentClock)",
+      		value: "_computeMute(clockArray,currentClock, soundingAlarms)",
       		notify: true,
       	},
       	long: {
@@ -804,15 +737,12 @@ Polymer({
 		this.setClockConstructor();	
 	},
 	attached: function()
-	{	this.$.myAlarmNoise.muted=true;
+	{	this.$.myAlarmNoise.muted=false;
 		this.initializeClocks();
 		this.$.myAlarmNoise.play();	
 	},
 //setting clocks and clock arrays and initialization from ready and attached
-	toCircleFunction:function(){
-		var setVal=(this.toCircle=="tocircle")?" ":"tocircle";
-		this.set("toCircle", setVal);
-	},
+
 
 	setClockConstructor:function(){
 		var self=this;
@@ -823,7 +753,7 @@ Polymer({
 		var date=new Date();
 		this.clockArray = [];
 		this.push("clockArray", new FcClock("Local-Time", "Clock", "", 0,date));
-		this.push("clockArray", new FcClock("Start-Time", "Clock", "", 0,date));
+		this.push("clockArray", new FcClock("Greenwhich-Time", "Clock", "", 0,date));
 		this.push("clockArray", new FcClock("Now-ish", "Alarmclock", "", 0,nowish));
 		this.push("clockArray", new FcClock("Later-ish", "Alarmclock","", 0,laterish));
 	  	this.push("clockArray", new FcClock("Reading", "Countdown","Focused SAT Reading Countdown", 39000));
@@ -831,11 +761,10 @@ Polymer({
 	 	this.push("clockArray", new FcClock("Math 25min", "Countdown","Focused SAT Math Countdown", 15000));
 	 	this.push("clockArray", new FcClock("Math 55min", "Countdown","Focused SAT Math Countdown 2", 33000));
 	 	this.push("clockArray", new FcClock("Essay", "Countdown","Focused Essay Writing Countdown", 30000));
-	 	this.push("clockArray", new FcClock("Timer 1", "Countdown", "Focused Programable Countdown ",0));
-	 	this.push("clockArray", new FcClock("Timer 2", "Countdown", "Focused Programable Countdown 2",0));
+	 	this.push("clockArray", new FcClock("Countdown 1", "Countdown", "Focused Programable Countdown ",0));
+	 	this.push("clockArray", new FcClock("Countdown 2", "Countdown", "Focused Programable Countdown 2",0));
         this.push("clockArray", new FcClock("Stopwatch 1", "Stopwatch", "Focused Fastback Stopwatch", 0));
         this.push("clockArray", new FcClock("Stopwatch 2", "Stopwatch", "Focused Section Split Stopwatch", 0));
-
 	  	
 	  	var temp=this.clockArray.filter(function(val,index){
 	  		return(val.clockType=="Alarmclock");
@@ -906,27 +835,21 @@ Polymer({
 					}, 100);
 	},
 // end data initialization;
-// begin clock switching by type via multiple click methods: displayed array and current array are filtered from the clock array; an api selection via clockType is used to separate out "Stopwatch", "Alarmclock", "Clock", and "Countdown"; the new array is in the displayed array with displayed[0] acting as the new "currentClock";
-//TODO:  last locale not maintaiend consider adding
-	currentClockObserver: function(nv,ov) {
-
-		if(nv && ov){
-			if(ov.clockType){
-			console.log(ov, "FIRST TIME?");
-		console.log(nv.convertToTenths(), nv.alarmTime, nv.clockType, ov.convertToTenths(), ov.alarmTime, ov.clockType, "TIME TODO");
-			}
-		}
-	},
+// begin clock switching by type via multiple click methods: displayed array and current array are filtered from the clock array; an api selection via clockType is used to separate out "Stopwatch", "Alarmclock", "Clock", and "Countdown"; the new array is in the displayed array with displayed[0] acting as the new "currentClock", which is used in the loop to trigger changes.  current clock is always updated for the dom-repeat, and the input displays of the digits;
 	selectApi: function(e){		
 		var compareVal=this.currentClock.clockType;
 		var len=this.apiChoices.length-1;
 		var apiIndex=this.apiChoices.indexOf(compareVal);
+		console.log(apiIndex, len);
 		if(apiIndex==len){apiIndex=0;}
 		else{apiIndex=apiIndex+1;}
+		console.log(apiIndex);
 		this.set("clockApi",this.apiChoices[apiIndex]);
+		console.log(this.clockApi);
 		var dispArr=this.clockArray.filter(function(val, i, arr){
 				return(val.clockType==this.apiChoices[apiIndex]);
 		}, this);
+		console.log(dispArr);
 		this.set("displayedArray",dispArr);
 		this.set("currentClock", this.displayedArray[0]);
 	},
@@ -939,6 +862,7 @@ Polymer({
 	selectNext: function(){
 		var last=this.displayedArray.length-1;
 		var num =(this.clockIndex<last)?(this.clockIndex+1):0;
+		console.log(num);
 		var next=1;
 			this.switchClock(num);			
 	},
@@ -950,6 +874,7 @@ Polymer({
 	switchClock: function(num){	
 		if(this.displayedArray){
 		this.set("clockIndex", num);
+		console.log(this.clockIndex, this.clockApi);
 		this.set("currentClock", this.displayedArray[num]);
 		this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
 		this.set("onOffColor", this.currentClock.isRunning?"red":"green");
@@ -968,9 +893,18 @@ Polymer({
 	}, 
 // end datepicker section
 //begin drag api--desirable to move to behavior// see below//
-	dragsOff: function(){this.set("drags", false);},
-	dragsOn: function(){this.async(this.dragSwitch, 50);},
-	dragSwitch: function(){this.set("drags", true);},
+	dragsOff: function()
+	{
+		this.set("drags", false);
+	},
+	dragsOn: function()
+	{
+		this.async(this.dragSwitch, 50);
+	},
+	dragSwitch: function()
+	{
+		this.set("drags", true);
+	},
 	_focusedDraggable:function(e){
 	  	if(this.drags==true){
 	        var self=this;
@@ -1013,13 +947,21 @@ Polymer({
 	    }
 	},
 
-/*TODO: fix api-drag behavior weak ket map issue related to the placement of an icon on the */
+	//all Drag above
+
+//NOTE: !!!!SCOTT!!! whole drag api above in YELLOW BOX
+
+/*TODO: fix api-drag behavior weak ket map issue related to the placement of an icon on the 
+	//draggable; impl was designed to avoid need to place tags or headers or specific drag elements in fc elements... Intent was to only have to place the word "drags" in the element, and it would be draggable.  work around surely possible.  Easiest would be to simply place the the small drag elements in the fc-elements as part of our process, the behavior would then just "find them" if it were present; Wrapper seems best solution will attempt soon;
+	*/
 //End Drag Notes//
+
+//compute header Icons and header section: TOP ROW OF CLOCK, must coincide with four APIS, change color and match the apis in tap handler below... WORK IN PROGERSS
 //TODO: FINISH TAP HANDLER ON MENU SO SET OF ICONS AND CHANGES KNOWN AND TESTABLE;
 	computeHeaderIcon: function(currentClock){
 		console.log("I AM IN THE COMPUTED FIUNCTION");
 		var clockType=(currentClock)?currentClock.clockType: "Clock";
-		var retVal=(clockType=="Clock")?"device:access-time": (clockType=="Alarmclock")? "device:access-alarm": (clockType=="Stopwatch")?"social:whatshot": (clockType=="Countdown")?"social:notifications":(clockType=="Newalert")?"icons:clock-add": "social:public";
+		var retVal=(clockType=="Clock")?"device:access-time": (clockType=="Alarmclock")? "device:access-alarm": (clockType=="Stopwatch")?"device:access-time": "device:access-time";
 		return retVal; 
 	},
 	computeHeaderIconColor: function(currentClock){
@@ -1049,7 +991,7 @@ _computeSecondaryDisplay:function(type, clock, name, lat, long){
 	else{ 
 		return clock.subType;
 	}
-},//CUT???? FIND OTHER METHODS???
+},
 showPosition: function(){
 		var lat=position.coords.latitude;
 		console.log(lat);
@@ -1075,102 +1017,32 @@ toggleRunning: function(event)
 //Done nothing on this save cut and past from other impl: likely will use case switch for the icons to handle the conditions any better ideas welcome!
 
 	_clickHandler: function(e) {
-			console.log(e.target.dataset.target, e.target.dataset.target ==2);
-			var setVal=e.target.dataset.target;
-			if(e.target.dataset.target<16 && e.target.dataset.target!=2){this.set("selected", setVal);}
-		else if(e.target.dataset.target=="tocircle"){this.toCircleFunction();}
-		else if(e.target.dataset.target==2){
 			console.log(e.target.dataset.target);
-			this.set("selected", setVal);
-			var clockType=this.currentClock.clockType;
-			this._addClockInterface(clockType);
-			// console.log("1033");
-		}
-	},
-	registerNewClock: function(){
+			var setVal=e.target.dataset.target;
+					if(e.target.dataset.target)
+		{this.set("selected", setVal);}
+			
+	},			
 
-
-
-
-	},
-	_addClockInterface: function(clockType){
+// 			if(e.target.selected!=undefined){
+// 				var sel = e.target.selected;
+				// this.set("selected", sel);
+			
+			// }
+		  // var button = e.target;
+		  // while (!button.hasAttribute('data-transition') && button!==document.body) {
+		  //   button = button.parentElement;
+		  // }
+		  // if (!button.hasAttribute('data-transition')) {
+		  //   return;
+		  // }
+		  // var id = button.getAttribute('data-transition');
+		  // var dialog = document.getElementById(id);
+		  // console.log(document.getElementById(id), id, "LOOOK HERE DUMMY", dialog);
+		  // if (dialog) {
+		  //   dialog.open();
+		  // }
 		
-
-
-
-	},
-	_addNewClock: function(e){
-			var date=new Date();
-			console.log("got the date", date);
-			var c=this.currentClock.clockType;
-			var argArray=c==("Clock")?["NewTimezone","Clock","Personal",0,date]:(c=="Alarmclock")?["NewAlert","Alarmclock","Personal",0, date]:(c=="Countdown")?["New Timer", "Countdown", "Personal", 0, false]:["New Stopwatch","Stopwatch", "Personal", 0, false];
-			console.log(argArray);
-			var clock=new FcClock(argArray[0], argArray[1],argArray[2],argArray[3],argArray[4]);
-			console.log(clock);
-			this.push("clockArray", clock);
-			var apiIndex=this.apiChoices.indexOf(c);
-			console.log(this.clockArray);
-			this.set("clockApi",this.apiChoices[apiIndex]);
-			var dispArr=this.clockArray.filter(
-				function(val, i, arr)
-				{
-					return(val.clockType==this.apiChoices[apiIndex]);
-				}, this);
-			var ncIndex=dispArr.length-1;
-			this.set("displayedArray",dispArr);
-			this.set("currentClock", this.displayedArray[ncIndex]);
-		},
-
-	dateTimeSetter: function(e){
-		var tap=e.target;
-		console.log(tap);
-		while(tap.nodeName!="FC-DATE-MINI" && tap.nodeName!="FC-DASHBOARD-ONE"){
-			tap=tap.parentNode;
-		}
-		if(tap.nodeName=="FC-DATE-MINI"){
-			var date=tap.calendarDay.date;
-			var alarm=new Date(date);
-			var clock = this.currentClock.clockData;
-			var hs=parseInt(clock.hours.value)+parseInt(clock.thours.value)*10;
-			console.log(hs, clock.hours.value, clock.thours.value);
-			var hours=(clock.tenth.value=="P" && hs!==12)?(hs+12):(clock.tenth.value=="A" && hs==12)?0:hs;
-			console.log(hours);
-			var ms=(parseInt(clock.min.value) +parseInt(clock.tmin.value)*10);
-			var ss=parseInt(clock.sec.value)+parseInt(clock.tsec.value)*10;
-			console.log(alarm, hours, ms, ss, 0,0);
-			var anotherDate=alarm.setHours(hours, ms, ss, 0);
-			console.log(anotherDate, alarm);
-			var dto=new Date(anotherDate);
-			this.set("currentClock.dto",dto);
-			this.set("currentClock.alarmTime", anotherDate);
-			var name =this.currentClock.clockName;
-			var index=this.clockArray.lastIndexOf(name);
-			console.log(index);
-				if(index>-1){
-				this.notifyPath(["clockArray", index,"alarmTime"],anotherDate);
-				this.notifyPath(["clockArray", index,"dto"],anotherDate);
-				this.async(console.log(this.currentClock.dto, this.currentClock.alarmTime, this.clockArray[index].alarmTime, this.clockArray[index].dto),2);
-				}
-			if(this.calendarButton===true){this.async(this.toggleDatePicker(),1600);}
-		}
-		
-		
-	},
-	computeShowTime: function(dto){
-		if(dto){
-		var toShow=dto.toLocaleString();
-		return toShow;
-	}
-	},		
-	resetAnimation: function(){
-		this.set("selected",0);
-	},
-	opencollapser: function()
-	{
-	this.$.collapser.opened=!this.$.collapser.opened;
-	var tm =(this.toggleMargin=="32px")?"12px": "32px";
-	this.set("toggleMargin",tm);
-	},		
 	resetCurrentClock: function(e){
 		if(this.currentClock.isRunning===true)
 		{
@@ -1179,7 +1051,7 @@ toggleRunning: function(event)
 		}
 		else{
 			var self=this;
-		this.set("currentClock.clockData", new FcClockData(this.currentClock.startTenths, this.currentClock.clockType, this.currentClock.dto));
+		this.set("currentClock.clockData", new FcClockData(this.currentClock.startTenths,  this.currentClock,clockType, this.currentClock.date));
 		this.set("displayedArray." + this.currentIndex, this.currentClock);
 		}
 	},
@@ -1223,7 +1095,7 @@ toggleRunning: function(event)
 		this.deleteAlert();//what do we do in the event array? In tree system should be last one on branch cause that is always what you are dealing with, so pop it?
 	},
 
-	_computeMute: function(clockArray,currentClock){
+	_computeMute: function(clockArray,currentClock,soundingAlarms){
 		if(this.$.myAlarmNoise){
 			return !this.$.myAlarmNoise.muted;
 		}
@@ -1261,12 +1133,114 @@ toggleRunning: function(event)
 		}
 	},
 
-	addAlarm: function()
-	{	
-		this._addNewClock();
+
+	addAlarm: function(argName, argTime)
+	{	var newAlarm=new FcClock(argName, "Alarmclock", 0, 0, 7, argTime);
+		this.push("clockArray", newAlarm);
+		
 	},
 
 });
 </script>
 </dom-module>
 <!--
+
+	// toggle: function(e)
+	// {	
+	// 	this.$.collapse.opened=!this.$.collapse.opened;	
+	// },
+	// {
+// this.$.collapser.opened=!this.$.collapser.opened;
+// var tm =(this.toggleMargin=="32px")?"12px": "32px";
+// this.set("toggleMargin",tm);
+
+// },
+
+
+
+	initMap: function() {
+          this.geocodeLatLng();
+        },
+      
+      geocodeLatLng: function() {
+   
+        var geocoder = new google.maps.Geocoder;
+        var input = this.lat+","+ this.long;
+        var latlngStr = input.split(',', 2);
+        var latlng = {lat: parseFloat(latlngStr[0]), lng: parseFloat(latlngStr[1])};
+        geocoder.geocode({'location': latlng}, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            if (results[1]) {
+            	this.set("location",results[1].formatted_address);
+              //infowindow.open(map, marker);
+              return this.location;
+            } else {
+              window.alert('No results found');
+            }
+          } else {
+            window.alert('Geocoder failed due to: ' + status);
+          }
+        });
+      }
+
+
+
+	addNewAlarm: function(e){
+		console.log(this.alarmTime);
+		var dtl = this.alarmTime.split("T");
+		var dpart=dtl[0].split("-");
+		var year = dpart[0];
+		var month=parseInt(dpart[1])-1;
+		var day=dpart[2];
+		var timepart= dtl[1].split(":");
+		var hours=timepart[0];
+		var minutes=timepart[1];
+		var atime = new Date(year, month, day, hours, minutes);
+			this.addAlarm(this.alarmName, atime);
+	}, 
+FcClockData.prototype.conversionObjectCreator=function(argDateTime) -
+{
+			var theDate = new Date(this.alarmDate);	
+			var yearN = theDate.getFullYear();
+			var year = yearN.toString();
+			var monthN = theDate.getMonth() + 1;
+			var month = (monthN<10)? "0" + monthN.toString(): monthN.toString();
+			var dateN = theDate.getDate();
+			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
+			var hoursN = theDate.getHours();
+			var ampm = hoursN >= 12? "PM": "AM"; 
+			var minutesN = theDate.getMinutes();
+			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
+			var secondsN = theDate.getSeconds();
+			var seconds =secondsN<10 && secondsN>0? "0" + secondsN.toString():secondsN==0? "0" +"0": secondsN.toString();
+			var millisecondsN = theDate.getMilliseconds();
+			var milliseconds = millisecondsN ==0? "0" + "0" + "0":millisecondsN >0 && millisecondsN<10? "0" +"0" + millisecondsN.toString(): millisecondsN >=10 && millisecondsN<100? "0" + millisecondsN.toString(): millisecondsN.toString(); 
+			var milliseconds = millisecondsN.toString();
+			var hoursNUS= hoursN>0 && hoursN>12? (hoursN-12): hoursN == 0? 12: hoursN;
+			var hours = hoursNUS <10? "0" + hoursNUS.toString(): hoursNUS.toString();
+			var hours24 = hoursN == 0? "0" + "0": hoursN<10 && hoursN>0?"0" + hoursN.toString(): hoursN.toString();
+			var timeNow = year+"-"+month+"-"+date+" "+hours+":"+minutes+" "+ampm;
+			var timeNowTwo = "Date: " + month + "/"+date+"/"+year+" Time: "+hours+":" + minutes+":"+ seconds+" " + ampm;
+			var toInputDateTimeLocal = year+"-"+month+"-"+date+"T"+hours24+":"+minutes;
+			var holderObject={
+				"year":year, 
+				"month":month, 
+				"date":date, 
+				"hours":hours, 
+				"minutes":minutes, 
+				"seconds":seconds, 
+				"milliseconds":milliseconds,
+				"ampm": ampm,
+				"yearN": yearN,
+				"monthN": monthN,
+				"dateN": dateN,
+				"hoursN": hoursN,
+				"minutesN": minutesN,
+				"secondsN": secondsN,
+				"millisecondsN": millisecondsN,
+				"timeNow": timeNow,
+				"timeNowTwo":timeNowTwo,
+				"toInputDateTimeLocal":toInputDateTimeLocal
+									};
+			return holderObject;
+};-->

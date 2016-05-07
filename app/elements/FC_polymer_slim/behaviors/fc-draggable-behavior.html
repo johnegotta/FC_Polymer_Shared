@@ -19,7 +19,18 @@ FCBehaviors.DraggableBehavior = {
         type: Number,
         computed: 'computeOffSet(noOffset)',
         notify: true
-      }
+      },
+      drags:{
+        type: Boolean,
+        value: true, 
+        notify: true
+      },
+      isDropDown:{
+        type: Boolean,
+        notify: true
+
+
+      },
   },
 
    listeners: {
@@ -30,14 +41,20 @@ FCBehaviors.DraggableBehavior = {
       return "0px";
 
     },
-    attached: function() {
-
-    },
+    dragsOff: function(){
+      this.set("drags", false);
+  },
+  dragsOn: function(){
+      this.async(this.dragSwitch, 50);
+  },
+  dragSwitch: function(){
+    this.set("drags", true);},
 
   _focusedDraggable:function(e){
       this.dragging=true;
       var self=this;
-      if(this.drags=true){e.preventDefault();
+      if(this.drags===true){
+        e.preventDefault();
       var pH=Polymer.dom(this).firstElementChild;
       //console.log(pH, "the paper-header-panel");
       var header=Polymer.dom(pH).firstElementChild;
@@ -81,13 +98,14 @@ FCBehaviors.DraggableBehavior = {
     }
   },
 
-  ready: function(){
+  attached: function(){
     var dragger = document.createElement('iron-icon');
     Polymer.dom(dragger).setAttribute('icon','icons:open-with');
     Polymer.dom(dragger).setAttribute("on-track","_focusedDraggable");
     Polymer.dom(dragger).setAttribute("draggable", true);
-     Polymer.dom(dragger).setAttribute("style", "opacity: 0");
+     Polymer.dom(dragger).setAttribute("style", "opacity: 0; width: 0px; height: 0px;");
     Polymer.dom(dragger).setAttribute("id", "blink");
+
     Polymer.dom(dragger).classList.add("dragtag"); 
     Polymer.dom(dragger).classList.add("menuItems-dark");
     var pH = Polymer.dom(this.root).firstElementChild;

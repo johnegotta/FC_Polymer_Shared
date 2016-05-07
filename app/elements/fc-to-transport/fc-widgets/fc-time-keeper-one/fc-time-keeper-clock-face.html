@@ -1,0 +1,43 @@
+<dom-module id="fc-time-keeper-clock-face">
+	<template>
+		<paper-material draggable drags class="slight clock-container" elevation="3">
+			<section class="top-row-clock-face">
+					<span class="flex-4" style="font-size: 12px; text-align: left;">{{date}}</span>
+				<section  on-tap="selectApi" on-down="alarmoff" class="flex-7" style="color: #008; font-size: 16px; cursor:pointer;">
+					<iron-icon icon="{{computeHeaderIcon(currentClock)}}" style$="color: {{computeHeaderIconColor(currentClock)}}; height: 29px; width: 29px;">
+					</iron-icon>
+				</section>	
+				<span class="flex-5" style="font-size: 12px; text-align: right;{{makeCircle}}">{{theTime}}</span>
+			</section>
+<!--end-row-one-->
+			<section style="font-size: 12px; color: brown;">[[_computeSecondaryDisplay(currentClock.clockType, currentClock, currentClock.clockName, lat, long)]]</section>
+<!--end row two-->		
+			<section class="clock-display" id="theClock">
+				<section class="layout horizontal flex-2 silent" >
+						<iron-icon class="left-chevron-clock" on-tap="selectPrevious" icon="icons:chevron-left">
+						</iron-icon>
+				</section>
+				<fc-clock-inputs input-style="text-align: left; margin-left: -4.5px; padding: 0px; border: 0px; font-weight: 600; font-size: 22px; min-width: 6px;max-width: 18px;" orientation="horizontal" dataobject="{{currentClock.clockData}}">
+					<fc-incrementor-tag></fc-incrementor-tag>
+				</fc-clock-inputs>
+				<section style$="position: absolute; right: 6px; background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;"class="dropdown">
+					<iron-icon class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, clockArray)}} dropbtn" icon="icons:today"style="position: absolute; z-index: 999909090909;"on-tap="toggleDatePicker" hidden="{{computeHiddenCalendarIcon(currentClock.clockType)}}">
+					</iron-icon>
+				</section>
+          				<section class="layout horizontal flex-2 silent" on-tap="selectNext" >
+								<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; right: 4px;" icon="icons:chevron-right">
+								</iron-icon>
+						</section>
+					</section>
+					<section style="font-weight: 600; font-size: 12px; width: 100%;" class="horizontal layout flex nowrap center-justified">
+					<paper-button 
+							class="horizontal flex-6 layout nowrap center-justified self-stretch startbutton"
+							elevation="0" 
+							style$="color:{{onOffColor}};"
+							on-tap="toggleRunning">
+									[[currentClock.clockName]]
+						</paper-button>
+						
+					</section>
+
+					</paper-material>

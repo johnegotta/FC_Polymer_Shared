@@ -158,12 +158,6 @@
 						background-color: #dfdfdf;
 						border: 3px solid #008;
 					}
-    .glass{
-    	border: 1px #009 solid;
-    	box-shadow: 3px 14px 29px 2px #afafaf;
-
-
-    }
 </style>
 <div style="padding: 0px; width: 320px; border: 1px ridge #efefef">
 	<div style="padding: 2px; text-align: center; {{makeCircle}}" class="layout vertical" on-track="_focusedDraggable">
@@ -188,7 +182,7 @@
 							</iron-icon>
 						</section>
 					</section>
-					<paper-button class="center-justified startbutton" elevation="0" style$="color:{{onOffColor}}; font-size: 12px;"on-tap="toggleRunning">&nbsp;[[currentClock.clockName]]&nbsp;
+					<paper-button class="center-justified startbutton" elevation="0" style$="color:{{onOffColor}};"on-tap="toggleRunning">[[currentClock.clockName]]
 					</paper-button>
 				</div>
 	      				<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; z-index: 999909090909; right: 4px; bottom: 40%;" on-tap="selectNext" icon="icons:chevron-right">
@@ -209,8 +203,8 @@
 			</audio>
 		</div>
 	</div>
-	<iron-collapse id="collapser"  class="vertical layout center-justified">
-		<div class="vertical layout block  glass" style=" height: 320px;overflow-y: scroll;">
+	<iron-collapse id="collapser"  class="vertical layout center-justified glass">
+		<div class="vertical layout block" style=" height: 320px;overflow-y: scroll;">
 			<neon-animated-pages class="flex" id="pages" selected="[[selected]]" on-tap="_clickHandler">
 		        <fc-hero-animated-main-page>
 		        <section class="horizontal layout flex wrap" style="overflow-y: scroll;max-height: 420px; min-height: 340px; max-width: 260px;padding: 2px 12px;">	
@@ -226,12 +220,12 @@
 		        	</fc-animated-list-page>
 		          </fc-hero-animated-page>
 		        <fc-hero-animated-page id="hero2">	
-		        	<div id="addClocks">
+		        	<div id="addAlarms">
 		        		<form>
 								<fc-input-prime
  									input-type="datetime-local"
  									input-style="text-align: right; font-size: 20px; width: 100%;"
- 									label="{{currentClock.clockType}}:&nbsp;{{currentClock.clockName}} &nbsp;"
+ 									label="{{currentClock.clockName}}"
  									is-time-display="true" 
  									time-bind="{{currentClock.alarmTime}}"
  									label-style="color: #4285f4;  text-transform: uppercase;">
@@ -241,7 +235,7 @@
 										input-type="text"
 										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
 										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="{{currentClock.clockType}} Name" 
+										label="Alarm Name" 
 										value="{{currentClock.clockName}}">
 									</fc-input-prime>
 									<fc-input-prime 
@@ -249,39 +243,13 @@
 										input-type="text"
 										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
 										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="Sub-Type: {{currentClock.subType}} &nbsp; " 
-										value="{{currentClock.subType}}">
-									</fc-input-prime>
-									<fc-input-prime 
-										style="text-align: left;"
-										input-type="text"
-										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
-										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
-										label="Date & Time: {{showTime}} &nbsp; " 
+										label="{{currentClock.dto}}" 
 										value="{{currentClock.alarmTime}}">
 									</fc-input-prime>
-									<section class="horizontal layout flex">
-										<section class="vertical layout flex-3 center center-justified" on-tap="_addNewClock"> 
-											<iron-icon icon="icons:alarm-add">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Add</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:save">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Save</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:delete">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Delete</span>
-										</section>
-										<section class="vertical layout flex-3 center center-justified" on-tap="_deleteClock"> 
-											<iron-icon icon="icons:cloud-upload">
-											</iron-icon>
-											<span class="horizontal layout flex nowrap center-justified" style="text-align: center;">Upload</span>
-										</section>
-									</section>
+									<section class="horizontal layout flex"> 
+									<paper-icon-button icon="icons:alarm-add" on-tap="addAlarm()">
+									</paper-icon-button>
+									<paper-button >make alert</paper-button>
 								</form>
 		        	</div>
 		          </fc-hero-animated-page>
@@ -399,6 +367,9 @@ FcClockData.prototype.convertToTenths = function()
 FcClockData.prototype.setAlarmFromDisplay=function(){
 
 
+
+
+
 };
 FcClockData.prototype.convertedFromInputToDate=function()
 {
@@ -513,7 +484,7 @@ class FcClock
 };
 Polymer({
 	is: "fc-time-keeper",
-	listeners:{"on-tap": "_addNewClock", "buttNew.tap": 'displayDatePicker'},
+	listeners:{"on-tap": "addAlarm", "buttNew.tap": 'displayDatePicker'},
 
 	properties: {
 		currentClock: {
@@ -611,12 +582,6 @@ Polymer({
 			},
 			notify: true
 		}, 
-		showTime: {
-			type: String,
-			computed: "computeShowTime(currentClock.dto)",
-			notify: true
-		},
-		
 		iconArray:{
 			type:Array,
 			value:function(){ return[
@@ -909,12 +874,8 @@ Polymer({
 // begin clock switching by type via multiple click methods: displayed array and current array are filtered from the clock array; an api selection via clockType is used to separate out "Stopwatch", "Alarmclock", "Clock", and "Countdown"; the new array is in the displayed array with displayed[0] acting as the new "currentClock";
 //TODO:  last locale not maintaiend consider adding
 	currentClockObserver: function(nv,ov) {
-
-		if(nv && ov){
-			if(ov.clockType){
-			console.log(ov, "FIRST TIME?");
+		if(nv &&ov){
 		console.log(nv.convertToTenths(), nv.alarmTime, nv.clockType, ov.convertToTenths(), ov.alarmTime, ov.clockType, "TIME TODO");
-			}
 		}
 	},
 	selectApi: function(e){		
@@ -1082,41 +1043,26 @@ toggleRunning: function(event)
 		else if(e.target.dataset.target==2){
 			console.log(e.target.dataset.target);
 			this.set("selected", setVal);
-			var clockType=this.currentClock.clockType;
-			this._addClockInterface(clockType);
+			this._addNewClock("Alarmclock");
 			// console.log("1033");
 		}
 	},
-	registerNewClock: function(){
-
-
-
-
-	},
-	_addClockInterface: function(clockType){
-		
-
-
-
-	},
-	_addNewClock: function(e){
+	_addNewClock: function(clockType){
 			var date=new Date();
 			console.log("got the date", date);
-			var c=this.currentClock.clockType;
-			var argArray=c==("Clock")?["NewTimezone","Clock","Personal",0,date]:(c=="Alarmclock")?["NewAlert","Alarmclock","Personal",0, date]:(c=="Countdown")?["New Timer", "Countdown", "Personal", 0, false]:["New Stopwatch","Stopwatch", "Personal", 0, false];
+			var c=clockType;
+			var argArray=(c=="Alarmclock" || "Clock")?["NewAlert","Alarmclock"," ",0, date]:(c=="Countdown")?["New Timer", "Countdown", " ", 0, false]:["Stopwatch","Stopwatch", " ", 0, false];
 			console.log(argArray);
 			var clock=new FcClock(argArray[0], argArray[1],argArray[2],argArray[3],argArray[4]);
 			console.log(clock);
 			this.push("clockArray", clock);
-			var apiIndex=this.apiChoices.indexOf(c);
+			var apiIndex=this.apiChoices.indexOf(clockType);
 			console.log(this.clockArray);
 			this.set("clockApi",this.apiChoices[apiIndex]);
-			var dispArr=this.clockArray.filter(
-				function(val, i, arr)
-				{
-					return(val.clockType==this.apiChoices[apiIndex]);
-				}, this);
+			var dispArr=this.clockArray.filter(function(val, i, arr){
+			return(val.clockType==this.apiChoices[apiIndex]);}, this);
 			var ncIndex=dispArr.length-1;
+			console.log(dispArr,ncIndex);
 			this.set("displayedArray",dispArr);
 			this.set("currentClock", this.displayedArray[ncIndex]);
 		},
@@ -1155,12 +1101,6 @@ toggleRunning: function(event)
 		}
 		
 		
-	},
-	computeShowTime: function(dto){
-		if(dto){
-		var toShow=dto.toLocaleString();
-		return toShow;
-	}
 	},		
 	resetAnimation: function(){
 		this.set("selected",0);
@@ -1263,7 +1203,7 @@ toggleRunning: function(event)
 
 	addAlarm: function()
 	{	
-		this._addNewClock();
+		this._addNewClock("Alarmclock");
 	},
 
 });

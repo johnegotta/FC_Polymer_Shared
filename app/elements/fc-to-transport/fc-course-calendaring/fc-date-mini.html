@@ -1,21 +1,13 @@
 <dom-module id="fc-date-mini">
 <template>
 <style>
-.pretty{
 
-background: red;
-height: 11px;
-width: 37px;
-
-}
 </style>
 		<section class="vertical layout flex self-shrink" on-tap="toggleDays">
-		<content select=".pretty" ></content>
-			
 			<span class="horizontal layout flex center-justified" style="[[_computeSizeStyle(sizeWanted)]] [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]]; {{circleSelect}};"> 
 			<content select=".date"></content></span>
 			</section>
-			<span hidden$="{{_calculateHideNotes(sizeWanted)}}"style="{{dateCardMiniNotesStyle}};">[[computeDayNotes(calendarDay, eventList)]]</span>   
+			<span hidden$="{{_calculateHideNotes(sizeWanted)}}"style="{{dateCardMiniNotesStyle}};">[[computeDayNotes(calendarDay, eventList)]]</span> 
 		
 </template>
 <script>
@@ -36,7 +28,6 @@ value: false,
 		eventList:{
 			type: Array,
 			value:[],
-			observer: "isEvents",
 			notify: true
 		},
  		dateMiniStyles: {
@@ -139,10 +130,10 @@ value: false,
 	_computeSizeStyle: function(size){
 		if(size=="" || size =="medium" || size=="normal"){
 			this.set("dateCardMiniNotesStyle",  "font-size:8px; font-weight: 500; font-style: merriweather; color: #008;");
-				return "margin: 1px; padding:4px 4px 8px 4px;font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid";
+				return "font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid";
 				}
 		else if(size=="small" || size=="datePicker" || size=="datepicker"){
-			return "padding:1px 1px 1px 1px; margin-bottom: 0px; font-size: 12px; font-weight: 600; cursor: pointer;";
+			return "margin-bottom: 0px; font-size: 14px; font-weight: 500; cursor: pointer;";
 
 		}
 
@@ -203,7 +194,7 @@ value: false,
 	},
 	observeBackground: function(calendarDay){
 		
-		console.log(calendarDay);
+		//console.log(calendarDay);
 	},
 
 	
@@ -218,13 +209,8 @@ value: false,
   		else
   		{
   			
-  			return "#dfdfdf";
+  			return "#fff";
   		}
-  	},
-  	isEvents: function(newVal, oldVal)
-  	{
-  		// console.log(newVal, oldVal);
-  	
   	},
 
   	toggleDays: function(e)
@@ -244,8 +230,16 @@ value: false,
 				  	this.set("calendarDay.inCourseCalendar", !this.calendarDay.inCourseCalendar);
 					var timestamp =new Date();
 			}
+			else if(this.toggleDay===true){
+				this.toggleDay=!this.toggleDay;
+			  		this.isSelected = !this.isSelected;
+			  		this.set("calendarDay.toggleDay",!this.calendarDay.toggleDay);
+				  	this.set("calendarDay.isSelected", !this.calendarDay.isSelected);
+				  	this.set("calendarDay.inCourseCalendar", !this.calendarDay.inCourseCalendar);
+				  	var timestamp =new Date();
+			}
 		var eList=this.calendarDay.eventList;
-		console.log(eList);
+		//console.log(eList);
 					
 	  		if(this.calendarDay.isSelected===true || this.calendarDay.inCourseCalendar===true)
 	  			{	
@@ -265,7 +259,7 @@ value: false,
   		}
   		else 
   		{
-  			return "#dfdfdf";
+  			return "#fff";
   		}
   	},
   	computePickedDaysWhite: function(inMonth, calendarDay, testDate){
@@ -277,13 +271,10 @@ value: false,
   		else if(inMonth==false) 
   		{
   			
-  			return "#efefef";
+  			return "#fff";
   		}
   	},
-  computeSelectedArray: function(isSelected, selected, toggleDay){
-  
 
-  }
 });
  </script>
  </dom-module>

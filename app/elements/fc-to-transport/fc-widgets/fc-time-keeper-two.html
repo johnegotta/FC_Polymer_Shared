@@ -1,0 +1,1224 @@
+<dom-module id="fc-time-keeper">
+<template>
+<style>
+	:host{
+		position: absolute; 
+		top: 8px;
+		background: #fff;
+		left: 8px;
+		min-width: 245px; 
+		z-index:93;
+	};
+      #map {
+        height: 400px;
+      }
+  
+      #latlng {
+        width: 225px;
+      }
+	paper-material{
+		opacity: 1;
+		position: relative;
+		background: #ffffff;
+		border: 3px ridge #aecdfe;
+		padding: 8px 4px;
+		display: block;
+		@apply(--horizontal-layout);
+		@apply(--nowrap-layout);
+	}
+	.timer{
+		font-size: 17px; 
+		opacity: 1; 
+		font-weight: 600; 
+		font-family: merriweather; 
+		color: #007; 
+		padding: 6px 4px 2px 4px; 
+		border: .4px solid #efefef;
+	}
+	.slight{
+		font-size: 14px; 
+		font-family: merriweather; 
+		opacity: 1; 
+		color: #008; 
+		font-weight: 400;
+	}
+	.startbutton{
+		margin: 1px; 
+		border: 2px solid #efefef;  
+		box-shadow: 3px 7px 17px 2px #dedede; 
+		font-size: 14px; 
+		font-weight: 600; 
+		text-align: center; 
+		padding: 2px; 
+		margin-bottom: 5px; 
+		width: 100%;
+	}
+	.startbutton:hover{ 
+		box-shadow: 1px 3px 4px 1px; 
+		font-weight: 700;
+	}
+	fc-input-prime{
+		max-width: 98%;
+
+	}
+	.clockname{
+		font-size:18px;
+		color: #008; 
+		font-family: times;
+	}
+	.clockname::after{
+		font-size: 10px;
+		color: white;
+		display: block;
+		content: " .";
+	}
+	.primary{
+		color: #008;
+		font-weight:600;
+		font-size: 15.5px;
+	}
+	.secondary{
+			color: grey;
+		font-weight:500;
+		font-size: 11px;
+
+	}
+	.clockname:hover::after{
+		font-size: 10px; 
+		color: brown;
+		display: block;
+		content: " Tap to Change Clock Type";
+
+	}
+	@keyframes yellowalert{
+		from {background-color: white;}
+		to{background-color: orange;}
+	}
+	.dropdown {
+	    position: relative;
+	    display: block;
+	}
+
+	.dropdown-content {
+	    display: none;
+	    position: absolute;
+	    background-color: #f9f9f9;
+	    min-width: 160px;
+	 
+	}
+
+	.dropdown-content {
+	    color: black;
+	    padding: 12px 16px;
+	    text-decoration: none;
+	    display: block;
+	}
+
+	.dropdown-content:hover {background-color: #f1f1f1
+	right: 0;}
+
+	.dropdown:hover .dropdown-content {
+	    display: fixed;
+	}
+
+	.dropdown:hover .dropbtn {
+	    background-color: #3e8e41;
+	}
+	.blinkyellow{
+		width: 14px;
+		height: 14px;
+		background-color: white;
+		animation-name: yellowalert;
+		animation-duration: .45s;
+		animation-iteration-count: 240;
+		animation-direction: alternate;
+	}
+	.blinkyellow:hover::after{
+		display: flex;
+		font-size: 7px;
+		color: #008;
+		content: " Click to Visit Calendar";
+	}
+	.small{
+		display: block;
+		width: 8px;
+		height: 8px;
+	}
+	.small.hover::after, .small.active::after{
+		font-size: 10px;
+		color: #C87533;
+		display: block;
+		content: " Click to Visit Calendar";
+	}
+	.inviso{display: none; width: 0px; height: 0px; opacity: 0;}
+
+	@keyframes redalert {
+	    from {background-color: #dfdfdf;}
+	    to {background-color: red;}
+	}
+	.animatedalert{
+	 
+	    background-color: #dfdfdf;
+	    animation-name: redalert;
+	    animation-duration: .5s;
+	    animation-iteration-count: infinite;
+	    animation-direction: alternate;
+	}
+</style>
+<div style="padding: 0px; width: 320px; border: 1px ridge #efefef">
+	<div on-track="_focusedDraggable" >
+
+		<div drags>		
+			<div class="">
+				<paper-material style$="width: 280px; padding: 8px; margin: 16px; z-index:90001000100100100100100; border-radius: 180;" draggable drags class="slight layout vertical flex no wrap" elevation="3">
+				<section class="horizontal layout center-center justified" style="{{makeCircle}}">
+					<span class="flex-4" style="font-size: 12px; text-align: left;">{{date}}</span>
+						<section  on-tap="selectApi" class="flex-7" style="color: #008; font-size: 16px; cursor:pointer;{{makeCircle}}">
+							<iron-icon 
+									icon="{{computeHeaderIcon(currentClock)}}" 
+									style$="color:{{computeHeaderIconColor(currentClock)}}; height: 29px; width: 29px;">
+							</iron-icon>
+
+						</section>	
+					<span class="flex-5" style="font-size: 12px; text-align: right;{{makeCircle}}">{{theTime}}</span>
+				</section>
+					<section style="font-size: 12px; color: brown;{{makeCircle}}; color:{{whiteOrBlue}}"> [[_computeSecondaryDisplay(currentClock.clockType, currentClock, currentClock.clockName, lat, long)]]
+					</section>				
+					<section on-tap="alarmoff" class="layout horizontal flex nowrap center-justified clockDisplay" id="theClock"  style="align-self: center; cursor:pointer;">
+						<section class="layout horizontal flex-2 silent" >
+									<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; left: 4px;" on-tap="selectPrevious" icon="icons:chevron-left">
+							</iron-icon>
+						</section>
+						<fc-clobjid-prime 
+							input-style="text-align: left; margin-left: -4.5px; padding: 0px; border: 0px silver solid; font-weight: 600; font-size: 22px; min-width: 6px;max-width: 18px;" 
+							orientation="horizontal" 
+							dataobject="{{currentClock.clockData}}"
+							>
+						<fc-incrementor-tag></fc-incrementor-tag>
+						</fc-clobjid-prime>
+						<section style$="position: absolute; right: 6px; background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;"class="dropdown">
+								<iron-icon class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, clockArray)}} dropbtn" icon="icons:today"style="position: absolute; z-index: 999909090909;"on-tap="toggleDatePicker" hidden="{{computeHiddenCalendarIcon(currentClock.clockType)}}">
+								</iron-icon>
+						</section>
+          				<section class="layout horizontal flex-2 silent" on-tap="selectNext" >
+								<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .65; position: absolute; right: 4px;" icon="icons:chevron-right">
+								</iron-icon>
+						</section>
+					</section>
+					<section style="font-weight: 600; font-size: 12px; width: 100%;" class="horizontal layout flex nowrap center-justified">
+					<paper-button 
+							class="horizontal flex-6 layout nowrap center-justified self-stretch startbutton"
+							elevation="0" 
+							style$="color:{{onOffColor}};"
+							on-tap="toggleRunning">
+									[[currentClock.clockName]]
+						</paper-button>
+						
+					</section>
+
+					</paper-material>
+			</div>
+			<fc-datepicker-dropdown id="friend" class="dropdown-content" drags="false" style="max-width: 191px;position: absolute; z-index: 99990909091111109; padding: 1px;right: 12px; top: 142px;" hidden="{{!calendarButton}}">
+			</fc-datepicker-dropdown> 
+  			<audio loop id="myAlarmNoise" style="border: green 2px solid; width: 220px; height: 35px;">
+  					<source src="fc-clock/beep-06.mp3" type="audio/mp3">
+  					<source src="fc-clock/beep-10.mp3" type="audio/mp3">
+			</audio>
+		</div>
+			<paper-tabs 
+					id="assistantMenu" 
+	      		scrollable="true"
+	      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 320px;" on-down="dragsOff" on-up="dragsOn"   on-tap="clickHandler"
+	      		bar="true"
+	      		hide-scroll-buttons="true"> 
+				<section class="horizontal layout flex nowrap" style="overflow-x: scroll;min-width: 320px;">									
+				<paper-icon-button on-tap="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button>
+				<template is="dom-repeat" items="{{iconArray}}">	<section>
+						<paper-icon-button data-tap$="{{item.onTap}}" style="color: {{item.newStyle}};" icon="{{item.newIcon}}"></paper-icon-button>
+					</section>
+				</template>
+				</section>
+			</paper-tabs>		
+			</div>
+		
+			
+	<section class="vertical layout block" style="overflow-y: scroll;">
+	<paper-list-box
+			style="height: 280px; padding: 2px; outline: white 3px solid; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" 
+			class="layout vertical">
+	<template is="dom-repeat" items="{{soundingAlarms}}" as="alarm"><section class="vertical layout block" style="overflow-y: scroll;">
+ 		<paper-item two-line class="animatedalert" style="border: silver 1px solid; font-size: 12px; max-height: 20px!important;" >
+				<paper-item-body on-tap="acknowledgeAlarm">
+					<div class="primary">		 
+						<span style="color:#008; font-size: 14px; font-weight: 600;">[[alarm.clockName]] </span>
+						<span style="color: #008; font-weight: 600;"> [[computeSoundingAlarm(alarm.dto)]]</span> 
+					</div>		
+					<div class="secondary">		
+						[[alarm.clockType]]	this will be notes, the details teaser;	
+					</div>		
+				</paper-item-body>		
+			</paper-item>		
+	</template>
+</paper-list-box>
+</section>
+</div>
+
+    
+
+</template>
+		
+
+<script>
+
+"use strict";
+  
+function FcClockData(argTenths, argType, argDateTime)
+{	
+	console.log(argDateTime);
+	var digitArray = [		
+		{name: "thours", value: 0, inputType: "digit", label:" "+" H", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "hours", value: 0, inputType: "digit", label:"H", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tmin", value: 0, inputType: "digit", label:"M", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "min",value: 0, inputType: "digit", label:"M", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tsec",value:0, inputType: "digit", label:"S", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "sec",value: 0, inputType: "digit", label:"S", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tenth", value: 0, inputType: "digit", label:"s", colon: false, inclock: true, isAmPm: false, isAmPm: false, type:argType},
+		{name: "hundredth", value: 0, inputType: "digit", label:"s", inclock: true, isAmPm: false, isAmPm: false, type:argType}
+	];
+	for(var i = 0; i < 8; i++)
+	{
+		var obj = digitArray[i];
+		this[obj.name] = obj;
+	}
+	this.digitArray=digitArray;
+	if(argType=="Countdown" || argType=="Stopwatch")
+	{
+		this.convertFromTenths(argTenths);
+	}
+
+	if(argType=="Clock"){ 
+		this.setClock();	
+		}
+	if (argType=="Alarmclock"){
+		this.setAlarm(argDateTime);
+	}
+	
+		
+};
+FcClockData.prototype.setClock=function(){
+		var theDate=new Date();
+		var hoursN = theDate.getHours();
+		var ampm = hoursN >= 12? "PM": "AM"; 
+		var minutesN = theDate.getMinutes();
+		var secondsN =theDate.getSeconds();
+		var ampm = hoursN >= 12? "PM": "AM";
+		var ap=ampm.charAt(0);
+		var milliseconds=theDate.getMilliseconds(); 
+		this.hundredth.value="M"; 
+		this.hundredth.isAmPm=true;
+		this.tenth.value=ap;
+		this.sec.isAmPm=true;
+		this.tenth.isAmPm=true;
+		this.sec.value = secondsN%10;
+		this.tsec.value = Math.floor(secondsN/10);
+		this.min.value =minutesN%10;
+		this.tmin.value =Math.floor(minutesN/10);
+		this.hours.value =(hoursN==0)?2:(hoursN<13)?hoursN%10:(hoursN-12)%10;
+		this.thours.value =(hoursN==0)?1:(hoursN<13)?Math.floor(hoursN/10):Math.floor((hoursN-12)/10);
+	
+
+};
+FcClockData.prototype.setAlarm=function(argDateTime){
+		var theDate=new Date(argDateTime);
+		console.log(theDate);
+		var hoursN = theDate.getHours();
+		var ampm = hoursN >= 12? "PM": "AM";
+		var ap=ampm.charAt(0);
+		var minutesN = theDate.getMinutes();
+		var secondsN =theDate.getSeconds();
+		var milliseconds=theDate.getMilliseconds(); 
+		this.hundredth.value="M"; 
+		this.hundredth.isAmPm=true;
+		this.tenth.value=ap;
+		this.sec.isAmPm=true;
+		this.tenth.isAmPm=true;
+		this.sec.value = secondsN%10;
+		this.tsec.value = Math.floor(secondsN/10);
+		this.min.value =minutesN%10;
+		this.tmin.value =Math.floor(minutesN/10);
+		this.hours.value =(hoursN==0)?2:(hoursN<13)?hoursN%10:(hoursN-12)%10;
+		this.thours.value =(hoursN==0)?1:(hoursN<13)?Math.floor(hoursN/10):Math.floor((hoursN-12)/10);
+	 	this.yearN= theDate.getFullYear();
+	 	this.monthN=theDate.getMonth()+1;
+	 	this.monthString=theDate.getFullMonth();
+	 	this.dayOfMonth=theDate.getDate();
+	 	this.calendarDate=new Date(this.yearN, this.monthN-1, this.dayOfMonth);
+	
+};
+FcClockData.prototype.convertToTenths = function()
+{
+	var result = 0;
+	result += this.hundredth.value;//put in animation for hundredths
+	result += this.tenth.value * 1;
+	result += this.sec.value * 10;
+	result += this.tsec.value * 100;
+	result += this.min.value * 600;
+	result += this.tmin.value * 6000;
+	result += this.hours.value * 36000;
+	result += this.thours.value * 360000;
+	return result;
+};
+FcClockData.prototype.convertedFromInputToDate=function()
+{
+		var dtl = this.toDateTimeLocalInput.split("T");
+		var dpart=dtl[0].split("-");
+		var year = dpart[0];
+		var month=parseInt(dpart[1])-1;
+		var day=dpart[2];
+		var timepart= dtl[1].split(":");
+		var hours=timepart[0];
+		var minutes=timepart[1];
+		var atime = new Date(year, month, day, hours, minutes);
+		return atime;
+};
+
+
+FcClockData.prototype.convertFromTenths = function(argTenths)
+{	
+	this.tenth.value = argTenths % 10;
+	var fullsec = Math.floor(argTenths / 10) % 60;
+	this.sec.value = fullsec % 10;
+	this.tsec.value = Math.floor(fullsec / 10);
+	var fullmin;
+	if(argTenths>35999 && argTenths<60000)
+	{
+		fullmin = Math.floor(argTenths / 600) % 100;
+	}
+	else
+	{
+		fullmin = Math.floor(argTenths / 600) % 60;
+	}
+	this.min.value = fullmin % 10;
+	var fullhour = Math.floor(argTenths / 36000);
+	this.hours.value = fullhour % 10;
+	this.tmin.value = Math.floor(fullmin / 10);
+	if(argTenths>35999 && argTenths<60000)
+	{
+		this.hours.value = 0;
+	}
+	else
+	{
+		//this.tmin.value = fullmin % 60;
+	}
+
+};
+FcClockData.prototype.convertFromSeconds = function(argSeconds)
+{
+
+	this.convertFromTenths(argSeconds*10);
+
+};
+
+class FcClock
+{
+	constructor(argName, argType, argSubType, argTenths, argDateTimeObject)
+	{
+		this.clockName = argName || "Focused Clock";
+		this.clockType = argType;
+		this.startTenths = argTenths;
+		this.isRunning = false;
+		this.alarmTime=(argType=="Alarmclock")?argDateTimeObject.getTime(): false;
+		var now=new Date().getTime();
+		if(argType=="Alarmclock")
+		{
+			this.isActive=true;
+			if(this.alarmtime<now){
+				this.isRunning=true;
+			}
+			else{
+				this.isActive=true;
+				this.isRunning=false;
+			}
+		}
+		this.dto=argDateTimeObject; 
+		this.subType=argSubType || "";
+		this.clockData= new FcClockData(argTenths, argType, argDateTimeObject);
+	}
+	convertFromTenths(argTenths)
+	{
+		this.clockData.convertFromTenths(argTenths);
+	}
+	convertToTenths()
+	{
+		return this.clockData.convertToTenths();
+	}
+	convertFromSeconds(argSeconds){
+		this.clockData.convertFromSeconds(argSeconds);
+	}
+	setClock(argSelf)
+	{
+		return this.clockData.setClock();
+	}
+	setAlarm(argDateTimeObject){
+		return this.clockData.setAlarm(argDateTimeObject);
+	}
+	toggleRunning()
+	{
+		var d = (new Date()).getTime();
+		if(this.isRunning)
+		{
+			this.lastTurnedOff = d;
+			this.lastTurnedOffTenths = this.clockData.convertToTenths();
+		}
+		else
+		{
+			this.lastTurnedOn = d;
+			this.lastTurnedOnTenths = this.clockData.convertToTenths();
+		}
+		this.isRunning = !this.isRunning;
+	}
+};
+Polymer({
+	is: "fc-time-keeper",
+	listeners:{"on-tap": "addAlarm", "buttNew.tap": 'displayDatePicker'},
+
+	properties: {
+		currentClock: {
+			type: FcClock,
+			value: {},
+			notify: true,
+		},
+		selected:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		calendarButton:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		clockType: {
+			type: String, 
+			notify: true,
+		},
+		openingArray:{
+			type: Array,
+			value:[],
+			notify: true,
+		},
+		primaryClock: {
+			type: FcClock,
+			value: {},
+			notify: true
+		}, 
+		clockArray:{
+			type: Array,
+			notify: true,
+			reflectToAttribite: true
+		},
+	
+		displayedArray:{
+			type: Array,
+			value:[],
+			observer: "watchDisplayed",
+			notify: true
+		},
+		clockApi:{
+			type: String,
+			value: function(){return "Countdown";},
+			notify: true,
+		},
+		apiChoices:{
+			type:Array,
+			value:function(){
+				return ["Clock",
+						"Countdown",
+						"Stopwatch",
+						"Alarmclock"			
+							];
+			},
+			notify: true
+		},
+		// 
+		iconArray:{
+			type:Array,
+			value:function(){ return[
+
+				{	
+					onTap:"addAlarm",
+			 		newStyle: "#4285f4", 
+				 	newIcon:"device:add-alarm"
+				 },
+				{ 		
+						onTap: "deletAlarm", 						
+						newStyle:"#C87533",
+				 		newIcon: "icons:delete"
+				 },
+				
+				{ 		onTap:"restore",
+				  		newStyle:"#4285f4;", 
+				  		newIcon: "icons:restore"
+				},
+				 		
+				 {		onTap: "reset", 
+				 		newStyle:"#C87533;",
+				 		 newIcon: "icons:view-list"
+				},
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						newIcon: "icons:date-range",
+				},		
+				{		onTap: "reset", 
+						newStyle:"#C87533;",
+						newIcon: "icons:swap-vertical-circle"
+				},	
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "notification:event-available"
+				},		
+				{		onTap: "reset", 
+						newStyle:"#C87533;",
+						 newIcon: "social:notifications-active"
+				},	
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "notification:event-busy"		
+				},
+				{		onTap: "reset", 
+						newStyle:"#C87533;",
+						newIcon: "notification:event-note"				},		
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "social:notifications-off"
+				},				
+				{		onTap: "reset", 
+						newStyle:"#C87533;",
+						 newIcon: "icons:swap-horiz"
+				},	
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "icons:alarm-off"
+				},	
+				{		onMyTap: "reset", 
+						newStyle:"#C87533;",
+						newIcon: "icons:gavel"
+				},
+						
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "social:person-add"
+				},
+				{		onTap: "reset", 
+						newStyle:"#C87533;",
+						 newIcon: "icons:language",
+				},
+				{		onTap: "reset", 
+						newStyle:"#4285f4;",
+						 newIcon: "maps:local-library"
+				}];
+			},
+			notify: true
+		},
+		calendarButton:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		makeCircle:{
+			type: String,
+			value:function(){return "border-radius: 180;";},
+			notify: true
+		},
+		muteButton:{
+			type: String,
+			value:function(){
+				var muted = this.$.myAlarmNoise.muted;
+				var getVal="av:volume-up";
+				return getVal;
+			},
+			notify: true
+		 },
+		 onOffColor: {
+		 	type: String,
+		 	value: "green",
+		 	notify: true
+		 },
+		
+		drags:{
+			type: Boolean,
+			value: true,
+			notify: true
+		},
+		dragCounter:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+		alarmTime:{
+				type: String,
+				notify: true,
+		},
+		theTime:{
+			type: String,
+			value:function(){
+				var newtime = new Date();
+				var update = newtime.toLocaleTimeString();
+				return update;
+			},
+			notify: true
+		}, 
+		refit:{
+			type: Boolean,
+			value: false,
+			notify: true,
+
+		},
+		
+		clockIndex: {
+			type: Number, 
+			value: 0,
+			notify: true
+		},
+		toggleMargin:{
+			type: String, 
+			value: "32px",
+			notify: true
+		},
+		soundingAlarms:{
+			type: Array,
+			value:[],
+			notify: true
+		},
+		acknowledgedAlerts:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		date:{
+			type: Date,
+			value:function(){
+				var d=new Date();
+				return d.getFullMonth() + " " + d.getDate() +", "+ d.getFullYear(); 
+			},
+			notify: true
+		},
+      	now:{
+      		type: Date, 
+      		notify: true
+      	}, 
+      	muted: {
+      		type: Boolean,
+      		value: "_computeMute(clockArray,currentClock, soundingAlarms)",
+      		notify: true,
+      	},
+      	long: {
+      		type: Number,
+      		value: 0,
+      		notify: true
+
+      	},
+      	lat: {
+      		type: Number,
+      		value: 0,
+      		notify: true
+      	},
+      	mapArray:{
+      		type: Array,
+      		value: [],
+      		notify: true
+      	},
+      	location: {
+      		type: String,
+      		value: "Home",
+      		notify: true
+      	},
+      	lastColor: {
+      		type: Number,
+      		value: 0,
+      		notify: true
+      			},
+    
+	},
+	initializeClocks:function(){
+		var self = this;
+		var runningClockArray=[];
+		
+		setInterval(function(){
+			var currentTime = new Date();
+			var time = currentTime.toLocaleTimeString();
+			var date=new Date(date).toLocaleDateString();
+			self.set("theTime", time);
+			var td=self.primaryClock.setClock(self);
+			var stamp=Math.floor(currentTime.getTime());
+			var tenths=self.primaryClock.convertToTenths();
+			var name=self.currentClock.clockName;
+
+			self.clockArray.forEach(function(cl, i, arr)
+			{	var s=stamp;
+				if(cl.clockType=="Clock"){cl.isRunning=true;}
+				if(cl.isRunning && cl.clockType!="Alarmclock")
+				{
+					var d=((s - cl.lastTurnedOn)/100);
+					var delta = (cl.clockType=="Countdown")?cl.lastTurnedOnTenths-d:(cl.clockType=="Stopwatch")?cl.lastTurnedOnTenths+d: 0;
+					var newTenths=(delta>0)?delta:0;
+					if(cl.clockType=="Countdown" || cl.clockType=="Stopwatch")
+					{
+					cl.convertFromTenths(newTenths);
+					}
+					if(delta<=0 && (cl.clockType=="Countdown"))
+					{
+						cl.isRunning=false; 
+					}
+					var path = "currentClock.clockData.tenth.value";
+					var path2 = "currentClock.clockData.sec.value";
+					if(cl.clockType!="Alarmclock"){
+					self.notifyPath(path, self.currentClock.clockData.tenth.value);
+					self.notifyPath(path2, self.currentClock.clockData.sec.value);
+					}
+				}
+				if(cl.clockType=="Alarmclock" && cl.isActive)
+					{
+						var alarmtime =cl.dto.getTime();
+						//console.log(alarmtime, alarmtime,alarmtime,alarmtime);
+						if(currentTime.getTime() > alarmtime)
+						{	console.log("AM IN THE DAMNED ALARM");
+							var books =cl.clockName + " " + cl.dto;
+							self.ringAlarm(cl);
+							cl.isActive = false;
+							
+							self.notifyPath("clockArray." + i + ".isActive", false);
+						}
+			}
+			},self);	
+					}, 100);
+	},
+
+	computeHeaderIcon: function(currentClock){
+			console.log("I AM IN THE COMPUTED FIUNCTION");
+			var clockType=currentClock.clockType;
+		var retVal=(clockType=="Clock")?"device:access-time": (clockType=="Alarmclock")? "device:access-alarm": (clockType=="Stopwatch")?"device:access-time": "device:access-time";
+		return retVal; 
+
+	},
+
+
+	computeHeaderIconColor: function(currentClock){
+
+				this.set("lastColor", this.lastColor+1);
+				var retVal=(this.lastColor%2!=0)?"#C87533;  font-weight: 700; stroke: 800; padding: 0px; margin: 0px; border: 1px solid silver; outline: grey; border-radius: 180px;":"#4285f4";
+				return retVal;
+		 },
+		computeHiddenCalendarIcon: function(clockType)
+		{
+		return !(clockType=="Alarmclock");
+		},
+
+	clockwatcher: function(newVal, oldVal)
+	{
+		console.log(newVal, oldVal);
+	},
+
+	ready: function()
+	{
+		this.setClockConstructor();
+		
+	},
+	attached: function()
+	{	this.$.myAlarmNoise.muted=false;
+		this.initializeClocks();
+		
+	},
+	_computeMute: function(clockArray,currentClock, soundingAlarms){
+		if(this.$.myAlarmNoise){
+			return !this.$.myAlarmNoise.muted;
+		}
+		else{return this.$.myAlarmNoise.muted;}
+	},
+	dragsOff: function(){
+			this.set("drags", false);
+	},
+	dragsOn: function(){
+			this.async(this.dragSwitch, 50);
+	},
+	dragSwitch: function(){
+		this.set("drags", true);},
+
+clickHandler: function(e) {
+			console.log(e);
+			if(e.target.selected!=undefined){
+				var sel = e.target.selected;
+				this.set("app.selected", sel);
+			}
+		  var button = e.target;
+		  while (!button.hasAttribute('data-transition') && button!==document.body) {
+		    button = button.parentElement;
+		  }
+		  if (!button.hasAttribute('data-transition')) {
+		    return;
+		  }
+		  var id = button.getAttribute('data-transition');
+		  var dialog = document.getElementById(id);
+		  console.log(document.getElementById(id), id, "LOOOK HERE DUMMY", dialog);
+		  if (dialog) {
+		    dialog.open();
+		  }
+		},
+	resetCurrentClock: function(e){
+		if(this.currentClock.isRunning===true)
+		{
+				this.set("currentClock.isRunning", false);
+				this.set("onOffColor", "green");
+		}
+		else{
+			var self=this;
+		this.set("currentClock.clockData", new FcClockData(this.currentClock.startTenths,  this.currentClock,clockType, this.currentClock.date));
+		this.set("displayedArray." + this.currentIndex, this.currentClock);
+		}
+	},
+	_computeResetButton: function(running){
+		var retVal=(running===true)?"STOP":"RESET";
+		return retVal;
+	},
+	
+	toggleRunning: function(event)
+	{	
+		var bool= !this.currentClock.isRunning;
+		this.currentClock.toggleRunning();
+		var setVal = this.onOffIcon=="icons:forward"?"icons:close":"icons:forward";
+		this.set("onOffIcon", setVal);
+		this.set("onOffColor", this.onOffColor=="green"?"red":"green");
+		this.set("currentClock.isRunning",bool);
+	},
+	toggleDatePicker:function(ev){
+		this.calendarButton=!this.calendarButton;
+		this.drags=!this.drags;
+	},
+
+	computeAlarmColor: function(argActive)
+	{
+		return argActive?"green":"red";
+	},
+_computeCalendarNeeded: function(ctype, cc, clockArray){
+	var now=new Date().getTime(); 
+	var retVal=(ctype!="Alarmclock")?"inviso":(((cc.dto-now)/1000)<3600)?"blinkyellow": "small";
+		return retVal;
+},
+	selectApi: function(e){
+		
+		var compareVal=this.currentClock.clockType;
+		var len=this.apiChoices.length-1;
+		var apiIndex=this.apiChoices.indexOf(compareVal);
+		console.log(apiIndex, len);
+		if(apiIndex==len){apiIndex=0;}
+		else{apiIndex=apiIndex+1;}
+		console.log(apiIndex);
+		this.set("clockApi",this.apiChoices[apiIndex]);
+		console.log(this.clockApi);
+		var dispArr=this.clockArray.filter(function(val, i, arr){
+				return(val.clockType==this.apiChoices[apiIndex]);
+		}, this);
+		console.log(dispArr);
+		this.set("displayedArray",dispArr);
+		this.set("currentClock", this.displayedArray[0]);
+	},
+
+	
+// {
+// this.$.collapser.opened=!this.$.collapser.opened;
+// var tm =(this.toggleMargin=="32px")?"12px": "32px";
+// this.set("toggleMargin",tm);
+
+// },
+
+    dragYes: function()
+    {
+    	this.set("drags",true);
+    },
+  
+	// toggle: function(e)
+	// {	
+	// 	this.$.collapse.opened=!this.$.collapse.opened;	
+	// },
+
+	selectPrevious: function(e){
+		var previous=-1;
+		var last=this.displayedArray.length-1;
+		var num =(this.clockIndex>0)?(this.clockIndex-1):last;
+			this.switchClock(num);
+	},
+	selectNext: function(){
+		var last=this.displayedArray.length-1;
+		var num =(this.clockIndex<last)?(this.clockIndex+1):0;
+		console.log(num);
+		var next=1;
+			this.switchClock(num);			
+	},
+	watchDisplayed: function(newVal, oldVal){
+		console.log(oldVal, newVal);
+		if(newVal.length){this.switchClock(0);}
+	},
+	selectClock: function(){
+		var last=this.displayedArray.length-1;
+		var num =(this.clockIndex<last)?(this.clockIndex+1):0;
+			this.switchClock(num);		
+	},
+	switchClock: function(num){	
+		if(this.displayedArray){
+		this.set("clockIndex", num);
+		console.log(this.clockIndex, this.clockApi);
+		this.set("currentClock", this.displayedArray[num]);
+		this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
+		this.set("onOffColor", this.currentClock.isRunning?"red":"green");
+		}
+		
+	},
+	_computeSecondaryDisplay:function(type, clock, name, lat, long){
+		var c=clock.clockData;
+		if(type=="Alarmclock"){ return "Event Date: " + c.monthString + " " + c.dayOfMonth + ", " + c.yearN;}
+		else if(type=="Clock"){
+			console.log("I was Here");
+			var self=this;
+        var latLong=navigator.geolocation.getCurrentPosition(function(position){
+        		var lat=position.coords.latitude;
+				console.log(lat);
+				self.set("lat", lat);
+				var long= position.coords.longitude;
+				console.log(long);
+				self.set("long",long);
+		return position;});
+		
+			return "Lg: " + self.long + " Lt: " + self.lat;
+		}
+		else{ 
+			return clock.subType;
+		}
+	},
+
+	showPosition: function(){
+		var lat=position.coords.latitude;
+		console.log(lat);
+		this.set("lat", lat);
+		var long= position.coords.longitude;
+		console.log(long);
+		this.set("long",long);
+		var pickle= this.long +" " + this.lat;
+		return pickle;
+	},
+	_focusedDraggable:function(e)
+	{
+	  	if(this.drags==true){
+	        var self=this;
+	        e.preventDefault();
+			switch(e.detail.state)
+			{
+	          case 'start':
+	            // console.log('START NoWayAreWe Draggin');
+	            self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+	            self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+	            console.log('top distance differenced?' + self._topprime);
+	            // }
+	            self.set("refit",true);
+	            self.changeX=0;
+	            self.changeY=0;
+	            Polymer.dom.flush();
+	            break;
+	          case 'track':
+	            self.changeX=e.detail.ddx + self.changeX;
+	            self.changeY=e.detail.ddy + self.changeY;
+	            self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+	            break;
+	          case 'end':
+	            console.log(self._topprime);
+	            self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+	            self._bottom = self.getBoundingClientRect().top;
+	            self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+	            self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+	            self.translate3d(0, 0, 0);
+
+	            console.log("ENDING", self._x);
+	            self.style.left=self._x.toString()+'px';
+	            self.style.top=self._y.toString()+'px';
+	            console.log('y: ' + e.detail.y);
+	            self.dragging=false;
+	            self.set("refit",true);
+	            Polymer.dom.flush();
+	            break;
+	        }
+	    }
+	},
+	setClockConstructor:function(){
+		var self=this;
+		var nowish = (new Date()).getTime() + 50000;
+		var laterish = (new Date()).getTime() + 123290;
+		nowish=new Date(nowish);
+		laterish=new Date(laterish);
+		var date=new Date();
+		this.clockArray = [];
+		this.push("clockArray", new FcClock("Local-Time", "Clock", "", 0,date));
+		this.push("clockArray", new FcClock("Greenwhich-Time", "Clock", "", 0,date));
+		this.push("clockArray", new FcClock("Now-ish", "Alarmclock", "", 0,nowish));
+		this.push("clockArray", new FcClock("Later-ish", "Alarmclock","", 0,laterish));
+	  	this.push("clockArray", new FcClock("Reading Countdown", "Countdown","Focused SAT Reading Countdown", 39000));
+	 	this.push("clockArray", new FcClock("Writing Countdown", "Countdown", "Focused SAT Writing Countdown", 21000));
+	 	this.push("clockArray", new FcClock("Math Countdown 1", "Countdown","Focused SAT Math Countdown", 15000));
+	 	this.push("clockArray", new FcClock("Math Countdown 2", "Countdown","Focused SAT Math Countdown 2", 33000));
+	 	this.push("clockArray", new FcClock("Essay Countdown", "Countdown","Focused Essay Writing Countdown", 30000));
+	 	this.push("clockArray", new FcClock("Countdown 1", "Countdown", "Focused Programable Countdown ",0));
+	 	this.push("clockArray", new FcClock("Countdown 2", "Countdown", "Focused Programable Countdown 2",0));
+        this.push("clockArray", new FcClock("Stopwatch 1", "Stopwatch", "Focused Fastback Stopwatch", 0));
+        this.push("clockArray", new FcClock("Stopwatch 2", "Stopwatch", "Focused Section Split Stopwatch", 0));
+	  	
+	  	var temp=this.clockArray.filter(function(val,index){
+	  		if(val.clockType=="Alarmclock"){console.log(val);}
+
+	  		return(val.clockType=="Alarmclock");
+	  	})
+	  	this.set("primaryClock", this.clockArray[0]);
+	  	this.set("openingArray", temp);
+	  	this.set("currentClock", this.primaryClock);
+	},
+	acknowledgeAlarm:function(e){
+			console.log(e);
+		var tstamp=new Date().getTime();
+		var alarmTime=e.model.dto;
+		var delta=alarmTime-delta;
+		var location=this.long +"_"+this.lat; //here should likely be __ as location is not event or alert related;
+		var referenceId=e.model.clockName;//location time data key;
+		var importanceLevel="A"; //one hex 0=f, already excessive at that;
+		var matterClassification= "E"; //hex again, maybe 64; we have a chart somewhere;
+		var resolutionClassification="C";
+		var payload=["McKinleyScott_000001", "FrazzanoJason_000001", "CollereteStacy_000001"];
+		var multiPartKeys=undefined;
+		var mykey=tstamp+"_"+alarmTime+"_"+delta+"_"+"__"+"_"+referenceId+"_"+importanceLevel+"_"+matterClassification+"_"+resolutionClassification+"__";
+		this.push("mapArray",[mykey,payload]);
+		this.deleteAlert();//what do we do in the event array? In tree system should be last one on branch cause that is always what you are dealing with, so pop it?
+	},
+	deleteAlert:function(){
+		this.push("acknowledgedAlerts", this.soundingAlarms[0]);
+		//what do we do in the event array?
+		this.splice("soundingAlarms", 0,1);
+		console.log(this.acknowledgedAlerts, this.soundingAlarms);
+	},
+	ringAlarm: function(alarm){
+		this.$.myAlarmNoise.play();
+		this.push("soundingAlarms", alarm);
+	},
+	alarmoff: function(){
+		this.$.myAlarmNoise.pause();
+	},
+	muteAlarm: function(){
+			var muted=this.$.myAlarmNoise.muted;
+			retval=(muted===true)?false: true;
+			var retVal=(this.$.myAlarmNoise.muted===true)?false: true;
+			var setVal=(muted)?"av:volume-off":"av:volume-up";
+			this.set("muteButton",setVal);
+			this.$.myAlarmNoise.muted=retVal;
+			return retVal;
+	},
+	computeSoundingAlarm: function(alarmTime){
+			return alarmTime.toLocaleString();
+
+	},
+	_computeAlarms: function(name, time){
+		console.log(name, this.currentClock, this.currentClock.clockName);
+			if(name==this.currentClock.clockName){
+			return `${time.toLocaleString()}`;
+		}
+	},
+
+
+	addAlarm: function(argName, argTime)
+	{	var newAlarm=new FcClock(argName, "Alarmclock", 0, 0, 7, argTime);
+		this.push("clockArray", newAlarm);
+		
+	},
+
+	initMap: function() {
+          this.geocodeLatLng();
+        },
+      
+      geocodeLatLng: function() {
+   
+        var geocoder = new google.maps.Geocoder;
+        var input = this.lat+","+ this.long;
+        var latlngStr = input.split(',', 2);
+        var latlng = {lat: parseFloat(latlngStr[0]), lng: parseFloat(latlngStr[1])};
+        geocoder.geocode({'location': latlng}, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            if (results[1]) {
+            	this.set("location",results[1].formatted_address);
+              //infowindow.open(map, marker);
+              return this.location;
+            } else {
+              window.alert('No results found');
+            }
+          } else {
+            window.alert('Geocoder failed due to: ' + status);
+          }
+        });
+      }
+
+
+});
+</script>
+</dom-module>
+<!-- 	addNewAlarm: function(e){
+		console.log(this.alarmTime);
+		var dtl = this.alarmTime.split("T");
+		var dpart=dtl[0].split("-");
+		var year = dpart[0];
+		var month=parseInt(dpart[1])-1;
+		var day=dpart[2];
+		var timepart= dtl[1].split(":");
+		var hours=timepart[0];
+		var minutes=timepart[1];
+		var atime = new Date(year, month, day, hours, minutes);
+			this.addAlarm(this.alarmName, atime);
+	}, 
+FcClockData.prototype.conversionObjectCreator=function(argDateTime) -
+{
+			var theDate = new Date(this.alarmDate);	
+			var yearN = theDate.getFullYear();
+			var year = yearN.toString();
+			var monthN = theDate.getMonth() + 1;
+			var month = (monthN<10)? "0" + monthN.toString(): monthN.toString();
+			var dateN = theDate.getDate();
+			var date = dateN<10? "0" + dateN.toString(): dateN.toString();
+			var hoursN = theDate.getHours();
+			var ampm = hoursN >= 12? "PM": "AM"; 
+			var minutesN = theDate.getMinutes();
+			var minutes = minutesN<10 && minutesN>0? "0" + minutesN.toString():minutesN==0? "0" +"0": minutesN.toString();
+			var secondsN = theDate.getSeconds();
+			var seconds =secondsN<10 && secondsN>0? "0" + secondsN.toString():secondsN==0? "0" +"0": secondsN.toString();
+			var millisecondsN = theDate.getMilliseconds();
+			var milliseconds = millisecondsN ==0? "0" + "0" + "0":millisecondsN >0 && millisecondsN<10? "0" +"0" + millisecondsN.toString(): millisecondsN >=10 && millisecondsN<100? "0" + millisecondsN.toString(): millisecondsN.toString(); 
+			var milliseconds = millisecondsN.toString();
+			var hoursNUS= hoursN>0 && hoursN>12? (hoursN-12): hoursN == 0? 12: hoursN;
+			var hours = hoursNUS <10? "0" + hoursNUS.toString(): hoursNUS.toString();
+			var hours24 = hoursN == 0? "0" + "0": hoursN<10 && hoursN>0?"0" + hoursN.toString(): hoursN.toString();
+			var timeNow = year+"-"+month+"-"+date+" "+hours+":"+minutes+" "+ampm;
+			var timeNowTwo = "Date: " + month + "/"+date+"/"+year+" Time: "+hours+":" + minutes+":"+ seconds+" " + ampm;
+			var toInputDateTimeLocal = year+"-"+month+"-"+date+"T"+hours24+":"+minutes;
+			var holderObject={
+				"year":year, 
+				"month":month, 
+				"date":date, 
+				"hours":hours, 
+				"minutes":minutes, 
+				"seconds":seconds, 
+				"milliseconds":milliseconds,
+				"ampm": ampm,
+				"yearN": yearN,
+				"monthN": monthN,
+				"dateN": dateN,
+				"hoursN": hoursN,
+				"minutesN": minutesN,
+				"secondsN": secondsN,
+				"millisecondsN": millisecondsN,
+				"timeNow": timeNow,
+				"timeNowTwo":timeNowTwo,
+				"toInputDateTimeLocal":toInputDateTimeLocal
+									};
+			return holderObject;
+};-->

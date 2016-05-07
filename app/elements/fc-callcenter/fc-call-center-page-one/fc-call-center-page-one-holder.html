@@ -1,9 +1,5 @@
 <dom-module id="fc-call-center-page-one-holder">
 <style>
-:host{
-padding: 0px;
-background: #007;}
-
 </style>
 <template>
    <firebase-collection 
@@ -12,37 +8,46 @@ background: #007;}
             order-by-child="timeStamp"
             data="{{inquiries}}">
         </firebase-collection>
-<div class="layout horizontal around-justified">
-        <div class="vertical flex-7 layout center" style="height: 96vh;background: white; width: 710px;">
+ <div class="layout horizontal flex">
+    <div class="vertical layout flex-7">        
+        <fc-call-intake-form 
+            form-submit-one="{{isFormSubmitted}}"  
+            search-values="{{searchVals}}" 
+            is-previous-caller="{{launchDialog}}" 
+            focused-student="{{studentSelectable}}" 
+            class="horizontal layout flex-5 content" 
+            style="padding: 12px; font-weight: 600; background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
+                <fc-profile-inputs 
+                    class="card-content" 
+                    fc-student="{{studentSelectable}}" 
+                    search-vals="{{searchVals}}" 
+                    data-source$="[[_dataSource(myData, myDataThree, isFormSubmitted)]]">
+                </fc-profile-inputs>
+        </fc-call-intake-form>
+    </div>
+        <!-- <div class="vertical flex-7 layout center" style="height: 96vh;background: white; width: 710px;">
      
 
                <template is="dom-repeat" items="{{flexCards}}" observer="callReportsObserver" class="dropzone" style="max-height: 2500px;">
                     <fc-inquiry-list head-class="[[item.class]]" style="[[item.style]]" orderby="[[item.orderby]]" my-id="[[item.theId]]" header-title="[[item.title]]">
                     </fc-inquiry-list>
                 </template>
-            </div>
-      
-        <div class="vertical flex-10 layout center" style="height: 96vh; width: 1080px;">
-            <fc-ddr-card header-title="New Caller Intake Form">
-                <fc-call-intake-form form-submit-one="{{isFormSubmitted}}"  search-values="{{searchVals}}" is-previous-caller="{{launchDialog}}" focused-student="{{studentSelectable}}" class="horizontal layout content" style="padding: 12px; font-weight: 600; background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
-                    <fc-profile-inputs class="card-content" fc-student="{{studentSelectable}}" search-vals="{{searchVals}}" style="width: 100%;" data-source$="[[_dataSource(myData, myDataThree, isFormSubmitted)]]">
-                    </fc-profile-inputs>
-                </fc-call-intake-form>
-            </fc-ddr-card>
-        </div>
-            
-        <div class="vertical flex-7 layout center" style="background: white; height: 96vh; width: 710px;">
-               
-                   <fc-ddr-card header-title="Searchable Call List">
-                        <neon-animated-pages class="fit" id="pages" selected="0">
-                            <fc-call-list-view id="callList" style="height: 100%;" search-vals="{{searchVals}}"></fc-call-list-view>
-                            <fc-tabbed-card id="viewProfile" student="{{studentSelectable}}" on-close="_onClose"></fc-tabbed-card>
-                        </neon-animated-pages>
-                    </fc-ddr-card>
-                    
-            
-        </div>
-    </div>
+            </div> -->
+      <div class="vertical layout center center-justified" style="background: white; height: 96vh;">  
+            <neon-animated-pages class="fit" style="" id="pages" selected="0">
+                <fc-call-list-view 
+                    id="callList" 
+                    search-vals="{{searchVals}}">
+                </fc-call-list-view>
+                <fc-tabbed-card 
+                    id="viewProfile" 
+                    student="{{studentSelectable}}" 
+                    on-close="_onClose">
+                </fc-tabbed-card>
+            </neon-animated-pages>
+        </div>   
+     </div>   
+    
 </template>
 <script>
 'use strict';

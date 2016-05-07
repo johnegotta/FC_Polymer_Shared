@@ -1,23 +1,59 @@
 <dom-module id="fc-clobjid-prime">
 <template>
 <style>
+.baseclass{
+    
+}
+.newclass{
+    margin-right: -2px;
+    padding: 0px;
+}
 .newclass::after{
-    font-weight: 600;
+    font-weight: 700;
+    padding:3px 2px 0px 0px;
     font-family: roboto;
-    margin-left: 2px;
+    margin-left: -2px;
+    margin-right: 3px;
+    margin-top:3px;
     content: ":";
 }
 .subclass::after{
-
+    font-weight: 700;
+    padding:2px 2px 0px 0px;
     font-family: roboto;
-    font-weight: 600;
-
-content: "."; 
+    margin-left: -2px;
+    margin-right: -2px;
+    margin-top:4px;
+    content: "."; 
 }
+.closer{margin-right: -2px;
+   font-family: roboto;
+    font-weight: 600;
+}
+.closer::after{
+    width: 0px;
+        content: ""}
+.closerleft{
+    margin-right: -2px;
+}
+
 .digitsmall{
      font-weight: 600;
     font-family: roboto;
     font-size: 12px;
+}
+.nodot{
+margin-right: -3px;
+}
+.fatems{
+        padding: 0px 3px;
+        margin-left: -6px;
+        max-width: 20px!important;
+    }
+.nodot::after{
+    margin:0px;
+    padding:0px;
+    width: 0px;
 }
 input::-webkit-inner-spin-button {
 
@@ -30,43 +66,42 @@ fc-input-prime{
 }
 </style>
 
-<section style="padding: 1px 2px 10px 3px; margin: 2px; max-width: 210px;" class$="{{orientation}} layout flex center justified-center"><!--padding and margin needed for the digits to remain square-->
+<section style="padding: 1px 2px 10px 3px; margin: 2px; max-width: 215px;" class$="{{orientation}} layout flex center justified-center" ><!--padding and margin needed for the digits to remain square on-mouseover="" -->
 <template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
   <fc-input-prime
+        id="{{item.name}}"
         input-type="{{item.inputType}}" 
         label="{{item.label}}"
-        input-style="{{inputStyle}}"
+        input-style="{{inputStyle}} {{specialStyle}}"
         hidden$="{{item.hidden}}"
         label-hidden="true"
         name$="{{item.name}}"
         min="{{item.min}}"
         max="{{item.max}}"
         value="{{item.value}}"
-        option-one="{{item.optionOne}}"
-        option-two="{{item.optionTwo}}"
-        option-three="{{item.optionThree}}"
-        option-four="{{item.optionFour}}"
-        option-five="{{item.optionFive}}"
-        option-six="{{item.optionSix}}"
-        option-seven="{{item.optionSeven}}"
-        option-eight="{{item.optionEight}}"
-        option-nine="{{item.optionNine}}"
-        option-ten="{{item.optionTen}}"
+        input-value="[[increment]]"
+        bind-value="[[increment]]"
         class$="{{item.class}} {{item.newclass}}"
         min="{{item.min}}"
         max="{{item.max}}"
         step="{{item.step}}"
         fcid="{{item.fcid}}"
         on-change="handleInputChange"
+        on-focus="showIncrementorsFunction"
        >
     </fc-input-prime>
-   
+    <section id="gelato" hidden="{{!showIncrementors}}" class="vertical layout flex nowrap">
+   <span id="incrementorPlus" on-tap="incrementPlus">&#8679;</span>
+    <span id="incrementorMinus" on-tap="incrementMinus">&#9772;</span>
+    <span>&#x262C;</span>
+    </section>
 </template>
 </section>      
 </template>
 <script>
 FcClobjidPrime=Polymer({
     is:"fc-clobjid-prime",
+    observers: ["observeDataObject(dataobject.*)"],
     properties:{
         dataobject: {
             type: Object,
@@ -79,38 +114,98 @@ FcClobjidPrime=Polymer({
         inputStyle:{
             type: String,
             notify: true,
-            reflectToAttribute: true
         },
+        showIncrementors:{
+            type: Boolean,
+            value: false,
+            notify: true
+        },
+        increment:{
+            type: Number,
+            notify: true
+        },
+        dataset:{
+            type: Array,
+           computed: "_computeDataset(dataobject.*)",
+            notify: true
+        },
+        digitsArray:{
+            type:Array,
+            computed: "_computeDigitsArray(dataset)",
+            notify: true
+            },
+
+    },
+    observeDataObject: function(odo){
+       // console.log(odo.base, odo.value);
+
     },
 
     attached: function(){
-        console.log(this.dataobject);
-        console.log(this.orientation);
-        this.orientation = this.orientation==""? "vertical": this.orientation;
+        // console.log(this.dataobject);
+        // console.log(this.orientation);
+        this.orientation = this.orientation==""? "horizontal": this.orientation;
     },
+    showIncrementorsFunction: function(){
+        this.set("showIncrementors", true);
+
+    },
+    incrementPlus: function(){
+            this.set("increment", increment+1);
+    },
+    incrementMinus: function(){
+            this.set("increment", increment-1);
+
+    }, 
 
     handleInputChange: function(e)
     {
         //console.log(e.target);
         this.dataobject[e.target.name].value = e.target.value;
     },
+    _computeDigitsArray:function(dataset){ 
+        // console.log(dataset);
+        var retVal=this.dataset.map(function(digit,i,array){
+                var valType=(digit.value=="A" || digit.value=="P"||digit.value=="M")?String: Number;
+               var digObj={name:digit.name,value: digit.value, type: valType};
+               return digObj;
+            },this);
+            // console.log(retVal, "here is the new digitsArray to fire");
+            return retVal;
+        },
 
     _computeDataset: function(dataobject)
     {
-        //console.log(dataobject);
+        var special="";
         var keys = Object.keys(this.dataobject);
         var numKeys = keys.length;
-        //this.dataset = [];
+        var styl="text-align: left; margin-left: -5px; padding: 0px 1px; border: 0px silver solid; font-weight: 600; min-width: 6px; max-width: 20px;"
         var dataset = [];
         for(var i = 0; i < numKeys; i++)
         {
             var val = this.dataobject[keys[i]];
+            if(val.inclock===true)
+            {
             var newclass="";
-            if(val.label=="s"){newclass="digitsmall"; var styl="text-align: left; font-size:14px; margin: 1px; margin-left: -3px; padding: 1px; font-weight: 600;min-width: 8px;max-width: 11px;"}
-            
-            else if(val.label=="S" && val.colon==":"){ newclass="subclass"; var styl=""}
-            else if(val.colon==":"){newclass="newclass";}
-            
+          
+            if(val.colon==false){newclass="closerleft"}
+
+           else if(val.name=="sec" && val.colon==":" && val.isAmPm===true){
+                newclass="nodot"; styl="";
+            }
+            else if(val.label=="s"){newclass="digitsmall"; var styl="text-align: left; font-size:14px; margin: 1px; margin-left: -3px; padding: 1px; font-weight: 600;min-width: 8px;max-width: 11px;"}
+           
+            else if(val.name=="sec" && val.colon==":" && val.isAmPm===true){
+                newclass="nodot"; styl="";
+            }
+            else if(val.name=="hundredth" && val.isAmPm===true){
+                newclass="fatems"; special="text-align: left; margin-left: -5px; padding: 0px 1px; border: 0px silver solid; font-weight: 600; min-width: 20px; max-width: 20px;";
+
+            }
+            else if(val.label=="S" && val.colon==":" && val.isAmPm==false){ newclass="subclass"; styl=""}
+            else if(val.colon==":" && val.isAmPm==false){newclass="newclass";}
+            else{}
+           
             dataset.push({
                 "value": val.value,
                 "name": val.name, //keys[i], //"tenth",
@@ -118,137 +213,18 @@ FcClobjidPrime=Polymer({
                 "hidden": val.hidden,
                 "inputType": val.inputType,
                 "inputStyle":styl, //"digit",
-                "optionOne": "",
-                "optionTwo": "",
-                "optionThree": "",
-                "optionFour": "",
-                "optionFive": "",
-                "optionSix": "",
-                "optionSeven": "",
-                "optionEight": "",
-                "optionNine": "",
-                "optionTen": "",
                 "class": "",
-                // "min": val.inputType == "digit"? 0: 0,
-                // "max": val.inputType == "digit"? 9: 99,
                 "step":"",
                 "fcid":"",
                 "colon": val.colon, 
-                "newclass": newclass, 
+                "newclass": newclass,
+                "specialStyle": special, 
                 })
+           } 
         }
+       // console.log(dataset);
         return dataset;
     },
 });
 </script>
 </dom-module>
-<!--
-
-<dom-module id="fc-clobjid-prime">
-<template>
-<style>
-</style>
-
-<section style="padding: 1px 8px 10px 4px; margin: 2px 2px 2px 2px; min-width: 214px;" class$="layout flex justified-around {{orientation}}">padding and margin needed for the digits to remain square
-<template is="dom-repeat" items="{{_computeDataset(dataobject.*)}}">
-	<fc-input-prime
-        clock-name="{{item.clockname}}"
-        hidden$="{{item.hidden}}"
-		input-type="{{item.inputType}}" 
-		label="{{item.label}}" 
-		name$="{{item.name}}"
-		min="{{item.min}}"
-		max="{{item.max}}"
-		value="{{item.value}}"
-		option-one="{{item.optionOne}}"
-        option-two="{{item.optionTwo}}"
-        option-three="{{item.optionThree}}"
-        option-four="{{item.optionFour}}"
-        option-five="{{item.optionFive}}"
-        option-six="{{item.optionSix}}"
-        option-seven="{{item.optionSeven}}"
-        option-eight="{{item.optionEight}}"
-        option-nine="{{item.optionNine}}"
-        option-ten="{{item.optionTen}}"
-        class$="{{item.class}}"
-        min="{{item.min}}"
-        max="{{item.max}}"
-        step="{{item.step}}"
-        fcid="{{item.fcid}}"
-        on-change="handleInputChange"
-       >
-	</fc-input-prime>
-    
-</template>
-</section>		
-</template>
-<script>
-FcClobjidPrime=Polymer({
-	is:"fc-clobjid-prime",
-	properties:{
-		dataobject: {
-			type: Object,
-			notify: true
-		},
-        orientation: {
-            type: String,
-            value: ""
-        }
-	},
-
-	attached: function(){
-		console.log(this.dataobject);
-        console.log(this.orientation);
-        this.orientation = this.orientation==""? "vertical": this.orientation;
-	},
-
-    handleInputChange: function(e)
-    {
- 
-        this.dataobject[e.target.name].value = e.target.value;
-    },
-
-    _computeDataset: function(dataobject)
-    {
-        if(dataobject)
-        {
-            var keys = Object.keys(this.dataobject);
-            var numKeys = keys.length;
-            //this.dataset = [];
-            var dataset = [];
-            for(var i = 0; i < numKeys; i++)
-            {
-                var val = this.dataobject[keys[i]];
-               
-                dataset.push({
-                    "value": val.value,
-                    "name": val.name, //keys[i], //"tenth",
-                    "label": val.label?val.label: val.name, //keys[i][0], //"d",
-                    "hidden": val.hidden,
-                    "inputType": val.inputType, //"digit",
-                    "optionOne": "",
-                    "optionTwo": "",
-                    "optionThree": "",
-                    "optionFour": "",
-                    "optionFive": "",
-                    "optionSix": "",
-                    "optionSeven": "",
-                    "optionEight": "",
-                    "optionNine": "",
-                    "optionTen": "",
-                    "class": "",
-                    "min": val.inputType == "digit"? 0: 0,
-                    "max": val.inputType == "digit"? 9: 99,
-                    "step":"",
-                    "fcid":"", 
-                    "colon":""
-                });
-            }
-        }
-        //console.log(dataset, "limon");
-        return dataset;
-    },
-});
-</script>
-</dom-module>
--->

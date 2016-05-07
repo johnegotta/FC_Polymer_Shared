@@ -1,0 +1,312 @@
+<script>
+"use strict";
+class FcClock
+{
+	constructor(argName, argType, argSubType, argTenths, argDateTimeObject, argSelf)
+	{
+		this.clockName = argName || "Focused Clock";
+		this.clockType = argType;
+		this.startTenths = argTenths;
+		this.isRunning = false;
+		var time=argDateTimeObject;
+		this.alarmTime=(argType=="Alarmclock")?time: false;
+		var now=new Date();
+		if(argType=="Alarmclock" && (time.getTime()<now)){
+			this.active=true;
+			console.log(this.active, this.active, this.active, "this is active");
+			
+		}
+		else{this.active=false;}
+		this.dto=argDateTimeObject; console.log(argDateTimeObject,argDateTimeObject,argDateTimeObject,argDateTimeObject);
+		this.subType=argSubType || "";
+		this.clockData= window.FcBehaviors.ClockDataBehavior.fcClockData(argTenths, argType, argDateTimeObject);
+		console.log(this.clockData);
+	}
+	convertFromTenths(argTenths)
+	{
+		this.clockData.convertFromTenths(argTenths);
+	}
+	convertToTenths()
+	{
+		return this.clockData.convertToTenths();
+	}
+	convertFromSeconds(argSeconds){
+		this.clockData.convertFromSeconds(argSeconds);
+	}
+	setClock(argSelf)
+	{
+		return this.clockData.setClock();
+	}
+	setAlarm(argDateTimeObject){
+		return this.clockData.setAlarm(argDateTimeObject);
+	}
+	toggleRunning()
+	{
+		var d = (new Date()).getTime();
+		if(this.isRunning)
+		{
+			this.lastTurnedOff = d;
+			this.lastTurnedOffTenths = this.clockData.convertToTenths();
+		}
+		else
+		{
+			this.lastTurnedOn = d;
+			this.lastTurnedOnTenths = this.clockData.convertToTenths();
+		}
+		this.isRunning = !this.isRunning;
+	}
+};
+window.FcBehaviors = window.FcBehaviors || {};
+FcBehaviors.ClockDataBehavior = {
+
+    properties: {
+    	currentClock: {
+			type: FcClock,
+			value: {},
+			notify: true,
+		},
+		calendarButton:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		clockType: {
+			type: String, 
+			notify: true,
+		},
+		openingArray:{
+			type: Array,
+			value:[],
+			notify: true,
+		},
+		primaryClock: {
+			type: FcClock,
+			value: {},
+			notify: true
+		}, 
+		clockArray:{
+			type: Array,
+			notify: true,
+			reflectToAttribite: true
+		},
+
+
+
+    },
+    ready: function()
+	{	var self=this;
+		this.setClockConstructor(self);
+	},
+	attached: function()
+	{	
+		this.initializeClocks();
+		this.$.myAlarmNoise.muted=false;
+	},
+  
+
+    setClockConstructor:function(argSelf){
+		var self=this;
+		var now = (new Date()).getTime()
+		var nowish = (new Date()).getTime() + 50000;
+		var laterish = (new Date()).getTime() + 123290;
+		nowish=new Date(nowish);
+		laterish=new Date(laterish);
+		var date=new Date();
+		this.clockArray = [];
+		this.push("clockArray", new FcClock("Local-Time", "Clock", "", 0,date, argSelf));
+		this.push("clockArray", new FcClock("Greenwhich-Time", "Clock", "", 0,date, argSelf));
+		this.push("clockArray", new FcClock("Now-ish", "Alarmclock", "", 0,nowish, argSelf));
+		this.push("clockArray", new FcClock("Later-ish", "Alarmclock","", 0,laterish, argSelf));
+	  	this.push("clockArray", new FcClock("Reading Countdown", "Countdown","Focused SAT Reading Countdown", 39000, argSelf));
+	 	this.push("clockArray", new FcClock("Writing Countdown", "Countdown", "Focused SAT Writing Countdown", 21000, argSelf));
+	 	this.push("clockArray", new FcClock("Math Countdown 1", "Countdown","Focused SAT Math Countdown", 15000, argSelf));
+	 	this.push("clockArray", new FcClock("Math Countdown 2", "Countdown","Focused SAT Math Countdown 2", 33000, argSelf));
+	 	this.push("clockArray", new FcClock("Essay Countdown", "Countdown","Focused Essay Writing Countdown", 30000, argSelf));
+	 	this.push("clockArray", new FcClock("Countdown 1", "Countdown", "Focused Programable Countdown ",0, argSelf));
+	 	this.push("clockArray", new FcClock("Countdown 2", "Countdown", "Focused Programable Countdown 2",0, argSelf));
+        this.push("clockArray", new FcClock("Stopwatch 1", "Stopwatch", "Focused Fastback Stopwatch", 0, argSelf));
+        this.push("clockArray", new FcClock("Stopwatch 2", "Stopwatch", "Focused Section Split Stopwatch", 0, argSelf));
+	  	
+	  	var temp=this.clockArray.filter(function(val,index){
+	  		if(val.clockType=="Alarmclock"){console.log(val);}
+
+	  		return(val.clockType=="Alarmclock");
+	  	})
+	  	this.set("primaryClock", this.clockArray[0]);
+	  	this.set("openingArray", temp);
+	  	this.set("currentClock", this.primaryClock);
+	},
+
+initializeClocks:function(){
+		var self = this;
+		var runningClockArray=[];
+		
+		setInterval(function(){
+			var currentTime = new Date();
+			var time = currentTime.toLocaleTimeString();
+			var date=new Date(date).toLocaleDateString();
+			self.set("theTime", time);
+			var td=self.primaryClock.setClock(self);
+			var stamp=Math.floor(currentTime.getTime());
+			var tenths=self.primaryClock.convertToTenths();
+			var name=self.currentClock.clockName;
+
+			self.clockArray.forEach(function(cl, i, arr)
+			{	var s=stamp;
+				if(cl.clockType=="Clock"){cl.isRunning=true;}
+				if(cl.isRunning)
+				{
+					var d=((s - cl.lastTurnedOn)/100);
+					var delta = (cl.clockType=="Countdown")?cl.lastTurnedOnTenths-d:(cl.clockType=="Stopwatch")?cl.lastTurnedOnTenths+d: 0;
+					var newTenths=(delta>0)?delta:0;
+					if(cl.clockType=="Countdown" || cl.clockType=="Stopwatch")
+					{
+					cl.convertFromTenths(newTenths);
+					}
+					if(delta<=0 && (cl.clockType=="Countdown"))
+					{
+						cl.isRunning=false; 
+						cl.alarmOn=true;
+					}
+					var path = "currentClock.clockData.tenth.value";
+					var path2 = "currentClock.clockData.sec.value";
+					if(cl.clockType!="Alarmclock"){
+					self.notifyPath(path, self.currentClock.clockData.tenth.value);
+					self.notifyPath(path2, self.currentClock.clockData.sec.value);
+					}
+				}
+				if(cl.clockType=="Alarmclock" && cl.isActive)
+					{cl.clockData.setClock(cl.clockType, cl.dto);
+						var alarmtime =cl.dto.getTime();
+						console.log(alarmtime, alarmtime,alarmtime,alarmtime);
+						if(currentTime.getTime() > alarmtime)
+						{	console.log("AM IN THE DAMNED ALARM");
+							self.ringAlarm(cl);
+							self.ringAlarm(self.clockArray[i]);
+							cl.isActive = false;
+							cl.ringAlarm(cl);
+							self.notifyPath("clockArray." + i + ".isActive", false);
+						}
+			}
+			},self);	
+					}, 100);
+	},
+
+
+
+
+    fcClockData: function(argTenths, argType, argDateTime)
+	{	
+	console.log(argDateTime);
+	var digitArray = [		
+		{name: "thours", value: 0, inputType: "digit", label:" "+" H", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "hours", value: 0, inputType: "digit", label:"H", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tmin", value: 0, inputType: "digit", label:"M", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "min",value: 0, inputType: "digit", label:"M", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tsec",value:0, inputType: "digit", label:"S", colon: false, inclock: true, isAmPm: false, type:argType},
+		{name: "sec",value: 0, inputType: "digit", label:"S", colon:":", inclock: true, isAmPm: false, type:argType},
+		{name: "tenth", value: 0, inputType: "digit", label:"s", colon: false, inclock: true, isAmPm: false, isAmPm: false, type:argType},
+		{name: "hundredth", value: 0, inputType: "digit", label:"s", inclock: true, isAmPm: false, isAmPm: false, type:argType}
+	];
+	for(var i = 0; i < 8; i++)
+	{
+		var obj = digitArray[i];
+		this[obj.name] = obj;
+	}
+	this.digitArray=digitArray;
+	if(argType=="Countdown" || argType=="Stopwatch")
+	{
+		this.convertFromTenths(argTenths);
+	}
+
+	if(argType=="Clock"){ 
+		this.setClock(argType);	
+		}
+	if (argType=="Alarmclock"){
+		this.setAlarm(argType, argDateTime);
+	}
+	
+		
+},
+setClock:function(argType, argDateTime){
+		var theDate=(argType=="Alarmclock")?new Date(argDateTime):new Date();
+		console.log(theDate);
+		var hoursN = theDate.getHours();
+		var ampm = hoursN >= 12? "PM": "AM"; 
+		var minutesN = theDate.getMinutes();
+		var secondsN =theDate.getSeconds();
+		var ampm = hoursN >= 12? "PM": "AM";
+		var ap=ampm.charAt(0);
+		var milliseconds=theDate.getMilliseconds(); 
+		this.hundredth.value="M"; 
+		this.hundredth.isAmPm=true;
+		this.tenth.value=ap;
+		this.sec.isAmPm=true;
+		this.tenth.isAmPm=true;
+		this.sec.value = secondsN%10;
+		this.tsec.value = Math.floor(secondsN/10);
+		this.min.value =minutesN%10;
+		this.tmin.value =Math.floor(minutesN/10);
+		this.hours.value =(hoursN==0)?2:(hoursN<13)?hoursN%10:(hoursN-12)%10;
+		this.thours.value =(hoursN==0)?1:(hoursN<13)?Math.floor(hoursN/10):Math.floor((hoursN-12)/10);
+		if(argType=="Alarmclock")
+		{
+			this.yearN= theDate.getFullYear();
+	 		this.monthN=theDate.getMonth+1;
+	 		this.monthString=theDate.getFullMonth();
+	 		this.dayOfMonth=theDate.getDate();
+	 		this.calendarDate=new Date(this.yearN, this.monthN-1, this.dayOfMonth);
+	 		console.log(this.calendarDate)
+	 	}
+},
+	convertToTenths:function()
+{
+	var result = 0;
+	result += this.hundredth.value;//put in animation for hundredths
+	result += this.tenth.value * 1;
+	result += this.sec.value * 10;
+	result += this.tsec.value * 100;
+	result += this.min.value * 600;
+	result += this.tmin.value * 6000;
+	result += this.hours.value * 36000;
+	result += this.thours.value * 360000;
+	return result;
+},
+convertFromTenths: function(argTenths)
+{	
+	this.tenth.value = argTenths % 10;
+	var fullsec = Math.floor(argTenths / 10) % 60;
+	this.sec.value = fullsec % 10;
+	this.tsec.value = Math.floor(fullsec / 10);
+	var fullmin;
+	if(argTenths>35999 && argTenths<60000)
+	{
+		fullmin = Math.floor(argTenths / 600) % 100;
+	}
+	else
+	{
+		fullmin = Math.floor(argTenths / 600) % 60;
+	}
+	this.min.value = fullmin % 10;
+	var fullhour = Math.floor(argTenths / 36000);
+	this.hours.value = fullhour % 10;
+	this.tmin.value = Math.floor(fullmin / 10);
+	if(argTenths>35999 && argTenths<60000)
+	{
+		this.hours.value = 0;
+	}
+	else
+	{
+		//this.tmin.value = fullmin % 60;
+	}
+},
+convertFromSeconds: function(argSeconds)
+{
+	this.convertFromTenths(argSeconds*10);
+},
+
+
+
+  
+};
+</script>

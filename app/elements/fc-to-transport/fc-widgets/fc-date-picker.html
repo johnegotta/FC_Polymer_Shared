@@ -2,128 +2,128 @@
 <template>
 <style>
 :host{
-	position: relative;
-		background: white;
-	box-shadow: 2px 6px 11px 4px #9fafaf;
-		display: block;
-	margin: 1px;
-
+	position: fixed;
 }
 .calendarheader{
-	
 	text-align: center;  
-	width:calc(100%/7.7)!important; 
-	font-size: 12px; 
+	width:calc(100%/7.3)!important; 
+	font-size: 18px; 
 	font-weight: 600; 
-	max-width: 21px; 
-	margin: auto; 
-	margin-top: 1px; 
-	border-top: 1px solid #afafaf; 
-	margin-bottom: 2px; 
-	background: white;
+	padding: 1px 4px;
+
+	color: #fff;
+	background: #009;
+	height: 18px!important;
 }
 .calendarcontainer{
 background: white; 
-width: 161px !important;
+border: 1px solid #009;
+box-shadow: -2px 6px 17px 4px #9fafaf;*/
 
 }
 .calendarborder{
-	background: #008; 
-	max-height: 24px!important; 
-	border-bottom: silver solid 2px; 
+	background: #009; 
 	width: 100%;
 }
-.pretty{
 
-background: red;
-height:4px;
-width: 14px;
-
-}
-.headerArrowLeft{
-	position: absolute; 
-	top: 0px; 
-	color: white; 
-	left: 1px;
-}
 .headerMonthYear{
-	margin: auto;
+	text-rendering: center;
 	text-align: center;
 	color: white; 
-	font-size:12px; 
-	font-weight: 500;
-	padding: 3px 3px;
-	
+	font-size:18px;
+	padding-top: 6px;
+	font-weight: 600;
 	}
 .headerTop{
-min-height: 21px;
+height: 100%;
 
 }
 .headerArrowRight{
+	padding-top: 4px;
 	 color: white; 
-	 position:absolute; 
-	 right: 2px;
+	 @apply(--layout-horizontal);
+	@apply(--layout-flex);
+	@apply(--flex-self-shrink);
+}
+.headerArrowLeft{
+	padding-top: 4px;
+	color: white;
+	@apply(--layout-horizontal);
+	@apply(--layout-flex);
+	@apply(--flex-self-shrink);
 }
   .card{
-  	text-align: center; 
-  	width:calc(100%/7.7); 
-  	margin: 2px 1px 2px 1px;
-  	font-size: 13px;
-  	padding-bottom: px;
-  	font-weight: 600;
+  	text-align: right; 
+  	width:calc(101%/7.3); 
+  	/*margin: 1px 1px 0px 1px;*/
+  	font-size: 18px;
+  	font-weight: 400;
   	display: flex;
-  	border-radius: 180;
-  	height: 23px!important;
+  	border-left: 1px solid #efefef;
+  	border-top: 1px solid #efefef;
+  	padding: 3px 0px 0px 0px;
   	@apply(--self-shrink);
   } 
   .cardcontainer{
-  	width: 161px!important;
   	background: white; 
-  	overflow:scroll; 
-  	height: 161px; 
-  	min-height: 133px;
+  	overflow-y:scroll;
+  	min-height: 185px; 
+ 
   }
   .cardcontainer2{
-	width: 161px!important;
-  	background: white;
-	padding: 2px 0px 1px 0px; 
-	height: 175px;
-	margin: 1px;
-  	overflow:scroll; 
-  	min-height: 150px;
+  	overflow:scroll;
+
+
   }
+ 
 </style>
-		<div class="vertical layout flex wrap calendarcontainer">
-			<paper-material class="horizontal layout flex calendarborder">
-				<span class="horizontal layout flex center-justify headerTop" style="align-items: center;">
-					<paper-icon-button 
-						on-tap="_backOne" 
-						icon="icons:chevron-left" 
-						hidden={{backHidden}} 
-						class="headerArrowLeft layout horizontal flex-2 self-shrink">
-					</paper-icon-button>
-					<span class="layout horizontal flex-7 nowrap headerMonthYear" style="padding-left: 22%;">
-					[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
-					</span>
-					<paper-icon-button 
-						on-tap="_forward" 
-						hidden="{{forwardHidden}}" 
-						icon="icons:chevron-right" 
-						class="headerArrowRight layout horizontal flex-2 self-shrink">
-					</paper-icon-button>
-					</span> 
-			</paper-material>
-			<section class="horizontal layout flex">
+	<paper-dialog id="sizeDialog" no-cancel-on-outside-click style="width: 320px; height: 380px; background: aliceblue; border: 2px solid #009;">
+		Height: {{currentHeight}}, Width: {{currentWidth}}
+		<fc-input-prime input-type="range" min="240" max="1200" value="{{currentWidth}}" label="Width">
+		</fc-input-prime>
+		<fc-input-prime input-type="range" min="240" max="1200" value="{{currentHeight}}" label="Height">
+		</fc-input-prime>
+		<paper-button on-tap="closeModal">close</paper-button>
+		<paper-button on-tap="swap">swap</paper-button>
+	</paper-dialog>
+	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height: {{currentHeight}}px!important; width: {{currentWidth}}px!important;">
+		<paper-material class$="{{vertOrient}} [[_computeHeaderHeight(orientation)]] calendarborder">
+			<section class$="{{vertOrient}} layout flex center headerTop">		
+				<section class$="headerMonthYear [[_computeHeaderClass(currentHeight, currentWidth, orientation)]]" style$="[[_computeHeaderStyle(currentWidth, currentHeight, orientation)]]">
+					[[computeViewMonth(displayedIndex, monthsList, orientation)]]
+				</section>
+				<section id="navigationBlock" class$="[[changeButtonClassOnOrientationChange(orientation)]]" style$="[[computeHeaderArrangementState(orientation)]]">
+					<div class="layout horizontal flex center center-justified">
+						<section on-tap="_backOne" class="headerArrowLeft">
+							<iron-icon icon="icons:chevron-left" style$="[[_computeBackHidden(backHidden)]];">
+							</iron-icon>
+						</section>
+						<section on-tap="launchDialog" class="layout flex center center-justified" style="width: 20px; height: 20px; border-radius: 50%; color: white;">
+							<iron-icon icon="social:public"></iron-icon>
+						</section>
+						<section on-tap="_forward" class=" headerArrowRight">
+							<iron-icon icon="icons:chevron-right" style$="[[_computeBackHidden(forwardHidden)]];">
+							</iron-icon>
+						</section>
+					</div>
+				</section>
+				<section class="horizontal flex layout end-justified" style="[[_computeWhereTheYearMustGo(orientation)]]">
+				 [[computeYear(displayed)]]
+				</section>
+			
+		</section> 
+	</paper-material>
+
+		<div class="vertical flex-9 layout cardcontainer" style$="width: {{currentWidth}}px!important overflow-y: scroll; [[computeLine(orientation)]]">
+		<section class="horizontal layout flex" style$="padding: top: 3px; margin-bottom: 4px; max-height: 20px!important;[[computeLine(orientation)]]">
 			<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
 			<!--example of stupid-->
-				<paper-material class="calendarheader">
+				<paper-material class="calendarheader" >
 					{{item}}
 				</paper-material><!--days of week header-->
 			</template>
-			</section>
-		</div>
-		<div class="vertical layout cardcontainer" >
-			<section class="horizontal flex layout wrap cardcontainer2">
+		</section>
+			<section class="horizontal layout flex wrap" style$="overflow-y: scroll; margin-top: 1px; width: {{currentWidth}}!important;">
 				<template 
 					is="dom-repeat" 
 					class="horizontal layout wrap" 
@@ -131,35 +131,40 @@ min-height: 21px;
 					as="day">
 						<fc-date-mini
 						 	class="card"
-						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
+						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex, day.inMonth)]]"
 						 	day="{{day}}"
 						 	day-id="{{day.dayId}}"
-						 	style$="margin: 0px auto; font-size: 13px" 
 						 	calendar-day={{day}}
 						 	mini-date="{{day.date}}"
-						 	index={{day.index}} 
+						 	index={{day.index}}
 						 	id$={{day.dateId}}
-						 	size-wanted="datepicker" 
+						 	current-width="{{currentWidth}}"
+						 	current-height="{{currentHeight}}"
 						 	testDate={{day.testDate}} 
 						 	event-list="{{day.eventList}}"
 						 	fc-course="{{fcCourse}}">
-							<span class="date" style="padding-bottom: 3px;" id="button">[[day.dayOfMonth]]</span>
+							<span class="date self-stretch" style="font-weight: 600; font-size: 18px;" id="button">[[day.dayOfMonth]]</span>
 						</fc-date-mini>	
 				</template>
 			</section>
+
+		<!-- <section class="layout horizontal" style="background: #aedefe; min-height: 6px; max-height: 36px;width:{{currentWidth}}px!important;">
+				
+					
+					
+				</section> -->
+				
 		</div>
-		<section style="background: #aedefe; height: 6px;">
-	
-		</section>
+	</div>
 </template>
 <script>
 FcDatePicker=Polymer({
 	is: "fc-date-picker",
-	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,FCBehaviors.DraggableBehavior],
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime, FCBehaviors.DraggableBehavior],
 	observers:[],
 	properties: {
 		day:{
-			type: Object, 
+			type: FcCalendarDay, 
 			value: {},
 			notify: true
 		},
@@ -168,7 +173,6 @@ FcDatePicker=Polymer({
 			value: function(){return new FcCourse({});},
 			notify: true
 		},
-		
 		days:{
 			type: Array,
 			value: function()
@@ -177,7 +181,23 @@ FcDatePicker=Polymer({
 			},
 			notify: true
 		},
-	
+		orientation:{
+			type: String,
+			value: function(){
+				return "horizontal";
+			},
+			notify: true,
+		},
+		currentWidth: {
+			type: String,
+			value: function(){return "365";},
+			notify: true,
+		},
+		currentHeight: {
+			type: String,
+			value: function(){return "286";},
+			notify: true,
+		},
 		maxIndex:{
 			type: Number,
 			notify: true,
@@ -193,7 +213,12 @@ FcDatePicker=Polymer({
 		},
 		displayedCalendarMonth:{
 			type: String,
-			computed: "computeViewMonth(displayedIndex)",
+			computed: "computeDisplayedMonth(displayedIndex, monthsList)",
+			notify: true
+		},
+		vertOrient:{
+			type: String,
+			value: function(){return "vertical";},
 			notify: true
 		},
 		units: {
@@ -215,11 +240,73 @@ FcDatePicker=Polymer({
 			type: Array,
 			value: [],
 			notify: true
-		}
+		},
+		drags:{
+			type: Boolean,
+			value: true,
+			notify: true,
+			reflectToAttribute: true
+		},
+
+		monthsList: {
+			type: Array,
+			value: function(){return["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
+			},
+			notify: true
+		},
    },
 
+_computeHeaderHeight: function(orientation){
+	var retVal=(orientation=="horizontal")?"layout flex-2": "layout flex-1 flex-shrink";
+	return retVal;
+},
 
-computeDay: function(day){if(day){return "pretty";}
+launchDialog: function(){
+	this.$.sizeDialog.alwaysOnTop=true;
+	this.$.sizeDialog.opened=true;
+	
+
+},
+computeLine:function(orientation){
+	var retVal = (orientation=="vertical")?"border-top: 3px silver solid;": "";
+
+},
+_computeWhereTheYearMustGo: function(orientation){
+	var retVal=(orientation=="horizontal")?"color: white; font-weight: 500; font-size: 22px; font-style: italic;position: absolute; bottom: 8px; right: 12px;": "color: white;  position: relative; font-weight:600;font-size: 24px; padding-top: 4px;font-style: italic; padding-right: 18px;"
+	return retVal;
+},
+swap:function(){
+	var retVal=(this.orientation=="horizontal")? "vertical": "horizontal";
+	var setOpposite=(this.orientation=="horizontal")?"horizontal": "vertical";
+	this.set("vertOrient", setOpposite);
+	this.set("orientation",retVal);
+
+},
+changeButtonClassOnOrientationChange: function(orientation){
+var retVal=(orientation=="vertical")?"horizontal layout flex center center-justified":"horizontal layout center end-justified";
+return retVal;
+},
+closeModal: function(){
+	this.$.sizeDialog.close();
+	this.$.sizeDialog.opened=false;
+},
+
+computeHeaderArrangementState: function(orientation){
+	var otherMiddle=1;
+var retVal=(orientation=="vertical")?"position: relative; padding-left: 4px;": "position:absolute; left:" +otherMiddle+  "px; bottom: 38px;";
+	return retVal;
+},
+_computeHeaderClass: function(orientation){
+	var retVal=(orientation=="horizontal")?"layout vertical flex-12 headerMonthYear": "layout horizontal flex headerMonthYear";
+	return retVal;
+
+},
+_computeHeaderStyle:function(one, two, orientation){
+	var retVal=(orientation=="horizontal")?"text-direction: vertical; width: 1em; padding-top: 20px;": "text-direction: horizontal;padding-left: 16px; font-size: 24px;";
+	Polymer.updateStyles();
+return retVal;
+
+
 },
 ready: function()
 {	
@@ -259,6 +346,16 @@ initialize:function(days){
 		this.set("fcCourse.courseCalendarDaysArray", calendar);
 		this.set("fcCourse.calendarDayArray", calendar);
 },
+_computeBackHidden: function(backHidden){
+	if(backHidden){this.async(this.takeAwayArrow, 100);	return "color: #008";}
+	else {return"color: white";}
+
+},
+takeAwayArrow: function(){
+			this.updateStyles();
+			console.log("I updated styles, not");		
+             Polymer.dom.flush();		
+        },
 
 computeDisplayed: function (displayedIndex)
 {
@@ -299,25 +396,28 @@ _forward: function(){
 		return retVal;
 		},
 
-computeNotInMonths: function(item, displayedIndex){
-	var x=new Date(item).getFullMonth();
+computeNotInMonths: function(dayDate, displayedIndex, inMonth){
+	var z=inMonth; console.log(inMonth);
+	var x=new Date(dayDate).getFullMonth();
 	var y=this.displayedCalendarMonth;
 	var retVal = (x===y);
-	var len = this.displayed.length;
 	return retVal;
 },
-computeViewMonth: function(displayedIndex){
- var monArr =[];	
- monArr=["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
-	return monArr[displayedIndex];
+computeDisplayedMonth: function(displayedIndex, monthsList){
+	if(monthsList && displayedIndex){
+	return monthsList[displayedIndex];
+}
+},
+computeViewMonth: function(displayedIndex, monthsList, orientation){
+ 	if(monthsList && displayedIndex){
+	var month=monthsList[displayedIndex].split("").map(function(val){return val+" ";});
+	var sMonth=	month.toString().replace(/,/g,"").toUpperCase();
+	var retVal=(orientation=="horizontal")?sMonth: monthsList[displayedIndex];
+	console.log(retVal);
+	return retVal;
+}
 	},
 
-computePrettyDay: function(day)
- 	{
-  		var result = day.toDateString();
-  		result = result.slice(0,10);  		
-  		return result;
- 	},
 });
 </script>
 </dom-module>

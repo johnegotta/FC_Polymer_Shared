@@ -920,12 +920,26 @@ _computeIsDigit: function(it){
 	},
 	makeTime:function(newVal, oldVal){
 			if(newVal && this.inputType=="datetime-local")
-			{
-				var time= this.dateTimeInputs(newVal);
+			{	d=new Date(newVal);
+				console.log(d, newVal, oldVal);
+				if(d){
+				var time= this.dateTimeInputs(d);
 				this.set("bindValue", time.toInputDateTimeLocal);
 				console.log(time, time);
 				this.set("value",time.toInputDateTimeLocal);
 				console.log(this.value);
+				}
+				else if(!d){
+					var j=new Date();
+					var temp=new FcClock("temp", "Clock","tempClock",0,j);
+					var p = temp.convertFromTenths(newVal);
+					var p=new Date(p);
+					var time=this.dateTimeInputs(p);
+					this.set("bindValue", time.toInputDateTimeLocal);
+					console.log(time, time);
+					this.set("value",time.toInputDateTimeLocal);
+					console.log(this.value);
+				}
 			}
 	},
 	trackRanger: function(e){

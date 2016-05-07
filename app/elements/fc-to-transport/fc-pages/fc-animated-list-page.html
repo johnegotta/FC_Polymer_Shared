@@ -1,0 +1,230 @@
+<dom-module id="fc-animated-list-page">
+<template>
+<style>
+		   :host {
+	        @apply(--layout-vertical);
+	      }
+	      .main {
+	      	min-height: 280px; 
+	      	padding: 2px; 
+	      	outline: aliceblue 3px solid; 
+	      	border: 1px #008 solid; 
+	      	text-align: left; 
+	      	overflow: hidden; 
+	      	overflow-y: scroll; 
+	      	background: white;
+	        @apply(--layout-flex);
+	        @apply(--layout-scroll);
+	        @apply(--layout-vertical);
+	      }
+	      iron-icon .classA{
+	        color: var(--google-blue-500);
+	      }
+	      iron-icon .classB{
+	      	color: var(--google-red-500);
+	      }
+	      paper-item {
+			border: silver 2px solid; 
+			font-size: 16px; 
+			padding: auto, 0px;
+			background: aliceblue;
+	      	@apply(--layout-horizontal);
+	      	@apply(--layout-flex)
+	      	@apply(--layout-flex-12);
+	      }
+	      paper-item .classB{
+		     background-color: #dfdfdf;
+		    animation-duration: .5s;
+		    animation-name: redalert;
+		    animation-iteration-count: infinite;
+		    animation-direction: alternate;
+		 }	      }
+
+	      paper-button{
+	      	font-size: 2px;
+	      	color: #008;
+	      	padding:4;
+	      	background:silver;
+	      	border: 4px solid gold;
+	     	border-radius: 50%;
+	      }
+		 .primary .classA{
+			color: #008;
+			font-weight:600;
+			font-size: 15.5px;
+		  }
+		 .secondary .classA{
+				color: grey;
+			font-weight:500;
+			font-size: 11px;
+		 }
+		 @keyframes redalert {
+		    from {background-color: #dfdfdf;}
+		    to {background-color: red;}
+		 }
+		 @keyframes yellowalert {
+		    from {background-color: #dfdfdf;}
+		    to {background-color: yellow;}
+		 }
+		 @keyframes greenalert {
+		    from {background-color: #dfdfdf;}
+		    to {background-color: green;}
+		 }
+		 .animatedalert-red{
+		     background-color: #dfdfdf;
+		    animation-duration: .5s;
+		    animation-name: redalert;
+		    animation-iteration-count: infinite;
+		    animation-direction: alternate;
+		 }
+		 .animatedalert-yellow{
+			background-color: #dfdfdf;
+		    animation-duration: .5s;
+		    animation-iteration-count: infinite;
+		    animation-direction: alternate;
+			animation-name: yellowalert;
+		 }
+		.animatedalert-green{
+			background-color: #dfdfdf;
+		    animation-duration: .5s;
+		    animation-name: greenalert;
+		    animation-iteration-count: 8;
+		    animation-direction: alternate;
+	     }
+</style>
+ <paper-button id="button" style="width: 12px; height: 12px; background: gold;">&#10560;</paper-button>
+		<paper-listbox style$="[[listboxStyle]]" class$="[[listboxClass]]">
+			<template is="dom-repeat" items="{{_computedStyledArray(dataArray.*, appliedStyleObject)}}">
+				<paper-item two-line class$="[[item.itemClass]]" style$="[[item.itemStyle]]">
+					<section class$="flex-1 [[item.leftIconClass]]">
+						<iron-icon icon="[[item.leftIcon]]" style="width: 24px; height: 24px; border-radius: 50%; padding: 6px;">
+						</iron-icon>
+					</section> 
+					<paper-item-body class="layout vertical flex-10">
+							<div class="primary">		 
+								<span style="color:#008; font-size: 18px; font-weight: 600;">[[item.clockName]]   [[item.primaryA]]</span>
+								<span style="color: #008; font-weight: 600;">[[item.dto]] [[item.primaryB]]</span> 
+							</div>		
+							<div class="secondary">		
+								[[item.secondary]]
+							</div>		
+					</paper-item-body>		
+				</paper-item>		
+			</template>
+		</paper-listbox>
+  </template>
+<script>
+  Polymer({
+    is: 'fc-animated-list-page',
+    behaviors: [
+      "Polymer.NeonAnimatableBehavior"
+    ],
+    listeners: {
+      'tap': '_onClick'
+    },
+    properties: {
+      styledArray: {
+        type: Array,
+      	notify: true,
+      },
+      dataArray:{
+      	type: Array,
+      	value:function(){return[];},
+      	notify: true
+      },
+      appliedStyleObject:{
+      	type: Object,
+      	value: function(){return{};},
+      	notify: true
+      },
+      listBoxStyle:{
+      	type: String,
+      	value: function(){return"";},
+      	notify: true
+      },
+      listBoxClass: {
+      	type: String,
+      	value: function(){return "main";},
+      	notify: true
+      },
+      comparisonArray: {
+      	type: String, 
+      	value: function(){return [];},
+      	notify: true
+      },
+      isStyledArray:{
+      	type: Boolean,
+      	value: function(){return false;},
+      	notify: true
+      },
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'entry': [{
+              name: 'fade-in-animation',
+              node: this.$.button
+            }],
+            'exit': [{
+              name: 'fade-out-animation',
+              node: this.$.button
+            }, {
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }]
+          };
+        },
+        notify: true
+      }
+    },
+    ready: function(){alert("I need to knoo", "dom-module");},
+ 
+
+   _computedStyledArray: function(dataArray, lao){
+    		var aso=lao;
+    		//console.log(dataArray.base);
+    		if(dataArray.base){
+    	retArr=dataArray.base.map(function(val, index,array){
+    		 var checker=aso.changeProperty;
+    			var j=aso.values.indexOf(val[checker]);
+    		//console.log(val[j],aso.primaryA[j]);
+    		
+
+    		var primaryB=(val[aso.primaryB[j]])?val[aso.primaryB[j]].toLocaleTimeString(): val.clockType,
+    		
+
+    		secondary=(val[aso.primaryB[j]] && val[aso.secondary])?val[aso.primaryB[j]].toLocaleDateString() + " " + val[aso.secondary]:(val[aso.primaryB[j]])?val[aso.primaryB[j]].toLocaleDateString():val[aso.secondary];
+    			var valueObject={
+    				itemClass: aso.itemClass[j],
+    				itemStyle:aso.itemStyle[j],
+    				leftIcon:aso.leftIcon[j],
+    				leftIconClass:aso.leftIconClass[j],
+    				primaryA:val[aso.primaryA[j]],
+    				primaryB:primaryB,
+    				secondary: secondary,
+    			};
+    			//console.log("valor: " + valueObject);
+    			return valueObject;
+    	});
+
+    		return retArr;
+    	}
+    },
+
+    _onClick: function(event) {
+      var target = event.target;
+      while (target !== this && !target._templateInstance) {
+        target = target.parentNode;
+      }
+      // configure the page animation
+      this.sharedElements = {
+        'hero': target,
+      };
+      this.fire('item-click', {
+        item: target,
+      });
+    }
+  });
+</script>
+</dom-module>

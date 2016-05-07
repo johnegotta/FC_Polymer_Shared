@@ -1,185 +1,65 @@
-<dom-module id="fc-clock">
-<style is="custom-style">
-:host{
-	position: absolute; 
-	top: 8px;
-	background: #fff;
-	left: 8px;
-	min-width: 245px; 
-	z-index:93;
-};
-paper-material{
-	opacity: 1;
-	position: relative;
-	background: #ffffff;
-	border: 3px ridge #aecdfe;
-	padding: 8px 4px;
-	display: block;
-	@apply(--horizontal-layout);
-	@apply(--nowrap-layout);
-}
-.timer{
-	font-size: 17px; 
-	opacity: 1; 
-	font-weight: 600; 
-	font-family: merriweather; 
-	color: #007; 
-	padding: 6px 4px 2px 4px; 
-	border: .4px solid #efefef;
-}
-.slight{
-	font-size: 14px; 
-	font-family: merriweather; 
-	opacity: 1; 
-	color: #008; 
-	font-weight: 400;
-}
-.startbutton{
-	margin: 1px; 
-	border: 2px solid #efefef;  
-	box-shadow: 3px 7px 17px 2px #dedede; 
-	font-size: 14px; 
-	font-weight: 600; 
-	text-align: center; 
-	padding: 2px; 
-	margin-bottom: 5px; 
-	width: 100%;
-}
-.startbutton:hover{ 
-	box-shadow: 1px 3px 4px 1px; 
-	font-weight: 700;
-}
-fc-input-prime{
-	max-width: 98%;
-
-}
-.clockname{
-	font-size:18px;
-	color: #008; 
-	font-family: times;
-}
-.clockname::after{
-	font-size: 10px;
-	color: white;
-	display: block;
-	content: " .";
-}
-.clockname:hover::after{
-	font-size: 10px; 
-	color: brown;
-	display: block;
-	content: " Tap to Change Clock Type";
-
-}
-
-@keyframes redalert {
-    from {background-color: #dfdfdf;}
-    to {background-color: red;}
-}
-.animatedalert{
- 
-    background-color: #dfdfdf;
-    animation-name: redalert;
-    animation-duration: .3s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate
-}
-
-
-
-}
-</style>
-
-<template>
-<div style="padding: 2px; border: 1px #efefef solid; width: 240px; outline: 3px solid #efefef">
-<div style="padding: 2px; border: 2px #008 double; text-align: center;" class="layout vertical" on-track="_focusedDraggable" drags>
-			<div style="padding: 2px; border: 1px #008 solid; text-align: center; overflow: hidden; overflow-y: scroll background: white;" class="layout vertical">
-			<template is="dom-repeat" items="{{soundingAlarms}}" as="alarm">
-					<paper-item two-line class="animatedalert" style="border: silver 1px solid; font-size: 12px; max-height: 20px!important;" on-tap="alarmoff">
-							<paper-item-body>
-								<div class="primary">
-										<span style="color:#008; font-size: 14px; font-weight: 600;">[[alarm.alarmName]] </span><span style="color: #008; font-weight: 600;"> [[computeSoundingAlarm(alarm.alarmTime)]]</span>
-								</div>
-								<div class="secondary">
-								[[alarm.notes]]
-								</div>
-							</paper-item-body>
-					</paper-item>
-				</template>
-					<div class="layout horizontal flex center-justified">
-					
-
+<fc-data-element id="marvin" hidden></fc-data-element>
+	
+<div class="layout horizontal flex center-justified">
 				<paper-material style$="width: 165px; margin: 24px 20px {{toggleMargin}} 20px;" class="layout vertical" elevation="3">
 					<span draggable drags on-tap="toggle" class="slight">{{date}}</span>
 					<section id="theClock" cursor:pointer; on-dblclick="opencollapser" class="timer">{{theTime}} </section>	
 				</paper-material>
-				</div>
-  <iron-collapse id="collapser"  class="vertical layout center-justified glass"> 
- <div class="layout horizontal flex center-justified nowrap">
-	<iron-selector selected="{{selected}}" class="vertical layout center-justified nowrap" items="{{clockArray}}" as="clock">
-	<section style="font-weight: 600; font-size: 16px;" class="horizontal layout flex nowrap center-justified"
-	>
-	<section class="layout horizontal flex-2">
-<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85" on-tap="selectPrevious" icon="icons:chevron-left">
-			</iron-icon>
-			</section>
-<section class="layout horizontal flex-10  center-justified" style="cursor:pointer;">
-<span class="clockname"><span on-tap="selectApi">{{currentClock.clockType}}</span>{{computeTheSes(currentClock.clockType)}}</span>
-</section>
-
-<section class="layout horizontal flex-2">
-<iron-icon icon="icons:chevron-right" 
-on-tap="selectNext" 
-style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85">
-</iron-icon>
-</section>
-		
-	</section>
-	<div class="horizontal layout flex center-justified nowrap" style="max-width: 235px;">
-	<section on-tap="selectPrevious" style="">
-			
-	</section>
-	
-				<section  hidden$="{{clockPrimarySwitch}}" class="vertical layout around-justified nowrap" style="max-width: 230px!important; padding-right: 0px;">
-						<section class="horizontal flex layout nowrap self-shrink">
-							<section class="horizontal layout nowrap" style="overflow-x: scroll;">
+			</div>
+  			<iron-collapse id="collapser"  class="vertical layout center-justified glass"> 
+ 				<div class="layout vertical flex center-justified nowrap">
+					<section style="font-weight: 600; font-size: 16px;" class="horizontal layout flex nowrap center-justified">	
+						<section class="layout horizontal flex-2">
+							<iron-icon style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85" on-tap="selectPrevious" icon="icons:chevron-left">
+							</iron-icon>
+						</section>
+						<section class="layout horizontal flex-10 center-justified" style="cursor:pointer;">
+							<span class="clockname">
+								<span on-tap="selectClock">{{currentClock.clockName}}{{currentClock.alarmName}}</span>
+								<br>
+								<span on-tap="selectApi" style="color: brown; font-size: 14px;">{{currentClock.clockType}}</span><span style="color: brown; font-size: 14px;">{{computeTheSes(currentClock.clockType)}}</span>
+							</span>
+						</section>
+						<section class="layout horizontal flex-2">
+							<iron-icon icon="icons:chevron-right" on-tap="selectNext" style="width: 24px; height: 24px;z-index: 22; color: silver; opacity: .85">
+							</iron-icon>
+						</section>		
+					</section>
+					<div class="layout vertical flex center-justified nowrap" style="max-width: 240px!important; min-height: 52px; padding-right: 0px;">
+						<section class="layout horizontal flex nowrap center-justified">
+							<section class="layout horizontal flex nowrap center-justified" style="align-self: center;">
 								<fc-clobjid-prime 
 									id="dsv"
-									input-style="text-align: left; margin-left: 1px; margin-left: -3px; padding: 0px 1px; border: 1px silver solid; font-weight: 600;min-width: 6px;max-width: 13px;{{computeFontSize(currentClock.clockData)}};" 
+									input-style="text-align: left; margin-left: 1px; margin-left: -5px; padding: 0px 1px; border: 1px silver solid; font-weight: 600;min-width: 7px;max-width: 15px;" 
 									orientation="horizontal" 
-									dataobject="{{currentClock.clockData}}"
+									dataobject="{{currentClock.allClockData}}"
 									>
 								</fc-clobjid-prime>
-							</section>
+						
+								<iron-icon on-tap="displayDatePicker" style$="position: absolute; right: 6px; background: white; padding: 0px; height: 12px; width: 12px; margin: 0px; color: #5DD7FC;" class$="{{_computeCalendarNeeded(currentClock.clockType, currentClock, alarmArray)}}" icon="icons:today">
+								</iron-icon>
+							
 								</section>
+						</section>
 						<paper-button 
-							class="horizontal flex layout nowrap center-justified startbutton" 
+							class="horizontal flex layout nowrap center-justified self-stretch startbutton" 
 							style$="color:{{onOffColor}};"
 							on-tap="toggleRunning">
-									[[currentClock.clockName]]
+									[[currentClock.clockName]][[currentClock.alarmName]]
 						</paper-button>
-					
-						</section>
-						<div style="min-height: 50px; max-width: 230px!important;" hidden$="{{!clockPrimarySwitch}}">
-
- 								<fc-input-prime
- 									input-type="datetime-local"
- 									input-style="text-align: center; font-size: 16px;"
- 									label="{{currentClock.alarmName}}"
- 									is-time-display="true" 
- 									time-bind="{{currentClock.alarmTime}}"
- 									readonly="true"
- 									label-style="color: #4285f4;  text-transform: uppercase;">
- 								</fc-input-prime>
- 							<iron-collapse id="collapse" class="vertical layout flex">
+					</div>
+						
+ 							
+ 						<iron-collapse id="collapse" class="vertical layout flex">
+ 						<
+ 							<div>
  							<audio loop id="myAlarmNoise" style="border: green 2px solid; width: 220px; height: 35px;">
   									<source src="fc-clock/beep-06.mp3" type="audio/mp3">
   										<source src="fc-clock/beep-10.mp3" type="audio/mp3">
 											Your browser does not support the audio element.
 							</audio>
-								<form>
-									<fc-input-prime 
-										input-type="datetime-local" 
+							
+									 <fc-input-prime input-type="datetime-local" 
 										value="{{alarmTime}}" 
 										label="Set Alarm Date & Time"
 										style="text-align: left;"
@@ -187,187 +67,63 @@ style="width: 32px; height: 32px;z-index: 22; color: silver; opacity: .85">
 										input-style="text-align: right; font-size: 14px; padding: 1px; margin: 0px; line-height: .8"; 
 										is-current-time="true">
 									</fc-input-prime>
-									<fc-input-prime 
-										style="text-align: left;"
+									<fc-input-prime style="text-align: left;"
 										input-type="text"
 										label-style="font-size: 13px; font-weight: 500; 0px; margin: 0px; font-style:italics"
 										input-style="font-size: 14px; padding: 1px; margin: 0px; line-height: .6";
 										label="Alarm Name" 
 										value="{{alarmName}}">
 									</fc-input-prime>
-									<paper-tabs 
-			      		id="assistantMenu" 
-			      		scrollable="true"
-			      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-down="dragsOff" on-up="dragsOn"   on-tap="clickHandler"
-			      		bar="true"
-			      		hide-scroll-buttons="true" 
-			  			> 
+									</div>
+								<paper-tabs 
+		      						id="assistantMenu" 
+						      		scrollable="true"
+						      		style="padding: 2px 0px; max-height: 96px; min-height: 32px; min-width: 120px;" on-down="dragsOff" on-up="dragsOn"   on-tap="clickHandler"
+						      		bar="true"
+						      		hide-scroll-buttons="true"> 
 									<!-- <section class="horizontal layout flex" style="overflow-x: scroll;width: 320px;"> -->
-									<paper-icon-button on-tap="muteAlarm" style="color: #CD7F32;" icon="{{muteButton}}"></paper-icon-button>
+									<paper-icon-button on-tap="{{tapFunction}}" style="{{styleColorOne}}" icon="{{iconUsed}}"></paper-icon-button>
 									<paper-icon-button on-tap="addNewAlarm" style="color: #4285f4;" icon="device:add-alarm"></paper-icon-button>
 									<paper-icon-button on-tap="deleteAlarm" style="color: #C87533;" icon="icons:delete"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:restore"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:view-list"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:date-range"></paper-icon-button>
 									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:swap-vertical-circle"></paper-icon-button>
-									</paper-tabs>
-								</form>
-							</iron-collapse>
- 						</div>
-		</div>
-				
-			</iron-selector>
-		
-</div>
-		<section class="horizontal flex layout nowrap center
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="notification:event-available"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="social:notifications-active"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="notification:event-busy"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="notification:event-note"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="social:notifications-off"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:swap-horiz"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="icons:alarm-off"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:gavel"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="social:person-add"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #C87533;" icon="icons:language"></paper-icon-button>
+									<paper-icon-button on-tap="reset" style="color: #4285f4;" icon="maps:local-library"></paper-icon-button>
+									
+								</paper-tabs>
+								
+					</iron-collapse>
+ 				</div>
+			<section class="horizontal flex layout nowrap center
 					 center-justified" style="width: 100%; font-size: 13px; font-weight:600; font-family: merriweather; color: #007; margin-left: 0px;">
 					<paper-button style="text-align: center; border: 2px solid #efefef;" on-tap="addNewAlarm" class="horizontal layout flex center-justified">Add</paper-button>
 						<paper-button class="horizontal layout flex center-justified" style="text-align: center;border: 2px solid #efefef;" on-tap="resetCurrentClock">[[_computeResetButton(currentClock.isRunning)]]</paper-button>
 
 					<paper-button class="horizontal layout flex center-justified" style="text-align: center; border: 2px solid #efefef;" on-tap="alarmoff">off</paper-button>
-		</section>
-	</iron-collapse>
+			</section>
+		</iron-collapse>
+		</div>
+		</div>
+		</div>
+		</template>
 
-	</div>
-
-
-</div>
-</div>
-</template>
 <script>
-
-
-
-function FcClockData(argTenths, argFirstDigit, argLastDigit, argInputObject)
-{	
-	var firstDigit = argFirstDigit || 0;
-	var lastDigit = argLastDigit || 7;
-	if(!argInputObject){
-	var digitArray = [
-		{name: "thours", value: 0, inputType: "digit", label:" "+" H"},
-		{name: "hours", value: 0, inputType: "digit", label:"H", colon:":"},
-		{name: "tmin", value: 0, inputType: "digit", label:"M"},
-		{name: "min",value: 0, inputType: "digit", label:"M", colon:":"},
-		{name: "tsec",value:0, inputType: "digit", label:"S"},
-		{name: "sec",value: 0, inputType: "digit", label:"S", colon:":"},
-		{name: "tenth", value: 0, inputType: "digit", label:"s"},
-		{name: "hundredth", value: 0, inputType: "digit", label:"s"}
-	];
-	for(var i = 0; i < 8; i++)
-	{
-		var obj = digitArray[i];
-		this[obj.name] = obj;
-		if(i < firstDigit || i > lastDigit)
-		{
-			this[obj.name].hidden = true;
-		}
-	}
-
-	
-	this.convertFromTenths(argTenths);
-	}
-	if(argInputObject){
-		this.alarmData=argInputObject;
-		this.setAlarmData();
-
-	}
-}
-FcClockData.prototype.setAlarmData=function()
-{	
-	this.hundredth.value ="M";
-	var ampm= this.alarmData.ampm.split("");
-	var ap= (ampm[0]=="a" || ampm[0]=="A")?"A": "P";
-	console.log(ap);
-	this.tenth.value = ap;
-	this.sec.value = this.alarmData.secondsN%10;
-	this.tsec.value = Math.floor(this.alarmData.secondsN);
-	this.min.value =this.alarmData.minutesN%10;
-	this.tmin.value =Math.floor(this.alarmData.minutesN/10);
-	this.hours.value =this.alarmData.hoursN%10;
-	this.thours.value =Math.floor(this.alarmData.hoursN/10);
-	this.month.value=
-
-sec.value * 10;
-	result += this.tsec.value * 100;
-	result += this.min.value * 600;
-	result += this.tmin.value * 6000;
-	result += this.hours.value * 36000;
-	result += this.thours.value * 360000;
-	return result;
-};
-
-
-FcClockData.prototype.convertFromTenths = function(argTenths)
-{	
-	
-	this.tenth.value = argTenths % 10;
-	var fullsec = Math.floor(argTenths / 10) % 60;
-	this.sec.value = fullsec % 10;
-	this.tsec.value = Math.floor(fullsec / 10);
-	var fullmin;
-	if(argTenths>35999 && argTenths<60000)
-	{
-		fullmin = Math.floor(argTenths / 600) % 100;
-	}
-	else
-	{
-		fullmin = Math.floor(argTenths / 600) % 60;
-	}
-	this.min.value = fullmin % 10;
-	var fullhour = Math.floor(argTenths / 36000);
-	this.hours.value = fullhour % 10;
-	this.tmin.value = Math.floor(fullmin / 10);
-	if(argTenths>35999 && argTenths<60000)
-	{
-		this.hours.value = 0;
-	}
-	else
-	{
-		//this.tmin.value = fullmin % 60;
-	}
-
-};
-
-class FcClock
-{
-	constructor(argName, argType, argTenths, argFirstDigit, argLastDigit)
-	{
-		this.clockName = argName;
-		this.clockType = argType;
-		this.startTenths = argTenths;
-		this.isRunning = false;
-		this.firstDigit = argFirstDigit;
-		this.lastDigit = argLastDigit;
-		this.clockData = new FcClockData(argTenths, argFirstDigit, argLastDigit);
-	}
-	convertFromTenths(argTenths)
-	{
-		this.clockData.convertFromTenths(argTenths);
-	}
-	convertToTenths()
-	{
-		return this.clockData.convertToTenths();
-	}
-	toggleRunning()
-	{
-		var d = (new Date()).getTime();
-		if(this.isRunning)
-		{
-			this.lastTurnedOff = d;
-			this.lastTurnedOffTenths = this.clockData.convertToTenths();
-		}
-		else
-		{
-			this.lastTurnedOn = d;
-			this.lastTurnedOnTenths = this.clockData.convertToTenths();
-		}
-		this.isRunning = !this.isRunning;
-	}
-}
 
 Polymer({
 	is: "fc-clock",
-	listeners:{"on-tap": "addNewAlarm"},
+	listeners:{"on-tap": "addAlarm", "buttNew.tap": 'displayDatePicker'},
+
 	properties: {
 		currentClock: {
 			type: FcClock,
@@ -378,6 +134,93 @@ Polymer({
 			type: String, 
 			notify: true,
 		},
+		iconArray:{
+			type:Array,
+			value:function(){ return[
+				{ 		
+					onTap:`on-tap="{{tapFunction}}"`, 
+					newStyle:`style="color:#C87533;"`, 
+					newIcon: `icon="av:mute"`,
+				},
+				{	
+					onTap:`on-tap="addNewAlarm"`,
+				 	newStyle:`style="color: #4285f4;"`, 
+				 	newIcon:`icon="device:ad-alarm"`
+				 },
+				{ 		
+						onTap: `on-tap="deleteAlarm"`, 
+						newStyle:`style="color: #C87533;"`,
+				 		newIcon: `icon="icons:delete"`
+				 },
+				
+				{ 		onTap: `on-tap="reset"`, 
+				  		newStyle:`style="color: #4285f4;"`, 
+				  		newIcon: `icon="icons:restore"`
+				},
+				 		
+				 {		onTap: `on-tap="reset"`, 
+				 		newStyle:`style="color: #C87533;"`,
+				 		 newIcon: `icon="icons:view-list"`
+				},
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						newIcon: `icon="icons:date-range"`,
+				},		
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						newIcon: `icon="icons:swap-vertical-circle"`
+				},	
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `icon="notification:event-available"`
+				},		
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						 newIcon: `icon="social:notifications-active"`
+				},	
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `icon="notification:event-busy"`		
+				},
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						newIcon: `icon="notification:event-note"`
+				},		
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `icon="social:notifications-off"`
+				},				
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						 newIcon: `"icon="icons:swap-horiz"`
+				},	
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `icon="icons:alarm-off"`
+				},	
+				{		onMyTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						newIcon: `"icon="icons:gavel"`
+				},
+						
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `icon="social:person-add"`
+				},
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #C87533;"`,
+						 newIcon: `"icon="icons:language"`,
+				},
+				{		onTap: `on-tap="reset"`, 
+						newStyle:`style="color: #4285f4;"`,
+						 newIcon: `"icon="maps:local-library"`
+				},
+
+				}];
+			},
+			notify: true
+		},
+
 		openingArray:{
 			type: Array,
 			value:[],
@@ -395,7 +238,7 @@ Polymer({
 		},
 		displayedArray:{
 			type: Array,
-			computed: "_computeDisplayedArray(fcClockArray, clockApi, openingArray)",
+			computed: "_computeDisplayedArray(fcClockArray, clockApi, openingArray,alarmArray)",
 			observer: "watchDisplayed",
 			notify: true
 		},
@@ -409,12 +252,16 @@ Polymer({
 			value:function(){
 				return ["Countdown",
 						"Stopwatch",
-						"Alarmclock",
-						"Alltimers"
+						"Alarmclock"
+						
 							];
 			},
 			notify: true
 
+		},
+		calendarButton:{
+			type: Boolean,
+			notify: true
 		},
 		muteButton:{
 			type: String,
@@ -506,7 +353,12 @@ Polymer({
 	},
 	behaviors:[],
 
-	
+	 displayDatePicker: function(e){
+		console.log(e, e.target, "I am tapping");
+		this.set("calendarButton", !this.calendarButton);
+		this.$.collapse.opened=!this.$.collapse.opened;	
+
+	},
 	clockwatcher: function(newVal, oldVal)
 	{
 		console.log(newVal, oldVal);
@@ -537,7 +389,7 @@ Polymer({
 				this.set("onOffColor", "green");
 		}
 		else{
-		this.set("currentClock.clockData", new FcClockData(this.currentClock.startTenths, this.currentClock.firstDigit, this.currentClock.lastDigit));
+		this.set("currentClock.allClockData", new FcClockData(this.currentClock.startTenths, this.currentClock.firstDigit, this.currentClock.lastDigit));
 		this.set("displayedArray." + this.currentIndex, this.currentClock);
 		}
 	},
@@ -549,27 +401,31 @@ Polymer({
 	_computeDisplayedArray: function(fcClockArray, api, openingArray){
 		if(fcClockArray!==[] && this.openingArray!==[])
 			{
-				if(api!=="Alarmclock" && api!="Alltimers")
+				if(api!=="Alarmclock")
 				{
 					var retVal = fcClockArray.filter(function(val, index, arr){
 						return (val.clockType==api);
 						});
-					console.log(retVal, api);
+					console.log(retVal, api, "heeeeeereeeee");
 		
 					return retVal;
 				}
 				else if(api=="Alarmclock" && this.alarmArray)
-				{    console.log(api, this.alarmArray);
+				{    console.log(api, this.alarmArray, this.displayedArray);
 					return this.alarmArray;
 				}
 				else{return openingArray;}
 			}
 	}, 
 
-	
-	computeFontSize: function(ccd){
-		console.log(ccd, ccd,ccd,ccd);
-	}, 
+	_computeDataObject: function(one, two, three, four){
+		console.log(one, two, three, four)
+
+		if(one=="Alarmclock"){return three;}
+		else{return two;}
+
+	},
+
 	selectApi: function(e){
 		console.log(e, e.target, e);
 		var compareVal=e.target.firstChild.data;
@@ -603,7 +459,15 @@ computeTheSes: function(clockType){
 	{
 		return argActive?"green":"red";
 	},
-
+_computeCalendarNeeded: function(ctype, cc, alarmArray){
+	var now=new Date().getTime();
+	if(ctype!="Alarmclock"){return "inviso";}
+		var tester=alarmArray.some(function(val, index){
+	return (((val.alarmTime.getTime()-now)/1000)<86000)});
+		console.log(tester);
+		var retVal=(tester)?"blinkyellow": "small";
+		return retVal;
+},
 
 opencollapser: function()
 {
@@ -636,8 +500,14 @@ this.set("toggleMargin",tm);
 		console.log(oldVal, newVal);
 		if(newVal.length){this.switchClock(0);}
 	},
+	selectClock: function(){
+		var last=this.displayedArray.length-1;
+		var num =(this.clockIndex<last)?(this.clockIndex+1):0;
+			this.switchClock(num);		
+	},
 	switchClock: function(num){	if(this.displayedArray && this.clockApi!="Alarmclock"){
 		this.set("clockIndex", num);
+		console.log(this.clockIndex, this.clockApi);
 		this.set("currentClock", this.displayedArray[num]);
 		this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
 		this.set("onOffColor", this.currentClock.isRunning?"red":"green");
@@ -646,8 +516,8 @@ this.set("toggleMargin",tm);
 			if(!num){num=0;}
 			this.set("clockIndex", num);
 			this.set("currentClock", this.alarmArray[num]);
-			this.set("onOffIcon", this.currentClock.isRunning?"icons:close":"icons:forward");
-			this.set("onOffColor", this.currentClock.isRunning?"red":"green");
+			this.set("onOffIcon", this.currentClock.isActive?"icons:close":"icons:forward");
+			this.set("onOffColor", this.currentClock.isActive?"red":"green");
 		}
 		// else{this.set("clockApi", this.clockApi);}
 	},
@@ -692,11 +562,11 @@ this.set("toggleMargin",tm);
 	    }
 	},
 	setClockConstructor:function(){
-		var nowish = (new Date()).getTime()+50000;
-		var laterish = (new Date()).getTime()+ 90000;
+		var nowish = (new Date()).getTime() + 50000;
+		var laterish = (new Date()).getTime() + 90000;
 		this.alarmArray = [];
-		this.addAlarm(nowish, "nowish");
-		this.addAlarm(laterish, "laterish");
+		this.addAlarm("NOW-ISH",nowish);
+		this.addAlarm("LATER-ISH", laterish);
 		this.fcClockArray = [];
 	  	this.push("fcClockArray", new FcClock("Reading Countdown", "Countdown", 39000, 0, 7));
 	 	this.push("fcClockArray", new FcClock("Writing Countdown", "Countdown", 21000, 0, 7));
@@ -712,6 +582,7 @@ this.set("toggleMargin",tm);
 	  		return(val.clockType=="Countdown");
 	  	})
 	  	this.set("openingArray", temp);
+	  	console.log(this.openingArray, this.currentClock);
 	},
 
 	initializeClocks:function(){
@@ -749,9 +620,9 @@ this.set("toggleMargin",tm);
 					if(self.currentClock.clockType!="Alarmclock")
 					{
 						clock.convertFromTenths(newTenths);
-						var path = "currentClock.clockData.tenth.value";
-						var pathlight = "fcClockArray." + i + ".clockData";
-						self.notifyPath(path, self.currentClock.clockData.tenth.value);
+						var path = "currentClock.allClockData.tenth.value";
+						var pathlight = "fcClockArray." + i + ".allClockData";
+						self.notifyPath(path, self.currentClock.allClockData.tenth.value);
 					}
 
 				}
@@ -759,10 +630,11 @@ this.set("toggleMargin",tm);
 			for(i = 0; i < numAlarms; i++)
 			{
 				var alarm = self.alarmArray[i];
+				//console.log(self.alarmArray);
 				var alarmTime = alarm.alarmTime;
 				if(alarm.isActive && (currentTime.getTime() > alarmTime.getTime()) )
 				{
-					console.log("Alarm went off at " + currentTime, alarm);
+					//console.log("Alarm went off at " + currentTime, alarm);
 					self.ringAlarm(alarm);
 					alarm.isActive = false;
 					self.notifyPath("alarmArray." + i + ".isActive", false);
@@ -772,20 +644,19 @@ this.set("toggleMargin",tm);
 
 
 	},
+	deleteAlert:function(){this.splice("soundingAlarms", 0,1);},
 	ringAlarm: function(alarm){
 		this.$.myAlarmNoise.play();
 		this.push("soundingAlarms", alarm);
 	},
 	alarmoff: function(){
 		this.$.myAlarmNoise.pause();
-		this.splice("soundingAlarms", 0,1);
 	},
 	muteAlarm: function(){
 			var muted = this.$.myAlarmNoise.muted;
 			this.$.myAlarmNoise.muted=!this.$.myAlarmNoise.muted;
 			var setVal=(muted)?"av:volume-up": "av:volume-off";
 			this.set("muteButton",setVal);
-
 	},
 	computeSoundingAlarm: function(alarmTime){
 			return alarmTime.toLocaleString();
@@ -808,18 +679,93 @@ this.set("toggleMargin",tm);
 		var hours=timepart[0];
 		var minutes=timepart[1];
 		var atime = new Date(year, month, day, hours, minutes);
-			this.addAlarm(atime, this.alarmName);
+			this.addAlarm(this.alarmName, atime);
 	}, 
 
-	addAlarm: function(argTime, argName)
-	{		console.log(argTime);
-		var alarmTime = new Date(argTime);
-		var now = new Date();
-		var active = (now < alarmTime);
-		this.push("alarmArray", {alarmName: argName, clockName: argName, clockType: "Alarmclock", isRunning: active, clockData: alarmTime, alarmTime: alarmTime, isActive:active});
+	addAlarm: function(argName, argTime)
+	{	var newAlarm=new FcAlarmClock(argName, argTime);
+		this.push("alarmArray", newAlarm);
 		
 	},
+
+ iconArray:{
+				type: Array,
+				value: function(){
+					return [
+
+						{	"sectionClass": " normal buttons blue-btn-class",
+							"dDialogOne": "firePadPrime",
+ 							"iconUsed": 
+ 						}
+				];
+			},
+			notify: true
+			},
+			  	firepad: {
+			type:Object,
+			value:{},
+			notify: true,	
+		},
+		firepadRef: {
+			type:Object,
+			value:{},
+			notify: true,
+			reflectToAttributes: true	
+		}, 
+		codeMirror: {
+			type: Object,
+			value: {},
+			notify: true
+		}, 
+		
+
+			},
+
+				computedStyle: function(determine){
+						return "margin: box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  "
+
+
+				}, 
+_onButtonClick: function(e) {
+		 // console.log(e);
+		  var button = e.detail;
+		  var selectedPage = button.getAttribute('data-transition');
+		 // console.log("SELECTED PAGE", selectedPage);
+		  this.set('mySelected', selectedPage);
+		},
+secondarySelectedChanged: function(e){
+	//console.log(this.secondarySelected);
+},
+_onCloseMe: function(e) {
+				//console.log("ON CLOSE ME", e.detail);
+				this.set('mySelected', 'default');
+			},
+ready: function(){
+	// (this.firepadElement)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue in drawer', this.firepadElement);
+	},
+});
+
 
 });
 </script>
 </dom-module>
+
+
+
+`style:"color: #4285f4;" icon:"device:add-alarm"`;
+style:"color: #C87533;" icon:"icons:delete"
+style:"color: #4285f4;" icon:"icons:restore"
+style:"color: #C87533;" icon:"icons:view-list
+style:"color: #4285f4;" icon:"icons:date-range
+style:"color: #C87533;" icon:"icons:swap-vertical
+style:"color: #4285f4;" icon:"notification:event-available
+style:"color: #C87533;" icon:"social:notifications-active
+style:"color: #4285f4;" icon:"notification:event-busy
+style:"color: #C87533;" icon:"notification:event-note
+style:"color: #4285f4;" icon:"social:notifications-off
+style:"color: #C87533;" icon:"icons:swap-horiz
+style:"color: #4285f4;" icon:"icons:alarm-off
+style:"color: #C87533;" icon:"icons:gavel"
+style:"color: #4285f4;" icon:"social:person-add
+style:"color: #C87533;" icon:"icons:language"
+style:"color: #4285f4;" icon:"maps:local-library
