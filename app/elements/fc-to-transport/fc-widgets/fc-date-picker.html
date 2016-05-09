@@ -1,105 +1,146 @@
 <dom-module id="fc-date-picker">
 <template>
-<style>
-:host{
-	position: fixed;
-}
-.calendarheader{
-	text-align: center;  
-	width:calc(100%/7.3)!important; 
-	font-size: 18px; 
-	font-weight: 600; 
-	padding: 1px 4px;
+	<style>
+		:host{
+			position: fixed;
+		
+		}
+		.calendardaysofweek{
+			text-align: center;  
+			width:calc(100%/7.3)!important; 
+			font-size: 18px; 
+			align-content: 	center;
+			font-weight: 600; 
+			padding: 1px 1px 1px 1.4px;
+			color: #fff;
+			background: #009;
+			height: 24px!important;
+				@apply(--layout-self-stretch);
+				@apply(--layout-center-justified);
+				@apply(--layout-flex);
+				@apply(--layout-horizontal)
+				@apply(--layout-flex);
+				@apply(--layout-horizontal);
+		}
+		.calendarcontainer{
+			background: white; 
+			border: 1px solid #009;
+			box-shadow: -2px 6px 17px 4px #9fafaf;
+			max-width: 1200px;
+			min-width: 340px;
+			min-height: 220px;
+			max-height: 720px;
 
-	color: #fff;
-	background: #009;
-	height: 18px!important;
-}
-.calendarcontainer{
-background: white; 
-border: 1px solid #009;
-box-shadow: -2px 6px 17px 4px #9fafaf;*/
+		}.small{
+			font-size: 14px;
+			font-weight: 400px;
+			font-family: times;
 
-}
-.calendarborder{
-	background: #009; 
-	width: 100%;
-}
+		}
+		.standard{
+			font-size: 16px;
+			font-weight: 500px;
+			font-family: times
+		}
+		.large{
+			font-size: 18px;
+			font-weight: 600px;
+			font-family: times;
+		}
+		.large-thin{
+				font-size: 18px;
+			font-weight: 400px;
+			font-family: times;
+		}
+		.larger-heavy{
+				font-size: 20px;
+				font-weight: 600px;
+				font-family: times;
+		}
+		.calendarborder{
+			background: #009; 
+			width: 100%;
+			@apply(--layout-horizontal);
+			@apply(--layout-center-justified);
+		}
 
-.headerMonthYear{
-	text-rendering: center;
-	text-align: center;
-	color: white; 
-	font-size:18px;
-	padding-top: 6px;
-	font-weight: 600;
-	}
-.headerTop{
-height: 100%;
+		.headerMonthYear{
+			text-rendering: center;
+			text-align: center;
+			color: white; 
+			font-size:18px;
+			padding-top: 6px;
+			font-weight: 600;
+			}
+		.headerTop{
+		height: 100%;
 
-}
-.headerArrowRight{
-	padding-top: 4px;
-	 color: white; 
-	 @apply(--layout-horizontal);
-	@apply(--layout-flex);
-	@apply(--flex-self-shrink);
-}
-.headerArrowLeft{
-	padding-top: 4px;
-	color: white;
-	@apply(--layout-horizontal);
-	@apply(--layout-flex);
-	@apply(--flex-self-shrink);
-}
-  .card{
-  	text-align: right; 
-  	width:calc(101%/7.3); 
-  	/*margin: 1px 1px 0px 1px;*/
-  	font-size: 18px;
-  	font-weight: 400;
-  	display: flex;
-  	border-left: 1px solid #efefef;
-  	border-top: 1px solid #efefef;
-  	padding: 3px 0px 0px 0px;
-  	@apply(--self-shrink);
-  } 
-  .cardcontainer{
-  	background: white; 
-  	overflow-y:scroll;
-  	min-height: 185px; 
- 
-  }
-  .cardcontainer2{
-  	overflow:scroll;
+		}
+		.headerArrowRight{
+			padding-top: 4px;
+			 color: white; 
+			 @apply(--layout-horizontal);
+			@apply(--layout-flex);
+			@apply(--flex-self-shrink);
+		}
+		.headerArrowLeft{
+			padding-top: 4px;
+			color: white;
+			@apply(--layout-horizontal);
+			@apply(--layout-flex);
+			@apply(--flex-self-shrink);
+		}
+		  .card{
+		  	text-align: right; 
+		  	width:calc(100.00%/7.0); 
+		  	margin: 0px -1px 0px 0px;
+		  	font-size: 18px;
+		  	font-weight: 400;
+		  	display: flex;
+		  	border-right: 1px solid #efefef;
+		  	border-top: 1px solid #efefef;
+		  	padding: 3px 0px 0px 0px;
+			@apply(--layout-self-stretch);
+			@apply(--layout-center-justified);
+				@apply(--layout-horizontal);
+				
+		  } 
+		  .cardcontainer{
+		  	background: white; 
+		  	overflow-y:scroll;
+		  	min-height: 185px; 
+		 
+		  }
+		  .cardcontainer2{
+		  	overflow:scroll;
+		  }
 
-
-  }
- 
-</style>
-	<paper-dialog id="sizeDialog" no-cancel-on-outside-click style="width: 320px; height: 380px; background: aliceblue; border: 2px solid #009;">
+	</style>
+	<paper-dialog id="sizeDialog" on-mousedown="dragsNo" on-mouseup="dragsYes"no-cancel-on-outside-click style="width: 320px; height: 380px; background: aliceblue; border: 2px solid #009;">
 		Height: {{currentHeight}}, Width: {{currentWidth}}
-		<fc-input-prime input-type="range" min="240" max="1200" value="{{currentWidth}}" label="Width">
+		<fc-input-prime input-type="range" min="310" max="1200" value="{{currentWidth}}" label="Width">
 		</fc-input-prime>
-		<fc-input-prime input-type="range" min="240" max="1200" value="{{currentHeight}}" label="Height">
+		<fc-input-prime input-type="range" min="205" max="720" value="{{currentHeight}}" label="Height">
 		</fc-input-prime>
 		<paper-button on-tap="closeModal">close</paper-button>
 		<paper-button on-tap="swap">swap</paper-button>
+		{{days}}
 	</paper-dialog>
-	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height: {{currentHeight}}px!important; width: {{currentWidth}}px!important;">
+
+	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height: {{currentHeight}}px!important; width: {{currentWidth}}px!important; resize: both;">
 		<paper-material class$="{{vertOrient}} [[_computeHeaderHeight(orientation)]] calendarborder">
 			<section class$="{{vertOrient}} layout flex center headerTop">		
-				<section class$="headerMonthYear [[_computeHeaderClass(currentHeight, currentWidth, orientation)]]" style$="[[_computeHeaderStyle(currentWidth, currentHeight, orientation)]]">
+				<section class$="headerMonthYear [[_computeMonthClass(currentHeight, currentWidth, orientation)]]" style$="[[_computeMonthStyle(currentWidth, currentHeight, orientation)]]">
 					[[computeViewMonth(displayedIndex, monthsList, orientation)]]
 				</section>
-				<section id="navigationBlock" class$="[[changeButtonClassOnOrientationChange(orientation)]]" style$="[[computeHeaderArrangementState(orientation)]]">
-					<div class="layout horizontal flex center center-justified">
+				<section id="navigationBlock" class$="[[computeGlobeButtonClass(orientation)]]" style$="[[_computeGlobeButtonStyles(orientation,currentWidth, currentHeight)]]">
+					<div class="layout horizontal center center-justified">
 						<section on-tap="_backOne" class="headerArrowLeft">
 							<iron-icon icon="icons:chevron-left" style$="[[_computeBackHidden(backHidden)]];">
 							</iron-icon>
 						</section>
-						<section on-tap="launchDialog" class="layout flex center center-justified" style="width: 20px; height: 20px; border-radius: 50%; color: white;">
-							<iron-icon icon="social:public"></iron-icon>
+						<section on-tap="launchDialog" class="layout flex center center-justified" style$="[[_computeGlobeSize(currentWidth, currentHeight, orientation)]] color: white;">
+							<iron-icon icon="social:public" style$="[[_computeGlobeSize(currentWidth, currentHeight, orientation)]]"></iron-icon>
 						</section>
 						<section on-tap="_forward" class=" headerArrowRight">
 							<iron-icon icon="icons:chevron-right" style$="[[_computeBackHidden(forwardHidden)]];">
@@ -107,23 +148,22 @@ height: 100%;
 						</section>
 					</div>
 				</section>
-				<section class="horizontal flex layout end-justified" style="[[_computeWhereTheYearMustGo(orientation)]]">
+				<section id="yearBlock" class="horizontal flex layout end-justified" style="[[_computeYearStyle(orientation, currentWidth, currentHeight)]]">
 				 [[computeYear(displayed)]]
 				</section>
 			
 		</section> 
 	</paper-material>
-
-		<div class="vertical flex-9 layout cardcontainer" style$="width: {{currentWidth}}px!important overflow-y: scroll; [[computeLine(orientation)]]">
-		<section class="horizontal layout flex" style$="padding: top: 3px; margin-bottom: 4px; max-height: 20px!important;[[computeLine(orientation)]]">
-			<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
+		<div class="vertical flex-9 layout cardcontainer" style$="width: {{currentWidth}}px!important overflow-y: scroll;">
+		<section class="horizontal layout flex" style="padding:0px; top: 3px; margin-bottom: 1px; max-height: 30px!important;">
+			<template is="dom-repeat" class="horizontal layout nowrap" items="[[computeDayStringLength(orientation, currentWidth, currentHeight)]]">
 			<!--example of stupid-->
-				<paper-material class="calendarheader" >
+				<paper-material class$="calendardaysofweek [[_daysOfWeekClass(orientation, currentWidth, currentHeight)]]">
 					{{item}}
 				</paper-material><!--days of week header-->
 			</template>
 		</section>
-			<section class="horizontal layout flex wrap" style$="overflow-y: scroll; margin-top: 1px; width: {{currentWidth}}!important;">
+			<section class="horizontal layout flex wrap"  style$="overflow-y: scroll; width: {{currentWidth}}!important;">
 				<template 
 					is="dom-repeat" 
 					class="horizontal layout wrap" 
@@ -138,36 +178,45 @@ height: 100%;
 						 	mini-date="{{day.date}}"
 						 	index={{day.index}}
 						 	id$={{day.dateId}}
-						 	current-width="{{currentWidth}}"
-						 	current-height="{{currentHeight}}"
+						 	parent-current-width="{{currentWidth}}"
+						 	parent-current-height="{{currentHeight}}"
 						 	testDate={{day.testDate}} 
 						 	event-list="{{day.eventList}}"
 						 	fc-course="{{fcCourse}}">
-							<span class="date self-stretch" style="font-weight: 600; font-size: 18px;" id="button">[[day.dayOfMonth]]</span>
+							<span class="date center center-justified layout horizontal flex" style="font-size:18px; font-weight: 600;" id="button">[[day.dayOfMonth]]</span>
 						</fc-date-mini>	
 				</template>
+				
 			</section>
-
-		<!-- <section class="layout horizontal" style="background: #aedefe; min-height: 6px; max-height: 36px;width:{{currentWidth}}px!important;">
-				
-					
-					
-				</section> -->
-				
 		</div>
 	</div>
+
+	
 </template>
 <script>
 FcDatePicker=Polymer({
 	is: "fc-date-picker",
-	behaviors:[FCBehaviors.FcCalendarBehaviorPrime, FCBehaviors.DraggableBehavior],
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime, FCBehaviors.DraggableBehavior, Polymer.NeonAnimatableBehavior, Polymer.IronResizableBehavior, Polymer.NeonAnimationRunnerBehavior
+  ],
 	observers:[],
+	listeners:{"onload": "trigger", "onmousemove":"trigger", 'neon-animation-finish': '_onNeonAnimationFinish'},
 	properties: {
+		slide:{
+			type: String,
+			value:"",
+			notify: true
+		},
 		day:{
 			type: FcCalendarDay, 
 			value: {},
 			notify: true
 		},
+  		entryAnimation: {
+    		value: 'slide-from-right-animation',
+  				},
+  		exitAnimation: {
+    		value: 'slide-left-animation',
+  		},
 		fcCourse:{
 			type: FcCourse,
 			value: function(){return new FcCourse({});},
@@ -175,10 +224,7 @@ FcDatePicker=Polymer({
 		},
 		days:{
 			type: Array,
-			value: function()
-			{
-					return ["Su","M","Tu","W","Th","F","Sa"];
-			},
+			computed: "computeDayStringLength(orientation, currentWidth, currentHeight)",
 			notify: true
 		},
 		orientation:{
@@ -190,12 +236,12 @@ FcDatePicker=Polymer({
 		},
 		currentWidth: {
 			type: String,
-			value: function(){return "365";},
+			value: function(){return "310";},
 			notify: true,
 		},
 		currentHeight: {
 			type: String,
-			value: function(){return "286";},
+			value: function(){return "220";},
 			notify: true,
 		},
 		maxIndex:{
@@ -255,24 +301,106 @@ FcDatePicker=Polymer({
 			notify: true
 		},
    },
+	_outToLeftInFromRight: function() {
+      
+      this.playAnimation('exit');
+    },
+    _onNeonAnimationFinish: function() {
+      // if (this.opened) {
+      //   this._finishRenderOpened();
+      // } else {
+      //   this._finishRenderClosed();
+      // }
+    },
+
+_computeGlobeSize: function(currentWidth, currentHeight, orientation){
+		// if(orientation=="horizontal"){
+			 var w=(parseFloat(currentWidth));var h=(parseFloat(currentHeight));
+				var retVal=(w<360 ||h<310)?"width:16px; height: 16px; padding-bottom: 6px;":(w<420 ||h<360)?"width:20px; height: 20px; padding-bottom: 6px;":"width:32px; height: 32px; padding-bottom: 6px;";
+		// 		}
+		// else{var retVal="width:20px; height: 20px;"}
+		return retVal;
+},
 
 _computeHeaderHeight: function(orientation){
 	var retVal=(orientation=="horizontal")?"layout flex-2": "layout flex-1 flex-shrink";
+	return retVal;
+},
+dragsYes:function(){
+	this.async(function(){this.set("drags",true);}, 1000);
+},
+dragsNo:function(){
+	this.set("drags", false);
+},
+computeDayStringLength: function(orientation, currentWidth, currentHeight){
+	var daysArray=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+	var size=parseInt(currentWidth);
+	var nocs=(size>400&&size<480)?2:(size>480&& size<1080)?3:(size>1080)?4:1;
+	
+	var returnArray=daysArray.map(function(val){
+
+		if(nocs===2){var pick = val.split("").slice(0,2); var pickle = pick[0]+pick[1]; return pickle;}
+		else if(nocs===3){var pick = val.split("").slice(0,3);pickle=pick[0]+pick[1]+pick[2]; return pickle;}
+		else if(nocs===4){
+			var pickle=val;
+			return pickle;}
+		else {var pickle=val.split("").shift(); return pickle;}
+	});
+console.log(returnArray);
+	return returnArray;
+	},
+_computeMonthStyle:function(one, two, orientation){
+	var w=parseFloat(one);
+	var h=parseFloat(two);
+	var size = (w<310||h<260)?"font-size: 14px;":(w<360|| h<330)?"font-size: 16px;":(w<405||h<385)?"20px;":(w<480||h<440)?"font-size: 22px;": (w<680||h<520)?"font-size: 24px;":"font-size: 26px;";
+	var retVal=(orientation=="horizontal")?"text-direction: vertical; width: 1em; padding-top: 24px;"+size: "text-direction: horizontal;padding-left: 16px;"+size+"padding-top:0px; font-weight: 500;";
+
+	Polymer.updateStyles();
+return retVal;
+},
+
+_daysOfWeekClass: function(orientation, currentWidth, currentHeight){
+		var w=Math.floor(parseFloat(currentWidth));
+		var h=Math.floor(parseFloat(currentHeight));
+		var o=(orientation=="vertical")?false:true;
+		var retVal=(o===false &&(w<360||h<320))?"small": (o===false &&(w<420||h<360))?"standard":(o===false &&(w<720||h<480))?"large":"large-heavy";
+			return retVal;
+		},
+
+_computeMonthClass: function(orientation){
+	var retVal=(orientation=="horizontal")?"layout vertical flex-12 headerMonthYear": "layout horizontal flex headerMonthYear";
 	return retVal;
 },
 
 launchDialog: function(){
 	this.$.sizeDialog.alwaysOnTop=true;
 	this.$.sizeDialog.opened=true;
-	
 
 },
-computeLine:function(orientation){
-	var retVal = (orientation=="vertical")?"border-top: 3px silver solid;": "";
 
-},
-_computeWhereTheYearMustGo: function(orientation){
-	var retVal=(orientation=="horizontal")?"color: white; font-weight: 500; font-size: 22px; font-style: italic;position: absolute; bottom: 8px; right: 12px;": "color: white;  position: relative; font-weight:600;font-size: 24px; padding-top: 4px;font-style: italic; padding-right: 18px;"
+_computeYearStyle: function(orientation, w, h){
+	var nw=parseInt(w);
+	// var smid="left:" +middle+"px;";
+	// var backUp ="left:" + Math.floor(parseFloat(w/48))+"px;";
+	var height=parseInt(h);
+	if(orientation=="horizontal"){ 
+		var elem=this.$.yearBlock;
+	var ew=window.getComputedStyle(elem, null).getPropertyValue("width");
+	console.log(ew);
+	var middle=Math.floor(((parseFloat(w)*(2/11)-(parseFloat(ew)))/2));
+	console.log(middle, w, ew, h);
+	// var nw=parseInt(w);
+	var smid="left:" +middle+"px;";
+	var backUp ="left:" + Math.floor(parseFloat(w/24))+"px;";
+	// var height=parseInt(h);
+	var baseStyle ="color: white; font-weight: 500;  font-style: italic; position: absolute;";
+	var size = (nw<345||height<260)?"bottom: 4px;font-size: 18px;":(nw<380|| height<330)?"bottom: 6px;font-size: 20px;":(nw<405||height<385)?"bottom: 7px;font-size: 22px;":(nw<480||height<440)?"bottom: 8px;font-size: 22px;": (nw<620)?"bottom: 12px;font-size: 24px;":"bottom: 12px;font-size: 26px;";
+	var retVal=(middle && parseInt(middle)>0)?baseStyle+smid+size:(backUp)?baseStyle+backUp+size: baseStyle +"left: 2px;"+size;
+	}
+	else {
+		var size = (nw<345||height<280)?"font-size: 14px;":(nw<380|| height<330)?"font-size: 16px;":(nw<405||height<385)?"font-size: 18px;":(nw<480||height<440)?"font-size: 20px;": (nw<620)?"font-size: 22px;":"font-size: 24px;";
+			var retVal="color: white;  position: relative; font-weight:500;padding-top: 4px;font-style: italic; padding-right: 18px;"+ size;
+		}
 	return retVal;
 },
 swap:function(){
@@ -280,9 +408,8 @@ swap:function(){
 	var setOpposite=(this.orientation=="horizontal")?"horizontal": "vertical";
 	this.set("vertOrient", setOpposite);
 	this.set("orientation",retVal);
-
 },
-changeButtonClassOnOrientationChange: function(orientation){
+computeGlobeButtonClass: function(orientation){
 var retVal=(orientation=="vertical")?"horizontal layout flex center center-justified":"horizontal layout center end-justified";
 return retVal;
 },
@@ -291,23 +418,25 @@ closeModal: function(){
 	this.$.sizeDialog.opened=false;
 },
 
-computeHeaderArrangementState: function(orientation){
-	var otherMiddle=1;
-var retVal=(orientation=="vertical")?"position: relative; padding-left: 4px;": "position:absolute; left:" +otherMiddle+  "px; bottom: 38px;";
+_computeGlobeButtonStyles: function(orientation, w, h){
+	if(orientation=="horizontal"){ 
+		var elem=this.$.navigationBlock;
+	var ew=window.getComputedStyle(elem, null).getPropertyValue("width");
+	console.log(ew);
+	var middle=Math.floor(((parseFloat(w)*2/11)-(parseFloat(ew)))/2);
+	console.log(middle, w, ew, h);
+	var smid=middle+"px;";
+	var nw=parseFloat(w);
+	var height=parseFloat(h);
+	var bottom = (nw<310||height<260)?"bottom: 24px":(nw<360|| height<330)?"bottom: 28px;":(nw<405||height<385)?"bottom: 32px;":(nw<480||height<440)?"bottom: 38px;":(nw<620)?"bottom: 42px;": "bottom: 48px;";
+	var base="color: white; position:absolute; right:";
+	var backUp =(parseFloat(w)/12)+"px;";
+	var retVal=(smid)?base +smid+ bottom:(backUp)?base +backUp+bottom:"color: white; position:absolute; right: 9px;"+bottom;
 	return retVal;
+	}
+	else{return "position: relative;"}
 },
-_computeHeaderClass: function(orientation){
-	var retVal=(orientation=="horizontal")?"layout vertical flex-12 headerMonthYear": "layout horizontal flex headerMonthYear";
-	return retVal;
 
-},
-_computeHeaderStyle:function(one, two, orientation){
-	var retVal=(orientation=="horizontal")?"text-direction: vertical; width: 1em; padding-top: 20px;": "text-direction: horizontal;padding-left: 16px; font-size: 24px;";
-	Polymer.updateStyles();
-return retVal;
-
-
-},
 ready: function()
 {	
 		var today = new Date();
@@ -367,10 +496,14 @@ _forward: function(){
  			this.set("forwardHidden",true);
  		}
  		else
- 		{	this.set("backHidden",false);
+ 		{	//this.playAnimation('exit');
+ 			this.set("slide", "slide");
+ 			this.async(function(){this.set("slide","");},1500);
+ 			this.set("backHidden",false);
  			this.set("forwardHidden",false);
     		this.set("displayedIndex", this.displayedIndex+1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    		  //this.playAnimation('entry');
     	}
     },
  _backOne: function(){	
@@ -379,10 +512,13 @@ _forward: function(){
  			this.set("backHidden",true);
  		}
  		else
- 		{	this.set("forwardHidden",false);
+ 		{	
+
+ 			this.set("forwardHidden",false);
  			this.set("backHidden",false);
     		this.set("displayedIndex", this.displayedIndex-1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    		this.playAnimation('entry');
  		}
  	
     },
@@ -397,7 +533,7 @@ _forward: function(){
 		},
 
 computeNotInMonths: function(dayDate, displayedIndex, inMonth){
-	var z=inMonth; console.log(inMonth);
+	var z=inMonth;
 	var x=new Date(dayDate).getFullMonth();
 	var y=this.displayedCalendarMonth;
 	var retVal = (x===y);
@@ -417,6 +553,30 @@ computeViewMonth: function(displayedIndex, monthsList, orientation){
 	return retVal;
 }
 	},
+ _resize: function(e){
+          var self=this;
+          e.preventDefault();
+              switch(e.detail.state) {
+                case 'start':
+                  console.log(e.detail);
+                  break;
+                case 'track':
+                  var newheight = parseInt(self.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  var trueWidth = nwidth.toString()+'px';
+                  var trueHeight = newheight.toString()+'px';
+                  self.currentWidth=trueWidth;
+                  self.currentHeight=trueHeight
+                  this.style.width= trueWidth;
+                  this.style.height= trueHeight;
+                  console.log(this, 'w:' + trueWidth, 'h:' + trueHeight, 'ddx:' + e.detail.ddx, 'ddy: ' + e.detail.ddy);
+                
+                  break;
+                case 'end':
+               
+                  break;
+          }
+        },
 
 });
 </script>

@@ -1,16 +1,35 @@
 <dom-module id="fc-date-mini">
 <template>
 <style>
-
+section{
+	border-radius: 50%;
+}
 </style>
-		<section class="vertical layout flex self-shrink" on-tap="toggleDays">
-			<span class="horizontal layout flex center-justified" style="[[_computeSizeStyle(sizeWanted)]] [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]]; {{circleSelect}};"> 
-			<content select=".date"></content></span>
-			</section>
-			<span hidden$="{{_calculateHideNotes(sizeWanted)}}"style="{{dateCardMiniNotesStyle}};">[[computeDayNotes(calendarDay, eventList)]]</span> 
+	<div id="myblock" class="vertical layout center-justified" style$="{{circleSelect}}; color: aliceblue; [[_computeSizeStyle(sizeWanted)]] [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]]; width:{{currentWidth}}px; height: {{currentHeight}}px;" on-tap="toggleDays"> 
+		<section id="blockSon" class="horizontal layout center-justified" style$="[[_computeCircleRadius(circleSelect,currentWidth, currentHeight)]] height:[[currentHeight]]px; width:[[currentHeight]]px; align-text: center; align-item: center; align-content: right;" > 
+			<content select=".date"></content>
+		</section>
+	</div> 
+			<span hidden$="{{_calculateHideNotes(sizeWanted)}}"style$="{{dateCardMiniNotesStyle}}; padding-right: 1px;">[[computeDayNotes(calendarDay, eventList)]]</span> 
 		
 </template>
 <script>
+(function(){
+	"use-strict";
+	function Measurer(bindToHeight, self) {
+    // I'll omit parameter validation here.
+    
+    Object.defineProperty(self, 'value', {
+        get : function ( ) {
+            return bindToHeight.value;
+        },
+        set : function ( val ) {
+            bindToHeight.value = val;
+        }
+    });
+};
+})();
+
 Polymer({
 	is:"fc-date-mini",
 	behaviors: [FCBehaviors.FcCalendarBehaviorPrime],
@@ -22,7 +41,7 @@ Polymer({
 		},
 		hideNotes:{
 			type: Boolean,
-value: false,
+				value: false,
 			notify: true
 		},
 		eventList:{
@@ -50,12 +69,27 @@ value: false,
  				value: function(){return "font-size:8px; font-weight: 500; font-style: merriweather; color: #008; height: 9px;"},
  				notify: true
  		},
+ 		fontSize:{
+ 			type: Number,
+ 			notify: true,
+
+ 		},
 
 		calendarDay:{
 			type: FcCalendarDay,
 			value:{},
 			notify: true
 		}, 
+		currentWidth:{
+				type: String,
+				value:function(){return 25;},
+				notify: true
+			}, 
+			currentHeight:{
+				type: String,
+				value:function(){return 25;},
+				notify: true
+			}, 
 		isCourseMeeting: {
 			type: Boolean,
 			value:false,
@@ -104,9 +138,15 @@ value: false,
 			type: String,
 			value: "-1",
 			notify: true,
-
 		},
-	
+		parentCurrentWidth:{
+				type: String,
+				notify: true
+		},
+		parentCurrentHeight:{
+				type: String,
+				notify: true
+		},
 		selectedArray:{
 			type: Array,
 			value: [],
@@ -122,10 +162,79 @@ value: false,
 			observer: "observeIsSelected",
 			notify: true
 		},
+		heightLog:{
+			type:Array,
+			value:[],
+			notify: true,
+			observer: "observeHeight",
+		},
+		widthLog:{
+			type: Array,
+			value:[],
+			notify: true,
+			observe: "observeWidth",
+		},
+		hiComp:{
+			type: Object,
+			computed: "computeHiComp(heightLog, currentHeight, parentCurrentHeight)",
+			notify: true
+			},
+		widComp:{
+
+
+
+		},
+		dimensionsObject:{
+
+
+
+		}
+
+	},
+	ready:function(){
+
+},
+	computeHiComp:function(hl, ch, pch){
+		var holder={};
+			//this.makeCircles(hl);
+		// var result=hl.lastIndexOf(!false);
+		// var lv=(parseFloat(hl[result]));
+		// var cv=parseFloat(ch);
+		// var retVal1=((lv-cv)===0);
+		// var pv=parseFloat(pch);
+		// var fractC=Math.floor(pv/cv);
+		// var fractL=Math.floor(pv/lv);
+
+		// var holder={
+		// 	key1: retVal1,
+		// 	key2: lv,
+		// 	key3: cv,
+		// 	key4: pv,
+		// 	key5: fractC,
+		// 	key6: fractL
+		// };
+		// console.log(holder, holder, holder);
+		// return holder;
+
+	},
+	_computeCircleRadius: function(a,b,c,h,w){
+
 
 	},
 	ready: function(){
 
+	},
+	observeHeight:function(nv, ov){
+		//console.log(nv, ov);		
+
+	},
+	observeWidth: function(nv,ov){
+		console.log(nv,ov)
+
+	},
+	attached: function(){
+
+			this.makeCircles();
 	},
 	_computeSizeStyle: function(size){
 		if(size=="" || size =="medium" || size=="normal"){
@@ -137,6 +246,37 @@ value: false,
 
 		}
 
+	},
+
+	makeCircles: function(){
+
+				var h=this.$.myblock.style.height;
+				var w=this.$.myblock.style.width;
+				var something=	Polymer.dom(this.root).firstElementChild.firstElementChild;
+				var son=something.firstELementChild;
+				var styles=getComputedStyle(something, null);
+				h=styles.getPropertyValue("height");
+				var setVal=(h!="auto" && h!="" && parseFloat(h))?parseFloat(h): false;
+				this.push("heightLog",setVal);
+				var self=this;
+				var values=[];
+				values=this.heightLog.filter(function(val){return (val!==false);});
+				console.log(values);
+				w=styles.getPropertyValue("width");
+				var wsetter=(w!="auto" && w!="" && parseFloat(w))?parseFloat(w): false;
+				var argarr=[];
+				this.push("widthLog",wsetter);
+				var argarr=this.widthLog.filter(function(val){return (val!==false);});
+				this.async(function(){
+				var oi=values.pop();
+				var bi=argarr.pop();
+				var valH=Math.floor((oi+bi)*.5);
+				this.set("fontSize", valH);
+				var oib=Math.ceil(valH);
+				this.set("fontSize", oib);
+				this.set("currentHeight", valH);
+				this.set("currentWidth", valH);
+			},1800);
 		},
 
 		_calculateHideNotes: function(size){
@@ -144,7 +284,7 @@ value: false,
 						var ret= true;
 						}
 				else{var ret= false;}
-				console.log(ret);
+				//console.log(ret);
 					return ret;
 		},
 		_computeCircleSelectStyle: function(size){
@@ -214,7 +354,8 @@ value: false,
   	},
 
   	toggleDays: function(e)
-  	{	console.log(e);
+  	{	
+  		//console.log(e);
   		if(this.inMonth===true)
   		{	
   			if(!this.selectedArray)

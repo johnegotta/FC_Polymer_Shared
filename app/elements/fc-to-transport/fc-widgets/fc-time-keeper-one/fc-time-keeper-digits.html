@@ -1,0 +1,407 @@
+<dom-module id="fc-time-keeper-digits">
+<template>
+<style>
+    host:{position: absolute; top: 0px;left: 0px; z-index: 1200000;
+ 
+        }
+    .newclass{
+        margin-left: 0px;
+        padding: 0px;
+    }
+    .newclass::after{
+        font-weight: 900;
+        font-size: 22px;
+        padding:0px 0px 0px 0px;
+        font-family: roboto;
+        margin-left: -5px;
+        margin-right: 1px;
+        margin-top:2px;
+        content: ":";
+    }
+    .subclass::after{
+        font-weight: 700;
+        padding:2px 2px 0px 0px;
+        font-family: roboto;
+        margin-left: -2px;
+        margin-right: -0px;
+        margin-top:4px;
+        content: "."; 
+    }
+    .closer{margin-right: -2px;
+        margin-left:-2px;
+       font-family: roboto;
+        font-weight: 600;
+    }
+    .closer::after{
+        width: 0px;
+        margin:-2px;
+            content: ""}
+    .closerleft{
+        margin-right: -2px;
+    }
+
+    .digitsmall{
+         font-weight: 600;
+        font-family: roboto;
+        font-size: 12px;
+    }
+    .nodot{
+    margin:0px -2px;
+    }
+    .fatems{
+            padding: 0px 3px;
+            margin-left: -8px;
+            max-width: 20px!important;
+        }
+    .nodot::after{
+        margin:0px;
+        padding:0px;
+        width: 0px;
+    }
+    input::-webkit-inner-spin-button {
+
+    div#spin{max-width: 6px!important;}
+    };
+    fc-input-prime{
+        @apply(--horizontal-layout);
+        @apply(--layout-flex);
+        display: flex;
+    }
+</style><!-- 
+<div class="wrapper">
+  <div class="cube">
+    <b class="front">front</b>
+    <b class="back">back</b>
+    <b class="top">top</b>
+    <b class="bottom">bottom</b>
+    <b class="left">left</b>
+    <b class="right">right</b>
+    <i class="front"></i>
+    <i class="back"></i>
+    <i class="top"></i>
+    <i class="bottom"></i>
+    <i class="left"></i>
+    <i class="right"></i>
+  </div>
+</div>-->
+<!-- <div>
+[[theTime]]
+</div> -->
+ <section style="position: absolute; outline: 2px solid #009; right: 96px; padding: 6px 24px 10px 24px; margin: 2px; border:22px silver outset; max-width: 205px!important;" class$="{{orientation}} layout flex center justified-center" on-track="_focusedDraggable" >
+
+
+<template is="dom-repeat" items="{{_computeDataset(currentClock.clockData.*)}}">
+  <fc-input-prime
+        id="{{item.name}}"
+        input-type="{{item.inputType}}" 
+        label="{{item.label}}"
+        input-style="{{inputStyle}} {{specialStyle}} margin-left: -4.5px; padding: 0px; border: 0px silver solid; font-weight: 600; font-size: 22px; min-width: 10px;max-width: 19px; min-height: 30px; text-align: left;"
+        hidden$="{{item.hidden}}"
+        label-hidden="true"
+        name$="{{item.name}}"
+        min="{{item.min}}"
+        max="{{item.max}}"
+        style="max-width: 18px!important;"
+        value="{{item.value}}"
+        input-value="{{increment}}"
+        bind-value="{{value.name}}"
+        class$="{{item.class}} {{item.newclass}}"
+        min="{{item.min}}"
+        max="{{item.max}}"
+        step="{{item.step}}"
+        fcid="{{item.fcid}}"
+        on-change="handleInputChange"
+        on-focus="showIncrementorsFunction"
+       >
+    </fc-input-prime>
+   
+</template>
+<!-- <span id="incrementorPlus" style="font-size: 35px; height: 25px; width: 25px;" on-tap="incrementPlus">&#8679;</span> -->
+   <!--  <span id="incrementorMinus" style=" height: 25px; width: 25px; font-size: 35px;" on-tap="incrementMinus">&#9772;</span>
+    --><span>{{currentClock.clockData.tsec.value}}</span> 
+    </section>      
+</template>
+<script>
+(function(){
+"use strict";
+
+})();
+FcTimeKeeperDigits=Polymer({
+    is:"fc-time-keeper-digits",
+    properties:{
+        orientation: {
+            type: String,
+            value: "horizontal",
+            notify: true
+        }, 
+        jasonClock:{
+            type: FcClock,
+            value: function(){return {};},
+            notify: true
+        },
+        drags:{
+            type: Boolean,
+            value: function(){return false;},
+            notify: true
+        },
+        inputStyle:{
+            type: String,
+            notify: true,
+        },
+        showIncrementors:{
+            type: Boolean,
+            value: false,
+            notify: true
+        },
+        increment:{
+            type: Number,
+            notify: true
+        },
+        theTime:{
+            type: String,
+            value:function(){
+                var newtime = new Date();
+                var update = newtime.toLocaleTimeString();
+                return update;
+            },
+            notify: true
+        }, 
+        dataset:{
+            type: Array,
+            computed: "_computeDataset(currentClock.clockData.sec.value)",
+            notify: true
+        },
+        digitsArray:{
+            type:Array,
+            value:function(){return[];},
+            notify: true
+            },
+        currentClock: {
+            type: FcClock,
+            value: {},
+            notify: true,
+        },
+        dragCounter:{
+            type: Number,
+            value: 0,
+            notify: true
+        },
+        primaryClock: {
+            type: FcClock,
+            value: function(){return{};},
+            notify: true
+        }, 
+        clockArray:{
+            type: Array,
+            value: function(){return [];},
+            notify: true,
+            reflectToAttribite: true
+        },
+        displayedArray:{
+            type: Array,
+            value:function(){return[];},
+            notify: true
+        },
+        primaryClock: {
+            type: FcClock,
+            value: function(){return{};},
+            notify: true
+        }, 
+
+    },
+    observeDataObject: function(odo){
+       // console.log(odo.base, odo.value);
+
+    },
+    ready: function(){
+            this.set("jasonClock", new FcClock("Jason Clock", "Clock", "Multi-timezone", 0, new Date()));
+            this.push("clockArray", this.jasonClock);
+            this.set("currentClock",this.jasonClock);
+            console.log(this.clockArray);
+        // this.set("dataobject", jasonClock.clockData);
+         this.set("orientation", "horizontal");
+     },
+
+    attached: function(){
+        // console.log(this.dataobject);
+        // console.log(this.orientation);
+        this.set("drags",true);
+        this.orientation = this.orientation==""? "horizontal": this.orientation;
+        this.initializeClocks();
+    },
+    showIncrementorsFunction: function(){
+        this.set("showIncrementors", true);
+
+    },
+    incrementPlus: function(){
+            this.set("increment", increment+1);
+    },
+    incrementMinus: function(){
+            this.set("increment", increment-1);
+
+    }, 
+
+    handleInputChange: function(e)
+    {
+        //console.log(e.target);
+        this.dataobject[e.target.name].value = e.target.value;
+    },
+
+    _computeDataset: function(ccd)
+    {      if(ccd && ccd.base){
+        var special="";
+        var keys = Object.keys(ccd.base);
+        var numKeys = keys.length;
+        var styl="text-align: left; margin-left: -1px; padding: 0px 1px; border: 0px silver solid; font-weight: 600; min-width: 7px; max-width: 20px;"
+        var dataset = [];
+        for(var i = 0; i < numKeys; i++)
+        {
+            var val = ccd.base[keys[i]];
+            if(val.inclock===true)
+            {
+            var newclass="";
+          
+            if(val.colon==false){newclass="closerleft"}
+
+           else if(val.name=="sec" && val.colon==":" && val.isAmPm===true){
+                newclass="nodot"; styl="";
+            }
+            else if(val.label=="s"){newclass="digitsmall"; var styl="text-align: left; font-size:14px; margin: 1px; margin-left: -1px; padding: 1px; font-weight: 600;min-width: 8px;max-width: 12px;"}
+           
+            else if(val.name=="sec" && val.colon==":" && val.isAmPm===true){
+                newclass="nodot"; styl="";
+            }
+            else if(val.name=="hundredth" && val.isAmPm===true){
+                newclass="fatems"; special="text-align: left; margin-left: -1px; padding: 0px 1px; border: 0px silver solid; font-weight: 600; min-width: 20px; max-width: 20px;";
+
+            }
+            else if(val.label=="S" && val.colon==":" && val.isAmPm==false){ newclass="subclass"; styl=""}
+            else if(val.colon==":" && val.isAmPm==false){newclass="newclass";}
+            else{}
+           
+            dataset.push({
+                "value": val.value,
+                "name": val.name, //keys[i], //"tenth",
+                "label": val.label?val.label: "", //keys[i][0], //"d",
+                "hidden": val.hidden,
+                "inputType": val.inputType,
+                "inputStyle":styl, //"digit",
+                "class": "",
+                "step":"",
+                "fcid":"",
+                "colon": val.colon, 
+                "newclass": newclass,
+                "specialStyle": special, 
+                });
+           } 
+        }
+       return dataset;
+        this.set("digitsArray",dataset);
+    }
+},
+
+      initializeClocks:function(){
+        var self = this;
+        var runningClockArray=[];
+        var timer =1;
+        setInterval(function(){
+            var currentTime = new Date();
+            var time = currentTime.toLocaleTimeString();
+            var date=new Date(date).toLocaleDateString();
+            self.set("theTime", time);
+            self.set("date",date);
+            var td=self.currentClock.setClock();
+            //console.log(self.currentClock.clockData, self.currentClock);
+            var stamp=currentTime.getTime();
+            self.clockArray.forEach(function(cl, i, arr)
+            {   var s=stamp;
+                if(cl.clockType=="Clock"){cl.isRunning=true;}
+                if(cl.isRunning && cl.clockType!="Alarmclock")
+                {
+                    var d=Math.floor((s - cl.lastTurnedOn)/100);
+                    var delta = (cl.clockType=="Countdown")?cl.lastTurnedOnTenths-d:(cl.clockType=="Stopwatch")?cl.lastTurnedOnTenths+d: 0;
+                    var newTenths=(delta>0)?delta:0;
+                    if(cl.clockType=="Countdown" || cl.clockType=="Stopwatch")
+                    {
+                    cl.convertFromTenths(newTenths);
+                    }
+                    if(delta<=0 && (cl.clockType=="Countdown"))
+                    {
+                        cl.isRunning=false; 
+                    }
+                    var path = "currentClock.clockData.tenth.value";
+                    var path2 = "currentClock.clockData.sec.value";
+                    if(cl.clockType!="Alarmclock"){
+                    self.notifyPath(path, self.currentClock.clockData.tenth.value);
+                    self.notifyPath(path2, self.currentClock.clockData.sec.value);
+                    }
+                }
+                if(cl.clockType=="Alarmclock" && cl.isActive)
+                    {
+                        var alarmtime =cl.dto.getTime();
+                        //console.log(alarmtime, alarmtime,alarmtime,alarmtime);
+                        if(currentTime.getTime() > alarmtime)
+                        {   console.log("AM IN THE DAMNED ALARM", cl.clockName);
+                            cl.isActive = false;
+                            cl.isRunning=false;
+                            self.ringAlarm(cl);
+                            var completedAlarm=cl;
+                            self.set(["clockArray", i, "isActive"], false);
+                            self.set(["clockArray", i, "isRunning"], false);                    
+                            self.notifyPath("clockArray." + i + ".isActive", false);
+                        }
+                      
+                    }
+                },self);
+                //console.log(self.clockArray[2].isActive, self.clockArray[3].isActive, self.clockArray[2].isRunning, self.clockArray[3].isRunning);    
+                    }, 100);
+    },
+
+    dragsOff: function(){this.set("drags", false);},
+    dragsOn: function(){this.async(this.dragSwitch, 50);},
+    dragSwitch: function(){this.set("drags", true);},
+    _focusedDraggable:function(e){
+        if(this.drags==true){
+            var self=this;
+            e.preventDefault();
+            switch(e.detail.state)
+            {
+              case 'start':
+                // console.log('START NoWayAreWe Draggin');
+                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                console.log('top distance differenced?' + self._topprime);
+                // }
+                self.set("refit",true);
+                self.changeX=0;
+                self.changeY=0;
+                Polymer.dom.flush();
+                break;
+              case 'track':
+                self.changeX=e.detail.ddx + self.changeX;
+                self.changeY=e.detail.ddy + self.changeY;
+                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+                break;
+              case 'end':
+                console.log(self._topprime);
+                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                self._bottom = self.getBoundingClientRect().top;
+                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+                self.translate3d(0, 0, 0);
+
+                console.log("ENDING", self._x);
+                self.style.left=self._x.toString()+'px';
+                self.style.top=self._y.toString()+'px';
+                console.log('y: ' + e.detail.y);
+                self.dragging=false;
+                self.set("refit",true);
+                Polymer.dom.flush();
+                break;
+            }
+        }
+    },
+});
+</script>
+</dom-module>
+
