@@ -1,7 +1,24 @@
-<dom-module id="fc-time-keeper-digits">
+
+
+
+<dom-module id="fc-time-keeper-light">
 <template>
 <style>
-    :host{position: fixed; top: 49px;right: 550px; z-index: 12; display: block;}
+    :host{position: fixed; top: 49px;left: 550px; z-index: 12; display: block;}
+    .hovering{
+        position: absolute; 
+        border-radius: 4px; 
+        box-shadow: 4px 16px 24px 6px; 
+        right: 96px; 
+        padding: 6px 24px 10px 24px; 
+        margin: 2px; 
+        border-radius: 9px; 
+        max-width: 205px!important; 
+        background: white;
+    }
+    .hoveringTwo{
+        box-shadow: 2px 4px 8px 2px;
+    }
     .newclass{
         margin-left: 0px;
         padding: 0px;
@@ -56,6 +73,19 @@
         padding:0px;
         width: 0px;
     }
+    .zeropacity{
+        
+            box-shadow:0px;
+    -webkit-transition: opacity .8s, box-shadow 1.4s, visibility .8s; /* Chrome, Safari, Opera */ 
+    transition: opacity: .8s,box-shadow: 1.4s, visibility: .8s;
+}
+    .zeropacity:hover{
+        visibility: visible;
+        opacity: 1; 
+        cursor: pointer;
+        box-shadow: 2px 3px 6px 1px #afafef;
+
+}
     input::-webkit-inner-spin-button {
 
     div#spin{max-width: 6px!important;}
@@ -66,7 +96,7 @@
         display: flex;
     }
 </style>
- <section style="position: absolute; outline: 2px solid #009; border-radius: 4px; box-shadow: 4px 16px 24px 6px; right: 96px; padding: 6px 24px 10px 24px; margin: 2px; border:22px silver outset; max-width: 205px!important; background: white;" class$="{{orientation}} layout flex center center-justified" on-track="focusedDragMe" >
+ <section on-tap="downAction" id="holder" class$="{{orientation}} layout flex center center-justified hovering" on-track="focusedDragMe" >
 
 
 <template is="dom-repeat" items="{{_computeDataset(currentClock.clockData.*)}}">
@@ -84,6 +114,7 @@
         value="{{item.value}}"
         input-value="{{increment}}"
         bind-value="{{value.name}}"
+
         class$="{{item.class}} {{item.newclass}}"
         min="{{item.min}}"
         max="{{item.max}}"
@@ -95,12 +126,13 @@
     </fc-input-prime>
    
 </template>
-<span class="vertical layout flex" style="margin-left: 12px; margin-right: -10px; font-size: 20px;"> <span style="color: green;">&#9650;</span><span style="color: red"> &#9660;</span></span> 
-    </section>      
+<span class="vertical layout flex" style="margin-left: 12px; margin-right: -10px; font-size: 16px;"> <span style="color: green;">&#9650;</span><span style="color: red"> &#9660;</span></span> 
+   </section>
+  
 </template>
 <script>
-FcTimeKeeperDigits=Polymer({
-    is:"fc-time-keeper-digits",
+FcTimeKeeperLight=Polymer({
+    is:"fc-time-keeper-light",
     properties:{
         orientation: {
             type: String,
@@ -128,6 +160,10 @@ FcTimeKeeperDigits=Polymer({
         },
         increment:{
             type: Number,
+            notify: true
+        },
+        date:{
+            type: String,
             notify: true
         },
         theTime:{
@@ -179,6 +215,12 @@ FcTimeKeeperDigits=Polymer({
             type: FcClock,
             value: function(){return{};},
             notify: true
+        },
+        hoverBool:{
+            type: Boolean,
+            value: true,
+            notify: true
+
         }, 
 
     },
@@ -202,19 +244,21 @@ FcTimeKeeperDigits=Polymer({
         this.orientation = this.orientation==""? "horizontal": this.orientation;
         this.initializeClocks();
     },
-    showIncrementorsFunction: function(){
+    showIncrementorsFunction: function(e){
+       console.log(e, e.detail, e.model, e.model.name, e.model.clockType);
         this.set("showIncrementors", true);
 
     },
     incrementPlus: function(e){
-        var toBind =e.target.value;
-        showIncrementorsFunction()
-            this.get("")
-            this.set("increment", increment+1);
+       
     },
     incrementMinus: function(){
             this.set("increment", increment-1);
-
+    },
+    downAction:function(e){
+        this.toggleClass("hoveringTwo", this.hoverBool, this.$.holder); 
+        this.hoverBool=!this.hoverBool;
+        
     }, 
 
     handleInputChange: function(e)
@@ -283,7 +327,7 @@ FcTimeKeeperDigits=Polymer({
         setInterval(function(){
             var currentTime = new Date();
             var time = currentTime.toLocaleTimeString();
-            var date=new Date(date).toLocaleDateString();
+            var date=new Date(currentTime).toLocaleDateString();
             self.set("theTime", time);
             self.set("date",date);
             var td=self.currentClock.setClock();
@@ -347,9 +391,9 @@ FcTimeKeeperDigits=Polymer({
                 self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
                 console.log('top distance differenced?' + self._topprime);
                if(self.counter==0){   self.translate3d(0, 0, 0);}
-                Polymer.dom(this).setAttribute("position", "fixed"); 
-               Polymer.dom(this).setAttribute("left", "0px"); Polymer.dom(this).setAttribute("left",self._leftprime+"px");
-               Polymer.dom(this).setAttribute("top", "0px"); Polymer.dom(this).setAttribute("top",self._topprime+"px");1
+                Polymer.dom(self).setAttribute("style.position", "fixed"); 
+               Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
+               Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");1
                 
                 self.set("refit",true);
                 self.changeX=0;
@@ -367,9 +411,8 @@ FcTimeKeeperDigits=Polymer({
                 self._bottom = self.getBoundingClientRect().top;
                 self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
                 self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
-                self.translate3d(0, 0, 0);
+            
 
-              
                 console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
               
                 self.style.left=self._x.toString()+'px';
