@@ -171,19 +171,19 @@
 					as="day">
 						<fc-date-mini
 						 	class="card"
-						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex, day.inMonth)]]"
+						 	in-month="[[day.inMonth]]"
 						 	day="{{day}}"
 						 	day-id="{{day.dayId}}"
 						 	calendar-day={{day}}
-						 	mini-date="{{day.date}}"
-						 	index={{day.index}}
 						 	id$={{day.dateId}}
+						 	is-holiday="{{day.isHoliday}}"
+						 	is-test-date="{{day.isTestDate}}"
+						 	is-selected="{{day.isSelected}}"
 						 	parent-current-width="{{currentWidth}}"
 						 	parent-current-height="{{currentHeight}}"
-						 	testDate={{day.testDate}} 
 						 	event-list="{{day.eventList}}"
-						 	fc-course="{{fcCourse}}">
-							<span class="date center center-justified layout horizontal flex" style="font-size:18px; font-weight: 600;" id="button">[[day.dayOfMonth]]</span>
+						 	>
+							<span class="date center center-justified layout horizontal flex" style$="font-size:18px; font-weight: 600; color: {{computeNumberColor(day,displayedIndex, day.inMonth, day.isTestDate,day.isHoliday, day.isSelected)}}; computeInMonth(day.InMonth)" id="button">[[_computeDate(day.date)]]</span>
 						</fc-date-mini>	
 				</template>
 				
@@ -201,22 +201,13 @@ FcDatePicker=Polymer({
 	observers:[],
 	listeners:{"onload": "trigger", "onmousemove":"trigger", 'neon-animation-finish': '_onNeonAnimationFinish'},
 	properties: {
-		slide:{
-			type: String,
-			value:"",
-			notify: true
-		},
+		
 		day:{
 			type: FcCalendarDay, 
 			value: {},
 			notify: true
 		},
-  		entryAnimation: {
-    		value: 'slide-from-right-animation',
-  				},
-  		exitAnimation: {
-    		value: 'slide-left-animation',
-  		},
+  
 		fcCourse:{
 			type: FcCourse,
 			value: function(){return new FcCourse({});},
@@ -306,12 +297,13 @@ FcDatePicker=Polymer({
       this.playAnimation('exit');
     },
     _onNeonAnimationFinish: function() {
-      // if (this.opened) {
-      //   this._finishRenderOpened();
-      // } else {
-      //   this._finishRenderClosed();
-      // }
+      
     },
+    computeNumberColor: function(day, displayedIndex, inMonth, isTestDate,isHoliday, isSelected){
+		var retVal=(inMonth==false)?"white": (isTestDate ===true && isSelected==false)?"red": (isHoliday===true &&isSelected==false)?"green":(isSelected===true)?"white":(inMonth===true)?"#009": "white";
+
+		return retVal;
+	},
 
 _computeGlobeSize: function(currentWidth, currentHeight, orientation){
 		// if(orientation=="horizontal"){
@@ -332,6 +324,12 @@ dragsYes:function(){
 dragsNo:function(){
 	this.set("drags", false);
 },
+ computeInMonth: function(inMonth){
+ 		var retVal=(inMonth==false)?"color: white;":"";
+ 		return retVal;
+
+
+ },
 computeDayStringLength: function(orientation, currentWidth, currentHeight){
 	var daysArray=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 	var size=parseInt(currentWidth);
@@ -352,11 +350,15 @@ console.log(returnArray);
 _computeMonthStyle:function(one, two, orientation){
 	var w=parseFloat(one);
 	var h=parseFloat(two);
-	var size = (w<310||h<260)?"font-size: 14px;":(w<360|| h<330)?"font-size: 16px;":(w<405||h<385)?"20px;":(w<480||h<440)?"font-size: 22px;": (w<680||h<520)?"font-size: 24px;":"font-size: 26px;";
+	var size = (w<310||h<260)?"font-size: 13px;":(w<360|| h<330)?"font-size: 16px;":(w<405||h<385)?"20px;":(w<480||h<440)?"font-size: 22px;": (w<680||h<520)?"font-size: 24px;":"font-size: 26px;";
 	var retVal=(orientation=="horizontal")?"text-direction: vertical; width: 1em; padding-top: 24px;"+size: "text-direction: horizontal;padding-left: 16px;"+size+"padding-top:0px; font-weight: 500;";
 
 	Polymer.updateStyles();
 return retVal;
+},
+_computeDate:function(date){
+		return date.getDate();
+
 },
 
 _daysOfWeekClass: function(orientation, currentWidth, currentHeight){
@@ -476,12 +478,12 @@ initialize:function(days){
 		this.set("fcCourse.calendarDayArray", calendar);
 },
 _computeBackHidden: function(backHidden){
-	if(backHidden){this.async(this.takeAwayArrow, 100);	return "color: #008";}
+	if(backHidden===true){this.async(this.takeAwayArrow, 100);	return "color: #008";}
 	else {return"color: white";}
 
 },
 takeAwayArrow: function(){
-			this.updateStyles();
+			Polymer.updateStyles();
 			console.log("I updated styles, not");		
              Polymer.dom.flush();		
         },
@@ -497,8 +499,7 @@ _forward: function(){
  		}
  		else
  		{	//this.playAnimation('exit');
- 			this.set("slide", "slide");
- 			this.async(function(){this.set("slide","");},1500);
+ 			
  			this.set("backHidden",false);
  			this.set("forwardHidden",false);
     		this.set("displayedIndex", this.displayedIndex+1);
@@ -518,7 +519,7 @@ _forward: function(){
  			this.set("backHidden",false);
     		this.set("displayedIndex", this.displayedIndex-1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
-    		this.playAnimation('entry');
+
  		}
  	
     },

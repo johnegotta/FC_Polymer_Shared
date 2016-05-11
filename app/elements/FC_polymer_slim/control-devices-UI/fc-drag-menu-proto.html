@@ -6,7 +6,7 @@
 }
 .menubuttons{
   display: inline-block; 
-  width: 42px; 
+  width: 36px; 
   height: 36px;
   background: silver;
   z-index: 1;
@@ -40,8 +40,10 @@
 
 
 </style>
-<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 360px !important; background: #000066; position: fixed; border: 3px ridge silver;'>
-  <span draggable$="[[_computestaticmenu(dragmenu)]]" hidden="[[_computestaticmenu(dragmenu)]]" on-track="dragmeplease">
+<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 320px!important; background: #000066; border: 3px ridge silver;'>
+  <span draggable$="[[_computestaticmenu(dragmenu)]]" hidden="[[_computestaticmenu(dragmenu)]]">
+<!-- 
+   on-track="dragmeplease" -->
       <iron-icon 
         name="fcdragtag"
         
@@ -60,13 +62,13 @@
       >
       </iron-icon>
   </section>
-  
+  <section on-down="dragsOff" on-up="dragsOn">
     <content>
     </content>
- 
+ </section>
   <section 
     class="menubuttons longer layout horizontal"
-    style="display: float; float: right;min-width: 63px; height: 48px; width: 63px !important; max-width: 64px; font-size: 24px" 
+    style="min-width: 63px; height: 48px; width: 63px !important; max-width: 64px; font-size: 24px" 
     on-tap="_toggleRightDrawer"
     >
       <iron-icon 
@@ -78,7 +80,6 @@
   </section>
   <section 
     class="menubuttons mini" 
-    style="display: float; float:right;" 
     on-tap="swapMenu">
       MENU
     <iron-icon 
@@ -87,25 +88,26 @@
       >
     </iron-icon>
     SWAP
-  </section>
-<span >
+</section>  
+<section on-down="dragsOff" on-up="dragsOn">
   <iron-icon
     draggable="[[_computestaticmenu(dragmenu)]]"
     track
-    icon="icons:input"  
+    icon="icons:input"
+
     on-track="_resetWidth"
     class="center center-justified menuItems-light"
-    style="position: absolute; right: -24px; top: 0; background: #000066; border: 2px ridge biege;"
-
+    style="background: #000066; border: 2px ridge biege;"
     >
   </iron-icon>
-</span>        
+</section>        
 </div>
 </template>
 <script>
 FcDragMenuProto = Polymer({
 	is:'fc-drag-menu-proto',
 	behaviors: [
+    FCBehaviors.DraggableBehavior,
 		Polymer.IronResizableBehavior,
 		Polymer.NeonAnimationBehavior,
 		Polymer.IronSelectableBehavior,
@@ -226,35 +228,7 @@ FcDragMenuProto = Polymer({
      swapMenu: function(){
       this.notRouter = !this.notRouter;
     },
-	dragmeplease: function(e) {
-    if (!this.staticmenu==true){
-      console.log(this.staticmenu, this.dragmenu);
-     this.dragging=true;
-        var self=this;
-      e.preventDefault();
-        switch(e.detail.state) {
-          case 'start':
-            self.currentX =e.detail.x;
-            self.currentX =e.detail.x;
-            console.log('START');
-            console.log(e);
-            break;
-          case 'track':
-            self.currentX =e.detail.x;
-            self.translate3d(e.detail.dx.toString() + 'px', e.detail.dy.toString() + 'px', 0);
-            break;
-          case 'end':
-            console.log("ENDING", e.detail.x, e.detail.y, e.detail.dx, e.detail.dy);
-            self.translate3d(0, 0, 0);
-            self.style.left = e.detail.x.toString() + 'px';
-            self.style.top = e.detail.y.toString() + 'px';
-            self.dragging=false;
-            break;
-        };
-      }
-      else return;
 
-     }, 
 
      _resetWidth: function(e){
           var self=this;

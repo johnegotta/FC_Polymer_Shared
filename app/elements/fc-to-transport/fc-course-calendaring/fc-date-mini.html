@@ -5,8 +5,8 @@ section{
 	border-radius: 50%;
 }
 </style>
-	<div id="myblock" class="vertical layout center-justified" style$="{{circleSelect}}; color: aliceblue; [[_computeSizeStyle(sizeWanted)]] [[computeWhite(inMonth, calendarDay.isSelected)]]; background: [[computePickedDaysDark(inMonth, calendarDay.isSelected)]]; text-align: center; color: [[computePickedDaysWhite(inMonth, calendarDay.isSelected,calendarDay.isTestDate)]]; width:{{currentWidth}}px; height: {{currentHeight}}px;" on-tap="toggleDays"> 
-		<section id="blockSon" class="horizontal layout center-justified" style$="[[_computeCircleRadius(circleSelect,currentWidth, currentHeight)]] height:[[currentHeight]]px; width:[[currentHeight]]px; align-text: center; align-item: center; align-content: right;" > 
+	<div id="myblock" class="vertical layout center-justified" style$="{{circleSelect}};color: [[computeNumberColor(inMonth, isTestDate,isHoliday, isSelected)]]; background: white; text-align: center; width:{{currentWidth}}px; height: {{currentHeight}}px;" on-tap="toggleDays"> 
+		<section id="blockSon" class="horizontal layout center center-justified" style$="[[_computeCircleSelectStyle currentWidth, currentHeight)]]; background: [[computeIsSelected(isSelected)]]; color: [[computeNumberColor(inMonth, isTestDate,isHoliday, isSelected)]];height:[[currentHeight]]px; width:[[currentHeight]]px; align-text: center; align-item: center; align-content: center;" > 
 			<content select=".date"></content>
 		</section>
 	</div> 
@@ -49,21 +49,13 @@ Polymer({
 			value:[],
 			notify: true
 		},
- 		dateMiniStyles: {
- 			type: String, 
- 			computed: "_computeSizeStyle(sizeWanted)",
- 			notify: true
- 		},
+ 		
  		circleSelect: {
  			type: String,
- 			computed:"_computeCircleSelectStyle(sizeWanted)",
+ 			computed:"_computeCircleSelectStyle(currentHeight, currentWidth)",
  			notify: true
  		},
- 		sizeWanted:{
- 			type: String,
- 			value:"medium",
- 			notify: true
- 		},
+ 	
  		dateCardMiniNotesStyle: {
  				type: String,
  				value: function(){return "font-size:8px; font-weight: 500; font-style: merriweather; color: #008; height: 9px;"},
@@ -90,30 +82,6 @@ Polymer({
 				value:function(){return 25;},
 				notify: true
 			}, 
-		isCourseMeeting: {
-			type: Boolean,
-			value:false,
-			notify: true
-		},
-		isPracticeTestDay:{
-			type: Boolean, 
-			value: false,
-			notify: true
-		},
-		miniDate:{
-			type: Date, 
-			notify: true,
-		},
-		fcCourse:{
-			type: FcCourse,
-			value: function(){var retVal = new FcCourse(); return retVal;},
-			notify: true
-		},
-		toggleDay:{
-			type: Boolean,
-			value: false, 
-			notify: true
-		}, 
 		inMonth: {
 			type: Boolean,
 			value: false,
@@ -125,19 +93,19 @@ Polymer({
 			value:"",
 			notify: true
 		},
+		isHoliday:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		isTestDate:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
 		displayedMonth:{
 			type: Array,
 			notify: true
-		},
-		displayedIndex:{
-			type: Number,
-			notify:true,
-			reflectToAttribute: true
-		},
-		cdIndex:{
-			type: String,
-			value: "-1",
-			notify: true,
 		},
 		parentCurrentWidth:{
 				type: String,
@@ -147,15 +115,6 @@ Polymer({
 				type: String,
 				notify: true
 		},
-		selectedArray:{
-			type: Array,
-			value: [],
-			notify: true
-		},
-		selected: {
-			type: Array, 
-			notify: true
-			},
 		isSelected: {
 			type: Boolean,
 			value: false,
@@ -166,17 +125,15 @@ Polymer({
 			type:Array,
 			value:[],
 			notify: true,
-			observer: "observeHeight",
 		},
 		widthLog:{
 			type: Array,
 			value:[],
 			notify: true,
-			observe: "observeWidth",
 		},
 		hiComp:{
 			type: Object,
-			computed: "computeHiComp(heightLog, currentHeight, parentCurrentHeight)",
+			// computed: "computeHiComp(heightLog, currentHeight, parentCurrentHeight)",
 			notify: true
 			},
 		widComp:{
@@ -191,47 +148,10 @@ Polymer({
 		}
 
 	},
-	ready:function(){
-
-},
-	computeHiComp:function(hl, ch, pch){
-		var holder={};
-			//this.makeCircles(hl);
-		// var result=hl.lastIndexOf(!false);
-		// var lv=(parseFloat(hl[result]));
-		// var cv=parseFloat(ch);
-		// var retVal1=((lv-cv)===0);
-		// var pv=parseFloat(pch);
-		// var fractC=Math.floor(pv/cv);
-		// var fractL=Math.floor(pv/lv);
-
-		// var holder={
-		// 	key1: retVal1,
-		// 	key2: lv,
-		// 	key3: cv,
-		// 	key4: pv,
-		// 	key5: fractC,
-		// 	key6: fractL
-		// };
-		// console.log(holder, holder, holder);
-		// return holder;
-
-	},
-	_computeCircleRadius: function(a,b,c,h,w){
-
-
-	},
 	ready: function(){
 
 	},
-	observeHeight:function(nv, ov){
-		//console.log(nv, ov);		
 
-	},
-	observeWidth: function(nv,ov){
-		console.log(nv,ov)
-
-	},
 	attached: function(){
 
 			this.makeCircles();
@@ -247,6 +167,10 @@ Polymer({
 		}
 
 	},
+	computeNumberColor: function(inMonth, isTestDate,isHoliday, isSelected){
+		var retVal=(inMonth==false)?"white": (isTestDate ===true && isSelected==false)?"red": (isHoliday===true &&isSelected==false)?"green":(isSelected===true)?"white":(inMonth===true)?"#009": "white";
+		return retVal;
+	},
 
 	makeCircles: function(){
 
@@ -261,7 +185,7 @@ Polymer({
 				var self=this;
 				var values=[];
 				values=this.heightLog.filter(function(val){return (val!==false);});
-				console.log(values);
+				//console.log(values);
 				w=styles.getPropertyValue("width");
 				var wsetter=(w!="auto" && w!="" && parseFloat(w))?parseFloat(w): false;
 				var argarr=[];
@@ -288,7 +212,7 @@ Polymer({
 					return ret;
 		},
 		_computeCircleSelectStyle: function(size){
-					return "border-radius:50%";
+					return "border-radius:50%; background: #009; color: white;";
 
 		},
 
@@ -317,104 +241,27 @@ Polymer({
 	observeIsSelected: function(newVal,oldVal){
 		if(newVal===true && oldVal===false)
 		{ console.log(newVal);
-			if(!this.fcCourse.courseCalendarDaysArray)
-			{
-				this.fcCourse.courseCalendarDaysArray=[];
-			}
-			if(!this.calendarDay)
-			{
-				this.set("calendarDay", new FcCalendarDay());
-			}
-		}
+			}		
 	},
+	computeIsSelected:function(isSelected){
+			var retVal=(isSelected===true)?"#009": "white";
+			return retVal;
 
-	computeMiniDate: function(calendarDay){
-		return calendarDay.date;
-
-	},
-	observeBackground: function(calendarDay){
-		
-		//console.log(calendarDay);
 	},
 
 	
-  	computePickedDaysDark: function(inMonth, calendarDay)
-  	{
-  		if(inMonth===true)
-  		{ 
-
-  			var retVal =(calendarDay===true)?"#008; border: 1px #008 solid":"white";
-  			return retVal;
-  		}
-  		else
-  		{
-  			
-  			return "#fff";
-  		}
-  	},
-
   	toggleDays: function(e)
   	{	
-  		//console.log(e);
   		if(this.inMonth===true)
   		{	
-  			if(!this.selectedArray)
-  				{	
-  					this.set("selectedArray", []);
-  				}
-  			if(this.toggleDay==false)
-  			{
-					this.toggleDay=!this.toggleDay;
-			  		this.isSelected = !this.isSelected;
-			 		this.set("calendarDay.toggleDay",!this.calendarDay.toggleDay);
-				  	this.set("calendarDay.isSelected", !this.calendarDay.isSelected);
-				  	this.set("calendarDay.inCourseCalendar", !this.calendarDay.inCourseCalendar);
-					var timestamp =new Date();
-			}
-			else if(this.toggleDay===true){
-				this.toggleDay=!this.toggleDay;
-			  		this.isSelected = !this.isSelected;
-			  		this.set("calendarDay.toggleDay",!this.calendarDay.toggleDay);
-				  	this.set("calendarDay.isSelected", !this.calendarDay.isSelected);
-				  	this.set("calendarDay.inCourseCalendar", !this.calendarDay.inCourseCalendar);
-				  	var timestamp =new Date();
-			}
-		var eList=this.calendarDay.eventList;
-		//console.log(eList);
-					
-	  		if(this.calendarDay.isSelected===true || this.calendarDay.inCourseCalendar===true)
-	  			{	
-	  				this.push("selectedArray", this.calendarDay);
-	  				
-	  			}
+  			
+  			this.isSelected=!this.isSelected;
 	  		
 	  	}
 	  	
 	  		
   	},
-  	computeWhite: function(inMonth, calendarDay)
-  	{
-  		if(inMonth===true)
-  		{
-  			return "white";
-  		}
-  		else 
-  		{
-  			return "#fff";
-  		}
-  	},
-  	computePickedDaysWhite: function(inMonth, calendarDay, testDate){
-  		if(inMonth)
-  		{
-  			var retVal=(calendarDay===true)?"white":(testDate===true)? "red; font-weight: 700": "#008";
-  			return retVal;
-  		}
-  		else if(inMonth==false) 
-  		{
-  			
-  			return "#fff";
-  		}
-  	},
+
 
 });
  </script>

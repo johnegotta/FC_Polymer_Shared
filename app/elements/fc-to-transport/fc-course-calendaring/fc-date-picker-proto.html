@@ -54,32 +54,20 @@ width: 30px;
 					items="{{computeCalendar(displayed, fcCourse.courseCalendarDaysArray.*)}}" 
 					as="day">
 						<fc-date-mini
-							
-						 	class="card"
-						 	cd-index="{{day.cdIndex}}"
-						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
-						 	toggle-days="{{toggleDays}}"
+							class="card"
+						 	in-month="[[day.inMonth]]"
 						 	day="{{day}}"
 						 	day-id="{{day.dayId}}"
-						 	is-practice-test-day="{{day.isPracticeTestDay}}"
-						 	is-course-meeting="{{day.isCourseMeeting}}"
-						 	selected-array="{{selectedArray}}"
-						 	style$="margin: 0px auto;" 
 						 	calendar-day={{day}}
-						 	mini-date="{{day.date}}"
-						 	index={{day.index}} 
-						 	id$={{day.dateId}} 
-						 	testDate={{day.testDate}} 
+						 	id$={{day.dateId}}
+						 	is-holiday="{{day.isHoliday}}"
+						 	is-test-date="{{day.isTestDate}}"
+						 	is-selected="{{day.isSelected}}"
+						 	parent-current-width="{{currentWidth}}"
+						 	parent-current-height="{{currentHeight}}"
 						 	event-list="{{day.eventList}}"
-						 	fc-course="{{fcCourse}}">
-							<span  style$="[[computeInClass(day, fcCourse)]];"></span>
-							<a class="date" id="button" >[[day.dayOfMonth]]</a>
-							<span class="[[computeDay(day)]]"></span>
-							<template class="date" is="dom-repeat" items="{{day.eventList}}" as="event">
-									{{event.eventType}}
-							</template>
-				
-							
+						 	>
+							<section class="date block" style="display: inline-block; padding-left: 3px; align-items: center; text-align: center; font-size:18px; border-radius: 50%; font-weight: 600;" id="button">[[_computeDate(day.date)]]</section>
 						</fc-date-mini>	
 				</template>
 			</section>
@@ -228,11 +216,11 @@ watchingSelectedArray: function(newVal, oldVal)
  			
  			}
 },
-
-computeDay: function(day){if(day){return "pretty";}
- 
+_computeDate:function(date){
+		return date.getDate();
 
 },
+
 computeCalendar: function(displayed, ccda){
 	if(ccda.base && ccda.base.length<95 && ccda.base[2]){
 	 var display=displayed.map(function(day, index, array){

@@ -1,7 +1,11 @@
 <dom-module id="fc-time-keeper-digits">
 <template>
 <style>
-    :host{position: fixed; top: 49px;right: 550px; z-index: 12; display: block;}
+    :host{
+        position: absolute;
+        left: 350px;
+        top: 500px;
+    }
     .newclass{
         margin-left: 0px;
         padding: 0px;
@@ -66,7 +70,8 @@
         display: flex;
     }
 </style>
- <section style="position: absolute; outline: 2px solid #009; border-radius: 4px; box-shadow: 4px 16px 24px 6px; right: 96px; padding: 6px 24px 10px 24px; margin: 2px; border:22px silver outset; max-width: 205px!important; background: white;" class$="{{orientation}} layout flex center center-justified" on-track="focusedDragMe" >
+<div>
+ <section style="outline: 2px solid #009; border-radius: 4px; box-shadow: 4px 16px 24px 6px; right: 96px; padding: 6px 24px 10px 24px; margin: 2px; border:22px silver outset; max-width: 205px!important; background: white;" class$="{{orientation}} layout flex center center-justified" >
 
 
 <template is="dom-repeat" items="{{_computeDataset(currentClock.clockData.*)}}">
@@ -93,14 +98,16 @@
         on-focus="showIncrementorsFunction"
        >
     </fc-input-prime>
-   
 </template>
 <span class="vertical layout flex" style="margin-left: 12px; margin-right: -10px; font-size: 20px;"> <span style="color: green;">&#9650;</span><span style="color: red"> &#9660;</span></span> 
-    </section>      
+</section>
+</div>      
 </template>
 <script>
 FcTimeKeeperDigits=Polymer({
     is:"fc-time-keeper-digits",
+    behaviors:[FCBehaviors.DraggableBehavior
+],
     properties:{
         orientation: {
             type: String,
@@ -332,60 +339,60 @@ FcTimeKeeperDigits=Polymer({
                     }, 100);
     },
 
-    dragsOff: function(){this.set("drags", false);},
-    dragsOn: function(){this.async(this.dragSwitch, 50);},
-    dragSwitch: function(){this.set("drags", true);},
-    focusedDragMe:function(e){
-        if(this.drags==true){
-            var self=this;
-            e.preventDefault();
-            switch(e.detail.state)
-            {
-              case 'start':
-                // console.log('START NoWayAreWe Draggin');
-                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-                console.log('top distance differenced?' + self._topprime);
-               if(self.counter==0){   self.translate3d(0, 0, 0);}
-                Polymer.dom(this).setAttribute("position", "fixed"); 
-               Polymer.dom(this).setAttribute("left", "0px"); Polymer.dom(this).setAttribute("left",self._leftprime+"px");
-               Polymer.dom(this).setAttribute("top", "0px"); Polymer.dom(this).setAttribute("top",self._topprime+"px");1
+ //    dragsOff: function(){this.set("drags", false);},
+ //    dragsOn: function(){this.async(this.dragSwitch, 50);},
+ //    dragSwitch: function(){this.set("drags", true);},
+ //    focusedDragMe:function(e){
+ //        if(this.drags==true){
+ //            var self=this;
+ //            e.preventDefault();
+ //            switch(e.detail.state)
+ //            {
+ //              case 'start':
+ //                // console.log('START NoWayAreWe Draggin');
+ //                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+ //                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+ //                console.log('top distance differenced?' + self._topprime);
+ //               if(self.counter==0){   self.translate3d(0, 0, 0);}
+ //                Polymer.dom(this).setAttribute("position", "fixed"); 
+ //               Polymer.dom(this).setAttribute("left", "0px"); Polymer.dom(this).setAttribute("left",self._leftprime+"px");
+ //               Polymer.dom(this).setAttribute("top", "0px"); Polymer.dom(this).setAttribute("top",self._topprime+"px");1
                 
-                self.set("refit",true);
-                self.changeX=0;
-                self.changeY=0;
-                Polymer.dom.flush();
-                break;
-              case 'track':
-                self.changeX=e.detail.ddx + self.changeX;
-                self.changeY=e.detail.ddy + self.changeY;
-                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
-                break;
-              case 'end':
-                console.log(self._topprime);
-                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
-                self._bottom = self.getBoundingClientRect().top;
-                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
-                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
-                self.translate3d(0, 0, 0);
+ //                self.set("refit",true);
+ //                self.changeX=0;
+ //                self.changeY=0;
+ //                Polymer.dom.flush();
+ //                break;
+ //              case 'track':
+ //                self.changeX=e.detail.ddx + self.changeX;
+ //                self.changeY=e.detail.ddy + self.changeY;
+ //                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+ //                break;
+ //              case 'end':
+ //                console.log(self._topprime);
+ //                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+ //                self._bottom = self.getBoundingClientRect().top;
+ //                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+ //                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+ //                self.translate3d(0, 0, 0);
 
               
-                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+ //                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
               
-                self.style.left=self._x.toString()+'px';
-                self.style.top=self._y.toString()+'px';
- Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
-          self.translate3d(0, 0, 0);
+ //                self.style.left=self._x.toString()+'px';
+ //                self.style.top=self._y.toString()+'px';
+ // Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
+ //          self.translate3d(0, 0, 0);
 
-                console.log('y: ' + e.detail.y);
+ //                console.log('y: ' + e.detail.y);
                     
-                self.dragging=false;
-                self.set("refit",true);
-                Polymer.dom.flush();
-                break;
-            }
-        }
-    }
+ //                self.dragging=false;
+ //                self.set("refit",true);
+ //                Polymer.dom.flush();
+ //                break;
+ //            }
+ //        }
+ //    }
 });
 </script>
 </dom-module>

@@ -470,8 +470,8 @@ class FcCourse
 		this.startTime="";
 		this.endTime= "";
 		this.programLength="";
-		// //this.primaryCalendar="";
-		// this.calendarDayArray=  []; 
+		//this.primaryCalendar="";
+		this.calendarDayArray=  []; 
 		this.startAndEndTimes= this.startTime + " to " + this.endTime || "";
 		this.courseMeetingDays="";
 		this.summerMeetingDays="";
@@ -766,8 +766,17 @@ setCourseLength(argWeeks, self)
 		}, this).map(function(curr,index, array){
 					let date =new Date(curr.date);
 					curr.date=date;
+					curr.showDate=new Date(date).toDateString();
 					curr.cdIndex=index;
+					curr.inCourseCalendarDayArray=true;
+					curr.inCourseCalendar=true;
 					curr.isSelected = true; 
+					curr.toggleDay = true;
+					curr.background= "#aedefe";
+					curr.isMeetingDay=false;
+					curr.coach=this.coach;
+					curr.color=this.coachObject.color;
+					curr.isPracticeTestDay=false;
 					counter ++;
 				return curr;
 
@@ -1094,7 +1103,23 @@ function getTimes(holiday, date)
 	{	var d = new Date(date);
 		var slotsArr = [];
 		var timeArr = [];
-	
+		// for(var i=1; i<24;i++)
+  //       {		
+      //       var hour=(i<1)?"12":(i>0 && i<13)?i.toString():(i-12).toString();
+      //       var hour2=parseInt(hour);
+      //       hour2=(hour2==12)?1: hour2+1;
+      //       hour2=hour2.toString();
+   			// var minutes="00";
+   			// var ampm;
+   			
+      //         ampm=(i<12)?"AM":"PM";
+      //         var ampm2=(i<11 ||i==23)?"AM":"PM";
+
+      //         var string=hour + ":" + minutes+ ampm;
+
+      //         var min=randomSixty();
+              	
+      //         var endTime=hour2 + ":"+ min+ampm2;
               if(holiday.length!==0)
               {
           			timeArr.push(new FcEvent(holiday[0]));	
@@ -1102,8 +1127,37 @@ function getTimes(holiday, date)
               else
               	{
               		var argEvent={};
-     
+      //         		argEvent={
+      //         			name:"new event", 
+      //         			startTime: string, 
+      //         			endTime: endTime, 
+      //         			duration: "15 Minutes", 
+      //         			location: "704 Ginesi Dr, Morganville, NJ 07733", 
+      //         			coach:"Scott McKinley", 
+      //         			coachFcid: "McKinleyScott00001",
+      //         			activity:"new event", 
+      //         			time: string, 
+      //         			date:new Date(date), 
+      //         			showDate: new Date(date).toDateString(),
+						// fcid: "", 
+						// calendarTotalTime:"", 
+						// relatedFcids:[], 
+						// parentEventName:[], 
+						// parentEventFcid:[], 
+						// studentFcids:[], 
+						// studentNames:[], 
+						// date: date,
+						// timestamp: date.getTime(), 
+						// isHoliday: holiday, 
+						// time: string,
+						// eventType: "",
+						// eventId: "",
+						// endTime: endTime,
+
+
+              		
               		timeArr.push(new FcEvent(argEvent));
+          		// }
          
           	}
           return(timeArr);
@@ -1144,7 +1198,8 @@ function FcCalendarDay(date, wantSlots)
 
 	var t=new Date(date);
 	var d= new Date();
- 	var p= d.setTime(t.getTime());
+ 	d.setTime(t.getTime());
+ 	var p=d;
  	var testEvent=[];
  	var te={name: "SAT Test Date", activity: "SAT Test Date", startTime:"7:30AM", endTime:"3:45PM", courseID:"allFCIDs00001", fcid:"", date: t, showDate: t.toDateString(), coach: "Joseph Zirkel", location: "see your registration ticket", color: "gold", background: "gold", isHoliday: false, isTestDate: true, time: "7:30AM", completed: false, timestamp: new Date(t).getTime("7:30AM")};
  	testEvent.push(te);
@@ -1159,16 +1214,15 @@ function FcCalendarDay(date, wantSlots)
 	var background=(testD.val===true)?"gold":"#008";
 	var color =(testD.val===true)?"red": "white";
 	var dateText =(testD.val===true)?"SAT":"";
-calendarDay={
+
+	calendarDay={
 				date:date2,
 				inMonth:true,
-				dateId:d.getTime(),
-				isSelected: false,
+				dateId:d,
 				isHoliday: holi,
 				isTestDate: testD.val,
 				eventList: (holi)?getTimes(holiday, date2):(testD.val)?getTimes(testEvent, date2): [],
 	};
-	
 	return calendarDay;
   }
 
@@ -1414,13 +1468,17 @@ FCBehaviors.FcCalendarBehaviorPrime = {
  		
  		calendarDay={
  			"color":"white",
- 			"date":currDate, 
+ 			"isTestDate":false,
+			"date":currDate, 
 			"eventList":[],
-			"dateId":currDate.dayStamp()+"_false",
+			"dateId":currDate.dayStamp(),
+			showDate:currDate.toDateString(),
+			"dayOfMonth":currDate.getDate(),
+			"dayIndex": currDate.getDay(),
 			"inMonth": false,
 			"isSelected":false,
-			"isHoliday": false,
-			"isTestDate": false,
+			"toggleDay": false,
+			"inCourseCalendar":false
 			
 		};
 		return calendarDay;
