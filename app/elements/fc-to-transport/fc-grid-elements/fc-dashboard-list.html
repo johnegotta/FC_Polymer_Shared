@@ -1,23 +1,64 @@
 <dom-module id="fc-dashboard-list">
 <template>
 <style>
+:host{
+	@apply(--layout-fit);
+	background: grey;
+	outline: 9px red solid;
+}
+#movingList0{
+	background: silver;
+}
+#movableList{
+position: absolute;
+top:0px;
+bottom: 50%;
+left: 0px;
+right: 50%;
+border: 8px solid gold;
+}
+#movableList1{
+position: absolute;
+top:50%;
+bottom: 0px;
+left: 0px;
+right: 50%;
+background: pink;
+border: 8px solid red;
+}
+#movableList2{
+position: absolute;
+top:0px;
+right: 0px;
+bottom: 50%;
+left: 50%;
+border: 8px solid green;
+
+}
+#movableList3{
+position: absolute;
+top:50%;
+right: 0px;
+bottom: 0px;
+left: 50%;
+border: 8px solid green;
+
+}
+
 </style>
-<div class="vertical layout flex wrap" style="max-height: 96vh; max-width: 20vh;">
-Movable List
-<template is="dom-repeat" items="{{containerArray}}" as="container" on-track="detachAndMove" on-tap="expandApi">
-<paper-item two-line style="border: 1.23px grey solid; box-shadow: 12px 23px 16px 7px;">
-	<paper-item-body id="">
-		<div id="primary{{container.indXone}}" class="primary">
-		{{container.primaryBindElement}}
+	<div id="movingList0" class="fit">
+		Movable List
+		<section id="movableList" style="background: blue; width: [[computeMovableListWidth(currentWidthZero, currentWidthTwo, totalWidth)]]; height: [[computeMovableListHeight(currentHeightZero,currentHeightOne, totalHeight)]];">
+		
 
 
-		</div>
-		<div secondary id="secondary[[container.indXtwo]]">
-		{{container.secondaryBindElement}}
-		</div>
-	</paper-item-body>
-</paper-item>
-</template>
+		</section>
+		<section id="movableList1" style="background: purple; width: [[computeMovableListOneWidth(currentWidthOne, currentWidthThree, totalWidth)]]; height: [[computeMovableList1Height(currentHeightZero,currentHeightOne, totalHeight)]];">
+		</section>
+<section id="movableList2" style="background: aliceblue;  width: [[computeMovableListTwoWidth(currentWidthZero, currentWidthTwo, totalWidth)]]; height: [[computeMovableListTwoHeight(currentHeightTwo,currentHeightThree, totalHeight)]];">
+</section>
+<section id="movableList3" class="flex-6 self-stretch" style="background: #aedefe; [[computeMovableListThreeWidth(currentWidthOne, currentWidthThree, totalWidth)]];computeMovableListThreeHeight(currentHeightTwo,currentHeightThree, totalHeight)]]">
+</section>
 </div>
 </template>
 <script>
@@ -31,8 +72,7 @@ Polymer({
 		},
 		iteratorObject: {
 			type: Array,
-		// 	value: function(){return [{"fcReadingZero":FcReadingZero()}, {"fcDatePicker":FcDatePicker(), 
-		// "fcTimeKeeperLight":FcTimeKeeperLight()}, {"fcClockDaya":FcClock(), "fcCalendarDialog":FcCalendarDialog()}];},
+		 	value: function(){return [["FcDdrCard",FcDdrCard], ["FcDdrCard",FcDdrCard], ["FcDatePicker",FcDatePicker], ["FcCalendarDialog",FcCalendarDialog]];},
 			notify: true
 		},
 		index:{
@@ -40,6 +80,11 @@ Polymer({
 			value: function() {return 0;},//key, method(), relatedKeys
 			notify: true
 		}
+
+	},
+	ready: function(){
+		this.createElementsForArray(this.iteratorObject);
+
 
 	},
 	computedContainerArray:function(io){
@@ -52,21 +97,29 @@ var dummyArray=[];
 		return dummyArray;
 
 	},
-	createElementsForArray: function(iteratorObject, arrayThing){
-			// var method=[];
-			// var keys=Object.keys(iteratorObject);
-			// var retValArray=[];
-			// retValArray=keys.map(function(k,i,arr){
-			// 	function func(){
-			// 		var l=iteratorObject[k]();
-			// 		return l;
-			// 	};
-			// 	this.method=function(func){this.apply(new Func());};
-			// 	return elem;});
+	createElementsForArray: function(iteratorObject){
+			var method=[];
+			var elements=[];
+			elements=iteratorObject.map(function(val, index,array){
+				return new val[1]();
+				},this);
+			console.log(elements);
+
+			// // var keys=Object.keys(iteratorObject);
+			// // var retValArray=[];
+			// // retValArray=keys.map(function(k,i,arr){
+			// // 	function func(){
+			// // 		var l=iteratorObject[k]();
+			// // 		return l;
+			// // 	};
+			// // 	this.method=function(func){this.apply(new Func());};
+			// // 	return elem;});
 			// this.set("containerArray",retValArray); 
-			// var counter=iteratorObject.length;
-			// for(var p=0;p<counter;p++){var parent=this.$$("#primary"+p);
-			// 	Polymer.dom(parent).appendChild(retValArray[p]);}
+			 var counter=elements.length;
+			for(var p=0;p<counter;p++){
+				var parent=(p===0)?this.$.movableList:(p===1)?this.$.movableList1:(p===2)?this.$.movableList2:this.$.movableList3;
+				console.log(parent);
+				Polymer.dom(parent).appendChild(elements[p]);}
 			// return retValArray;
 
 		}

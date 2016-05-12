@@ -7,6 +7,7 @@
 	font-size: 13.5px;
 	width: 167px;
 }
+#main{background: white;}
 .secondary{
 		color: grey;
 	font-weight:500;
@@ -15,23 +16,10 @@
 	padding: 0 4px;
 	width: 50px;
 }	
-.circle{
-        border-radius: 180px;
-        position: absolute; 
-        top: 1px; 
-        left: 8px;
-        z-index: 180;
-        width: 12px;
-        height: 12px;
-        z-index: 28;
-        background: red;
-        border: 2px solid white;
-        padding: 2px;
-        margin: 0px 2px 2px 2px;
-        cursor: pointer;
-        @apply(--shadow-elevation-8dp);
-      }
-iron-icon .small {
+.circle
+	{border-radius: 180px;position: absolute; top: 1px; left: 8px; z-index: 5;width: 12px; height: 12px; background: red;border: 2px solid white;padding: 2px; margin: 0px 2px 2px 2px;cursor: pointer; @apply(--shadow-elevation-8dp);
+     }
+iron-icon.small {
 	height: 14px!important;
 	width:14px!important;
 }
@@ -39,6 +27,9 @@ iron-icon .small {
 .header-class{min-height: 35px !important; max-height: 55px !important; height: 100%;}
 .selected{}
 </style>
+<fc-event-dialog event="{{dialogEvent}}" id="eventDialog">
+</fc-event-dialog>
+
 <div class="horizontal layout" id="main">
 <div 
       class="circle" 
@@ -55,9 +46,25 @@ iron-icon .small {
 				<content select=".headerButton"></content>
 				</div>
 			</section>
-		<paper-list-box style="height: 360px; overflow-y: scroll;">
+		<paper-list-box style="height: 360px; overflow-y: scroll;" on-dragover="allowDrop" on-drop="handleDrop">
 
 <content></content>
+		<template is="dom-repeat" items="{{eventList}}" as="event">
+				<fc-event-item 
+				draggable="true"
+				on-dragstart="handleDragStart"
+				event="{{event}}"
+				event-list="{{eventList}}"
+				back-width={{backWidth}}
+			>
+			<section class="dialogButton" on-tap="openup" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
+					</iron-icon>
+				</section>
+			</fc-event-item>
+
+
+				</template>
 
 		</paper-list-box>
 </div>
@@ -105,7 +112,7 @@ FcCalendarDayBack=Polymer({
 		},
 		eventList:{
 			type: Array,
-			computed: "_computeEventList(calDay)",
+			value:function(){return [];},
 			notify: true
 		},
 		courseCalendarDaysArray:{
@@ -178,14 +185,69 @@ FcCalendarDayBack=Polymer({
 		}
 		else{ return "#008; color: white; font-weight: 600";} 
 	},
+	  openup: function(e){
+    		console.log(e);
+    		var event=e.model.__data__.event;
+    		this.$.eventDialog.openDi();
+    		console.log(this.$.eventDialog, event);
+    		this.set("dialogEvent", event);
+    		console.log(this.$.eventDialog, event, this.dialogEvent);
+
+    },
 	computeShowDate: function(date){
-		if(date){
-		return date.toDateString();
-	}
+		if(date){ 
+			var d=new Date(date);
+		var p= d.toDateString();
+		return p;
+		}
 	},
+
 	observeCalDay: function(newv, oldv){
-		console.log(newv, oldv);
+		this.set("eventList",newv.eventList);
 	}, 
+	handleDragStart: function(e){
+     var cucumber =JSON.stringify(e.model.__data__.event);
+      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.__data__.event));
+      console.log(cucumber, e, e.model, e.target);
+      var pickle=localStorage.setItem("cucumber", cucumber);
+    },
+	handleDrop: function(e){
+		e.preventDefault();
+		 console.log(e, e.model, e.target);
+		var target=e.target;
+		while(target.nodeName!="FC-CALENDAR-DAY-BACK" && target.nodeName!="BODY"){
+			target=target.parentNode;
+		}
+		if(target.nodeName=="FC-CALENDAR-DAY-BACK"){
+			console.log(target, target, target.calDay.cdIndex);
+			var index=target.calDay.cdIndex;
+     var strData=(e.dataTransfer.getData("fcdata"));
+       var edata = JSON.parse(strData);
+         var ev=new FcEvent(edata);// add a last change index/timestamp for recording to system
+
+		if(!this.fcCourse.courseCalendarDaysArray[index].eventList){
+		 	this.set(["fcCourse.courseCalendarDaysArray", index, "eventList"], []);
+		 }
+		 console.log(this.fcCourse.courseCalendarDaysArray[index].eventList);
+	 this.push(["fcCourse.courseCalendarDaysArray", index, "eventList"], ev);
+      }
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+    },
+    _sortSlots: function(a,b){
+			var ao = stringTime(a.startTime);
+			var bo= stringTime(b.startTime); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+		},
 });
 </script>
 </dom-module>

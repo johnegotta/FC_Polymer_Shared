@@ -1,0 +1,96 @@
+<dom-module id="fc-calendar-ap">
+	<template>
+		<style>
+			:host{
+				position: relative;
+				min-height:480px;
+				resize: both;
+			}
+
+		</style>
+		<neon-animated-pages 
+			class="layout vertical flex-1" 
+			id="pages" 
+			style="min-width: 320px; 
+			min-height:480px;" 
+			selected="1">
+			<div class="horizontal layout flex">
+			<template is="dom-repeat" items="{{calendarDayArraySet}}" as="day">
+				<fc-calendar-day-back
+					id="dayBack"
+					is-single="true"
+					on-close="_onClose"
+					hook="{{day}}"
+					cal-day="{{day}}"
+					event-list="{{day.eventList}}"
+					course-calendar-days="{{calendarDayArray}}">
+				</fc-calendar-day-back>
+			</template>
+			</div>
+			<div>
+			<fc-date-picker
+				id="datePickerCompactCalendar" 
+				displayed-month="{{displayedMonth}}" 
+				on-tap="_dateSelected" 
+				calendar-day-array="{{calendarDayArray}}">
+			</fc-date-picker>
+		</div>
+		</neon-animated-pages>
+</template>
+<script>
+Polymer({
+	is:"fc-calendar-ap",
+	behaviors: [FCBehaviors.DraggableBehavior],
+	properties:{
+		calendarDayArray:{
+			type: Array,	
+			value: function(){return[];},
+			notify: true
+		},
+		displayedMonth:{
+			type: Array,
+			value: function(){return[];},
+			notify: true
+		},
+		hook:{
+			type: Object,
+			value: function(){return {};},
+			notify: true,
+		},
+		calendarDayArraySet:{
+			type:Array,
+			value: function(){return[];},
+			notify: true
+		},
+	},
+
+
+
+_dateSelected: function(event) {
+      var targetOne = event.target;
+      while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
+        targetOne = targetOne.parentNode; 
+       }
+       if(targetOne.nodeName=="FC-DATE-MINI")
+         {
+         	var arrDay=	[targetOne.previousElementSibling.day, targetOne.day,  targetOne.nextElementSibling.day ,targetOne.nextElementSibling.nextElementSibling.day];
+         	arrDay.forEach(function(val){this.push("calendarDayArraySet", val);}, this);       	
+
+         	this.set("hook", targetOne.day);
+         	this.set("hook.eventList", targetOne.__data__.calendarDay.eventList);
+        
+      this.sharedElements = {
+        'hero': this.$.dayBack
+      };
+             this.$.pages.selected = 0;
+        }    
+    },
+
+
+    _onClose: function() {
+      this.$.pages.selected = 1;
+      this.set("calendarDayArraySet", []);
+    },
+});
+</script>
+</dom-module>

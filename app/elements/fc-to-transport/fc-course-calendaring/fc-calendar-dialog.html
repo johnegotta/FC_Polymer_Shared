@@ -4,7 +4,8 @@
 :host{
 background: white;
 padding: 0px 3px 4px 8px;
-opacity: 1;}
+opacity: 1;
+position: relative;}
 .primary{
 	color: #008;
 	font-weight:600;
@@ -68,11 +69,12 @@ top: 10px;
 }
 paper-button{max-width: 357px;}
 
-</style>		
-<fc-ddr-card drags="true" focused-planner="true" id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;" current-width="{{computedWidth}}" current-height="{{computedHeight}}">
-
+</style>
 <fc-event-dialog event="{{dialogEvent}}" id="eventDialog">
-</fc-event-dialog>
+</fc-event-dialog>		
+<fc-ddr-card drags="true" focused-planner="true" id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;" current-width="{{currentWidth}}" current-height="{{currentHeight}}">
+
+
 	<div class="horizontal layout flex nowrap">
 		<section class="vertical layout flex-4">
  		<div class="flex layout horizontal center-justified">
@@ -95,10 +97,11 @@ paper-button{max-width: 357px;}
 					on-close="_onClose"
 					hook="{{hook}}"
 					cal-day="{{hook}}"
-					event-list="{{hook.eventList}}"
+					
 					course-calendar-days="{{fcCourseObject.courseCalendarDaysArray}}" 
 					fc-course={{fcCourseObject}}
 				>
+		
 				</fc-calendar-day-back>
 				<fc-date-picker-proto
 					id="datePickerPro" 
@@ -133,7 +136,7 @@ paper-button{max-width: 357px;}
  				</fc-event-element>
  			</div>
  		</div>
- 		<div id="widthBasis" class="layout horizontal flex-2" style="margin-top: 8px; padding: 10px;padding-bottom: 0px;">
+ 		<!-- <div id="widthBasis" class="layout horizontal flex-2" style="margin-top: 8px; padding: 10px;padding-bottom: 0px;">
  		<fc-input-prime 
  				value="{{displayType}}"
  				input-type="select"
@@ -144,7 +147,7 @@ paper-button{max-width: 357px;}
  				style="max-width: 320px; color: #008;">
  		</fc-input-prime>
  		W: {{computedWidth}} H: {{computedHeight}}
- 		</div>
+ 		</div> -->
  		<paper-tabs 
  			id="calendarTabs" 
  			scrollable="true" 
@@ -162,32 +165,15 @@ paper-button{max-width: 357px;}
 						course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}" 
 						fc-course={{fcCourseObject}}
 						cal-day="{{day}}"
-						on-dragover="allowDrop" 
-						on-drop="handleDrop">
+						event-list="{{day.eventList}}"
+						>
 						<section class="headerButton flex-1" on-tap="addEvent" style="border-radius:180px;">
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
 						</iron-icon>
 					</section>
-	<template is="dom-repeat" sort="_sortSlots" observe="event day.eventList.event" id="mymeantemplate" items="{{day.eventList}}" as="event">
-			<fc-event-item 
-				draggable="true"
-				on-dragstart="handleDragStart"
-				event="{{event}}"
-				fc-course="{{fcCourseObject}}"
-				event-list="{{day.eventList}}" 
-				date="[[day.date]]"
-				back-width={{backWidth}}
-				cal-day="{{day}}"
-				date-id="[[day.dateId]]"
-			>
-			<section class="dialogButton" on-tap="openup" style="border-radius:180px;">
-					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
-					</iron-icon>
-				</section>
-			</fc-event-item>
-	</template>
 				</fc-calendar-day-back>
-				</template>
+			</template>
+
 			</div>
 		 </paper-tabs> 
 	</section>
@@ -253,7 +239,7 @@ FcCalendarDialog= Polymer({
 		 "FCBehaviors.DraggableBehavior"
 		  ],
 
-	listeners: {"mywidth": "reportsize", "click": "myclickgetter"},
+	listeners: {"click": "myclickgetter"},
 	observers:["observeEventTypes(dialogEvent.*, event.*)"],
 	properties:{
 		fcCourseObject:{
@@ -268,23 +254,6 @@ FcCalendarDialog= Polymer({
 			type: String, 
 			notify: true
 		},
-		displayOptionArray:{
-			type: Array,
-			value: function(){
-				return ["A Five Day Schedule",
-						"Horizontal Scroll",
-						"Vertical Scroll", 
-						"Two Weeks At A Time",
-						"One Week At A Time",
-						"One Day At A Time"];
-			},
-			notify: true
-		},
-		displayType: {
-			type: String,
-			value: "A Five Day Schedule",
-			notify: true
-		},
 		backWidth:{
 			type: String, 
 			computed: "_computeBackWidth(displayType, computedWidth)",
@@ -293,11 +262,6 @@ FcCalendarDialog= Polymer({
 		backHeight: {
 			type: String,
 			computed: "_computeBackHeight(displayType)",
-			notify: true
-		},
-		counter: {
-			type: Boolean,
-			value: false, 
 			notify: true
 		},
 		displayedMonth:{
@@ -324,13 +288,21 @@ FcCalendarDialog= Polymer({
 			value: [],
 			notify: true
 		},
-	
+		currentHeight:{
+			type: String,
+			observer:"observeCurrentHeight",
+			notify: true
+		},
+		currentWidth: {
+				type: String,
+			observer: "observeCurrentWidth",
+			notify: true,
+		},
 		inputs: {
 			type: Array,
 			value: [],
 			notify: true
 		},
-
 		calendarDayArray:{
 			type: Array,
 			value: [],
@@ -371,9 +343,7 @@ FcCalendarDialog= Polymer({
 		console.log(this.courses);
 	},
 
-	reportsize:function(e){
-		console.log(e, e.model, e.target);
-	},
+	
 	myclickgetter: function(e){
 		console.log(e.target, e.parent, e);
 	},
@@ -400,30 +370,25 @@ FcCalendarDialog= Polymer({
 			}
 		},
 
-handleDragStart: function(e){
-     var cucumber =JSON.stringify(e.model.__data__.event);
-      e.dataTransfer.setData("fcdata", JSON.stringify(e.model.__data__.event));
-      var pickle=localStorage.setItem("cucumber", cucumber);
+    observeCurrentWidth: function(newVal,oldVal){
+ 		if(newVal && newVal!=oldVal)
+ 		{
+ 		this.set("computedWidth", newVal);
+        console.log(newVal);
+        var wt= Math.floor(parseFloat(newVal));//making sure no pxs or %s are sent in;
+      	Polymer.dom(this).setAttribute("style.width", wt+"px");
+    	}
     },
-	handleDrop: function(e){
-		e.preventDefault();
-		var index = e.model.__data__.day.cdIndex;
-      var strData=(e.dataTransfer.getData("fcdata"));
-      var edata = JSON.parse(strData);
-        var ev=new FcEvent(edata);
-     	var p = new Date();
-     	p=p.getMilliseconds();
-     	ev.date=e.model.__data__.day.date;
-		var pickle =ev.evId;
-		pickle=pickle+p;
-		ev.evId=pickle;
-		if(!this.fcCourseObject.courseCalendarDaysArray[index].eventList){
-			this.set(["fcCourseObject.courseCalendarDaysArray", index, "eventList"], []);
-		}
-		this.push(["fcCourseObject.courseCalendarDaysArray", index, "eventList"], ev);
-      },
-    allowDrop: function (e) {
-      e.preventDefault();
+    observeCurrentHeight: function(newVal, oldVal){
+    	if(newVal && newVal!=oldVal){
+         console.log(newVal, newVal, oldVal,"new, new, old");
+        var ht= Math.floor(parseFloat(newVal));//making sure no pxs or %s are sent in;
+        this.set("computedHeight",newVal);
+      console.log(ht, ht, ht, ht, ht, ht, "this value should set the height");
+      Polymer.dom(this).setAttribute("style.height", ht+"px");
+    }
+
+
     },
     addEvent:function(e){
 			console.log(e);
@@ -463,15 +428,7 @@ handleDragStart: function(e){
 			}
 },
 
-    openup: function(e){
-    		console.log(e);
-    		var event=e.model.__data__.event;
-    		this.$.eventDialog.openDi();
-    		console.log(this.$.eventDialog, event);
-    		this.set("dialogEvent", event);
-    		console.log(this.$.eventDialog, event, this.dialogEvent);
-
-    },
+  
 	_computeBackWidth: function(displayType, computedWidth)
 	{
 		
@@ -600,9 +557,9 @@ _dateSelected: function(event) {
        }
        if(targetOne.nodeName=="FC-DATE-MINI")
          {
-         	console.log(event, targetOne.__data__.day, targetOne.day);
-         	this.set("hook", []);
-         	this.push("hook", targetOne.day);
+         	console.log(event, targetOne.__data__.calendarDay.eventList, targetOne.day);
+         	this.set("hook", targetOne.day);
+         	this.set("hook.eventList", targetOne.__data__.calendarDay.eventList);
         
       this.sharedElements = {
         'hero': this.$.dayBack
@@ -638,6 +595,15 @@ _dateSelected: function(event) {
 
 
  },
+  openup: function(e){
+    		console.log(e);
+    		var event=e.model.__data__.event;
+    		this.$.eventDialog.openDi();
+    		console.log(this.$.eventDialog, event);
+    		this.set("dialogEvent", event);
+    		console.log(this.$.eventDialog, event, this.dialogEvent);
+
+    },
 
 
 });

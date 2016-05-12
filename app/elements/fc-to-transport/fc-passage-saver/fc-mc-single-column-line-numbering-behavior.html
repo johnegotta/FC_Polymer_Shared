@@ -1,0 +1,61 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcMCSingleColumnLineNumberBehavior = {
+properties:{
+	lineNumberArray: {
+		  type: Array,
+		  value: function(){
+		  	this.arrayNums=[]
+		  	for(var i=1; i <= 180; i++)
+		   		{
+				var showLine =  i % 5 ? false: true;
+				this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			return this.arrayNums;
+		  	//'_computeLineNumberArray(nuthin)',
+		  },
+		  notify: true
+	},
+	nuthin: ""
+    // passageObject: {
+    // 	type: Object,
+    // 	 notify: true
+    // }
+  	
+}, //end of properties
+	ready: function(){
+	 this.addEventListener("mouseover", this.setMeasureParams);
+	},
+	_computeLineNumberArray: function(nuthin){
+		  this.arrayNums=[]
+		  for(var i=1; i <= 180; i++)
+		     {
+			var showLine =  i % 5 ? false: true;
+			this.push('arrayNums',{'number': i, 'show': showLine});
+			}
+			return this.arrayNums;
+		},
+    
+	 _onIronResize: function(){
+	 	var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	
+	     (!isNaN(ht) && ht>20)?this.set("lineNumbers", ht) && this.removeEventListener("mouseover", this.setMeasureParams) && this.notifyResize:this.setMeasureParams();
+		 },
+	  setMeasureParams: function(){
+	      var ht=Math.floor((this.$.focusedMark.getBoundingClientRect().top-this.$.linesA1.getBoundingClientRect().top)/this.$.focusedMark.getBoundingClientRect().height)-2;
+	     console.log(ht);
+	      if(!isNaN(ht) && ht>20)
+	      	{
+	      	this.set("lineNumbers", ht);
+	      	 //this.removeEventListener("mouseover",this.setMeasureParams);
+	      	 this.notifyResize;
+	      	}
+	      else if(isNaN(ht))
+	      	{
+	      	var lineNumbers=Math.ceil((this.estimatedHeight/24)-2);
+	      	this.set("lineNumbers",lineNumbers);
+	    	} 
+	  	}
+	  	//add a  this.notifyResize(); on a screen change
+	};
+</script>

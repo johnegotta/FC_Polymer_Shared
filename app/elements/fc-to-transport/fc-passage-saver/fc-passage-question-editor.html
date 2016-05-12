@@ -1,0 +1,108 @@
+<dom-module id="fc-passage-question-editor">
+<style>
+:host{margin-top: -24px;
+  margin-left: -32px;
+padding: 0px;}
+</style>
+<template>
+<div class="flex layout horizontal" style="margin-top: -64px;
+  margin-left: -24px;
+padding: 0px;">
+<!--
+<div style="height:50px;width:80px;background:orange;" class="flex">{{passageRootPath}}</div>
+-->
+<div class="layout flex-8 vertical">
+<fc-new-passage-display id="passageDisplayer" passage-root-path="{{passageRootPath}}" passages-full-path="{{passagesPath}}" class="flex">
+</fc-new-passage-display>
+</div>
+<div class="layout flex-8 vertical">
+<fc-new-question-display id="questionDisplayer" passage="{{passage}}" questions="{{questions}}" passage-root-path="{{passageRootPath}}" class="flex" selected="{{selectedItem}}" shared-selection="[[_computeSharedSelection(selectedItem)]]">
+</fc-new-question-display>
+</div>
+<div class="layout flex-3 vertical">
+<fc-new-passage-saver id="passageSaver" questions="{{questions}}" passage-root-path="{{passageRootPath}}" passages-path="{{passagesPath}}" class="flex">
+</fc-new-passage-saver>
+</div>
+
+
+</div>
+</template>
+<script>
+Polymer({
+is: "fc-passage-question-editor",
+listeners: {
+    "passage-revert": "revertPassage",
+    "passage-change": "changePassage",
+    "passage-stage": "stagePassage",
+    "passage-save": "savePassage",
+    "fc-searchchange": "changeSearch"
+},
+properties: {
+	sharedSelection:{
+		type: String,
+		computed: "_computeSharedSelection(selectedItem)",
+		observer: "announceSharedSelection",
+		notify: true
+	}, 
+	menuItemArray: {type: Array,
+    	value: function(){return [];},
+    	notify: true
+    },
+    selectedItem: {
+    	type: String,
+    	notify: true
+    },
+    passage: {
+      type: Object,
+      value: {},
+      notify: true,
+      reflectToAttribute: true
+    },
+    questions: {
+      type: Array,
+      notify: true
+    },
+    passagesPath: {
+      type: String
+    },
+    passageRootPath: {
+      type: String
+    }
+   
+   },//end of properties
+   changeSearch: function(e)
+   {
+      console.log(e);
+      this.$.questionDisplayer.updateSearch(e.detail);
+   },
+   announceSharedSelection: function(){
+   	// alert(this.sharedSelection);
+    },
+  revertPassage: function(argEvent)
+  {
+    this.$.passageDisplayer.revertPassage();
+  },
+  //saver has altered passage
+  stagePassage: function(argEvent)
+  {
+    console.log(argEvent);
+    this.$.passageDisplayer.stagePassage(argEvent.detail);
+  },
+  savePassage: function(argEvent)
+  {
+    console.log(argEvent);
+    this.$.passageDisplayer.savePassage(argEvent.detail.passage);
+  },
+  //displayer has swapped entire passage
+  changePassage: function(argEvent)
+  {
+    console.log(argEvent.detail);
+    this.set("passage", argEvent.detail.passage);
+    this.$.passageSaver.changePassage(this.passage);
+  },
+_computeSharedSelection: function(selectedItem){
+	return selectedItem;
+}
+});
+</script>
+</dom-module>

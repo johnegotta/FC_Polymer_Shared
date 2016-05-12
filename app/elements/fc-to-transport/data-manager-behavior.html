@@ -1,0 +1,88 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.dataManagerBehavior = {
+	properties: 
+	{
+		dataStrategy: 
+		{
+			type: String,
+			value: "firebaseOnly"
+			/* firebaseOnly, localOnly, or localAndFirebase */
+		},
+		firebaseLocation:
+		{
+			type: String,
+			value: ""
+		}
+	},
+	attached: function()
+	{
+	},
+	setFirebaseLocation: function(argLoc)
+	{
+		if(argLoc){
+		this.firebaseLocation = argLoc;
+		this.firebase = new Firebase(this.firebaseLocation);
+		}
+	},
+	setDataStrategy: function(argStrategy)
+	{
+		this.dataStrategy = argStrategy;
+	},
+	getData: function (argName, argCallback)
+	{
+		console.log(argName, argCallback);
+		var localVal = null;
+		var fbVal = null;
+		if(this.dataStrategy == "localOnly" || this.dataStrategy == "localAndFirebase")
+		{
+			localVal = localStorage.getItem(argName);
+			localVal = JSON.parse(localVal);
+			console.log(localVal);
+			if(localVal != undefined)
+			{
+				console.log(argName, localVal);
+				argCallback(localVal);
+			}
+		}
+		if(localVal == undefined && this.dataStrategy != "localOnly")
+		{
+			var self = this;
+			this.firebase.child(argName).once("value", function(snap){
+				fbVal = snap.val();
+				console.log(argName, fbVal);
+				var localResaveVal = JSON.stringify(fbVal);
+				try
+				{
+					localStorage.setItem(argName, localResaveVal);
+				}
+				catch(err)
+				{
+					console.log(err);
+				}
+				argCallback(fbVal);
+			});
+		}
+	},
+	setData: function(argName, argObject)
+	{
+		if(this.dataStrategy == "localOnly" || this.dataStrategy == "localAndFirebase")
+		{
+			var saveObj = JSON.stringify(argObject);
+			try
+			{
+				localStorage.setItem(argName, saveObj);
+			}
+			catch(err)
+			{
+				console.log(err);
+			}
+		}
+		if(this.dataStrategy != "localOnly")
+		{
+			var self = this;
+			this.firebase.child(argName).update(argObject);
+		}
+	}
+}
+</script>
