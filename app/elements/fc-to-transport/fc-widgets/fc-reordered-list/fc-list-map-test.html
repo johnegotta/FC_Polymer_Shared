@@ -1,0 +1,126 @@
+  <dom-module id="fc-list-map-test">
+    <style>
+    :host{@apply(--layout-reverse);}
+      .item {
+        position: static;
+        padding: 10px;
+
+        border-bottom: 1px solid gray;
+        background: #efe;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        user-select: none;
+        -webkit-transform: translateZ(0);
+      }
+      .item.moving {
+        -webkit-transition: -webkit-transform 0.2s ease-in-out;
+        transition: transform 0.1s ease-in-out;
+      }
+      .item.dragging {
+        z-index: 1;
+        box-shadow: 2px 2px 9px 0px rgba(50, 50, 50, 0.75);
+      }
+
+      #reorderer, .reorderer {
+        width: 300px;
+        min-height: 420px;
+        border: 1px solid black;
+        max-height: 720px;
+        margin: 12px 12px;
+      
+        overflow: hidden;
+        overflow-y: scroll;
+      }
+      .col {
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: vertical;
+      }
+      .col > * {
+        padding: 8px;
+        margin: 0px 4px;
+        border: silver ridge 6px;
+       overflow: hidden;
+       padding-bottom:15%;
+      }
+    </style>
+    <template>
+      <div class="col">
+        <div>
+          <input value="{{filterText1::input}}" placeholder="filter"><br><br>
+          <div style="overflow: hidden; max-height: 680px!important;padding: 8px;">
+          <fc-reordered-list id="reorderer" class="reorderer flex layout vertical">
+            <template is="dom-repeat" style="overflow-y: scroll;" items="{{days}}" filter="{{createFilter(filterText1)}}">
+              <div class="item">
+                <span>{{item.key}}</span><br>
+                <span>{{computeDate(item.day.date)}}</span>
+              </div>
+            </template>
+          </fc-reordered-list>
+            
+        </div>
+        </div>
+        </div>
+        <!-- <div class="col">
+        <div>
+          <input value="{{filterText2::input}}" placeholder="filter"><br><br>
+            <fc-reordered-list id="reorderer" class="reorderer flex layout vertical" style="overflow-y: scroll;">
+            <template is="dom-repeat" items="{{days}}" filter="{{createFilter(filterText2)}}">
+              <div class="item">
+                <span>{{item.key}}</span><br>
+                <span>{{item.day.eventList.0.activity}}</span>
+              </div>
+            </template>
+          </fc-reordered-list> 
+        </div>
+      </div> -->
+    </template>
+ 
+  <script>
+    Polymer({
+      is: 'fc-list-map-test',
+      properties: {
+        filterText1: {
+          value: '',
+          notify: true
+        },
+        days: {
+          type: Array,
+          value: function(){return [];},
+          notify: true,
+        }, 
+        events: {
+          type: Array,
+          value: function(){return [];},
+          notify: true,
+        } 
+      },
+      createFilter: function(filterText) {
+        var regex = new RegExp('.*' + filterText + '.*', 'i');
+        return function(item) {
+          
+
+           var pickle=item.key.toString();
+           return pickle.match(regex);
+        };
+      },
+      computeDate:function(date){
+          return date.toDateString();
+
+      }
+    });
+  </script>
+  </dom-module>
+<!-- 
+window.setItems = function(items) {
+    window.items = items;
+  };
+  </script>
+  <script src="http://www.json-generator.com/api/json/get/cimkLprNMy?indent=2&callback=setItems"></script>
+
+  <x-test id="test"></x-test>
+  
+</body>
+
+</html>
+ -->

@@ -1,6 +1,7 @@
 <dom-module id="fc-calendar-day-back">
 <template>
 <style>
+:host{background: white;}
 .primary{
 	color: #008;
 	font-weight:600;
@@ -37,7 +38,7 @@ iron-icon.small {
       on-click="_onClearButtonClick"
       hidden$="{{!isSingle}}">
 </div>
-	<div class="vertical layout" id="swipable" style="margin: 2px; border: silver 2px solid; height: {{backHeight}}; width:{{backWidth}};">
+	<div class="vertical layout flex" id="swipable" style="margin: 2px; border: silver 2px solid; height: {{backHeight}}; min-width:{{backWidth}};">
 			<section class="header-class layout horizontal" style="height: 42px!important; font-size:16px; background: [[_computeHeaderBackGround(calDay.*)]]; padding-top: 6px; text-align: center; font-family: merriweather;">	
 					<section class="flex-7" style="text-align: center; padding: 8px 2px 2px 8px;">
 					[[computeShowDate(calDay.date)]]
@@ -61,6 +62,30 @@ iron-icon.small {
 					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
 					</iron-icon>
 				</section>
+			</fc-event-item>
+
+
+				</template>
+					<template is="dom-repeat" items="{{eventMap}}" as="item">
+				<fc-event-item 
+				draggable="true"
+				on-dragstart="handleDragStart"
+				event="{{item.day.eventList.0}}"
+				event-list="{{item.day.eventList}}"
+				back-width={{backWidth}}>
+				
+				<!-- [[item.day.eventList.0.startTime]]
+				[[item.day.eventList.0.endTime]] -->
+			<section class="dialogButton" on-tap="openup" style="border-radius:180px;font-size: 10px;">{{item.key}}<br>
+		<!-- 	[[computeShowDate(item.day.date)]]
+			[[item.day.eventList.0.coach]] -->
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: white; background: silver;" icon="icons:add-circle-outline">
+					</iron-icon>
+			
+				
+			
+			
+		</section>
 			</fc-event-item>
 
 
@@ -99,9 +124,16 @@ FcCalendarDayBack=Polymer({
 			value: "420px",
 			notify: true
 		},
+		evLister:{
+			type: Array,
+			value:function(){return [];},
+			notify: true,
+
+
+		},
 		backWidth:{
 			type: String,
-			value: "320px",
+			value: "300px",
 			notify: true
 		},
 	
@@ -120,11 +152,21 @@ FcCalendarDayBack=Polymer({
 			value:[],
 			notify: true,
 		},
+		eventMap:{
+			type:Array,
+			value:function(){return new Array();},
+			notify: true,
+		},
 
    	hook: {
    		type: Array,
 		value: [],
 		notify: true
+	},
+	dialogEvent:{
+			type: FcEvent,
+			value: function(){return new FcEvent({});},
+			notify: true
 	},
     sharedElements: {
         type: Object,
@@ -188,10 +230,24 @@ FcCalendarDayBack=Polymer({
 	  openup: function(e){
     		console.log(e);
     		var event=e.model.__data__.event;
-    		this.$.eventDialog.openDi();
-    		console.log(this.$.eventDialog, event);
-    		this.set("dialogEvent", event);
-    		console.log(this.$.eventDialog, event, this.dialogEvent);
+    		
+    		if(event){
+    			this.set("dialogEvent", event);
+    			console.log(event, e, e.model, e.modelForItem);
+    			console.log(this.$.eventDialog, event);
+    				console.log(this.$.eventDialog, event, this.dialogEvent);
+    				this.$.eventDialog.openDi();
+    			}
+    		else if(e.model.__data__.item.day.eventList[0] && e.model.__data__.item.day.eventList[0] instanceof FcEvent){
+    			var ev=e.model.__data__.item.day.eventList[0];
+    			this.set("dialogEvent", ev);
+    			this.$.eventDialog.event=this.dialogEvent;
+    			this.$.eventDialog.event=ev;
+    			console.log(event, e, e.model, e.modelForItem);
+    			console.log(this.$.eventDialog, event);
+    				console.log(this.$.eventDialog, event, this.dialogEvent);
+    				this.$.eventDialog.openDi();
+    			}    		  //fix this to generalize
 
     },
 	computeShowDate: function(date){

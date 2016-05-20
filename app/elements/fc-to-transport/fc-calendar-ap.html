@@ -2,18 +2,32 @@
 	<template>
 		<style>
 			:host{
-				position: relative;
-				min-height:480px;
-				resize: both;
+				display: flex;
+
+			}
+			fc-calendar-day-back{
+				min-width: 300px;
 			}
 
 		</style>
+<div class="layout vertical flex around-justified self-stretch" style="border: silver 6px ridge; padding: 24px;height: 64vh;">
+		<div class="horizontal layout flex center-justified">
+		<div class="vertical layout flex-11" style="margin:12px;">
 		<neon-animated-pages 
 			class="layout vertical flex-1" 
-			id="pages" 
-			style="min-width: 320px; 
-			min-height:480px;" 
+			id="pagestwo" 
+			style="min-height:480px; min-width: 280px;" 
 			selected="1">
+			<paper-tabs 
+ 			id="calendarTabs" 
+ 			scrollable="true" 
+ 			style="padding: 2px 0px; height: 450px; outline: 0px; overflow: hidden; overflow-x: scroll; border: 9px ridge #efefef;" 
+ 			class="horizontal layout" 
+ 			bar="true" 
+ 			hide-scroll-buttons="false">  
+			<div 
+				class="horizontal layout justified" 
+				style="width: 100%; margin: 9px; overflow-x: scroll;">
 			<div class="horizontal layout flex">
 			<template is="dom-repeat" items="{{calendarDayArraySet}}" as="day">
 				<fc-calendar-day-back
@@ -23,19 +37,30 @@
 					hook="{{day}}"
 					cal-day="{{day}}"
 					event-list="{{day.eventList}}"
-					course-calendar-days="{{calendarDayArray}}">
+					course-calendar-days="{{calendarDayArray}}"
+					event-map="{{dayHolder}}">
 				</fc-calendar-day-back>
 			</template>
 			</div>
+			</div>
+			</paper-tabs>
 			<div>
 			<fc-date-picker
+				style="min-width: 720px;min-height:602px;position: static;"
 				id="datePickerCompactCalendar" 
-				displayed-month="{{displayedMonth}}" 
+				displayed="{{displayedMonth}}" 
 				on-tap="_dateSelected" 
 				calendar-day-array="{{calendarDayArray}}">
 			</fc-date-picker>
 		</div>
 		</neon-animated-pages>
+		</div>
+<div class="vertical layout flex-6" style="overflow:hidden; margin:8px;">
+<fc-list-map-test id="test" events="{{eventHolder}}" days="{{dayHolder}}" class="horizontal layout flex self-stretch"></fc-list-map-test>
+</div>
+
+		</div>
+		</div>
 </template>
 <script>
 Polymer({
@@ -52,6 +77,16 @@ Polymer({
 			value: function(){return[];},
 			notify: true
 		},
+		dayHolder:{
+			type: Array,
+			value: function(){return[];},
+			notify: true
+		},
+		eventHolder:{
+			type: Array,
+			value: function(){return[];},
+			notify: true
+		},
 		hook:{
 			type: Object,
 			value: function(){return {};},
@@ -62,33 +97,72 @@ Polymer({
 			value: function(){return[];},
 			notify: true
 		},
+		eventMap:{
+			type: Map,
+			value: function(){ 
+					return new Map();
+
+			},
+			notify: true
+		},
 	},
-
-
+	attached:function(){
+		alert("go attached calendar ap");
+	},
+	ready: function(){
+			alert("calendar ap ready");
+	},
 
 _dateSelected: function(event) {
       var targetOne = event.target;
+      var self=this;
+      this.dragsOff();
+      this.eventArrayForLater=this.calendarDayArray.filter(function(val){
+					return(val.eventList.length!=0);
+			}, this).reduce(function(pre,day,index,array){
+				
+				var keyString=stringTimeToDateTime(day.eventList[0].startTime, day.date);
+				console.log(keyString);
+				self.eventMap.set(keyString,{"event":day.eventList[0],"day": day});
+				return pre.concat(day.eventList);}, []);
+
+			console.log(this.eventArrayForLater, this.eventMap);
+				var dayholder =[],
+					eventHolder=[],
+					counter=0;
+			this.eventMap.forEach(function(val,i){ 
+				console.log(val, i, counter);counter++;
+				dayholder.push({key:i, day: val.day});
+				eventHolder.push({"key": i, "ev":val.event});
+			});
+			console.log(dayholder, eventHolder);
+			this.set("dayHolder", dayholder);
+			this.set("eventHolder", eventHolder);
+
+	
+
       while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
         targetOne = targetOne.parentNode; 
        }
        if(targetOne.nodeName=="FC-DATE-MINI")
          {
          	var arrDay=	[targetOne.previousElementSibling.day, targetOne.day,  targetOne.nextElementSibling.day ,targetOne.nextElementSibling.nextElementSibling.day];
-         	arrDay.forEach(function(val){this.push("calendarDayArraySet", val);}, this);       	
+         	arrDay.forEach(function(val){this.set("hook.eventList",val.eventList); this.push("calendarDayArraySet", val);}, this); 
+         	console.log(this.calendarDayArraySet);      	
 
          	this.set("hook", targetOne.day);
-         	this.set("hook.eventList", targetOne.__data__.calendarDay.eventList);
+         	this.set("hook.eventList", targetOne.day.eventList);
         
       this.sharedElements = {
         'hero': this.$.dayBack
       };
-             this.$.pages.selected = 0;
+             this.$.pagestwo.selected = 0;
         }    
     },
 
 
     _onClose: function() {
-      this.$.pages.selected = 1;
+      this.$.pagestwo.selected = 1;
       this.set("calendarDayArraySet", []);
     },
 });

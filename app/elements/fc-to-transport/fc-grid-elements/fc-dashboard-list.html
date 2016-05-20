@@ -10,69 +10,54 @@
 	background: silver;
 }
 #movableList{
-position: absolute;
-top:0px;
-bottom: 50%;
-left: 0px;
-right: 50%;
+position: relative;
+
 border: 8px solid gold;
 }
-#movableList1{
-position: absolute;
-top:50%;
-bottom: 0px;
-left: 0px;
-right: 50%;
-background: pink;
+#movableListOne{
+position: relative;
+
 border: 8px solid red;
 }
-#movableList2{
-position: absolute;
-top:0px;
-right: 0px;
-bottom: 50%;
-left: 50%;
+#movableListTwo{
+position: relative;
+border: 8px solid black
+
+}
+#movableListThree{
+position: relative;
 border: 8px solid green;
 
 }
-#movableList3{
-position: absolute;
-top:50%;
-right: 0px;
-bottom: 0px;
-left: 50%;
-border: 8px solid green;
+section{
 
+	min-width: 200px; min-height: 47vh;
 }
 
 </style>
-	<div id="movingList0" class="fit">
-		Movable List
-		<section id="movableList" style="background: blue; width: [[computeMovableListWidth(currentWidthZero, currentWidthTwo, totalWidth)]]; height: [[computeMovableListHeight(currentHeightZero,currentHeightOne, totalHeight)]];">
+	<div id="movingList0" class="flex horizontal layout">
+		<div class="flex vertical layout self-stretch">
+		<section id="movableList" style="background: blue;">
+		</section>
 		
-
-
+		<section id="movableListOne" style="background: purple;">
 		</section>
-		<section id="movableList1" style="background: purple; width: [[computeMovableListOneWidth(currentWidthOne, currentWidthThree, totalWidth)]]; height: [[computeMovableList1Height(currentHeightZero,currentHeightOne, totalHeight)]];">
-		</section>
-<section id="movableList2" style="background: aliceblue;  width: [[computeMovableListTwoWidth(currentWidthZero, currentWidthTwo, totalWidth)]]; height: [[computeMovableListTwoHeight(currentHeightTwo,currentHeightThree, totalHeight)]];">
+	</div>
+	<div class="flex vertical layout self-stretch">
+<section id="movableListTwo" style="background: aliceblue;">
 </section>
-<section id="movableList3" class="flex-6 self-stretch" style="background: #aedefe; [[computeMovableListThreeWidth(currentWidthOne, currentWidthThree, totalWidth)]];computeMovableListThreeHeight(currentHeightTwo,currentHeightThree, totalHeight)]]">
+<section id="movableListThree" style="background: red;">
 </section>
 </div>
+<div>
 </template>
 <script>
 Polymer({
 	is:"fc-dashboard-list",
 	properties: {
-		containerArray:{
-			type: Array,
-			computed:"computedContainerArray(iterableObject)",
-			notify: true
-		},
 		iteratorObject: {
 			type: Array,
-		 	value: function(){return [["FcDdrCard",FcDdrCard], ["FcDdrCard",FcDdrCard], ["FcDatePicker",FcDatePicker], ["FcCalendarDialog",FcCalendarDialog]];},
+		 	value: function(){return [["FcDdrCard",FcDdrCard], ["FcDdrCard",FcDdrCard], ["FcDatePicker",FcDdrCard], ["FcDdrCard",FcDdrCard]];},
 			notify: true
 		},
 		index:{
@@ -84,82 +69,24 @@ Polymer({
 	},
 	ready: function(){
 		this.createElementsForArray(this.iteratorObject);
-
-
 	},
-	computedContainerArray:function(io){
-		var index=io.length;
-var dummyArray=[];
-		for(var i=0; i<index;i++){
-			var object={indXone: i, indXtwo: i};
-			dummyArray.push(object);
-		}
-		return dummyArray;
 
-	},
 	createElementsForArray: function(iteratorObject){
 			var method=[];
 			var elements=[];
 			elements=iteratorObject.map(function(val, index,array){
 				return new val[1]();
 				},this);
-			console.log(elements);
-
-			// // var keys=Object.keys(iteratorObject);
-			// // var retValArray=[];
-			// // retValArray=keys.map(function(k,i,arr){
-			// // 	function func(){
-			// // 		var l=iteratorObject[k]();
-			// // 		return l;
-			// // 	};
-			// // 	this.method=function(func){this.apply(new Func());};
-			// // 	return elem;});
-			// this.set("containerArray",retValArray); 
+			console.log(this.iteratorObject[0][1], this.iteratorObject[2][1], iteratorObject[1][1], this.iteratorObject[3][1]);
 			 var counter=elements.length;
 			for(var p=0;p<counter;p++){
-				var parent=(p===0)?this.$.movableList:(p===1)?this.$.movableList1:(p===2)?this.$.movableList2:this.$.movableList3;
+				var parent=(p===0)?this.$.movableList:(p===1)?this.$.movableListOne:(p===2)?this.$.movableListTwo:this.$.movableListThree;
 				console.log(parent);
 				Polymer.dom(parent).appendChild(elements[p]);}
-			// return retValArray;
+			
 
 		}
 
 });
 </script>
 </dom-module>
-<!-- // return calendarDay;
- //  }
-	// calendarDay={
-	// 			cdIndex:"-1",
-	// 			date:date2,
-	// 			dateCopy:d,
-	// 			index: "", 
-	// 			color: color,
-	// 			background: background, 
-	// 			toggleDay: false,
-	// 			isSelected: false,
-	// 			inMonth:true,
-	// 			index: "",
-	// 			isMonth: month,
-	// 			displayIndex:"",
-	// 			inCalendarDayArray:true,
-	// 			inCourseCalendarDayArray:false,
-	// 			inCourseCalendar: false,
-	// 			isCourseMeeting:false,
-	// 			isPracticeTestDay: false,
-	// 			courseMeetingArray:[],
-	// 			dateId:p,
-	// 			showDate: d.toDateString(),
-	// 			meetingText: "Class",
-	// 			practiceTestText: "Test",
-	// 			dateText: dateText,
-	// 			freshDate: t,
-	// 			dayOfMonth: d.getDate(),
-	// 			isHoliday: holi,
-	// 			isTestDate: testD.val,
-	// 			eventList: (holi)?getTimes(holiday, date2):(testD.val)?getTimes(testEvent, date2): getTimes("", date2),
-	// 			eventType: "",
-	// 			specialty: "" 
-	// };
-
- -->

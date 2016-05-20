@@ -1,0 +1,97 @@
+
+
+
+
+<dom-module id="fc-double-tab-set">
+<template>
+<style>
+.size{
+
+	width: 96%;
+	min-width: 1080px;
+	height: 64px;
+	background: blue;
+	color: white;
+	padding: 12px;
+	font-size: 48px;
+}
+paper-tab{
+	width: 134px; height: 59px; background: green; outline: red 5px solid;
+}
+</style>
+	<paper-tabs selected="{{selected}}" class="horizontal layout flex nowrap size" scrollable>
+		
+				<paper-tab>{{verticalTabs.0.title}} </paper-tab>
+
+				<paper-tab>{{verticalTabs.1.title}} </paper-tab>
+				<paper-tab>{{verticalTabs.2.title}} </paper-tab>
+				<paper-tab>{{verticalTabs.3.title}} </paper-tab>
+				<paper-tab>{{verticalTabs.4.title}} </paper-tab>
+				<paper-tab>{{verticalTabs.5.title}} </paper-tab>
+				<paper-tab>{{verticalTabs.6.title}} </paper-tab>
+		
+	</paper-tabs>
+	<iron-pages id="verticalTabPages" class="vertical layout flex" style="height: 100vh; padding:3px; overflow-y: scroll;" selected="{{selected}}">
+
+
+
+
+
+
+	</iron-pages>
+</template>
+<script>
+Polymer({
+	is: "fc-double-tab-set",
+	properties: {
+		selected: {
+			type: Number,
+			value: function(){return 0;},
+			notify: true,
+		},
+		verticalTabs:{
+			type: Array,
+			value: function(){ return [
+				 {"title":"Math Results"},
+				 {"title" : "Reading Results"},
+				 {"title" : "Essay Results"},
+				 {"title" : "Writing Results"},
+				 {"title" : "Syllabus"},
+				 {"title": "Relative Results"}, 
+				 {"title": "Improving"},
+
+				 ]; 
+			},
+			notify: true,
+		},
+		iteratorArray: {
+			type: Array,
+		 	value: function(){return [["FcDdrCard",FcProfileApi], ["FcDdrCard",FcProfileApi], ["FcDatePicker",FcDatePicker], ["FcDdrCard",FcDdrCard]];},
+			notify: true
+
+		},
+	},
+
+		ready: function(){
+				this.createElementsForArray();
+
+
+		},
+		createElementsForArray: function(){
+			var method=[];
+			var elements=[];
+			elements=this.iteratorArray.map(function(val, index,array){
+				return new val[1]();
+				},this);
+			var counter=elements.length;
+			for(var p=0;p<counter;p++){
+				var parent=this.$.verticalTabPages;
+				Polymer.dom(parent).appendChild(elements[p]);}
+			
+
+		}
+
+
+});
+</script>
+</dom-module>

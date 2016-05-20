@@ -27,10 +27,12 @@
 			background: white; 
 			border: 1px solid #009;
 			box-shadow: -2px 6px 17px 4px #9fafaf;
-			max-width: 1600px;
+			max-width: 2100px;
 			min-width: 340px;
 			min-height: 220px;
-			max-height: 1600px;
+			max-height: 1260px;
+			@apply(--layout-hotizontal);
+			@apply(--layout-self-stretch);
 
 		}.small{
 			font-size: 14px;
@@ -93,8 +95,8 @@
 		}
 		  .card{
 		  	text-align: right; 
-		  	width:calc(100.00%/7.05); 
-		  	margin: 0px -1.225px 0px 0px;
+		  	width:calc(100.00%/7.0375); 
+		  	margin: 0px -1.125px 0px 0px;
 		  	font-size: 18px;
 		  	font-weight: 400;
 		  	display: flex;
@@ -117,15 +119,15 @@
 		  }
 
 	</style>
-	<paper-dialog id="sizeDialog" on-mousedown="dragsNo" on-mouseup="dragsYes"no-cancel-on-outside-click style="width: 320px; height: 380px; background: aliceblue; border: 2px solid #009;">
+	<paper-dialog id="sizeDialog" on-mousedown="dragsNo" on-mouseup="dragsYes"no-cancel-on-outside-click style="width: 480px; height: 380px; background: aliceblue; border: 2px solid #009;overflow: hidden;">
 		Height: {{currentHeight}}, Width: {{currentWidth}}
-		<fc-input-prime input-type="range" min="310" max="1200" value="{{currentWidth}}" label="Width">
+		<fc-input-prime input-type="range" min="210" max="1900" step="15" value="{{currentWidth}}" label="Width">
 		</fc-input-prime>
-		<fc-input-prime input-type="range" min="205" max="720" value="{{currentHeight}}" label="Height">
+		<fc-input-prime input-type="range" min="205" max="1720" step="15" value="{{currentHeight}}" label="Height">
 		</fc-input-prime>
 		<paper-button on-tap="closeModal">close</paper-button>
 		<paper-button on-tap="swap">swap</paper-button>
-		{{days}}
+	
 	</paper-dialog>
 
 	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height: {{currentHeight}}px!important; width: {{currentWidth}}px!important; resize: both;">
@@ -222,18 +224,18 @@ FcDatePicker=Polymer({
 		orientation:{
 			type: String,
 			value: function(){
-				return "horizontal";
+				return "vertical";
 			},
 			notify: true,
 		},
 		currentWidth: {
 			type: String,
-			value: function(){return "310";},
+			value: function(){return "auto";},
 			notify: true,
 		},
 		currentHeight: {
 			type: String,
-			value: function(){return "220";},
+			value: function(){return "auto";},
 			notify: true,
 		},
 		maxIndex:{
@@ -256,7 +258,7 @@ FcDatePicker=Polymer({
 		},
 		vertOrient:{
 			type: String,
-			value: function(){return "vertical";},
+			value: function(){return "horizontal";},
 			notify: true
 		},
 		units: {
@@ -281,7 +283,7 @@ FcDatePicker=Polymer({
 		},
 		drags:{
 			type: Boolean,
-			value: true,
+			value: false,
 			notify: true,
 			reflectToAttribute: true
 		},
@@ -440,12 +442,37 @@ _computeGlobeButtonStyles: function(orientation, w, h){
 	else{return "position: relative;"}
 },
 
-ready: function()
+attached: function()
 {	
+	alert("date picker attached");
 		var today = new Date();
 		var index=today.getMonth();
  		this.set("displayedIndex",index);
 		this.async(this.initialize, 40);
+		this.startHeight();
+		// this.async(function(){this.startWidth();},3100);
+},
+ready: function(){
+		alert("datepicker ready");
+
+},
+
+startHeight: function(){
+		var ht=Math.ceil(parseFloat(screen.availHeight)*.45);
+		this.set("currentHeight",ht);
+},
+startWidth: function(){
+
+	this.widthArray=[this.nextElementSibling.style.width,this.previousElementSibling.style.width,this.nextElementSibling.nextElementSibling.style.width,
+	this.previousElementSibling.previousElementSibling.style.width];
+	var wt=this.widthArray.reduce(function(prev, val, i, array){
+		var retVal=(i<array.length-1)?Math.floor(parseFloat(prev)+parseFloat(val)):Math.floor(((parseFloat(prev)+parseFloat(val))/array.length)*1.5);
+			return retVal;
+	},0);
+		this.set("currentWidth", wt);
+		console.log(wt, wt, wt, wt, wt);
+
+
 },
 initialize:function(days){
 	var startYear =new Date().getFullYear();

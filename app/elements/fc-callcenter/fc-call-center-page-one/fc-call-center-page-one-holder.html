@@ -1,22 +1,42 @@
 <dom-module id="fc-call-center-page-one-holder">
-<style>
-</style>
 <template>
+<style>
+:host{
+        position: static;
+        @apply(--layout-flex);
+}
+</style>
+
    <firebase-collection 
             id='inquiries' 
             location="https://focused0ne.firebaseio.com/inquiries"
             order-by-child="timeStamp"
             data="{{inquiries}}">
         </firebase-collection>
- <div class="layout horizontal flex">
-    <div class="vertical layout flex-7">        
+ <div class="layout horizontal flex nowrap self-stretch" style="position: relative;">
+  <div class="layout vertical flex-6 self-stretch" style="position: relative; min-height: 90vh;">
+
+    <fc-ddr-card> 
+    <div style="position:static; height: 80vh;">
+     
+
+               <template is="dom-repeat" items="{{flexCards}}" observer="callReportsObserver" class="dropzone" style="max-height: 2500px;">
+                    <fc-inquiry-list head-class="[[item.class]]" class="flex vertical layout nowrap" style$="position: static; [[item.style]];" drags draggable orderby="[[item.orderby]]" my-id="[[item.theId]]" header-title="[[item.title]]">
+                    </fc-inquiry-list>
+                </template>
+            </div> 
+    </fc-ddr-card>
+    </div>
+
+ <div class="layout flex-9" style="position: relative; min-height: 90vh;">
+    <fc-ddr-card>        
         <fc-call-intake-form 
             form-submit-one="{{isFormSubmitted}}"  
             search-values="{{searchVals}}" 
             is-previous-caller="{{launchDialog}}" 
             focused-student="{{studentSelectable}}" 
-            class="horizontal layout flex-5 content" 
-            style="padding: 12px; font-weight: 600; background: #fff; border: 2px ridge silver; font-size: 20pt; color: #000088;margin: 2px;">
+            class="horizontal layout flex content" 
+            style="padding: 12px; font-weight: 600; background: #fff; border: 2px ridge silver; font-size: 20pt; color: #008;margin: 2px;">
                 <fc-profile-inputs 
                     class="card-content" 
                     fc-student="{{studentSelectable}}" 
@@ -24,8 +44,9 @@
                     data-source$="[[_dataSource(myData, myDataThree, isFormSubmitted)]]">
                 </fc-profile-inputs>
         </fc-call-intake-form>
-    </div>
-        <!-- <div class="vertical flex-7 layout center" style="height: 96vh;background: white; width: 710px;">
+    </fc-ddr-card>
+</div>
+        <!--  <div class="vertical flex-7 layout center" style="height: 96vh;background: white; width: 710px;">
      
 
                <template is="dom-repeat" items="{{flexCards}}" observer="callReportsObserver" class="dropzone" style="max-height: 2500px;">
@@ -33,8 +54,9 @@
                     </fc-inquiry-list>
                 </template>
             </div> -->
-      <div class="vertical layout center center-justified" style="background: white; height: 96vh;">  
-            <neon-animated-pages class="fit" style="" id="pages" selected="0">
+    <div class="layout flex-7" style="position: relative; min-height: 90vh;">
+      <fc-ddr-card style="max-width: calc(90vw/3); max-height: 90vh;" vertical-align="true">  
+            <neon-animated-pages  class="layout flex vertical self-stretch" id="pages" style="overflow-x: hidden; height: 720px; min-width: 340px; width: 680px;" selected="0">
                 <fc-call-list-view 
                     id="callList" 
                     search-vals="{{searchVals}}">
@@ -45,7 +67,8 @@
                     on-close="_onClose">
                 </fc-tabbed-card>
             </neon-animated-pages>
-        </div>   
+        </fc-ddr-card> 
+    </div>  
      </div>   
     
 </template>
@@ -282,11 +305,11 @@ properties: {
             "anLabel": "Address Line 2",
             "anInputType":"text",
             "anClass": "",
-            "ao": "Select",
+            "ao": "select",
             "aoName":"startReading",
-            "aoLabel": "Highest SAT Reading",
+            "aoLabel":"SAT Reading",
             "aoInputType":"range",
-            "aoMin": 200,
+            "aoMin":200,
             "aoMax":800,
             "aoClass": "",
             "ap": "",
