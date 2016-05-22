@@ -3,7 +3,6 @@
 	<style>
 		:host{
 			position: fixed;
-			resize: both;
 		
 		}
 		.calendardaysofweek{
@@ -28,7 +27,7 @@
 			border: 1px solid #009;
 			box-shadow: -2px 6px 17px 4px #9fafaf;
 			max-width: 2100px;
-			min-width: 340px;
+			min-width: 280px;
 			min-height: 220px;
 			max-height: 1260px;
 			@apply(--layout-hotizontal);
@@ -120,17 +119,22 @@
 
 	</style>
 	<paper-dialog id="sizeDialog" on-mousedown="dragsNo" on-mouseup="dragsYes"no-cancel-on-outside-click style="width: 480px; height: 380px; background: aliceblue; border: 2px solid #009;overflow: hidden;">
+	<div style="height: 65px; width: 100%;">
 		Height: {{currentHeight}}, Width: {{currentWidth}}
-		<fc-input-prime input-type="range" min="210" max="1900" step="15" value="{{currentWidth}}" label="Width">
+	</div>
+		<paper-scroll-dialog>
+		<fc-input-prime input-type="number" min="" max="" step="8" value="{{currentWidth}}" label="Width">
 		</fc-input-prime>
-		<fc-input-prime input-type="range" min="205" max="1720" step="15" value="{{currentHeight}}" label="Height">
+		<fc-input-prime input-type="number" step="8" value="{{currentHeight}}" label="Height">
 		</fc-input-prime>
+		</paper-scroll-dialog>
+		<div style="height: 65px; width: 100%;">
 		<paper-button on-tap="closeModal">close</paper-button>
 		<paper-button on-tap="swap">swap</paper-button>
-	
+		</div>
 	</paper-dialog>
 
-	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height: {{currentHeight}}px!important; width: {{currentWidth}}px!important; resize: both;">
+	<div class$="{{orientation}} layout flex wrap calendarcontainer" style$="height:{{currentHeight}}px!important; width: {{currentWidth}}px!important;">
 		<paper-material class$="{{vertOrient}} [[_computeHeaderHeight(orientation)]] calendarborder">
 			<section class$="{{vertOrient}} layout flex center headerTop">		
 				<section class$="headerMonthYear [[_computeMonthClass(currentHeight, currentWidth, orientation)]]" style$="[[_computeMonthStyle(currentWidth, currentHeight, orientation)]]">
@@ -235,7 +239,6 @@ FcDatePicker=Polymer({
 		},
 		currentHeight: {
 			type: String,
-			value: function(){return "auto";},
 			notify: true,
 		},
 		maxIndex:{
@@ -276,6 +279,10 @@ FcDatePicker=Polymer({
 			value: false,
 			notify: true
 		},
+		startHt:{
+			type: String,
+			notify: true
+		},
 		event:{
 			type: Array,
 			value: [],
@@ -311,7 +318,7 @@ FcDatePicker=Polymer({
 _computeGlobeSize: function(currentWidth, currentHeight, orientation){
 		// if(orientation=="horizontal"){
 			 var w=(parseFloat(currentWidth));var h=(parseFloat(currentHeight));
-				var retVal=(w<360 ||h<310)?"width:16px; height: 16px; padding-bottom: 6px;":(w<420 ||h<360)?"width:20px; height: 20px; padding-bottom: 6px;":"width:32px; height: 32px; padding-bottom: 6px;";
+				var retVal=(w<360 ||h<310)?"width:14px; height: 12px; padding-bottom: 6px;":(w<480 ||h<480)?"width:18px; height: 18px; padding-bottom: 6px;":(w<660 ||h<660)?"width:28px; height: 28px; padding-bottom: 6px;":(w<920 ||h<920)?"width:32px; height:32px; padding-bottom:6px;":"32px; height: 32px; padding-bottom: 6px;";
 		// 		}
 		// else{var retVal="width:20px; height: 20px;"}
 		return retVal;
@@ -340,7 +347,7 @@ computeDayStringLength: function(orientation, currentWidth, currentHeight){
 	
 	var returnArray=daysArray.map(function(val){
 
-		if(nocs===2){var pick = val.split("").slice(0,2); var pickle = pick[0]+pick[1]; return pickle;}
+		if(nocs===2){var pick = val.split("").slice(0,3); var pickle = pick[0]+pick[1]; return pickle;}
 		else if(nocs===3){var pick = val.split("").slice(0,3);pickle=pick[0]+pick[1]+pick[2]; return pickle;}
 		else if(nocs===4){
 			var pickle=val;
@@ -353,7 +360,7 @@ console.log(returnArray);
 _computeMonthStyle:function(one, two, orientation){
 	var w=parseFloat(one);
 	var h=parseFloat(two);
-	var size = (w<310||h<260)?"font-size: 13px;":(w<360|| h<330)?"font-size: 16px;":(w<405||h<385)?"20px;":(w<480||h<440)?"font-size: 22px;": (w<680||h<520)?"font-size: 24px;":"font-size: 26px;";
+	var size=(w<360 ||h<310)?"font-size: 16px;":(w<480 ||h<480)?"font-size: 18px;":(w<660 ||h<660)?"font-size: 22px;":(w<920 ||h<920)?"font-size: 24px;":"font-size:32px;";
 	var retVal=(orientation=="horizontal")?"text-direction: vertical; width: 1em; padding-top: 24px;"+size: "text-direction: horizontal;padding-left: 16px;"+size+"padding-top:0px; font-weight: 500;";
 
 	Polymer.updateStyles();
@@ -458,8 +465,15 @@ ready: function(){
 },
 
 startHeight: function(){
-		var ht=Math.ceil(parseFloat(screen.availHeight)*.45);
-		this.set("currentHeight",ht);
+	var ht=Math.ceil(parseFloat(screen.availHeight)*.41);
+	var setVal;
+	if(this.startHt){
+	setVal=(this.startHt.length>0)?this.startHt:ht;
+	}
+	else {setVal=ht;} 
+		console.log(setVal);
+		this.set("currentHeight",setVal.toString());
+		this.style.height=setVal.toString()+"px";
 },
 startWidth: function(){
 

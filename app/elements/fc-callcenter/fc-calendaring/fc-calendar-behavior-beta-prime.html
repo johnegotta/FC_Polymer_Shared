@@ -843,7 +843,7 @@ setCourseLength(argWeeks, self)
 						activity: "Practice Test: 00001",
 						name: "Practice Test: 00001",
 						coach:  this.coach,
-						date: currentValue.date,
+						date: new Date(currentValue.date),
 						endTime: "12:45PM",
 						fcid: "JoesPracticeTest00001",
 						coachId: this.coachId,
@@ -1157,10 +1157,11 @@ function FcCalendarDay(date, wantSlots)
 	var color =(testD.val===true)?"red": "white";
 	var dateText =(testD.val===true)?"SAT":"";
 calendarDay={
-				date:date2,
+				date:t,
 				inMonth:true,
 				dateId:d.getTime(),
 				isSelected: false,
+				cdIndex:"",
 				isHoliday: holi,
 				isTestDate: testD.val,
 				eventList: (holi)?getTimes(holiday, date2):(testD.val)?getTimes(testEvent, date2): [],
@@ -1174,11 +1175,14 @@ calendarDay={
 	var calendarDays = new Array();
       var currentDate = startDate;
       var calDay={};
+      var i=0;
       while (currentDate <= stopDate)
       { 
       	calDay=new FcCalendarDay(currentDate);
+      	calDay.cdIndex=i;
         calendarDays.push(calDay);
         currentDate = currentDate.addDays(1);
+        i++;
       }
       return calendarDays;
 }

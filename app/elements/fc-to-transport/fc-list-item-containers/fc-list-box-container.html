@@ -1,0 +1,381 @@
+<dom-module id="fc-list-box-container">
+<template id="fc-list-box-container-template">
+	<style>
+	:host{@apply(--layout-reverse);}
+		.topHeaderContainer{
+			background: #009;
+			border-bottom: double 4px #009; 
+			padding:8px 4px 4px 4px; 
+			min-height: 42px;
+			height: 48px; 
+			max-height: 64px; 
+			box-shadow: 4px 7px 13px 3px #6f6f6f; 
+			margin-bottom: 16px;
+			display: block;
+			@apply(--layout-block);
+		}
+		.one{
+		font-family: merriweather; 
+		font-weight: 600;
+		height: 30px !important;
+		padding-top: 12px;
+		padding-left: 4px;
+		min-width: 124px;
+		max-width: 129px;
+		border-left: solid 4px green;
+		color: #080808;
+		font-size: 12px;
+		white-space: nowrap;
+		display: inline-block;
+	}
+	fc-input-prime{
+			height: 24px !important;
+			top-margin: -8px;
+	}
+	.two{
+		font-family: merriweather; 
+		display: inline-block;
+		height: 30px !important;
+		color: brown;
+		font-weight: 500;
+		min-width: 150px;
+		max-width: 198px;
+		overflow: hidden;
+		white-space: nowrap;
+			font-size: 12px;
+	}
+		.headingLayer{
+				font-size: 20px;
+				font-weight: 600;
+				font-color: #fff;
+				color: white;
+				text-align: center;
+				@apply(--horizontal-layout); 
+				@apply(--layout-flex);
+				@apply(--layout-nowrap);
+				@apply(--layout-center-justified);
+
+		}
+
+		.theItem{
+
+			color: #009;
+			min-height: 60px!important;
+			padding: auto;
+			margin: auto 8px;
+		}
+		
+		.footerButtonColumn{
+			border-top: double 4px #009; 
+			padding: 4px; 
+			margin: 2px; 
+			min-height: 74px; 
+			max-height: 108px;
+			@apply(--layout-vertical);
+			@apply(--layout-flex); 
+			@apply(--layout-flex);
+			/*@apply(--layout-nowrap);*/
+			box-shadow: 2px 5px 9px 3px #afafaf; 
+
+		}
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			@apply(--layout-wrap);
+			padding: 2px;
+		}
+		.primary{
+				color: #008;
+				font-weight:600;
+				font-size: 16px;
+				font-family: merriweather;
+			}
+		.secondary{
+			font-family: merriweather;
+			color: grey;
+			font-weight:500;
+			font-size: 12px;
+			}
+		.one{
+	font-family: merriweather; 
+	font-weight: 500;
+	color: #009;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
+.col {
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: vertical;
+      }
+      .col > * {
+      
+      }
+
+	.item {
+        position: static;
+        padding: 10px;
+
+        border-bottom: 1px solid gray;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        user-select: none;
+        -webkit-transform: translateZ(0);
+      }
+      .item.moving {
+        -webkit-transition: -webkit-transform 0.2s ease-in-out;
+        transition: transform 0.1s ease-in-out;
+      }
+      .item.dragging {
+        z-index: 1;
+        box-shadow: 2px 2px 9px 0px rgba(50, 50, 50, 0.75);
+      }
+		/* medium screen */
+     
+</style>
+<section>
+<form>
+	<div class="vertical layout nowrap" 
+	id="myContainer"
+	style="max-height:{{maxHt}}; min-height: {{minHt}}; border: double 6px #009; border-left: 14px solid #009; border-right: 14px solid #009;outline: silver;">
+	
+		<template is="dom-repeat"  items="{{optionsArray}}" as="option"  class$="[[computeOrientation(horizontal)]]">
+			<section class="topHeaderContainer" style$="height:{{headerHeight}}!important; min-height:{{headerHeight}}!important;max-height:{{headerHeight}}!important;">
+				<section class="headingLayer layout horizontal flex center center-justified" style$="font-size: {{headerFont}}!important;" >
+					<content select=".leftSide"></content>
+						<span hidden="{{option.header}}" style$="font-size: {{_computeHeaderFont(headerFont,topHeading)}}!important;" class="headingLayer layout horizontal flex center center-justified">{{topHeading}}</span>
+						<span style$="font-size: {{headerFont}}!important;" hidden="{{!option.header}}" class="headingLayer layout horizontal flex center center-justified">{{option.header}}</span>
+					<content select=".rightSide"></content>
+					</section>
+				</section>
+				<section class="vertical layout flex-9" style="overflow-y: scroll;">
+				<paper-list-box  class="col" style="overflow-y: scroll;">
+<fc-reordered-list id="reorderer" class="reorderer flex layout vertical">
+					
+						<template 
+							is="dom-repeat" 
+							items="{{listItemData}}" filter="{{createFilter(item, filterOne, option)}}"
+						>
+							<paper-item on-tap="setItem"
+								class="layout horizontal theItem item"
+								hidden="{{isInput}}"
+								style="border: silver 1px solid; margin: 0px 2px;">
+								<paper-item-body  
+									class="layout vertical"
+								>
+									<div class="primary">
+										{{_computePrimary(item, fcprimary, option)}}
+									</div>
+									<div class="secondary">
+										{{_computePrimary(item, secondaryOne, option)}}
+										<br style="line-height: 24px;">
+										{{_computePrimary(item, secondaryTwo, option)}}
+									</div>
+								</paper-item-body>   	
+								<paper-icon-button 
+										icon="{{itemIcon}}" 
+										style="color: {{item.coachObject.color}}"
+										alt="favourite this!">
+								</paper-icon-button>
+					  		</paper-item>
+					  		
+							<div id="iamtheItem" hidden$="{{!isInput}}" class="theItem horizontal layout item" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; border-bottom: 2px solid green; padding: 2px; overflow: hidden;">  
+							<fc-input-prime hidden="true" value="{{_computePrimary(item, fcprimary, option)}}" input-type="text" label="{{_computePrimary(item, secondaryOne, option)}}" name="{{_computePrimary(item, secondaryTwo, option)}}" ></fc-input-prime>
+									<span class="one">{{_computePrimary(item, secondaryOne, option)}}:</span>
+								<span class="two">
+								<fc-input-prime hidden="{{!isInput}}" input-type="text" name="{{_computePrimary(item, secondaryTwo, option)}}" label-hidden="true" value="{{_computePrimary(item, fcprimary, option)}}"></fc-input-prime> &nbsp; &nbsp;
+								</span>
+								</div>
+								</template>
+					
+				</fc-reordered-list>
+				</paper-list-box>
+				</section>
+				<section class="footerButtonColumn" style="min-height:{{footerHeight}}!important; background:[[footerBackground]];">
+				<content select=".buttonColumn"></content>
+				<section class="buttonRow">
+					<content select=".buttonRowOne"></content>
+				</section>
+				<section class="buttonRow">
+				<content select=".buttonRowTwo"></content>
+				</section>
+				</section>
+			</template>
+		</div>
+		</form>
+	</section>
+</template>
+<script>
+FcListBoxContainer=Polymer({
+	is: "fc-list-box-container",
+	properties:{
+		isInput:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		horizontal:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		orientation:{
+			type:String,
+			computed:"computeOrientation(horizontal)",
+			notify: true
+		},
+		topHeading: {
+			type: String,
+			value: function(){return "Use 'top-heading' to title";},
+			notify: true
+		},
+		listItemData:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		footerBackground:{
+			type: String,
+			value: function(){return "#009";},
+			notify: true
+		},
+		optionsArray:{
+			type: Array,
+			value:function(){return ["topHeading"];},
+			notify: true
+		},
+		headerFont: {
+			type: String,
+			value:"20px",
+			notify: true,
+		},
+		itemIcon:{
+			type: String,
+			value: function(){return "info";},
+			notify: true
+		},
+		maxHt:{
+			type:String,
+			value: function(){return "80vh";},
+			notify: true
+		},
+		minHt:{
+			type: String,
+			value: function(){return "420px";},
+			notify: true
+		},
+		filterOne:{
+			type: String,
+			notify: true
+		},
+		filterTwo:{
+			type: String,
+			notify: true
+		},
+		revealFilterOne:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		revealFilterTwo:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+
+		footerHeight: {
+			type: String,
+			notify: true
+		},
+		headerHeight: {
+			type: String,
+			notify: true 
+		},
+		fcprimary:{
+			type: Array,
+			value: function(){return ["coach", "fcid"];},
+			notify: true,
+			reflectToAttribute: true
+		},
+		secondaryOne:{ 
+			type: Array,
+			value: function(){return ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"];},
+			notify: true
+		},
+		secondaryTwo: {
+			type: Array,
+			value: function(){ return ["_Test: ", "testDate","_,", "programLength", "price"];},
+			notify: true
+		},
+
+
+	},
+	setItem(e){
+		console.log(e.model.item, e, "the Item");
+
+	},
+	computeOrientation(horizontal){
+			var retVal=(horizontal)?"horizontal layout flex nowrap self-stretch": "vertical layout flex nowrap self-stretch";
+			return retVal;
+	},	
+	_computeHeaderFont(headerFont,topHeading){
+		if(topHeading=="Course Calendars"){return "20px";}
+		else{return headerFont;}
+
+	},
+
+	_computePrimary(item, userInput, option){
+		console.log(userInput, this.fcprimary);
+		if(typeof userInput =="String"){userInput = userInput.split(",");}
+		var numWords=userInput.length;
+		if(numWords){
+			var retVal ="";
+				for(var i=0; i<numWords; i++)
+					{ 
+						var justWord=userInput[i].toString();
+						if(justWord.charAt(0)==="_")
+							{
+								justWord=justWord.replace("_", "");
+								if(justWord.charAt(0)=="," || justWord.charAt(0)==":")
+								{
+									retVal+=justWord;
+								}
+								else{
+								retVal+=" "+ justWord;
+								}
+							}
+						else if(justWord.charAt(0)==="~"&&justWord.charAt(1)==="_")
+						{	
+							justWord=justWord.replace("~", "");
+							justWord=justWord.replace("_", "");
+							retVal+=" "+ option[justWord];
+						}
+						else if(justWord.charAt(0)=="~"){
+							console.log("sending", item);
+							return item;
+						}
+						else
+							{
+								retVal+=" " + item[userInput[i]];
+							}
+					}
+			return retVal;
+		}
+	},
+	 createFilter(filterText) {
+        var regex = new RegExp('.*' + filterText + '.*', 'i');
+        return function(item) {
+          
+
+           var pickle=item.key.toString();
+           return pickle.match(regex);
+        };
+      },
+	
+
+
+});
+</script>
+</dom-module>

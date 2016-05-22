@@ -1,0 +1,150 @@
+<dom-module id="fc-list-box-container">
+<template id="fc-list-box-container-template">
+	<style>
+		.topHeaderContainer{
+			background: #009;
+			border-bottom: double 4px #009; 
+			padding: 8px 4px; 
+			min-height: 42px;
+			height: 48px; 
+			max-height: 64px; 
+			box-shadow: 4px 7px 13px 3px #6f6f6f; 
+			margin-bottom: 9px;
+			@apply(--vertical-layout);
+			@apply(--layout-flex-3);
+			@apply(--layout-self-stretch);
+		}
+		.headingLayer{
+				font-size: 20px;
+				font-weight: 600;
+				font-color: #fff;
+				@apply(--horizontal-layout); 
+				@apply(--layout-flex);
+				@apply(--layout-nowrap);
+				@apply(--layout-center-justified);
+
+		}
+			 paper-button{
+		 	 width: 50%;
+		 	 font-weight: 600; 	  
+		 	 font-size: 14px;
+		 	 text-align: center;
+		 }
+		 paper-button.green{
+		 	color: green; 
+		 	border: 2px solid green;
+		}
+		paper-button.darkblue{
+			color: #009;
+			border: 2px solid #009;
+		}
+		paper-button.red{
+			color: red;
+			border: 2px solid red;
+		}
+		paper-button.orange{
+			color: orange;
+			border: 2px solid orange;
+		}
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			padding: 2px;
+		}
+		.footerButtonColumn{
+			border-top: double 4px #009; 
+			padding: 4px; 
+			margin: 2px; 
+			min-height: 74px; 
+			max-height: 108px;
+			@apply(--layout-vertical);
+			@apply(--layout-flex); 
+			@apply(--layout-flex);
+			@apply(--layout-nowrap);
+
+		}
+	</style>
+		<section>
+			<div class="vertical layout flex nowrap" 
+			id="myContainer"
+			style="max-height: 80vh; min-height: 80vh;
+			border: double 6px #009;
+			outline: silver;">
+				<section class="topHeaderContainer">
+				<section class="headingLayer" >
+					<content select=".leftSide"></content>{{topHeading}}<content select=".rightEdge"></content>
+					</section>
+				</section>
+				<section class="vertical layout flex-9" style="overflow-y: scroll;">
+
+					<paper-list-box style="overflow-y: scroll;">
+						<template 
+							is="dom-repeat" 
+							items="{{listItemData}}" 
+							as="course"
+						>
+							<paper-item 
+								on-tap="setCourse" 
+								class="layout-horizontal courseItem"
+								style="border: silver 1px solid;"
+							>
+								<paper-item-body  
+									class="layout vertical one"
+								>
+									<div 
+										class="primary">
+										{{course.coach}} {{course.fcid}}
+									</div>
+									<div 
+										class="secondary">
+										[[course.courseMeetingSets]], {{course.numberOfMeetings}} Classes<br>
+										Test:{{course.testDate}}, {{course.programLength}}, {{course.price}}
+									</div>
+								</paper-item-body>   	
+								<paper-icon-button 
+										icon="star" 
+										style="color: {{course.coachObject.color}}"
+										alt="favourite this!">
+								</paper-icon-button>
+					  		</paper-item>
+						</template>
+					</paper-list-box>
+				</section>
+				<section class="footerButtonColumn">
+				<section class="buttonRow">
+					<paper-button class="green" on-tap="newCalendar">New Calendar</paper-button>
+					
+					<paper-button class="darkBlue" on-tap="loadToDayCalendar">set primary</paper-button>
+					</section>
+				<section class="buttonRow">
+					<paper-button class="red" on-tap="deleteCalendar">Delete Calendar</paper-button>
+					<paper-button on-tap="clearWorkArea" class="orange"> Clear Work</paper-button>
+				</section>
+				</section>
+			</div>
+		</section>
+	</template>
+<script>
+FcListBoxContainer=Polymer({
+	is: "fc-list-box-container",
+	properties:{
+		topHeading: {
+			type: String,
+			value: function(){return "Use 'top-heading' to title";},
+			notify: true
+		},
+
+
+
+
+
+	},
+
+
+
+
+
+
+});
+</script>
+</dom-module>

@@ -1,17 +1,20 @@
 <dom-module id="fc-titling-form">
+  <template>
 	<style>
   :host{
-    position: relative;
-    max-height: 2200px;
+    position: statics;
+    max-height: 2400px;
     min-width: 360px;
+    max-width: 1020px!important;
     overflow-y: scroll;
   }
   paper-card, paper-card.form {
     padding: 16px;
-  	border: 4px double #008;
+  	border: 6px double #008;
   	margin: auto;
     max-height:2200px;
     overflow-y: scroll;
+      max-width: 980px!important;
     outline: 8px solid #aecefe;
  --paper-card-header: {
     border-bottom: 4px solid #efefef;
@@ -43,74 +46,60 @@
 @apply(--paper-card-header-text);
 @apply(--paper-card-header-image);
 }
+fc-input-prime{
+  margin:16px;
+  max-width: 480px;
+}
 
-  .headSeparator{
-                  width: 100%;
-                  background: #006;
-                  border-top: 4px solid #006; 
-                  border-bottom: 6px solid #c6dafc;
-                  height: 4px;
-                            }
+ 
 	</style>
-	<template>
- <paper-card 
-    heading="Focused Call Intake Form" 
-    image="../../../images/FC_frontpage_logo.png" 
-    style="border-bottom: 6px edged gold; overflow-y: scroll;  padding: auto;" 
-    elevation="5" 
-    class="form vertical flex wrap layout" 
-    animated-shadow="true">
+
+ <paper-card heading="Focused Call Intake Form" image="{{image}}" style="border-bottom: 6px ridge gold; overflow-y: scroll;" elevation="2" class="form vertical flex wrap layout" animated-shadow="true">
+ <section class="horizontal layout block">
+    <img src="http://localhost:3000/images/FC_frontpage_logo.png" style="max-height: 98px; max-width: 210px;">      
+
+    <span style="position: absolute; top: 12px; right: 10px;">Call Intake and Clasification Form</span>
+
+ </section>
  <form is="iron-form" class="form" id="formGet" method="get" action="/">
- <paper-material elevation="4" style="background: #dadada; box-shadow: 3px 7px 11px 4px #9a9a9a;" class="vertical layout">
- <paper-material class="headSeparator" style="margin-bottom: 6px;"></paper-material>
-    <section  class="horizontal layout flex wrap"
-      style="max-height: 25px; margin-left: 4px; color: brown; font-size:18px;  border-bottom: solid brown 1px; margin-bottom: 8px;">
-      Timestamp & Callback Time 
-    </section>
-    <section class="horizontal layout flex wrap">
+<hr>
+<hr>
       <section class="horizontal layout flex wrap"> 
         <fc-input-prime input-type="datetime-local" class="horizontal flex layout wrap" name="timeStamp" id="callTimestamp" is-time-stamp="true"  readonly="true" label='Timestamp'>
         </fc-input-prime>
-        <fc-input-prime id='callbacktime' class="horizontal layout flex wrap" name='callbackTime' tab-index='0' label='Scheduled Callback'  value='{{callbackTime}}' input-type="datetime-local" is-callback="true" on-input="updateInput">
-         </fc-input-prime>
+       <!--  <fc-input-prime id='callbacktime' class="horizontal layout flex wrap" name='callbackTime' tab-index='0' label='Scheduled Callback'  value='{{callbackTime}}' input-type="datetime-local" is-callback="true" on-input="updateInput">
+         </fc-input-prime> -->
+         <fc-input-prime name="callerRole" input-type="select" class="horizontal flex layout wrap" id="callerRole" option-one="parent1" option-two="parent2" option-three="student" option-four="Other" label="Caller Role">
+        </fc-input-prime>
       </section>
-    </section> 
-  </div>
-  <div class="vertical layout wrap">
-    <section 
-      style="max-height: 25px; margin-left: 4px; color: brown; font-size:18px;  border-bottom: solid brown 1px; margin-bottom: 8px;">
-      Caller Classification 
-    </section>  
-    <span style="color:green; font-size: 16px; margin: 4px;"> Is this a Previous Caller?</span>
-    <section class="horizontal layout">
-      <section class="horizontal layout flex wrap">  
+    <section class="horizontal layout flex"> 
+      
         <fc-input-prime 
           input-type="checkbox" 
           style="margin-top: -6px;"
-          label="Yes. This is a previous caller." 
+          label="This caller has called previously." 
           name="isPreviousCaller">
         </fc-input-prime>
         <fc-input-prime 
           input-type="checkbox"
           style="margin-top: -6px;" 
-          label="No. This is a New Caller" 
+          label="This Caller is a New Caller" 
           name="isNewCaller" 
           checked>
         </fc-input-prime>
-      </section>
-      <section class="horizontal layout flex wrap">
-      <fc-input-prime input-type="button" type="button" style="width: 110px; height: 65px; background: gold;" label="Select Profile"> </fc-input-prime>
-       <fc-input-prime id='login' class="horizontal layout flex" name='intakeFcid' label='Your Login'  value='{{yourLogin}}' on-input="updateInput">
+         <fc-input-prime 
+          input-type="checkbox"
+          style="margin-top: -6px;" 
+          label="This Caller is Repeat Client" 
+          name="isNewCaller" 
+          checked>
         </fc-input-prime>
-          <fc-input-prime name="callerRole" class="horizontal flex layout wrap" input-type="select" id="callerRole" option-one="parent1" option-two="parent2" option-three="student" option-four="Other" label="Caller Role">
-        </fc-input-prime>
-         <!-- on-tap="{{_selectProfile(fcProfile)}}"  -->
-      </section>
-    </section>
-    </div>
-      <paper-material class="headSeparator" style="margin-top: 6px;"></paper-material>
-  </paper-material> 
-  
+  </section>
+<section 
+      style="margin-left: 8px; color: black; font-size:18px;margin-bottom: 2px;">
+      Client Intake 
+      <hr>
+    </section> 
 <content class="horizontal layout center-justified">
 </content>
       <div class="card-actions horizontal layout container center-justified">
@@ -121,7 +110,7 @@
             Record and Continue
             </paper-button>
          <content select="paper-button"></content>
-         <paper-button raised class="flex layout self-stretch" on-tap="resetHandler"> clear 3</paper-button>
+         <paper-button raised class="flex layout self-stretch" on-tap="resetHandler"> clear</paper-button>
         </div>
 </form>
 </paper-card>
@@ -160,6 +149,14 @@
               value: {},
               notify: true, 
               reflectToAttribute: true
+            }, 
+
+            image:{
+              type: String,
+              value: function(){ return "http://localhost:3000/images/FC_frontpage_logo.png";
+
+              },
+              notify: true
             }
             
 					}; //end properties

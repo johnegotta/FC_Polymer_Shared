@@ -200,6 +200,10 @@ FcDdrCard=Polymer({
         computed: "computeHeadHeight(currentHeight)",
 
       },
+      dragState:{
+        type: Boolean,
+        notify: true,
+      },
 
     },
     listeners: {
@@ -242,6 +246,7 @@ FcDdrCard=Polymer({
         this.set("heightHolder", this.currentHeight);
         this.set("_notifyingDescendant", true);
        this.set("verticalAlign", "auto"); this.set("horizontalAlign", "auto");
+       this.set("dragState", this.drags);
 
     },
     
@@ -258,6 +263,7 @@ FcDdrCard=Polymer({
     },
 
     _onIronResize: function(){
+
      
       console.log(this.currentHeight, this.currentWidth, this.style.width);
     },
@@ -318,7 +324,7 @@ FcDdrCard=Polymer({
         },
       
       dragsOff: function(){this.set("drags", false);},
-    dragsOn: function(){this.async(this.dragSwitch, 50);},
+    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
     dragSwitch: function(){this.set("drags", true);},
     focusedDragMe:function(e){
         if(this.drags==true){

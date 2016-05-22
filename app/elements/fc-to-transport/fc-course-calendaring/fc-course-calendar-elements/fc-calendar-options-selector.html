@@ -1,4 +1,4 @@
-<dom-module id="fc-event-element">
+<dom-module id="fc-calendar-options-selector">
 <template>
 <style>
 :host{
@@ -8,171 +8,48 @@
 	margin-top: 12px;
 	background: white;
 	position:relative;
-	height: 440px;
+	height: 460px;
 	width: 330px;
 }
-paper-item {
-	border: 1px solid #adadad;
-		background: white;
-    --paper-item-focus: {
-      background: var(--paper-amber-500);
-      font-weight: 600;
-    };
-    
-  }
-#demo{
-	display: block;
-	background: #aedefe;
-}
-.holder{
-	width: 320px;
-	height: 400px;
-	background: #aedefe;
-	margin-left: 2px;
-	border: gold ridge 3px;
-	box-shadow: 4px 11px 21px 7px #9fafaf;
-		display: block;
-	oveflow: hidden;
-	padding: 3px;
-	float: right;
-}
-.innerholder{
-	overflow-y: scroll;
-}
-.header-class{
-font-size: 18px;
-color: white;
-	background: #03A9F4;
-font-weight: 600;
-text-align: center;
-	padding: 12px;
-height: 60px!important;
-}
+
 .selected{background: var(--paper-amber-500);
       font-weight: bold;}
-.primary{
-	color: #008;
-	font-weight:600;
-	font-size: 15.5px;
-}
-.secondary{
-		color: grey;
-	font-weight:500;
-	font-size: 11px;
 
-}
 .headerLeft{
-height: 42px; width: 42px; color: white; float: left;
+height: 40px; width: 40px; color: white; float: left;
 top: 10px;
 
 }
 .headerRight{
-	height: 42px; width: 42px; color: white; float: right;
+	height: 38px; width: 38px; color: white; float: right;
 top: 10px;
 }
-.footerclass{
-	height: 32px;
-	padding: 14px;
-	color: white;
-	background: #03A9F4;
-	font-weight: 600;
-	text-align: center;
-	font-size: 11px;
-}
-.slides{overflow: hidden; overflow-y: scroll;}
-
-.one{
-	font-family: merriweather; 
-	font-weight: 600;
-	color: #080808;
-	font-size: 14px;
-
-	white-space: nowrap;
-	display: inline-block;
-}
-.courseData{
-	height: 72px!important;
-
-}
 </style>
-{{currentArray}}:{{inputIndex}}-- {{selected}} --
-{{valueOptions.3.0.labelA}}, {{valueOptions.2.1.labelA}},
-{{valueOptions.4.0.labelA}}, {{valueOptions.2.3.labelA}}
 <array-selector 
  	id="eventArraySelector" 
  	items="{{inputArrays}}" 
  	selected="{{selected}}"  
  	toggle>
 </array-selector>
-<div class="layout vertical" style="margin-top: 3px; float: right;height: 420px!important;">
-	<section class="holder layout vertical">
-		<template 
-			is="dom-repeat" 
-			items="{{inputArrays}}" 
-			as="option"
-		>
-<!--HEADER-->
-			<section class="header-class layout horizontal">
-				<paper-icon-button 
+<fc-list-box-container list-item-data="{{someArray}}" options-array="{{inputArrays}}" min-ht="460px" max-ht="460px" fcprimary="{{primary}}" secondary-one="{{secondaryOne}}" secondary-two="{{secondaryTwo}}"  header-height="62px" header-font="18px" top-heading="Course Calendars" on-tap="soSelected">
+			<paper-icon-button 
 					on-tap="_backOneInput" 
 					icon="icons:arrow-back"
-					class="headerLeft"
-					>
-				</paper-icon-button>
-				<span 
-						class="flex layout horizontal nowrap center center-justified" 
-						style="color: white; font-size:18px; margin-top: 4px; text-align: center; font-family: merriweather;"
-				>
-					[[option.header]]
-				</span>
-				<paper-icon-button 
+					class="headerLeft leftSide">
+			</paper-icon-button>
+			<paper-icon-button 
 						on-tap="_forwardOneInput" 
 						icon="icons:arrow-forward" 
-						class="headerRight" >
+						class="headerRight rightSide" >
 				</paper-icon-button> 
-			</section>
-<!--END HEADER-->
-			<paper-listbox 
-					class="layout vertical scroll" 
-					style="overflow: hidden; overflow-y: scroll;height: 240px!important;">
-				<template 
-						is="dom-repeat" 
-						items="{{option.selectItems}}" 
-						>
-						<paper-item 
-							on-tap="soSelected" 
-							class="layout-horizontal courseData">
-							<paper-item-body  
-										class="layout vertical one" value$="{{item}}">
-									<div 
-										class="primary">
-										[[item]]
-									</div>
-									<div 
-										class="secondary">
-										[[option.labelA]]
-									</div>
-							</paper-item-body>   	
-							<paper-icon-button 
-									icon="star" 
-									on-tap="soUnSelected" 
-									value$="{{val}}" 
-									alt="favourite this!">
-							</paper-icon-button>
-				  		</paper-item>
-					</template>
-				</paper-listbox>
-				<section  
-				class="footerclass layout horizontal">
-				</section>	
-			</template>
-</section>
+		</fc-list-box-container>
+									
 </div>
 </template>
 <script>
 "use-strict";
 Polymer({
-	is:"fc-event-element",
+	is:"fc-calendar-options-selector",
 		behaviors:["FCBehaviors.FcCalendarBehaviorPrime"], 
 	properties:{
 		eventData:{
@@ -189,6 +66,16 @@ Polymer({
 		selected: {
 			type: Array,
 			value: [],
+			notify: true
+		},
+		primary:{
+			type:Array,
+			value:function(){return ["~"];},
+			notify: true
+		},
+		secondaryOne:{
+			type: Array,
+			value: function(){return ["~_labelA"];},
 			notify: true
 		},
 		
@@ -212,6 +99,11 @@ Polymer({
 			notify: true,
 			reflectToAttribute: true
 		},
+		someArray:{
+			type: Array,
+			notify: true
+
+		},
 		courseCalendarDaysArray:{
 			type: Array,
 			value: [],
@@ -228,7 +120,11 @@ Polymer({
 			value: false,
 			notify: true
 		},
-
+		secondaryTwo:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
 		calendarDayArray:{
 			type: Array,
 			value: [],
@@ -278,6 +174,9 @@ Polymer({
 			if(self.valueOptions[curra]){
 					var retV= self.valueOptions[curra][i]; 
 					console.log(retV);
+					if(retV){
+					this.set("someArray", retV.selectItems);
+				}
 					return retV;
 					}
 				}
@@ -381,7 +280,7 @@ Polymer({
 	},
 
 	soSelected(e){
-		console.log(e, e.model.item);
+		console.log(new Date().getTime());
 		var propertyName = e.model.__data__.option.name;
 		var val = e.model.item;
 		var indexOfNextInput=this.inputIndex+1;
