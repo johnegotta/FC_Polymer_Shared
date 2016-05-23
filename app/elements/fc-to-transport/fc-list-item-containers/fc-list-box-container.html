@@ -137,7 +137,7 @@
 </style>
 <section>
 <form>
-	<div class="vertical layout nowrap" 
+	<div class$="[[computeOrientation(horizontal)]]" 
 	id="myContainer"
 	style="max-height:{{maxHt}}; min-height: {{minHt}}; border: double 6px #009; border-left: 14px solid #009; border-right: 14px solid #009;outline: silver;">
 	
@@ -150,14 +150,18 @@
 					<content select=".rightSide"></content>
 					</section>
 				</section>
+				<section hidden='true' style="color: black;">
+			
+			</section>
 				<section class="vertical layout flex-9" style="overflow-y: scroll;">
 				<paper-list-box  class="col" style="overflow-y: scroll;">
 <fc-reordered-list id="reorderer" class="reorderer flex layout vertical">
-					
+					<section hidden="{{_computeFalseHidden(!isGridbox, !isInput)}}" style="width: 10px; height:10px; background: #[[option.key]];">
+							[[option.index]] here	{{option.key}} [[option.value]] [[option]]
+					</section>
 						<template 
 							is="dom-repeat" 
-							items="{{listItemData}}" filter="{{createFilter(item, filterOne, option)}}"
-						>
+							items="{{listItemData}}" filter="{{createFilter(item, filterOne, option)}}">
 							<paper-item on-tap="setItem"
 								class="layout horizontal theItem item"
 								hidden="{{isInput}}"
@@ -181,7 +185,7 @@
 								</paper-icon-button>
 					  		</paper-item>
 					  		
-							<div id="iamtheItem" hidden$="{{!isInput}}" class="theItem horizontal layout item" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; border-bottom: 2px solid green; padding: 2px; overflow: hidden;">  
+							<div id="iamtheItem" hidden="{{!isInput}}" class="theItem horizontal layout item" style="color: #008; font-weight: 600; font-family: merriweather; font-size: 14px; border-bottom: 2px solid green; padding: 2px; overflow: hidden;">  
 							<fc-input-prime hidden="true" value="{{_computePrimary(item, fcprimary, option)}}" input-type="text" label="{{_computePrimary(item, secondaryOne, option)}}" name="{{_computePrimary(item, secondaryTwo, option)}}" ></fc-input-prime>
 									<span class="one">{{_computePrimary(item, secondaryOne, option)}}:</span>
 								<span class="two">
@@ -211,6 +215,11 @@
 FcListBoxContainer=Polymer({
 	is: "fc-list-box-container",
 	properties:{
+		isGridbox:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
 		isInput:{
 			type: Boolean,
 			value: false,
@@ -314,8 +323,18 @@ FcListBoxContainer=Polymer({
 	},
 	setItem(e){
 		console.log(e.model.item, e, "the Item");
+		if(this.isGridbox===true){
+		this.set("fcprimary",["key", "value", "~_key", "~_value","~_", "~", "_:" ]);
+		this.set("secondaryOne",["key", "value", "~_key", "~_value","~_", "~", "_:" ]);
+		this.set("secondaryTwo",["key", "value", "~_key", "~_value","~_", "~", "_:"]); 
+			}
+	},
+	computeInnerArray(option, listItemData){
+			if(option.innerArray){return option.innerArray;}else if(listItemData){return listItemData;}
 
 	},
+	_computeTrueHidden(isInput, isGridbox){var retVal=(this.isInput===true)?false:(isGridbox===true)?false:true;; return retVal;},
+	_computeFalseHidden(isInput, isGridbox){var retVal=(isInput&&isGridbox)?true:false; return retVal;},
 	computeOrientation(horizontal){
 			var retVal=(horizontal)?"horizontal layout flex nowrap self-stretch": "vertical layout flex nowrap self-stretch";
 			return retVal;
@@ -326,8 +345,10 @@ FcListBoxContainer=Polymer({
 
 	},
 
+
+
 	_computePrimary(item, userInput, option){
-		console.log(userInput, this.fcprimary);
+		 console.log(userInput, this.fcprimary, this.parentElement);
 		if(typeof userInput =="String"){userInput = userInput.split(",");}
 		var numWords=userInput.length;
 		if(numWords){
@@ -348,9 +369,12 @@ FcListBoxContainer=Polymer({
 							}
 						else if(justWord.charAt(0)==="~"&&justWord.charAt(1)==="_")
 						{	
+							if(justWord.charAt(2)===""){retVal=option;}
+							else{
 							justWord=justWord.replace("~", "");
 							justWord=justWord.replace("_", "");
 							retVal+=" "+ option[justWord];
+								}
 						}
 						else if(justWord.charAt(0)=="~"){
 							console.log("sending", item);
