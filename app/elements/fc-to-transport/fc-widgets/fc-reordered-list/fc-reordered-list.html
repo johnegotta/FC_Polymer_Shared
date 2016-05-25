@@ -3,7 +3,7 @@
       :host {
         display: flex;
         @apply(--layout-end-justified);
-        @apply(--layout-horizontal);
+        @apply(--layout-vertical);
         @apply(--layout-self-stretch)
         overflow-y: scroll;
         left-margin: 4%;
@@ -48,6 +48,8 @@
             if(this.dragEl.nodeName=="FC-DASHBOARD-ONE"){console.log("YOU F___ED THE POOCH"); alert("pooch f___ED");}
             else if(this.dragEl.classList.contains("item")){
               console.log(this.dragEl, this.dragEl.classList);
+              Polymer.dom(this.dragEl).setAttribute("style.zIndex","220000");
+               Polymer.dom(this.dragEl).setAttribute("style.background","white");
         switch (e.detail.state) {
           case 'start':
             // Capture initial state
@@ -55,6 +57,7 @@
             this.dragEl.style.pointerEvents = 'none';
             this.dragEl.classList.add('dragging');
             this.dragModel = this.repeater.modelForElement(this.dragEl);
+            console.log(this.repeater.modelForElement(this.dragEl));
             break;
           case 'track':
             // Re-position dragged item
@@ -102,7 +105,10 @@
             Polymer.dom(this).children.forEach(function(el) {
               this.transform('', el);
               el.classList.remove('moving');
+              
             }, this);
+            
+            Polymer.dom(this.dragEl).setAttribute("style.zIndex","1");
             break;
         }
       }

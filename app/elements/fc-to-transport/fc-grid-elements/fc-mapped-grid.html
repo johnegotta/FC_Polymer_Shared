@@ -1,0 +1,302 @@
+<dom-module id="fc-mapped-grid">
+ <template id="fc-mapped-grid-template">
+ <style>
+ section{
+  background:white;
+ }
+:host{
+	background: white;
+	padding: 0px 3px 4px 8px;
+	opacity: 1;
+
+	position: static;
+	@apply(--horizontal-layout);
+	@apply(--layout-flex);
+  @apply(--layout-fit);
+	}
+ </style>
+<!-- <fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue"  is-picker="true" header-title="Focus Grid" class="horizontal layout flex nowrap" start-ht="91vh" style="padding-right:2px; width: 98%!important;">  -->
+
+<div on-down="draggy" on-dragover="allowDrop" is-gridbox="true" class="horizontal layout" style="height:100%; min-width:99%!important; max-width:88vh;">
+
+<template is="dom-repeat"  class="horizontal layout" id="template" items="{{dataArrays}}">
+
+<div class="vertical layout flex nowrap">
+<span>{{item.column}}</span>
+<template is="dom-repeat" id="templateTwo" class="vertical layout" items="{{item.row}}" as="val">
+
+<section class="horizontal layout flex self-stretch item" counter="0" drags draggable dragging is-gridbox="true" val="{{val}}"style="min-width:calc(88vh/16);min-height:calc(88vh/16); max-width: 120px; max-height:72px; background-color:#ffff[[val]]; border:2px solid #009;"  
+ on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe" id$="gridBox{{val}}">
+{{val}}
+</section>
+
+</template>
+</div>
+</template>
+<fc-fit-wrapper id="wrapper" class="item wrapper" drags dragging draggable on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe"></fc-fit-wrapper> 
+</div>
+<!-- </fc-ddr-card> -->
+ </template>
+ <script>
+ FcMappedGrid=Polymer({
+ 	is:"fc-mapped-grid",
+ 	properties: {
+    hoverDude:{
+      notify: true
+    },
+    theCoords:{
+      type: Array,
+      notify: true
+    },
+    dragEl:{
+      type: Object,
+      notify: true
+    },
+    dens:{
+      type:Object,
+      notify: true
+    },
+    depe:{
+      type:Object,
+      notify: true
+
+    },
+    dataArrays:{
+      type: Array,
+      
+    },
+    trueArrays:{
+      type: Array,
+      notify: true
+    },
+ 		colGridMap:{
+ 			type:Map,
+ 		   notify: true
+	 		},
+    isWrapper:{
+      type: Boolean,
+      value: false,
+      notify: true
+    },
+
+	 	drags:{type: Boolean, value: function(){return false;}, notify: true},
+	 	
+ 		},
+    ready(){
+      var da=this.setDataArrays();
+      this.set("dataArrays",da);
+      var map=this.setMap(da);
+      var clone=da.map(function(val){return val;});
+      this.set("trueArrays",clone);
+      this.set("colGridMap",map);
+      },
+    setDataArrays(){
+        var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+        var tempArr=[];
+        var retArrays=columnKeys.map(function(val, index,array){
+                    var count=array.length;
+                    var tempArr=[];
+                    for(var i=0;i<count;i++)
+                    {
+                       var retMini= val+array[i];
+                       tempArr.push(retMini);
+                    }
+                   retVal={column: val, row: tempArr};
+                    return retVal;  
+            }, []);
+        return retArrays;
+        },
+    setMap(da){
+        var map=new Map(); 
+        this.keys2=[];
+       var sa= this.dataArrays.reduce(function(pre, val, index, array){
+         return pre.concat(val.row);
+       },[]).forEach(function(val, index, array){
+        var key=val;
+        var value={"history":[val],"current":val};
+        map.set(key,value);
+        this.push("keys2",[val,val]);
+       }, this);
+       console.log(map);
+       map.set("current", this.keys2);
+       return map;
+        },
+    updateMap(newKey, oldKey){
+     var current= this.colGridMap.get("current");
+     console.log(current);
+     var changekey= current.filter(function(val){return (val[1]==oldKey);});
+      console.log(changekey);
+
+
+
+
+    },
+ 		draggy(e){
+ 			var targ=e.target;
+ 			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
+      {targ=targ.parentElement;}
+ 			if(targ.classList.contains("item")==true){
+ 				targ.drags=true;
+ 				targ.dragging=true;
+ 				targ.draggable=true;
+        if(targ.classList.contains("wrapper")==false){
+          var coords=e.model.__data__.val;
+          var theCoords=this.getIndex(coords);
+          this.set("dragCoords",[theCoords,coords]);
+          this.set("dragEl", targ);
+          this.set("dens",Polymer.dom(targ).nextSibling);
+          this.set('depe',Polymer.dom(targ).parentNode);
+         // console.log(this.dragCoords, this.dragEl,this.dens, "elene");
+        }
+        if(targ.classList.contains("wrapper")==true){this.set("isWrapper",true);}
+ 				this.dragSwitch();
+ 			}
+ 			
+
+ 		},
+
+        dragsOff: function(){this.set("drags", false);},
+    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
+    dragSwitch: function(){this.set("drags", true);},
+    focusedDragMe:function(e){
+     //  if(e.target.classList.contains("wrapper")==false){
+     //    var eid="#"+e.srcElement.id;
+     //    var nt=this.$$(eid);
+     //   // console.log(nt);
+     //    console.log(e);
+     //    nt.isGridbox=true;
+     //  }
+    	// if(nt.isGridbox==true){
+    	// 	this.dragSwitch();
+         if(this.isWrapper==true){
+          console.log(e);
+          var landingtarget=e.detail.sourceEvent.toElement;
+          console.log(landingtarget);
+          this.dropit(landingtarget);
+        }
+      var nt=e.target;
+        if(nt.drags==true){
+            var self=nt;
+            e.preventDefault();
+           // console.log(e.model.keyv);
+            switch(e.detail.state)
+            {
+              case 'start':
+                // console.log('START NoWayAreWe Draggin');
+                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                console.log(this.colGridMap);
+               // console.log('top distance differenced?' + self._topprime);
+               // if(self.counter==0){   this.translate3d(0, 0, 0, self);}
+               //  Polymer.dom(self).setAttribute("style.position", "absolute"); 
+               // Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
+               // Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
+                console.log(e);
+                //this.$.template.set("refit",true);
+                self.changeX=0;
+                self.changeY=0;
+                Polymer.dom.flush();
+                break;
+              case 'track':
+             
+                self.changeX=e.detail.ddx + self.changeX;
+                self.changeY=e.detail.ddy + self.changeY;
+                
+              // this. translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0, self);
+               var hd=e.detail.hover();
+           
+               // var ho =this.$.templateTwo.modelForElement(this.hoverDude); does not work
+              //  console.log(ho, this.hoverDude.element, this.hoverDude.event);
+                break;
+              case 'end':
+               // console.log(self._topprime);
+                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                self._bottom = self.getBoundingClientRect().top;
+                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            
+
+            //    console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+               // this.translate3d(0, 0, 0, self);
+               //  self.style.left=self._x.toString()+'px';
+               //  self.style.top=self._y.toString()+'px';
+               //  Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
+                
+
+              //  console.log('y: ' + e.detail.y);
+                 
+          
+                  // this.dropitlikeitsHot();
+                this.handleDrop();
+                  this.translate3d(0, 0, 0, self);
+                 //Polymer.dom(self).classList.add("fit");
+                //Polymer.dom(self).setAttribute('horizontal-align','auto');
+                
+                //this.$.template.refit=true;
+                Polymer.dom.flush();
+                this.set("hoverDude", e.detail.hover());
+                console.log(this.hoverDude.val);
+                if(this.isWrapper==true){this.dropit();}
+                else{ this.dropitlikeitsHot(); 
+                }
+               self.drags=false;
+            
+
+                break;
+            }
+        }
+    },
+    dropitlikeitsHot(){console.log("dropitlikeitsHot");
+     var newVal= this.hoverDude.val;
+      var di=this.getIndex(newVal);
+      
+      var oldVal=this.dragCoords[1].toString();
+      console.log(newVal, oldVal, "youwho");
+      this.updateMap(newVal, oldVal);
+      var removed=this.trueArrays[di[0]].row[di[1]];
+      var hoverData=this.trueArrays[this.dragCoords[0][0]].row[this.dragCoords[0][1]];
+      this.splice(['trueArrays',di[0],'row'],di[1], 1,hoverData);
+      this.splice(['trueArrays',this.dragCoords[0][0],'row'],this.dragCoords[0][1],1,removed);
+    
+
+      var parent=Polymer.dom(this.hoverDude).parentNode;
+      var nes=Polymer.dom(this.hoverDude).nextSibling;
+       Polymer.dom(this.depe).insertBefore(this.hoverDude, this.dens);
+       Polymer.dom(parent).insertBefore(this.dragEl, nes);
+      console.log(this.trueArrays[this.dragCoords[0][0]].row,this.trueArrays[di[0]].row);
+      
+  },
+  dropit(lt){
+    this.set("isWrapper",false);
+    var target= lt;
+    var wrap=this.$$("fc-fit-wrapper");
+    wrap.positionTarget = target;
+    wrap.defaultTarget= target;
+        console.log(target, wrap, wrap.positionTarget,wrap.defaultTarget);
+      wrap.refit();
+
+  },
+
+  getIndex(val){
+    var index=val.charAt(0);
+    var dex1=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15:parseInt(index); 
+    index=val.charAt(1);
+    var dex2=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15: parseInt(index);
+    return [dex1, dex2];
+  },
+	handleDrop: function(e){
+   // console.log(this.hoverDude, "drop");  
+   
+		// var target=e.target;
+		// while(target.classList.contains("item")!==true && target.nodeName!="FC-DDR-CARD"){
+		// 	target=target.parentElement;
+		// }
+		// if(target.classList.contains("item")===true){
+	
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+    },
+  });
+    </script>
+   </dom-module>

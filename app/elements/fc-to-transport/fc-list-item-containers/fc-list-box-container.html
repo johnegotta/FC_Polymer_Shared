@@ -2,6 +2,20 @@
 <template id="fc-list-box-container-template">
 	<style>
 	:host{@apply(--layout-reverse);}
+		.gridBox{max-width:10px;
+				max-height:10px;
+				@apply(--layout-fixed);
+
+
+
+		},
+		.gridBox:hover, .gridBox:active{
+			height: 320px;
+			width: 320px;
+			z-index:20;
+
+		}
+
 		.topHeaderContainer{
 			background: #009;
 			border-bottom: double 4px #009; 
@@ -13,6 +27,13 @@
 			margin-bottom: 16px;
 			display: block;
 			@apply(--layout-block);
+		}
+		.gridBox >*{
+			border:0px snow solid;
+			border-left:0px;
+			border-right:0px;
+			border-top: 0px;
+			border-bottom: 0px;
 		}
 		.one{
 		font-family: merriweather; 
@@ -139,7 +160,7 @@
 <form>
 	<div class$="[[computeOrientation(horizontal)]]" 
 	id="myContainer"
-	style="max-height:{{maxHt}}; min-height: {{minHt}}; border: double 6px #009; border-left: 14px solid #009; border-right: 14px solid #009;outline: silver;">
+	style="max-height:{{maxHt}}; min-height: {{minHt}}; outline: silver; {{computeBorderGrid(isGridbox)}}">
 	
 		<template is="dom-repeat"  items="{{optionsArray}}" as="option"  class$="[[computeOrientation(horizontal)]]">
 			<section class="topHeaderContainer" style$="height:{{headerHeight}}!important; min-height:{{headerHeight}}!important;max-height:{{headerHeight}}!important;">
@@ -150,17 +171,12 @@
 					<content select=".rightSide"></content>
 					</section>
 				</section>
-				<section hidden='true' style="color: black;">
-			
-			</section>
+				
 				<section class="vertical layout flex-9" style="overflow-y: scroll;">
 				<paper-list-box  class="col" style="overflow-y: scroll;">
 <fc-reordered-list id="reorderer" class="reorderer flex layout vertical">
-					<section hidden="{{_computeFalseHidden(!isGridbox, !isInput)}}" style="width: 10px; height:10px; background: #[[option.key]];">
-							[[option.index]] here	{{option.key}} [[option.value]] [[option]]
-					</section>
 						<template 
-							is="dom-repeat" 
+							is="dom-repeat" hidden="{{isGridbox}}" 
 							items="{{listItemData}}" filter="{{createFilter(item, filterOne, option)}}">
 							<paper-item on-tap="setItem"
 								class="layout horizontal theItem item"
@@ -321,14 +337,20 @@ FcListBoxContainer=Polymer({
 
 
 	},
-	setItem(e){
-		console.log(e.model.item, e, "the Item");
-		if(this.isGridbox===true){
-		this.set("fcprimary",["key", "value", "~_key", "~_value","~_", "~", "_:" ]);
-		this.set("secondaryOne",["key", "value", "~_key", "~_value","~_", "~", "_:" ]);
-		this.set("secondaryTwo",["key", "value", "~_key", "~_value","~_", "~", "_:"]); 
-			}
+	attached(){
+		if(this.isGridbox==true){
+			var bunches=[];
+			bunches=Polymer.dom(this.root).querySelectorAll("*");
+			console.log(bunches);
+			bunches.forEach(function(val,i){Polymer.dom(val).classList.add(".gridBox");},this);
+			
+		}
+
+
+
 	},
+
+	computeBorderGrid(ibg){if(ibg===true){ return "border:0px solid snow;";}else {return "border: double 6px #009; border-left: 14px solid #009; border-right: 14px solid #009;";}},
 	computeInnerArray(option, listItemData){
 			if(option.innerArray){return option.innerArray;}else if(listItemData){return listItemData;}
 
@@ -377,14 +399,25 @@ FcListBoxContainer=Polymer({
 								}
 						}
 						else if(justWord.charAt(0)=="~"){
-							console.log("sending", item);
-							return item;
+							if(this.isGridbox){
+								var str=JSON.stringify(item).toString(); console.log(str); return str;
+								console.log(str, item[i].key);
+								return `$(item[i].key)   $(item[i].value)  $(str)  $(item[userInput[i]].key)`;
+
+							}
+							
+							else{
+								console.log("sending", item);
+								return item;
+							}
 						}
 						else
 							{
 								retVal+=" " + item[userInput[i]];
 							}
 					}
+					if(this.isGridbox){var str=JSON.stringify(retVal).toString(); console.log(str); return str;}
+
 			return retVal;
 		}
 	},
@@ -397,6 +430,7 @@ FcListBoxContainer=Polymer({
            return pickle.match(regex);
         };
       },
+
 	
 
 

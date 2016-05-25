@@ -21,10 +21,9 @@ top: 10px;
 top: 10px;
 }
  </style>
-<fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue" is-picker="true" header-title="Focus Grid" class="horizontal layout flex nowrap" start-ht="93vh" style="padding-right:2px; width: 98%!important;">
-<fc-list-box-container horizontal="true" is-input="true" is-gridbox="true" list-item-data="{{rows}}"  header-height="2px" footer-height="2px" fcprimary="{{primary}}" top-heading="" secondary-one="{{secondary}}" secondary-two="{{secondaryTwo}}" style="height: 95%; width: 100%!important;" options-array="{{columns}}">
+<fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue"  is-picker="true" header-title="Focus Grid" class="horizontal layout flex nowrap" start-ht="93vh" style="padding-right:2px; width: 98%!important;">
+<fc-list-box-container on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe" horizontal="true" is-input="true" is-gridbox="true" list-item-data="{{rows}}"  header-height="2px" footer-height="2px" fcprimary="{{primary}}" top-heading="" secondary-one="{{secondary}}" secondary-two="{{secondaryTwo}}" style="height: 95%; width: 100%!important;" options-array="{{columns}}">
 </fc-list-box-container>
-
 </fc-ddr-card>
  </template>
  <script>
@@ -44,7 +43,7 @@ top: 10px;
  							returnarray.push({"key":temp.toString(), "value":"I am gridBox "+ temp.toString()});
  							gridMap.set(temp,{"key":"I am gridBox "+ temp.toString(),"value": returnarray});
  						}
- 						console.log(returnarray, gridMap);
+ 						console.log(returnarray, gridMap, "lookHere");
 
  						return returnarray;
 		 				});
@@ -70,6 +69,7 @@ top: 10px;
 
 
 	 	},
+	 	drags:{type: Boolean, value: function(){return false;}, notify: true},
 	 	columns:{
 	 		type:Array,
 	 
@@ -91,10 +91,110 @@ top: 10px;
 			this.set("secondary",["key", "value", "~_key", "~_value","~_", "~", "_:" ]);
 			this.set("secondaryTwo",["key", "value", "~_key", "~_value","~_", "~", "_:"]); 
 
-
-
+ 		},
+ 		draggy(e){
+ 			console.log(e,e.target);
+ 			var targ=e.target;
+ 			while(targ.classList.contains("item")!==true && targ.nodeName!="FC-DDR-CARD"){
+ 				targ=targ.parentElement;
+ 			}
+ 			if(targ.classList.contains("item")==true){
+ 				targ.drags=true;
+ 				targ.dragging=true;
+ 				targ.draggable=true;
+ 				console.log(targ, e);
+ 				this.dragSwitch();
+ 				console.log("handOff but have to fumble roosky with no args i can pass cause i need event tracks");
+ 			}
+ 			
 
  		},
+
+        dragsOff: function(){this.set("drags", false);},
+    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
+    dragSwitch: function(){this.set("drags", true);},
+    focusedDragMe:function(e){
+    	if(this.isGridBox==true){
+    		this.dragSwitch();
+
+        if(this.drags==true){
+            var self=this;
+            e.preventDefault();
+            switch(e.detail.state)
+            {
+              case 'start':
+                // console.log('START NoWayAreWe Draggin');
+                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                console.log('top distance differenced?' + self._topprime);
+               if(self.counter==0){   self.translate3d(0, 0, 0);}
+                Polymer.dom(self).setAttribute("style.position", "fixed"); 
+               Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
+               Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
+                
+                self.set("refit",true);
+                self.changeX=0;
+                self.changeY=0;
+                Polymer.dom.flush();
+                break;
+              case 'track':
+                self.changeX=e.detail.ddx + self.changeX;
+                self.changeY=e.detail.ddy + self.changeY;
+                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+                break;
+              case 'end':
+                console.log(self._topprime);
+                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                self._bottom = self.getBoundingClientRect().top;
+                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            
+
+                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+              
+                self.style.left=self._x.toString()+'px';
+                self.style.top=self._y.toString()+'px';
+                Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
+          self.translate3d(0, 0, 0);
+
+                console.log('y: ' + e.detail.y);
+                    
+                self.dragging=false;
+                this.dragsOff();
+                self.set("refit",true);
+                Polymer.dom.flush();
+                break;
+            }
+        }
+
+    }
+    },
+
+
+	handleDrop: function(e){
+		e.preventDefault();
+		 console.log(e, "drop");
+		var target=e.target;
+		while(target.classList.contains("item")!==true && target.nodeName!="FC-DDR-CARD"){
+			target=target.parentElement;
+		}
+		if(target.classList.contains("item")===true){
+			get
+			console.log(target, target, target.name, target.value, target.key);
+     // var strData=(e.dataTransfer.getData("fcdata"));
+     //   var edata = JSON.parse(strData);
+     //     var ev=new FcEvent(edata);// add a last change index/timestamp for recording to system
+
+		if(!this.fcCourse.courseCalendarDaysArray[index].eventList){
+		 	this.set(["fcCourse.courseCalendarDaysArray", index, "eventList"], []);
+		 }
+		 console.log(this.fcCourse.courseCalendarDaysArray[index].eventList);
+	 this.push(["fcCourse.courseCalendarDaysArray", index, "eventList"], ev);
+      }
+      },
+    allowDrop: function (e) {
+      e.preventDefault();
+    },
  		// _computeColumns(cgm){
  		// 	var arrayHolder=[];
  				
