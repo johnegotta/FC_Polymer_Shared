@@ -147,6 +147,7 @@ top: 10px;
 				fc-course="{{fcCourseObject}}" 
 					inputs="{{inputs}}" 
 					class="calendarItem"
+					id="calendarOptionsSelector"
 					course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}"
 					calendar-day-array="{{calendarDayArray}}">
 			</fc-calendar-options-selector>
@@ -186,7 +187,7 @@ top: 10px;
 			class="vertical layout flex-1" 
 			style="max-height: 80vh; min-height: 80vh;
 			margin: 12px;">
-			<fc-list-box-container list-item-data="{{courses}}" header-height="62px" footer-height="30vh" on-tap="setCourse" fcprimary$="coach, fcid" top-heading="Course Calendars" style="height: 80vh;">
+			<fc-list-box-container list-item-data="{{courses}}" header-height="62px" footer-height="112px" on-tap="setCourse" fcprimary$="coach, fcid" top-heading="Course Calendars" style="min-height: 80vh;">
 				<section class="buttonColumn horizontal layout flex wrap">
 					<paper-button class="green layout horizontal flex nowrap center center-justified" on-tap="newCalendar">New Calendar</paper-button>
 					<paper-button class="darkblue layout horizontal flex nowrap center center-justified" on-tap="loadToDayCalendar">set primary</paper-button>
@@ -696,7 +697,7 @@ FcCalendarDialog= Polymer({
 	newCalendar: function(){
 		course= new FcCourse();
 		this.set("fcCourseObject",course);
-		this.$.datePickerPro.initialize();
+		this.$.datePickerCompactTwo.initialize();
 	},
 	_sortSlots: function(a,b){
 			var ao = stringTime(a.startTime);
@@ -760,6 +761,10 @@ FcCalendarDialog= Polymer({
 		console.log(course.calendarDayArray);
 		this.set("fcCourseObject",course);
 		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
+		var optEl=this.$.calendarOptionsSelector;
+		optEl.inputIndex=0;
+		optEl._backOneInput();
+		optEl._forwardOneInput();
 
 	},
 	_computeBackHeight: function(displayType)
@@ -770,7 +775,7 @@ FcCalendarDialog= Polymer({
 		var calendarDayArray=this.fcCourseObject.calendarDayArray;
 		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
 		console.log(course.calendarDayArray);
-		this.$.datePickerPro.initialize(calendarDayArray);
+		this.$.datePickerCompactTwo.initialize(calendarDayArray);
 	},
 
 	setCourse: function(e){

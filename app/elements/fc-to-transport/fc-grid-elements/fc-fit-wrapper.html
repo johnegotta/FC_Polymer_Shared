@@ -2,76 +2,248 @@
 <template>
   <style>
     :host {
-      background-color: var(--paper-light-blue-500);
-      color: white;
+      color: #009;
       text-align: center;
+      position: relative!important;
     }
-    div{height: 400px;
-        width: 400px;
+    div{padding: 10px;
         background: white;}
+        section{background: aqua;}
   </style>
 
-<div style="border:4px double #009; outline: 2px white solid;">
-<paper-button on-tap="openButtons">align controls</paper-button>
-  <iron-collapse id="collapsable">
+<div style="border:4px double #009; outline: 2px white solid; height:{{currentHeight}}; width:{{currentWidth}}">
+{{currentHeight}}, [[currentWidth]]
+<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section>
+<button on-tap="openButtons">O</button><paper-button on-tap="seeElement">Yep</paper-button>
+   <iron-collapse id="collapsable">
   <section on-tap="updateAlign">
    <p>
       <button data-align="verticalAlign_top">top</button>
       <button data-align="verticalAlign_bottom">bottom</button>
       <button data-align="verticalAlign_auto">auto</button>
-      <button data-align="vertical-align_null">null</button>
+      <button data-align="verticalAlign_null">null</button>
     </p>
     <p>
       <button data-align="horizontalAlign_left">left</button>
       <button data-align="horizontalAlign_right">right</button>
       <button data-align="horizontalAlign_auto">auto</button>
-      <button data-align="horizontalAlign_null">nukk</button>
+      <button data-align="horizontalAlign_null">null</button>
+
     </p>
     <p>
-    <button data-align="noOverLap_bool">no overlap</button>
-    <button data-align="dynamicAlign_bool">dynamic align</button>
+    <button data-align="noOverLap_bool_false">no overlap</button>
+    <button data-align="dynamicAlign_bool_true">dynamic align</button>
     </p>
   </section>
   </iron-collapse>
+  <iron-collapse id="seeUrElement">
     <content></content>
+    </iron-collapse>
 </div>
+<section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn"></section>     
   </template>
 <script>
 FcFitWrapper=Polymer({
     is: 'fc-fit-wrapper',
     behaviors: [
-      Polymer.IronFitBehavior
+      Polymer.IronFitBehavior,
+      FCBehaviors.ResizableRootBehavior
     ],
     properties:{
-      defaultTarget:{
-        value:"gridBox78",
+      _defaultTarget:{
+        value:function(){return Polymer.dom(this.root).querySelector("#gridBox78");},
         notify: true
       },
+    positionTarget:{
+        value: function(){return Polymer.dom(this.root.parentNode);},
+        notify: true
+    },
+    fitInto:{
+        computed:"_computeFitInto(positionTarget)",
+        notify: true
+    },
+
     parentN:{
       type:Object,
       value:function(){var parent= Polymer.dom(this).parentNode;
         return parent;}
-    }
+      },
+      drags:{
+        notify: true,
+      },
+      isResizing:{
+        value: function(){return true;},
+        notify: true
+
+      },
+
+      currentWidth: {
+          type: String, 
+          notify: true,
+          observer: "observeCurrentWidth",
+          reflectToAttribute: true
+      },
+      currentHeight: {
+          type: String, 
+          notify: true, 
+          observer: "observeCurrentHeight",
+      },
+    },
+    ready(){
+      this.initialize();
+        },
+    initialize(){
+      this.set("autoFitOnAttached",false);
+      this.set("dynamicAlign",true);
+      this.set("noOverlap", false);
+      this.set("verticalAlign","auto");
+      this.set("horizontalAlign","auto");
+
+        },
+    attached(){this.center();},
+    
+    openButtons(){
+        this.$.collapsable.opened=!this.$.collapsable.opened;
+      },
+     seeElement(){
+
+     this.$.seeUrElement.opened=!this.$.seeUrElement.opened
+   },
+    updateAlign(e){  
+      if(e.target.nodeName==="BUTTON"){  
+          var target = e.target.dataset.align;
+          var attValArr=target.split("_"),
+          att=attValArr[0].toString(),
+          val=attValArr[1].toString();
+          if(val=="bool"){this.set(att,!this[att]);}
+          else{this.set(att,val);}
+        }
+        console.log(this.horizontalAlign, this.verticalAlign, this.dynamicAlign);
+          this.specialRefit();
+      },
+      _computeFitInto(pt){
+        if(pt && pt.parentNode){
+        var target=pt;
+        while(target.nodeName!="FC-MAPPED-GRID"){
+          target=target.parentNode;
+
+        }
+        return target;
+      }
+
+
+      },
+  dragsOff(){
+    this.set("drags", false);
+    this.set("draggable", false);
+    this.set("dragging", false);
+
+
+  },
+  dragsOn(){
+ this.set("drags", true);
+    this.set("draggable", true);
+    this.set("dragging", true);
+
+  },
+
+  specialRefit(target){
+    console.log("in sp1");
+    if(this._raf){
+      console.log("in sp3");
+      this._raf && window.cancelAnimationFrame(this._raf);
+      this._raf=window.requestAnimationFrame(()=>{
+        this._raf = null;
+        console.log(this._raf);
+        if(target){ this.set("positionTarget", target); console.log("in sp4");}
+        this.async(this.refit, 3);
+      });
+      }
+      else{this.refit(); console.log("in sp2");}
     },
 
-  openButtons(){
-    this.$.collapsable.opened=!this.$.collapsable.opened;
-      },
-  updateAlign(e){  
-  if(e.target.nodeName==="BUTTON"){  
-      var target = e.target.dataset.align;
-      console.log(e,e);
-      var attValArr=target.split("_"),
-      att=attValArr[0].toString(),
-      val=attValArr[1].toString();
-      if(val=="bool"){this.set(att.toString(),!att);}
-      else{this.set(att.toString(),val);}
-      console.log(this.dynamicAlign, this.horizontalAlign, this.verticalAlign, this.noOverlap);
-      this.refit();
-      console.log(this, this[att], att, val, "last one is func???");
-      }
-    console.log(e, "not button: e.target.nodeName");
-  },
+     observeCurrentHeight:function(newVal, oldVal){
+      if(newVal && newVal!=oldVal){
+        Polymer.dom.flush();
+        var ht= Math.floor(parseFloat(newVal));
+        console.log(ht);//making sure no pxs or %s are sent in;
+      Polymer.dom(this).setAttribute("style.height", ht+"px");
+    }
+
+    },
+    computePanelWidth: function(measure){
+      return Math.floor(parseFloat(measure)*.98).toString()+"px";
+    },
+
+    computePanelHeight:function(measure){  
+      return Math.floor(parseFloat(measure*.98)).toString()+"px";
+    },
+
+    observeCurrentWidth: function(newVal,oldVal){
+      if(newVal && newVal!=oldVal){
+        var wt= Math.floor(parseFloat(newVal));
+      Polymer.dom(this).setAttribute("style.width", wt+"px");
+
+    }
+    },
+    
+     attached: function(){
+        var self=this;
+        this.set("isResizing", true);
+     
+        this.click();
+        this.set("heightHolder", this.currentHeight);
+        this.set("_notifyingDescendant", true);
+       this.set("verticalAlign", "auto"); this.set("horizontalAlign", "auto");
+       this.set("dragState", this.drags);
+
+    },
+
+     _resize: function(e){
+          var self=this;
+          var template=this.$.ddrtemplate;
+          e.preventDefault();
+          var width=Math.floor(parseFloat(window.screen.width)*.96);
+          var height=Math.floor(parseFloat(window.screen.height)*.999);
+          if(this.isResizing==true){
+          switch(e.detail.state) {
+                case 'start':
+                var theId=this.relId;
+                var elem=this.$$(theId);
+                var sWidth =window.getComputedStyle(self.$.myPanel, null).getPropertyValue("width");
+                self.set("currentWidth", sWidth);
+              
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  var nheight2=(newheight<parseFloat(self.minHeight))?self.minHeight:(newheight>height)?height: newheight;
+                  var nwidth2=(nwidth<320)?320:(nwidth>width)? width:nwidth;
+                  var trueWidth = nwidth2.toString()+'px';
+                  var trueHeight = nheight2.toString()+'px';
+                  
+                  
+                  self.set("currentWidth",trueWidth);
+                  self.set("currentHeight",trueHeight);
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                
+                  break;
+                case 'end':
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                  this.set("heightHolder", self.currentHeight);
+                  this.set("widthHolder", self.currentWidth);
+                  // self.notifyResize();
+                  this.toggleColor=true;
+                  self._onIronResize();
+                  self.set("refit", true);
+                 // self.afterStartResize();
+                  Polymer.dom.flush();
+                  break;
+              }
+            }
+        },
 
 
 
@@ -80,21 +252,7 @@ FcFitWrapper=Polymer({
   });
 </script>
 </dom-module>
-<!-- 
-    var  = 
-    var template = document.querySelector('template[is="dom-bind"]');
-
-    template.containers = new Array(30);
-
-    template.updatePositionTarget = function(e) {
-      var target = Polymer.dom(e).rootTarget;
-      target = myFit.positionTarget === target ? defaultTarget : target;
-      myFit.positionTarget.style.backgroundColor = '';
-      target.style.backgroundColor = 'orange';
-      myFit.positionTarget = target;
-      template.refit();
-    };
-
+<!--
     template._raf = null;
     template.refit = function() {
       template._raf && window.cancelAnimationFrame(template._raf);
@@ -104,36 +262,7 @@ FcFitWrapper=Polymer({
       });
     };
 
-    template.updateAlign = function(e) {
-      var target = Polymer.dom(e).rootTarget;
-      if (target.hasAttribute('horizontal-align')) {
-        myFit.horizontalAlign = target.getAttribute('horizontal-align');
-        var children = target.parentNode.querySelectorAll('[horizontal-align]');
-        for (var i = 0; i < children.length; i++) {
-          toggleClass(children[i], 'selected', children[i] === target);
-        }
-      }
-      if (target.hasAttribute('vertical-align')) {
-        myFit.verticalAlign = target.getAttribute('vertical-align');
-        var children = target.parentNode.querySelectorAll('[vertical-align]');
-        for (var i = 0; i < children.length; i++) {
-          toggleClass(children[i], 'selected', children[i] === target);
-        }
-      }
-      template.refit();
-    };
 
-    template.toggleNoOverlap = function(e) {
-      myFit.noOverlap = !myFit.noOverlap;
-      toggleClass(Polymer.dom(e).rootTarget, 'selected', myFit.noOverlap);
-      template.refit();
-    };
-
-    template.toggleDynamicAlign = function(e) {
-      myFit.dynamicAlign = !myFit.dynamicAlign;
-      toggleClass(Polymer.dom(e).rootTarget, 'selected', myFit.dynamicAlign);
-      template.refit();
-    };
 
     // Listen for resize and scroll on window.
     window.addEventListener('resize', template.refit);

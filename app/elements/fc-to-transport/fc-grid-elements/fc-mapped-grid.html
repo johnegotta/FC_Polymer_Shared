@@ -18,7 +18,7 @@
 <!-- <fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue"  is-picker="true" header-title="Focus Grid" class="horizontal layout flex nowrap" start-ht="91vh" style="padding-right:2px; width: 98%!important;">  -->
 
 <div on-down="draggy" on-dragover="allowDrop" is-gridbox="true" class="horizontal layout" style="height:100%; min-width:99%!important; max-width:88vh;">
-
+<fc-fit-wrapper id="wrapper" class="item wrapper" drags dragging draggable on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe"></fc-fit-wrapper> 
 <template is="dom-repeat"  class="horizontal layout" id="template" items="{{dataArrays}}">
 
 <div class="vertical layout flex nowrap">
@@ -33,7 +33,7 @@
 </template>
 </div>
 </template>
-<fc-fit-wrapper id="wrapper" class="item wrapper" drags dragging draggable on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe"></fc-fit-wrapper> 
+
 </div>
 <!-- </fc-ddr-card> -->
  </template>
@@ -131,61 +131,51 @@
 
 
     },
- 		draggy(e){
+ 	draggy(e){
  			var targ=e.target;
  			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
-      {targ=targ.parentElement;}
+            {targ=targ.parentElement;}
  			if(targ.classList.contains("item")==true){
+            if(targ.classList.contains("wrapper")===true){this.set("isWrapper",true)};
  				targ.drags=true;
  				targ.dragging=true;
- 				targ.draggable=true;
-        if(targ.classList.contains("wrapper")==false){
-          var coords=e.model.__data__.val;
-          var theCoords=this.getIndex(coords);
-          this.set("dragCoords",[theCoords,coords]);
-          this.set("dragEl", targ);
-          this.set("dens",Polymer.dom(targ).nextSibling);
-          this.set('depe',Polymer.dom(targ).parentNode);
-         // console.log(this.dragCoords, this.dragEl,this.dens, "elene");
-        }
-        if(targ.classList.contains("wrapper")==true){this.set("isWrapper",true);}
- 				this.dragSwitch();
+            targ.draggable=true;
+            if(targ.classList.contains("wrapper")==false){
+               var coords=e.model.__data__.val;
+               var theCoords=this.getIndex(coords);
+               this.set("dragCoords",[theCoords,coords]);
+               this.set("dragEl", targ);
+               this.set("dens",Polymer.dom(targ).nextSibling);
+               this.set('depe',Polymer.dom(targ).parentNode);
+            }
  			}
- 			
-
+         console.log("leaving draggy");
  		},
 
-        dragsOff: function(){this.set("drags", false);},
-    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
-    dragSwitch: function(){this.set("drags", true);},
     focusedDragMe:function(e){
-     //  if(e.target.classList.contains("wrapper")==false){
-     //    var eid="#"+e.srcElement.id;
-     //    var nt=this.$$(eid);
-     //   // console.log(nt);
-     //    console.log(e);
-     //    nt.isGridbox=true;
-     //  }
-    	// if(nt.isGridbox==true){
-    	// 	this.dragSwitch();
+         e.preventDefault();
          if(this.isWrapper==true){
           console.log(e);
           var landingtarget=e.detail.sourceEvent.toElement;
-          console.log(landingtarget);
-          this.dropit(landingtarget);
+          console.log(landingtarget, "am a wrapper");
+          var wrap=this.$$("fc-fit-wrapper");
+         wrap.set("positionTarget", landingtarget);
+         console.log(wrap.positionTarget);
+           wrap.specialRefit(landingtarget);
+         wrap.set("drags",false);
+          // this.dropit(landingtarget);
         }
-      var nt=e.target;
-        if(nt.drags==true){
+            nt=e.target;
+        if(nt.drags===true){
             var self=nt;
-            e.preventDefault();
-           // console.log(e.model.keyv);
             switch(e.detail.state)
             {
               case 'start':
+             
                 // console.log('START NoWayAreWe Draggin');
-                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-                console.log(this.colGridMap);
+                // self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+                // self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                // console.log(this.colGridMap);
                // console.log('top distance differenced?' + self._topprime);
                // if(self.counter==0){   this.translate3d(0, 0, 0, self);}
                //  Polymer.dom(self).setAttribute("style.position", "absolute"); 
@@ -193,9 +183,9 @@
                // Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
                 console.log(e);
                 //this.$.template.set("refit",true);
-                self.changeX=0;
-                self.changeY=0;
-                Polymer.dom.flush();
+                // self.changeX=0;
+                // self.changeY=0;
+                // Polymer.dom.flush();
                 break;
               case 'track':
              
@@ -203,17 +193,17 @@
                 self.changeY=e.detail.ddy + self.changeY;
                 
               // this. translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0, self);
-               var hd=e.detail.hover();
+               // var hd=e.detail.hover();
            
                // var ho =this.$.templateTwo.modelForElement(this.hoverDude); does not work
               //  console.log(ho, this.hoverDude.element, this.hoverDude.event);
                 break;
               case 'end':
                // console.log(self._topprime);
-                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
-                self._bottom = self.getBoundingClientRect().top;
-                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
-                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+                // self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                // self._bottom = self.getBoundingClientRect().top;
+                // self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                // self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
             
 
             //    console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
@@ -239,7 +229,7 @@
                 if(this.isWrapper==true){this.dropit();}
                 else{ this.dropitlikeitsHot(); 
                 }
-               self.drags=false;
+               
             
 
                 break;
@@ -251,7 +241,7 @@
       var di=this.getIndex(newVal);
       
       var oldVal=this.dragCoords[1].toString();
-      console.log(newVal, oldVal, "youwho");
+      console.log(newVal, oldVal,di, "youwho");
       this.updateMap(newVal, oldVal);
       var removed=this.trueArrays[di[0]].row[di[1]];
       var hoverData=this.trueArrays[this.dragCoords[0][0]].row[this.dragCoords[0][1]];
@@ -266,16 +256,16 @@
       console.log(this.trueArrays[this.dragCoords[0][0]].row,this.trueArrays[di[0]].row);
       
   },
-  dropit(lt){
-    this.set("isWrapper",false);
-    var target= lt;
-    var wrap=this.$$("fc-fit-wrapper");
-    wrap.positionTarget = target;
-    wrap.defaultTarget= target;
-        console.log(target, wrap, wrap.positionTarget,wrap.defaultTarget);
-      wrap.refit();
+  // dropit(lt){
+  //   this.set("isWrapper",false);
+  //   var target= lt;
+  //   var wrap=this.$$("fc-fit-wrapper");
+  //   wrap.set("positionTarget", target);
+  //   console.log("indroppit", wrap.positionTarget);
+  //    wrap.specialRefit(target);
+  //    wrap.set("drags",false);
 
-  },
+  // },
 
   getIndex(val){
     var index=val.charAt(0);
