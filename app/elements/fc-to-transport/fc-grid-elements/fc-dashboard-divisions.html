@@ -1,15 +1,19 @@
 <dom-module id="fc-dashboard-divisions">
    <template>
   <style>
-  :host{overflow-y: scroll;}
+  :host{overflow-y: scroll;
+    @apply(--vertical-layout);
+    @apply(--layout-flex);
+  }
     .container {
       min-height: 99vh;
       border: 4px solid #aaa;
     }
     
-    #box1, #box3, #box5, #box6 {
+    #box1, #box3, #box5, #box6, #box11{
       width: 50%; 
     }
+  paper-material{max-height: 96.8vh;}
   div{overflow: hidden;
     height: 50%;
       overflow-y: scroll;
@@ -51,11 +55,24 @@
  -->
 
 <!--   <fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue"  is-picker="true" header-title="Focus Grid" class="horizontal layout flex" style="overflow: hidden" start-ht="91vh" style="padding-right:2px; width: 98%!important;" current-height="{{currentHeight}}">   -->
+<paper-material>
   <div class="container" horizontal="" layout="" style$="height:[[currentHeight]]">
     <div id="box11">
-    <div flex="" style="height: 45vh;"><paper-button on-tap="scrollH">scrollheight</paper-button><fc-mapped-grid style="position: static;" class="flex layout horizontal self-stretch fit"></fc-mapped-grid></div>
+<div class="flex dropzone" style="height: 45vh;"  on-dragover="allowDrop" on-up="handleDrop">
+  
+    <fc-relative-fit-wrapper id="wrapper1" class="item wrapper" on-down="dragStart" on-up="handleDrop">
+        <fc-calendar-dialog class="vertical layout flex self-stretch"></fc-calendar-dialog>     
+   </fc-relative-fit-wrapper>
+
+</div>
     <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up"></iron-splitter>
-    <div id="box4" flex=""><fc-mapped-grid style="position: static;" class="flex layout horizontal self-stretch fit"></fc-mapped-grid></div>
+    <div id="box4" class='flex dropzone'  on-dragover="allowDrop" on-up="handleDrop"><!-- <fc-mapped-grid style="position: static;" class="flex layout horizontal self-stretch fit">
+       -->
+<fc-relative-fit-wrapper id="wrapper2" class="item wrapper" on-down="dragStart" draggable drags on-up="handleDrop">
+
+<fc-calendar-options-selector></fc-calendar-options-selector></fc-relative-fit-wrapper> 
+
+   </div>
   </div>
 
 
@@ -65,11 +82,14 @@
 
 
     <div id="box5" class="flex">
-      <div class="layout flex" style="height: 45vh;">3<fc-mapped-grid style="position: static;" class="flex layout horizontal self-stretch fit"></fc-mapped-grid>
+      <div class="layout flex dropzone" on-dragover="allowDrop"  on-up="handleDrop" style="height: 45vh;">
+          <fc-relative-fit-wrapper id="wrapper3" class="item wrapper" draggable drags on-down="dragStart" on-up="handleDrop"><fc-profile-api></fc-profile-api></fc-relative-fit-wrapper>
       </div>
       <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up"></iron-splitter>
-      <div class="flex layout self-stretch" >
-      4<fc-mapped-grid style="position: static;" class="flex layout horizontal self-stretch fit"></fc-mapped-grid>
+      <div class="flex layout self-stretch dropzone" on-dragover="allowDrop" on-up="handleDrop">
+      <fc-relative-fit-wrapper id="wrapper4" class="item wrapper" draggable drags current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-down="dragStart"  on-up="handleDrop">
+      <fc-passage-display></fc-passage-display>
+      </fc-relative-fit-wrapper>
 
         
 
@@ -77,6 +97,7 @@
       </div>
     </div>
   </div>
+  </paper-material>
  <!--  </fc-ddr-card> -->
   </template>
   <script>
@@ -90,11 +111,70 @@ fauxSheight:{
   type: Number,
     notify: true
   },
-// scrollHeight: {
-//   computed:'_computeScrollHeight(fauxSheight)',
-//   notify: true,
+  isWrapper:{
+    type: Boolean,
+    value: false,
+    notify: true
+  },
+  dragEl:{
+    type: Object,
+    notify: true 
+  },
+  parentDragEl:{
+
+
+  },
 
 },
+
+  dragStart(e){
+      var targ=e.target;
+      while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
+            {targ=targ.parentElement;}
+      if(targ.classList.contains("item")==true){
+            if(targ.classList.contains("wrapper")===true){this.set("isWrapper",true)};
+        targ.drags=true;
+        targ.dragging=true;
+        targ.draggable=true;
+        this.set("dragEl", targ);
+        var par=Polymer.dom(targ).parentNode;
+        console.log(par)
+        this.set("parentDragEl",par);
+            }
+        console.log(this.dragEl, "leaving dragStart");
+    },
+
+   allowDrop: function (e) {
+      e.preventDefault();
+    },
+
+    handleDrop: function(e){
+        
+                   var lt=e.detail.sourceEvent.toElement;
+         var bool =Polymer.dom(lt).classList.contains("wrapper");
+        console.log(bool);
+         while(!bool && lt.nodeName!="FC-RELATIVE-FIT-WRAPPER")
+         {
+            lt=lt.parentElement;
+             var bool =Polymer.dom(lt).classList.contains("wrapper");
+         }
+         if(bool && this.isWrapper==true){
+          console.log(e, "in drop event");
+          console.log(lt, "am a wrapper element", this.dragEl, "dragElement");
+           var parent=lt.parentElement;
+        
+        
+          
+          Polymer.dom(this.parentDragEl).insertBefore(lt, this.dragEl);
+          console.log(this.parentDragEl, parent);
+        Polymer.dom(parent).appendChild(this.dragEl);
+          
+   
+         
+         Polymer.dom.flush();
+         }
+
+      },
 // },
 // attached:function(){
 //   this.scrollH();

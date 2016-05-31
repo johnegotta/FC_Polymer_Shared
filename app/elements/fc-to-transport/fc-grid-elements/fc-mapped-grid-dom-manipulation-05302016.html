@@ -12,9 +12,10 @@
 	position: static;
 	@apply(--horizontal-layout);
 	@apply(--layout-flex);
+ @apply(--layout-fit);
 	}
  </style>
-
+<!-- <fc-ddr-card id="focusedGrid" is-gridbox="true" head-class="darkBlue"  is-picker="true" header-title="Focus Grid" class="<content></content>" start-ht="91vh" style="padding-right:2px; width: 98%!important;">  -->
 <a>
 <div is-gridbox="true" class="horizontal layout flex self-stretch reverse" style="min-width:99.99vw; max-width:99.99vw; min-height: 91vh;">
 <content></content>
@@ -23,12 +24,12 @@
 
 <div id="divCol[[columnIndex]]" class="vertical layout flex nowrap self-stretch">
 <h4>{{item.column}}</h4>
-<template is="dom-repeat" id$="templateTwo{{item.column}}" class="vertical flex layout" items="{{item.cell}}" as="cell">
-<div location="{{cell.location}}" column="[[item.column]]">
-<section class="horizontal layout flex self-stretch item" location="{{cell.location}}" counter="0" drags draggable dragging is-gridbox="true" cell="{{cell}}" key="{{cell.key}}" value="{{cell.value}}"style$="min-width:calc(80%/17); min-height:calc(88vh/16); max-width: 300px; max-height:182px; background-color:#[[cell.key]]ffff; border:2px solid #009; font-size:14px;" on-down="startDrag" on-dragover="allowDrop" on-up="handleDrop"id$="gridBox{{cell.key}}">
+<template is="dom-repeat" id="templateTwo" class="vertical flex layout" items="{{item.cell}}" as="cell">
+<div location="{{cell.key}}" column="[[item.column]]">
+<section class="horizontal layout flex self-stretch item" location="[[cell.location]]" counter="0" drags draggable dragging is-gridbox="true" key="{{cell.key}}" style$="min-width:calc(96vw/16); min-height:calc(96vh/16); max-width: 120px; max-height:182px; background-color:#ffff[[cell.key]]; border:2px solid #009; font-size:14px;" on-down="startDrag" on-dragover="allowDrop" on-up="handleDrop"id$="gridBox{{cell.key}}">
 
 {{cell.location}}
-<fc-input-prime input-type="text" id$="input[[cell.key]]" drags dragging dragable on-change="adjustValueArrays" input-style="max-width: 50px; max-height: 50px;" label="KEY: [[cell.key]]" value="{{cell.value}}" key="{{cell.key}}" to-location="{{cell.location}}" ></fc-input-prime>
+<fc-input-prime input-type="text" id$="input[[cell.key]]" on-change="adjustValueArrays" input-style="max-width: 50px; max-height: 50px;" label="[[cell.key]]" value="{{cell.value}}" key="[[cell.key]]" to-location="[[cell.location]]" ></fc-input-prime>
 </section>
 </div>
 </template>
@@ -37,6 +38,7 @@
 
 </div>
 </a>
+<!-- </fc-ddr-card> -->
  </template>
  <script>
  FcMappedGrid=Polymer({
@@ -65,16 +67,18 @@
       value: function(){return[];},
       notify: true,
     },
-    stateMap:{
+    valuesMap:{
       type: Map,
-      notify: true,
 
     },
     eventModelCell:{
       type: Object,
     },
-   
- 		gridMap:{
+    dropTargetCellObject:{
+      type: Object,
+
+    },
+ 		gridHistoryMap:{
  			type:Map,
 	 		},
       stateMap:{
@@ -82,14 +86,19 @@
          observer:"observeStateMap",
      
       },
-    
+      currentHeight:{
+        notify:true,
+      },
+      currentWidth:{
+        notify: true,
+      },
     isWrapper:{
       type: Boolean,
       value: false,
       notify: true
     },
 
-	 	drags:{type: Boolean, value: function(){return true;}, notify: true},
+	 	drags:{type: Boolean, value: function(){return false;}, notify: true},
 	 	
  		},
 
@@ -104,7 +113,7 @@
          index2=e.model.cell.key.charAt(1),
          val = e.target.value,
         valueStart =e.model.cell.value;
-        console.log(val, valueStart, index1, index2, e.model.cell.location, e.model.cell.key, "look for VALUES HERE", e);
+        console.log(val, valueStart, index2, index1);
 
 
 
@@ -114,10 +123,12 @@
     ready(){
       var da=this.setDataArrays();
       this.set("dataArrays",da);
-      var map=this.setMaps(da);
+      //var map=this.setMaps(da);
       var clone=da.map(function(item, index, array){  return item;});
       console.log(clone);
       this.set("trueArrays",clone);
+      // this.set("gridHistoryMap",map[0]);
+      // this.set("stateMap", map[1]);
       },
 
       // var retsub=item.cell.map(function(it, i){return [it.val, it.value];}); console.log(retsub[index]);
@@ -150,19 +161,21 @@
     setMaps(da){
         var map=new Map(); 
         this.keys2=[];
+        var valMap=new Map();
         var stateMap=new Map();
        var sa= this.dataArrays.reduce(function(pre, val, index, array){
          return pre.concat(val.cell);
        },[]).forEach(function(vals, index, array){
         var key=vals.key;
-        var value=[{"value": vals.value,"timestamp": new Date().getTime(),"userId": "userString", "location": vals.location}];
+        var value=[[vals,new Date().getTime(),"userString"]];
         map.set(key,value);
-        var k2=vals.location;
-        stateMap.set(k2,[vals.key, vals.value]);
+        var changeRecord={"currentValue":vals.location, "changeRecord": value};
+        valMap.set(key,changeRecord);
+
+        stateMap.set(key,vals.val);
        }, this);
-       this.set("stateMap", stateMap);
-       this.set("gridMap", map)
-       console.log("gridMap: ",map, "stateMap: ", stateMap);
+       this.set("valuesMap", valMap);
+       console.log("map: ",map, "stateMap: ", stateMap, "valuesMap", valMap);
        var mapPair=[map,stateMap];
 
        return mapPair;
@@ -182,7 +195,25 @@
       this.initializeValuesMap, 8500);
 
     },
-   
+    initializeValuesMap(){
+      var vmap=new Map();
+     var parent=this.$.template;
+     // console.log(parent); why 10 times?
+         //var  primeArray=Polymer.dom(parent).querySelectorAll("template[is='dom-repeat']");
+         // template[is="dom-repeat"]
+         
+      
+     //     var smkeys=this.stateMap.keys();
+     // console.log(smkeys);
+     // var mappedParray=primeArray.map(function(val, i, index){
+     //   var key=smkeys.next().value;
+     //     vmap.set(key, [val, val.value]);
+     //     return [key, val.value];
+     //  });
+     // //console.log(vmap);
+     // this.set("valuesMap", vmap);
+    // console.log(this.valuesMap, "this is the coolest map ever");
+    },
     updateHistory(key, value){
       var ova=this.gridHistoryMap.get(key),
       nva=[value, new Date().getTime(),"userString"],
@@ -191,7 +222,7 @@
       console.log(this.gridHistoryMap, this.gridHistoryMap.get(key));
     },
  	startDrag(e){
-    e.preventDefault(e);
+    e.preventDefault()
  			var targ=e.target;
  			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
             {targ=targ.parentElement;}
@@ -199,11 +230,16 @@
  				targ.drags=true;
  				targ.dragging=true;
         targ.draggable=true;
-        var coords=targ.key;
+        console.log(targ);
+        var coords=targ.location;
+        console.log(coords, "look here");
        var theCoords=this.getIndex(coords);
-              this.set("eventModelCell", e.model.__data__.cell);
+              this.set("eventModelCell", e.model.__data__.cell.location);
+               console.log(e.model.__data__.cell, "startHere, thenpass");
                this.set("dragCoords",[theCoords,coords]);
-               
+               console.log(this.dragCoords);
+               this.set("dragEl", targ);
+          console.log(e);
         }
       },
    allowDrop(e){
@@ -216,27 +252,31 @@
                 lt=lt.parentElement;
                 bool=Polymer.dom(lt).classList.contains("item");
               }
-            var key=lt.key;
-            var val=lt.value;
-       
-            var locator= this.getIndex(lt.key);
-            newLocationArray=[[locator[0],locator[1]],key];
-            var myKey=lt.key;
-            var tempParent=lt.parentElement;
-            while((tempParent && !tempParent._templateInstance)&&tempParent!=null){
-              tempParent=tempParent.parentElement;
-            }
-            this.set(['trueArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"key"],myKey);
-            this.set(['trueArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'key'],this.dragCoords[1]);
-        
-         e.model.set("cell.key",myKey);
-            tempParent._templateInstance.dataHost.modelForElement(lt).set("cell.key", this.dragCoords[1]);
-            this.stateMap.set(this.dragCoords[1],[myKey, lt.value]);
-            this.stateMap.set(newLocationArray[1],[this.dragCoords[1],this.trueArrays[newLocationArray[0][0]].cell[newLocationArray[0][1]].value]);
-            this.console.log(this.stateMap);
-                console.log(lt.cell, "look here for cell", lt.value, this.trueArrays);
-             Polymer.dom.flush();
-
+            var loc=lt.location;
+            console.log(lt.location, "loook here");
+            var locator= this.getIndex(lt.location);
+            newLocationArray=[[locator[0],locator[1]],loc];
+            var myLoc=lt.location;
+            console.log(e, lt, myLoc);
+              console.log(this.dragCoords[0][0], this.dragCoords[0][1], newLocationArray[0][0], newLocationArray[0][1])
+            this.set(['trueArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"location"],myLoc);
+            this.set(['trueArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+              e.model.set("cell.location",myLoc);
+            // while(parent.nodeName!="TEMPLATE" && parent.nodeNam!="DOM-REPEAT" && parent.nodeName!="FC-DASHBOARD-ONE"){
+            //   if(parent.nodeName=="A"){              parent=Polymer.dom(parent).parentNode;}
+            //   console.log(parent.nodeName);
+            //   parent=Polymer.dom(parent).parentNode;
+            // }
+         console.log(lt, e.model.dataHost);
+            // parent.modelForElement(lt).set("cell.location", this.dragCoords[1]);
+            
+            var parent=Polymer.dom(lt).parentNode,
+      parent2=Polymer.dom(this.dragEl).parentNode,
+      nes=Polymer.dom(lt).nextSibling,
+      nes2=Polymer.dom(this.dragEl).nextSibling;
+       Polymer.dom(parent2).insertBefore(lt, nes2);
+       Polymer.dom(parent).insertBefore(this.dragEl, nes);
+       Polymer.dom.flush();
    
       
    
@@ -264,30 +304,7 @@
   });
     </script>
    </dom-module>
-   <!--
-  
-           // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
-         // e.model.set("cell.location",myLoc);
-         //    while(parent.nodeName!="TEMPLATE" && parent.nodeNam!="DOM-REPEAT" && parent.nodeName!="FC-DASHBOARD-ONE"){  console.log(parent.nodeName);
-         //     if(parent.nodeName=="TEMPLATE"){  console.log(parent.nodeName);            }
-         //       console.log(parent.nodeName);
-         //    //   parent=Polymer.dom(parent).parentNode;
-         //   }
-         // console.log(lt, e.model.dataHost);
-      //       var parent=Polymer.dom(lt).parentNode,
-      // parent2=Polymer.dom(this.dragEl).parentNode,
-      // nes=Polymer.dom(lt).nextSibling,
-      // nes2=Polymer.dom(this.dragEl).nextSibling;
-      //  Polymer.dom(parent2).insertBefore(lt, nes2);
-      //  Polymer.dom(parent).insertBefore(this.dragEl, nes);
-              
-
-
-              // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
-        
-       
-            // this.notifyPath(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
-   //  if(this.isWrapper==true){
+   <!--//  if(this.isWrapper==true){
         //   var wrap=this.$$("fc-fit-wrapper");
         //  wrap.set("positionTarget", lt);
         //    wrap.specialRefit(lt);

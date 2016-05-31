@@ -1,48 +1,30 @@
-<dom-module id="fc-fit-wrapper">
+<dom-module id="fc-relative-fit-wrapper">
 <template>
   <style>
     :host {
+      background: white;
       color: #009;
       text-align: center;
       position: relative!important;
       overflow: scroll;
+
     }
     div{padding: 0px;
-        background: white;}
+        background: white;
+        border: 14px silver ridge;
+        overflow: scroll;}
         section{background: aqua;}
   </style>
 
-<div id="myPanel" style="border:4px double #009; height:[[computePanelHeight(positionTarget)]]; max-width: 4000px; max-height: 4000px; width:[[computePanelWidth(positionTarget)]];">
- <button on-tap="openButtons">O</button><paper-button on-tap="seeElement">Yep</paper-button>
-   <iron-collapse id="collapsable">
-  <section on-tap="updateAlign">
-   <p>
-      <button data-align="verticalAlign_top">top</button>
-      <button data-align="verticalAlign_bottom">bottom</button>
-      <button data-align="verticalAlign_auto">auto</button>
-      <button data-align="verticalAlign_null">null</button>
-    </p>
-    <p>
-      <button data-align="horizontalAlign_left">left</button>
-      <button data-align="horizontalAlign_right">right</button>
-      <button data-align="horizontalAlign_auto">auto</button>
-      <button data-align="horizontalAlign_null">null</button>
-
-    </p>
-    <p>
-    <button data-align="noOverLap_bool_false">no overlap</button>
-    <button data-align="dynamicAlign_bool_true">dynamic align</button>
-    </p>
-  </section>
-  </iron-collapse>
-  <iron-collapse id="seeUrElement">
+<div id="myPanel" style="background: white; height:[[computePanelHeight(positionTarget,special)]]; width:[[computePanelWidth(positionTarget,special)]];">
+ <iron-collapse id="seeElement" style="background:white;">
     <content></content>
-    </iron-collapse>
+  </iron-collapse>
 </div>
  </template>
 <script>
 FcFitWrapper=Polymer({
-    is: 'fc-fit-wrapper',
+    is: 'fc-relative-fit-wrapper',
     behaviors: [
       Polymer.IronFitBehavior,
       // FCBehaviors.ResizableRootBehavior
@@ -55,6 +37,11 @@ FcFitWrapper=Polymer({
       positionTarget:{
         value: function(){return Polymer.dom(this.root.parentNode);},
         notify: true
+    },
+    special:{
+
+
+
     },
 
       parentN:{
@@ -71,35 +58,20 @@ FcFitWrapper=Polymer({
     },
     ready(){
       this.initialize();
+      this.openToSeeElement();
         },
     initialize(){
       this.set("autoFitOnAttached",false);
       this.set("dynamicAlign",true);
       this.set("noOverlap", false);
-      this.set("verticalAlign","auto");
-      this.set("horizontalAlign","auto");
+      this.set("verticalAlign","top");
+      this.set("horizontalAlign","left");
 
         },
 
-    openButtons(){
-        this.$.collapsable.opened=!this.$.collapsable.opened;
-      },
-     seeElement(){
-
-     this.$.seeUrElement.opened=!this.$.seeUrElement.opened
-   },
-    updateAlign(e){  
-      if(e.target.nodeName==="BUTTON"){  
-          var target = e.target.dataset.align;
-          var attValArr=target.split("_"),
-          att=attValArr[0].toString(),
-          val=attValArr[1].toString();
-          if(val=="bool"){this.set(att,!this[att]);}
-          else{this.set(att,val);}
-        }
-        console.log(this.horizontalAlign, this.verticalAlign, this.dynamicAlign);
-          this.specialRefit();
-      },
+    openToSeeElement(){
+      this.$.seeElement.opened=true;
+    },
       _computeFitInto(pt){
         console.log(pt);
         if(pt && pt.parentNode){
@@ -127,6 +99,8 @@ FcFitWrapper=Polymer({
 
   },
 
+
+
   specialRefit(target){
     console.log("in sp1");
     this.set("positionTarget",target);
@@ -140,9 +114,11 @@ FcFitWrapper=Polymer({
         this.async(this.refit, 3);
       });
       }
-      else{
-        this.refit(); console.log("in sp2");}
+      else{this.refit(); console.log("in sp2");}
+      console.log(target.style.width, target.style.height, window.getComputedStyle(target, null).getPropertyValue("width"), window.getComputedStyle(target, null).getPropertyValue("height"));
+      var newHeight=window.getComputedStyle(target, null).getPropertyValue("height");
       this.computePanelWidth(target);
+      var newWidth=window.getComputedStyle(target, null).getPropertyValue("width");
       this.computePanelHeight(target);
     },
 
@@ -164,7 +140,9 @@ FcFitWrapper=Polymer({
      attached: function(){
         var self=this;
         this.set("isResizing", true);
-     
+        var self=this;
+        var par=Polymer.dom(this.root).parentNode;
+    console.log(par);
         this.click();
         this.set("heightHolder", this.currentHeight);
         this.set("_notifyingDescendant", true);
@@ -173,29 +151,7 @@ FcFitWrapper=Polymer({
 
     },
 
+
   });
 </script>
 </dom-module>
-<!--
-    template._raf = null;
-    template.refit = function() {
-      template._raf && window.cancelAnimationFrame(template._raf);
-      template._raf = window.requestAnimationFrame(function() {
-        template._raf = null;
-        myFit.refit();
-      });
-    };
-
-
-
-    // Listen for resize and scroll on window.
-    window.addEventListener('resize', template.refit);
-    window.addEventListener('scroll', template.refit);
-
-    function toggleClass(element, cssClass, condition) {
-      element.classList[condition ? 'add' : 'remove'](cssClass);
-    }
-  </script>
-</template>
-
-</script> -->
