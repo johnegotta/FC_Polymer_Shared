@@ -1,0 +1,152 @@
+<dom-module id="fc-grid-columns">
+<template id="fc-grid-columns-template">
+<div is-gridbox="true" class="horizontal layout flex self-stretch reverse" style="min-width:79.99vw; max-width:85.99vw; min-height: 91vh;">
+
+    <template is="dom-repeat"  class="horizontal layout flex" id="template" index-as="columnIndex" items="[[dataArrays]]">
+      <div id="divCol[[columnIndex]]" class="vertical layout flex nowrap self-stretch">
+        <section class="horizontal layout flex nowrap center center-justified self-stretch" style="background: aliceblue; border: 2px #005c00 ridge; font-weight:700; color: #009; font-size: 20px; overflow: hidden; text-align: center;">{{item.column}}</section>
+<template is="dom-repeat" id$="templateTwo_{{item.column}}" class="vertical flex layout" items="{{item.cell}}" as="cell">
+<div location="{{cell.location}}" val="{{cell}}" value="{{cell.value}}" column="[[item.column]]">
+<content select=".sweetSpot">
+</content>
+</div>
+</template>
+</div>
+</template>
+
+</div>
+</template>
+</dom-module>
+<script>
+FcGridColumns=Polymer({
+	is:"fc-grid-columns",
+	properties:{
+	  theCoords:{
+      type: Array,
+      value:function(){return[];},
+    },
+    dragEl:{
+      type: Object,
+    },
+    dataArrays:{
+      type: Array,
+      value:function(){return[];},
+    },
+    trueArrays:{
+      type: Array,
+      value: function(){return[];},
+      notify: true,
+    },
+ 	gridMap:{
+ 			type:Map,
+	 		},
+    stateMap:{
+      type: Map,
+      observer:"observeStateMap",
+      },
+    },
+
+    ready(){
+      var da=this.setDataArrays();
+      this.set("dataArrays",da);
+      var map=this.setMaps(da);
+      //var clone=da.map(function(item, index, array){  return item;});
+      console.log(clone);
+      //this.set("trueArrays",clone);
+      },
+
+     setDataArrays(){
+        var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"], columnNames=["Years","January","February","March","April","May","June","July","August","September","October","November","December","Year Total",`&#x0394`, `&#x0394`], tempArr=[];
+        	var retArrays=columnKeys.map(function(val, index,array)
+        		{
+                    var count=array.length, tempArr=[],valueArray=[];
+                    for(var i=0;i<count;i++)
+                    {  var retMini= val+array[i],
+                       value="inputValue__"+index+"_"+i;
+                       tempArr.push({"key": retMini, "location": retMini, "value": retMini});
+                       valueArray.push(value);
+                    }
+                   var retVal={column: columnNames[index], cell: tempArr, values:valueArray};
+                   return retVal;
+               	},[]);
+        return retArrays;
+        },
+    setMaps(da){
+        var map=new Map(); 
+        this.keys2=[];
+        var stateMap=new Map();
+       	var sa= da.reduce(function(pre, val, index, array){return pre.concat(val.cell);},[]).forEach(function(vals, index, array){var key=vals.key,value=[{"value": vals.value,"timestamp": new Date().getTime(),"userId": "userString", "location": vals.location}];
+        map.set(key,value);
+        var k2=vals.location;
+        stateMap.set(k2,[vals.key, vals.value,[value]]);
+       }, this);
+       this.set("stateMap", stateMap);
+       this.set("gridMap", map)
+       console.log("gridMap: ",map, "stateMap: ", stateMap);
+       var mapPair=[map,stateMap];
+       return mapPair;
+        },
+    startDrag(e){
+    e.preventDefault();
+ 			var targ=e.target;
+ 			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
+            {targ=targ.parentElement;}
+ 			if(targ.classList.contains("item")==true){
+ 				targ.drags=true;
+        targ.draggable=true;
+        var coords=targ.key;
+       var theCoords=this.getIndex(coords);
+               this.set("dragCoords",[theCoords,coords]);        
+        }
+      },
+   allowDrop(e){
+          e.preventDefault();
+        },
+  handleDrop(e){
+          var lt=e.detail.sourceEvent.toElement, bool=Polymer.dom(lt).classList.contains("item");
+            while(!bool && lt.nodeName!="DIV")
+              {
+                lt=lt.parentElement;
+                bool=Polymer.dom(lt).classList.contains("item");
+              }
+            var key=lt.key;
+            var val=lt.value;
+       
+            var locator= this.getIndex(lt.key);
+            newLocationArray=[[locator[0],locator[1]],key];
+            var myKey=lt.key;
+            var tempParent=lt.parentElement;
+            while((tempParent && !tempParent._templateInstance)&&tempParent!=null){
+              tempParent=tempParent.parentElement;
+            }
+          this.set(['trueArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"key"],myKey);
+          this.set(['trueArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'key'],this.dragCoords[1]);
+    //set template instance data    
+    e.model.set("cell.key",myKey);
+    tempParent._templateInstance.dataHost.modelForElement(lt).set("cell.key", this.dragCoords[1]);
+    //set instance data
+            this.stateMap.set(this.dragCoords[1],[myKey, lt.value]);
+            this.stateMap.set(newLocationArray[1],[this.dragCoords[1],this.trueArrays[newLocationArray[0][0]].cell[newLocationArray[0][1]].value]);
+            console.log(this.stateMap, this.dataArrays);
+                console.log(lt.cell, "look here for cell", lt.value, this.trueArrays);
+             Polymer.dom.flush();   
+  },
+
+	  getIndex(cell){
+	    var index=cell.toString().charAt(0);
+	    var dex1=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15:parseInt(index); 
+	    index=cell.charAt(1);
+	    var dex2=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15: parseInt(index);
+	    return [dex1, dex2];
+	  },
+	  getCoordsFromIndex(ind){
+	    var index=ind[0];
+	    var dex1=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+	    index=ind[1];
+	    var dex2=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+	    index=ind[1];
+	    var retVal=dex1.toString()+dex2.toString();
+	    return retVal;
+	  }
+  });
+    </script>

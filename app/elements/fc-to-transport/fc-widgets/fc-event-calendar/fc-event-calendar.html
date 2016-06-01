@@ -2,19 +2,23 @@
 <template>
 <style>
 :host{
-	position: relative;
+	position: absolute;
 		background: white;
 	box-shadow: 4px 11px 21px 7px #9fafaf;
-		display: block;
-	margin: 2px;
+
+		max-width: 100%;
+	padding: 0px 0px;
+	margin: 6px 10px;
+max-height: 92vh;
+display: flex;	/*width: 420px;*/
+
 
 }
 .calendarheader{
 	border-right: 1px solid white;
 	text-align: center; 
 	padding-right:1px; 
-	width:calc(100%/7.5)!important; 
-	font-size: 9px; 
+	font-size: 14px; 
 	font-weight: 600; 
 	max-width: 25px; 
 	margin: auto; 
@@ -22,17 +26,17 @@
 	border-top: 1px solid #afafaf; 
 	margin-bottom: 3px; 
 	background: white;
-	max-width: 32px;
+	/*max-width: 32px;*/
 }
 .calendarcontainer{
 background: white; 
-width: 210px !important;
+/*width: 440px !important;*/
 
 }
 .calendarborder{
-	background: #008; 
-	max-height: 38px!important; 
-	border-bottom: silver solid 2px; 
+	background: #005c00; 
+	/*max-height: 38px!important; */
+	border-bottom: #005c00 solid 2px; 
 	width: 100%;
 }
 .pretty{
@@ -52,9 +56,13 @@ width: 30px;
 	margin: 0 auto;
 	text-align: center;
 	color: white; 
-	font-size:16px; 
+	font-size:22px; 
 	font-weight: 500;
 	padding: 6px 6px;
+	@align(--layout-self-stretch);
+	@align(--layout-center);
+	@align(--layout-flex);
+	@align(--layout-center-justified);
 	
 	
 	}
@@ -70,92 +78,90 @@ min-height: 38px;
   .card{
   	border-top: 1px solid silver;
   	text-align: center; 
-  	width:calc(100%/7.5); 
+  	/*width:calc(100%/7.5);*/ 
   	margin: 1px; 
   	display: flex;
-  	min-height: 32px!important;
-  	max-height: 32px!important;
-  	@apply(--self-shrink);
+  /*	min-height: 32px!important;*/
+  	/*max-height: 32px!important;*/
+  	@apply(--self-stretch);
   } 
   .cardcontainer{
-  	width: 210px!important;
+  /*	width: 440px!important;*/
   	background: white; 
   	overflow:scroll; 
-  	height: 225px; 
-  	min-height: 180px;
+  	/*height: 225px; 
+  	min-height: 180px;*/
   }
   .cardcontainer2{
-	width: 210px!important;
+	/*width: 420px!important;
   	background: white;
 	padding: 6px 0px; 
-	height: 225px;
+	height: 225px;*/
   	overflow:scroll; 
-  	min-height: 180px;
+  /*	min-height: 180px;*/
   }
 </style>
-		<div class="vertical layout flex wrap calendarcontainer">
-			<paper-material class="horizontal layout flex calendarborder">
-				<span class="horizontal layout flex center-justify headerTop" style="align-items: center;">
+	<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; left: 0px; top: -10px; right:0px; cursor:ns-resize; padding: 4px; height: 8px!important;opacity: 1;"></section>
+		<div drags on-down="dragsOn" on-track="focusedDragMe" id="myPanel" style$="width:{{currentWidth}};height:{{currentHeight}}px;" class="vertical layout flex calendarcontainer">
+		<div horizontal flex-2 layout style="background: #fafafa; padding: 24px;">
+		I am your mudderFingViewScreen
+		</div>
+		<!-- <section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; left: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section> -->
+			<section class="layout flex">
+			<paper-material class=" layout flex around-justified calendarborder">
+				<section class="horizontal layout flex center-justify headerTop" style="align-items: center;">
 					<paper-icon-button 
 						on-tap="_backOne" 
 						icon="icons:chevron-left" 
 						hidden={{backHidden}} 
 						class="headerArrowLeft layout horizontal flex-2 self-shrink">
 					</paper-icon-button>
-					<span class="layout horizontal flex-7 nowrap headerMonthYear" style="padding-left: 22%;">
+					<section class="layout horizontal headerMonthYear" >
 					[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
-					</span>
+					</section>
 					<paper-icon-button 
 						on-tap="_forward" 
 						hidden="{{forwardHidden}}" 
 						icon="icons:chevron-right" 
 						class="headerArrowRight layout horizontal flex-2 self-shrink">
 					</paper-icon-button>
-					</span> 
+					</section> 
 			</paper-material>
+			 <section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section>
 			<section class="horizontal layout flex">
-			<template is="dom-repeat" class="horizontal layout nowrap" items="{{days}}">
-			<!--example of stupid-->
-				<paper-material class="calendarheader">
-					{{item}}
-				</paper-material><!--days of week header-->
-			</template>
+						<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
+		<div class="vertical layout flex" style$="width:calc(.84*{{currentWidth}})px; height:calc(.84*{{currentHeight}})px;" >
+		<paper-material class="horizontal layout center center-justified" style="font-size: 20px; font-weight:600; background: #005c00; color: white;text-align: center; padding: 1px;">
+			
+			<a >	{{item.0}}
+				</a>
+		</paper-material>
+		<section class="vertical layout flex" style="background: white; box-shadow: 4px 11px 21px 7px #9fafaf; border-bottom: 1px silver solid; border-right: 1px silver solid;">
+			<template is="dom-repeat" items="{{item.1}}" as="day" style="font-size: 24px; font-weight:600; color: #005c00;">
+			<section style="border:green solid 2px; padding: 8px; background: white;" class="date horizontal layout center center-justified">
+			<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; border-radius:50%;"></iron-icon>
+			{{day.eventText}}
+			{{day.eventU}} 
+			<a class="date horizontal layout center-justified" id="button" style="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: #005c00;"><span hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</span></a>
+			<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}}; border-radius:50%;"></iron-icon>
+			{{day.eventText}}
+			{{day.eventU}} 
 			</section>
-		</div>
-		<div class="vertical layout cardcontainer" >
-			<section class="horizontal flex layout wrap cardcontainer2">
-				<template 
-					is="dom-repeat" 
-					class="horizontal layout wrap" 
-					items="{{displayed}}" 
-					as="day">
-						<fc-date-mini
-						 	class="card"
-						 	in-month="[[computeNotInMonths(day.freshDate, displayedIndex)]]"
-						 	day="{{day}}"
-						 	day-id="{{day.dayId}}"
-						 	style$="margin: 0px auto; font-size: 13px" 
-						 	calendar-day={{day}}
-						 	mini-date="{{day.date}}"
-						 	index={{day.index}} 
-						 	id$={{day.dateId}} 
-						 	testDate={{day.testDate}} 
-						 	event-list="{{day.eventList}}"
-						 	fc-course="{{fcCourse}}">
-							<a class="date" id="button" >[[day.dayOfMonth]]</a>
-						</fc-date-mini>	
-				</template>
-			</section>
-		</div>
-		<section style="height: 22px; background: silver; border-bottom: 6px solid #008;">
-		<span style="background: #aedefe; height: 16px; width: 100%;"></span>
+		</template>
 		</section>
+		</div>
+		</template>
+		</section>
+		
+	
+
+ <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn"></section>
+ </div>
 </template>
 <script>
 FcEventCalendar=Polymer({
-	is: "fc-date-picker",
-	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,
-			 FCBehaviors.DraggableBehavior],
+	is: "fc-event-calendar",
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime],
 	observers:[],
 	properties: {
 		day:{
@@ -187,6 +193,10 @@ FcEventCalendar=Polymer({
 			value: 0,
 			notify: true
 		},
+		displayedTwo:{
+			type: Array,
+			notify: true
+		},
 		displayed:{
 			type: Array,
 			notify: true
@@ -194,6 +204,17 @@ FcEventCalendar=Polymer({
 		displayedCalendarMonth:{
 			type: String,
 			computed: "computeViewMonth(displayedIndex)",
+			notify: true
+		},
+		currentWidth: {
+			type: String,
+			value: function(){},
+			notify: true,
+
+		},
+		currentHeight: {
+			type: String,
+			value: function(){return "42vh";},
 			notify: true
 		},
 		units: {
@@ -215,9 +236,21 @@ FcEventCalendar=Polymer({
 			type: Array,
 			value: [],
 			notify: true
-		}
-   },
+		},
+		drags:{
+			value: true,
+			notify: true
+		}, 
+		isResizing: {
+			value: true,
+			notify: true
 
+		},
+
+   },
+computeEventHeightLightColor:function(){
+	return "aliceblue";
+},
 
 computeDay: function(day){if(day){return "pretty";}
 },
@@ -227,7 +260,61 @@ ready: function()
 		var index=today.getMonth();
  		this.set("displayedIndex",index);
 		this.async(this.initialize, 40);
+
+
 },
+
+computeCurrentHeight: function(currentHeight){
+    	var ht=window.screen.height;
+      ht=.90*(ht);
+      ht=ht.toString()+"px";
+    	if(this.currentHeight==undefined) {this.set("currentHeight", ht); this.style.height=ht;}
+    	
+    	
+    },
+setArrays:function(){
+	var daysofweek=this.displayed.sort(function(a,b){
+		return (b.date.getDay()-a.date.getDay());});
+
+	console.log(daysofweek, "yoohoo");
+	var daysOfWeek=daysofweek.reverse();
+	var dow=[["Sun"],["Mon"],["Tues"],["Wed"],["Thur"],["Fri"],["Sat"]];
+	var counter=daysofweek.length;
+	var holder=[],
+	iconsarr=["social:school","editor:border-color", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
+	holder.push(daysOfWeek[0]);
+	for(let i=1; i<counter; i++)
+	{	var truth=(daysOfWeek[i].date.getDay()==daysOfWeek[i-1].date.getDay());
+		if(daysOfWeek[i].inMonth && i%3==0){
+			daysOfWeek[i].eventIcon=iconsarr[Math.floor(i/3)],
+			daysOfWeek[i].eventIcon1=iconsarr[Math.floor((i/3)+(1/4))],
+			daysOfWeek[i].eventPrimaryColor="aliceblue",
+			daysOfWeek[i].eventSecondaryColor="#009";
+			daysOfWeek[i].eventPrimaryColor1="aliceblue",
+			daysOfWeek[i].eventSecondaryColor1="red";
+		}
+		if(truth)
+		{
+			holder.push(daysOfWeek[i]);
+		}
+		if(i==counter-1 || !truth){
+			var holder2=holder.sort(function(a,b){
+				return a.displayIndex-b.displayIndex;
+			});
+			console.log(holder2, "h2");
+			var slot=Math.floor(i/7);
+			if(i==counter-1){slot++;}
+			dow[slot].push(holder2);
+			holder=[];
+			holder2=[];
+			holder.push(daysOfWeek[i]);
+			}
+
+	}
+	console.log(dow, "dow");
+	this.set("displayedTwo", dow);
+
+	},
 initialize:function(days){
 	var startYear =new Date().getFullYear();
    	var endYear =startYear + 3;
@@ -255,9 +342,11 @@ initialize:function(days){
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
 		var calendar =[];
+		console.log(this.displayed);
 		calendar = this.calendarDayArray;
 		this.set("fcCourse.courseCalendarDaysArray", calendar);
 		this.set("fcCourse.calendarDayArray", calendar);
+			this.setArrays();
 },
 
 computeDisplayed: function (displayedIndex)
@@ -312,12 +401,128 @@ computeViewMonth: function(displayedIndex){
 	return monArr[displayedIndex];
 	},
 
-computePrettyDay: function(day)
- 	{
-  		var result = day.toDateString();
-  		result = result.slice(0,10);  		
-  		return result;
+_computePrettyDay: function(d)
+ 	{	
+ 		var day=new Date(d).getDate();console.log(day);
+ 		return day;
+
  	},
+
+ 	 _resize: function(e){
+          var self=this;
+          var template=this.$.ddrtemplate;
+          this.set("drags",false);
+          e.preventDefault();
+          var width=Math.floor(parseFloat(window.screen.width)*.96);
+          var height=Math.floor(parseFloat(window.screen.height)*.999);
+          if(this.isResizing==true){
+          switch(e.detail.state) {
+                case 'start':
+                var theId=this.relId;
+                var elem=this.$$(theId);
+                var sWidth =window.getComputedStyle(self.$.myPanel, null).getPropertyValue("width");
+                self.set("currentWidth", sWidth);
+              
+                 break;
+                case 'track':
+                  var newheight = parseInt(self.currentHeight) + e.detail.ddy;
+                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
+                  var nheight2=(newheight<parseFloat(self.minHeight))?self.minHeight:(newheight>height)?height: newheight;
+                  var nwidth2=(nwidth<320)?320:(nwidth>width)? width:nwidth;
+                  var trueWidth = nwidth2.toString()+'px';
+                  var trueHeight = nheight2.toString()+'px';
+                  
+                  
+                  self.set("currentWidth",trueWidth);
+                  self.set("currentHeight",trueHeight);
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                
+                  break;
+                case 'end':
+                  self.style.width= trueWidth;
+                  self.style.height= trueHeight;
+                  this.set("heightHolder", self.currentHeight);
+                  this.set("widthHolder", self.currentWidth);
+                  // self.notifyResize();
+                  this.toggleColor=true;
+                  // self._onIronResize();
+                  self.set("refit", true);
+                 // self.afterStartResize();
+                  Polymer.dom.flush();
+                  break;
+              }
+            }
+        },
+      
+      dragsOff: function(){this.set("drags", false);},
+    dragsOn: function(){ if(!this.drags){this.async(this.dragSwitch, 500);}},
+    dragSwitch: function(){this.set("drags", true);},
+    focusedDragMe:function(e){
+        if(this.drags==true){
+            var self=this;
+            e.preventDefault();
+            switch(e.detail.state)
+            {
+              case 'start':
+                // console.log('START NoWayAreWe Draggin');
+                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
+                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                console.log('top distance differenced?' + self._topprime);
+               if(self.counter==0){   self.translate3d(0, 0, 0);}
+                Polymer.dom(self).setAttribute("style.position", "fixed"); 
+               Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
+               Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
+                
+                self.set("refit",true);
+                self.changeX=0;
+                self.changeY=0;
+                Polymer.dom.flush();
+                break;
+              case 'track':
+                self.changeX=e.detail.ddx + self.changeX;
+                self.changeY=e.detail.ddy + self.changeY;
+                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+                break;
+              case 'end':
+                console.log(self._topprime);
+                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                self._bottom = self.getBoundingClientRect().top;
+                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            
+
+                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+              
+                self.style.left=self._x.toString()+'px';
+                self.style.top=self._y.toString()+'px';
+                Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
+          self.translate3d(0, 0, 0);
+
+                console.log('y: ' + e.detail.y);
+                    
+                self.dragging=false;
+                self.set("refit",true);
+                Polymer.dom.flush();
+                break;
+            }
+        }
+    },
+       falseClose: function(){
+        this.toggleColor=!this.toggleColor;
+        if(this.toggleColor===false){
+        this.set('currentHeight', this.minHeight);
+        this.style.height= this.minHeight;
+        this.style.width=this.currentWidth +"px";
+        this._onIronResize();
+      }
+        else{
+          this.set('currentHeight',this.heightHolder);
+          this.style.height = this.heightHolder;
+          this._onIronResize();
+            }
+
+       },
 });
 </script>
 </dom-module>

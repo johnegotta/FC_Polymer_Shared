@@ -1,0 +1,169 @@
+<dom-module id="fc-grid-cell-templ">
+<template>
+<template id="gridCellTemplate" style="width: auto; height: auto;">
+<section class="horizontal layout flex self-stretch item" location="{{cell.location}}" counter="0" drags draggable dragging is-gridbox="true" cell="{{cell}}" key="{{cell.key}}" value="{{cell.value}}"style$="min-width:86px; min-height:88px; max-width: 220px; max-height:60px; background-color:#[[cell.key]]ffff; border:1px solid #009; font-size:14px;" on-down="startDrag" on-dragover="allowDrop" on-up="handleDrop"id$="gridBox{{cell.key}}">
+
+{{cell.location}}
+<fc-input-prime input-type="text" id$="input[[cell.key]]" drags dragging dragable on-change="adjustValueArrays" input-style="max-width: 50px; max-height: 50px;" label="key: [[cell.key]]" value="{{cell.value}}" key="{{cell.key}}" to-location="{{cell.location}}" ></fc-input-prime>
+</section>
+</template>
+</template>
+</dom-module>
+<script>
+FcGridCellTempl=Polymer({
+	is:'fc-grid-cell-templ',
+	behaviors:[Polymer.Templatizer],
+	properties:{
+		dataArrays:{
+			type: Array,
+			notify: true
+		},
+		cellMap:{
+			type:Map,
+			notify: true,
+		},
+		elementMap:{
+			type:Map,
+			notify: true,
+		},
+
+		instanceProps:{
+        	column:true,
+        	row:true,
+        	location:true,
+        	key:true,
+        	value:true
+        	},
+    },
+    ready(){
+
+
+    },
+    attached(){
+      var da=this.setDataArrays();
+      this.set("dataArrays",da);
+      var template= Polymer.dom(this.root).firstElementChild;
+console.log(template);
+while(template.nodeName!="TEMPLATE"){
+	this.template=Polymer.dom(template).nextSibling;
+
+}
+    	console.log(template);
+        this.templatize(template);
+      this.async(function(){
+      var maps=this.setMaps(da);
+      console.log(maps);
+  },1400);
+      },
+
+     setDataArrays(){
+        var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"], columnNames=["Years","January","February","March","April","May","June","July","August","September","October","November","December","Year Total",`&#x0394`, `&#x0394`], tempArr=[];
+        	var retArrays=columnKeys.map(function(val, index,array)
+        		{
+                    var count=array.length, tempArr=[],valueArray=[];
+                    for(var i=0;i<count;i++)
+                    {  var retMini= val+array[i],
+                       value="inputValue__"+index+"_"+i;
+                       tempArr.push({"key": retMini, "location": retMini, "value": retMini});
+                       valueArray.push(value);
+                    }
+                   var retVal={column: columnNames[index], cell: tempArr, values:valueArray};
+                   return retVal;
+               	},[]);
+        return retArrays;
+        },
+    setMaps(da)
+    {
+    	var elementMap=new Map();
+    	
+    	
+        var cellMap=new Map(); 
+        this.keys2=[];
+        var stateMap=new Map();
+       	var sa= da.reduce(function(pre, val, index, array){return pre.concat(val.cell);},[]).forEach(function(vals, index, array){
+       		var key=vals.key,value=[{"value": vals.value,"timestamp": new Date().getTime(),"userId": "userString", "location": vals.location}];
+        cellMap.set(template,{"column": location.toString().charAt(0),"row": location.toString().charAt(1),"key":key, "value":value});
+        	
+        var instance=this.stamp({"column":location.toString().charAt(0),"row": location.toString().charAt(1), "location":location, "key":key, "value":value});
+        this.myNewArray=[];
+        this.push("myNewArray", instance);
+
+        elementMap.set(instance, [instance.location, instance]);
+        var k2=vals.location;
+        stateMap.set(k2,[vals.key, vals.value,[value]]);
+        var parent=Polymer.dom().parentNode;
+        
+	        Polymer.dom(this).appendChild(instance.root);
+
+       console.log(this, instance.root);
+       }, this);
+       this.set("stateMap", stateMap);
+       this.set("cellMap", cellMap)
+       this.set("elementMap", elementMap);
+       console.log("cellMap: ",cellMap, "stateMap: ", stateMap, "elementMap", elementMap);
+       var mapPair=[elementMap,stateMap];
+       return mapPair;
+   },startDrag(e){
+    e.preventDefault();
+ 			var targ=e.target;
+ 			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
+            {targ=targ.parentElement;}
+ 			if(targ.classList.contains("item")==true){
+ 				targ.drags=true;
+        targ.draggable=true;
+        var coords=targ.key;
+       var theCoords=this.getIndex(coords);
+               this.set("dragCoords",[theCoords,coords]);        
+        }
+      },
+   allowDrop(e){
+          e.preventDefault();
+        },
+  handleDrop(e){
+          var lt=e.detail.sourceEvent.toElement, bool=Polymer.dom(lt).classList.contains("item");
+            while(!bool && lt.nodeName!="DIV")
+              {
+                lt=lt.parentElement;
+                bool=Polymer.dom(lt).classList.contains("item");
+              }
+            var key=lt.key;
+            var val=lt.value;
+       
+            var locator= this.getIndex(lt.key);
+            newLocationArray=[[locator[0],locator[1]],key];
+            var myKey=lt.key;
+            var tempParent=lt.parentElement;
+            while((tempParent && !tempParent._templateInstance)&&tempParent!=null){
+              tempParent=tempParent.parentElement;
+            }
+          this.set(['trueArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"key"],myKey);
+          this.set(['trueArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'key'],this.dragCoords[1]);
+    //set template instance data    
+    e.model.set("cell.key",myKey);
+    tempParent._templateInstance.dataHost.modelForElement(lt).set("cell.key", this.dragCoords[1]);
+    //set instance data
+            this.stateMap.set(this.dragCoords[1],[myKey, lt.value]);
+            this.stateMap.set(newLocationArray[1],[this.dragCoords[1],this.trueArrays[newLocationArray[0][0]].cell[newLocationArray[0][1]].value]);
+            console.log(this.stateMap, this.dataArrays);
+                console.log(lt.cell, "look here for cell", lt.value, this.trueArrays);
+             Polymer.dom.flush();   
+  },
+
+	  getIndex(cell){
+	    var index=cell.toString().charAt(0);
+	    var dex1=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15:parseInt(index); 
+	    index=cell.charAt(1);
+	    var dex2=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15: parseInt(index);
+	    return [dex1, dex2];
+	  },
+	  getCoordsFromIndex(ind){
+	    var index=ind[0];
+	    var dex1=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+	    index=ind[1];
+	    var dex2=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+	    index=ind[1];
+	    var retVal=dex1.toString()+dex2.toString();
+	    return retVal;
+	  }
+  });
+    </script>

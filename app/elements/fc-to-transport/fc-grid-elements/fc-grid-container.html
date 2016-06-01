@@ -1,0 +1,161 @@
+<dom-module id="fc-grid-container">
+ <template id="fc-mapped-grid-template">
+ <style>
+ section{
+  background:white;
+ }
+:host{
+	background: white;
+	padding: 0px 3px 4px 8px;
+	opacity: 1;
+
+	position: static;
+	@apply(--horizontal-layout);
+	@apply(--layout-flex);
+	}
+  *{@apply(--layout-nowrap);}
+ </style>
+<div layout vertical flex self-stretch style="border: 12px ridge green;">
+<paper-material class="onhooov" style="width:100%;">
+<paper-button on-tap="abuseDom" style="width:140px; height: 50px; background: orange; z-index: 33000000; " >abuse</paper-button><fc-grid-cell-templ data-arrays="{{dataArrays}}" style="min-width:133px; min-height:120px; width: 123px;">
+</fc-grid-cell-templ>
+<section class="horizontal layout flex wrap self-shrink">
+  <fc-input-prime input-type="select" is-repeater-selected="true" place-holder="{{arraySets.0.0}}"unless-select selected={{selected}} label="{{arraySets.0.0}}" select-items={{arraySets.0.1}}></fc-input-prime>
+  <fc-input-prime input-type="select" label="{{arraySets.1.0}}" place-holder="{{arraySets.1.0}}" is-repeater-selected="true" unless-select selected={{selected}} select-items={{arraySets.1.1}}></fc-input-prime>
+  <fc-input-prime input-type="select" label="{{arraySets.2.0}}" place-holder="{{arraySets.2.0}}" is-repeater-selected="true" unless-select selected={{selected}} select-items={{arraySets.2.1}}></fc-input-prime>
+  <span style="position: relative; width: 66px; height: 46px;">
+  <paper-swatch-picker on-down="pickColor">
+  </paper-swatch-picker>
+  </span>
+</section>
+</paper-material>
+<a>
+
+<fc-grid-cell-templ data-arrays="{{dataArrays}}" style="min-width:calc(77vw/16); min-height:calc(88vh/16); height: 120px; width: 123px;">
+</fc-grid-cell-templ>
+
+</a>
+</div>
+ </template>
+ <script>
+FcGridContainer=Polymer({
+ 	is:"fc-grid-container",
+  behaviors:[Polymer.Templatizer],
+ 	properties: {
+  dataArrays:{
+    type: Array,
+    notify: true,
+  },
+    instanceProps:{
+        myGridMap: {
+          type: Map,
+          notify: true,
+        },
+        myStateMap: true,
+      },
+      arraySets:{
+        type:Function,
+        value:function(){return [
+                                  ["keyColors", 
+                                          ["yellow","orange","#afafaf", "lightblue","lightgreen","red", "cornflowerblue"]
+                                  ],
+                                  ["numberOfHighlightColors",["one", "two", "2 plus one accent", "2 plus 2 accents", "3 plus 2 accents"]
+                                  ],
+                                  ["selectionOfFirstHighlightColor",["rowsOnly", "columnsOnly", "rowsAndColumns", "rowsAndSummations", "All"]
+                                  ],//0th has key then val array
+        ]
+      },
+	
+ 		},
+  },
+      showvalues(e){
+            console.log(e.target, e);
+      },
+      computeElementApiRequestsFromDataStar(needsAvalue){},
+      adjustValueArrays(e){
+        var index1 =e.model.cell.key.charAt(0), 
+         index2=e.model.cell.key.charAt(1),
+         val = e.target.value,
+        valueStart =e.model.cell.value;
+        console.log(val, valueStart, index1, index2, e.model.cell.location, e.model.cell.key, "look for VALUES HERE", e);
+      },
+      pickColor(){},
+      abuseDom(){
+          var tcs= this.$.template;
+          var elems=Polymer.dom(this.root).getEffectiveChildNodes();
+          var getChildren=Polymer.dom(tcs).getEffectiveChildNodes();
+          console.log(tcs, elems, tcs.id, getChildren);
+      },
+   
+        getRows(){
+          console.log(this.stateMap);
+
+        },
+    
+ 	});
+    </script>
+    </dom-module>
+
+   <!--
+  
+           // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+         // e.model.set("cell.location",myLoc);
+         //    while(parent.nodeName!="TEMPLATE" && parent.nodeNam!="DOM-REPEAT" && parent.nodeName!="FC-DASHBOARD-ONE"){  console.log(parent.nodeName);
+         //     if(parent.nodeName=="TEMPLATE"){  console.log(parent.nodeName);            }
+         //       console.log(parent.nodeName);
+         //    //   parent=Polymer.dom(parent).parentNode;
+         //   }
+         // console.log(lt, e.model.dataHost);
+      //       var parent=Polymer.dom(lt).parentNode,
+      // parent2=Polymer.dom(this.dragEl).parentNode,
+      // nes=Polymer.dom(lt).nextSibling,
+      // nes2=Polymer.dom(this.dragEl).nextSibling;
+      //  Polymer.dom(parent2).insertBefore(lt, nes2);
+      //  Polymer.dom(parent).insertBefore(this.dragEl, nes);
+              
+
+
+              // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+        
+       
+            // this.notifyPath(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+   //  if(this.isWrapper==true){
+        //   var wrap=this.$$("fc-fit-wrapper");
+        //  wrap.set("positionTarget", lt);
+        //    wrap.specialRefit(lt);
+        //  wrap.set("drags",false);
+        //  this.set("isWrapper",false);
+   // this.set(['dataArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"location"], e.model.__data__.cell.location);
+      // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],loc);
+
+      //this should key map the thing, will location map next
+     // .cell[this.dragCoords[0][1]];
+
+        //   while(templateChild.nodeName){
+        //     templateChild = Polymer.dom(templateChild).nextSibling;
+        //     }
+        //     if(templateChild.nodeName=="TEMPLATE"){
+        //       var target =templateChild;
+        //       nodeArr.push(target);
+        //       console.log(nodeArr);
+        //     }
+        //     else if(templateChild.nodeName==null){
+        //       stepchild=Polymer.dom(templateChild).nextNode;
+        //     }
+        //     else{parent=parent.parentNode;}
+        //    console.log(template, template)
+        //        if(template.nodeName=="TEMPLATE" && template.id="template"){
+        //             template.child
+
+        //        }
+
+
+                  
+        // var instance = this.stamp({
+        //                       myStateMap: this.stateMap,
+        //                       myGridMap:this.gridMap,
+        //                           });
+        //   Polymer.dom(this).appendChild(instance.root);
+
+
+
