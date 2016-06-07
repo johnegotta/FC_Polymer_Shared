@@ -1,374 +1,88 @@
 <dom-module id="fc-calendar-options-selector">
 <template>
-<style>
-:host{
-	font-family: merriweather;
-	font-size: 14px;
-	line-height: 1.0;
-	margin-top: 12px;
-	background: white;
-	position:relative;
-	height: 460px;
-	width: 330px;
-}
-
-.selected{background: var(--paper-amber-500);
-      font-weight: bold;}
-
-.headerLeft{
-height: 40px; width: 40px; color: white; float: left;
-top: 10px;
-
-}
-.headerRight{
-	height: 38px; width: 38px; color: white; float: right;
-top: 10px;
-}
-</style>
+	<style>
+		:host{	font-family: merriweather;	font-size: 14px;	line-height: 1.0;	margin-top: 12px;	background: white;	position:relative;	height: 460px;	width: 330px; }
+		.selected{	background: var(--paper-amber-500); font-weight: bold;}
+		.headerLeft{ height: 40px; width: 40px; color: white; float: left; top: 10px;}
+		.headerRight{ height: 38px; width: 38px; color: white; float: right; top: 10px; }
+		paper-button{  width: 50%;	font-weight: 600; font-size: 14px;	text-align: center;	white-space: nowrap;	max-height: 36px;	@apply(--layout-nowrap);	background: white;}
+		paper-button.green{color: green; border: 2px solid green;}
+		paper-button:hover, paper-button:active{box-shadow: 2px 4px 7px 2px #afafaf;} 
+		paper-button.darkblue:hover, paper-button.darkblue:active{box-shadow: 2px 4px 7px 2px gold; } 
+		.buttonRow{@apply(--layout-flex);@apply(--layout-horizontal);padding: 2px;}
+	</style>
 <array-selector 
  	id="eventArraySelector" 
  	items="{{inputArrays}}" 
  	selected="{{selected}}"  
  	toggle>
 </array-selector>
-<fc-list-box-container list-item-data="{{someArray}}" options-array="{{inputArrays}}" min-ht="460px" max-ht="460px" fcprimary="{{primary}}" secondary-one="{{secondaryOne}}" secondary-two="{{secondaryTwo}}"  header-height="62px" header-font="18px" top-heading="Course Calendars" on-tap="soSelected">
+<fc-list-box-container list-item-data="{{someArray}}" options-array="{{inputArrays}}" min-ht="460px" max-ht="460px" fcprimary="{{primary}}" secondary-one="{{secondaryOne}}" secondary-two="{{secondaryTwo}}"  header-height="62px" header-font="18px"  on-tap="_handleTaps" container-type="courseCalendarOptions">
 			<paper-icon-button 
-					on-tap="_backOneInput" 
+					on-down="_backOneInput" 
 					icon="icons:arrow-back"
 					class="headerLeft leftSide">
 			</paper-icon-button>
 			<paper-icon-button 
-						on-tap="_forwardOneInput" 
+						on-down="_forwardOneInput" 
 						icon="icons:arrow-forward" 
 						class="headerRight rightSide" >
 				</paper-icon-button> 
-		</fc-list-box-container>
-									
-</div>
+			<section class="buttonRowOne buttonRow">
+				<paper-button elevation="3" class="buttonRowOne green layout horizontal flex nowrap center center-justified" on-down="confirmCalculate">CONFIRM</paper-button>
+			</section>
+</fc-list-box-container>
 </template>
 <script>
 "use-strict";
 Polymer({
 	is:"fc-calendar-options-selector",
-		behaviors:["FCBehaviors.FcCalendarBehaviorPrime"], 
+		behaviors:[FCBehaviors.FcCalendarOptionsSelectorBehavior], 
 	properties:{
-		eventData:{
-			type: Object,
-			value: {},
-			notify: true, 
-			reflectToAttribute: true
-		},
-		inputArrays:{
-			type: Array,
-			computed: "setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex)",			
-			notify: true
-		},
-		selected: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		primary:{
-			type:Array,
-			value:function(){return ["~"];},
-			notify: true
-		},
-		secondaryOne:{
-			type: Array,
-			value: function(){return ["~_labelA"];},
-			notify: true
-		},
-		
-		fcCourse: {
-			type: FcCourse,
-			value:function(){return new FcCourse();},
-			notify: true,
-		},
-		inputIndex: {
-			type: Number,
-			value: 0,
-			notify: true
-		},	
-		valueOptions: {
-			type: Array, 
-			notify: true
-			},
-		inputOptions: {
-			type: Array, 
-		 	computed:"selectInputs(inputs, inputIndex)",
-			notify: true,
-			reflectToAttribute: true
-		},
-		someArray:{
-			type: Array,
-			notify: true
-
-		},
-		courseCalendarDaysArray:{
-			type: Array,
-			value: [],
-			notify: true
-
-		},
-		inputs: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		saveChoiceLocal:{
-			type: Boolean, 
-			value: false,
-			notify: true
-		},
-		secondaryTwo:{
-			type: Array,
-			value: function(){return [];},
-			notify: true
-		},
-		calendarDayArray:{
-			type: Array,
-			value: [],
-			notify: true,
-			reflectToAttribute: true
-		},
-		summer:{
-			type: Boolean,
-			value: false,
-			notify: true
-
-		},
-		currentArray:{
-			type: Number,
-			value: 1,
-			notify: true
-		},
-		propertyName:{
-			type: String, 
-			value: "", 
-			notify: true,
-		}, 
-		val: {
-			type: String,
-			value: '',
-			notify: true
-		},
-		curra:{
-			type: Number,
-			notify: true
-		},
-
-
-	
-	},
-
-	setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex){	
-		if(this.curra=="" || undefined || this.valueOptions[curra=undefined]){this.curra=1;}
-		var curra=this.curra;
-		var retArray=[];
-		var retVal;
-		var self=this;
-		var i=this.inputIndex;
-		this.vfunc=function(i, curra)
-			{	console.log(curra, i, self.valueOptions, self.valueOptions[3][2]);
-				self.set("currentArray", curra);
-			if(self.valueOptions[curra]){
-					var retV= self.valueOptions[curra][i]; 
-					console.log(retV);
-					if(retV){
-					this.set("someArray", retV.selectItems);
-				}
-					return retV;
-					}
-				}
-			this.saveChoiceLocal===true
-		switch(true) {
-			    case this.inputIndex===0 && propertyName=="" || propertyName==undefined:
-			        curra=1;
-			   		retVal=this.vfunc(i, curra);
-			   		retArray.push(retVal);
-			     return retArray;
-			    case (this.fcCourse.summer===true && this.fcCourse.scheduleType=="Focused 1600SAT Course" && i==5):
-			        curra=1;
-			        i=6;
-			        this.set("fcCourse.summer",false);
-			        retVal= self.vfunc(i, curra);
-			        retArray.push(retVal);
-			        return retArray;
-			    case (this.fcCourse.scheduleType=="Focused 1600SAT Course"):
-			    	curra=1;
-			    	if(i==6){i=7;}
-			        retVal= self.vfunc(i, curra);
-			        retArray.push(retVal);
-			        return retArray;
-			    default: 
-			    	curra=1;
-			    	retVal=self.vfunc(i, curra);
-			    	retArray.push(retVal);
-			    	return retArray;
-			    	}
-			    	console.log(retVal, JSON.stringify(retVal));
-			this.saveChoiceLocal=false;
-    return retArray;
 	},
 	
+
 	attached(){
-		this._computeInputArrays(this.inputs);	
-	},
-	ready(){
-		this._computeInputArrays(this.inputs);	
-	},
-	_backOneInput()
-	{
-		this.set("saveChoiceLocal", true);
-		this.set("inputIndex", this.inputIndex-1);
-	},
-	_forwardOneInput()
-	{	
-		this.set("saveChoiceLocal", true);
-		this.set("inputIndex", this.inputIndex+1);
-	},
-
-	selectInputs(inputs, inputIndex)
-	{		
-		var retVal = [];
-		if(this.inputIndex===0)	
-			{ 		
-					retVal.push(inputs[this.inputIndex]);
-					//console.log(retVal);
-			}
-			else if(this.saveChoiceLocal===true)
-			{	
-				retVal.push(inputs[this.inputIndex]);
-				this.set("saveChoiceLocal", false);
-			}
-			return retVal;
-	},
-	
-	_computeInputArrays(inputs){
-		var retArray=new Array();
-		retArray.push(this.inputs);//array inputArrays[0][0]
-		var arrayOne=this.inputs.filter(function(item, index, array){
-			//console.log(item);
-			return(index<11 || index==16);
-		}, this);console.log(arrayOne);
-		retArray.push(arrayOne);
-		var arrayTwo=[];
-		for(var i=0; i<6;i++){
-			arrayTwo.push(this.inputs[i]);
-			if(i==5)
-			{
-				arrayTwo.push(this.inputs[12]);
-				arrayTwo.push(this.inputs[7]);
-				arrayTwo.push(this.inputs[8]);
-				arrayTwo.push(this.inputs[9]);
-			}
-		}
-		var miniArr=[0, 2, 13, 14, 4, 5, 10, 11, 17, 16, 14]/*adjust 11, 17, 16 needs Push a set linkag, */
-		var arrayThree=miniArr.map(function(elem, index){
-			return this.inputs[elem];
-		}, this);
-		var self=this;
-		retArray.push(arrayThree);
+		this._computeInputArrays(this.inputs);
+		// var keys=Object.keys(this.__data__);
+		// console.log(keys);	
 		
-		var miniArr2=[0,2, 3, 4, 5, 10,11,13, 14, 16, 17]; //set schedules
-		var arrayFour= miniArr2.map(function(elem, index){
-			return self.inputs[elem];
-		}, self);
-		retArray.push(arrayFour);
-			this.set("valueOptions", retArray);
-			console.log(this.valueOptions, "this is what comes back");
+	},
+	_handleTaps: function(e){
+		console.log(e,
+		e.target );
+		var target=e.target;
+				while(target.nodeName!=="PAPER-BUTTON" && target.nodeName!=="PAPER-ICON-BUTTON" && target.nodeName!=="FC-LIST-BOX-CONTAINER")
+					{target=target.parentElement;}
+					if(target.nodeName=="PAPER-BUTTON" || target.nodeName=="PAPER-ICON-BUTTON"){
+
+						this[target.btm]();
+					}
+						else{
+							var j=e;
+							this.soSelected(j);
+						}
+			},
+	// _backOneInput()
+	// {
+	// 	this.set("saveChoiceLocal", true);
+	// 	this.set("inputIndex", this.inputIndex-1);
+	// },
+	// _forwardOneInput()
+	// {	
+	// 	this.set("saveChoiceLocal", true);
+	// 	this.set("inputIndex", this.inputIndex+1);
+	// },
+
+	confirmCalculate(){
+		console.log(this.fcCourse);
+		this.fcCourse.save();
+		this.fire("catchTheCourse", {theCourse: this.fcCourse});
+		event = JSON.stringify(this.fcCourse);
+		console.log(event);
+ 		localStorage.setItem("New_Course", event); 
 	},
 
-	soSelected(e){
-		console.log(new Date().getTime());
-		console.log(e);
-		var propertyName = e.model.__data__.option.name;
-		var val = e.model.item;
-		var indexOfNextInput=this.inputIndex+1;
-		this.set("propertyName", propertyName);
-		this.set("val", val);
-		var self=this;
-		if(propertyName == "testDate")
-		{
-			this.fcCourse.setTestDate(val);
-			 var testDay = new FcCalendarDay(val);
-			 testDay.eventList=[];
-			 testDay.eventList.push(new FcEvent({activity: "SAT Test Date",name:"SAT Test Date", startTime: "7:30AM", "endTime": "3:45PM", time: "7:30AM", duration: "8.75 Hours", coach: "Focused Coaching", "location": "Check Your Registration", color: "gold",isTestDate: true }));
-			this.set("fcCourse.courseCalendarDaysArray", []);
-			this.push("fcCourse.courseCalendarDaysArray",testDay);
-			this.fcCourse.setTestDate(val);
-			this.push("fcCourse.eventArray", testDay);
-		}
-		else if(propertyName =="coach"){
-			
-			this.fcCourse.setCoach({fullName: val}, self);
-		}
-		else if(propertyName == "programLength")
-		{	var self=this;	
-			this.splice("fcCourse.courseCalendarDaysArray",0,1);
-			this.fcCourse.setCourseLength(val, self);
-			var testDay;
-			testDay=this.shift("fcCourse.eventArray");
-			this.push("fcCourse.courseCalendarDaysArray", testDay);	
-			this.push("fcCourse.eventArray",testDay);
-			 
-		}
-		else if(propertyName == "practiceTestDay")
-		{	
-
-			this.fcCourse.setPracticeTestDay(val, self);
-		
-
-		}
-		else if(propertyName == "courseMeetingSets")
-		{			
-		
-			var courseMeetings= this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
-			this.set("fcCourse.courseMeetingSets",val);
-			this.set("fcCourse.summerMeetingDays", "Not Applicable");
-			
-
-		}
-		else if(propertyName == "summerMeetingDays")
-		{	
-			this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
-			this.fcCourse[propertyName] = val;
-			this.set("fcCourse.courseMeetingSets", val);		
-			
-		}
-		else if(propertyName=="privateCoach")
-			{	this.set("fcCourse.courseType", "Private Coaching"); 
-				this.set("fcCourse.coach", val);
-				this.set("fcCourse.courseSize", 1);
-			this.fcCourse[propertyName] = val;}
-		else if(propertyName=="privateCoachingHours")
-		{ 
-			this.set("fcCourse.privateCoachingHours", val);
-			var retVal = (val=="12 Hours, 4-6 Sessions, Price Total")?"3 Weeks": (val == "18 Hours, 6-9 Sessions, Price Total")?"4 Weeks": (val == "24 Hours, 8-12 Sessions, Price Total")?"5 Weeks": (val == "36 Hours, 12-18 Sessions, Price Total")?"6 Weeks": (val == "50 Hours, up to 25 Sessions, Price Total")?"10 Weeks": "13 Weeks";
-			this.set("fcCourse.programLength", retVal);
-			//console.log(val);
-		}
-		else if(propertyName == "testDate" && this.fcCourse.isPrivateSchedule===true)
-		{
-			this.fcCourse.setTestDate(val);
-			this.fcCourse.setCourseLength(this.fcCourse.programLength);
-
-		}
-		else
-		{
-			this.fcCourse[propertyName] = val;
-			var propertyString="fcCourse."+propertyName;
-			this.notifyPath(propertyString, val);
-		
-		}
-		// var inputIndex =self.inputIndex;
-	    //var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, inputIndex);
-	    this.set("saveChoiceLocal",true);
-		this.set("inputIndex", indexOfNextInput);
-		console.log(new Date().getTime());
-
-	
-}
 
 });
 </script>

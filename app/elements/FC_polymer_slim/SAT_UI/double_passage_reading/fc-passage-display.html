@@ -31,7 +31,7 @@
 			{{passageBlurb}}
 		</div>
 	<!--single column container-->
-		<!-- <firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> -->
+		<firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> 
 
 		<!-- end-of-column-1 line number and text container-->
 		<div id="doubleColumnContainer" class="layout horizontal columnContainer"  style="padding-right: 8px;">
@@ -134,18 +134,18 @@ Polymer({
 
 	ready: function(){
 		self=this;
-		var ref = new Firebase(self.passageRootPath);
-		ref.on("child_added", function(snap) {
-			//console.log("added", snap.key());
-			if(snap.key()=='new_Test_1') {
-				self.passageArray = snap.val();
-				self.passageBlurb=self.passageArray[1].passageBlurb;
-				self.finalWordIndex=self.passageArray.length;
-				console.log(self, "JUST GOT FIREBASE PASSAGE", self.passageArray);
-				self.splitPassageForColumns;
-			}
-			ref.off();
-		});
+		// var ref = new Firebase(self.passageRootPath);
+		// ref.on("child_added", function(snap) {
+		// 	//console.log("added", snap.key());
+		// 	if(snap.key()=='new_Test_1') {
+		// 		self.passageArray = snap.val();
+		// 		self.passageBlurb=self.passageArray[1].passageBlurb;
+		// 		self.finalWordIndex=self.passageArray.length;
+		// 		console.log(self, "JUST GOT FIREBASE PASSAGE", self.passageArray);
+		// 		self.splitPassageForColumns;
+		// 	}
+		// 	ref.off();
+		// });
 	},
 	altMethod: function(e){
 		/*
@@ -156,7 +156,7 @@ Polymer({
 		//console.log(e);
 		this.passageBlurb=self.passageArray[1].passageBlurb;
 		this.finalWordIndex=self.passageArray.length;
-		console.log(this, "JUST GOT FIREBASE PASSAGE", this.passageArray, e);
+		//console.log(this, "JUST GOT FIREBASE PASSAGE", this.passageArray, e);
 		//Line above always logs the second instance of passage display
 		this.splitPassageForColumns();
 	},
@@ -164,16 +164,16 @@ Polymer({
 	{
 		this.screenTrueHeight =  (window.innerHeight-320);
 		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
-		if(this.$.noJudge4.clientWidth >= 640 /*&& this.screenTrueHeight>=440*/) {
-			this.showingSecondColumn = true;
+		if(this.$.noJudge4.clientWidth >= 660 /*&& this.screenTrueHeight>=440*/) {
+			this.set("showingSecondColumn", true);
 		} else {
-			this.showingSecondColumn = false;
+			this.set("showingSecondColumn", false);
 		}
 		this.splitPassageForColumns();
 	},
 
 	splitPassageForColumns: function(){
-		console.log(this.id, "IN splitPassageForColumns")
+		//console.log(this.id, "IN splitPassageForColumns")
 		if(this.showingSecondColumn == true){
 			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
 			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;

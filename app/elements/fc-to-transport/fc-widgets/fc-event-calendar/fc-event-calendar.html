@@ -40,11 +40,9 @@ background: white;
 	width: 100%;
 }
 .pretty{
-
 background: red;
 height: 9px;
 width: 30px;
-
 }
 .headerArrowLeft{
 	position: absolute; 
@@ -63,8 +61,6 @@ width: 30px;
 	@align(--layout-center);
 	@align(--layout-flex);
 	@align(--layout-center-justified);
-	
-	
 	}
 .headerTop{
 min-height: 38px;
@@ -100,23 +96,60 @@ min-height: 38px;
   	overflow:scroll; 
   /*	min-height: 180px;*/
   }
-</style>
-	<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; left: 0px; top: -10px; right:0px; cursor:ns-resize; padding: 4px; height: 8px!important;opacity: 1;"></section>
-		<div drags on-down="dragsOn" on-track="focusedDragMe" id="myPanel" style$="width:{{currentWidth}};height:{{currentHeight}}px;" class="vertical layout flex calendarcontainer">
-		<div horizontal flex-2 layout style="background: #fafafa; padding: 24px;">
-		I am your mudderFingViewScreen
-		</div>
-		<!-- <section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; left: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section> -->
-			<section class="layout flex">
-			<paper-material class=" layout flex around-justified calendarborder">
-				<section class="horizontal layout flex center-justify headerTop" style="align-items: center;">
+
+
+/*
+.marquee {
+  height: 25px;
+  min-width: 220px;
+  width: 100%;
+  max-width: 720px;
+
+  overflow: hidden;
+  position: relative;
+}
+
+div.marquee, template.marquee{
+  display: block;
+  width: 200%;
+  height: 36px;
+
+  position: absolute;
+  overflow: hidden;
+
+  animation: marquee 5s linear infinite;
+}
+
+.marquee, span.marque {
+  float: left;
+  width: 50%;
+}
+
+@keyframes marquee {
+  0% { left: 0; }
+  100% { left: -100%; }*/
+}
+</style><!-- 
+on-track="focusedDragMe" -->
+	<div drags on-down="dragsOn"  id="myPanel" style$="width:{{currentWidth}};height:{{currentHeight}}px;" class="horizontal layout flex calendarcontainer">
+		<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
+  			<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
+    					<span class="marquee">{{wordEvent}}</span> 
+    					
+  			</template>
+  		</div>
+
+
+	<div class$="layout {{visualSwap}} flex-7"><!--visual swap?-->
+			<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important;">
+				<section class="horizontal layout center-justify headerTop" style="align-items: center;">
 					<paper-icon-button 
 						on-tap="_backOne" 
 						icon="icons:chevron-left" 
 						hidden={{backHidden}} 
 						class="headerArrowLeft layout horizontal flex-2 self-shrink">
 					</paper-icon-button>
-					<section class="layout horizontal headerMonthYear" >
+					<section class="layout horizontal headerMonthYear">
 					[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
 					</section>
 					<paper-icon-button 
@@ -127,35 +160,53 @@ min-height: 38px;
 					</paper-icon-button>
 					</section> 
 			</paper-material>
-			 <section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section>
-			<section class="horizontal layout flex">
-						<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
+		<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section>
+	<!--header ender using internal now unclosed section to, when closed pivot horiz and vert-->
+<div class="vertical layout flex">
+<section class="horizontal layout flex" style="max-height: 48%;">
+
+
+<!-- //DAYS AND DAYS OF WEEK COLUMN REPEATER -->
+<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
 		<div class="vertical layout flex" style$="width:calc(.84*{{currentWidth}})px; height:calc(.84*{{currentHeight}})px;" >
 		<paper-material class="horizontal layout center center-justified" style="font-size: 20px; font-weight:600; background: #005c00; color: white;text-align: center; padding: 1px;">
 			
-			<a >	{{item.0}}
-				</a>
+			<a>{{item.0}}</a>
+		
 		</paper-material>
 		<section class="vertical layout flex" style="background: white; box-shadow: 4px 11px 21px 7px #9fafaf; border-bottom: 1px silver solid; border-right: 1px silver solid;">
 			<template is="dom-repeat" items="{{item.1}}" as="day" style="font-size: 24px; font-weight:600; color: #005c00;">
 			<section style="border:green solid 2px; padding: 8px; background: white;" class="date horizontal layout center center-justified">
-			<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; border-radius:50%;"></iron-icon>
-			{{day.eventText}}
-			{{day.eventU}} 
-			<a class="date horizontal layout center-justified" id="button" style="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: #005c00;"><span hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</span></a>
-			<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}}; border-radius:50%;"></iron-icon>
-			{{day.eventText}}
-			{{day.eventU}} 
-			</section>
-		</template>
+				<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; border-radius:50%;">
+				</iron-icon>
+					{{day.eventText}}
+					{{day.eventU}} 
+				<a class="date horizontal layout center-justified" id="button" style="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: #005c00;">
+					<span hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</span>
+				</a>
+				<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}}; border-radius:50%;">
+				</iron-icon>
+					{{day.eventText}}
+					{{day.eventU}} 
+				</section>
+			</template>
 		</section>
-		</div>
-		</template>
-		</section>
-		
-	
+	</div>
+</template>
+</section>
 
- <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn"></section>
+	<section class="horizontal layout flex">
+		<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
+  			<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
+    					<span class="marquee">{{wordEvent}}</span> 
+    					
+  			</template>
+  		</div>
+	</section>
+</div>
+</div>
+ <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
+ </section>
  </div>
 </template>
 <script>
@@ -173,6 +224,11 @@ FcEventCalendar=Polymer({
 			type: FcCourse,
 			value: function(){return new FcCourse({});},
 			notify: true
+		},
+		visualSwap:{
+			type: String,
+			value: function(){return "horizontal";},
+			notify: true,
 		},
 		
 		days:{
@@ -232,6 +288,26 @@ FcEventCalendar=Polymer({
 			value: false,
 			notify: true
 		},
+		wordEvents:{
+			type:Array,
+			value: function(){
+			readingArr=[];
+			var words="I walked twenty miles a day, when I had just turned twenty years-old...Older dogs not only have a difficult time learning new tricks, but also tend to forget even their most favored of youthful pleasures. Older men would be more faithful. So, I was to marry a Berto twenty years my senior, unlike her Berto who--at twenty days he junior--the whole world believed would have wandered if Mama were not so incessantly desirable. It is twenty minutes past when Berto and I married: Mamma insisted on that precise time. She always said that she and 'her' Berto had such a lovely first night and forty-four years of time after together all beacse they had and she would never pay any mind to others schedules. Mamma called it one of her Benito's many, but oddly enough--to her at least--most reveerred and marvelled at traits. Mamma never seemed to understand that everyone actually did everything at her pace and on her schedule. She was the Mussolini of the whole world's personal train schedule. Everything precisely on time. Her time or someone shot the clock, and everyone who had ever so terribly lie about the time.";
+				var wordArr=words.split(" "),
+				counter=wordArr.length,
+				start=wordArr[0];
+				for(var i=1; i<counter;i++){
+					var zeroed=i%9;
+					start +=" " +wordArr[i];
+					start=start.toString();
+					if(zeroed===0||i+1.1>counter){ 
+						readingArr.push(start);
+						start="";
+					}
+						}
+			return readingArr;},
+			notify: true,
+		},
 		event:{
 			type: Array,
 			value: [],
@@ -247,7 +323,7 @@ FcEventCalendar=Polymer({
 
 		},
 
-   },
+  },
 computeEventHeightLightColor:function(){
 	return "aliceblue";
 },
@@ -260,12 +336,10 @@ ready: function()
 		var index=today.getMonth();
  		this.set("displayedIndex",index);
 		this.async(this.initialize, 40);
-
-
 },
 
 computeCurrentHeight: function(currentHeight){
-    	var ht=window.screen.height;
+   	var ht=window.screen.height;
       ht=.90*(ht);
       ht=ht.toString()+"px";
     	if(this.currentHeight==undefined) {this.set("currentHeight", ht); this.style.height=ht;}
@@ -276,12 +350,12 @@ setArrays:function(){
 	var daysofweek=this.displayed.sort(function(a,b){
 		return (b.date.getDay()-a.date.getDay());});
 
-	console.log(daysofweek, "yoohoo");
+	//console.log(daysofweek, "yoohoo");
 	var daysOfWeek=daysofweek.reverse();
 	var dow=[["Sun"],["Mon"],["Tues"],["Wed"],["Thur"],["Fri"],["Sat"]];
 	var counter=daysofweek.length;
 	var holder=[],
-	iconsarr=["social:school","editor:border-color", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
+	iconsarr=["social:school","icons:dashboard", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
 	holder.push(daysOfWeek[0]);
 	for(let i=1; i<counter; i++)
 	{	var truth=(daysOfWeek[i].date.getDay()==daysOfWeek[i-1].date.getDay());
@@ -301,7 +375,7 @@ setArrays:function(){
 			var holder2=holder.sort(function(a,b){
 				return a.displayIndex-b.displayIndex;
 			});
-			console.log(holder2, "h2");
+			//console.log(holder2, "h2");
 			var slot=Math.floor(i/7);
 			if(i==counter-1){slot++;}
 			dow[slot].push(holder2);
@@ -311,7 +385,7 @@ setArrays:function(){
 			}
 
 	}
-	console.log(dow, "dow");
+	//console.log(dow, "dow");
 	this.set("displayedTwo", dow);
 
 	},
@@ -342,7 +416,7 @@ initialize:function(days){
 		}
 		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
 		var calendar =[];
-		console.log(this.displayed);
+		//console.log(this.displayed);
 		calendar = this.calendarDayArray;
 		this.set("fcCourse.courseCalendarDaysArray", calendar);
 		this.set("fcCourse.calendarDayArray", calendar);
@@ -403,7 +477,7 @@ computeViewMonth: function(displayedIndex){
 
 _computePrettyDay: function(d)
  	{	
- 		var day=new Date(d).getDate();console.log(day);
+ 		var day=new Date(d).getDate();//console.log(day);
  		return day;
 
  	},
@@ -468,7 +542,7 @@ _computePrettyDay: function(d)
                 // console.log('START NoWayAreWe Draggin');
                 self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
                 self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-                console.log('top distance differenced?' + self._topprime);
+                //console.log('top distance differenced?' + self._topprime);
                if(self.counter==0){   self.translate3d(0, 0, 0);}
                 Polymer.dom(self).setAttribute("style.position", "fixed"); 
                Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
@@ -485,21 +559,21 @@ _computePrettyDay: function(d)
                 self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
                 break;
               case 'end':
-                console.log(self._topprime);
+                //console.log(self._topprime);
                 self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
                 self._bottom = self.getBoundingClientRect().top;
                 self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
                 self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
             
 
-                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+                //console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
               
                 self.style.left=self._x.toString()+'px';
                 self.style.top=self._y.toString()+'px';
                 Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
           self.translate3d(0, 0, 0);
 
-                console.log('y: ' + e.detail.y);
+                //console.log('y: ' + e.detail.y);
                     
                 self.dragging=false;
                 self.set("refit",true);

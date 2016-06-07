@@ -1,0 +1,924 @@
+<dom-module id="fc-calendar-dialog">
+<template id="fc-calendar-dialog-template">
+<style>
+:host{
+	background: white;
+	padding: 0px 3px 4px 8px;
+	opacity: 1;
+	position: static;
+	@apply(--horizontal-layout);
+	@apply(--layout-flex);
+	}
+
+.headerLeft{
+height: 42px; width: 42px; color: white; float: left;
+top: 10px;
+
+}
+.headerRight{
+	height: 42px; width: 42px; color: white; float: right;
+top: 10px;
+}
+		paper-button{
+		 	 width: 50%;
+		 	 min-width: 147px;
+		 	 font-weight: 600; 	  
+		 	 font-size: 14px;
+		 	 text-align: center;
+		 	 white-space: nowrap;
+		 	 max-height: 36px;
+		 	 @apply(--layout-nowrap);
+		 	 background: white;
+		 }
+		 paper-button.green{
+		 	color: green; 
+		 	border: 2px solid green;
+		}
+		paper-button.darkblue{
+			color: #009;
+			border: 2px solid #009;
+		}
+		paper-button.red{
+			color: red;
+			border: 2px solid red;
+		}
+		paper-button.orange{
+			color: orange;
+			border: 2px solid orange;
+		}
+		paper-button:hover, paper-button:active{
+			box-shadow: 2px 4px 7px 2px; 
+
+		} 
+		paper-button.darkblue:hover, paper-button.darkblue:active{
+			box-shadow: 2px 4px 7px 2px gold; 
+
+		} 
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			padding: 2px;
+		}
+
+.footerclass{
+	height: 32px;
+	padding: 14px;
+	color: white;
+	background: #03A9F4;
+	font-weight: 600;
+	text-align: center;
+	font-size: 11px;
+}
+.slides{overflow: hidden; overflow-y: scroll;}
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
+.courseData{
+	height: 72px!important;
+
+}
+.calendarItem{min-height: 380px!important;}
+.fbutton{text-align: center; width: 99.6%;border: #afafaf 1px solid; border-radius: 3px; z-index: 7; box-shadow: 3px 7px 11px 4px #efefef; padding: 5px 0px; cursor: pointer;}
+.fbutton:active{
+	border:4px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+ width: 98.6%
+}
+
+</style>
+<fc-event-dialog event="{{dialogEvent}}" class="fit center" id="eventDialog">
+</fc-event-dialog>		
+<fc-ddr-card id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap self-stretch" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;">
+
+
+	<div class="horizontal layout flex nowrap">
+		<section class="vertical layout flex-3">
+ 			<div class="flex layout horizontal center-justified">
+				<neon-animated-pages 
+					class="layout vertical flex-1" 
+					id="pages" 
+					style="width: 320px; 
+					height:400px;" 
+					selected="1"
+				>
+				<fc-calendar-day-back
+					id="dayBack"
+					style="margin: 12px;"
+					is-single="true"
+					on-close="_onClose"
+					hook="{{hook}}"
+					cal-day="{{hook}}"
+					course-calendar-days="{{fcCourseObject.courseCalendarDaysArray}}" 
+					fc-course={{fcCourseObject}}
+				>
+				</fc-calendar-day-back>
+				<fc-date-picker
+					start-ht="460"
+					style="min-width: 204px;position: static; margin:12px; border:3px solid #009;"
+					class="fit"
+					id="datePickerCompactTwo" 
+					displayed-month="{{displayedMonth}}" 
+					on-tap="_dateSelected" 
+					calendar-day-array="{{calendarDayArray}}"
+					fc-course="{{fcCourseObject}}" 
+					course-calendar-days="{{fcCourseObject.courseCalendarDaysArray}}" 
+					>
+				</fc-date-picker>
+			</neon-animated-pages>
+			<fc-calendar-text-inputs
+				class="calendarItem" 
+				value-options={{valueOptions}} 
+				output-options="{{outputs}}" 
+				fc-course="{{fcCourseObject}}"
+				>
+			</fc-calendar-text-inputs>
+			<fc-calendar-options-selector
+				fc-course="{{fcCourseObject}}" 
+					inputs="{{inputs}}" 
+					class="calendarItem"
+					id="calendarOptionsSelector"
+					course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}"
+					calendar-day-array="{{calendarDayArray}}">
+			</fc-calendar-options-selector>
+ 		</div>
+ 		<paper-button on-tap="addSyllabus">add events</paper-button>
+ 		<paper-tabs 
+ 			id="calendarTabs" 
+ 			scrollable="true" 
+ 			style="padding: 2px 0px; height: 450px; outline: 0px; overflow: hidden; overflow-x: scroll;" 
+ 			class="horizontal layout" 
+ 			bar="true" 
+ 			hide-scroll-buttons="false">  
+			<div 
+				class="horizontal layout justified" 
+				style="width: 100%; margin: 9px; overflow-x: scroll;">
+			<template is="dom-repeat" initial-count="16" class="horizontal layout flex" items="{{fcCourseObject.courseCalendarDaysArray}}"  as="day">		
+				<fc-calendar-day-back 
+					back-width="{{backWidth}}"
+					back-height="{{}}"
+					course-calendar-days-array="{{fcCourseObject.courseCalendarDaysArray}}" 
+					fc-course="{{fcCourseObject}}"
+					cal-day="{{day}}"
+					event-list="{{day.eventList}}"
+					>
+					<section class="headerButton flex-1" on-tap="addEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
+						</iron-icon>
+					</section>
+				</fc-calendar-day-back>
+			</template>
+
+			</div>
+		 </paper-tabs> 
+	</section>
+	<section 
+				id="myContainer"
+			class="vertical layout flex-1" 
+			style="max-height: 60vh; min-height: 60vh;
+			margin: 12px;">
+			<fc-list-box-container list-item-data="{{courses}}" header-height="62px" footer-height="112px" on-tap="setCourse" fcprimary$="coach, fcid" top-heading="Course Calendars" style="min-height: 45vh max-height: 50vh;">
+				<section class="buttonColumn horizontal layout flex wrap">
+					<paper-button class="green layout horizontal flex nowrap center center-justified" on-tap="newCalendar">New Calendar</paper-button>
+					<paper-button class="darkblue layout horizontal flex nowrap center center-justified" on-tap="loadToDayCalendar">set primary</paper-button>
+					<paper-button class="red layout horizontal flex nowrap center center-justified" on-tap="deleteCalendar">Delete</paper-button>
+					<paper-button on-tap="clearWorkArea" class="orange layout horizontal flex nowrap center center-justified"> Clear Work</paper-button>
+				</section>
+			</fc-list-box-container>
+		</section>
+</div>
+</fc-ddr-card>	
+</template>
+<script>
+FcCalendarDialog= Polymer({
+	is:"fc-calendar-dialog",
+	behaviors:[
+			"Polymer.IronResizableBehavior",
+		 "FCBehaviors.DraggableBehavior"
+		  ],
+
+	listeners: {"click": "myclickgetter"},
+	observers:["observeEventTypes(dialogEvent.*, event.*)"],
+	properties:{
+		primary:{
+			type:String,
+			value: function(){ return "coach, fcid";},
+			notify: true
+		},
+		fcCourseObject:{
+			type: FcCourse,
+			notify: true
+		},
+
+		displayedMonth:{
+			type:Array,
+			notify: true
+		},
+		event: {
+			type: Object,
+			value: {},
+			notify: true
+		},
+		valueOptions: {
+			type: Array, 
+			value: [],
+			notify: true
+			},
+		outputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		hook:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		currentHeight:{
+			type: String,
+			notify: true
+		},
+		currentWidth: {
+				type: String,
+			notify: true,
+		},
+		inputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		calendarDayArray:{
+			type: Array,
+			value: [],
+			notify: true
+		}, 
+		courses: {
+			type: Array, 
+			value: [],
+			notify: true
+		},
+		dialogEvent:{
+			type: Object,
+			value: {},
+			notify: true
+		},
+		syllabus:{
+			type: Array,
+			value: function(){ 
+				return [{	Day: "1",
+							Math_Homework: "Read Math Workbook Chapter 1: Lines & Slopes, Do homework problems in Math Workbook Chapter 1: Lines & Slopes",
+							Reading_Homework: "",
+							Writing_Homework: "Read Grammar Guide Pages 1-10",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "2",
+							Math_Homework: "",
+							Reading_Homework: "",
+							Writing_Homework: "Read Grammar Guide Pages 11-17",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "3",
+							Math_Homework: "Read Math Workbook Chapter 2: Systems of Equations, Do homework probems in Math Workbook Chapter 2: Systems of Equations",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 3: Relative Clauses",
+							Assignments_Due: "Homework Problems in Math Workbook Chapter 1: Lines & Slopes, Have read Grammar Guide Pages 1-17",
+							Label: ""
+
+						},
+						{
+							Day: "4",
+							Math_Homework: "Read Math Workbook Chapter 3: Inequalities, Do homework problems in Math Workbook Chapter 3: Inequalities",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 4: Prepositional Phrases",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "5",
+							Math_Homework: "Do homework problems in Heart of Algebra Handout Practice Set 1: Linear Equations",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 5: Idioms",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "6",
+							Math_Homework: "Do homework problems in Heart of Algebra Handout Practice Set 2: Systems of Linear Equations",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "7",
+							Math_Homework: "Review Practice Test 2 and find questions you want to ask in class",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "8",
+							Math_Homework: "Do homework problems in Heart of Algebra Handout Practice Set 3: Inequalities",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 6: Subject Verb Agreement",
+							Assignments_Due: "Redone Reading from Practice Test 1, Homework Problems in Math Workbook Chapters 2 - 3, Homework Problems in Heart of Algerba Handout Practice Sets 1 - 2, Grammar Handouts Chapters 3 - 5",
+							Label: ""
+
+						},
+						{
+							Day: "9",
+							Math_Homework: "Read Math Workbook Chapter 4: Exponents & Radicals, Do homework problems in Math Workbook Chapter 4: Exponents & Radicals",
+							Reading_Homework: "Redo Reading Section from Practice Test 1",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "10",
+							Math_Homework: "Read Math Workbook Chapter 5: Polynomials, Roots, and Remainders, Do homework problems in Math Workbook Chapter 5: Polynomials, Roots, and Remainders",
+							Reading_Homework: "Do Reading Literature Passage Handout Questions",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 7: Modifiers",
+							Assignments_Due: "Homework Problems in Math Workbook Chapter 4, Homework Problems in Heart of Algerba Handout Practice Set 3, Grammar Handouts Chapter 6",
+							Label: ""
+
+						},
+						{
+							Day: "11",
+							Math_Homework: "Read Math Workbook Chapter 6: Functions, Do homework problems in Math Workbook Chapter 6: Functions",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "12",
+							Math_Homework: "Read Math Workbook Chapter 7: Linear, Quadratic, and Exponential Functions, Do homework problems in Math Workbook Chapter 7: Linear, Quadratic, and Exponential Functions",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 8: Run-ons",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "13",
+							Math_Homework: "Do homework problems in Passport to Advanced Mathematics Handout Practice Set 7: Exponents, Radicals, Polynomials, and Rational Expressions",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "14",
+							Math_Homework: "Review Practice Test 3 and find questions you want to ask in class",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "15",
+							Math_Homework: "Do homework problems in Passport to Advanced Mathematics Handout Practice Set 8: Advanced Techniques for Polynomials and Rational Equations",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 9: Fragments",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 5 -7, Homework Problems in Passport to Advanced Mathematics Handout Practice Set 7, Grammar Handouts Chapters 7 - 8, Literature Passage Handout",
+							Label: ""
+
+						},
+						{
+							Day: "16",
+							Math_Homework: "Do homework problems in Passport to Advanced Mathematics Handout Practice Set 9: Functions and Function Notation",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 9: Fragments",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 5 -7, Homework Problems in Passport to Advanced Mathematics Handout Practice Set 7, Grammar Handouts Chapters 7 - 8, Literature Passage Handout",
+							Label: ""
+
+						},
+						{
+							Day: "17",
+							Math_Homework: "Do homework problems in Passport to Advanced Mathematics Handout Practice Set 10: Quadratic Equations and Their Graphs",
+							Reading_Homework: "Do Reading Science Passage Handout Questions",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 11: Parallelism",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 5 -7, Homework Problems in Passport to Advanced Mathematics Handout Practice Sets 8-9, Grammar Handouts Chapters 9 - 10",
+							Label: ""
+
+						},
+						{
+							Day: "18",
+							Math_Homework: "Read Math Workbook Chapter 8: Rates, Ratios, and Proportions, Do homework problems in Math Workbook Chapter 8: Rates, Ratios, and Proportions",
+							Reading_Homework: "Do Reading Science Passage Handout Questions",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 12: Pronoun Reference",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 5 -7, Homework Problems in Passport to Advanced Mathematics Handout Practice Sets 8-9, Grammar Handouts Chapters 9 - 10",
+							Label: ""
+
+						},
+						{
+							Day: "19",
+							Math_Homework: "Read Math Workbook Chapter 9: Percentages, Do homework problems in Math Workbook Chapter 9: Percentages",
+							Reading_Homework: "Do Reading Science Passage Handout Questions",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 13: Tenses",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "20",
+							Math_Homework: "Read Math Workbook Chapter 10: Scatterplots and Tables, Do homework problems in Math Workbook Chapter 10: Scatterplots and Tables",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 14: Commas, Dashes, & Colons",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "21",
+							Math_Homework: "Review Practice Test 4 and find questions you want to ask in class",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "22",
+							Math_Homework: "Read Math Workbook Chapter 11: Statistics and Probability, Do homework problems in Math Workbook Chapter 11: Statistics and Probability",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 8 - 10, Homework Problems in Passport to Advanced Mathematics Handout Practice Set 10, Grammar Handouts Chapters 11 - 14, Science Passage Handout",
+							Label: ""
+
+						},
+						{
+							Day: "23",
+							Math_Homework: "Do homework problems in Problem Solving and Data Analysis Handout Practice Set 4: Rates, Ratios, Proportions, and Percentages",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 15: Apostrophes",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "24",
+							Math_Homework: "Do homework problems in Problem Solving and Data Analysis Handout Practice Set 5: Scatterplots",
+							Reading_Homework: "Do Reading Social Science Passage Handout Questions, Write essay in response to passage handed out in class",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 22: Point of View, Do homework questions in Grammar Handouts Chapter 23: Comparatives vs. Superlatives",
+							Assignments_Due: "Homework Problems in Math Workbook Chapter 11, Homework Problems in Problem Solving and Data Analysis Handout Practice Set 4, Grammar Handouts Chapter 15",
+							Label: ""
+
+						},
+						{
+							Day: "25",
+							Math_Homework: "Do homework problems in Problem Solving and Data Analysis Handout Practice Set 6: Two-way Tables, Statistics, and Probability",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 24: Who vs. Whom, Do homework questions in Grammar Handouts Chapter 25: Combining Sentences",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "26",
+							Math_Homework: "Read Math Workbook Chapter 12: Imaginary Numbers, Do homework problems in Math Workbook Chapter 12: Imaginary Numbers",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 16: Word Choice",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "27",
+							Math_Homework: "Read Math Workbook Chapter 13: Lines & Angles, Do homework problems in Math Workbook Chapter 13: Lines & Angles",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 17: Transitions",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "28",
+							Math_Homework: "Review Practice Test 5 and find questions you want to ask in class",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "29",
+							Math_Homework: "Read Math Workbook Chapter 14: Triangles, Do homework problems in Math Workbook Chapter 14: Triangles",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 18: Topic, Conclusion, & Transition Sentences",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 12 - 13, Homework Problems in Problem Solving and Data Analysis Handout Practice Sets 5 - 6, Grammar Handouts Chapters 22 - 25, 16 - 17, Social Science Passage Handout, Additional Essay",
+							Label: ""
+
+						},
+						{
+							Day: "30",
+							Math_Homework: "Read Math Workbook Chapter 15: Circles, Do homework problems in Math Workbook Chapter 15: Circles",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 19: Supporting Evidence & Examples",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "31",
+							Math_Homework: "Read Math Workbook Chapter 16: Trigonometry, Do homework problems in Math Workbook Chapter 16: Trigonometry",
+							Reading_Homework: "Do Reading Double Passage Handout Questions, Write essay in response to passage handed out in class",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 20: Relevance & Purpose",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 14 - 15, Grammar Handouts Chapters 18 - 19",
+							Label: ""
+
+						},
+						{
+							Day: "32",
+							Math_Homework: "Read Math Workbook Chapter 17: Areas & Solid Geometry, Do homework problems in Math Workbook Chapter 17: Areas & Solid Geometry",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "33",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 11: Imaginary Numbers",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 21: Placement",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "34",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 12: Lines, Angles, and Triangles",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "35",
+							Math_Homework: "Review Practice Test 6 and find questions you want to ask in class",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "36",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 13: Similarity, Congruence, and Proofs",
+							Reading_Homework: "",
+							Writing_Homework: "Do homework questions in Grammar Handouts Chapter 26: Data Interpretation",
+							Assignments_Due: "Homework Problems in Math Workbook Chapters 16 - 17, Homework Problems in Additional Topics in Mathematics Handout Practice Sets 11 - 12, Grammar Handouts Chapters 20 - 21, Reading Double Passage Handout, Additional Essay",
+							Label: ""
+
+						},
+						{
+							Day: "37",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 14: Circles",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						},
+						{
+							Day: "38",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 15: 3-D Shapes",
+							Reading_Homework: "Write essay in response to passage handed out in class",
+							Writing_Homework: "",
+							Assignments_Due: "Homework Problems in Additional Topics in Mathematics Handout Practice Sets 13 - 14, Grammar Handouts Chapter 26",
+							Label: ""
+
+						},
+						{
+							Day: "39",
+							Math_Homework: "Do homework problems in Additional Topics in Mathematics Handout Set 16: Trigonometry",
+							Reading_Homework: "",
+							Writing_Homework: "",
+							Assignments_Due: "",
+							Label: ""
+
+						}
+					];
+				},
+				notify: true
+			}
+		},
+	
+	ready: function()
+	{	
+		this.set("fcCourseObject", new FcCourse());
+		var self=this;
+		var valueArray=FcCourse.getInputs();
+		valueArray.forEach(function(item, index, array){
+			 self.push("valueOptions",item);
+
+		 });
+		// this.getFireBaseCourses();
+	},
+	
+	attached: function()
+	{		
+		this.set("firstTime", false);
+		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
+		this.set("inputs", inputO);	
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourseObject);
+		this.set("outputs", outputs);
+		console.log(this.fcCourseObject.courseCalendarDaysArray);
+		this.getFireBaseCourses();
+		console.log(this.courses, "look here");
+		this.set("fcCourseObject.courseCalendarDaysArray", this.displayedMonth);
+		console.log("displayedMonth", this.displayedMonth);
+
+	},
+
+	addSyllabus: function(){
+		var newCourses = this.courses.map(function(val, ind, array){ var courseNow=array[ind];
+			var cdarray= val.courseCalendarDaysArray.map(function(day, index, arr){
+				var eve= new FcEvent({});
+
+				eve.syllabus = this.syllabus[index];
+				if(index<this.syllabus.length-1){
+					eve.date=new Date(day.dateId);
+					eve.cdIndex=day.cdIndex;
+					eve.coach=courseNow.coach;
+					eve.color=(courseNow.color)?courseNow.color: "#000099";
+					eve.name="Day Number: " + this.syllabus[index].Day + " Assignments ";
+				eve.activity="Assignment: " + this.syllabus[index].Math_Homework + " ; " + this.syllabus[index].Reading_Homework + " " + this.syllabus[index].Writing_Homework; 
+				console.log(eve);
+				if(!day.eventList){
+					day.eventList=[];
+					if(eve){
+				 	day.eventList.push(eve);
+				 	return day;}
+				}
+				else if(day){ day.eventList.push(eve); return day;}}
+			}, this); var cour = val; 
+			cour.courseCalendarDaysArray=cdarray;
+			return cour;
+		}, this);
+		this.set("courses", newCourses);
+
+
+	},
+	myclickgetter: function(e){
+		console.log(e.target, e.parent, e);
+	},
+	observeEventTypes: function(dev, ev){
+	if(dev){console.log(dev, dev.base, dev.value);} 
+	if(ev){console.log(ev, ev.base, ev.value);}
+	},
+	newCalendar: function(){
+		course= new FcCourse();
+		this.set("fcCourseObject",course);
+		this.$.datePickerCompactTwo.initialize();
+	},
+	_sortSlots: function(a,b){
+			var ao = stringTime(a.startTime);
+			var bo= stringTime(b.startTime); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+
+
+    },
+    addEvent:function(e){
+			console.log(e);
+			var index=e.model.day.cdIndex;
+				var model = event.model;
+				var day=model.day
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourseObject;
+				
+
+			if(index==-1)
+			{	var model = event.model;
+				var day=model.day;
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourseObject;
+				var index=this.fcCourseObject.courseCalendarDaysArray.length;
+				day.cdIndex=index;
+				day.inCourseCalendarDayArray=true;
+				day.color="#008";
+				//day.background="#aecefe";
+				day.eventType="private course meeting";
+				day.dateText="Session";
+			var modelPst=new FcCourseEvent({activity: "Private Course Meeting", name: "Private Course Meeting", color: "purple", cdIndex: index, eventType: day.eventType, courseEventType: day.eventType, date: day.date, showDate: day.showDate, coach: this.fcCourseObject.coach, coachId: this.fcCourseObject.fcid});
+				this.push("fcCourseObject.courseCalendarDaysArray",day);
+			}
+			else{
+			var evId =stringTimeToDateTime(this.fcCourseObject.startTime, day.date);
+			var pst=new FcEvent({activity: "new event", date: day.date, showDate: day.showDate, coach: this.fcCourseObject.coach, coachId: this.fcCourseObject.fcid, evId: evId});
+			if(this.fcCourseObject.courseCalendarDaysArray[index].eventList){
+			this.push(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], pst);
+			}
+			else{this.set(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], []);
+				this.push(["fcCourseObject.courseCalendarDaysArray",index,"eventList"], pst);
+				}
+			}
+},
+
+  
+	clearWorkArea: function(){
+		var	cda=[];
+		var course={};
+		course= new FcCourse();
+		course.calendarDayArray=this.fcCourseObject.calendarDayArray;
+		console.log(course.calendarDayArray);
+		this.set("fcCourseObject",course);
+		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
+		var optEl=this.$.calendarOptionsSelector;
+		optEl.inputIndex=0;
+		optEl._backOneInput();
+		optEl._forwardOneInput();
+
+	},
+	_computeBackHeight: function(displayType)
+	{
+
+	},
+	loadToDayCalendar: function(){
+		var calendarDayArray=this.fcCourseObject.calendarDayArray;
+		this.set("fcCourseObject.calendarDayArray",course.calendarDayArray);
+		console.log(course.calendarDayArray);
+		this.$.datePickerCompactTwo.initialize(calendarDayArray);
+	},
+
+	setCourse: function(e){
+			this.set("fcCourseObject",e.model.item);
+	},
+	deleteCalendar: function(){
+		var fcid=this.fcCourseObject.fcid;
+		var partRef=FcCourse.getFirebaseLocation();
+		var firebase=partRef+"/"+fcid;
+		var deleteRef=new Firebase(firebase);
+		deleteRef.remove();
+		this.set("fcCourseObject", new FcCourse({}));
+	}, 
+	
+	createCalendar: function(){
+		var sortedCalDays= this.fcCourseObject.courseCalendarDaysArray.sort(function(a,b){
+			if (a.dateId > b.dateId) {
+    		return 1;
+  			}
+  			if (a.dateId < b.dateId) {
+   	 		return -1;
+  			}
+  			if (a.dateId ===b.dateId){
+  			  return 0;
+			}
+		});
+		
+		 this.set("fcCourseObject.courseCalendarDaysArray", sortedCalDays);
+	},
+
+
+_computeOutput: function(valueOptions, fcCourseObject)
+	{
+		var length=valueOptions.length;
+	 	 var outputArray=[];
+	 	for(i=0;i<length;i++)
+	  {
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	 		var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		var propertyName ="fcCourseObject."+name;
+	 		var eventOutput={
+	 			"name":name,
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"value": this.fcCourseObject[name] || ""
+	 		};
+	 		outputArray.push(eventOutput);
+	 	}
+	 	return outputArray;
+	},
+
+inputValueAndLabelSerialization: function(valueOptions)
+	 {	
+		var length=valueOptions.length;
+	 	 var derray=[];
+	 	for(i=0;i<length;i++)
+	  {	
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	
+	 		var eventInput={
+	 			"name":"",
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"labelB":"",
+	 			"isRepeaterSelect":true,
+	 			"selectItems":valarr[2],
+	 			"style":"",
+	 			"class": "",
+	 			"aside":{	"noteOne:": "",
+	 						"noteTwo:": ""}
+			};
+	 			var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		eventInput.name=name;
+	 		derray.push(eventInput);
+
+	 	}
+	 	 return derray;
+	 },	
+	
+_dateSelected: function(event) {
+      var targetOne = event.target;
+      while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
+        targetOne = targetOne.parentNode; 
+       }
+       if(targetOne.nodeName=="FC-DATE-MINI")
+         {
+         	
+         	this.set("hook", targetOne.day);
+         	this.set("hook.eventList", targetOne.day.eventList);
+        
+      this.sharedElements = {
+        'hero': this.$.dayBack
+      };
+             this.$.pages.selected = 0;
+        }    
+    },
+
+
+    _onClose: function() {
+      this.$.pages.selected = 1;
+    },
+
+  computeYear: function(displayedMonth)
+{	
+	if(this.displayedMonth[15])
+	{
+	return displayedMonth[15].date.getFullYear();
+	}
+},
+
+ getFireBaseCourses: function(){
+ 		var self=this;
+ 		var ref = new Firebase(FcCourse.getFirebaseLocation());
+
+ 		ref.on("child_added", function(snapshot, prevChildKey) {
+  				var course = snapshot.val();
+  				if(snapshot.key()!="counter")
+  				{
+  					self.push("courses", course);
+  				}
+  			});
+
+
+ },
+  openup: function(e){
+    		console.log(e);
+    		var event=e.model.__data__.event;
+    		this.$.eventDialog.openDi();
+    		console.log(this.$.eventDialog, event);
+    		this.set("dialogEvent", event);
+    		console.log(this.$.eventDialog, event, this.dialogEvent);
+
+    },
+
+
+});
+</script>
+</dom-module>

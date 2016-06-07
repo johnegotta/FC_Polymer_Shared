@@ -26,7 +26,10 @@
 			box-shadow: 4px 7px 13px 3px #6f6f6f; 
 			margin-bottom: 16px;
 			display: block;
-			@apply(--layout-block);
+			@apply(--layout-horizontal);
+			@apply(--layout-flex);
+			@apply(--around-justified);
+
 		}
 		.gridBox >*{
 			border:0px snow solid;
@@ -162,28 +165,37 @@
 	id="myContainer"
 	style="max-height:{{maxHt}}; min-height: {{minHt}}; outline: silver; {{computeBorderGrid(isGridbox)}}">
 	
-		<template is="dom-repeat"  items="{{optionsArray}}" as="option"  class$="[[computeOrientation(horizontal)]]">
-			<section class="topHeaderContainer" style$="height:{{headerHeight}}!important; min-height:{{headerHeight}}!important;max-height:{{headerHeight}}!important;">
-				<section class="headingLayer layout horizontal flex center center-justified" style$="font-size: {{headerFont}}!important;" >
+	<template is="dom-repeat"  items="{{optionsArray}}" as="option"  class$="[[computeOrientation(horizontal)]]">
+		<section class="topHeaderContainer" style$="height:{{headerHeight}}!important; min-height:{{headerHeight}}!important; max-height:{{headerHeight}}!important;">
+				<section>
 					<content select=".leftSide"></content>
-						<span hidden="{{option.header}}" style$="font-size: {{_computeHeaderFont(headerFont,topHeading)}}!important;" class="headingLayer layout horizontal flex center center-justified">{{topHeading}}</span>
-						<span style$="font-size: {{headerFont}}!important;" hidden="{{!option.header}}" class="headingLayer layout horizontal flex center center-justified">{{option.header}}</span>
-					<content select=".rightSide"></content>
-					</section>
 				</section>
+				<section class="headingLayer layout horizontal flex center center-justified" style$="font-size:{{headerFont}}!important;">
+						<section hidden="{{option.header}}" style$="font-size:{{_computeHeaderFont(headerFont,topHeading)}}!important;" class="headingLayer layout horizontal flex center center-justified">{{topHeading}}</section>
+						<section style$="font-size:{{headerFont}}!important;" hidden="{{!option.header}}" class="headingLayer layout horizontal flex center center-justified">{{option.header}}
+						</section>
+				</section>
+				<section>
+					<content select=".rightSide"></content>
+				</section>
+			
+		</section>
 				
 				<section class="vertical layout flex-9" style="overflow-y: scroll;">
 				<paper-list-box  class="col" style="overflow-y: scroll;">
 <fc-reordered-list id="reorderer" class="reorderer flex layout vertical">
 						<template 
 							is="dom-repeat" hidden="{{isGridbox}}" 
-							items="{{listItemData}}" filter="{{createFilter(item, filterOne, option)}}">
+							items="{{listItemData}}">
+							<!-- filter="{{createFilter(item, filterOne, option)}}" -->
 							<paper-item on-tap="setItem"
 								class="layout horizontal theItem item"
 								hidden="{{isInput}}"
+								data-button="{{}}"
 								style="border: silver 1px solid; margin: 0px 2px;">
 								<paper-item-body  
 									class="layout vertical"
+									btn="{{option.btn}}{{item.btn}}{{item.name}}"
 								>
 									<div class="primary">
 										{{_computePrimary(item, fcprimary, option)}}
@@ -197,7 +209,9 @@
 								<paper-icon-button 
 										icon="{{itemIcon}}" 
 										style="color: {{item.coachObject.color}}"
-										alt="favourite this!">
+										item-name="{{item}}"
+										alt="favourite this!"
+										btn="{{itemIconBtn}}">
 								</paper-icon-button>
 					  		</paper-item>
 					  		
@@ -213,16 +227,17 @@
 				</fc-reordered-list>
 				</paper-list-box>
 				</section>
-				<section class="footerButtonColumn" style="min-height:{{footerHeight}}!important; background:[[footerBackground]];">
+					</template><!--move if solve button issue related to item type taps and data button on a repeat-->
+				<section class="footerButtonColumn" style="position: absolute: bottom: 2px; right: 2px; left: 2px; min-height:{{footerHeight}}!important;max-height:{{footerHeight}}!important; background:[[footerBackground]];">
 				<content select=".buttonColumn"></content>
 				<section class="buttonRow">
 					<content select=".buttonRowOne"></content>
 				</section>
 				<section class="buttonRow">
-				<content select=".buttonRowTwo"></content>
+				<content select=".buttonRowTwo, .buttonrowtwo"></content>
 				</section>
 				</section>
-			</template>
+		
 		</div>
 		</form>
 	</section>
@@ -230,16 +245,23 @@
 <script>
 FcListBoxContainer=Polymer({
 	is: "fc-list-box-container",
+	behaviors: [FCBehaviors.FcCalendarBehaviorPrime, FCBehaviors.FcCalendarOptionsSelectorBehavior],
 	properties:{
 		isGridbox:{
-			type: Boolean,
-			value: false,
+			type: Boolean,		
+			value:function(){return false;},
 			notify: true
 		},
 		isInput:{
 			type: Boolean,
-			value: false,
+			value:function(){return false;},
 			notify: true
+		},
+		itemName:{
+			type:String,
+			notify: true,
+			reflectToAttribute: true
+
 		},
 		horizontal:{
 			type: Boolean,
@@ -259,6 +281,12 @@ FcListBoxContainer=Polymer({
 		listItemData:{
 			type: Array,
 			value: function(){return [];},
+			observer:"_myListItemData",
+			notify: true
+		},
+		isCourseSelector:{
+			type:Boolean,
+			value:function(){return false;},
 			notify: true
 		},
 		footerBackground:{
@@ -273,12 +301,17 @@ FcListBoxContainer=Polymer({
 		},
 		headerFont: {
 			type: String,
-			value:"20px",
+			value:function(){return "20px";},
 			notify: true,
 		},
 		itemIcon:{
 			type: String,
 			value: function(){return "info";},
+			notify: true
+		},
+		itemIconBtn:{
+			type:String,
+			value: function(){return "itemInfo";},
 			notify: true
 		},
 		maxHt:{
@@ -312,21 +345,27 @@ FcListBoxContainer=Polymer({
 
 		footerHeight: {
 			type: String,
+			value:function(){
+				return "0px";
+			},
 			notify: true
 		},
 		headerHeight: {
 			type: String,
+			value:function(){
+				return "60px";
+			},
 			notify: true 
 		},
 		fcprimary:{
 			type: Array,
-			value: function(){return ["coach", "fcid"];},
+			value: function(){return["coach", "fcid"];},
 			notify: true,
 			reflectToAttribute: true
-		},
+		}, 
 		secondaryOne:{ 
 			type: Array,
-			value: function(){return ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"];},
+			value: function(){ return ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"];},
 			notify: true
 		},
 		secondaryTwo: {
@@ -343,6 +382,12 @@ FcListBoxContainer=Polymer({
 			bunches=Polymer.dom(this.root).querySelectorAll("*");
 			bunches.forEach(function(val,i){Polymer.dom(val).classList.add(".gridBox");},this);	
 		}
+		if(this.isCourseSelector==true){
+			this._computeInputArrays(this.inputs);
+		}
+	},
+	_myListItemData(newVal, oldVal){
+		//console.log(newVal, oldVal);
 	},
 
 	setItem(){
@@ -365,8 +410,6 @@ FcListBoxContainer=Polymer({
 		else{return headerFont;}
 
 	},
-
-
 
 	_computePrimary(item, userInput, option){
 		// console.log(userInput, this.fcprimary, this.parentElement);
@@ -404,9 +447,9 @@ FcListBoxContainer=Polymer({
 								return `$(item[i].key)   $(item[i].value)  $(str)  $(item[userInput[i]].key)`;
 
 							}
-							
+
 							else{
-								console.log("sending", item);
+								//console.log("sending", item);
 								return item;
 							}
 						}

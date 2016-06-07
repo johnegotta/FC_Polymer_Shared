@@ -28,7 +28,7 @@
 
 		div.text {
 			line-height: 1.2;
-			font-size: 14pt;
+			font-size: 16pt;
 			font-size: 1.25em;
 			font-family: merriweather;
 			font-weight: 500;
@@ -38,8 +38,10 @@
 			display: flex;
 			min-width: 260px !important;
 			max-width: 720px !important;
+			overflow-y:scroll;
 		}
 </style>
+<div layout vertical>
 	<div class="layout horizontal container">
 
 		<div id="linenumbersA1" class="layout vertical line-number">
@@ -56,7 +58,7 @@
 		 		<section hidden$="{{columnOne}}"> <br><br></section>
 		 	    <template is="dom-repeat" items="{{theContent}}" on-dom-change='checkForLastNode' filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
 						<template is="dom-if" if="{{item.newPara}}">
-							<br><span>&nbsp&nbsp&nbsp&nbsp</span>
+							<br><span>&nbsp&nbsp&nbsp&nbsp&nbsp</span>
 						</template>
 						<a id="oneOneWords_{{item.order}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
 				</template>
@@ -66,14 +68,14 @@
 			</article>
 		</div>
 	</div>
-
+</div>
 </template>
 
 <script>
 Polymer({
 	is: 'fc-single-column-layout',
 	behaviors: [Polymer.IronResizableBehavior],
-	//listeners: {'iron-resize':'checkForLastNode'},
+	listeners: {'iron-resize':'checkForLastNode'},
 	properties: {
 		theContent:{
 			type: Array,
@@ -83,7 +85,7 @@ Polymer({
 
 		columnOne: {
 			type: Boolean,
-			value: false,
+			value: function(){return false;},
 			notify: true,
 			reflectToAttribute: true
 		},
@@ -128,18 +130,19 @@ Polymer({
 	},
 
 	gotContent: function(newTheContent){
-		console.log(this.id, 'IN gotContent', newTheContent);
-		this.lastWordIndex = newTheContent.length;
+		this.lastWordIndex = newTheContent.length-1;
+		console.log(newTheContent, newTheContent.length);
 	},
 
 	gotLastWordIndex: function(newLastWordIndex){
-		console.log(this.id, "IN gotLastWordIndex", newLastWordIndex);
 		this.checkForLastNode();
 	},
 
 	wordsOffBottom: function(){
-	    var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+	    console.log(lwId);
 	    var lastWordNode = this.$$(lwId);
+	    // if(lastWordNode){
 	    var lastWordNodeBottom = lastWordNode.getBoundingClientRect().bottom;
 
 	    var previousWordNode = lastWordNode;
@@ -153,8 +156,6 @@ Polymer({
 	        numberOfWordsToCut++;
 	      }
 	    }
-
-	    console.log("IN wordsOffBottom", this.lastWordIndex, numberOfWordsToCut);
 	    return numberOfWordsToCut;
 	},
 
@@ -162,21 +163,23 @@ Polymer({
 
 	    var lwId =  '#oneOneWords_' + this.firstWordIndex;
 	    var firstWordNode = this.$$(lwId);
-	    var firstWordNodeBottom = firstWordNode.getBoundingClientRect().bottom;
+	    // if(firstWordNode)
+	    // {
+		    var firstWordNodeBottom = firstWordNode.getBoundingClientRect().bottom;
 
-	    var nextWordNode = firstWordNode;
-	    var nextWordNodeBottom = firstWordNodeBottom;
-	    var numberOfWordsToCut = 0;
+		    var nextWordNode = firstWordNode;
+		    var nextWordNodeBottom = firstWordNodeBottom;
+		    var numberOfWordsToCut = 0;
 
-	    while(nextWordNodeBottom == firstWordNodeBottom){
-	      nextWordNode = nextWordNode.nextSibling;
-	      if(nextWordNode.nodeName == firstWordNode.nodeName){
-	        nextWordNodeBottom = nextWordNode.getBoundingClientRect().bottom;
-	        numberOfWordsToCut++;
-	      }
-	    }
-	    console.log("IN wordsOffTop", this.firstWordIndex, numberOfWordsToCut);
-	    return numberOfWordsToCut;
+		    while(nextWordNodeBottom == firstWordNodeBottom){
+		      nextWordNode = nextWordNode.nextSibling;
+		      if(nextWordNode.nodeName == firstWordNode.nodeName){
+		        nextWordNodeBottom = nextWordNode.getBoundingClientRect().bottom;
+		        numberOfWordsToCut++;
+		      }
+		    }
+		    return numberOfWordsToCut;
+		// } //add promise
 	},
 
 	computeLastRowIndex: function(lastWordNode){
@@ -184,7 +187,6 @@ Polymer({
 		var lwId =  '#oneOneWords_' + this.lastWordIndex;
 		var last_word_bottom = this.$$(lwId).getBoundingClientRect().bottom;
 	 	var line_height = this.$.linesA1.clientHeight;
-
 	 	var delta =  last_word_bottom - bottom_of_top_mark;
 	 	var numRows = Math.floor(delta/line_height);
 	 	this.lastRowIndex = this.firstRowIndex + numRows - 1;
@@ -193,7 +195,6 @@ Polymer({
 
 	getLastWordNode: function(nodeId){
 		var lastNode = this.$$(nodeId);
-
 		var lastNodePromise = new Promise(function(resolve, reject){
 			if(lastNode != undefined){
 				resolve(lastNode);
@@ -201,43 +202,39 @@ Polymer({
 				reject(Error("lastNode doesn't exist"));
 			}
 		});
-
 		return lastNodePromise;
 	},
 
 	checkForLastNode: function(){
 		var self = this;
-
 		var lwId =  '#oneOneWords_' + this.lastWordIndex;
 		var lastNode = this.getLastWordNode(lwId);
-
 		lastNode.then( (lastNode)=>{
 			self.computeLastRowIndex();
 		},
 		                (error)=>{
-			console.log(error);
+			console.log("error, add async");
 		});
 	},
 
-
   // FILTERS
   _numberRowsFilter: function(firstRowIndex, lastRowIndex){
-    return (item) =>{
-      return (item.number >= firstRowIndex && item.number <= lastRowIndex);
-    };
-  },
+	    return (item) =>{
+	      return (item.number >= firstRowIndex && item.number <= lastRowIndex);
+	    };
+	  },
 
   _theContentFilter: function(firstWordIndex, lastWordIndex){
-    if(!isNaN(lastWordIndex)){
-      return (item) =>{
-        return (item.order >= firstWordIndex && item.order <= lastWordIndex);
-      };
-    } else {
-      return (item) =>{
-        return true;
-      };
-    }
-  }
+	    if(!isNaN(lastWordIndex)){
+	      return (item) =>{
+	        return (item.order >= firstWordIndex && item.order <= lastWordIndex);
+	      };
+	    } else {
+	      return (item) =>{
+	        return true;
+	      };
+	    }
+	  }
 
 });
 </script>

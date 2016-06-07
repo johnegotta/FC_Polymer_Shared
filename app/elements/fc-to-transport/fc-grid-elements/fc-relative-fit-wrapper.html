@@ -4,29 +4,31 @@
     :host {
       background: white;
       color: #009;
-      text-align: center;
+      height: 2500px;
+
       position: relative!important;
       overflow: scroll;
 
     }
+
     div{padding: 0px;
         background: white;
         border: 14px silver ridge;
-        overflow: scroll;}
+        height: 100%;
         section{background: aqua;}
   </style>
 
-<div id="myPanel" style="background: white; height:[[computePanelHeight(positionTarget,special)]]; width:[[computePanelWidth(positionTarget,special)]];">
- <iron-collapse id="seeElement" style="background:white;">
-    <content></content>
-  </iron-collapse>
+<div id="myPanel" style="overflow-y: scroll; background: white; height:[[computePanelHeight(positionTarget,cws)]]; width:[[computePanelWidth(positionTarget,cws)]];">
+ <!-- <iron-collapse id="seeElement" style="background:white;"> -->
+    <content style="overflow-y: scroll;"></content>
+<!--   </iron-collapse> -->
 </div>
  </template>
 <script>
 FcFitWrapper=Polymer({
     is: 'fc-relative-fit-wrapper',
     behaviors: [
-      Polymer.IronFitBehavior,
+      Polymer.IronFitBehavior,Polymer.IronResizableBehavior
       // FCBehaviors.ResizableRootBehavior
     ],
     properties:{
@@ -38,10 +40,10 @@ FcFitWrapper=Polymer({
         value: function(){return Polymer.dom(this.root.parentNode);},
         notify: true
     },
-    special:{
-
-
-
+    cws:{
+      type:String,
+      value:function(){return "out";},
+      notify: true,
     },
 
       parentN:{
@@ -70,7 +72,7 @@ FcFitWrapper=Polymer({
         },
 
     openToSeeElement(){
-      this.$.seeElement.opened=true;
+      // this.$.seeElement.opened=true;
     },
       _computeFitInto(pt){
         console.log(pt);
@@ -123,17 +125,27 @@ FcFitWrapper=Polymer({
     },
 
  
-    computePanelWidth: function(target){
+    computePanelWidth: function(target, cws){
         if(target && target.style && window.getComputedStyle(target, null).getPropertyValue("width")){
-      return Math.floor(parseFloat(window.getComputedStyle(target, null).getPropertyValue("width"))*.98).toString()+"px";
+      
+
+      var targetWidth= Math.floor(parseFloat(window.getComputedStyle(target, null).getPropertyValue("width"))*.98).toString()+"px";
+      if(cws="out"){
+        return "0px;"
+      }
+      else{return targetWidth}
     }
     },
 
-    computePanelHeight:function(target){  
+    computePanelHeight:function(target, cws){  
         if(target && target.style && window.getComputedStyle(target, null).getPropertyValue("height"))
         {
-      return Math.floor(parseFloat(window.getComputedStyle(target, null).getPropertyValue("height"))*.98).toString()+"px";
-    }
+     var targetHeight=Math.floor(parseFloat(window.getComputedStyle(target, null).getPropertyValue("height"))*.98).toString()+"px";
+        if(cws==="out"){
+          return "0px; border-radius: 50%; box-shadow: 3px 5px 13px 2px #afafaf"; 
+        }
+        else {return targetHeight;}
+      }
     },
 
     

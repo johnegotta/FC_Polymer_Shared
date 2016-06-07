@@ -43,7 +43,7 @@ top: 10px;
 </style>
 <fc-list-box-container is-grid-box="false" list-item-data="{{outputOptions}}" is-input="true" options-array$="" min-ht="460px" max-ht="460px" fcprimary="{{primary}}" secondary-one="{{secondaryOne}}" secondary-two="{{secondaryTwo}}"  header-height="62px" header-font="20px" top-heading="Course Selections">
 	<section class="buttonRowOne buttonRow">
-				<paper-button elevation="3" class="green layout horizontal flex nowrap center center-justified" on-tap="confirmCalculate">CONFIRM</paper-button>
+				<paper-button elevation="3" class="green layout horizontal flex nowrap center center-justified" on-tap$="function(){this.confirmCalculate}">CONFIRM</paper-button>
 	</section>
 </fc-list-box-container>
 
@@ -54,34 +54,29 @@ top: 10px;
 "use strict";
 Polymer({
 	is:"fc-calendar-text-inputs",
-	behaviors: [FCBehaviors.FcCalendarBehaviorPrime],
-	observers: ['fcCourseObserver(fcCourse.*)'],
+	behaviors: [FCBehaviors.FcCalendarBehaviorPrime, FCBehaviors.FcCalendarOptionsSelectorBehavior],
+	
 	properties: {
-		outputOptions: {
-			type: Array,
-			value:"",
-			notify: true
-		},
-		valueOptions: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		daysInEvent: {
-			type: Array,
-			value: [],
-			notify: true
-		},
-		fcCourse:{
-			type: FcCourse,
-			value: function(){var course =new FcCourse({}); return course;},
-			notify: true
-		}, 
+		
+		// valueOptions: {
+		// 	type: Array,
+		// 	value: [],
+		// 	notify: true
+		// },
+		// daysInEvent: {
+		// 	type: Array,
+		// 	value: [],
+		// 	notify: true
+		// },
+		// fcCourse:{
+		// 	type: FcCourse,
+		// 	value: function(){var course =new FcCourse({}); return course;},
+		// 	notify: true
+		// }, 
 		primary:{
 			type: Array,
 			value:function(){return ["value"];}, 
 			notify: true
-
 		},
 		secondaryOne:{
 			type: Array,
@@ -92,54 +87,12 @@ Polymer({
 			type: Array,
 			value:function(){return ["name"];}, 
 			notify: true
-
 		},
 		
 	},
 	
-fcCourseObserver(fcCourse){
-	this._computeCourse(this.valueOptions, this.fcCourse);
-},
 
-_computeCourse(valueOptions, fcCourse)
-	{
-		var length=valueOptions.length;
-	 	 var outputArray=[];
-	 	for(i=0;i<length;i++)
-	  {	
 
-	 		var valarr = [];
-	 		valarr=valueOptions[i];
-	 		var name = valarr[1].label2;
-	 			name =name.charAt(0).toLowerCase() + name.slice(1);
-	 			name=name.replace(/\s/g,'');		
-	 		var eventOutput={
-	 			"name":name,
-	 			"inputType": "select",
-	 			"header":valarr[0].label,
-	 			"labelA":valarr[1].label2,
-	 			"value": this.fcCourse[name] 
-	 		};
-	 	
-	 		outputArray.push(eventOutput);
-	
-	 	}
-		this.set("outputOptions", outputArray);
-	 	return outputArray;
-	},
-
-confirmCalculate(){
-	console.log(this.fcCourse);
-	
-	this.fcCourse.save();
-	
-	this.fire("catchTheCourse", {theCourse: this.fcCourse});
-	event = JSON.stringify(this.fcCourse);
-	console.log(event);
- 		localStorage.setItem("New_Course", event); 
-},
-
-	
 
 });
 </script>

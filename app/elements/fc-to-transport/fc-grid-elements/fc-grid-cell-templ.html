@@ -1,14 +1,33 @@
 <dom-module id="fc-grid-cell-templ">
 <template>
-<template id="gridCellTemplate" style="width: auto; height: auto;">
-<section class="horizontal layout flex self-stretch item" location="{{cell.location}}" counter="0" drags draggable dragging is-gridbox="true" cell="{{cell}}" key="{{cell.key}}" value="{{cell.value}}"style$="min-width:86px; min-height:88px; max-width: 220px; max-height:60px; background-color:#[[cell.key]]ffff; border:1px solid #009; font-size:14px;" on-down="startDrag" on-dragover="allowDrop" on-up="handleDrop"id$="gridBox{{cell.key}}">
+<style>
+:host{max-height: 80vh;
+      max-width: 72vw;
+      @apply(--layout-horizontal);
+      @apply(--layout-flex);
+      @apply(--layout-wrap);
+      max-height: 80vh;};
+</style>
 
+<template id="gridCellTemplate" style="width: auto; height: auto;">
+
+
+<paper-material style="background:white; border: 1px #afafaf solid;padding: 2px 6px; margin 1px;">
+<section class="horizontal layout flex self-stretch item" location="{{cell.location}}" counter="0" drags draggable dragging is-gridbox="true" cell="{{cell}}" value="{{cell.value}}" style$="min-width:106px; min-height:88px; max-width: 220px; max-height:60px; border:1px solid #009; font-size:14px;background: orange;" on-down="startDrag" on-dragover="allowDrop" drags draggable dragging on-up="handleDrop"id$="gridBox{{cell.key}}">
 {{cell.location}}
-<fc-input-prime input-type="text" id$="input[[cell.key]]" drags dragging dragable on-change="adjustValueArrays" input-style="max-width: 50px; max-height: 50px;" label="key: [[cell.key]]" value="{{cell.value}}" key="{{cell.key}}" to-location="{{cell.location}}" ></fc-input-prime>
+<fc-input-prime input-type="text" id$="input[[cell.key]]" drags dragging dragable on-change="adjustValueArrays" input-style="background: red; max-width: 50px; max-height: 50px;" label="key: [[cell.key]]" value="{{cell.value}}" key="{{cell.key}}" to-location="{{cell.location}}">
+</fc-input-prime>
 </section>
+</paper-material>
+
+
 </template>
+<template is="dom-if" if="true">
 </template>
-</dom-module>
+
+<div id="hanger" style="width:0px; height:0px;">
+</div>
+</template>
 <script>
 FcGridCellTempl=Polymer({
 	is:'fc-grid-cell-templ',
@@ -16,6 +35,7 @@ FcGridCellTempl=Polymer({
 	properties:{
 		dataArrays:{
 			type: Array,
+      value: function(){return[];},
 			notify: true
 		},
 		cellMap:{
@@ -26,35 +46,66 @@ FcGridCellTempl=Polymer({
 			type:Map,
 			notify: true,
 		},
-
 		instanceProps:{
         	column:true,
         	row:true,
         	location:true,
         	key:true,
-        	value:true
+        	value:true, 
+          cell: true
         	},
+    counter:{
+      type: Number,
+      value: 0,
+      notify: true
+      },
+    instanceArray:{
+      type: Array,
+      value:function(){return[];},
+      notify: true
+      },
+    trueArrays:{
+      type: Array,
+      value: function(){return[];},
+      notify: true
+      },
     },
+
     ready(){
-
-
-    },
-    attached(){
       var da=this.setDataArrays();
       this.set("dataArrays",da);
-      var template= Polymer.dom(this.root).firstElementChild;
-console.log(template);
-while(template.nodeName!="TEMPLATE"){
-	this.template=Polymer.dom(template).nextSibling;
-
-}
-    	console.log(template);
-        this.templatize(template);
-      this.async(function(){
-      var maps=this.setMaps(da);
-      console.log(maps);
-  },1400);
-      },
+      //console.log(this.dataArrays);
+    },
+    attached(){
+    var node=this.firstChild.nextSibling;
+    if(!node){
+      //console.log("inasync");
+      this.async(this.nodeFind,1750);
+        }
+    else{
+      //console.log(node, "notasync");
+      this.setMaps();
+      }
+    },
+    nodeFind(){
+      var node=this.firstChild;
+    while(node.nodeName!="TEMPLATE" && node.id!=="gridCellTemplate"){
+      node=node.nextSibling;
+    }
+  if(node.nodeName!="TEMPLATE" ||  node.id!=="gridCellTemplate")
+        {   
+            node=Polymer.dom(this.root).querySelector("#gridCellTemplate");
+            //console.log("special: "+ node);
+        }
+  if(node.nodeName=="TEMPLATE"&&  node.id==="gridCellTemplate")
+      {
+        this.console("hallelleuha");
+        this.set("node",node);
+        this.templatize(node);
+        var maps=this.setMaps(this.dataArrays);
+        //console.log(maps, "77 bb", this.node, node);
+      }
+    },
 
      setDataArrays(){
         var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"], columnNames=["Years","January","February","March","April","May","June","July","August","September","October","November","December","Year Total",`&#x0394`, `&#x0394`], tempArr=[];
@@ -70,40 +121,48 @@ while(template.nodeName!="TEMPLATE"){
                    var retVal={column: columnNames[index], cell: tempArr, values:valueArray};
                    return retVal;
                	},[]);
+          this.set("trueArrays", this.dataArrays);
         return retArrays;
         },
-    setMaps(da)
+    setMaps()
     {
     	var elementMap=new Map();
-    	
-    	
         var cellMap=new Map(); 
         this.keys2=[];
         var stateMap=new Map();
-       	var sa= da.reduce(function(pre, val, index, array){return pre.concat(val.cell);},[]).forEach(function(vals, index, array){
-       		var key=vals.key,value=[{"value": vals.value,"timestamp": new Date().getTime(),"userId": "userString", "location": vals.location}];
-        cellMap.set(template,{"column": location.toString().charAt(0),"row": location.toString().charAt(1),"key":key, "value":value});
-        	
-        var instance=this.stamp({"column":location.toString().charAt(0),"row": location.toString().charAt(1), "location":location, "key":key, "value":value});
-        this.myNewArray=[];
-        this.push("myNewArray", instance);
-
-        elementMap.set(instance, [instance.location, instance]);
+       	var sa= this.dataArrays.reduce(function(pre, val, ind, array){return pre.concat(val.cell);},[]);
+        sa.forEach(function(vals, index, array){
+       		var key=vals.key,
+          value=[{
+                  "value": vals.value,
+                  "timestamp": new Date().getTime(),
+                  "userId": "userString", 
+                  "location": vals.location
+                }];
+          this.templatize(this.firstChild.nextSibling);
+        cellMap.set(this.firstChild.nextSibling,{"column": location.toString().charAt(0),"row": location.toString().charAt(1),"key":key, "value":value});
+        //console.log(cellMap);
         var k2=vals.location;
         stateMap.set(k2,[vals.key, vals.value,[value]]);
-        var parent=Polymer.dom().parentNode;
-        
-	        Polymer.dom(this).appendChild(instance.root);
+        //console.log(stateMap);
+        var instance=[];
+        instance[index]=this.stamp({"column":location.toString().charAt(0),"row": location.toString().charAt(1), "location":location, "cell": vals, "key":key, "value":value});
+        this.push("instanceArray", instance[index]);
 
-       console.log(this, instance.root);
+        elementMap.set(instance[index], [[index, instance[index].location, instance[index], index]]);
+        //console.log(elementMap);
+	        Polymer.dom(this.root).insertBefore(instance[index].root, this.root.lastElementChild);
        }, this);
        this.set("stateMap", stateMap);
        this.set("cellMap", cellMap)
        this.set("elementMap", elementMap);
-       console.log("cellMap: ",cellMap, "stateMap: ", stateMap, "elementMap", elementMap);
+       //console.log(this.instanceArray);
+       //console.log("cellMap: ",cellMap, "stateMap: ", stateMap,"instance Array: " + this.instanceArray, "elementMap", elementMap);
        var mapPair=[elementMap,stateMap];
        return mapPair;
-   },startDrag(e){
+   },
+
+   startDrag(e){
     e.preventDefault();
  			var targ=e.target;
  			while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
@@ -144,7 +203,7 @@ while(template.nodeName!="TEMPLATE"){
     //set instance data
             this.stateMap.set(this.dragCoords[1],[myKey, lt.value]);
             this.stateMap.set(newLocationArray[1],[this.dragCoords[1],this.trueArrays[newLocationArray[0][0]].cell[newLocationArray[0][1]].value]);
-            console.log(this.stateMap, this.dataArrays);
+            //console.log(this.stateMap, this.dataArrays);
                 console.log(lt.cell, "look here for cell", lt.value, this.trueArrays);
              Polymer.dom.flush();   
   },
@@ -167,3 +226,4 @@ while(template.nodeName!="TEMPLATE"){
 	  }
   });
     </script>
+    </dom-module>

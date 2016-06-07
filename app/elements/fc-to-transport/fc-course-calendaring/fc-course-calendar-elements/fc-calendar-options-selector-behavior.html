@@ -1,0 +1,375 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcCalendarOptionsSelectorBehaviorImpl = {
+observers: ['fcCourseObserver(fcCourse.*)'],
+properties:{
+		calendarDayArray:{
+			type: Array,
+			value: [],
+			notify: true,
+			reflectToAttribute: true
+		},
+		courseCalendarDaysArray:{
+			type: Array,
+			value: [],
+			notify: true
+
+		},
+		curra:{
+			type: Number,
+			notify: true
+		},
+		currentArray:{
+			type: Number,
+			value: 0,
+			notify: true
+		},
+
+
+		eventData:{
+			type: Object,
+			value: {},
+			notify: true, 
+			reflectToAttribute: true
+		},
+		fcCourse: {
+			type: Object,
+			value:function(){return new FcCourse();},
+			notify: true,
+		},
+		inputArrays:{
+			type: Array,
+			computed: "setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex)",			
+			notify: true
+		},
+		
+		inputIndex: {
+			type: Number,
+			value: 0,
+			notify: true
+		},	
+		
+		inputOptions: {
+			type: Array, 
+		 	computed:"selectInputs(inputs, inputIndex)",
+			notify: true,
+			reflectToAttribute: true
+		},
+		
+		
+		inputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		outputOptions: {
+			type: Array,
+			value:[],
+			notify: true
+		},
+		primary:{
+			type:Array,
+			value:function(){return ["~"];},
+			notify: true
+		},
+		
+		propertyName:{
+			type: String, 
+			value: "", 
+			notify: true,
+		}, 
+
+		saveChoiceLocal:{
+			type: Boolean, 
+			value: false,
+			notify: true
+		},
+		secondaryOne:{
+			type: Array,
+			value: function(){return ["~_labelA"];},
+			notify: true
+		},
+		secondaryTwo:{
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+
+		selected: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		someArray:{
+			type: Array,
+			value:[],
+			notify: true
+
+		},
+		summer:{
+			type: Boolean,
+			value: false,
+			notify: true
+
+		},
+		val: {
+			type: String,
+			value: '',
+			notify: true
+		},
+
+		valueOptions: {
+			type: Array, 
+			notify: true
+			},
+		someOtherArray:{
+			type:Array,
+			computed:"_computeSomeArray(valueOptions, curra, inputIndex)",
+			notify: true
+
+		},
+		
+
+	},
+	attached:function(){
+		// this.set("someArray", this.valueOptions[this.currentArray][this.inputIndex].selectItems);
+	},
+	_computeSomeArray(valueOptions, currentArray, inputIndex)
+		{console.log("I am in the some array");
+			if(valueOptions && currentArray && inputIndex){console.log("I am in the some array");
+			// this.set("someArray",valueOptions[currentArray][inputIndex].selectItems);
+		return valueOptions[currentArray][inputIndex].selectItems;
+			}
+		}, 
+	
+	setCalendarCreatorNextInput(propertyName, val, valueOptions, inputIndex){	
+		if(this.curra=="" || undefined || this.valueOptions[curra=undefined]){this.curra=1;}
+		var curra=this.curra;
+		var retArray=[];
+		var retVal;
+		var self=this;
+		var i=this.inputIndex;
+		this.vfunc=function(i, curra)
+			{
+				self.set("currentArray", curra);
+			if(self.valueOptions[curra]){
+					var retV= self.valueOptions[curra][i]; 
+					//console.log(retV);
+					if(retV){
+					this.set("someArray", retV.selectItems);
+				}
+					return retV;
+					}
+				}
+			this.saveChoiceLocal===true
+		switch(true) {
+			    case this.inputIndex===0 && propertyName=="" || propertyName==undefined:
+			        curra=1;
+			   		retVal=this.vfunc(i, curra);
+			   		retArray.push(retVal);
+			     return retArray;
+			    case (this.fcCourse.summer===true && this.fcCourse.scheduleType=="Focused 1600SAT Course" && i==5):
+			        curra=1;
+			        i=6;
+			        this.set("fcCourse.summer",false);
+			        retVal= self.vfunc(i, curra);
+			        retArray.push(retVal);
+			        return retArray;
+			    case (this.fcCourse.scheduleType=="Focused 1600SAT Course"):
+			    	curra=1;
+			    	if(i==6){i=7;}
+			        retVal= self.vfunc(i, curra);
+			        retArray.push(retVal);
+			        return retArray;
+			    default: 
+			    	curra=1;
+			    	retVal=self.vfunc(i, curra);
+			    	retArray.push(retVal);
+			    	return retArray;
+			    	}
+			    	console.log(retVal, JSON.stringify(retVal));
+			this.saveChoiceLocal=false;
+    return retArray;
+	},
+	
+	selectInputs(inputs, inputIndex)
+	{		
+		var retVal = [];
+		if(this.inputIndex===0)	
+			{ 		
+					retVal.push(inputs[this.inputIndex]);
+					//console.log(retVal);
+			}
+			else if(this.saveChoiceLocal===true)
+			{	
+				retVal.push(inputs[this.inputIndex]);
+				this.set("saveChoiceLocal", false);
+			}
+			return retVal;
+	},
+	
+	_computeInputArrays(inputs){
+		var retArray=new Array();
+		retArray.push(this.inputs);//array inputArrays[0][0]
+		var arrayOne=this.inputs.filter(function(item, index, array){
+			//console.log(item);
+			return(index<11 || index==16);
+		}, this);console.log(arrayOne);
+		retArray.push(arrayOne);
+		var arrayTwo=[];
+		for(var i=0; i<6;i++){
+			arrayTwo.push(this.inputs[i]);
+			if(i==5)
+			{
+				arrayTwo.push(this.inputs[12]);
+				arrayTwo.push(this.inputs[7]);
+				arrayTwo.push(this.inputs[8]);
+				arrayTwo.push(this.inputs[9]);
+			}
+		}
+		var miniArr=[0, 2, 13, 14, 4, 5, 10, 11, 17, 16, 14]/*adjust 11, 17, 16 needs Push a set linkag, */
+		var arrayThree=miniArr.map(function(elem, index){
+			return this.inputs[elem];
+		}, this);
+		var self=this;
+		retArray.push(arrayThree);
+		
+		var miniArr2=[0,2, 3, 4, 5, 10,11,13, 14, 16, 17]; //set schedules
+		var arrayFour= miniArr2.map(function(elem, index){
+			return self.inputs[elem];
+		}, self);
+		retArray.push(arrayFour);
+			this.set("valueOptions", retArray);
+			console.log(this.valueOptions, "this is what comes back");
+	},
+
+	soSelected(val,prop){
+		console.log(new Date().getTime());
+		console.log(val, prop);
+		var propertyName = prop;
+		console.log(prop);
+		var val = val;
+		var indexOfNextInput=this.inputIndex+1;
+		this.set("propertyName", propertyName);
+		this.set("val", val);
+		var self=this;
+		if(propertyName == "testDate")
+		{
+			this.fcCourse.setTestDate(val);
+			 var testDay = new FcCalendarDay(val);
+			 testDay.eventList=[];
+			 testDay.eventList.push(new FcEvent({activity: "SAT Test Date",name:"SAT Test Date", startTime: "7:30AM", "endTime": "3:45PM", time: "7:30AM", duration: "8.75 Hours", coach: "Focused Coaching", "location": "Check Your Registration", color: "gold",isTestDate: true }));
+			this.set("fcCourse.courseCalendarDaysArray", []);
+			this.push("fcCourse.courseCalendarDaysArray",testDay);
+			this.fcCourse.setTestDate(val);
+			this.push("fcCourse.eventArray", testDay);
+		}
+		else if(propertyName =="coach"){
+			
+			this.fcCourse.setCoach({fullName: val}, self);
+		}
+		else if(propertyName == "programLength")
+		{	var self=this;	
+			this.shift("fcCourse.courseCalendarDaysArray");
+			this.fcCourse.setCourseLength(val, self);
+			var testDay;
+			testDay=this.shift("fcCourse.eventArray");
+			this.push("fcCourse.courseCalendarDaysArray", testDay);	
+			this.push("fcCourse.eventArray",testDay);
+			 
+		}
+		else if(propertyName == "practiceTestDay")
+		{	
+
+			this.fcCourse.setPracticeTestDay(val, self);
+		
+
+		}
+		else if(propertyName == "courseMeetingSets")
+		{			
+		
+			var courseMeetings= this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
+			this.set("fcCourse.courseMeetingSets",val);
+			this.set("fcCourse.summerMeetingDays", "Not Applicable");
+			
+
+		}
+		else if(propertyName == "summerMeetingDays")
+		{	
+			this.fcCourse.setCourseMeetingDaysAndTimes(val, self);
+			this.fcCourse[propertyName] = val;
+			this.set("fcCourse.courseMeetingSets", val);		
+			
+		}
+		else if(propertyName=="privateCoach")
+			{	this.set("fcCourse.courseType", "Private Coaching"); 
+				this.set("fcCourse.coach", val);
+				this.set("fcCourse.courseSize", 1);
+			this.fcCourse[propertyName] = val;}
+		else if(propertyName=="privateCoachingHours")
+		{ 
+			this.set("fcCourse.privateCoachingHours", val);
+			var retVal = (val=="12 Hours, 4-6 Sessions, Price Total")?"3 Weeks": (val == "18 Hours, 6-9 Sessions, Price Total")?"4 Weeks": (val == "24 Hours, 8-12 Sessions, Price Total")?"5 Weeks": (val == "36 Hours, 12-18 Sessions, Price Total")?"6 Weeks": (val == "50 Hours, up to 25 Sessions, Price Total")?"10 Weeks": "13 Weeks";
+			this.set("fcCourse.programLength", retVal);
+			//console.log(val);
+		}
+		else if(propertyName == "testDate" && this.fcCourse.isPrivateSchedule===true)
+		{
+			this.fcCourse.setTestDate(val);
+			this.fcCourse.setCourseLength(this.fcCourse.programLength);
+
+		}
+		else
+		{
+			this.fcCourse[propertyName] = val;
+			var propertyString="fcCourse."+propertyName;
+			this.notifyPath(propertyString, val);
+		
+		}
+		// var inputIndex =self.inputIndex;
+	    //var indexOfNextInput= this.fcCourse.setCourseCreatorNextInput(propertyName, val, inputIndex);
+	    this.set("saveChoiceLocal",true);
+		this.set("inputIndex", indexOfNextInput);
+		console.log(new Date().getTime());
+
+	},
+	// END SELECTOR
+
+	_computeCourse(valArray, fcCourse)
+	{
+		var length=valArray.length;
+		//console.log(length, valArray);
+	 	 var outputArray=[];
+	 	for(i=0;i<length;i++)
+	  {	
+	 		var valarr = [];
+	 	
+	 		valarr=valArray[i];
+	 	//	console.log(valarr);
+	 		var name = valarr.name;
+	 			// name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			// name=name.replace(/\s/g,'');		
+	 		var eventOutput={
+	 			"name":name,
+	 			"labelA":valarr.labelA,
+	 			"value": this.fcCourse[name] 
+	 		};
+	 	
+	 		outputArray.push(eventOutput);
+	
+	 	}
+		this.set("outputOptions", outputArray);
+	 	return outputArray;
+	},
+fcCourseObserver(fcCourse){
+	if(this.someArray!=undefined && this.someArray.length>0 && this.someArray[0]!=undefined){
+		//console.log(this.valueOptions[0], this.valueOptions.length);
+	this.async(function(){this._computeCourse(this.valueOptions[0], this.fcCourse)}, 250);//remove when promise above works
+		}
+	},
+}
+FCBehaviors.FcCalendarOptionsSelectorBehavior = [
+
+    FCBehaviors.FcCalendarOptionsSelectorBehaviorImpl
+  ];
+</script>

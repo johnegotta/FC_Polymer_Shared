@@ -1,0 +1,727 @@
+<dom-module id="fc-calendar-dialog">
+<template id="fc-calendar-dialog-template">
+<style>
+:host{
+	background: white;
+	padding: 0px 3px 4px 8px;
+	opacity: 1;
+	position: static;
+	@apply(--horizontal-layout);
+	@apply(--layout-flex);
+	}
+
+.headerLeft{
+height: 42px; width: 42px; color: white; float: left;
+top: 10px;
+
+}
+.headerRight{
+	height: 42px; width: 42px; color: white; float: right;
+top: 10px;
+}
+		paper-button{
+		 	 width: 50%;
+		 	 min-width: 147px;
+		 	 font-weight: 600; 	  
+		 	 font-size: 14px;
+		 	 text-align: center;
+		 	 white-space: nowrap;
+		 	 max-height: 36px;
+		 	 @apply(--layout-nowrap);
+		 	 background: white;
+		 }
+		 paper-button.green{
+		 	color: green; 
+		 	border: 2px solid green;
+		}
+		paper-button.darkblue{
+			color: #009;
+			border: 2px solid #009;
+		}
+		paper-button.red{
+			color: red;
+			border: 2px solid red;
+		}
+		paper-button.orange{
+			color: orange;
+			border: 2px solid orange;
+		}
+		paper-button:hover, paper-button:active{
+			box-shadow: 2px 4px 7px 2px; 
+
+		} 
+		paper-button.darkblue:hover, paper-button.darkblue:active{
+			box-shadow: 2px 4px 7px 2px gold; 
+
+		} 
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			padding: 2px;
+		}
+
+.footerclass{
+	height: 32px;
+	padding: 14px;
+	color: white;
+	background: #03A9F4;
+	font-weight: 600;
+	text-align: center;
+	font-size: 11px;
+}
+.slides{overflow: hidden; overflow-y: scroll;}
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
+.courseData{
+	height: 72px!important;
+
+}
+.calendarItem{min-height: 380px!important;}
+.fbutton{text-align: center; width: 99.6%;border: #afafaf 1px solid; border-radius: 3px; z-index: 7; box-shadow: 3px 7px 11px 4px #efefef; padding: 5px 0px; cursor: pointer;}
+.fbutton:active{
+	border:4px solid #2435C9;
+ color: #FFD410;
+ box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -moz-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
+ background-color: #5DD7FC;
+ width: 98.6%
+}
+
+</style>
+<fc-event-dialog event="{{dialogEvent}}" class="fit center" id="eventDialog">
+</fc-event-dialog>		
+<fc-ddr-card id="focusedPlanner" head-class="darkBlue" is-picker="true" header-title="Focused Planner" class="horizontal layout flex nowrap self-stretch" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;">
+
+ <!-- <firebase-collection data="{{courses}}" location="{{courseTemp}}"></firebase-collection>  -->
+	<!-- <div class="horizontal layout flex nowrap"> -->
+		<section class="vertical layout flex-3">
+ 			<div class="flex layout horizontal center-justified">
+ 			 <!-- 
+				<neon-animated-pages 
+					class="layout vertical flex-1" 
+					id="pages" 
+					style="width: 320px; 
+					height:400px;" 
+					selected="1"
+				>
+				<fc-calendar-day-back
+					id="dayBack"
+					style="margin: 12px;"
+					is-single="true"
+					on-close="_onClose"
+					hook="{{hook}}"
+					cal-day="{{hook}}"
+					course-calendar-days="{{fcCourse.courseCalendarDaysArray}}" 
+					fc-course={{fcCourse}}
+				>
+				</fc-calendar-day-back>-->
+				<fc-date-picker
+					start-ht="460"
+					style="min-width: 204px;position: static; margin:12px; border:3px solid #009;"
+					class="fit"
+					id="datePickerCompactTwo" 
+					displayed-month="{{displayedMonth}}" 
+					on-tap="_dateSelected" 
+					calendar-day-array="{{calendarDayArray}}"
+					fc-course="{{fcCourse}}" 
+					course-calendar-days="{{fcCourse.courseCalendarDaysArray}}" 
+					>
+				</fc-date-picker>
+		<!-- 	</neon-animated-pages>  -->
+			 <!-- <paper-button on-tap="addSyllabus">add events</paper-button> -->
+		 
+			<!--  <fc-calendar-text-inputs
+				class="calendarItem" 
+				value-options={{valueOptions}} 
+				output-options="{{outputs}}" 
+				fc-course="{{fcCourse}}"
+				>
+			</fc-calendar-text-inputs>  
+			  <fc-calendar-options-selector
+				fc-course="{{fcCourse}}" 
+					inputs="{{inputs}}" 
+					class="calendarItem"
+					id="calendarOptionsSelector">
+			</fc-calendar-options-selector> 
+ 		 -->
+ 		<!-- <paper-button on-tap="addSyllabus">add events</paper-button> -->
+ 		 <!-- <paper-tabs 
+ 			id="calendarTabs" 
+ 			scrollable="true" 
+ 			style="padding: 2px 0px; height: 450px; outline: 0px; overflow: hidden; overflow-x: scroll;" 
+ 			class="horizontal layout" 
+ 			bar="true" 
+ 			hide-scroll-buttons="false">  
+			<div 
+				class="horizontal layout justified" 
+				style="width: 100%; margin: 9px; overflow-x: scroll;">
+			<template is="dom-repeat" initial-count="16" class="horizontal layout flex" items="{{fcCourse.courseCalendarDaysArray}}" as="day">		
+				<fc-calendar-day-back 
+					back-width="{{backWidth}}"
+					back-height="{{}}"
+					course-calendar-days-array="{{fcCourse.courseCalendarDaysArray}}" 
+					fc-course="{{fcCourse}}"
+					cal-day="{{day}}"
+					event-list="{{day.eventList}}"
+					>
+					<section class="headerButton flex-1" on-tap="addEvent" style="border-radius:180px;">
+					<iron-icon class="small" style="height: 16px!important;width:16px!important; border-radius:180px; color: green; background: silver;"icon="icons:add-circle-outline">
+						</iron-icon>
+					</section>
+				</fc-calendar-day-back>
+			</template>
+
+			</div>
+		 </paper-tabs>
+	 </section> 
+	<section 
+				id="myContainer"
+			class="vertical layout flex-1" 
+			style="margin: 12px;">  -->
+		<template is="dom-repeat" id="mytemplate" items="{{listElements}}">
+			<fc-list-box-container 
+				id$="[[item.id]]"
+				list-item-data="{{_computeListItemData(item.listItemData, courses, someArray, outputs)}}" 
+				options-array="{{computeOptionsArray(item.optionsArray, inputArrays)}}" 
+				max-ht="[[item.maxHt]]" 
+				is-input="{{item.isInput}}" 
+				min-ht="[[item.minHt]]" 
+				header-height="{{item.headerHeight}}" 
+				footer-height="{{item.footerHeight}}" 
+				fcprimary="{{item.fcprimary}}" 
+				secondary-one="{{item.secondaryOne}}" 
+				secondary-two="{{item.secondaryTwo}}" 
+				top-heading="{{item.topHeading}}" 
+				style$="max-width:[[item.theWidth]]; min-width:[[item.theMinWidth]]; [[item.listBoxStyle]];"
+				is-course-selector="{{item.isCourseSelector}}"
+				on-tap="_handleTaps"
+				fc-course="{{fcCourse}}"
+				inputs="{{inputs}}"
+				course-calendar-days-array="{{fcCourse.courseCalendarDaysArray}}"
+				output-options="{{outputs}}"
+				value-options="{{valueOptions}}"
+				some-array="{{someArray}}"
+				courses="{{courses}}" 
+				>
+				
+				<paper-icon-button 
+					btn="{{item.headerBtnLeftTap}}" 
+					icon="{{item.leftHeaderIcon}}"
+					class$="{{item.leftHeaderBtnClass}} leftSide">
+				</paper-icon-button>
+				<paper-icon-button 
+					btn="{{item.headerBtnRightTap}}" 
+					icon="{{item.rightHeaderIcon}}"
+					class$="{{item.rightHeaderBtnClass}} rightSide">
+				</paper-icon-button> 
+				<section class="buttonColumn horizontal layout flex wrap">
+					<paper-button hidden$="{{computeHidden(item.btn.0)}}" class="green layout horizontal flex nowrap center center-justified" btn="{{item.btn.0}}">{{item.btnName.0}}</paper-button>
+					<paper-button hidden$="{{computeHidden(item.btn.1)}}" class="darkblue layout horizontal flex nowrap center center-justified" btn="{{item.btn.1}}">{{item.btnName.1}}</paper-button>
+					<paper-button  hidden$="{{computeHidden(item.btn.2)}}" class="red layout horizontal flex nowrap center center-justified" btn="{{item.btn.2}}">{{item.btnName.2}}</paper-button>
+					<paper-button  hidden$="{{computeHidden(item.btn.3)}}" btn="{{item.btn.3}}" class="orange layout horizontal flex nowrap center center-justified">{{item.btnName.3}}</paper-button>
+				</section>
+			</fc-list-box-container>
+		</template>
+	</div>
+</section>
+
+</fc-ddr-card>	
+</template>
+<script>
+FcCalendarDialog= Polymer({
+	is:"fc-calendar-dialog",
+	behaviors:[
+			Polymer.IronResizableBehavior,FCBehaviors.FcCalendarOptionsSelectorBehavior,
+		 FCBehaviors.FcCalendarControllerBehavior
+		  ],
+
+	// listeners: {"click": "myclickgetter"},
+	observers:["observeEventTypes(dialogEvent.*, event.*)", "classesObserver(classes.splices)"],
+	properties:{
+		primary:{
+			type:String,
+			value: function(){ return "coach, fcid";},
+			notify: true
+		},
+		fcCourse:{
+			type: FcCourse,
+			notify: true
+		},
+
+		displayedMonth:{
+			type:Array,
+			notify: true
+		},
+		event: {
+			type: Object,
+			value: {},
+			notify: true
+		},
+		
+		outputs: {
+			type: Array,
+			value: function(){return [];},
+			notify: true
+		},
+		hook:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		courseTemp:{
+			type: String,
+			value:function(){
+				var ref=FcCourse.getFirebaseLocation();
+		console.log(ref, "this is the ref");
+		return ref;
+
+
+			},
+			notify: true,
+		},
+		currentHeight:{
+			type: String,
+			notify: true
+		},
+		currentWidth: {
+				type: String,
+			notify: true,
+		},
+		inputs: {
+			type: Array,
+			value: [],
+			notify: true
+		},
+		calendarDayArray:{
+			type: Array,
+			value: [],
+			notify: true
+		},
+		someArray:{
+			type:Array,
+			value:function(){return [];},
+			notify: true
+		}, 
+		
+		courses: {
+			type: Array,
+			value:[],
+			notify: true
+		},
+		dialogEvent:{
+			type: Object,
+			value: {},
+			notify: true
+		},
+		
+		listElements:{
+			type: Array,
+			value: function(){ 
+				var courses=this.courses, someArray=this.someArray, outputs=this.outputs;
+				console.log(courses, someArray, outputs, "line 315");
+
+				return [
+							{
+							"id":"databaseCourseCalendars",
+							"topHeading": "Course Calendars",
+							"fcprimary": ["coach", "fcid"], 
+							"secondaryOne": ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"],
+							"secondaryTwo":["_Test: ", "testDate","_,", "programLength", "price"],
+							"theHeight": "480px",
+							"theMinWidth":"420px",
+							"theWidth": "420px",
+							"maxHt":"480px",
+							"isInput":false,
+							"minHt":"480px",
+							"listBoxStyle":"margin:12px",
+							"btn":["newCalendar", "setPrimary", "delete", "clearWork"],
+							"btnName": ["New Calendar", "Set Primary", "Delete", "Clear Work"],
+							"headerHeight": "62px",
+							"footerHeight": "112px",
+							"listItemData": "courses",
+							"optionsArray":[{"header":"Course Calendars","btn":"pickClass"}],
+							},
+							{"id":"courseTextSelections",
+							"topHeading": "Course Selections",
+							"fcprimary": ["value"], 
+							"secondaryOne": ["labelA"],
+							"secondaryTwo":["name"],
+							"isGridBox":false, 
+							"isInput":true, 
+							"optionsArray":"",
+							"theHeight": "480px",
+							"theMinWidth":"420px",
+							"theWidth": "420px",
+							"maxHt":"480px",
+							"minHt":"480px",
+							"listBoxStyle":"margin:12px",
+							"btn":["confirm"],
+							"btnName": ["Confirm"],
+							"headerHeight": "72px",
+							"footerHeight": "112px",
+							"listItemData": "outputs",
+							"optionsArray":[{"header":"Course Selections", "btn":""}],
+							"isCourseSelector":false
+							},
+							{"id":"calendarOptionsSelector",
+							"topHeading": "Course Calendars",
+							"fcprimary": ["~"], 
+							"secondaryOne": ["~_labelA"],
+							"secondaryTwo":["~_labelB"],
+							"theHeight": "480px",
+							"theMinWidth":"420px",
+							"theWidth": "420px",
+							"isInput":false,
+							"maxHt":"480px",
+							"minHt":"480px",
+							"listBoxStyle":"margin:12px",
+							"btn":["confirm"],
+							"btnName": ["Confirm"],
+							"headerHeight": "72px",
+							"footerHeight": "112px",
+							"listItemData": "someArray", 
+							"optionsArray": "inputArrays", 
+							"headerFont": "18px",  
+							"containerType":"courseCalendarOptions", 
+							"isCourseSelector":true, 
+							"headerBtnRightTap": "forwardOneInput",
+							"headerBtnLeftTap":"backOneInput",
+							"rightHeaderIcon":"icons:arrow-forward",
+							"leftHeaderIcon":"icons:arrow-back",
+							"rightHeaderBtnClass":"headerRight",
+							"leftHeaderBtnClass":"headerLeft"
+							},
+
+
+						];
+					},
+				notify: true,
+			},
+
+		},
+
+	classesObserver(changerecord){
+		console.log(changerecord);
+		if (changeRecord) {
+      changeRecord.indexSplices.forEach(function(s) {
+        s.removed.forEach(function(user) {
+          console.log(user.name + ' was removed');
+        });
+        for (var i=0; i<s.addedCount; i++) {
+          var index = s.index + i;
+          var newUser = s.object[index];
+          console.log('User ' + classes.name + ' added at index ' + index);
+        }
+      }, this);
+    }
+
+	},
+
+	computeHidden(btn){
+		var retVal=(btn)?false: true;
+		return retVal;
+	},
+	computeOptionsArray(item, val){
+		//console.log(val,item, this.__data__[item], "hello");
+		if(this.__data__[item]==undefined){ return item;}
+		else{
+		return this.__data__[item];
+		}
+	}, 
+	_computeListItemData(itemData, courses, someArray, outputs){
+		if(itemData=="courses"){this.async(function(){return this[itemData];}, 15000);}
+
+		// else{
+		// console.log(this.__data__[datum], "here is the index");
+		// if(courses.length>0 && datum=="courses"){this.notifySplices("courses",this.courses);console.log("why no go", datum, courses, this[datum]); return this[datum]; }
+		
+		 else{return this[itemData];}
+	},
+	_handleTaps: function(e){
+		console.log(e,
+		e.target );
+		var target=e.target;
+				while(target.nodeName!=="PAPER-BUTTON" && target.nodeName!=="PAPER-ICON-BUTTON" && target.nodeName!=="FC-LIST-BOX-CONTAINER" && target.nodeName!=="PAPER-ITEM_BODY")
+					{target=target.parentElement;}
+					if(target.nodeName=="PAPER-BUTTON" || target.nodeName=="PAPER-ICON-BUTTON"){
+						// console.log(target.btn, target.itemName, target, "here is the btn");
+						// var keys=Object.keys(target);
+						// // console.log(keys);
+						if(target.itemName){
+						this[target.btn](target.itemName);
+						}
+						else{this[target.btn]();}
+					}
+					else {console.log(this.courses, e.target.parentElement.dataHost);					
+						console.log(e);
+							var j=e.target.parentElement.dataHost,
+							val=j.__data__.item,
+							propertyName=j.__data__.option.name;
+
+							console.log(target);
+							this.soSelected(val, propertyName);
+						}
+			},
+	
+	ready: function()
+	{	
+
+		this.set("fcCourse", new FcCourse());
+		var self=this;
+		var valueArray=FcCourse.getInputs();
+		var valopts=[];
+		valueArray.forEach(function(item, index, array){
+			 valopts.push(item);
+		 });
+		this.set("valueOptions",valopts);
+		this.set("firstTime", false);
+		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
+		this.set("inputs", inputO);	
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourse);
+		this.set("outputs", outputs);
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourse);
+		this.set("outputs", outputs);
+		this._computeInputArrays(this.inputs);
+		this.getFireBaseCourses();
+		// this.getFireBaseCourses();
+	},
+	pickClass(e){e.model.__data__.courses},
+	attached: function()
+	{		
+			
+		this.getFireBaseCourses();
+		console.log(this.courses, this.courseTemp, "look here for courses");
+		this.set("fcCourse.courseCalendarDaysArray", this.displayedMonth);
+
+		this.set("someArray", this.valueOptions[this.currentArray][this.inputIndex].selectItems);
+
+	},
+	
+	myclickgetter: function(e){
+		console.log(e.target, e.parent, e);
+	},
+	observeEventTypes: function(dev, ev){
+	// if(dev){console.log(dev, dev.base, dev.value);} 
+	// if(ev){console.log(ev, ev.base, ev.value);}
+	},
+	newCalendar: function(){
+		course= new FcCourse();
+		this.set("fcCourse",course);
+		this.$.datePickerCompactTwo.initialize();
+	},
+	_sortSlots: function(a,b){
+			var ao = stringTime(a.startTime);
+			var bo= stringTime(b.startTime); 
+		if (ao> bo) {
+    		return 1;
+  			}
+  		if (ao < bo) {
+   	 		return -1;
+  			}
+  		if (ao ===bo){
+  			  return 0;
+			}
+
+
+    },
+    addEvent:function(e){
+			console.log(e);
+			var index=e.model.day.cdIndex;
+				var model = event.model;
+				var day=model.day
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourse;
+			if(index==-1)
+			{	var model = event.model;
+				var day=model.day;
+				var elist=day.eventList;
+				var dateId=day.dateId;
+				var course=model.__data__.fcCourse;
+				var index=this.fcCourse.courseCalendarDaysArray.length;
+				day.cdIndex=index;
+				day.inCourseCalendarDayArray=true;
+				day.color="#008";
+				//day.background="#aecefe";
+				day.eventType="private course meeting";
+				day.dateText="Session";
+			var modelPst=new FcCourseEvent({activity: "Private Course Meeting", name: "Private Course Meeting", color: "purple", cdIndex: index, eventType: day.eventType, courseEventType: day.eventType, date: day.date, showDate: day.showDate, coach: this.fcCourse.coach, coachId: this.fcCourse.fcid});
+				this.push("fcCourse.courseCalendarDaysArray",day);
+			}
+			else{
+			var evId =stringTimeToDateTime(this.fcCourse.startTime, day.date);
+			var pst=new FcEvent({activity: "new event", date: day.date, showDate: day.showDate, coach: this.fcCourse.coach, coachId: this.fcCourse.fcid, evId: evId});
+			if(this.fcCourse.courseCalendarDaysArray[index].eventList){
+			this.push(["fcCourse.courseCalendarDaysArray",index,"eventList"], pst);
+			}
+			else{this.set(["fcCourse.courseCalendarDaysArray",index,"eventList"], []);
+				this.push(["fcCourse.courseCalendarDaysArray",index,"eventList"], pst);
+				}
+			}
+},
+
+  
+	clearWork: function(){
+		var	cda=[];
+		var course={};
+		course= new FcCourse();
+		course.calendarDayArray=this.fcCourse.calendarDayArray;
+		console.log(course.calendarDayArray);
+		this.set("fcCourse",course);
+		this.set("fcCourse.calendarDayArray",course.calendarDayArray);
+		var optEl=Polymer.dom(this.root).querySelector("#calendarOptionsSelector");
+		console.log(optEl);
+		this.inputIndex=0;
+		this._backOneInput();
+		this._forwardOneInput();
+
+	},
+	
+	loadToDayCalendar: function(){
+		var calendarDayArray=this.fcCourse.calendarDayArray;
+		this.set("fcCourse.calendarDayArray",course.calendarDayArray);
+		console.log(course.calendarDayArray);
+		this.$.datePickerCompactTwo.initialize(calendarDayArray);
+	},
+
+	setCalendar: function(e){
+			this.set("fcCourse",e.model.item);
+	},
+	delete: function(){
+		var fcid=this.fcCourse.fcid;
+		var partRef=FcCourse.getFirebaseLocation();
+		var firebase=partRef+"/"+fcid;
+		var deleteRef=new Firebase(firebase);
+		deleteRef.remove();
+		this.set("fcCourse", new FcCourse({}));
+	}, 
+	
+	newCalendar: function(){
+		var sortedCalDays= this.fcCourse.courseCalendarDaysArray.sort(function(a,b){
+			if (a.dateId > b.dateId) {
+    		return 1;
+  			}
+  			if (a.dateId < b.dateId) {
+   	 		return -1;
+  			}
+  			if (a.dateId ===b.dateId){
+  			  return 0;
+			}
+		});
+		
+		 this.set("fcCourse.courseCalendarDaysArray", sortedCalDays);
+	},
+
+
+_computeOutput: function(valueOptions, fcCourse)
+	{
+		var length=valueOptions.length;
+	 	 var outputArray=[];
+	 	for(i=0;i<length;i++)
+	  {
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	 		var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		var propertyName ="fcCourse."+name;
+	 		var button="inputSelected__name_"+name+"__value_"+ this.fcCourse[name] || "";
+	 		var eventOutput={
+	 			"name":name,
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"value": this.fcCourse[name] || ""
+	 		};
+	 		outputArray.push(eventOutput);
+	 	}
+	 	return outputArray;
+	},
+
+inputValueAndLabelSerialization: function(valueOptions)
+	 {	
+		var length=valueOptions.length;
+	 	 var derray=[];
+	 	for(i=0;i<length;i++)
+	  {	
+	 		var valarr = [];
+	 		valarr=valueOptions[i];
+	
+	 		var eventInput={
+	 			"name":"",
+	 			"inputType": "select",
+	 			"header":valarr[0].label,
+	 			"labelA":valarr[1].label2,
+	 			"labelB":"",
+	 			"isRepeaterSelect":true,
+	 			"selectItems":valarr[2],
+	 			"style":"",
+	 			"class": "",
+	 			"aside":{	"noteOne:": "",
+	 						"noteTwo:": ""}
+			};
+	 			var name = valarr[1].label2;
+	 			name =name.charAt(0).toLowerCase() + name.slice(1);
+	 			name=name.replace(/\s/g,'');
+	 		eventInput.name=name;
+	 		derray.push(eventInput);
+
+	 	}
+	 	 return derray;
+	 },	
+	
+_dateSelected: function(event) {
+      var targetOne = event.target;
+      while (targetOne.nodeName!=="FC-DATE-MINI"&& targetOne !== this && !targetOne._templateInstance && targetOne.nodeName!="PAPER-ICON-BUTTON" && targetOne.nodeName!="PAPER-MATERIAL" && targetOne.nodeName!="BODY") {
+        targetOne = targetOne.parentNode; 
+       }
+       if(targetOne.nodeName=="FC-DATE-MINI")
+         {
+         	
+         	this.set("hook", targetOne.day);
+         	this.set("hook.eventList", targetOne.day.eventList);
+        
+      this.sharedElements = {
+        'hero': this.$.dayBack
+      };
+             this.$.pages.selected = 0;
+        }    
+    },
+
+
+    _onClose: function() {
+      this.$.pages.selected = 1;
+    },
+
+  computeYear: function(displayedMonth)
+{	
+	if(this.displayedMonth[15])
+	{
+	return displayedMonth[15].date.getFullYear();
+	}
+},
+
+ 
+  openup: function(e){
+    		console.log(e);
+    		var event=e.model.__data__.event;
+    		this.$.eventDialog.openDi();
+    		console.log(this.$.eventDialog, event);
+    		this.set("dialogEvent", event);
+    		console.log(this.$.eventDialog, event, this.dialogEvent);
+
+    },
+
+
+});
+</script>
+</dom-module>
