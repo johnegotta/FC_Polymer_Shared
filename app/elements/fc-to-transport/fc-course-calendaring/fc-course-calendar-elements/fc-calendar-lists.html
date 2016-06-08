@@ -1,0 +1,288 @@
+<dom-module id="fc-calendar-lists">
+<style>
+		.headerLeft{
+			height: 42px; width: 42px; color: white; float: left;top: 5px;}
+		.headerRight{
+			height: 42px; width: 42px; color: white; float: right;top: 5px;}
+		paper-button{
+		 	 width: 50%;
+		 	 min-width: 147px;
+		 	 font-weight: 600; 	  
+		 	 font-size: 14px;
+		 	 text-align: center;
+		 	 white-space: nowrap;
+		 	 max-height: 36px;
+		 	 @apply(--layout-nowrap);
+		 	 background: white;
+		 }
+		paper-button.green{
+		 	color: green; 
+		 	border: 2px solid green;
+		}
+		paper-button.darkblue{
+			color: #009;
+			border: 2px solid #009;
+		}
+		paper-item{
+			@apply(--paper-item-paper-item-focus: orange);
+		}
+		paper-button.red{
+			color: red;
+			border: 2px solid red;
+		}
+		paper-button.orange{
+			color: orange;
+			border: 2px solid orange;
+		}
+		paper-button:hover, paper-button:active{
+			box-shadow: 2px 4px 7px 2px; 
+		} 
+		paper-button.darkblue:hover, paper-button.darkblue:active{
+			box-shadow: 2px 4px 7px 2px gold; 
+		} 
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			padding: 2px;
+		}
+</style>
+<template>
+<fc-list-box-container
+	is-gridbox="{{isGridbox}}"
+	list-item-data="{{innerArray}}" 
+	options-array="{{outerArray}}" 
+	fcprimary="[[fcprimary]]" 
+	secondary-two="[[secondaryTwo]]" 
+	secondary-one="[[secondaryOne]]" 
+	top-heading="[[listName]]" 
+	min-ht="480px!important" 
+	the-width="420px!important"
+	header-height="{{headerHeight}}" 
+	the-min-width="420px!important" 
+	the-width="420px!important" 
+	footer-height="{{footerHeight}}"  
+	max-ht="480px!important"
+	is-input="[[isInput]]"
+	is-course-selector="[[isCourseSelector]]"
+	style="min-height: 480px; margin: 12px; max-height: 480px; min-width: 420px; max-width: 420px;">
+		<section class="buttonColumn horizontal layout flex wrap">
+				<template is="dom-repeat" items="{{buttonArray}}">
+					<paper-button 
+						class$="{{item.btnClass}}" 
+						btn="{{item.btnFunctionName}}">
+						{{item.btnName}}
+					</paper-button>
+				</template>
+	</section>
+</fc-list-box-container>
+</template>
+<script>
+FcCalendarLists=Polymer({
+	is:"fc-calendar-lists",
+	behaviors: [FCBehaviors.FcCalendarOptionsSelectorBehavior,
+		 FCBehaviors.FcCalendarControllerBehavior, FCBehaviors.FcCalendarBehaviorPrime],
+	properties:{
+		isGridbox:{
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+		courses:{
+			type:Array,
+			value:function(){return [];},
+			notify: true,
+			reflectToAttribute: true,
+		},
+		buttonArray:{
+			type: Array,
+			notify: true,
+		},
+		fcprimary:{
+			type: Array,		 
+			notify: true
+		},
+		secondaryOne:{
+			type: Array,	
+			notify: true
+		},
+		secondaryTwo:{
+			type: Array, 
+			notify: true
+		},
+		listType:{
+			type:String,
+			notify: true,
+		},
+		listName:{
+			type: String,
+			notify: true
+		},
+		outerArray:{
+			type:Array,
+			notify: true,
+		},
+		innerArray:{
+			type:Array,
+			notify: true,
+		},
+		isInput:{
+			type: Boolean,
+			value:function(){return false;},
+			notify: true,
+		},
+		isCourseSelector:{
+			type: Boolean,
+			value:function(){return false;},
+			notify: true,
+		},
+		counter:{
+			type: Number,
+			value:function(){
+				return 0;},
+			notify: true,
+			},
+		footerHeight:{
+			type: String,
+			// value: function(){return "24px";},
+			notify: true
+		},
+		headerHeight:{	
+			type: String,
+			//value: function(){return "24px";},
+			notify: true
+		},
+
+	// 	inputs:{
+	// 		type:Array,
+	// 		notify: true,
+	// 	},
+	// 	outputs:{
+	// 		notify: true,
+	// 	},
+	// valueOptions:{
+	// 	notify: true,
+	// },
+	// someArray:{
+	// 	notify: true
+	// }
+	},
+	ready(){ 
+	
+		this.set("fcCourse", new FcCourse());
+		var valueArray=FcCourse.getInputs();
+		var valopts=[];
+		valueArray.forEach(function(item, index, array){valopts.push(item);});
+		this.set("valueOptions",valopts);
+		this.set("firstTime", false);
+		var inputO=this.inputValueAndLabelSerialization(this.valueOptions);
+		this.set("inputs", inputO);	
+		var outputs= this._computeOutput(this.valueOptions, this.fcCourse);
+		this.set("outputs", outputs);
+		this.async(this.initializeLists, 200);
+		//this.set("courses.btn","pickClass");
+	},
+	attached(){
+			
+		},
+
+	initializeLists(){
+
+			switch(this.listType){
+				case "textInputs":
+					this.set("fcprimary",["value"]);
+					this.set("secondaryOne", ["labelA"]);
+					this.set("secondaryTwo", ["name"]);
+					var btnArray=[
+					{	"btnclass": "buttonRowOne green layout horizontal flex nowrap center center-justified",
+						"btnFunctionName":"confirm", 
+						"btnName":"Confirm"
+					}
+					];
+					this.set("isInput", true);
+					this.set("buttonArray", btnArray);
+					this.set("innerArray", this.outputOptions);
+					this.set("outerArray",[{"header":"Course Selections", "btn":""}]);
+					if(this.counter==0){this.set("counter", 1); this.initializeLists();}
+					break;
+				case "databaseCalendars":
+					this.set("fcprimary", ["coach", "fcid"]);
+					this.set("secondaryOne", ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"]);
+					this.set("secondaryTwo", ["_Test: ", "testDate","_,", "programLength", "price"]);
+					this.set("innerArray", this.courses);
+					var array=[];
+					array=[
+						{	"btnclass": "green layout horizontal flex nowrap center center-justified", 
+							"btnFunctionName":"newCalendar", 
+							"btnName":"New Calendar"
+						},
+						{	"btnClass":"darkblue layout horizontal flex nowrap center center-justified", 
+							"btnFunctionName":"pickClass", 
+							"btnName": "Set Primary"
+						},
+						{	"btnClass":"red layout horizontal flex nowrap center center-justified", 
+							"btnFunctionName":"delete", 
+							"btnName": "Delete"
+						},
+						{	"btnClass":"orange layout horizontal flex nowrap center center-justified",
+							"btnFunctionName":"clearWork",
+							"btnName": "Clear Work"
+						},
+						];
+					this.set("buttonArray", array);
+					this.set("listName", "Course Calendars");
+					if(this.counter<8){this.set("counter", this.counter+1); this.initializeLists();}
+					break;
+				case "inputSelectors":
+					this.set("fcprimary",["~"]);
+					this.set("secondaryOne", ["~_labelA"]);
+					this.set("secondaryTwo", ["~_labelB"]);
+					this.set("listName", "Course Options")
+					this.set("outerArray", this.inputArrays);
+					this.set("innerArray", this.someArray);
+					var btnArray=[
+					{	"btnclass": "buttonRowOne green layout horizontal flex nowrap center center-justified",
+						"btnFunctionName":"confirm", 
+						"btnName":"Confirm"
+					}
+					];
+					this.set("buttonArray", btnArray);
+					this.set("isCourseSelector", true);
+					this._computeInputArrays(this.inputs);
+					if(this.counter==0){this.set("counter", 1); this.initializeLists();}
+
+					break;
+				case "eventList":
+					this.set("fcprimary", ["coach", "fcid"]);
+					this.set("secondaryOne", ["courseMeetingSets","_,", "numberOfMeetings", "_Classes"]);
+					this.set("secondaryTwo", ["_Test: ", "testDate","_,", "programLength", "price"]);
+					this.set("listName", "Event List");
+					this.set("isGridbox", true);
+					this.set("footerHeight", "0px");
+					this.set("headerHeight", "12px");
+					this.set("isGridBox", true);
+					
+					if(this.courses && this.courses.length>1){
+						console.log(this.courses, "am in courses");
+						this.set("outerArray", this.courses);
+					this.set("innerArray", this.courses[1].eventArray);
+					}
+					else{this.async(this.initializeLists, 22000);
+						console.log("ran the crazy async");}
+						
+					break;
+				default:
+					this.set("fcprimary", ["~"]);
+					this.set("secondaryOne", ["labelA"]);
+					this.set("secondaryTwo", ["name"]);
+					break;
+			}
+
+
+
+},
+
+
+
+});
+</script>
+</dom-module>

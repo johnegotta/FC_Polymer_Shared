@@ -58,7 +58,7 @@
 		 		<section hidden$="{{columnOne}}"> <br><br></section>
 		 	    <template is="dom-repeat" items="{{theContent}}" on-dom-change='checkForLastNode' filter="{{_theContentFilter(firstWordIndex, lastWordIndex)}}">
 						<template is="dom-if" if="{{item.newPara}}">
-							<br><span>&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+							<br><span>&nbsp&nbsp&nbsp&nbsp</span>
 						</template>
 						<a id="oneOneWords_{{item.order}}" hidden="{{!columnOneShow}}">{{item.word}}</a>
 				</template>
@@ -82,6 +82,11 @@ Polymer({
 			observer: 'gotContent',
 			notify: true
 		},
+		showingSecondColumn:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true,
+		},
 
 		columnOne: {
 			type: Boolean,
@@ -94,16 +99,25 @@ Polymer({
 			type: Number,
 			value: 0
 		},
+		lastWordIndexOfFirst:{
+			type: Number,
+			observer:"lastWordIndexOfFirstWatcher",
+			notify: true
+		},
 
 		lastWordIndex: {
-			type: Number,
+			// type: Number,
 			observer: 'gotLastWordIndex',
 			notify: true
 		},
 
 		firstRowIndex: {
-			type: Number,
+			// type: Number,
 			value: 1,
+			notify: true
+		},
+		firstWordIndexOfSecond:{
+			type: Number,
 			notify: true
 		},
 
@@ -133,58 +147,97 @@ Polymer({
 		this.lastWordIndex = newTheContent.length-1;
 		console.log(newTheContent, newTheContent.length);
 	},
+	lastWordIndexOfFirstWatcher(nval,oval){
+		//console.log(parseInt(nval),parseInt(oval));
+	},
 
 	gotLastWordIndex: function(newLastWordIndex){
 		this.checkForLastNode();
 	},
 
 	wordsOffBottom: function(){
-		var lwId =  '#oneOneWords_' + this.lastWordIndex;
-	    console.log(lwId);
+		if(this.columnOne===true && this.showingSecondColumn===true && this.lastWordIndex){
+			var lwi=this.lastWordIndex;
+			console.log(parseInt(this.lastWordIndex), this.columnOne);
+		var lwId =  '#oneOneWords_' + lwi;
+		   var numberOfWordsToCut = 0;
 	    var lastWordNode = this.$$(lwId);
-	    // if(lastWordNode){
+	        console.log(lwId, this.lastWordNode);
+	    while(lastWordNode==null&&lwi>450){
+	    	lwi=lwi-1;
+	    	lwId =  '#oneOneWords_' + lwi;
+	    	lastWordNode=this.$$(lwId);
+	    	numberOfWordsToCut--;
+	    }
 	    var lastWordNodeBottom = lastWordNode.getBoundingClientRect().bottom;
 
 	    var previousWordNode = lastWordNode;
 	    var previousWordNodeBottom = lastWordNodeBottom;
-	    var numberOfWordsToCut = 0;
+	 
 
 	    while(previousWordNodeBottom == lastWordNodeBottom){
 	      previousWordNode = previousWordNode.previousSibling;
 	      if(previousWordNode.nodeName == lastWordNode.nodeName){
 	        previousWordNodeBottom = previousWordNode.getBoundingClientRect().bottom;
 	        numberOfWordsToCut++;
+	        console.log(previousWordNode);
 	      }
 	    }
+	    var lwi=this.lastWordIndex-numberOfWordsToCut;
+	    this.set("lastWordIndex", lwi-1);
+	    this.set("firstWordIndexOfSecond", lwi);
 	    return numberOfWordsToCut;
+		}
 	},
 
 	wordsOffTop: function(){
-
-	    var lwId =  '#oneOneWords_' + this.firstWordIndex;
-	    var firstWordNode = this.$$(lwId);
-	    // if(firstWordNode)
-	    // {
+		if(!this.columnOne){
+			var numberOfWordsToCut = 0,
+			fwsc=this.firstWordIndex,
+			lwId =  '#oneOneWords_' + fwsc,
+			firstWordNode = this.$$(lwId);
+	    while(firstWordNode==null && this.lastWordIndex-fwsc>100){
+	    	fwsc++;
+	    	lwId='#oneOneWords_' + fwsc,
+			firstWordNode = this.$$(lwId);
+			numberOfWordsToCut++;
+	    }
 		    var firstWordNodeBottom = firstWordNode.getBoundingClientRect().bottom;
 
 		    var nextWordNode = firstWordNode;
 		    var nextWordNodeBottom = firstWordNodeBottom;
-		    var numberOfWordsToCut = 0;
-
 		    while(nextWordNodeBottom == firstWordNodeBottom){
 		      nextWordNode = nextWordNode.nextSibling;
 		      if(nextWordNode.nodeName == firstWordNode.nodeName){
 		        nextWordNodeBottom = nextWordNode.getBoundingClientRect().bottom;
 		        numberOfWordsToCut++;
+		        console.log(nextWordNode);
+		       
 		      }
 		    }
+		    var fwi=this.firstWordIndex-numberOfWordsToCut;
+		    console.log(fwi);
+		    this.set("firstWordIndex",fwi);
+		    this.set("lastWordIndexOfFirst", fwi-1);
 		    return numberOfWordsToCut;
-		// } //add promise
+		 } //add promise
 	},
 
 	computeLastRowIndex: function(lastWordNode){
-		var bottom_of_top_mark = this.$.linesA1.getBoundingClientRect().bottom;
-		var lwId =  '#oneOneWords_' + this.lastWordIndex;
+		var bottom_of_top_mark = this.$.linesA1.getBoundingClientRect().bottom,
+		lwId =  '#oneOneWords_' + this.lastWordIndex, 
+		lwi=this.lastWordIndex,
+		lastWordNode=this.$$(lwId),
+		wordsOff=0;
+		if(this.columnOne){
+			while(lastWordNode==null){
+				lwi--;
+				lwId =  '#oneOneWords_' + lwi;
+				lastWordNode=this.$$(lwId);
+				wordsOff++;
+			}
+			console.log(wordsOff, this.lastWordIndex, lwi);
+		}
 		var last_word_bottom = this.$$(lwId).getBoundingClientRect().bottom;
 	 	var line_height = this.$.linesA1.clientHeight;
 	 	var delta =  last_word_bottom - bottom_of_top_mark;
@@ -199,7 +252,7 @@ Polymer({
 			if(lastNode != undefined){
 				resolve(lastNode);
 			} else {
-				reject(Error("lastNode doesn't exist"));
+				reject(Error("lastNode doesn't exist", this.columnOne));
 			}
 		});
 		return lastNodePromise;
@@ -213,7 +266,7 @@ Polymer({
 			self.computeLastRowIndex();
 		},
 		                (error)=>{
-			console.log("error, add async");
+			console.log("error, add async", this.columnOne);
 		});
 	},
 

@@ -23,6 +23,11 @@
       min-height:218vh;
       max-height:12999px;
      }
+
+    fc-relative-fit-wrapper{
+      cursor: move;
+
+    }
     
   </style>
   
@@ -76,7 +81,7 @@
     <div id="box11">
       <div class="flex dropzone" style="height: 45vh; overflow-y:scroll;"  parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
     <fc-relative-fit-wrapper id="wrapper1" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-        <fc-calendar-dialog class="vertical layout flex self-stretch">
+        <fc-calendar-dialog stationary="true" class="vertical layout flex self-stretch">
         </fc-calendar-dialog>     
     </fc-relative-fit-wrapper>
 
@@ -84,7 +89,7 @@
     <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up"></iron-splitter>
     <div id="box4" class='flex dropzone'  style="overflow-y:scroll;" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
       <fc-relative-fit-wrapper id="wrapper2" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-         <fc-event-calendar style="position: relative;"></fc-event-calendar>
+         <fc-event-calendar class="stationary" style="position: relative;"></fc-event-calendar>
       </fc-relative-fit-wrapper> 
    </div>
   </div>
@@ -161,10 +166,12 @@ computeOptionsArray(item, val){
   dragAndDrop(e){
       var targ=e.target;
       event.preventDefault;
+    
 
-      while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL")
+      while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL" && targ.classList.contains("stationary")!==true)
               {targ=targ.parentElement;}
-      if(targ.classList.contains("item")==true)
+      if(targ.classList.contains("stationary")==true){this.drags=false;}
+      else if(targ.classList.contains("item")==true)
         {
           if(targ.classList.contains("wrapper")===true)
               {
@@ -180,7 +187,7 @@ computeOptionsArray(item, val){
                       this.set("dragEl", dragEl);
                       self=this.wrapperDragEl;
                       console.log(self, self, Polymer.dom(targ).childNodes, "be sure you have the element.... getting template next");  
-              };
+              }
           this.dragEl.drags=true;
           self.drags=true;
           this.dragEl.dragging=true;
@@ -226,7 +233,7 @@ computeOptionsArray(item, val){
                   break;
                 }//close switch???
             }//close if
-
+       
       },
       _computeWrapperState(transformWrapperStyle, cws)
       {

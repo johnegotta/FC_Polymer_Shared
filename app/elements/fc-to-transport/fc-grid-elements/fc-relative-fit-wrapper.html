@@ -10,6 +10,14 @@
       overflow: scroll;
 
     }
+    .stationary{
+      background: white;
+      cursor: pointer;
+      max-height:2500px;
+      height: 91vh;
+      overflow-y: scroll;
+
+    }
 
     div{padding: 0px;
         background: white;
@@ -18,9 +26,11 @@
         section{background: aqua;}
   </style>
 
-<div id="myPanel" style="overflow-y: scroll; background: white; height:[[computePanelHeight(positionTarget,cws)]]; width:[[computePanelWidth(positionTarget,cws)]];">
+<div id="myPanel" style="border: green 7px solid; padding: 12px; overflow-y: scroll; background: grey; height:[[computePanelHeight(positionTarget,cws)]]; width:[[computePanelWidth(positionTarget,cws)]];">
  <!-- <iron-collapse id="seeElement" style="background:white;"> -->
+ <section class="stationary">
     <content style="overflow-y: scroll;"></content>
+</section>
 <!--   </iron-collapse> -->
 </div>
  </template>
@@ -75,7 +85,7 @@ FcFitWrapper=Polymer({
       // this.$.seeElement.opened=true;
     },
       _computeFitInto(pt){
-        console.log(pt);
+       // console.log(pt);
         if(pt && pt.parentNode){
         var target=pt;
         while(target.nodeName!="FC-MAPPED-GRID"){
@@ -104,20 +114,22 @@ FcFitWrapper=Polymer({
 
 
   specialRefit(target){
-    console.log("in sp1");
+   // console.log("in sp1");
     this.set("positionTarget",target);
     if(this._raf){
-      console.log("in sp3");
+     // console.log("in sp3");
       this._raf && window.cancelAnimationFrame(this._raf);
       this._raf=window.requestAnimationFrame(()=>{
         this._raf = null;
-        console.log(this._raf);
-        if(target){ this.set("positionTarget", target); console.log("in sp4");}
+       // / console.log(this._raf);
+        if(target){ this.set("positionTarget", target);
+        // console.log("in sp4");
+      }
         this.async(this.refit, 3);
       });
       }
       else{this.refit(); console.log("in sp2");}
-      console.log(target.style.width, target.style.height, window.getComputedStyle(target, null).getPropertyValue("width"), window.getComputedStyle(target, null).getPropertyValue("height"));
+      //console.log(target.style.width, target.style.height, window.getComputedStyle(target, null).getPropertyValue("width"), window.getComputedStyle(target, null).getPropertyValue("height"));
       var newHeight=window.getComputedStyle(target, null).getPropertyValue("height");
       this.computePanelWidth(target);
       var newWidth=window.getComputedStyle(target, null).getPropertyValue("width");
@@ -154,7 +166,7 @@ FcFitWrapper=Polymer({
         this.set("isResizing", true);
         var self=this;
         var par=Polymer.dom(this.root).parentNode;
-    console.log(par);
+   // console.log(par);
         this.click();
         this.set("heightHolder", this.currentHeight);
         this.set("_notifyingDescendant", true);

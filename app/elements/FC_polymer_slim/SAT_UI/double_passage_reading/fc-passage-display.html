@@ -27,20 +27,23 @@
 <div id="fcpassagedisplay" style="width: 98%;">
 	<div id="noJudge4" class="layout vertical flex container left passageContainer" style="overflow-y:scroll;">
 	<!--blurb full width container-->
-		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-width: 680px !important; max-height: 140px;">
+		<div class="layout horizontal blurb" style="margin: 12px 24px 0px 24px;min-width: 240px !important; max-height: 140px; line-height: 1.2;">
 			{{passageBlurb}}
 		</div>
 	<!--single column container-->
 		<firebase-collection location="https://focusedstaging1.firebaseio.com/passagesDestinations/new_Test_1" data="{{passageArray}}" on-firebase-value="altMethod"></firebase-collection> 
 
 		<!-- end-of-column-1 line number and text container-->
-		<div id="doubleColumnContainer" class="layout horizontal columnContainer"  style="padding-right: 8px;">
+		<div id="doubleColumnContainer" class="layout horizontal columnContainer"  style="padding-right: 4px;">
 			<fc-single-column-layout
 				class="flex-1 left-passage-column"
 				id="firstColumn"
 				the-content='{{passageArray}}'
 				column-one
-				last-word-index='[[lastWordIndexOfFirst]]'
+				first-word-index-of-second="{{firstWordIndexOfSecond}}"
+				showing-second-column="[[showingSecondColumn]]"
+				last-word-index-of-first="{{lastWordIndexOfFirst}}"
+				last-word-index='{{lastWordIndexOfFirst}}'
 				last-row-index='{{lastRowIndexOfFirst}}'>
 			</fc-single-column-layout>
 			<fc-single-column-layout
@@ -48,9 +51,10 @@
 				id="secondColumn"
 				hidden='{{!showingSecondColumn}}'
 				the-content='{{passageArray}}'
-				first-word-index='[[firstWordIndexOfSecond]]'
-				last-word-index='[[finalWordIndex]]'
-				first-row-index='[[firstRowIndexOfSecond]]'>
+				first-word-index='{{firstWordIndexOfSecond}}'
+				last-word-index='{{finalWordIndex}}'
+				last-word-index-of-first="{{lastWordIndexOfFirst}}"
+				first-row-index='{{firstRowIndexOfSecond}}'>
 			</fc-single-column-layout>
 		</div>
 
@@ -129,7 +133,7 @@ Polymer({
 	      type: Boolean,
 	      value: false,
 	      notify: true
-	    }
+	    }, 
 	},
 
 	ready: function(){
@@ -164,7 +168,7 @@ Polymer({
 	{
 		this.screenTrueHeight =  (window.innerHeight-320);
 		this.$.firstColumn = this.$.fcpassagedisplay.clientWidth;
-		if(this.$.noJudge4.clientWidth >= 660 /*&& this.screenTrueHeight>=440*/) {
+		if(this.$.noJudge4.clientWidth >= 680 /*&& this.screenTrueHeight>=440*/) {
 			this.set("showingSecondColumn", true);
 		} else {
 			this.set("showingSecondColumn", false);
@@ -176,6 +180,7 @@ Polymer({
 		//console.log(this.id, "IN splitPassageForColumns")
 		if(this.showingSecondColumn == true){
 			this.lastWordIndexOfFirst = Math.floor(.618*this.finalWordIndex);
+			// console.log(this.lastWordIndexOfFist, "this is the dividing point");
 			this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
       		this.readjustWordSplit();
 		} else {
@@ -189,7 +194,7 @@ Polymer({
 	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst - this.querySelector('#firstColumn').wordsOffBottom();
 	      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
 	    } else {
-	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst + this.querySelector('#secondColumn').wordsOffTop();
+	      this.lastWordIndexOfFirst = this.lastWordIndexOfFirst + this.querySelector('#secondColumn').wordsOffTop();console.log(this.lastWordIndexOfFirst, 'in radjust');
 	      this.firstWordIndexOfSecond = this.lastWordIndexOfFirst + 1;
 	      this.readjustWordSplit();
 	    }

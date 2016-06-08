@@ -20,7 +20,7 @@ display: flex;	/*width: 420px;*/
 	padding-right:1px; 
 	font-size: 14px; 
 	font-weight: 600; 
-	max-width: 25px; 
+	/*max-width: 25px; */
 	margin: auto; 
 	margin-top: 3px; 
 	border-top: 1px solid #afafaf; 
@@ -39,11 +39,7 @@ background: white;
 	border-bottom: #005c00 solid 2px; 
 	width: 100%;
 }
-.pretty{
-background: red;
-height: 9px;
-width: 30px;
-}
+
 .headerArrowLeft{
 	position: absolute; 
 	top: 0px; 
@@ -96,6 +92,10 @@ min-height: 38px;
   	overflow:scroll; 
   /*	min-height: 180px;*/
   }
+  iron-icon{
+  	height: 20px;
+  	width: 20px;
+  }
 
 
 /*
@@ -131,80 +131,83 @@ div.marquee, template.marquee{
 }
 </style><!-- 
 on-track="focusedDragMe" -->
-	<div drags on-down="dragsOn"  id="myPanel" style$="width:{{currentWidth}};height:{{currentHeight}}px;" class="horizontal layout flex calendarcontainer">
-		<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
+<!--holder for horizontal two panel view begins here-->
+	<div drags on-down="dragsOn" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer">
+	<!--text-holder is here-->
+		<div class="layout vertical flex-6" style="background: #fafafa; padding: 12px 24px;">
   			<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
     					<span class="marquee">{{wordEvent}}</span> 
     					
   			</template>
   		</div>
-
-
-	<div class$="layout {{visualSwap}} flex-7"><!--visual swap?-->
-			<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important;">
-				<section class="horizontal layout center-justify headerTop" style="align-items: center;">
-					<paper-icon-button 
-						on-tap="_backOne" 
-						icon="icons:chevron-left" 
-						hidden={{backHidden}} 
-						class="headerArrowLeft layout horizontal flex-2 self-shrink">
-					</paper-icon-button>
-					<section class="layout horizontal headerMonthYear">
-					[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
-					</section>
-					<paper-icon-button 
-						on-tap="_forward" 
-						hidden="{{forwardHidden}}" 
-						icon="icons:chevron-right" 
-						class="headerArrowRight layout horizontal flex-2 self-shrink">
-					</paper-icon-button>
+  	<!--text holder ends-->
+  	<!--calendar and green division begin-->
+		<div class$="layout {{visualSwap}} flex-7"><!--visual swap in horizontal layout here-->
+			<!--greeen side border-->
+			<section style="width: 25px; background: #005c00;">
+			</section>
+		<!--green side border ends; buttons can be in border-->
+		<!--to panel top and bottom display with calendar begins-->
+			<div class="vertical layout flex self-stretch">
+				<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important;">
+					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
+						<paper-icon-button 
+							on-tap="_backOne" 
+							icon="icons:chevron-left" 
+							hidden={{backHidden}} 
+							class="headerArrowLeft layout horizontal flex-2 self-shrink">
+						</paper-icon-button>
+						<section class="layout horizontal headerMonthYear">
+							[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
+						</section>
+						<paper-icon-button 
+							on-tap="_forward" 
+							hidden="{{forwardHidden}}" 
+							icon="icons:chevron-right" 
+							class="headerArrowRight layout horizontal flex-2 self-shrink">
+						</paper-icon-button>
 					</section> 
-			</paper-material>
-		<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;"></section>
-	<!--header ender using internal now unclosed section to, when closed pivot horiz and vert-->
-<div class="vertical layout flex">
-<section class="horizontal layout flex" style="max-height: 48%;">
-
-
-<!-- //DAYS AND DAYS OF WEEK COLUMN REPEATER -->
-<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
-		<div class="vertical layout flex" style$="width:calc(.84*{{currentWidth}})px; height:calc(.84*{{currentHeight}})px;" >
-		<paper-material class="horizontal layout center center-justified" style="font-size: 20px; font-weight:600; background: #005c00; color: white;text-align: center; padding: 1px;">
-			
-			<a>{{item.0}}</a>
-		
-		</paper-material>
-		<section class="vertical layout flex" style="background: white; box-shadow: 4px 11px 21px 7px #9fafaf; border-bottom: 1px silver solid; border-right: 1px silver solid;">
-			<template is="dom-repeat" items="{{item.1}}" as="day" style="font-size: 24px; font-weight:600; color: #005c00;">
-			<section style="border:green solid 2px; padding: 8px; background: white;" class="date horizontal layout center center-justified">
-				<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; border-radius:50%;">
-				</iron-icon>
-					{{day.eventText}}
-					{{day.eventU}} 
-				<a class="date horizontal layout center-justified" id="button" style="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: #005c00;">
-					<span hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</span>
-				</a>
-				<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}}; border-radius:50%;">
-				</iron-icon>
-					{{day.eventText}}
-					{{day.eventU}} 
+				</paper-material><!--header ends-->
+				<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
+				</section><!--resizer-->
+				<section class="horizontal layout flex-1">
+						<!-- //DAYS AND DAYS OF WEEK COLUMN REPEATER -->
+					<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
+						<div class="vertical layout flex" style$="width:calc(.84*{{currentWidth}})px; height:calc(.84*{{currentHeight}})px;" >
+							<paper-material class="horizontal layout center center-justified" style="font-size: 20px; font-weight:600; background: #005c00; color: white;text-align: center; padding: 1px;">
+									<a>{{item.0}}</a>
+							</paper-material>
+							<section class="vertical layout flex" style="background: white; box-shadow: 4px 11px 21px 7px #9fafaf; border-bottom: 1px silver solid; border-right: 1px silver solid;">
+								<template is="dom-repeat" items="{{item.1}}" as="day" style="font-size: 24px; font-weight:600; color: #005c00;">
+									<section style="border:green solid 2px; padding: 8px; background: white;" class="date vertical layout flex center center-justified self-stretch">
+										
+										<a class="date horizontal flex layout center-justified self-stretch" id="button" style="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: #005c00;">
+											<section class="date horizontal layout center-justified self-stretch" hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</section>
+										</a>
+										<span>
+										<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}};border-radius:50%;cursor: pointer;">
+										</iron-icon>
+										{{day.eventText}}{{day.eventU}}
+										<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; cursor: pointer;border-radius:50%;">
+										</iron-icon>
+										{{day.eventText}}{{day.eventU}}
+										</span>
+									</section>
+								</template>
+							</section>
+						</div>
+					</template>
 				</section>
-			</template>
-		</section>
-	</div>
-</template>
-</section>
-
-	<section class="horizontal layout flex">
-		<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
-  			<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
-    					<span class="marquee">{{wordEvent}}</span> 
-    					
-  			</template>
-  		</div>
-	</section>
-</div>
-</div>
+				<section class="horizontal layout flex-1">
+					<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
+		  				<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
+		    					<span class="marquee">{{wordEvent}}</span> 	
+		    					<span class="marquee">{{wordEvent}}</span> 		
+		  				</template>
+		  			</div>
+				</section>
+			</div>
+		</div>
  <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
  </section>
  </div>
@@ -335,7 +338,7 @@ ready: function()
 		var today = new Date();
 		var index=today.getMonth();
  		this.set("displayedIndex",index);
-		this.async(this.initialize, 40);
+		this.async(this.initialize, 240);
 },
 
 computeCurrentHeight: function(currentHeight){
@@ -435,8 +438,10 @@ _forward: function(){
  		else
  		{	this.set("backHidden",false);
  			this.set("forwardHidden",false);
+ 			console.log(this.calendarMonthsArray);
     		this.set("displayedIndex", this.displayedIndex+1);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+    		this.setArrays();
     	}
     },
  _backOne: function(){	
@@ -448,7 +453,9 @@ _forward: function(){
  		{	this.set("forwardHidden",false);
  			this.set("backHidden",false);
     		this.set("displayedIndex", this.displayedIndex-1);
+    		console.log(this.calendarMonthsArray);
     		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+ 				this.setArrays();
  		}
  	
     },
@@ -495,7 +502,8 @@ _computePrettyDay: function(d)
                 var theId=this.relId;
                 var elem=this.$$(theId);
                 var sWidth =window.getComputedStyle(self.$.myPanel, null).getPropertyValue("width");
-                self.set("currentWidth", sWidth);
+                var sheight =window.getComputedStyle(self.$.myPanel, null).getPropertyValue("height");
+                self.set("currentHeight", sheight);
               
                  break;
                 case 'track':
@@ -529,7 +537,7 @@ _computePrettyDay: function(d)
             }
         },
       
-      dragsOff: function(){this.set("drags", false);},
+     dragsOff: function(){this.set("drags", false);},
     dragsOn: function(){ if(!this.drags){this.async(this.dragSwitch, 500);}},
     dragSwitch: function(){this.set("drags", true);},
     focusedDragMe:function(e){
