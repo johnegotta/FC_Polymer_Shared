@@ -1,0 +1,242 @@
+<dom-module id="fc-call-center">
+<template>
+<style>
+:host{
+        margin: -24px
+        min-height: 98vh;
+        height: 100%;
+        height: 2500px;
+        background: white;
+        display: flex;
+        font-family: merriweather;
+        
+        @apply(--layout-horizontal);
+      }
+      .headerLeft{
+height: 42px; width: 42px; color: white; float: left;
+top: 10px;
+
+}
+.headerRight{
+	height: 42px; width: 42px; color: white; float: right;
+top: 10px;
+}
+		paper-button{
+		 	 width: 50%;
+		 	 min-width: 147px;
+		 	 font-weight: 600; 	  
+		 	 font-size: 14px;
+		 	 text-align: center;
+		 	 white-space: nowrap;
+		 	 max-height: 36px;
+		 	 @apply(--layout-nowrap);
+		 	 background: white;
+		 }
+		 paper-button.green{
+		 	color: green; 
+		 	border: 2px solid green;
+		}
+		paper-button.darkblue{
+			color: #009;
+			border: 2px solid #009;
+		}
+		paper-button.red{
+			color: red;
+			border: 2px solid red;
+		}
+		paper-button.orange{
+			color: orange;
+			border: 2px solid orange;
+		}
+		paper-button:hover, paper-button:active{
+			box-shadow: 2px 4px 7px 2px; 
+
+		} 
+		paper-button.darkblue:hover, paper-button.darkblue:active{
+			box-shadow: 2px 4px 7px 2px gold; 
+
+		} 
+		.buttonRow{
+			@apply(--layout-flex);
+			@apply(--layout-horizontal);
+			padding: 2px;
+		}
+
+.footerclass{
+	height: 32px;
+	padding: 14px;
+	color: white;
+	background: #03A9F4;
+	font-weight: 600;
+	text-align: center;
+	font-size: 11px;
+}
+.slides{overflow: hidden; overflow-y: scroll;}
+
+.one{
+	font-family: merriweather; 
+	font-weight: 600;
+	color: #080808;
+	font-size: 14px;
+
+	white-space: nowrap;
+	display: inline-block;
+}
+      paper-card{
+        width: 100%;
+        --paper-card-header-image-text:{color:#009; position: absolute; right: 32px; top: 45px;}
+        --paper-card-header-image: {width: 165px; height: 120px; margin: 12px 16px 16px 16px;};
+        --paper-card-header:{height: 95px; border-bottom: double 6px green;}
+  
+    }
+    paper-input{
+      margin:12px;
+    }
+    gold-input{
+     margin:12px; 
+    }
+      neon-animated-pages {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal)
+        margin: 0px;
+        padding: 0px;
+        background: white;
+      }
+      neon-animatable {
+        color: white;
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        @apply(--paper-font-display3);
+        margin: 0px;
+        padding: 0px;
+      }
+      .holderClass {
+        min-width: 240px;
+        max-width: 624px;       
+        min-height: 48px;
+        max-height: 72px;
+}
+    .subheading {
+    font-size: 13px;
+    color: brown;
+    font-family: times;
+    }
+    iron-icon{ 
+        width: 36px;
+        height: 36px;
+    }
+  .setHeight {
+    min-height: 680px;
+    max-height: 720px;
+    max-width: 485px;
+    min-width: 380px;
+    margin: 4px;
+    padding: 4px;
+  }
+  @media(max-width: 767px){
+  	#content{
+  		@apply(--layout-vertical);
+  		@apply(--layout-center);
+  	}
+  	/*add more here*/
+  }
+  </style>
+  <fc-ddr-card id="focusedCallInterface" head-class="darkBlue" header-title="Focused Client Intake Center" class="horizontal layout flex nowrap self-stretch" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;">
+  	<div class="dropdown headerRight">
+		  	<paper-icon-button icon="icons:dashboard" class="dropbtn"
+		  	btn="openDropdown"></paper-icon-button>
+			<paper-list-box id="dropdownlist" class="block dropdown-content" style="width: 320px!important; min-width: 320px!important; max-width: 320px!important; border: 4px green solid;">
+		 		<template is="dom-repeat" id="controllerList" items="{{listElements}}">
+					<paper-item class="block" style="border: 1px silver solid; width: 300px!important; min-width: 300px!important; max-width: 300px!important;padding: 3px!important;color: green;" on-tap="toggleSelection"><span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>{{item.topHeading}}</paper-item>
+		 		</template>
+		 	</paper-list-box>
+		</div>
+	
+		<div class="dropdown headerLeft">
+		  	<paper-icon-button icon="icons:dashboard" class="dropbtn"
+		  	btn="openDropdown"></paper-icon-button>
+			<paper-list-box id="dropdownlist2" class="dropdown-content" style="position: absolute; left: 0px;width: 320px!important; min-width: 320px!important; max-width: 320px!important; border: 4px green solid;">
+		 		<template is="dom-repeat" id="controllerList2" items="{{instanceArray}}">
+					<paper-item class="block" style="border: 1px silver solid; width: 300px!important; min-width: 300px!important; max-width: 300px!important;padding: 3px!important;color: green;" on-tap="insertElements"><span hidden$="{{!item.selectCheck}}" courses="{{item.courses}}" class="check">&#10148;</span>{{item.name}}</paper-item>
+		 		</template>
+		 	</paper-list-box>
+		 </div>
+		 	<array-selector id="selector2" items="{{instanceArray}}" selected="{{insertedElements}}" multi toggle></array-selector>
+ 			<div class="flex layout horizontal center-justified">
+ 			<section id="hanger" ></section>
+
+  <neon-animated-pages id="pages" class="flex" selected="0" entry-animation="[[slide-from-right-animation]]" exit-animation="[[slide-left-animation]]">
+        <paper-card heading="Intake Form" elevation="3" class="intakeForm vertical layout" image="../../../images/FC_frontpage_logo.png">
+        <section>
+        <span class="subheading">
+        * Indicates a Required Field
+        </span>
+        </section>
+                <div class="card-content">
+                    <section name="callDateAndTimeAndCallerRole">
+                        <span class="questionHeader">Classify the caller as a student, a student's parent or 'other'.</span>
+                        <fc-holder class="horizontal layout container holderClass"> 
+                                <paper-input class="labelsClass" id="callTimestamp" value='[[timeStamp]]' read-only=true label='Date & Time'></paper-input>
+                                <paper-input type="list" value='{{call.callerRole}}' class="labelsClass" id="callerRole" label="Caller Role" list="two"> 
+                                         <datalist id="callerRoleInput">
+                                              <option value="{{Mother}}"> Mother</option>
+                                              <option value="{{Father}}"> Father </option>
+                                              <option value="{{Student}}"> Student </option>
+                                              <option value="{{Other}}"> Other </option>
+                                         </datalist>
+                                  </paper-input>
+                                </fc-holder>
+                    </section>
+
+                    <section name="callerIntake">
+                        <span class="questionHeader">Type the Caller's first & last names into the below fields.</span>
+                        <fc-holder class="horizontal layout container holderClass">
+                                <paper-input id='callerFirstName' class="labelsClass" name='callerFirst' tab-index='0' label='Caller First Name'  value='{{call.callerFirst}}' on-input="updateInput">
+                                </paper-input>
+                                <paper-input id='callerLastName' class="labelsClass" name='callerLast' label='Caller Last Name'  value='{{call.callerLast}}' on-input="updateInput">
+                                </paper-input>
+                        </fc-holder>
+                     </section>
+                     <section name="studentName">
+                            <span class="questionHeader">Type the <a href="http://www.focusedcoaching.com"><i>Related Student</i></a>'s names into the labelled fields below.</span>
+                            <fc-holder class="horizontal layout container holderClass">
+                              <paper-input id='studentFirst' class="labelsClass" name='studentFirst' class="labelsClass" label='Student First' value='{{call.studentFirst}}' on-input="updateInput name">
+                              </paper-input>
+                              <paper-input id='studentLast' class="labelsClass"  name='studentLast' label='Student Last Name'  value='{{call.studentLast}}' on-input="updateInput">
+                              </paper-input>
+                            </fc-holder>
+                   
+                        </section>
+                    
+
+
+                    <section>   
+                        <span class="questionHeader">SELECT<a href="http://www.focusedcoaching.com"><u>a Previous Caller</u></a> </span><span class="questionHeader">from the</span><paper-button class="questionHeader" on-tap="_focusedAssistant">Call List</paper-button>
+                        <br>
+                    </section>
+
+                <paper-status></paper-status>
+                </div>
+
+                <div class="card-actions horizontal layout flex container center-justified">
+                    <paper-button class="flex-1">back
+                    </paper-button>
+                    <paper-button class="flex-1" id="one" on-tap="nextPage">CONTINUE
+                    </paper-button>
+                </div>
+            </paper-card>
+      </neon-animated-pages> 
+      </div>
+    </fc-ddr-card>
+</template>
+<script>
+FcCallCenterDialog=Polymer({
+	is:"FcCallCenterDialog",
+	properties:{
+
+	},
+
+
+});
+</script>
+</dom-module>
