@@ -4,12 +4,24 @@
 :host{margin-top: 12px;}
   paper-card{
         width: 100%;
+        padding: 8px;
+        margin: 12px 2px 12px 2px;
         --paper-card-header-image-text:{color:#009; position: absolute; right: 32px; top: 45px;}
-        --paper-card-header-image: {width: 165px; height: 120px; margin: 12px 16px 16px 16px;};
+        --paper-card-header-image: {width: 165px; height: 97px; margin: 12px 16px 24px 16px;};
         --paper-card-header:{height: 95px; border-bottom: double 6px green;}
   
     }
-    		paper-button{
+    fc-input-search-select.right{
+        padding: 4px;
+        margin: 4px 8px;
+        max-width: 660px;
+      }
+    fc-input-search-select.left{
+      padding: 4px;
+        margin: 4px 6px;
+        max-width: 660px;
+    }
+    paper-button{
 		 	 width: 50%;
 		 	 min-width: 147px;
 		 	 font-weight: 600; 	  
@@ -142,13 +154,13 @@
 		    display: none;
 		    position: absolute;
 		    background-color: #f9f9f9;
-		    min-width: 160px;
+		    min-width: 120px;
 		    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 		}
 		/* Links inside the dropdown */
 		.dropdown-content a {
 		    color: black;
-		    padding: 12px 16px;
+		    padding: 5px 8px;
 		    text-decoration: none;
 		    display: block;
 		}
@@ -164,10 +176,12 @@
 		}
 		.radioGroupBlock{
 			padding: 12px;
+    }
+      .questionHeader{
+        padding: 8px;
+        margin: 12px;
+      }
 
-
-
-		},
 		.importantNote{
 				color: black;
 				font-weight: 600;
@@ -177,14 +191,27 @@
 
 		},
 		.detailPads{
-				margin:12px;
-				margin-top: 24px;
+				margin: 24px;
 
 		}
-
+    .holderClass{
+        margin:8px;
+        padding:8px;
+    }
+    @media(max-width: 540px){
+    .container{
+        width: 99%;
+        @apply(--layout-vertical);
+        @apply(--layout-flex);
+        @apply(--layout-self-stretch);
+        @apply(--layout-wrap);
+        @apply(--layout-flex-grow);
+        @apply(--flex-grow);
+    }
+}
 </style>
   <paper-card heading="Intake Form" elevation="3" class="intakeForm vertical layout" image="../../../images/FC_frontpage_logo.png">
-        <span style="position: absolute; right: 22px; top: 24px;">Page {{pageNumber}} of 8</span>
+        <span style="position: absolute; right: 80px; top: 38px;">Page {{pageNumber}} of <content select=".pageTotal"></content></span>
                <section>
         <span class="timestamp">
         [[time]], on [[date]]
@@ -193,66 +220,35 @@
         * Indicates a Required Field
         </span>
         </section>
-         <div class="card-content">
-         <section name="callDateAndTimeAndCallerRole">
-                        <span class="questionHeader">Classify the caller as a student, a student's parent or 'other'.</span>
-                        <fc-holder class="horizontal layout container holderClass"> 
-                        <span class="horizontal layout nowrap flex self-stretch">
-                        <fc-input-pro-select>
-                        </fc-input-pro-select>
-                                <!-- <paper-input type="list" value='{{call.callerRole}}' id="callerRole" label="Caller Role" list="two"> 
-                                         <datalist id="callerRoleInput">
-                                              <option value="{{Mother}}"> Mother</option>
-                                              <option value="{{Father}}"> Father </option>
-                                              <option value="{{Student}}"> Student </option>
-                                              <option value="{{Other}}"> Other </option>
-                                         </datalist>
-                                  </paper-input> -->
-                                  <paper-button btn="selectStudent" style="margin-top: 26px;">select client</paper-button>
-                                  </span>
-                                </fc-holder>
-                    </section>
-
-                    <section name="callerIntake">
-                        <span class="questionHeader">Type the Caller's first & last names into the below fields.</span>
-                        <fc-holder class="horizontal layout container holderClass">
-                                <paper-input id='callerFirstName' name='callerFirstName' tab-index='0' label='Caller First Name'  value='{{call.callerFirst}}' on-input="updateInput">
-                                </paper-input>
-                                <paper-input id='callerLastName' name='callerLast' label='Caller Last Name'  value='{{call.callerLast}}' on-input="updateInput">
-                                </paper-input>
-                        </fc-holder>
-                     </section>
-                     <section name="studentName">
-                            <span class="questionHeader">Type the <a href="http://www.focusedcoaching.com"><i>Related Student</i></a>'s names into the labelled fields below.</span>
-                            <fc-holder class="horizontal layout flex wrap">
-                              <paper-input id='studentFirst' class="labelsClass" name='studentFirst' class="labelsClass" label='Student First' value='{{call.studentFirst}}' on-input="updateInput name">
-                              </paper-input>
-                              <paper-input id='studentLast' class="labelsClass"  name='studentLast' label='Student Last Name'  value='{{call.studentLast}}' on-input="updateInput">
-                              </paper-input>
-                            </fc-holder>
-                   
-                        </section>
-                    
-
-
-                    <section>   
-                        <span class="questionHeader">SELECT<a href="http://www.focusedcoaching.com"><u>a Previous Caller</u></a> </span><span class="questionHeader">from the</span><paper-button class="questionHeader" on-tap="_focusedAssistant">Call List</paper-button>
-                        <br>
-                    </section>
-
-                <paper-status></paper-status>
-         
-
-          </div>
-          <section style="height: 16px; min-width:110px;">
+  <div class="card-content">
+    <div class="vertical layout self-stretch nowrap" >    
+      <template is="dom-repeat" items="{{itemObject}}">
+        <section class="horizontal layout container holderClass"> 
+        <span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
+      </section>
+      <div class="horizontal layout flex wrap stretch center center-justified">
+        <section class="container holderClass">
+          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="{{item.propertyNameA}}" dropdown-items="{{item.dropdownItemsA}}">
+          </fc-input-search-select>
+        </section>
+        <section class="container holderClass">
+          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="{{item.propertyNameB}}" class="right"  dropdown-items="{{item.dropdownItemsB}}">
+          </fc-input-search-select>
+        </section>        
+    </div>
+    
+  </template>
+  </div>      
+</div>
+<section style="height: 74px; min-width:110px;">
 </section>
-          <div class="card-actions horizontal layout flex container center-justified">
+    <div class="card-actions horizontal layout flex container center-justified" style="min-height: 18%;">
           <paper-button class="flex-1" btn="leftClick">back</paper-button>
            <paper-button class="flex-1" id="one" btn="rightClick">CONTINUE</paper-button>
-                </div>
-            </paper-card>
-            	</template>
- 	<script>
+    </div>
+  </paper-card>
+</template>
+<script>
 FcCallCenterForm=Polymer({
     is:"fc-call-center-form",
     properties:{
@@ -260,35 +256,48 @@ FcCallCenterForm=Polymer({
 			type:Date,
 			value:function(){
 					var time=new Date().toLocaleTimeString();
-					console.log(time);
 					return time;
-
 			},
 			notify: true
 		},
+    pageNumber:{
+      type:Number,
+      value: function(){return 2;},
+      notify: true,
+    },
 		date:{
 				type: Date,
 				value: function(){var date=new Date().toLocaleDateString();
-					console.log(date);
 					return date;},
 				notify: true,
-
-
 		},
-		pageNumber:{
-				type: Number,
-				value:function(){
-					return 2;
-				},
-				notify: true,
-		},
-		contentArray:{
-				type: Array,
-				value: function(){return [];},
-				notify: true,
-
-		},
+      inputArray:{
+        type: Array,
+        notify: true,
+      },
+      dropdownItems:{
+        type:Array,
+        value:function(){return },
+        notify: true,
+      },
+      item:{
+        notify: true,
+       
+      },
+      itemObject:{
+        type:Array,
+        notify: true,
+        
+      },
+    
 	},
+
+  computeItemHeaderHidden(header){
+    if(header){return false;}else{return true;}
+  },
+
+
 });
+
 </script>
 </dom-module>

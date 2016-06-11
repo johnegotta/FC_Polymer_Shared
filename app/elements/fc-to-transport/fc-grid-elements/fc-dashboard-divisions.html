@@ -89,15 +89,21 @@
     <div id="box11">
       <div class="flex dropzone" style="height: 45vh; overflow-y:scroll;"  parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
     <fc-relative-fit-wrapper id="wrapper1" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-        <fc-calendar-dialog stationary="true" class="vertical layout flex self-stretch">
-        </fc-calendar-dialog>     
+       <fc-calendar-dialog stationary="true" class="vertical layout flex self-stretch">
+        </fc-calendar-dialog>
     </fc-relative-fit-wrapper>
 
 </div>
     <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up"></iron-splitter>
     <div id="box4" class='flex dropzone'  style="overflow-y:scroll;" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
       <fc-relative-fit-wrapper id="wrapper2" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-         <fc-event-calendar class="stationary" style="position: relative;"></fc-event-calendar>
+         <!-- <fc-event-calendar class="stationary" style="position: relative;"></fc-event-calendar> -->
+<fc-ddr-card>
+<paper-input value="{{currentHeight}}" class="headerLeft" label="height"></paper-input>
+<paper-input value="{{currentWidth}}" class="headerLeft"  label="width"></paper-input>
+         <fc-input-search-select class="headerRight" iss-value="{{webAddress}}" dropdown-items="{{webAddresses}}"></fc-input-search-select>
+        <iframe allow-scripts src="{{webAddress}}" accept-scripts height="{{currentHeight}}px" width="{{currentWidth}}px"></iframe>
+  </fc-ddr-card> 
       </fc-relative-fit-wrapper> 
    </div>
   </div>
@@ -107,14 +113,14 @@
   <div id="box5" class="flex">
         <div class="layout flex dropzone" on-dragover="allowDrop" parent-cws="in" on-up="handleDrop" style="height: 45vh; overflow-y:scroll;">
             <fc-relative-fit-wrapper id="wrapper3" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-                <fc-call-center-dialog stationary="true" class="vertical layout flex self-stretch"></fc-call-center-dialog>
+                <fc-call-center-dialog stationary="true" allow-scripts class="vertical layout flex self-stretch"></fc-call-center-dialog>
             </fc-relative-fit-wrapper>
         </div>
   <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up">
   </iron-splitter>
       <div class="flex layout self-stretch dropzone" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop" style="overflow-y:scroll;">
           <fc-relative-fit-wrapper id="wrapper4" cws="in" class="item wrapper" current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-track="dragAndDrop" draggable drags>
-                  <fc-passage-display></fc-passage-display>
+                  <fc-passage-display allow-scripts></fc-passage-display>
           </fc-relative-fit-wrapper>
       </div>
   </div>
@@ -134,6 +140,20 @@ currentHeight:{
 fauxSheight:{
   type: Number,
     notify: true
+  },
+  webAddress:{
+    type:String,
+    value:function(){
+      return "http://localhost:3000/#!/testarea2";
+    },
+    notify: true,
+  },
+  webAddresses:{
+    type:Array,
+    value: function(){
+     return ["http://localhost:3000","http://localhost:3000/#!/testarea1","http://localhost:3000/#!/testarea2",'http://localhost:3000/#!/users', 'http://localhost:3000/#!/user-info','http://localhost:3000/#!/user-info', 'http://localhost:3000"/#!/reading',"http://localhost:3000/#!/reading"];
+  },
+    notify: true,
   },
   isWrapper:{
     type: Boolean,

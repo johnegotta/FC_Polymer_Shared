@@ -2,7 +2,7 @@
 <template>
 <style>
 :host{
-        margin: -24px
+        margin: -12px
         min-height: 98vh;
         height: 100%;
         height: 2500px;
@@ -14,16 +14,16 @@
       }
       .intakeForm{
       	border: 1px #efefef solid;
-      	margin: 12px;
+      	margin: 12px 0px;
       }
       .headerLeft{
 height: 42px; width: 42px; color: white; float: left;
-top: 10px;
+top: 10px; z-index:42; align-items:right;
 
 }
 .headerRight{
 	height: 42px; width: 42px; color: white; float: right;
-top: 10px;
+top: 10px; z-index:42; align-items:right;
 }
 		paper-button{
 		 	 width: 50%;
@@ -95,19 +95,20 @@ top: 10px;
   
     }
     paper-input{
-      margin:12px;
+      margin:8px;
     }
     gold-input{
-     margin:12px; 
+     margin:8px; 
     }
       neon-animated-pages {
         @apply(--layout-flex);
-        @apply(--layout-vertical)
-        margin: 12px;
+        @apply(--layout-horizontal)
+        margin: 12px 0px 12px 0px
         padding: 12px;
         background: white;
         @apply(--layout-self-stretch);
-        min-height: 720px;
+        min-height: 1080px;
+        height: 100%;
       }
       neon-animatable {
         color: white;
@@ -117,12 +118,7 @@ top: 10px;
         margin: 0px;
         padding: 0px;
       }
-     /* .holderClass {
-        min-width: 240px;
-        max-width: 624px;       
-        min-height: 48px;
-        max-height: 72px;
-}*/
+    
     .subheading {
     font-size: 14px;
     color: brown;
@@ -165,29 +161,14 @@ top: 10px;
     		}
   .setHeight {
     min-height: 680px;
-    max-height: 720px;
+    max-height: 1480px;
+
     max-width: 485px;
     min-width: 380px;
     margin: 4px;
     padding: 4px;
   }
-  .sumTag{
-  	font-weight: 700;
-  	font-size: 18px;
-  	margin-left: 12px;
-  	outline: 0px white solid;
-  }
-  .detTag{
-  		font-weight: 600;
-  		font-size: 16px;
-  		margin: 12px 24px;
-  		padding: 12px;
-  		color: brown;
-  		border: silver solid 2px;
-  		background: #efefef;
-  		box-shadow: 3px 5px 11px 3px #afafaf;
-
-  }
+  
   .timestamp{
   	font-weight: 600;
   	font-size: 16px;
@@ -249,7 +230,7 @@ top: 10px;
 		}
 
 		.show {display:block; z-index: 45; right: 0;}
-  @media(max-width: 767px){
+  @media(max-width: 687px){
   	#content{
   		@apply(--layout-vertical);
   		@apply(--layout-center);
@@ -260,65 +241,81 @@ top: 10px;
   <iron-form>
   <fc-ddr-card id="focusedCallInterface" head-class="darkBlue" header-title="Focused Client Intake Center" class="horizontal layout flex nowrap self-stretch" on-tap="_tapHandler" style="padding-right:2px; margin: 4px 0px 4px 0px; width: 100%!important;">
   	
-  	<div class="dropdown headerRight">
-		  	<paper-icon-button icon="icons:dashboard" class="dropbtn"
-		  	btn="openDropdown"></paper-icon-button>
-			<paper-list-box id="dropdownlist" class="block dropdown-content" style="width: 180px!important; min-width: 180px!important; max-width: 180px!important; border: 4px green solid;">
-		 		<template is="dom-repeat" id="controllerList" items="{{signUpPages}}">
-					<paper-item class="block" style="border: 1px silver solid; width: 177px!important; min-width: 177px!important; max-width: 177px!important;padding: 3px!important;color: green;" on-tap="toggleSelection"><span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>{{item.name}}</paper-item>
-		 		</template>
-		 	</paper-list-box>
-		</div>
+    <div class="dropdown headerRight">
+        <paper-icon-button icon="icons:dashboard" class="dropbtn" btn="openDropdown">   
+        </paper-icon-button>
+        <paper-list-box id="dropdownlist" class="dropdown-content" style="position: absolute; width: 420px; right: -4px; top: -20px; border:6px #adadad solid;">
+		 	<!-- <template is="dom-repeat" id="controllerList" items="{{signUpPages}}">
+				<paper-item class="block" style="border: 1px silver solid; min-width: 177px!important; max-width: 360px!important;padding: 3px!important;color: green;" on-tap="toggleSelection">
+                    <span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>
+                    <span>{{item.name}}</span>
+                </paper-item>
+		 	</template> -->
+            <neon-animated-pages style="position: absolute; left:0px; top: 56px;" id="pages9" selected="0">
+             <fc-call-list-view id="callList" style="position: absolute; right:100px; top: 56px; left:0px;height: 600px; width:460px;" search-vals="{{searchVals}}"></fc-call-list-view>
+             <fc-tabbed-card id="viewProfile" student="{{studentSelectable}}" on-close="_onClose"></fc-tabbed-card>
+        </neon-animated-pages>
+		</paper-list-box>
+	</div>
 	
-		<div class="dropdown headerLeft">
-		  	<paper-icon-button icon="icons:dashboard" class="dropbtn"
-		  	btn="openDropdown"></paper-icon-button>
+	<div class="dropdown headerLeft">
+		<paper-icon-button icon="icons:dashboard" class="dropbtn" btn="openDropdown"></paper-icon-button>
 			<paper-list-box id="dropdownlist2" class="dropdown-content" style="position: absolute; left: 0px;width: 320px!important; min-width: 320px!important; max-width: 320px!important; border: 4px green solid;">
 		 		<template is="dom-repeat" id="controllerList" items="{{signUpPages}}">
-					<paper-item class="block" style="border: 1px silver solid; width: 300px!important; min-width: 300px!important; max-width: 300px!important;padding: 3px!important;color: green;" btn="toggleSelection"><span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>{{item.name}}</paper-item>
-		 		</template>
-		 	</paper-list-box>
-		 </div>
-		 	<array-selector id="selector2" items="{{instanceArray}}" selected="{{insertedElements}}" multi toggle></array-selector>
- 			<div class="flex layout horizontal center-justified">
- 			<section id="hanger" ></section>
-
-   <neon-animated-pages id="pages" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
-
-  <div>
-      <fc-call-center-form-one></fc-call-center-form-one>
-</div>
-
-<div>
-<fc-call-center-form>
-</fc-call-center-form>
-</div>
-
-<div>
-<fc-call-center-form>
-</fc-call-center-form>
-</div>
-
-<div>
-<fc-call-center-form>
-</fc-call-center-form>
-</div>
-
-<div>
-<fc-call-center-form>
-</fc-call-center-form>
-</div>
-      </neon-animated-pages>
-   
+					<paper-item class="block" style="border: 1px silver solid; width: 300px!important; min-width: 300px!important; max-width: 300px!important;padding: 3px!important;color: green;" btn="toggleSelection"><span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>{{item.name}}
+                    </paper-item>
+		 	    </template>
+		  </paper-list-box>
+	</div>
+	<array-selector id="selector2" items="{{instanceArray}}" selected="{{insertedElements}}" multi toggle>
+    </array-selector>
+ 	<div class="flex layout horizontal center-justified">
+ 		<section id="hanger" ></section>
+        <neon-animated-pages id="pages" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
+            <div>
+                <fc-call-center-form-one>
+                </fc-call-center-form-one>
+            </div>
+            <template is="dom-repeat" items="{{inputArraysAb}}">
+                <div>
+                    <fc-call-center-form input-array="{{item}}" item="{{inputArraysAb}}" page-number="{{computePageNumber(selected)}}" item-object="{{item}}">
+                        <span class="pageTotal">{{_computePageTotal(inputArraysAb, index)}}
+                        </span>
+                    </fc-call-center-form>
+                </div>
+            </template>
+        </neon-animated-pages>
     </fc-ddr-card>
-    </iron-form>
+</iron-form>
 </template>
 <script>
-FcCallCenterDialog=Polymer({
+"use strict";
+
+class FcStudentPastAcademics{
+constructor (gradeLevel, currentSchool, pastSchool, highestEducationLvl, startMath, startReading, startTotal,goalScore,desiredTestDate, fcid){
+  this.gradeLevel= gradeLevel ||"";
+  this.currentSchool= currentSchool ||"";
+  this.pastSchool= pastSchool ||"";
+  this.highestEducationLevel= highestEducationLvl ||"";
+  this.startMathScore =  startMath  || "";
+  this.startReadingScore = startReading || "";
+  this.startTotalScore = startTotal || "";
+  this.goalScore=goalScore || "";
+  this.desiredTestDate=desiredTestDate||"";
+  if(this.desiredTestDate){
+  this.weeksUntilTestDate=new Date()-this.desiredTestDate;
+  }
+  }
+};
+Polymer({
 	is:"fc-call-center-dialog",
 		 behaviors:[Polymer.NeonAnimatableBehavior,
                 Polymer.NeonAnimationBehavior,
                 Polymer.NeonAnimationRunnerBehavior],
+        listeners: {"on-call-click": "_onCallClick", 
+            "sendInputVal": "_passSearchVals", 
+            "studentSelected":"_setPreviousCaller"
+            },
       properties: {
         entryAnimation: {
           type: String,
@@ -330,11 +327,38 @@ FcCallCenterDialog=Polymer({
             value: function(){return "";},
           notify: true
         },
+        searchVals:{
+        type: Object,
+        value: {
+            fcProfile: {},
+        },
+        notify: true, 
+        reflectToAttribute: true
+    },
+    data: {
+        type: Array,
+        value: function(){return [];},
+        notify: true
+    },
+        pageTotal:{
+          type: Number,
+          notify: true
+        },
         selected: {
           type: Number,
           value: 0,
           notify: true
-        }, 
+        },
+    inputArraysAb:{
+        type: Array,
+        value:function(){return[];},
+        notify: true
+    },
+    currentPage:{
+      type: Number,
+      computed:"computePageNumber(selected)",
+      notify: true
+    },
 		signUpPages:{
 			type: Array,
 			value:function(){
@@ -345,6 +369,87 @@ FcCallCenterDialog=Polymer({
 		
 
 	},
+  ready(){
+      this.initializePages();
+  },
+  computePageNumber(selected){return this.selected+1;},
+   _callSearch: function(event){
+      this.fire('search-val-change', {
+            item: this.callSearchVal
+          });
+  },
+   _onCallClick: function(e) {
+      this.$.pages.selected = 1;
+      console.log(e.detail.item);
+     this.$.viewProfile.setStudent(e.detail.item.fcid); 
+     console.log(e.detail.item.fcid);
+     console.log(this.studentSelectable, "here is selected");
+  
+    },
+
+    _setPreviousCaller: function(e, detail)
+    {
+        console.log(e.detail);
+        this.set("studentSelectable", e.detail);
+    },
+
+
+  _computePageTotal(inputArraysAb, index){
+     var pageTotal=(this.inputArraysAb.length+1);
+     this.set("pageTotal", pageTotal);
+     console.log(index);
+    return pageTotal;},
+
+  initializePages(){
+    //get at least the labelable values from the classes we have made... oh getters and setters would make this five-10 lines of code....
+    var student=new FcStudentProfile({}), pastAcademics=new FcStudentPastAcademics({}),theCourse=new FcCourse({}), keysz= Object.keys(theCourse);
+    var methodList=Object.getOwnPropertyNames(student);
+    console.log(methodList, "see what they got");
+    var courseArray=keysz.map(function(key, ind, arr){
+          return {key:theCourse[key]};
+        });
+        var it={},keyz=Object.keys(pastAcademics),keys=Object.keys(student),inputArrayA=[],inputArrayB=[],contentArray=[], two=keys[12],one=keys.splice(12,1);
+        //note that the it object will be used for moving properties from one object to another, later in the code via an Object.assign--poor mans defineProperties set and gets...
+        keys.push(two);
+        var moreKeys=keys.concat(keyz, keysz); 
+        var length;
+        moreKeys.forEach(function(val, index, array){
+          length=array.length;
+        var label=val.replace(/([A-Z])/g, ' $1'),  
+        label=label.replace(/^./, function(label){ return label.toUpperCase(); }),
+        label=label.replace("1", " One"),
+        label=label.replace("2", " Two");
+        var ab=(index%2===0)?"A":"B",nameProp="name"+ab,labelProp="label"+ab,propertyNameProp="propertyName"+ab,dropdownItemsProperty="dropdownItems"+ab;
+        //built up the franken-it object now gonna use it to run sixty input objects! wish i ordered the data more consistently earlier....
+        it[labelProp]=label,it[nameProp]=val,it[propertyNameProp]=val, it[dropdownItemsProperty]=(val.selectedItems)?val.selecteditems: false;
+        var pushVal=(index%2===0)?inputArrayA:inputArrayB;
+        //alternating on the index to get a pair of items to load on the dom!
+        pushVal.push(it);
+        it={};
+        //cleared `it`, next gonna grab eight inputs (four pairs of two) for the cards
+        if((index+1)%4==0 || array.length-1===index){
+              this.push("inputArraysAb", [inputArrayA, inputArrayB]);
+              inputArrayA=[];
+              inputArrayB=[];
+                 }
+         }, this);
+        //this was original impl... used two arrays to make columns... now need to resort them and move paired odd array elements object sub properties all onto one replacement element for the other two, and maintain order in the impl... Wait for it... wait for it... it's is coming!
+         var mymerge=this.inputArraysAb.map(function(prop, index, array){
+         var pickle=prop[0].concat(prop[1]); 
+            var nobj=Object.assign({},pickle[0],pickle[2]);
+            var nobj2=Object.assign({},pickle[1],pickle[3]);
+            return[nobj,nobj2];
+         }, this);
+        //this is a columns to rows switch will need same api dynamics in the grid table and in any accounting interface DUAL USE IMPORTANT!!! 
+         var arrat=[];
+         mymerge.forEach(function(val,i,arr){
+                if(i%2===0&&i<arr.length-1){var mini=val.concat(arr[i+1]); arrat.push(mini);}
+                 console.log(arrat, "this is the data array delivered");});
+        //had to do the above twice to get the ordering correct...see 391 above, this time though I didnt need the assigment as I did two at once above;
+        // next we wipe out our mistake in approach by resetting the original array we had to deal with...
+         this.set("inputArraysAb",null);
+         this.set("inputArraysAb", arrat);
+    },
 
 	attached(){
 		this.async(this.openDdr, 300);
@@ -363,19 +468,34 @@ FcCallCenterDialog=Polymer({
 		this.$.focusedCallInterface.falseClose();
 		this.$.focusedCallInterface.falseClose();
 	},
-	toggleSelection(e) {
+   _computePageNumber(index){console.log(index); var retVal = parseInt(index)+2;},
+	toggleSelection(e){
         var item = this.$.controllerList.itemForElement(e.target);
         var model=this.$.controllerList.modelForElement(e.target);
-        model.set("item.selectCheck",!model.item.selectCheck);
-        var index=this.selected.indexOf(item);
-        if(index<0){
-        	e.target.style.background="aliceblue";
-        	this.$.selector.select(item);
-    	}
-    	else{
-    		e.target.style.background="white";
-    		this.splice("selected",index,1);}
-      },
+        if(model.item.selectCheck&&(model.item.selectCheck===true||model.item.selectCheck===false))
+        {
+            model.set("item.selectCheck",!model.item.selectCheck);
+            var index=this.selected.indexOf(item);
+            if(index<0){
+        	   e.target.style.background="aliceblue";
+        	   this.$.selector.select(item);
+    	   }
+    	   else{
+    		  e.target.style.background="white";
+    		  this.splice("selected",index,1);
+            }
+        }
+    },
+_passSearchVals: function(e, detail){
+      console.log(e.detail.value, e.detail.name, "take Note here");
+      var name = e.detail.name;
+      var val = e.detail.value;
+        if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}
+      this.$.callList.updateSearchVals(this.searchVals, name, val);
+
+
+    },
+
  openDropdown(e){
 		var targ=e.target;
 		while(targ.nodeName!="PAPER-ICON-BUTTON"&& targ.nodeName!=="FC-DDR-CARD")

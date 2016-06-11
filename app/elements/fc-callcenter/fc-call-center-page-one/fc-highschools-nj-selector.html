@@ -58,7 +58,7 @@
       label="Current School" 
 			style="width: 100%;" 
 			selected="{{menuSelected}}">
-			<template is="dom-repeat" items="{{liArray}}" filter="{{_mySelectFilter(searchValue)}}">
+			<template is="dom-repeat" items="{{liArray}}" ><!-- filter="{{_mySelectFilter(searchValue)}}" -->
 				<paper-item value="{{item}}">{{item}}
 				</paper-item>
 			</template>
@@ -153,24 +153,11 @@ FcInputProSelect=Polymer({
          
       },
 
-  _mySelectFilter: function(searchValue){
-  return function(item) {
-    if (!searchValue) return true;
-    if (!item) return false;
-    return (item && ~item.indexOf(searchValue));
-    };
-  },
- 
 
   computefullPath: function(rootPath, instancePath){
     var olive = rootPath + '/' + instancePath; 
     return olive;
   },
-
-_ironSelected: function(selected)
-  {
-      // this.set("selectedMenu", this.njhs);
-    },
 
   computeStartListItems: function(fullPath, localStorageHs){
     var self=this;
@@ -180,72 +167,16 @@ _ironSelected: function(selected)
 
   },
 
-
-	computeliArray: function(startTempArray, startListItems, count, njhs){
-  this.tempArray =[];
-
-    	var counterOne = njhs.length;
-
-     return njhs;
-
-},
-
 	
 	attached:function(){
-    //  var olive = this.rootPath + '/' + this.instancePath;
-    //  this.set("fullPath", olive); 
-    // var items = localStorage.getItem("NJHIGHSCHOOLS");
-    // items=JSON.parse(items);
-    // console.log(items);
-    // this.set("njhs", items);
-    // console.log("i am in attached", this.njhs);
-    // this.set('liArray', this.njhs);
      var self=this;
      var ref = new Firebase(self.fullPath+"/"+self.fcid);
     ref.on("value", function(snap){
       var vald = snap.val();
-        // console.log(vald);
       self.set("njhs",vald); 
       self.set('liArray', self.njhs);
     });
   }
 });
 </script>
-</dom-module>
-<!--
- <template>
-    <div>[[arrayItem(myArray.*, 0, 'name')]]</div>
-    <div>[[arrayItem(myArray.*, 1, 'name')]]</div>
-  </template>
-
-  <script>
-    Polymer({
-
-      is: 'bind-array-element',
-
-      properties: {
-
-        myArray: {
-          type: Array,
-          value: [{ name: 'Bob' }, { name: 'Doug' } ]
-        }
-      },
-     
-      // first argument is the change record for the array change,
-      // change.base is the array specified in the binding
-      arrayItem: function(change, index, path) {
-        // this.get(path, root) returns a value for a path
-        // relative to a root object.
-        return this.get(path, change.base[index]);
-      },
-     
-      ready: function() {
-        // mutate the array
-        this.unshift('myArray', { name: 'Susan' });
-        // change a subproperty
-        this.set('myArray.1.name', 'Rupert');
-      }
-    });
-  </script>
-
 </dom-module>
