@@ -20,7 +20,7 @@ span, {
 
 textarea:focus,
 input:focus {
-  outline: 0;
+  outline: 1px green solid;
   margin-bottom: 6px;
 }
 
@@ -44,23 +44,28 @@ input.question + label{
   white-space: nowrap;
   padding: 0;
   margin: 0;
-/* width: 10%;*/
+width: 80%;
   border-top: 1px solid red;
   -webkit-transition: width 0.4s ease;
   transition: width 0.4s ease;
   height: 0px;
 }
 
-input.question:focus + label,
+input.question:focus + label
 {
-  width: 93%;
+  width: 99%;
+  border-top: 3px solid red;
+   -webkit-transition: width 0.3s ease, border-top .3s ease;
+  transition: width 0.3s ease, border-top .3s ease;
 }
-input.question:focus + label > span {
+input.question:focus + label > span{
 top: -53px;
-  z-index:3;
+  z-index:1;
   font-size: 16px;
   font-family: merriweather;
   color: #050;
+  -webkit-transition: color 0.3s ease, top .3s ease;
+  transition: color 0.3s ease, top .3s ease;
 }
 input.question:valid + label > span {
   top: 3px;
@@ -79,7 +84,7 @@ input.question:invalid{
 }
 
 
-input.question + label > span {
+input.question + label > span{
   font-weight: 300;
   margin: 0;
   position: absolute;
@@ -88,9 +93,17 @@ input.question + label > span {
   top: -26px;
   left: 0px;
   z-index: 0;
-  -webkit-transition: top 0.4s ease, font-size 0.4s ease, color 0.4s ease;
-  transition: top 0.4s ease, font-size 0.4s ease, color 0.4s ease;
+  -webkit-transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+  transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
 }
+/*input.question + label > span:active {
+  top: -53px;
+  z-index:1;
+  font-size: 16px;
+  font-family: merriweather;
+  color: #050;
+}*/
+
 
 input.question:valid  input[type="submit"], textarea.question:valid  input[type="submit"] {
   -webkit-animation: appear 1.2s forwards;
@@ -99,6 +112,14 @@ input.question:valid  input[type="submit"], textarea.question:valid  input[type=
 
 input.question:invalid  input[type="submit"], textarea.question:invalid  input[type="submit"] {
   display: none;
+}
+
+span.above {
+top: -53px;
+  z-index:1;
+  font-size: 16px;
+  font-family: merriweather;
+  color: #050;
 }
 
 @-webkit-keyframes appear {
@@ -121,8 +142,6 @@ input.question:invalid  input[type="submit"], textarea.question:invalid  input[t
   }
   .selectColor{
    background: orange;
-
-
   }
   input{outline: 0px;
     border: 0px;
@@ -138,6 +157,7 @@ input.question:invalid  input[type="submit"], textarea.question:invalid  input[t
       position: absolute;
       background-color: #efefef;
       min-width: 160px;
+      opacity: 0;
       box-shadow: 3px 8px 16px 5px #afafaf;
   }
 /*  / Links inside the dropdown /*/
@@ -155,24 +175,28 @@ input.question:invalid  input[type="submit"], textarea.question:invalid  input[t
    position: absolute;
    left: 5px;
   }
-  .show {display:block; z-index: 45; left:0px; right:0px; top:40px;}
+  .show {display:block; z-index: 45; left:0px; right:0px; top:30px; opacity: 1;
+         -webkit-transition: top 0.6 ease, display 0.6s ease, opacity 0.6s ease;
+  transition: top 0.6s ease, display 0.6s ease, opacity 0.6s ease;}
 
 </style>
-<array-selector id="selector" items="{{itemsArray}}" selected="{{selected}}" multi="{{multiSelected}}"></array-selector>
+<array-selector id="selector" items="{{dropdownItems}}" selected="{{selected}}" toggle multi="{{multiSelect}}"></array-selector>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="down" on-keys-pressed="onDownArrow"></iron-a11y-keys>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="up" on-keys-pressed="onUpArrow"></iron-a11y-keys>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="onEnter"></iron-a11y-keys>
 
 <div class="horizontal layout flex">
-	<paper-icon-button class="dropbtn" on-up="focusInput" hidden$="{{!itemSelectProperty}}"  icon="icons:dashboard" on-tap="toggleDropdownOpen">  
-  </paper-icon-button>
-	<div class="vertical layout dropdown">
-		<input id="issInput" class="question"required autocomplete="on" value="{{issValue::input}}" name="[[issName]]" on-down="openDropdown" on-up="focusInput">
-				<label for="issInput"><span on-down="focusInput">{{issLabel}}</span></label>
-			<paper-list-box id="dropdownlist" class="block dropdown-content" hidden="{{!dropdownItems}}" style="min-height: 220px; overflow-y: scroll;">
-		 		<template is="dom-repeat" id="controllerList" style="height: 2200px;" items="{{dropdownItems}}" filter="{{createFilter(issValue)}}">
-					<paper-item class="block" style="border: 1px silver solid;margin-top: 3px; color: #006; font-size: 20px; font-weight: 600;font-family:times;text-align: center;" on-tap="toggleSelection">
-          <span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span><span>{{_computeItemSelectedPropValue(item, dropdownItems,itemSelectProperty)}}</span>
+<paper-icon-button class="dropbtn" icon="icons:dashboard" on-tap="inputToggle"> 
+</paper-icon-button>
+<div class="vertical layout dropdown" on-down="focusInput">
+	<input id="issInput" class="question" required value="{{issValue::input}}" on-change="sortArrayForMultiSelect" name="[[issName]]">
+		<label for="issInput"><span on-tap="focusInput">{{issLabel}}</span></label>
+			<paper-list-box id="dropdownlist" class="block dropdown-content" hidden="{{!dropdownItems}}" style$="min-height:220px; max-height:{{maxHeight}}px; overflow-y: scroll;">
+		 		<template is="dom-repeat" id="controllerList" style="height: 2200px;" items="{{dropdownItems}}" observe="selectCheck value name propertyName val" filter="{{createFilter(issValue)}}">
+					<paper-item class="block" style="border: 1px silver solid;margin-top: 3px; color: #006; font-size: 20px; font-weight: 600;font-family:times;text-align: center;" on-up="toggleSelection">
+          <span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>
+
+          <span>{{_computeItemSelectedPropValue(item,index, itemSelectProperty)}}</span>
           </paper-item>
 		 		</template>
 		 	</paper-list-box>
@@ -183,28 +207,29 @@ input.question:invalid  input[type="submit"], textarea.question:invalid  input[t
 <script>
 FcInputSearchSelect=Polymer({
 	is:"fc-input-search-select",
-	// listeners:{"click":"elemclick"},
 	properties:{
 		issValue:{
-			type:String,
-			value:function(){return "";},
 			notify: true,
 		},
+    maxHeight: {
+      type: String,
+      value:function(){return "180";},
+      notify:true,
+     },
 		dropdownItems:{
 			type:Array,
       value:function(){return[];},
 			notify: true,
 		},
 		selected:{
-			type:Array,
-			value:function(){return [];},
 			notify: true,
 		},
 		target: {
     		type: Object,
     		value: function() {
       		return this.$.issInput;
-    			}, 
+    			},
+        // observer:"_observeInput", 
         notify: true
   		},
   		dropdownlist:{
@@ -228,162 +253,268 @@ FcInputSearchSelect=Polymer({
   		},
   	itemSelectProperty:{
   			type: String,
-  			value: function(){return "name";},
+  			value: function(){return "";},
   			notify: true
   		},
   	itemKeyStrokeIndex:{
   			type: Number,
-  			value: -1,
+  			value: function(){return -889;},
   			notify: true,
   		},
- 
-  
+    selectedArray:{
+        type: Array,
+        notify: true
+      },
+      issValueArray:{
+        type:Array,
+        value:function(){return [];},
+        notify: true,
+      },
       topHolder:{
       		type:Number,
       		value:function(){return 0;},
       		notify: true
       },
-  
-        multiSelected:{
+        multiSelect:{
         	type:Boolean,
         	value:function(){return false;},
         	notify: true,
-
         },
         dropdownOpen:{
         	type: Boolean,
         	value:function(){return false;},
-        	notify: true
+        	notify: true,
+          observer:"observeDropdown",
         },
         shadowIndex:{
         		type:Object,
-        		computed:"_computedSetterForIndex(multiSelected, dropdownOpen)",
+        		computed:"_computedSetterForIndex(multiSelect, dropdownOpen)",
         		notify: true,
         },
-        itemArray:{
-          notify:true,
-        },
-        item:{
-          obserever:"_observeItem",
+        startScrollTop:{
+          type: Number,
           notify: true
         },
-        
+        baseScrollTop:{
+          type: Number,
+          notify: true
+        },  
 	},//end properties
-	_observeItem(nv,ov){
-    console.log(nv,ov, "read these values");
-
+	ready(){
+    var retVal=(this.multiSelect===true)?[]:"";
+    this.set("selected",retVal);
+    retVal=(this.multiSelect===true)?Array:String;
+    this.set("selected.type", retVal);
+     },
+ attached(){
+  //console.log(this.$.dropdownlist.scrollTop);
+  this.set("startScrollTop",this.$.dropdownlist.scrollTop);
+  this.set("baseScrollTop",this.$.dropdownlist.scrollTop);
+ 
+ },
+ _computeItemSelectedPropValue(item, index,isp){
+       //console.log(index, "in itemSelectPropValue");
+ //       var pickle=function(){
+	 		var retval=(isp==="")?item:item[isp];
+       return retval;
+		
+	// 		//this.doItAgainTempVar=pickle(); 
+	// 	//}
+	// else{
+	// 	// this.async(this.doItAgain,1500);
+ //    return item;
+	// 	}
+	 },
+  	// doItAgain(){return this.call(this.doItAgainTempVar());}, REVISIT WHEN HOOKING UP SCHOOL CHOICE
+	focusInput(){
+    this.set("dropdownOpen",true);
+    this.async(function(){
+          this.$.issInput.focus();},50);
   },
-	_computeItemSelectedPropValue(item, isp){
-	  if(isp!==undefined){ 
-		var pickle=function(){
-			var retval=(isp==="__")?item:item[isp];return retval;
-			};
-			this.doItAgainTempVar=pickle(); 
-		return this.doItAgainTempVar;
-		}
-	else{
-		this.async(this.doItAgain,1500);
-		}
-	},
-	doItAgain(){return this.call(this.doItAgainTempVar());},
-	focusInput(){this.$.issInput.focus();},
-	openDropdown(){this.set("dropdownOpen",true);Polymer.dom(this.$.dropdownlist).classList.add("show");},
-  closeDropdown(){this.set("dropdownOpen",false);Polymer.dom(this.$.dropdownlist).classList.remove("show");},
+   blurInput(){
+    this.set("dropdownOpen",false);
+    this.async(function(){
+          this.$.issInput.blur();},20);
+ },
+  observeDropdown(newVal,oldVal){
+    if(newVal===true){
+        this.async(function(){Polymer.dom(this.$.dropdownlist).classList.add("show");}, 320);}
+    else{
+        this.async(function(){Polymer.dom(this.$.dropdownlist).classList.remove("show");}, 1220);
+          }
+        },
+  inputToggle(){
+  var retFunc=(this.dropdownOpen===false)?"focusInput": "blurInput";
+    //console.log(this.dropdownItems, "this is what y0ou want jasp");
+        this[retFunc]();
+  },
 	createFilter(issValue) {
+      var self=this, isp=self.itemSelectProperty;
         var regex = new RegExp('.*' + issValue + '.*', 'i');
         return function(item) {
-          return item.match(regex);
-      		};
+          if(self.multiSelect===true){return true;}
+          else if(item[self.itemSelectProperty]){return item[self.itemSelectProperty].match(regex);}
+          else if(item.value){return item.value.match(regex);}
+        };
       },
-  toggleDropdownOpen(){
-    	var setVal=(this.dropdownOpen)?["closeDropdown", false]:["openDropdown",true];
-    	this[setVal[0]]();
-    	this.set("dropdownOpen",setVal[1]);
-    },
-  _computedSetterForIndex(multiSelected, ddo){
-   		var setVal=(!ddo)?0:this.itemKeyStrokeIndex;
-   		this.set("itemKeyStrokeIndex", setVal);
-   		return setVal;
+  _computedSetterForIndex(multi, ddo){
+     // console.log("insetter for index",ddo, multi);
+   		// var setVal=(!ddo)?0:this.itemKeyStrokeIndex;
+   		// this.set("itemKeyStrokeIndex", setVal);
+   		// return setVal;
    	},
-   
-    toggleSelection(e){
-    	if(this.dropdownOpen===true){
-        var item = this.$.controllerList.itemForElement(e.target);
-        var model=this.$.controllerList.modelForElement(e.target);
-        if(!this.$.selector.multi || (this.$.selector.multi===true && (model.item.selectCheck && model.item.selectCheck===false))){
-        	this.$.selector.select(item);
-        	var setval=(!this.dropdownItems)?"":(this.itemSelectProperty==="---")?this.issValue: (this.itemSelectProperty==="__")?model.item:model.item[this.itemSelectProperty];
-        	this.set("issValue",setval);
-        	if(this.$.selector.multi===true){this.valueMap.set(item,this.issValue);}
-        		}
-    	else if(model.item.selectCheck && model.item.selectCheck===true){
-    		 this.$.selector.deselect(item); 
-    		 model.item.set("selectCheck",false);
-    		 this.valueMap.delete(item);
-    		 }
-		this.async(this.closeDropdown, 20);
-		this.set("dropdownOpen",false);
+  getDropdownChildren(){
+    var children=Polymer.dom(this.$.dropdownlist).children;
+        itemChildren=children.filter(function(val,index, array){
+              return (val.nodeName==="PAPER-ITEM");});
+        return itemChildren;
+  },
+  removeColorFromChildren(children){
+    var retChildren=children.map(function(val,index, array){
+      if(val.classList.contains("selectColor")){val.classList.remove("selectColor");}
+        return val;
+        });
+    return retChildren;
+    },
+  sortArrayForMultiSelect(e){
+    var valArr=this.issValue.split(",");
+    console.log(valArr);
+    var length=valArr.length;
+    var arr=this.issValueArray;
+    var size=arr.length;
+    var diff=size-length;
+    console.log(diff,valArr, arr);
+
+
+    
+  },
+  toggleSelection(e){
+    var item = this.$.controllerList.itemForElement(e.target);//console.log(item);
+    var model=this.$.controllerList.modelForElement(e.target);
+    //console.log(item,model);
+    var targ=e.target;
+    while(targ.nodeName!=="PAPER-ITEM"){targ=targ.parentElement;}
+    if(targ.nodeName==="PAPER-ITEM"){
+    	if(this.dropdownOpen===true && this.$.controllerList){
+              if(!this.$.selector.multi){
+               // Polymer.dom(targ).classList.add("selectColor");
+        	      var setval=(this.itemSelectProperty==="")?item:model.item[this.itemSelectProperty];
+                this.set("issValue",setval);
+                var children=this.getDropdownChildren();
+                Polymer.dom(children[0]).classList.add("selectColor");
+              }
+        	
+          else if(this.$.selector.multi===true&&model.item.selectCheck===true){
+    		    this.$.selector.deselect(item[this.itemSelectProperty]); 
+    		    model.set("item.selectCheck",false);
+            var index=this.issValue.indexOf(model.item[this.itemSelectProperty]);
+            this.set("issValue","");
+            index=this.issValueArray.indexOf(model.item[this.itemSelectProperty]);
+    		    this.splice("issValueArray",index, 1);
+            var showvalue=this.issValueArray.toString();
+            this.set("issValue", showvalue);
+            Polymer.dom(targ).classList.remove("selectColor");
+            //console.log(this.issValue, typeof this.issValue, this.issValue.length);
+          }    		  
+          else if(this.$.selector.multi===true&&model.item.selectCheck===false){
+            this.$.selector.select(item[this.itemSelectProperty]);
+            this.push("issValueArray",item[this.itemSelectProperty]);
+            model.set("item.selectCheck", true);
+            this.set("issValue",null);
+            Polymer.dom(targ).classList.add("selectColor");
+            var showvalue=this.issValueArray.toString();
+            this.async(function(){this.set("issValue", showvalue);}, 50);
+            // this.valueMap.set(item,this.issValue);
+          }
+        }
+		  this.set("dropdownOpen",false);
 		}
   },
-
-    onDownArrow(e){
-      	var children=Polymer.dom(this.$.dropdownlist).children;
-      	itemChildren=children.filter(function(val,index, array){
-      			if(val.classList.contains("selectColor"))
-      			{
-      				val.classList.remove("selectColor");
-      			} 
-      				return (val.nodeName==="PAPER-ITEM");
-      	});
-      	this.$.dropdownlist.focus();
-      	var size=itemChildren.length-1;
-      	if(this.itemKeyStrokeIndex>=size){
-      		this.set("itemKeyStrokeIndex",0);
-      	}
-      	else if(this.itemKeyStrokeIndex==-1){this.set("itemKeyStrokeIndex",0);}
-      	else{this.set("itemKeyStrokeIndex", this.itemKeyStrokeIndex+1);}
- 		var elem=itemChildren[this.itemKeyStrokeIndex];
- 		elem.classList.add("selectColor");
- 		var rectBttm=elem.getBoundingClientRect(),
- 		scrolltop=this.$.dropdownlist.scrollTop,
- 		delta=rectBttm.height+3;
- 		this.$.dropdownlist.scrollTop=this.$.dropdownlist.scrollTop+delta;
- 		this.set("topHolder", rectBttm);
+    updateAllyKeyChangedItemInColumnPosition(dy, elem){
+        this.trackDelta = dy || this.trackDelta || 0;
+        //console.log(this.trackDelta);
+        var scrollDelta = this.$.dropdownlist.scrollTop - this.startScrollTop;
+        var pos = this.trackDelta + scrollDelta;
+        this.translate3d(0, -pos + 'px', 0, elem);
     },
-      onUpArrow(e){
-      	var scroller=this.$.dropdownlist,
-  		children=Polymer.dom(scroller).children;
-      	itemChildren=children.filter(function(val,index, array){
-      			if(val.classList.contains("selectColor"))
-      			{val.classList.remove("selectColor");} 
-      				return (val.nodeName==="PAPER-ITEM");
-      	});
-      	var size=itemChildren.length-1;
-      	console.log(size);
-      	if(this.itemKeyStrokeIndex==0){this.set("itemKeyStrokeIndex", size);}
-      	else{this.set("itemKeyStrokeIndex", this.itemKeyStrokeIndex-1);}
-      	var elem=itemChildren[this.itemKeyStrokeIndex];
+    onDownArrow(e){
+          this.set("startScrollTop", this.$.dropdownlist.scrollTop);
+      	 var children=this.getDropdownChildren(),setterBase=this.itemKeyStrokeIndex;
+         var last=(children.length-1),oneLess=(setterBase-1),oneMore=(setterBase+1);
+         var bool=children[last]._templateInstance.item.selectCheck;
+         var element=children[oneMore]; 
+         var preSib=children[setterBase];
+         var clas="selectColor";
+         var func="classFollows";
+         // //console.log(clas, bool, elem,previous);
+          if(this.itemKeyStrokeIndex<0||this.itemKeyStrokeIndex===last){
+            this.set("itemKeyStrokeIndex", 0);
+            var elem=children[this.itemKeyStrokeIndex];
+            var previous=children[last];
+            var setVal=[func, clas,elem,previous,0];
+            Polymer.dom(elem).classList.add(clas); 
+            this[setVal[0]](setVal[1],setVal[2],setVal[3]);
+            element=elem;
+          }
+          else{
+   
+          var setVal=(setterBase===last&&children[last]._templateInstance.item.selectCheck===false)?["classFollows",clas, children[0],children[last],0, "ONE"]:["classFollows",clas, children[oneMore], children[setterBase],oneMore, "TWO"];
+          //console.log("inelse else", setVal,setVal[5]);
+        
+            this.set("itemKeyStrokeIndex",setVal[4]);
+            this[setVal[0]](setVal[1],setVal[2],setVal[3]);
+          }
+            var boundRect=element.getBoundingClientRect();
+            var delta=boundRect.height+3;
+            this.$.dropdownlist.scrollTop=(this.$.dropdownlist.scrollHeight - this.$.dropdownlist.scrollTop === this.$.dropdownlist.clientHeight)?this.baseScrollTop:this.$.dropdownlist.scrollTop+delta;       
+    },
+
+    onUpArrow(e){
+      	var children=this.getDropdownChildren();
+        var last=(children.length-1);
+        setVal=(this.itemKeyStrokeIndex==0)?last:(this.itemKeyStrokeIndex-1);  ;  	
+        this.set("itemKeyStrokeIndex",setVal);
+        children=this.removeColorFromChildren(children);
+      	var elem=children[this.itemKeyStrokeIndex];
       	elem.classList.add("selectColor");
       	var rect=elem.getBoundingClientRect(),
       	ht=window.getComputedStyle(elem,null).getPropertyValue("height"), 
       	height=rect.height;
- 		this.$.dropdownlist.scrollTop=this.$.dropdownlist.scrollTop-(Math.floor((height+ht)/2)+2);
+ 		   this.$.dropdownlist.scrollTop=this.$.dropdownlist.scrollTop-(Math.floor((height+ht)/2)+2);
       },
-      onEnter(e){
-      	 var children=Polymer.dom(this.$.dropdownlist).children;
-      	itemChildren=children.filter(function(val,index, array){
-      		if(val.classList.contains("selectColor"))
-      			{val.classList.remove("selectColor");}
-      			return (val.nodeName==="PAPER-ITEM");
-      	});
-      		if(this.itemSelectProperty=="__"){this.set("issValue",itemChildren[this.itemKeyStrokeIndex]._templateInstance.item);}
-        	else if(this.itemSelectProperty!=="__")
-          {
-     		   var value=itemChildren[this.itemKeyStrokeIndex]._templateInstance.item[this.itemSelectProperty];
-     		   this.set("issValue", value);
-     	    }
-     		   this.closeDropdown();
-        },
+    onEnter(e){
+      var children=Polymer.dom(this.$.dropdownlist).children;
+      if(this.itemSelectProperty===""){
+        this.set("issValue",children[this.itemKeyStrokeIndex]._templateInstance.item);
+        children=this.getDropdownChildren();
+        var elem=children[0];
+        Polymer.dom(elem).classList.add("selectColor"); 
+
+      }
+      else if(this.multiSelect===false){
+        var value=children[this.itemKeyStrokeIndex]._templateInstance.item[this.itemSelectProperty];
+        this.set("issValue", value);
+        }
+      else if(this.multiSelect===true){
+         var value=children[this.itemKeyStrokeIndex]._templateInstance.item[this.itemSelectProperty];
+        var model=children[this.itemKeyStrokeIndex]._templateInstance;
+         this.set("issValue","");
+        if(children[this.itemKeyStrokeIndex]._templateInstance.item.selectCheck===true){
+          model.set("item.selectCheck", false);
+          var index = this.issValueArray.indexOf(value);
+          this.splice("issValueArray",index, 1);
+          var newVal=this.issValueArray.toString();
+          this.set("issValue", newVal);
+        }
+        else{ 
+              model.set("item.selectCheck", true);
+              this.push("issValueArray", value);
+               var newVal=this.issValueArray.toString();
+              this.set("issValue", newVal);
+            }
+      }
+      if(this.$.selector.multi===false){this.blurInput();}
+    },
 
   
 });

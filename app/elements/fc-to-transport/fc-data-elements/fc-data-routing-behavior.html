@@ -38,9 +38,219 @@ properties:{
     			return map;},
     		notify: true
     		},
-    	},
+    _aStaffFcid:{
+			type: String,
+			notify: true
+		},  
+		_qoa: {
+			type: Array, 
+			notify: true
+		},
+		callLogFormOneObject: {
+			type: Object,
+			notify: true
+		},
+		dataSource: {
+			type: Array,
+			notify: true
+		},
+		dataSourceInputMap: {
+			type: Object,
+			notify: true
+						},			
+		location:{
+			type: String,
+			notify: true
+		},
+		isSecondParent:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		isAddAddress:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		addCourses:{
+			type: Boolean,
+			value: false,
+			notify: true 
+		}, 
+		isPreviousCaller:{
+			type: Boolean,
+			value: false,
+			notify: true
 
+		},
+		dataSource: {
+			type: Array,
+			notify: true
+		},
+		 rootPath: {
+          type: String,
+          value: function()
+              { var rootPath= "https://focusedstaging1.firebaseio.com";
+                return  rootPath;
+              },
+          notify: true
+        },
+        callRecordPath:{
+        	type: String,
+        	value: function(){return "/inquiries"}
+        },
+        fcStudent: {
+        	type: Object,
+        	value: {},
+        	observer: "fcStudentSelected",
+        	notify: true
+        },
+        searchVals:{
+        	type: Object,
+        	value: {},
+        	notify: true,
+        	reflectToAttribute: true
+        },
+			dataSourceInputMap: {
+			type: Object,
+			notify: true
+						},			
+		location:{
+			type: String,
+			notify: true
+		},
+		isSecondParent:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		isAddAddress:{
+			type:Boolean,
+			value: false,
+			notify: true
+		},
+		addCourses:{
+			type: Boolean,
+			value: false,
+			notify: true 
+		}, 
+		isPreviousCaller:{
+			type: Boolean,
+			value: false,
+			notify: true
+
+		},
+		dataSource: {
+			type: Array,
+			notify: true
+		},
+		 rootPath: {
+          type: String,
+          value: function()
+              { var rootPath= "https://focusedstaging1.firebaseio.com";
+                return  rootPath;
+              },
+          notify: true
+        },
+        callRecordPath:{
+        	type: String,
+        	value: function(){return "/inquiries"}
+        },
+        fcStudent: {
+        	type: Object,
+        	value: {},
+        	observer: "fcStudentSelected",
+        	notify: true
+        },
+        searchVals:{
+        	type: Object,
+        	value: {},
+        	notify: true,
+        	reflectToAttribute: true
+        },
+	},//end of properties
+
+
+ready: function(){ 
+		var d = new Date();
+		var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		this.daysOfWeek = days[d.getDay()].toString();  
+		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		this.month = months[d.getMonth()].toString().slice(0,3);
+		console.log(this.month);
+
+		var day = this.day = d.getDate().toString();
+		console.log(d);
+		var year = this.year = d.getFullYear().toString();
+		this.timeStamp = days[d.getDay()].toString().slice(0,3) +'.' + ' ' + this.month + ' ' + day + ',' + ' ' +year;
+	},
+
+	fcStudentSelected: function(newVal, oldVal)
+	{
+		console.log(newVal, oldVal);
+		if(newVal!={} && newVal.FcStudent!=null)
+		{	//console.log(newVal);
+			var profile=newVal.FcStudent.profile;
+			//console.log(profile);
+			var prokeys =Object.keys(profile);
+			//console.log(prokeys);
+			var counter=prokeys.length;
+			//console.log(counter);
+			var pasta =newVal.FcStudent.pastacademics;
+			//console.log(pasta);
+			var pastakeys=Object.keys(pasta);
+			var len =pastakeys.length;
+			//console.log(pastakeys); 
+			var arr=[];
+			arr = Polymer.dom(this.root).querySelectorAll('fc-input-search-select');
+			var i=0;
+			//console.log(arr);
+			for(i=0; i<counter; i++)
+			{
+				arr.forEach(function(elem, index, arr){
+			
+					if(elem.name==prokeys[i])
+						{
+							elem.value=profile[prokeys[i]];
+							console.log(elem.value);
+						}
+					if((len-i)>0 && elem.name==pastakeys[i])
+						{
+							elem.value=pasta[pastakeys[i]];
+							elem.selected=pasta[pastakeys[i]];
+							console.log(elem.value);
+						}
+					console.log(elem.name, elem.value);
+				});
+			}
+		}
+	},
+	_sendInputChanged: function(e, detail){
+		
+		var target=e.target;
+		while(target.nodeName!=="FC-INPUT-PRIME"){
+			console.log(target.nodeName, e.target.value);
+			target=target.parentNode;
+		}
+		var name=target.name;
+		this.fire("sendInputVal", {value: e.target.value, name: name});
+		this.searchVals[name]=e.target.value;
+	},
+_computeProfileObj: function(dataSource){
+	console.log(dataSource.itemValue);
+},
+_compute_atFocusedProgramFit: function(ak){
+		var returnVal =("focusedProgramFit"=="Grade 4")?["Young Scholars Reading","Young Scholars Math"]:("focusedProgramFit"=="Grade 5")?["Young Scholars Reading","Young Scholars Math", "Young Scholars:Young Authors"]:("focusedProgramFit"=="Grade 6")?["Young Scholars Reading","Young Scholars Math","Young Scholars:Young Authors","PSAT 8/9"]:("focusedProgramFit"=="Grade 7")?["PSAT 8/9","Young Scholars Reading","Young Scholars Math","Young Scholars:Young Authors","Focused1600Prep"]:("focusedProgramFit"=="Grade 8")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II: True Scholarship"]:("focusedProgramFit"=="Grade 9")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II:Deep Learning"]:("focusedProgramFit"=="Grade 10+")?["1600 SAT","PSAT-NMSQT","PSAT 10"]:["1600 SAT"];
+			return returnVal;
+	},
+_computeTimeStampUseful: function(timeStamp, callLogFormOneObject){
+		var d = new Date();
+		var n = -d.getTime();
+		console.log(n);
+		return n;
+},
 
   	_computefullPath(rootPath, instancePath){
-    var olive = rootPath + '/' + instancePath; 
-    return olive;
+    	var olive = rootPath + '/' + instancePath; 
+    	return olive;},
+</script>

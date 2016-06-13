@@ -1,7 +1,26 @@
 <dom-module id="fc-call-center-form">
 <template id="fc-call-center-form-template">
 <style>
-:host{margin-top: 12px;}
+:root{
+--paper-card-mid-sized:{
+        width: 100%;
+        padding: 4px;
+        margin: 6px 2px 6px 2px;
+        --paper-card-header-image-text:{color:#009; position: absolute; right: 16px; top: 28px;}
+        --paper-card-header-image: {width: 85px; height: 44px; margin: 8px; padding: 8px;};
+        --paper-card-header:{height: 70px; border-bottom: double 6px green;}
+      };
+  }
+:host{margin-top: 12px;
+}paper-card{
+        width: 100%;
+        padding: 4px;
+        margin: 6px 2px 6px 2px;
+        --paper-card-header-image-text:{color:#009; position: absolute; right: 16px; top: 28px;}
+        --paper-card-header-image: {width: 85px; height: 44px; margin: 8px; padding: 8px;};
+        --paper-card-header:{height: 70px; border-bottom: double 6px green;}
+  
+    };
   paper-card{
         width: 100%;
         padding: 8px;
@@ -198,7 +217,7 @@
         margin:8px;
         padding:8px;
     }
-    @media(max-width: 540px){
+    @media(max-width: 570px){
     .container{
         width: 99%;
         @apply(--layout-vertical);
@@ -207,14 +226,28 @@
         @apply(--layout-wrap);
         @apply(--layout-flex-grow);
         @apply(--flex-grow);
-    }
+    };
+  }
+   @media(max-width: 570px){
+    paper-card{
+        width: 100%;
+        padding: 4px;
+        margin: 6px 2px 6px 2px;
+        --paper-card-header-image-text:{color:#009; position: absolute; right: 16px; top: 28px;}
+        --paper-card-header-image: {width: 85px; height: 44px; margin: 8px; padding: 8px;};
+        --paper-card-header:{height: 70px; border-bottom: double 6px green;}
+  
+    };
+    @apply(--paper-card-header-image-text);
+    @apply(--paper-card-header-image);
+    @apply(--paper-card-header);
 }
 </style>
   <paper-card heading="Intake Form" elevation="3" class="intakeForm vertical layout" image="../../../images/FC_frontpage_logo.png">
         <span style="position: absolute; right: 80px; top: 38px;">Page {{pageNumber}} of <content select=".pageTotal"></content></span>
                <section>
         <span class="timestamp">
-        [[time]], on [[date]]
+        [[time]] on [[date]]
         </span>
          <span class="subheading">
         * Indicates a Required Field
@@ -222,17 +255,17 @@
         </section>
   <div class="card-content">
     <div class="vertical layout self-stretch nowrap" >    
-      <template is="dom-repeat" items="{{itemObject}}">
+      <template is="dom-repeat" id="inputTemplate" items="{{itemObject}}">
         <section class="horizontal layout container holderClass"> 
         <span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
       </section>
       <div class="horizontal layout flex wrap stretch center center-justified">
         <section class="container holderClass">
-          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="{{item.propertyNameA}}" dropdown-items="{{item.dropdownItemsA}}">
+          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
           </fc-input-search-select>
         </section>
         <section class="container holderClass">
-          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="{{item.propertyNameB}}" class="right"  dropdown-items="{{item.dropdownItemsB}}">
+          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
           </fc-input-search-select>
         </section>        
     </div>
@@ -253,9 +286,13 @@ FcCallCenterForm=Polymer({
     is:"fc-call-center-form",
     properties:{
     	time:{
-			type:Date,
-			value:function(){
-					var time=new Date().toLocaleTimeString();
+		    type:Date,
+        value:function(){
+  					var time=new Date().toLocaleTimeString(),
+            spliceLocation =(time.charAt(1)===":")?4:5;
+            time=time.split("")
+            time.splice(spliceLocation,3)
+            time=time.toString().replace(/,/g,"")
 					return time;
 			},
 			notify: true
@@ -280,14 +317,14 @@ FcCallCenterForm=Polymer({
         value:function(){return },
         notify: true,
       },
-      item:{
-        notify: true,
-       
-      },
       itemObject:{
         type:Array,
         notify: true,
         
+      },
+      currentHeight:{
+        type: String,
+        notify: true
       },
     
 	},
@@ -295,6 +332,7 @@ FcCallCenterForm=Polymer({
   computeItemHeaderHidden(header){
     if(header){return false;}else{return true;}
   },
+  
 
 
 });
