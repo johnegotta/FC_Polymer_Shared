@@ -2,10 +2,10 @@
 <template>
 	<style>
 		:host{
-			position: relative;
+			position: static;
 			top: 0px;
 			bottom: 0px;
-			right: 0px;
+			left: 0px;
 			width: 100%;
 			min-height: 100vh;
 			height: 100%;
@@ -13,6 +13,7 @@
 			max-width: 98vw;
 			display: flex;
 			border-left: 48px solid #aedefe;
+			@apply(--layout-horizontal-flex);
 
 			box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);
 
@@ -21,7 +22,7 @@
 									/*overflow-x: hidden;*/
 									color: black;
 									font-weight: 700;
-									/*background: #7baaf7;*/
+									background: #7baaf7;
 									border-left: 3px solid #f7cb4d;
 									border-right: 3px solid #f7cb4d;
 									};
@@ -127,17 +128,26 @@ neon-pages{
         				<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]" inside-selection="{{secondarySelected}}">
         					<fc-value-holder div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>
         						<div class="head" >
-									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails]]">
+									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails2]]">
 									</fc-input-generator>
         						</div>
 								<div class="main left">
 									<iron-pages attr-for-selected="data-trans" selected="[[secondarySelected]]">
-										<template id="secondPages" is="dom-repeat" items="[[item.tabDetails]]" as="second">
+									<div width="100%">
+										<template id="secondPages" is="dom-repeat" items="[[item.tabDetails2]]" as="second">
 										<div mode="seamed" data-trans$="{{second.tabName}}">
 
-											<div paper-header class="flex self-stretch" style="min-height: 50px; background: magenta; width:50vw-64px;height: 100%; padding: 25px;">{{second.tabName}}</div>
-											<!-- <fc-input-layout-test class$="[[second.pageClass]]" layout-classes$="[[second.layoutClass]]">
-											</fc-input-layout-test> -->
+											<div paper-header class="flex self-stretch" style="min-height: 50px; margin-top: 24px; background: magenta; width:50vw-64px;height: 100%; padding: 25px;">{{second.tabName}}</div>
+											<div id="tabContentContainer" class="tabeContentContainer">
+
+											{{second.name}} select {{second.selected}}
+
+												<content>
+
+
+												</content>
+
+											</div>
 										</div>
 										</template>
 									</iron-pages>
@@ -363,13 +373,13 @@ neon-pages{
  							"isFirepad": false,
  							"tabPageClass":"left main",
  							"divId":'firepad', 
- 							"tabDetails": [
+ 							"tabDetails2": [
 								            { "tabName": "Titling",
 											  "pageLinkId": "contentSavingPage",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "layoutClass": "buttons layout stretch center",
+											  // "layoutClass": "buttons layout stretch center",
 											},
 											{ "tabName": "Content",
 											  "pageLinkId": "firePadPrime",
@@ -625,7 +635,7 @@ _onCloseMe: function(e) {
 				this.set('mySelected', 'default');
 			},
 ready: function(){
-	// (this.firepadElement)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue in drawer', this.firepadElement);
+	 (this.firepadElement)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue in drawer', this.firepadElement);
 	},
 });
 

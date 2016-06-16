@@ -1,15 +1,23 @@
 <dom-module id="fc-dashboard-divisions">
    <template strip-whitespace>
   <style>
-  :host{overflow-y: scroll;
+  :host{
     @apply(--vertical-layout);
-    @apply(--layout-fit);
     position: absolute;
     top: 0px;
     bottom: 0px;
     left:0px;
     right: 0px;
     overflow: hidden;
+  }
+  @media all and (min-width: 640px){
+
+  }
+  #dashboardRightDrawer{
+     height: 101vh; background:white; position: absolute; right: 0px; top: 0px; bottom: 0px; left
+  }
+  #dashboardLeftDrawer{
+     height: 101vh; border-right: 2px green solid; position: absolute; left: 0px; top: 0px; bottom: 0px; z-index:999999999999;
   }
     .container {
       min-height: 99vh;
@@ -53,15 +61,19 @@
     [flex] {
       @apply(--layout-flex);
     }
+     .contentContainer {
+        position: relative;
+
+        height: 100%;
+        top: 0px; bottom: 0px;  
+      }
     iron-splitter{
       z-index:2;
       position: static;
     }
   </style>
-<paper-material class="container horizontal layout flex">
-<!--left-drawer begins-->
-<!--hidden="{{!isResizing}}"-->
-<div class="horizontal layout flex self-stretch" is-resizing dragging draggable id="dashboardLeftDrawer" is-resizing style$="width:{{dashboardLeftDrawerCurrentWidth}}px; height: 101vh; border-right: 2px green solid; position: absolute; left: 0px; top: 0px; bottom: 0px; z-index:999999999999;">
+<paper-material class="horizontal layout flex">
+<div class="horizontal layout flex self-stretch" is-resizing dragging draggable id="dashboardLeftDrawer" is-resizing style$="width:{{dashboardLeftDrawerCurrentWidth}}px;">
       
   <div class="vertical layout flex" style="min-height: 102vh; background: white;">     
     <template is="dom-repeat" id="widgetHolder" items="{{widgets}}" as="widget">
@@ -84,13 +96,13 @@
         </section>
     </section>
   </div>
-<section on-down="dragsOff" id="dashboardLeftDrawer_resizer" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position: relative; left:calc( {{dashboardLeftDrawerCurrentWidth}}+12)px; bottom:0px; top: 0px; min-width: 44px!important;margin-right:-22px; height: 103vh; cursor:ew-resize; padding: 4px; width: 133px!important; opacity: 1; background: orange; border-right: 13px solid red; z-index: 9898989898989898898;">
+<section on-down="dragsOff" id="dashboardLeftDrawer_resizer" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position: relative; left:calc( {{dashboardLeftDrawerCurrentWidth}}+12)px; bottom:0px; top: 0px; min-width:22px!important; height:103vh; cursor:ew-resize; padding: 4px; width: 16px!important; opacity: 1; background: orange; border-right: 13px solid red; z-index: 9898989898989898898;">
 </section>
 
 </div>
 <!--Drawer-End-->
    <!--BOX CONTAINER ON DASHBOARD LAYOUT-->
-  <div class="container horizontal layout flex-6" style$="position: relative; top: 0px; bottom: 0px; height:[[currentHeight]]; right:0px;"> 
+  <div class="contentContainer horizontal layout" id="contentContainer" style$="width:100%; position: relative; margin-right:[[dashboardRightDrawerCurrentWidth]]px; margin-left:{{dashboardLeftDrawerCurrentWidth}}px;"> 
   <!--LEFT COLUMN CONTAINER ON DASHBOARD LAYOUT-->
     <div id="box11">
       <!--Left-TOP BOX FOR ZONE in LEFT COLUMN-->
@@ -101,21 +113,21 @@
       </div>
       <!--END LEFT TOP BOX IN DASH BOARD-->
       <!--LEFT COLUMN SPLITTER(row creator)-->
-          <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up">
+          <iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #aeaeae; max-width: 100vh;" ;" direction="up">
           </iron-splitter>
       <!--END LEFT COLUMN SPLITTER(row creator)-->
       <!--BEGIN BOTTOM HALF OF LEFT COLUMN-->
       <div id="box4" class='flex dropzone'  style="overflow-y:scroll;" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
             <fc-relative-fit-wrapper id="wrapper2" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-              <fc-ddr-card>
+              <fc-ddr-card is-resizing>
                     <content select=".leftBottom">
 
                     </content>
               </fc-ddr-card> 
-      </fc-relative-fit-wrapper> 
+          </fc-relative-fit-wrapper> 
    </div>
   </div>
-    <iron-splitter style="top: 0px; bottom:0px; background: blue; width: 24px;  border: 2px solid gold;" direction="left"></iron-splitter>
+    <iron-splitter style="top: 0px; bottom:0px; background: silver; width: 12px;  border: 2px solid #aeaeae;" direction="left"></iron-splitter>
 
 
   <div id="box5" class="flex">
@@ -124,38 +136,28 @@
                 <content select=".rightTop"></content>
             </fc-relative-fit-wrapper>
         </div>
-  <iron-splitter style="background: blue; height: 24px;border: 2px solid gold;" direction="up">
+<iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #aeaeae; max-width: 100vh;" direction="up">
+          </iron-splitter>
   </iron-splitter>
-      <div class="flex layout self-stretch dropzone" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop" style="overflow-y:scroll;">
+      <div class="flex layout dropzone" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop" style="overflow-y:scroll;">
           <fc-relative-fit-wrapper id="wrapper4" cws="in" class="item wrapper" current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-track="dragAndDrop" draggable drags>
             <content select=".rightBottom"></content>
           </fc-relative-fit-wrapper>
       </div>
   </div>
   </div>
-  <div class="horizontal layout flex self-stretch end" is-resizing dragging draggable id="dashboardRightDrawer" is-resizing style$="width:{{dashboardRightDrawerCurrentWidth}}px; height: 101vh; background:white; position: absolute; right: 0px; top: 0px; bottom: 0px; left:">
-<section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 4px; width: 13px!important; max-width:13px; opacity: 1; border-left: 3px solid orangered; z-index:223300; background: purple;">
+  <!--Start Right Drawer-->
+  <div class="horizontal layout flex end" is-resizing dragging draggable id="dashboardRightDrawer" style$="width:{{dashboardRightDrawerCurrentWidth}}px;" >
+<section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 4px; width:18px!important; opacity:1; border-left: 5px solid orangered; z-index:223300; background: purple;">
 </section>
-  <div class="vertical layout flex" style="position: absolute; right:0px; top: 0px; bottom: 0px; min-height: 102vh; background: white;">     
-    <template is="dom-repeat" id="widgetHolder" items="{{widgets}}" as="widget">
-    <section class="horizontal flex layout wrap" style="margin-left: 32px;">
-      <section style="height: 36px; width: 36px; overflow: hidden; margin: 16px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae; border-radius: 50%; z-index: 34;" parent-cws="out" on-up="handleDrop" text="{{widget.name}}">
-        <fc-relative-fit-wrapper id="wrapper{{index}}" on-track="dragAndDrop" class="item wrapper" cws="out" on-track="dragAndDrop" draggable drags>
-       </fc-relative-fit-wrapper>
-    </section>
-    <span>
-  </span>
-    <span class="horizontal layout center justified">{{widget.nodeName}}</span>
-  </section>
-</template>
+  <div class="vertical layout flex" style="position:relative; right:0px; top: 0px; bottom: 0px; min-height: 102vh; background: white;">     
+    
+                   <fc-right-tabbed-drawer icon-array="{{resetIconArray}}" config-object="" class="fit">
+                     <fc-value-holder data-object-array=""data-object-array="{{dataObjectArray}}" is-firepad="[[item.isFirepad]]"></fc-value-holder>
+                   </fc-right-tabbed-drawer>
+            
 
-    <section class="horizontal flex layout wrap" style="margin-left: 32px;">
-        <section style="height: 36px; width: 36px; overflow: hidden; margin: 16px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae; border-radius: 50%; z-index: 34;" parent-cws="out" on-up="handleDrop" text="{{widget}}">
-            <fc-relative-fit-wrapper id="wrapper2" on-track="dragAndDrop" class="item wrapper" cws="out" on-track="dragAndDrop" draggable drags>
-                      <content select=".rightDrawer"></content>
-            </fc-relative-fit-wrapper>
-        </section>
-    </section>
+ 
   </div>
 </div>
   </paper-material>
@@ -165,10 +167,50 @@
 FcDashboardDivisions=Polymer({
     is:"fc-dashboard-divisions",
     behaviors:[Polymer.IronResizableBehavior],
+
+      listeners: {
+        // 'tap': '_tapHandler',
+        'app-drawer-reset-layout': 'resetLayout'
+      },
+
+      observers: [
+        'resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'
+      ],
+
     properties:{
-        currentHeight:{
+      isResizing:{
+        type:Boolean,
+        value:function(){return false;},
+        notify: true,
+      },
+      currentHeight:{
         notify: true
         },
+    deltaOfTheDrag:{
+      type:Number,
+      notify: true,
+
+    },
+    params:{
+      type:Object,
+      value:function(){return {"hasAuth":true,"databaseUpdateWaiting":false, "id":"longJohnSilver_00001","lastConfig":"someDataDetailsConfig"};},
+      notify: true
+    },
+    stateChanged: {
+      type:Array,
+      computed:"_computeStateChanged(params)",
+      notify: true,
+    },
+  dataDetails:{
+      type:Array, //key: value array of arrays.
+      value:function(){return [["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""]];},
+      notify:true,
+    },  
+  dashboardInitializationObserver:{
+    type: Object,
+    computed:'computeDashBoardElementInitialization(screenWidth, screenHeight,stateChanged)',
+    notify: true,
+    },
 fauxSheight:{
   type: Number,
     notify: true
@@ -178,29 +220,15 @@ fauxSheight:{
     value:function(){return 175;},
     notify: true
   },
-
-  ldid:{
-    type: String,
-    value: "dashboardLeftDrawer"
+  notifyDescendants:{
+    type: Boolean,
+    value:function(){return true;},
+    notify: true,
   },
   dashboardRightDrawerCurrentWidth:{
       type: Number,
       value: function(){return 175;},
       notify: true,
-  },
-  webAddress:{
-    type:String,
-    value:function(){
-      return "http://localhost:3000";
-    },
-    notify: true,
-  },
-  webAddresses:{
-    type:Array,
-    value: function(){
-     return ["http://localhost:3000","http://localhost:3000/#!/testarea1","http://localhost:3000/#!/testarea2",'http://localhost:3000/#!/users', 'http://localhost:3000/#!/user-info','http://localhost:3000/#!/user-info', 'http://localhost:3000"/#!/reading',"http://localhost:3000/#!/reading"];
-  },
-    notify: true,
   },
   isWrapper:{
     type: Boolean,
@@ -214,8 +242,16 @@ fauxSheight:{
   wrapperDragEl:{
     type: Object,
     notify: true 
+  },
+  dataObject:{
+    type:Object,
 
   },
+   iconArray2:{
+        type: Array,
+        
+                        notify: true,
+                       },
   counter:{
     type:Number,
     value:0,
@@ -223,21 +259,64 @@ fauxSheight:{
   },
   widgets:{
     type:Array,
-    value:function(){return [{"name":FcGridCellTempl,"show":true, "nodeName": "FC-GRID-CELL-TEMPL"}, {"name":FcGridContainer,"show":true, "nodeName":"FC-GRID-CONTAINER"},{"name":FcMappedGrid,"nodeName": "FC-MAPPED-GRID", "show":true},{"name":FcRqtversionc,"nodeName":"FC-RQTCVERSIONC","show":true},{"name":FcDragMenuProto,"showDash":false}];},
-    //note here that I am giving the actual constructor functions, not the strings of the names.  The strings of the names didnt work, as they are not defined locally, so a this[arrayOfStringsNamesOfFunctions[ArrayNumberNeeded](ArgArray[0],ArgArray[1],ArgArray[2],ArgArray[3]...etc.) wont work.  
+    value:function(){return [
+        {"name":"FcGridCellTempl", 
+        "thisConstructor":FcGridCellTempl,
+        "show":true, 
+        "nodeName": "FC-GRID-CELL-TEMPL",
+        "class":"fcGridCellTempl_valueElement", 
+        "id":"fcGridCellTempl",
+        "mappedKeys":this.path,
+        "handler": this.ObjectPropertyHandler,
+        "hashPath":"local-host:3000/fcDashboardDivisions"
+        }, 
+        { 
+        "thisConstructor":FcGridContainer,
+        "show":true,
+        "id":"fcGridContainer", 
+        "nodeName":"FC-GRID-CONTAINER" 
+        },
+        { "thisConstructor":FcMappedGrid,
+            "nodeName": "FC-MAPPED-GRID", 
+            "show":true,
+            "name":"fcMappedGrid",
+            "id":"fcMappedGrid",
+
+          },
+          {"thisConstructor":FcRqtversionc,
+          "nodeName":"FC-RQTCVERSIONC",
+          "show":true,
+        },{"thisConstructor":FcDragMenuProto,"name":"fcRqtcVersionC","show":false}];},
+    
     notify: true,
   },
   parentDragEl:{
     type: Object,
     notify: true //note this is the parent of both the wrapper and the cell template--it is the cell
   },
+  resetIconArray:{
+    type:Array,
+    value:function(){return[]},
+    notify: true,
+  },
+
+    responsiveWidth: {
+          type: String,
+          value: '980px'
+        },
+
+    narrow: {
+          type: Boolean,
+          readOnly: true,
+          notify: true
+        },
   screenWidth:{
       type: Array,
       value: function(){
         var widthArray=[];
-            var numberWidth=parseInt(window.innerWidth);
+            var numberWidth=Math.ceil(window.innerWidth*(.94));
             widthArray.push(numberWidth);
-            var width=window.innerWidth;
+            var width=numberWidth.toString()+"px";
             widthArray.push(width);
             return widthArray;
       },
@@ -246,12 +325,12 @@ fauxSheight:{
   screenHeight:{
       type: Array,
       value: function(){
-        var widthArray=[];
-            var numberHeight=parseInt(window.innerHeight);
-            widthArray.push(numberHeight);
-            var width=window.innerHeight;
-            widthArray.push(width);
-            return widthArray;
+        var heightArray=[];
+            var numberHeight=Math.ceil(parseInt((window.innerHeight)*.84));
+            heightArray.push(numberHeight);
+            var height=numberHeight.toString()+"px";
+            heightArray.push(height);
+            return heightArray;
       },
       notify: true
   },
@@ -261,34 +340,63 @@ fauxSheight:{
     notify: true,
       },
   },
+  _computeStateChanged(params){},
+  computeDashBoardElementInitialization(nameOfElement,hasStateChange,screenWidth, screenHeight){
+      if(hasStateChange===false){
+        this.somefunctiontoloadlastsavedstatefromcache();
+        return
+
+
+      }
+
+
+
+
+  },
+
+  somefunctiontoloadlastsavedstatefromcache(){
+
+
+  },
   created(){
 
   },
   ready(){
-
-
-
+    console.log(this.screenWidth, this.screenHeight, "in ready");
   },
   attached(){
       this.async(function(){
         var holderArray=[], length=this.widgets.length;
         //go with this content tags deprecated
         //its now just an apend child in a slot
-        for(var i=0;i<length;i++)
-        {
-            var element= new this.widgets[i].name();
+        
+            var element= new this.widgets[i].thisConstructor();
             holderArray.push(element);
         }
         this.set("elementHolderArray", holderArray);
         this.implantElements(this.holderArray);
+        this.setcontainerwidth();
         }, 2000);
+
+        console.log(this.screenWidth, this.screenHeight, "attached");
+
+
         //loaded heavy elements to see effect
         //not time to load, when I dom repeated their templates it was a disaster
     },
+    setcontainerwidth(){var rt=this.dashboardRightDrawerCurrentWidth, lt=
+            this.dashboardLeftDrawerCurrentWidth;
+            var dx=(lt===0&&rt===0)?0:(lt===0||rt===0)?12:24; 
+            var delta=(rt+lt+dx); 
+            console.log(delta);
+            var setVal=(this.screenWidth-delta);
+   },
 
 implantElements(elemArr){
     var target=this.$.widgetHolder,children=target.children;
     console.log(children, target);
+     console.log(this.screenWidth, this.screenHeight, "in the elemcreater attached async"); console.log(this.screenWidth, this.screenHeight, "attached");
+     
 
 },
 computeOptionsArray(item, val){
@@ -308,9 +416,7 @@ computeOptionsArray(item, val){
       while(targ.classList.contains("item")!==true && targ.nodeName!="PAPER-MATERIAL" && targ.classList.contains("stationary")!==true)
               {targ=targ.parentElement;}
       if(targ.classList.contains("stationary")==true){this.drags=false;}
-      else if(targ.classList.contains("item")==true)
-        {
-          if(targ.classList.contains("wrapper")===true)
+      else if(targ.classList.contains("item")==true && targ.classList.contains("wrapper")===true)
               {
                       this.set("wrapperDragEl", targ);
                       var par=Polymer.dom(targ).parentNode;
@@ -323,23 +429,13 @@ computeOptionsArray(item, val){
                       // console.log(dragEl, "look here for dragEl");
                       this.set("dragEl", dragEl);
                       self=this.wrapperDragEl;
-                      // console.log(self, self, Polymer.dom(targ).childNodes, "be sure you have the element.... getting template next");  
-              }
-          this.dragEl.drags=true;
-          self.drags=true;
-          this.dragEl.dragging=true;
-          self.dragging=true;
-          this.dragEl.draggable=true;
-          self.draggable=true;
+            
           switch(e.detail.state){
                   case 'start':
                       self._leftprime = parseInt(window.getComputedStyle(targ).getPropertyValue("left"))-e.detail.x;
                       self._topprime = parseInt(window.getComputedStyle(targ).getPropertyValue("top"))-e.detail.y;
                        self.changeX=0;
-                       self.changeY=0; //TODO:Self has to be set dynamically see above, 
-                       /*FIX??? HACK??  Wrapper solved issue temporarily, am experimenting with the hucking of the templates into the cells.  If that works, we can avoid repetitive copies of the same Elements by keeping a store house top level, and then firing them from the wrapper dashboard into apropos locals; 
-                      Polymer.dom.flush();
-                      */
+                       self.changeY=0; 
                   break;
                   case 'track':
                         e.preventDefault();
@@ -360,17 +456,14 @@ computeOptionsArray(item, val){
                         var parent=lt.parentElement;
                         this.set("lt.cws",this.parentDragEl.parentCws);
                         this.set("wrapperDragEl.cws", parent.parentCws);
-                       // console.log(lt.cws, this.wrapperDragEl.cws);
                         Polymer.dom(this.parentDragEl).insertBefore(lt, this.wrapperDragEl);
-                        // console.log(this.parentDragEl, parent);
                         Polymer.dom(parent).appendChild(this.wrapperDragEl);
                         self.dragging=false;
                          Polymer.dom.flush();
                       }
                   break;
                 }//close switch???
-            }//close if
-       
+            }//close wrapper//close item
       },
       _computeWrapperState(transformWrapperStyle, cws)
       {
@@ -380,29 +473,173 @@ computeOptionsArray(item, val){
         else return "";
       },
       handleDrop(e){
-        // var lt=e.detail.sourceEvent.toElement;
-        //               var bool =Polymer.dom(lt).classList.contains("wrapper");
-        //               console.log(bool);
-        //               while(!bool && lt.nodeName!="FC-RELATIVE-FIT-WRAPPER")
-        //                {
-        //                   lt=lt.parentElement;
-        //                    var bool =Polymer.dom(lt).classList.contains("wrapper");
-        //                }
-        //               if(bool && this.isWrapper==true){
-        //                 console.log(e, "in drop event");
-        //                 console.log(lt, "am a wrapper element", this.dragEl, "dragElement");
-        //                 var parent=lt.parentElement;
-        //                 Polymer.dom(this.parentDragEl).insertBefore(lt, this.dragEl);
-        //                 console.log(this.parentDragEl, parent);
-        //                 Polymer.dom(parent).appendChild(this.dragEl);
-        //                 self.dragging=false;
-        //                 self.set("refit",true);
-        //                 Polymer.dom.flush();
+       /* var lt=e.detail.sourceEvent.toElement;
+                      var bool =Polymer.dom(lt).classList.contains("wrapper");
+                      console.log(bool);
+                      while(!bool && lt.nodeName!="FC-RELATIVE-FIT-WRAPPER")
+                       {
+                          lt=lt.parentElement;
+                           var bool =Polymer.dom(lt).classList.contains("wrapper");
+                       }
+                      if(bool && this.isWrapper==true){
+                        var parent=lt.parentElement;
+                        Polymer.dom(this.parentDragEl).insertBefore(lt, this.dragEl);
+                        Polymer.dom(parent).appendChild(this.dragEl);
+                        self.dragging=false;
+                        self.set("refit",true);
+                        Polymer.dom.flush();*/
                       // }
 
 
       },
       allowDrop(e){e.preventDefault();},
+
+   _resize: function(e){
+          e.preventDefault();
+          this.isResizing=true;
+          var nId=e.target.attributes.id.value.split("_"),theId="#"+nId[0], elem=this.$$(theId);
+          this.set("theMovingElement",elem);
+          var width=Math.floor(parseFloat(window.screen.width));
+          var height=Math.floor(parseFloat(window.screen.height)*.999);
+          if(this.isResizing===true){
+            var widthString=nId[0]+"CurrentWidth";
+          switch(e.detail.state) {
+            case 'start':
+              var sWidth =window.getComputedStyle(elem, null).getPropertyValue("width");
+                  sWidth = Math.floor(parseInt(sWidth));
+                  this.set(widthString, sWidth);
+              break;
+            case 'track':
+                  var rol=(widthString.match("Right") && widthString.match("Right").length>0)?"right":"left";
+                  var change = (widthString.match("Right") && widthString.match("Right").length>0)?[(-e.detail.ddx),"Left","Right"]: [e.detail.ddx,"Right","Left"];//here i chose to place the "negative" string value in position 1, as it is needed below; I placed the "true" value in 1 as it may be needed shortly
+                  var nwidth=this[widthString]+parseFloat(change[0]),
+                  oppositeSide="dashboard"+change[1].toString()+"DrawerCurrentWidth";
+                  var trueWidth=(nwidth<15)?15:(nwidth>width)? width:nwidth;
+                  // (nwidth+this[oppositeSide]>width)?Math.ceil(parseFloat(width-this[oppositeSide])): should check here for over lap;
+                  // // trueWidth=(trueWidth<0)?(-1*trueWidth):trueWidth;
+                  // console.log(trueWidth);
+                  this[widthString]=trueWidth;
+                  var holder=trueWidth;
+                  var holder=holder.toString()+"px";
+                  Polymer.dom(elem).setAttribute("style.width",holder);
+                  this.notifyResize();
+              break;
+            case 'end':
+                 Polymer.dom(elem).setAttribute("style.width",holder);
+                   this.notifyResize();
+                  Polymer.dom.flush();
+            break;
+              }
+            }
+        },
+        changeCentersMargins(){
+
+
+        },
+        calculateContentContainerWidth(ltdrawerWidth, rtdrawerWidth)
+          {        
+            var rt=this.dashboardRightDrawerCurrentWidth, lt=
+            this.dashboardLeftDrawerCurrentWidth;
+            var dx=(lt===0&&rt===0)?0:(lt===0||rt===0)?12:24; 
+            var delta=(rt+lt+dx); 
+            console.log(delta);
+            //var centralWidth=this.screenWidth[0]-delta;
+                   console.log(dx,this.screenWidth);
+            // this.set("centralWidth", centralWidth);
+            return delta;
+          },
+
+       set movingApiElement(argument){},
+
+      get movingApiElements() {
+        if(this.movingElementsArray&&this.movingElementsArray.length>0){
+        var contentArrayToResizeOrMove=this.movingElementsArray.map(function(val,i, arr){
+        return Polymer.dom(this.$[val]).getDistributedNodes()[0];
+        }, this);
+        return contentArrayToResizeOrMove;
+      }
+      },
+
+      _tapHandler: function(e) {
+       
+      },
+
+      resetLayout: function() {
+        this.debounce('_resetLayout', function() {
+          if (!this.isAttached)
+            {return;}
+          else if(this.screenWidth[0]<1200)
+            {this.slideBackForLayoutTwo();}
+          else if(this.screenWidth[0]<720)
+            {this.slideBackForLayoutThree()}
+          else if(this.screenWidth[0]<480)
+          {this.slideBackForLayoutThree();}
+         
+          // if (this.narrow) {
+          //     this[userLayoutChoice]
+          //   this.$$drawer.opened = drawer.persistent = false;
+          //   contentContainer.classList.add('narrow');
+
+          //   contentContainer.style.marginLeft = '';
+          //   contentContainer.style.marginRight = '';
+          // } else {
+          //   drawer.opened = drawer.persistent = true;
+          //   contentContainer.classList.remove('narrow');
+
+          //   if (drawer.position == 'right') {
+          //     contentContainer.style.marginLeft = '';
+          //     contentContainer.style.marginRight = drawerWidth + 'px';
+          //   } else {
+          //     contentContainer.style.marginLeft = drawerWidth + 'px';
+          //     contentContainer.style.marginRight = '';
+          //   }
+          // }
+                 //this.setcontainerwidth()
+          this.notifyResize();
+         });
+        
+      },
+      slideBackForLayoutTwo(){},
+      slideBackForLayoutThree(){},
+      slideBackForLayoutThree(){},
+
+      _onQueryMatchesChanged: function(event) {
+        this._setNarrow(event.detail.value);
+      },
+
+      _computeMediaQuery: function(forceNarrow, responsiveWidth) {
+        return forceNarrow ? '(min-width: 0px)' : '(max-width: ' + responsiveWidth + ')';
+      },
+
+      
+    dragsOff: function(){this.set("drags", false);},
+    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
+    dragSwitch: function(){this.set("drags", true);},
+
+
+  });
+</script>
+</dom-module> 
+<!-- 
+      // var target = Polymer.dom(e).localTarget;
+        // if (target && target.hasAttribute('drawer-toggle')) {
+        //   this.drawer.toggle();
+        // }
+      // listeners: {
+      //   'tap': '_tapHandler',
+      //   'app-drawer-reset-layout': 'resetLayout'
+      // },
+
+      // observers: [
+      //   'resetLayout(narrow, isAttached)'
+      // ],
+
+      /**
+       * A reference to the app-drawer element.
+       *
+       * @property drawer
+       */
+
 // },
 // attached:function(){
 //   this.scrollH();
@@ -419,70 +656,35 @@ computeOptionsArray(item, val){
 // }
 // },
 
-   _resize: function(e){
-          e.preventDefault();
-          this.isResizing=true;
-          var nId=e.target.attributes.id.value.split("_");
-          var theId="#"+nId[0];
-          var elem=this.$$(theId);
-          var width=Math.floor(parseFloat(window.screen.width)*.96);
-          var height=Math.floor(parseFloat(window.screen.height)*.999);
-      
-          // if(this.isResizing===true){
-            var widthString=nId[0]+"CurrentWidth";
-          switch(e.detail.state) {
-                case 'start':
-                  var sWidth =window.getComputedStyle(elem, null).getPropertyValue("width");
-                  sWidth = Math.floor(parseInt(sWidth));
-                  this.set(widthString, sWidth);
-                  console.log(this[widthString],elem, "look here a lot");
-                 break;
-                case 'track':
-                  //var newheight = parseInt(self.currentHeight) + e.detail.ddy;
-                  var change = (widthString.match("Right") && widthString.match("Right").length>0)? (- e.detail.ddx): e.detail.ddx;
-                  var nwidth=this[widthString]+change;
+                       /*TODO:Self has to be set dynamically see above, 
+                       /*FIX??? HACK??  Wrapper solved issue temporarily, am experimenting with the hucking of the templates into the cells.  If that works, we can avoid repetitive copies of the same Elements by keeping a store house top level, and then firing them from the wrapper dashboard into apropos locals; 
+                      Polymer.dom.flush();
+                      */
 
 
-                  // console.log(nwidth, this[widthString], e.detail.ddx);
-                  // var nheight2=(newheight<parseFloat(self.minHeight))?self.minHeight:(newheight>height)?height: newheight;
-                  var trueWidth=(nwidth<15)?15:(nwidth>width)? width:nwidth;
-                  console.log((widthString.match("Right") && widthString.match("Right").length>0), trueWidth);
-                
-                  this[widthString]=trueWidth;
-                  // var trueHeight = nheight2.toString()+'px';
-                  //this[widthString]=trueWidth;
-                  var holder=trueWidth;
-                  holder=holder.toString()+"px";
-                  //self.set("currentHeight",trueHeight);
-                  Polymer.dom(elem).setAttribute("style.width",holder);
-                  //self.style.height= trueHeight;
-                  break;
-                case 'end':
-                 Polymer.dom(elem).setAttribute("style.width",holder);
-                    var side=(widthString.match("Right") && widthString.match("Right").length>0)?"Right":"Left";
-                    console.log(side, this[widthString],elem.style.width);
-                  //self.style.height= trueHeight;
-                  //this.set("heightHolder", self.currentHeight);
-        
-                  // self.notifyResize();
-                 // this.toggleColor=true;
-                  // self._onIronResize();
-                  // self.set("refit", true);
-                 // self.afterStartResize();
-                  //Polymer.dom.flush();
-                  break;
-              }
-            
-        },
-      
-    dragsOff: function(){this.set("drags", false);},
-    dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
-    dragSwitch: function(){this.set("drags", true);},
 
+      #contentContainer {
+        position: relative;
 
-  });
-</script>
-</dom-module> <!-- 
+        height: 100%;
+
+        transition: var(--app-drawer-layout-content-transition, none);
+      }
+
+      #contentContainer:not(.narrow) > ::content [drawer-toggle] {
+        display: none;
+      }
+    </style>
+
+    <div id="contentContainer">
+      <content select=":not(app-drawer)"></content>
+    </div>
+
+    <content id="drawerContent" select="app-drawer"></content>
+
+    <iron-media-query
+        query="[[_computeMediaQuery(forceNarrow, responsiveWidth)]]"
+        on-query-matches-changed="_onQueryMatchesChanged"></iron-media-query>
   <template id="FC-TO-DO-LIST">
    <fc-to-do-list params="{{thisAuth}}">
    </fc-to-do-list>

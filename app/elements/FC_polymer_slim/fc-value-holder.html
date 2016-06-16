@@ -1,6 +1,9 @@
 <dom-module id="fc-value-holder">
 <template>
-
+<div id="hanger">
+</div>
+<content>
+</content>
 </template>
 <script>
 FcValueHolder=Polymer({
@@ -15,12 +18,69 @@ FcValueHolder=Polymer({
 			reflectToAttribute: true,
 			notify: true
 		},
-		
+		index:{
+			type:Number,
+			notify: true,
+		},
+		dataObjectArray:{
+			type: Array,
+			notify: true,
+		},
+		dataObject:{
+			type:Object,
+			value:function(){return {"name": null,"id": null, "class":null, "nodeName":null,"thisConstructor":null, "config":undefined, "handler": undefined,"registrants":undefined};},
+			notify: true,
+			computed: "computeDataObject(dataObjectArray, index)",
+		},
+		elemsConstructorArray:{
+			type:Array,
+			value:function(){return [];},
+			notify: true
+		},
+		objectsToInstantiate:{
+			type: Number,
+			value:function(){
+				return 0;
+			},
+			notify: true,
+		},
+	},		
+	ready: function(){
+	console.log(this.dataObject, this.divId,"there were lots of empty instances here with no dom show of btns");
 	},
-ready: function(){
-	
+	computeDataObject(arr,index){
+		var obj={},obj=arr[index], keys=Object.keys(obj);
+		namingArray=[obj.name,obj.id,obj.class,obj.nodeName];
+		var map=new Map()
+		var index1 = namingArray.indexOf(null);
+		if(index1>-1&& index1<namingArray.length-1){var lastIndex=namingArray.lastIndexOf(null);
+		var fmap=keys.map(function(key,i,arr){
+				if(key==="thisConstructor")
+				{	
+						this.push("elemsConstructorArray",obj[key]);
+						this.set("objectsToInstantiate",this.objectsToInstantiate+1);
+						return {"thisConstructor":obj[key]};
+				}					
+				else if(obj[key]!=null&&namingArray.indexOf(key)>-1)
+				}
+				else if(obj[key]==null){return {key:false};}
+				else
+				else{this.set(key, obj[key]);} 
+		}, this);
 
-}
+
+			arr[index]
+			Polymer.dom(this).classList.add(this.datObject.class);
+
+			var valueElement=new this.dataObject.thisConstructor(this.dataObject.config);
+			Polymer.dom("this.$.hanger").apendChild(valueELement);
+		}
+
+
+
+
+
+	},
 
 
 
