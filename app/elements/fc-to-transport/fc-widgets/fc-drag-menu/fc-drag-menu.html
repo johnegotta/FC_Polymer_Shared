@@ -1,4 +1,4 @@
-<dom-module id="fc-drag-menu-proto">
+<dom-module id="fc-drag-menu">
 <template>
 <style>
 :host {
@@ -40,7 +40,7 @@
 
 
 </style>
-<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 320px!important; background: #000066; border: 3px ridge silver;'>
+<div id="menu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 320px!important; background: #000066; border: 3px ridge silver;'>
   <span draggable$="[[_computestaticmenu(dragmenu)]]" hidden="[[_computestaticmenu(dragmenu)]]">
 <!-- 
    on-track="dragmeplease" -->
@@ -63,6 +63,8 @@
       </iron-icon>
   </section>
   <section on-down="dragsOff" on-up="dragsOn">
+  <fc-router>
+  </fc-router>
     <content>
     </content>
  </section>
@@ -97,21 +99,21 @@
 
     on-track="_resetWidth"
     class="center center-justified menuItems-light"
-    style="background: #000066; border: 2px ridge biege;"
+    style="background: #000066; border: 2px ridge white;"
     >
   </iron-icon>
 </section>        
 </div>
 </template>
 <script>
-FcDragMenuProto = Polymer({
-	is:'fc-drag-menu-proto',
+FcDragMenu = Polymer({
+	is:'fc-drag-menu',
 	behaviors: [
     FCBehaviors.DraggableBehavior,
 		Polymer.IronResizableBehavior,
-		Polymer.NeonAnimationBehavior,
+		// Polymer.NeonAnimationBehavior,
 		Polymer.IronSelectableBehavior,
-		Polymer.NeonAnimationRunnerBehavior,
+		// Polymer.NeonAnimationRunnerBehavior,
 		Polymer.IronMenubarBehavior,
 		Polymer.IronRangeBehavior],
 	properties: {
@@ -132,7 +134,7 @@ FcDragMenuProto = Polymer({
                 },
             dragmenu:{
                 type: Boolean,
-                value: false,
+                value: function(){return false;},
                 reflectToAttruibute: true,
                 notify: true
                },
@@ -186,7 +188,7 @@ FcDragMenuProto = Polymer({
       this._holdJob = null;
     },
     ready: function() {
-      this.setScrollDirection('x', this.$.tabsContainer);
+      this.setScrollDirection('y', this.$.tabsContainer);
     },
     attached: function(){
     
@@ -241,10 +243,10 @@ FcDragMenuProto = Polymer({
                   var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
                   var trueWidth = nwidth.toString()+'px';
                   self.currentWidth=trueWidth;
-                  this.$.protoMenu.style.width= trueWidth;
-                  var insertionPoint = Polymer.dom(this.root).querySelector('content');
-                  var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[1];
-                  distributed.style.width= trueWidth;
+                  this.$.menu.style.width= trueWidth;
+                  // var insertionPoint = Polymer.dom(this.root).querySelector('content');
+                  // var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[1];
+                  // distributed.style.width= trueWidth;
                 
                   break;
                 case 'end':

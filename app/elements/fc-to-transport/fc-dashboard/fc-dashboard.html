@@ -1,0 +1,202 @@
+<dom-module id="fc-dashboard">
+<template id="fc-dashboard-template">
+<style>
+:host{
+	position: fixed;
+	top: 0px; 
+	right: 0px; 
+	left: 0px; 
+	bottom: 0px;
+	background: white;
+	}
+fc-dashboard-divisions>*{
+	@apply(--vertical-layout); 
+	@apply(--layout-flex);
+	@apply(--layout-self-stretch); 
+}
+</style>
+<fc-dashboard-divisions id="dashboardDivisions" is-resizing>
+		
+	</fc-dashboard-divisions>
+</template>
+<script>
+FcDashboard=Polymer({
+	is:"fc-dashboard",
+	properties: {
+		currentPosition:{
+			type: String,
+			value: function(){return "";},
+			notify: true,
+		},
+		nodeNameIndexedList:{
+			type: Array,
+			notify: true
+		},
+		selectedLT:{
+			notify: true,
+			observer:"observeSelectedLT",
+		},
+		selectedLB:{
+			notify: true,
+			observer:"observeSelectedLB",
+		},
+		selectedRT:{
+			notify: true,
+			observer:"observeSelectedRT",
+		},
+		selectedRB:{
+			notify: true,
+			observer:"observeSelectedRB",
+		},
+
+
+
+		positions:{
+			type: Array,
+			value: function(){return["leftTop", "leftBottom", "rightTop", "rightBottom"];},
+			notify: true,
+		},
+
+
+	},
+	attached(){
+		var nodeList= this.getNodeList();
+		this.computeNodeNameIndexedList(nodeList);
+
+	},
+	getNodeList(){
+		    var children = Polymer.dom(this.$.dashboardDivisions).children;
+                  console.log(children);
+                  return children;
+                  // var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[1];
+	},
+	computeNodeNameIndexedList(nodeList){
+		nodeList.forEach(function(val,index,arr){
+			this.push("nodeNameIndexedList", [index,val.nodeName]);
+
+		}, this);
+
+	},
+	__computePositionOnGrid(currentPosition, nodeName, selected){
+		if(selected){
+			console.log(selected, "indexed list: " + nodeName, "currentPosition: " +currentPosition); return "leftBottom";}
+	},
+	observeSelectedLT(newVal, oldval){
+			console.log(newVal,oldval);
+			var nodeName=newVal;
+			var oldNode=oldval;
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+			children.forEach(function(val, i, arr){
+					if(val.oldNode==nodeName){val.classList.remove("leftTop");}
+					if(val.nodeName===nodeName){
+						val.classList.add("leftTop");}
+			},this);
+			Polymer.updateStyles();
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+
+	},
+	observeSelectedLB(newVal, oldval){
+				console.log(newVal,oldval);
+			var nodeName=newVal;
+			var oldNode=oldval;
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+			children.forEach(function(val, i, arr){
+					if(val.oldNode==nodeName){val.classList.remove("leftBottom");}
+					if(val.nodeName===nodeName){
+						val.classList.add("leftBottom");}
+			},this);
+			Polymer.updateStyles();
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+	},
+	observeSelectedRT(newVal, oldval){
+			console.log(newVal,oldval);
+			var nodeName=newVal;
+			var oldNode=oldval;
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+			children.forEach(function(val, i, arr){
+					if(val.oldNode==nodeName){val.classList.remove("rightTop");}
+					if(val.nodeName===nodeName){
+						val.classList.add("rightTop");}
+			},this);
+			Polymer.updateStyles();
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+	},
+	observeSelectedRB(newVal, oldval){
+							console.log(newVal,oldval);
+			var nodeName=newVal;
+			var oldNode=oldval;
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+			children.forEach(function(val, i, arr){
+					if(val.oldNode==nodeName){val.classList.remove("rightBottom");}
+					if(val.nodeName===nodeName){
+						val.classList.add("rightBottom");}
+			},this);
+			Polymer.updateStyles();
+			var children = Polymer.dom(this.$.dashboardDivisions).children;
+			console.log(children);
+	},
+
+
+});
+</script>
+</dom-module>
+
+<!--
+leftTop:{
+			type: Array,
+			value: function(){return [];},
+			notify: true,
+		},
+		leftBottom:{
+			type: Array,
+			value: function(){return [];},
+			notify: true,
+		},
+		rightTop:{
+			type: Array,
+			value: function(){return [];},
+			notify: true,
+		},
+		rightBottom:{
+			type: Array,
+			value: function(){return [];},
+			notify: true,
+		},
+<fc-dashboard-divisions is-resizing>
+	<section class="leftTop main dashboard">
+		<fc-calendar-dialog class="leftTop stationary vertical layout flex self-stretch">
+		</fc-calendar-dialog>
+	</section>
+			
+	<section class="leftBottom cardContent">
+		<fc-mapped-grid class="vertical layout self-stretch flex" resizing style="position: absolute; top:0px; bottom: 0px; left: 0px; right: 0px;"></fc-mapped-grid>
+	</section>
+
+	<section 
+		class="rightTop" >
+		<fc-call-center-dialog stationary="true" allow-scripts class="vertical layout flex self-stretch"></fc-call-center-dialog>
+	</section>
+
+	<section class="rightBottom">
+		<fc-double-tab-set stationary="true" allow-scripts class="vertical layout flex self-stretch">
+		</fc-double-tab-set>
+	</section>
+
+			<section class="aside_1">
+				
+			</section> 
+			<section class="aside_2 horizontal layout flex">
+ 			
+			</section>
+			<section class="aside_3 asideone horizontal layout">
+		
+			
+			</section>
+		</fc-dashboard-divisions>

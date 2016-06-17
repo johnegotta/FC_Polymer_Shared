@@ -14,10 +14,10 @@
 
   }
   #dashboardRightDrawer{
-     height: 101vh; background:white; position: absolute; right: 0px; top: 0px; bottom: 0px; left
+     height: 101vh; background:white; position: absolute; right: 0px; top: 0px; bottom: 0px; left; z-index:4;
   }
   #dashboardLeftDrawer{
-     height: 101vh; border-right: 2px green solid; position: absolute; left: 0px; top: 0px; bottom: 0px; z-index:999999999999;
+     height: 101vh; position: absolute; left: 0px; top: 0px; bottom: 0px; z-index:5;
   }
     .container {
       min-height: 99vh;
@@ -42,6 +42,12 @@
       cursor: move;
 
     }
+
+fc-relative-fit-wrapper>*{
+  @apply(--vertical-layout); 
+  @apply(--layout-flex);
+  @apply(--layout-self-stretch); 
+}
     
   </style>
   
@@ -72,75 +78,97 @@
       position: static;
     }
   </style>
+  <fc-drag-menu drags style="position:fixed; left: 25px; bottom: 25px; z-index:7;"></fc-drag-menu>
 <paper-material class="horizontal layout flex">
 <div class="horizontal layout flex self-stretch" is-resizing dragging draggable id="dashboardLeftDrawer" is-resizing style$="width:{{dashboardLeftDrawerCurrentWidth}}px;">
       
   <div class="vertical layout flex" style="min-height: 102vh; background: white;">     
-    <template is="dom-repeat" id="widgetHolder" items="{{widgets}}" as="widget">
-    <section class="horizontal flex layout wrap" style="margin-left: 32px;">
-      <section style="height: 36px; width: 36px; overflow: hidden; margin: 16px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae; border-radius: 50%; z-index: 34;" parent-cws="out" on-up="handleDrop" text="{{widget.name}}">
-        <fc-relative-fit-wrapper id="wrapper{{index}}" on-track="dragAndDrop" class="item wrapper" cws="out" on-track="dragAndDrop" draggable drags>
-       </fc-relative-fit-wrapper>
-    </section>
-    <span>
-  </span>
-    <span class="horizontal layout center justified">{{widget.nodeName}}</span>
-  </section>
-</template>
-
-    <section class="horizontal flex layout wrap" style="margin-left: 32px;">
-        <section style="height: 36px; width: 36px; overflow: hidden; margin: 16px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae; border-radius: 50%; z-index: 34;" parent-cws="out" on-up="handleDrop" text="{{widget}}">
-            <fc-relative-fit-wrapper id="wrapper2" on-track="dragAndDrop" class="item wrapper" cws="out" on-track="dragAndDrop" draggable drags>
-                      <content select=".leftDrawer"></content>
-            </fc-relative-fit-wrapper>
+    <div style="max-height: 550px; min-width: 320px; border: red 3px solid; color: black;" class="vertical layout flex nowrap leftDrawer">
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="leftTop" label="Left Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLT}}">
+            </fc-input-search-select>
         </section>
-    </section>
+        <section>
+            Left Top:<br>
+            {{selectedLT}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="leftBottom" label="Left Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLB}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Left Bottom:<br>
+            {{selectedLB}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="rightTop" label="Right Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRT}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Right Top:<br>
+            {{selectedRT}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="rightBottom" label="Right Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRB}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Right Bottom:<br>
+            {{selectedRB}}
+        </section>
+      </div>
+    </div>
+            <content select=".leftDrawer"></content>
   </div>
-<section on-down="dragsOff" id="dashboardLeftDrawer_resizer" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position: relative; left:calc( {{dashboardLeftDrawerCurrentWidth}}+12)px; bottom:0px; top: 0px; min-width:22px!important; height:103vh; cursor:ew-resize; padding: 4px; width: 16px!important; opacity: 1; background: orange; border-right: 13px solid red; z-index: 9898989898989898898;">
-</section>
-
+    <section on-down="dragsOff" id="dashboardLeftDrawer_resizer" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position: relative; left:calc({{dashboardLeftDrawerCurrentWidth}}+12)px; bottom:0px; top: 0px; min-width:6px!important; height:103vh; cursor:ew-resize; padding: 1px; width: 12px!important; opacity: 1; background:#009; border-right: 2px solid #aecefe; z-index: 5;">
+    </section>
 </div>
-<!--Drawer-End-->
+<!--left Drawer-End-->
    <!--BOX CONTAINER ON DASHBOARD LAYOUT-->
   <div class="contentContainer horizontal layout" id="contentContainer" style$="width:100%; position: relative; margin-right:[[dashboardRightDrawerCurrentWidth]]px; margin-left:{{dashboardLeftDrawerCurrentWidth}}px;"> 
   <!--LEFT COLUMN CONTAINER ON DASHBOARD LAYOUT-->
     <div id="box11">
       <!--Left-TOP BOX FOR ZONE in LEFT COLUMN-->
       <div class="flex dropzone" style="height: 45vh; overflow-y:scroll;"  parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
-        <fc-relative-fit-wrapper id="wrapper1" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
+        <fc-relative-fit-wrapper id="wrapperLt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
                 <content select=".leftTop"></content>
         </fc-relative-fit-wrapper>
       </div>
       <!--END LEFT TOP BOX IN DASH BOARD-->
       <!--LEFT COLUMN SPLITTER(row creator)-->
-          <iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #aeaeae; max-width: 100vh;" ;" direction="up">
+          <iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #efefef; max-width: 100vw;" ;" direction="up">
           </iron-splitter>
       <!--END LEFT COLUMN SPLITTER(row creator)-->
       <!--BEGIN BOTTOM HALF OF LEFT COLUMN-->
       <div id="box4" class='flex dropzone'  style="overflow-y:scroll;" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop">
-            <fc-relative-fit-wrapper id="wrapper2" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-              <fc-ddr-card is-resizing>
+            <fc-relative-fit-wrapper id="wrapperLb" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
+            
                     <content select=".leftBottom">
 
                     </content>
-              </fc-ddr-card> 
           </fc-relative-fit-wrapper> 
    </div>
   </div>
-    <iron-splitter style="top: 0px; bottom:0px; background: silver; width: 12px;  border: 2px solid #aeaeae;" direction="left"></iron-splitter>
+    <iron-splitter style="top: 0px; bottom:0px; background: silver; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
 
 
   <div id="box5" class="flex">
         <div class="layout flex dropzone" on-dragover="allowDrop" parent-cws="in" on-up="handleDrop" style="height: 45vh; overflow-y:scroll;">
-            <fc-relative-fit-wrapper id="wrapper3" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
+            <fc-relative-fit-wrapper id="wrapperRt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
                 <content select=".rightTop"></content>
             </fc-relative-fit-wrapper>
         </div>
-<iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #aeaeae; max-width: 100vh;" direction="up">
-          </iron-splitter>
-  </iron-splitter>
+<iron-splitter style="background: silver; height: 12px; min-width: 100%;  border: 2px solid #efefef; max-width: 100vw;" direction="up">
+</iron-splitter>
       <div class="flex layout dropzone" parent-cws="in" on-dragover="allowDrop" on-up="handleDrop" style="overflow-y:scroll;">
-          <fc-relative-fit-wrapper id="wrapper4" cws="in" class="item wrapper" current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-track="dragAndDrop" draggable drags>
+          <fc-relative-fit-wrapper id="wrapperRb" cws="in" class="item wrapper" current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-track="dragAndDrop" draggable drags>
             <content select=".rightBottom"></content>
           </fc-relative-fit-wrapper>
       </div>
@@ -148,12 +176,12 @@
   </div>
   <!--Start Right Drawer-->
   <div class="horizontal layout flex end" is-resizing dragging draggable id="dashboardRightDrawer" style$="width:{{dashboardRightDrawerCurrentWidth}}px;" >
-<section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 4px; width:18px!important; opacity:1; border-left: 5px solid orangered; z-index:223300; background: purple;">
+<section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 1px; width:12px!important; opacity:1; border-left: 2px solid #aecefe; z-index:4; background: #009;">
 </section>
   <div class="vertical layout flex" style="position:relative; right:0px; top: 0px; bottom: 0px; min-height: 102vh; background: white;">     
     
-                   <fc-right-tabbed-drawer icon-array="{{resetIconArray}}" config-object="" class="fit">
-                     <fc-value-holder data-object-array=""data-object-array="{{dataObjectArray}}" is-firepad="[[item.isFirepad]]"></fc-value-holder>
+                   <fc-right-tabbed-drawer config-object="" class="fit">
+                    <!--  <fc-value-holder data-object-array="" data-object-array="{{dataObjectArray}}" is-firepad="[[item.isFirepad]]"></fc-value-holder> -->
                    </fc-right-tabbed-drawer>
             
 
@@ -164,198 +192,158 @@
  <!--  </fc-ddr-card> -->
   </template>
   <script>
-FcDashboardDivisions=Polymer({
-    is:"fc-dashboard-divisions",
+  "use strict";
+Polymer({
+  is:"fc-dashboard-divisions",
     behaviors:[Polymer.IronResizableBehavior],
-
-      listeners: {
-        // 'tap': '_tapHandler',
-        'app-drawer-reset-layout': 'resetLayout'
-      },
-
-      observers: [
-        'resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'
-      ],
-
+    listeners: {'app-drawer-reset-layout': 'resetLayout'},
+    observers: ['resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'],
     properties:{
-      isResizing:{
-        type:Boolean,
-        value:function(){return false;},
-        notify: true,
-      },
-      currentHeight:{
-        notify: true
+        isResizing:{
+            type:Boolean,
+            value:function(){return false;},
+            notify: true,
         },
-    deltaOfTheDrag:{
-      type:Number,
-      notify: true,
-
-    },
-    params:{
-      type:Object,
-      value:function(){return {"hasAuth":true,"databaseUpdateWaiting":false, "id":"longJohnSilver_00001","lastConfig":"someDataDetailsConfig"};},
-      notify: true
-    },
-    stateChanged: {
-      type:Array,
-      computed:"_computeStateChanged(params)",
-      notify: true,
-    },
-  dataDetails:{
-      type:Array, //key: value array of arrays.
-      value:function(){return [["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""]];},
-      notify:true,
-    },  
-  dashboardInitializationObserver:{
-    type: Object,
-    computed:'computeDashBoardElementInitialization(screenWidth, screenHeight,stateChanged)',
-    notify: true,
-    },
-fauxSheight:{
-  type: Number,
-    notify: true
-  },
-  dashboardLeftDrawerCurrentWidth:{
-    type: Number,
-    value:function(){return 175;},
-    notify: true
-  },
-  notifyDescendants:{
-    type: Boolean,
-    value:function(){return true;},
-    notify: true,
-  },
-  dashboardRightDrawerCurrentWidth:{
-      type: Number,
-      value: function(){return 175;},
-      notify: true,
-  },
-  isWrapper:{
-    type: Boolean,
-    value: false,
-    notify: true
-  },
-  dragEl:{
-    type: Object,
-    notify: true 
-  },
-  wrapperDragEl:{
-    type: Object,
-    notify: true 
-  },
-  dataObject:{
-    type:Object,
-
-  },
-   iconArray2:{
-        type: Array,
-        
-                        notify: true,
-                       },
-  counter:{
-    type:Number,
-    value:0,
-    notify: true,
-  },
-  widgets:{
-    type:Array,
-    value:function(){return [
-        {"name":"FcGridCellTempl", 
-        "thisConstructor":FcGridCellTempl,
-        "show":true, 
-        "nodeName": "FC-GRID-CELL-TEMPL",
-        "class":"fcGridCellTempl_valueElement", 
-        "id":"fcGridCellTempl",
-        "mappedKeys":this.path,
-        "handler": this.ObjectPropertyHandler,
-        "hashPath":"local-host:3000/fcDashboardDivisions"
-        }, 
-        { 
-        "thisConstructor":FcGridContainer,
-        "show":true,
-        "id":"fcGridContainer", 
-        "nodeName":"FC-GRID-CONTAINER" 
+        currentHeight:{
+            notify: true
         },
-        { "thisConstructor":FcMappedGrid,
-            "nodeName": "FC-MAPPED-GRID", 
-            "show":true,
-            "name":"fcMappedGrid",
-            "id":"fcMappedGrid",
-
+        deltaOfTheDrag:{
+            type:Number,
+            notify: true,
+        },
+        params:{
+            type:Object,
+            value:function(){return {"hasAuth":true,"databaseUpdateWaiting":false, "id":"longJohnSilver_00001","lastConfig":"someDataDetailsConfig"};},
+            notify: true
+        },
+        stateChanged: {
+            type:Array,
+            computed:"_computeStateChanged(params)",
+            notify: true,
+        },
+        dashboardInitializationObserver:{
+            type: Object,
+            computed:'computeDashBoardElementInitialization(screenWidth, screenHeight,stateChanged)',
+            notify: true,
           },
-          {"thisConstructor":FcRqtversionc,
-          "nodeName":"FC-RQTCVERSIONC",
-          "show":true,
-        },{"thisConstructor":FcDragMenuProto,"name":"fcRqtcVersionC","show":false}];},
-    
-    notify: true,
-  },
-  parentDragEl:{
-    type: Object,
-    notify: true //note this is the parent of both the wrapper and the cell template--it is the cell
-  },
-  resetIconArray:{
-    type:Array,
-    value:function(){return[]},
-    notify: true,
-  },
-
-    responsiveWidth: {
-          type: String,
-          value: '980px'
+        dashboardLeftDrawerCurrentWidth:{
+            type: Number,
+            value:function(){return 175;},
+            notify: true
         },
-
-    narrow: {
-          type: Boolean,
-          readOnly: true,
+        notifyDescendants:{
+            type: Boolean,
+            value:function(){return true;},
+            notify: true,
+        },
+        dashboardRightDrawerCurrentWidth:{
+            type: Number,
+            value: function(){return 175;},
+            notify: true,
+        },
+        isWrapper:{
+            type: Boolean,
+            value: false,
+            notify: true
+        },
+        dragEl:{
+            type: Object,
+            notify: true 
+        },
+        wrapperDragEl:{
+            type: Object,
+            notify: true 
+        },
+        dataObject:{
+            type:Object,
+        },
+        iconArray2:{
+              type: Array,
+              notify: true,
+            },
+        counter:{
+          type:Number,
+          value:0,
+          notify: true,
+        },
+       
+        parentDragEl:{
+          type: Object,
+          notify: true //note this is the parent of both the wrapper and the cell template--it is the cell
+        },
+        constructorArray:{
+          type: Array,
+          value:function(){return [["FcCalendarDialog",FcCalendarDialog], ["FcMappedGrid",FcMappedGrid],["FcCallCenterDialog",FcCallCenterDialog],["FcDoubleTabSet",FcDoubleTabSet],["FcEventCalendar",FcEventCalendar],["FcPassageQuestionDisplay",FcPassageQuestionDisplay],["FcGridContainer",FcGridContainer],["FcGridCellTempl",FcGridCellTempl],["FcRqtversionc",FcRqtversionc], ["FcPassageDbDisplay",FcPassageDbDisplay]];},
           notify: true
+          },
+          responsiveWidth: {
+                type: String,
+                value: '980px'
+              },
+          elemMap:{
+              type: Map,
+              notify: true,
+          },
+          narrow: {
+                type: Boolean,
+                readOnly: true,
+                notify: true
+              },
+        screenWidth:{
+            type: Array,
+            value: function(){
+              var widthArray=[];
+                  var numberWidth=Math.ceil(window.innerWidth*(.94));
+                  widthArray.push(numberWidth);
+                  var width=numberWidth.toString()+"px";
+                  widthArray.push(width);
+                  return widthArray;
+            },
+            notify: true
+          },
+        screenHeight:{
+            type: Array,
+            value: function(){
+              var heightArray=[];
+                  var numberHeight=Math.ceil(parseInt((window.innerHeight)*.84));
+                  heightArray.push(numberHeight);
+                  var height=numberHeight.toString()+"px";
+                  heightArray.push(height);
+                  return heightArray;
+            },
+            notify: true
         },
-  screenWidth:{
-      type: Array,
-      value: function(){
-        var widthArray=[];
-            var numberWidth=Math.ceil(window.innerWidth*(.94));
-            widthArray.push(numberWidth);
-            var width=numberWidth.toString()+"px";
-            widthArray.push(width);
-            return widthArray;
-      },
-      notify: true
-    },
-  screenHeight:{
-      type: Array,
-      value: function(){
-        var heightArray=[];
-            var numberHeight=Math.ceil(parseInt((window.innerHeight)*.84));
-            heightArray.push(numberHeight);
-            var height=numberHeight.toString()+"px";
-            heightArray.push(height);
-            return heightArray;
-      },
-      notify: true
-  },
-  elementHolderArray:{
-    type: Array,
-    value:function(){return [];},
-    notify: true,
-      },
+        elementHolderArray:{
+          type: Array,
+          value:function(){return [];},
+          notify: true,
+            },
+        selectedLT:{
+          notify: true,
+          observer:"observeSelectedLT",
+        },
+        selectedLB:{
+          notify: true,
+          observer:"observeSelectedLB",
+        },
+        selectedRT:{
+          notify: true,
+          observer:"observeSelectedRT",
+        },
+        selectedRB:{
+          notify: true,
+          observer:"observeSelectedRB",
+        },
+
   },
   _computeStateChanged(params){},
   computeDashBoardElementInitialization(nameOfElement,hasStateChange,screenWidth, screenHeight){
       if(hasStateChange===false){
         this.somefunctiontoloadlastsavedstatefromcache();
         return
-
-
       }
-
-
-
-
   },
-
   somefunctiontoloadlastsavedstatefromcache(){
-
 
   },
   created(){
@@ -365,19 +353,24 @@ fauxSheight:{
     console.log(this.screenWidth, this.screenHeight, "in ready");
   },
   attached(){
-      this.async(function(){
-        var holderArray=[], length=this.widgets.length;
+     console.log(this.constructorArray);
+      
+        var holderArray=[], length=this.constructorArray;
+        console.log(this.constructorArray);
         //go with this content tags deprecated
         //its now just an apend child in a slot
-        
-            var element= new this.widgets[i].thisConstructor();
-            holderArray.push(element);
-        }
-        this.set("elementHolderArray", holderArray);
-        this.implantElements(this.holderArray);
+        var elemMap=new Map();
+      var elementsArray= this.constructorArray.map(function(func,index,array){
+           elemMap.set(func[0], new func[1]());
+           return new func[1]();   
+      },this);
+            console.log(elementsArray, elemMap);
+              this.set("elemMap", elemMap);
+       
+        this.set("elementHolderArray",elementsArray);
+        this.implantElements(this.elementHolderArray);
         this.setcontainerwidth();
-        }, 2000);
-
+       
         console.log(this.screenWidth, this.screenHeight, "attached");
 
 
@@ -393,10 +386,9 @@ fauxSheight:{
    },
 
 implantElements(elemArr){
-    var target=this.$.widgetHolder,children=target.children;
-    console.log(children, target);
-     console.log(this.screenWidth, this.screenHeight, "in the elemcreater attached async"); console.log(this.screenWidth, this.screenHeight, "attached");
-     
+   var children=elemArr;
+    console.log(children);
+     console.log(children, this.screenWidth, this.screenHeight, "in the elemcreator attached async");
 
 },
 computeOptionsArray(item, val){
@@ -468,28 +460,11 @@ computeOptionsArray(item, val){
       _computeWrapperState(transformWrapperStyle, cws)
       {
         if(cws==="out"){
-          return "height: 36px; width: 36px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae;";
+          return "height: 36px; width: 36px; border:solid gold 6px; background: purple; box-shadow: 4px 8px 16px 5px #aeaeae;";
         }
         else return "";
       },
       handleDrop(e){
-       /* var lt=e.detail.sourceEvent.toElement;
-                      var bool =Polymer.dom(lt).classList.contains("wrapper");
-                      console.log(bool);
-                      while(!bool && lt.nodeName!="FC-RELATIVE-FIT-WRAPPER")
-                       {
-                          lt=lt.parentElement;
-                           var bool =Polymer.dom(lt).classList.contains("wrapper");
-                       }
-                      if(bool && this.isWrapper==true){
-                        var parent=lt.parentElement;
-                        Polymer.dom(this.parentDragEl).insertBefore(lt, this.dragEl);
-                        Polymer.dom(parent).appendChild(this.dragEl);
-                        self.dragging=false;
-                        self.set("refit",true);
-                        Polymer.dom.flush();*/
-                      // }
-
 
       },
       allowDrop(e){e.preventDefault();},
@@ -616,11 +591,183 @@ computeOptionsArray(item, val){
     dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
     dragSwitch: function(){this.set("drags", true);},
 
+    observeSelectedLT(newVal, oldval){
+      console.log(newVal,oldval);
+     var insertElement=this.elemMap.get(newVal);
+     console.log(insertElement,"here is where the map false should be");
+     if(oldval!==undefined && newVal===oldval){
+      console.log("we do nothing here");
+     }
+     else if(oldval!==undefined && insertElement!=null){
+       var removeElement =Polymer.dom(this.$.wrapperLt).firstElementChild;
+       Polymer.dom(this.$.wrapperLt).insertBefore(insertElement,removeElement);
+       Polymer.dom(this.$.wrapperLt).removeChild(removeElement);
+      var nodeName=removeElement.nodeName.toString();
+      console.log(nodeName);
+      nodeName=nodeName.replace(/A-Z/g, function(nodeName){ return nodeName.toLowerCase();}),
+      console.log(nodeName);
+      nodeName.charAt(0).replace(nodeName.charAt(0).toUpperCase());
+      console.log(nodeName);
+      nodeName.replace("-","");
+      console.log(nodeName); 
+     }
+     else if(insertElement==null){
+      console.log("wait", insertElement);
+     }
+     else{
+      console.log(Polymer.dom(this.$.wrapperLt).firstElementChild);
+      Polymer.dom(this.$.wrapperLt).insertBefore(insertElement,Polymer.dom(this.$.wrapperLt).firstElementChild);
+
+     }
+     
+  },
+  observeSelectedLB(newVal, oldval){
+      console.log(newVal,oldval);
+     var insertElement=this.elemMap.get(newVal);
+     console.log(insertElement,"here is where the map false should be");
+     if(oldval!==undefined && newVal===oldval){
+      console.log("we do nothing here");
+     }
+     else if(oldval!==undefined && insertElement!=null){
+       var removeElement =Polymer.dom(this.$.wrapperLb).firstElementChild;
+       Polymer.dom(this.$.wrapperLb).insertBefore(insertElement,removeElement);
+       Polymer.dom(this.$.wrapperLb).removeChild(removeElement);
+      var nodeName=removeElement.nodeName.toString();
+      console.log(nodeName);
+      nodeName=nodeName.replace(/A-Z/g, function(nodeName){ return nodeName.toLowerCase();}),
+      console.log(nodeName);
+      nodeName.charAt(0).replace(nodeName.charAt(0).toUpperCase());
+      console.log(nodeName);
+      nodeName.replace("-","");
+      console.log(nodeName); 
+     }
+     else if(insertElement==null){
+      console.log("wait", insertElement);
+     }
+     else{
+      console.log(Polymer.dom(this.$.wrapperLb).firstElementChild);
+      Polymer.dom(this.$.wrapperLb).insertBefore(insertElement,Polymer.dom(this.$.wrapperLb).firstElementChild);
+
+    }
+
+  },
+  observeSelectedRT(newVal, oldval){
+       console.log(newVal,oldval);
+     var insertElement=this.elemMap.get(newVal);
+     console.log(insertElement,"here is where the map false should be");
+     if(oldval!==undefined && newVal===oldval){
+      console.log("we do nothing here");
+     }
+     else if(oldval!==undefined && insertElement!=null){
+       var removeElement =Polymer.dom(this.$.wrapperRt).firstElementChild;
+       Polymer.dom(this.$.wrapperRt).insertBefore(insertElement,removeElement);
+       Polymer.dom(this.$.wrapperRt).removeChild(removeElement);
+      var nodeName=removeElement.nodeName.toString();
+      console.log(nodeName);
+      nodeName=nodeName.replace(/A-Z/g, function(nodeName){ return nodeName.toLowerCase();}),
+      console.log(nodeName);
+      nodeName.charAt(0).replace(nodeName.charAt(0).toUpperCase());
+      console.log(nodeName);
+      nodeName.replace("-","");
+      console.log(nodeName); 
+     }
+     else if(insertElement==null){
+      console.log("wait", insertElement);
+     }
+     else{
+      console.log(Polymer.dom(this.$.wrapperRt).firstElementChild);
+      Polymer.dom(this.$.wrapperRt).insertBefore(insertElement,Polymer.dom(this.$.wrapperRt).firstElementChild);
+        }
+  },
+  observeSelectedRB(newVal, oldval){
+       console.log(newVal,oldval);
+     var insertElement=this.elemMap.get(newVal);
+     console.log(insertElement,"here is where the map false should be");
+     if(oldval!==undefined && newVal===oldval){
+      console.log("we do nothing here");
+     }
+     else if(oldval!==undefined && insertElement!=null){
+       var removeElement =Polymer.dom(this.$.wrapperRb).firstElementChild;
+       Polymer.dom(this.$.wrapperRb).insertBefore(insertElement,removeElement);
+       Polymer.dom(this.$.wrapperRb).removeChild(removeElement);
+      var nodeName=removeElement.nodeName.toString();
+      console.log(nodeName);
+      nodeName=nodeName.replace(/A-Z/g, function(nodeName){ return nodeName.toLowerCase();}),
+      console.log(nodeName);
+      nodeName.charAt(0).replace(nodeName.charAt(0).toUpperCase());
+      console.log(nodeName);
+      nodeName.replace("-","");
+      console.log(nodeName); 
+     }
+     else if(insertElement==null){
+      console.log("wait", insertElement);
+     }
+     else{
+      console.log(Polymer.dom(this.$.wrapperRb).firstElementChild);
+      Polymer.dom(this.$.wrapperRb).insertBefore(insertElement,Polymer.dom(this.$.wrapperRb).firstElementChild);
+
+        }
+
+        },
+
+
 
   });
 </script>
 </dom-module> 
 <!-- 
+ // widgets:{
+  //   type:Array,
+  //   value:function(){return [
+  //       {"name":"FcGridCellTempl", 
+  //       "thisConstructor":FcGridCellTempl,
+  //       "show":true, 
+  //       "nodeName": "FC-GRID-CELL-TEMPL",
+  //       "class":"fcGridCellTempl_valueElement", 
+  //       "id":"fcGridCellTempl",
+  //       "mappedKeys":this.path,
+  //       "handler": this.ObjectPropertyHandler,
+  //       "hashPath":"local-host:3000/fcDashboardDivisions"
+  //       }, 
+  //       { 
+  //       "thisConstructor":FcGridContainer,
+  //       "show":true,
+  //       "id":"fcGridContainer", 
+  //       "nodeName":"FC-GRID-CONTAINER" 
+  //       },
+  //       { "thisConstructor":FcMappedGrid,
+  //           "nodeName": "FC-MAPPED-GRID", 
+  //           "show":true,
+  //           "name":"fcMappedGrid",
+  //           "id":"fcMappedGrid",
+
+  //         },
+  //         {"thisConstructor":FcRqtversionc,
+  //         "nodeName":"FC-RQTCVERSIONC",
+  //         "show":true,
+  //       },{"thisConstructor":FcDragMenuProto,"name":"fcRqtcVersionC","show":false}];},
+    
+  //   notify: true,
+  // },
+handleDrop(e){
+       /* var lt=e.detail.sourceEvent.toElement;
+                      var bool =Polymer.dom(lt).classList.contains("wrapper");
+                      console.log(bool);
+                      while(!bool && lt.nodeName!="FC-RELATIVE-FIT-WRAPPER")
+                       {
+                          lt=lt.parentElement;
+                           var bool =Polymer.dom(lt).classList.contains("wrapper");
+                       }
+                      if(bool && this.isWrapper==true){
+                        var parent=lt.parentElement;
+                        Polymer.dom(this.parentDragEl).insertBefore(lt, this.dragEl);
+                        Polymer.dom(parent).appendChild(this.dragEl);
+                        self.dragging=false;
+                        self.set("refit",true);
+                        Polymer.dom.flush();*/
+                      // }
+
+
       // var target = Polymer.dom(e).localTarget;
         // if (target && target.hasAttribute('drawer-toggle')) {
         //   this.drawer.toggle();
@@ -703,4 +850,16 @@ computeOptionsArray(item, val){
    <fc-rqtversionc></fc-rqtversionc>
    </template>
    <fc-dashboard-one hidden id="focusedPrimeOne">
-   </fc-dashboard-one> -->
+   </fc-dashboard-one>
+    <template is="dom-repeat" id="widgetHolder" items="{{widgets}}" as="widget">
+    <section class="horizontal flex layout wrap" style="margin-left: 32px;">
+      <section style="height: 36px; width: 36px; overflow: hidden; margin: 16px; border:solid gold 6px; background: green; box-shadow: 4px 8px 16px 5px #aeaeae; border-radius: 50%; z-index: 34;" parent-cws="out" on-up="handleDrop" text="{{widget.name}}">
+        <fc-relative-fit-wrapper id="wrapper{{index}}" on-track="dragAndDrop" class="item wrapper" cws="out" on-track="dragAndDrop" draggable drags>
+       </fc-relative-fit-wrapper>
+    </section>
+    <span>
+  </span>
+    <span class="horizontal layout center justified">{{widget.nodeName}}</span>
+  </section>
+</template>
+    -->
