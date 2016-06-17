@@ -28,21 +28,16 @@
 			<array-selector 
 				id="selector" 
 				items="{{menuItemArray}}" 
-				selected="{{selected}}"
-
-				multi="true"
-				toggle>
+				selected="{{selected}}">
 			</array-selector>
 
 	    	<fc-dropdown-menu 
 	    		class="flex layout horizontal"							
 		  		style="max-width: 60px;" 
-		  		 
 		  		id="questionsForPassages"
 		  		data-source="{{menuItemArray}}" 
 		  		selected="{{selectedItem}}"
-		  		value$="{{selectedItem.key}}"
-		  		label="Questions"
+ 		  		label="Questions"
 		  		>
 		  	</fc-dropdown-menu>
 		</div>
@@ -66,27 +61,40 @@
 <script>
 FcPassageQuestionDisplay=Polymer({
 	is: "fc-passage-question-display",
+	listeners:{"newPassageSelectedTwo": "listenToSelection"},
 	behaviors:[FCBehaviors.FcQuestionLocalDataBehavior],
 	properties: {
 		
 		sharedSelection: {
-			type: String,
+			type: Object,
+			value:function(){return{};},
+			observer: "observeSharedSelection",
+			reflectToAttribute:true,
 			notify: true,
-			reflectToAttribute: true
 		},
 		passageTypeSelected: {
 			type: String,
-			value: function(){return "fiction";},
+			value: function(){return "";},
 			notify: true
-		}
+		},
+		
 		
 	},
 
 	attached: function(){
 		this._getAndSetData();
 	
+	},
+	observeSharedSelection(newVal, oldVal){
+			console.log(newVal,oldVal);
+			this.coincideChange();
+			if(newVal.questionItemKey){
+				this.set("selected.menuItem",newVal.questionItemKey);
+				console.log(this.selected,this.selected.menuItem, "I am alove");
+			this.$.questionsForPassages.set("bindValue", this.selected.menuItem);
+			}
+	},
 
-}
 
 	
 });

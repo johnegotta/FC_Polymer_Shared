@@ -1,15 +1,31 @@
 <script>
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FcPassageLocalDataBehavior = {
+listeners:{"questionKey":"setQuestionKey"},
 properties:{
 	selected: {
-		type: Array,
+		type: Object,
+		value: function(){return {};},
+		observer: "observeSelected",
 		notify: true
 	},
 	selectedItem:{
 		type:String,
+		value: function(){return "";},
 		notify: true
 	},
+	questionKey:{
+		type: String,
+		value: function(){return "";},
+		notify: true,
+
+	},
+	passageTitleForMenu:{
+		type: String,
+		value: function(){return "";},
+		notify: true,
+	},
+
 	 menuItemArray: {
    		type: Array,
 		value: function(){
@@ -20,17 +36,25 @@ properties:{
 
 },//end of properties
 
-
-
 	_getAndSetLocalOrDatabase:function(){
 		var gotLocalPassages=	localStorage.getItem('localPassages');
 			gotLocalPassages = JSON.parse(gotLocalPassages);
-	 (gotLocalPassages!=undefined)?this.set("menuItemArray",gotLocalPassages) && this.set("itemSelected", gotLocalPassages[0]):this._getFromFireBaseAndSetLocal();
-	// console.log(this.menuItemArray);
+			console.log(gotLocalPassages[0].questionItemKey);
+			this.set("questionKey",gotLocalPassages[0].questionItemKey);
+			this.set("passageTitleForMenu",gotLocalPassages[0].menuItem);
+	 (gotLocalPassages!=undefined)?this.set("menuItemArray",gotLocalPassages):this._getFromFireBaseAndSetLocal();
+	
 		},
 attached: function(){
 		this._getAndSetLocalOrDatabase();
-	},
+		},
+
+	observeSelected(newVal, oldVal){
+		if(newVal.key){
+		this.fire("newPassageSelected", {"newSelected": newVal});
+			}
+	}, 
+	
 	 _getFromFireBaseAndSetLocal: function(){
 		var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
 		var self=this;

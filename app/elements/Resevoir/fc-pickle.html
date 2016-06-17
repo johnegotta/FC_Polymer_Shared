@@ -263,23 +263,11 @@ input[type="number"]{text-align: center; }
 	</paper-header-panel>
 </template>
 <script>
-'use strict';
-    (function() {
-	class FcPickle {
-	   get behaviors() { 
-	    return [
-		  Polymer.IronResizableBehavior, 
-		  FCBehaviors.FCFirepadBehavior, 
-		  FCBehaviors.PassageDataBehavior,
-		 FCBehaviors.FcQuestionLocalDataBehavior
-		 //FCBehaviors.MetaObjectSavingBehavior
-		  ];
-	   }
-	   beforeRegister() {
-
-	this.is = 'fc-pickle';
-	    this.properties = {
-		newDatabasePath:{
+FcPickle=Polymer({
+is:"fc-pickle",
+behaviors: [Polymer.IronResizableBehavior, FCBehaviors.FCFirepadBehavior, FCBehaviors.PassageDataBehavior,FCBehaviors.FcQuestionLocalDataBehavior ],
+properties:{
+	newDatabasePath:{
 			type: String,
 			value: function() {return "";},
 			notify: true
@@ -398,17 +386,11 @@ input[type="number"]{text-align: center; }
 		  	},
 			notify: true
 		}	
-    };
-	   }
+    },
 	
 	 ready(){
 	 this.loadFirepad();
-	     
-// 		var ref = new Firebase("https://focusedstaging1.firebaseio.com/patterns");
-// 		ref.orderByChild("questions").on("child_added", function(snapshot) {
-//   console.log(snapshot.val()+ " was " + JSON.stringify(snapshot.val().questions) + " question nunmber");
-// });
-	}
+	},
 
 
 	 createMetaObject(){
@@ -439,7 +421,7 @@ input[type="number"]{text-align: center; }
 			"passageMenuItem": this.passageMenuItem,
 			"isTwoColumns": this.isTwoColumns
 		});
-		}
+		},
 
 	createPassageObject(){
 		this.set("passageObject",
@@ -455,19 +437,16 @@ input[type="number"]{text-align: center; }
 				var ref = new Firebase("https://focusedcoaching.firebaseio.com/reading/passages");
 		ref.child(fcidString).set(self.passageObject);
 
-	}
+	},
 	attached(){
-		//this._toggleRightDrawer();
-		//this._toggleLeftDrawer();
-
-	}
+	},
 
 	 saveLocal(){
 	 	var passageContent = this.firepad.getText();
 	 	this.getText(passageContent);
 	 	this.createMetaObject();
 	 	this.createPassageObject();
-	 }
+	 },
 	saveToDb(){
 		this.saveLocal();
 		this.createPassageObject();
@@ -481,7 +460,7 @@ input[type="number"]{text-align: center; }
 	  else {
 	  	this.openDialog();
 	  }
-	}
+	},
 
 	clearInputs(){
 		this.set("passageType", null);
@@ -492,42 +471,14 @@ input[type="number"]{text-align: center; }
 		this.set("fcid",null);
 		this.set("passageTitle", null);
 	
-	}
+	},
 
 	openDialog(){
 		Polymer.dom("fc-dashboard-one").querySelector("#dataAdminPrime").open();
-	}
-	_toggleRightDrawer(){
-			var drawer = document.querySelector('#drawer-2');	
-			if(drawer.forceNarrow!==true)
-			{drawer.forceNarrow = true;}
-			else{drawer.forceNarrow = false;
-			}
-	}
-	_toggleLeftDrawer(){
-		var drawer = document.querySelector('#drawerPrimed');
-          var dashboard = document.querySelector("#dashboardPrime");	
-		if(drawer.forceNarrow!==true)
-          {
-               drawer.forceNarrow = true;
-               drawer.responsiveWidth='90000px';
-               dashboard.leftHidden=true;
-          }
-          else
-          {
-               drawer.forceNarrow = false;
-               drawer.responsiveWidth ='1080px';
-               dashboard.leftHidden=false;
-
-          }
-     }
+	},
 	
-
-}
-
-    Polymer(FcPickle);
-
-  })();
+	
+  });
  </script>
  </dom-module>
  

@@ -130,21 +130,34 @@ FcPassageDbDisplay=Polymer({
 			},
 			notify: true,
 	    }, 
+	selectedItemKey:{
+			type:String,
+			value: function(){return'';},
+			observer:"observeSelectedItemKey",
+			notify: true
+
+	},
 	
 	
     passageObject: {
     	type: Object,
-    	 notify: true
+    	 notify: true,
+    	 observer:"passageObjectObserver",
     },
   
 }, //end of properties
 	ready: function(){
 	 this.addEventListener("mouseover", this.setMeasureParams);
 	},
+	passageObjectObserver(newVal,oldVal){
+			console.log(newVal, newVal.key);
+	},
 	_computeSelectedQuestions: function (selected){
 	var returnValue = selected.relatedItemKey; 
 	return returnValue;
 },
+	observeSelectedItemKey(nv,ov){console.log(nv,ov);},
+
 	toggleSelection: function(e){
 	
 		
@@ -153,6 +166,7 @@ FcPassageDbDisplay=Polymer({
 	
 	_computeSharedSelection:function(selected){
 	 		var returnValue = this.menuItemArray.questionItemKey;
+	 		console.log(selected);
 	 		return returnValue; 
 	 },
 	attached: function(){

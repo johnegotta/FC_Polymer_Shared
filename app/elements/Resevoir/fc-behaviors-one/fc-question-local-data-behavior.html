@@ -1,8 +1,11 @@
 <script>
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FcQuestionLocalDataBehavior = {
+
 properties:{
 	selected: {
+		type:Object,
+		value:function(){return{};},
 		notify: true,
 		},
 	selectedItem: {
@@ -23,18 +26,19 @@ properties:{
 	coincideChange: function(){
 		var counter = this.menuItemArray.length;
 		for(var i=0; i<counter; i++){
-			if(this.menuItemArray[i].key ==this.sharedSelection){
+			if(this.menuItemArray[i].key ===this.sharedSelection.questionItemKey){
 				//alert("We have a 	match");
 				this.set("selectedItem", this.menuItemArray[i]);
 				this.set("selected", this.selectedItem);
+				this.set("selectedItem.key",this.sharedSelection.questionItemKey);
 				}
 		}
 	},
 
 	attached: function(){
 		this._getAndSetData();
+		console.log(this.menuItemArray, "keys?");
 	},
-
 	_getAndSetData:function(){
 		var gotLocalQuestions=	localStorage.getItem('localQuestions');
 			gotLocalQuestions = JSON.parse(gotLocalQuestions);
@@ -58,7 +62,7 @@ properties:{
 					"key": keys[i],
 					"relatedContentKey": relatedContentKey 
 				});
-		    console.log(self.menuItemArray[i].key);
+		    console.log(self.menuItemArray[i].key, self.menuItemArray[i].relatedContentKey, "look here for keys to synch");
 		    }
 		    var holder = self.menuItemArray;
 		   holder= JSON.stringify(holder);

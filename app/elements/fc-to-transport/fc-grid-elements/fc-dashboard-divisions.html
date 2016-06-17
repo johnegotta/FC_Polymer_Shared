@@ -70,10 +70,10 @@
     div{overflow: hidden;
         height: 50%;
           overflow-y: scroll;
-          max-height: 110%;
+          max-height: 102%;
         }
     #box5, #box11{
-          min-height:218vh;
+          min-height:198vh;
       }
 
     fc-relative-fit-wrapper{
@@ -202,7 +202,7 @@
 Polymer({
   is:"fc-dashboard-divisions",
     behaviors:[Polymer.IronResizableBehavior],
-    listeners: {'app-drawer-reset-layout': 'resetLayout'},
+    listeners: {'app-drawer-reset-layout': 'resetLayout',  "newPassageSelected": "listenToSelection", "newPassageSelectedTwo":"didItFire"},
     observers: ['resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'],
     properties:{
         hiddenProp:{
@@ -272,6 +272,12 @@ Polymer({
               "nodeName": "FC-PASSAGE-DB-DISPLAY",
               "constructorName":"FcPassageDbDisplay",
               "constructor":FcPassageDbDisplay,
+            },
+            { "sectionClass": "normal buttons blue-btn-class",
+              "iconUsed": "icons:chrome-reader-mode",
+              "nodeName": "FC-PICKLE",
+              "constructorName":"FcPickle",
+              "constructor":FcPickle,
             },
             // { "sectionClass": "normal buttons blue-btn-class",
             //   "iconUsed": "icons:assessment",
@@ -364,7 +370,7 @@ Polymer({
         },
         constructorArray:{
           type: Array,
-          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar],["FC-PASSAGE-QUESTION-DISPLAY",FcPassageQuestionDisplay],["FC-GRID-CONTAINER",FcGridContainer],["FC-RQTVERSIONC",FcRqtversionc], ["FC-PASSAGE-DB-DISPLAY",FcPassageDbDisplay]];},
+          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar],["FC-PASSAGE-QUESTION-DISPLAY",FcPassageQuestionDisplay],["FC-GRID-CONTAINER",FcGridContainer],["FC-RQTVERSIONC",FcRqtversionc], ["FC-PASSAGE-DB-DISPLAY",FcPassageDbDisplay],["FC-PICKLE", FcPickle]];},
           notify: true
           },
           responsiveWidth: {
@@ -466,11 +472,20 @@ Polymer({
             var setVal=(this.screenWidth-delta);
     },
     observeResize(newVal, oldVal){
-        console.log(newVal, oldVal);
+        // console.log(newVal, oldVal);
         this.notifyResize();
-
-
     },
+    didItFire(e){console.log(e.detail.newSelected);},
+    listenToSelection(e){
+      console.log(e.detail.newSelected, "YOU GOT THE KEY");
+      var elem = this.$$("FC-PASSAGE-QUESTION-DISPLAY"); 
+      console.log(elem);
+      if(elem){
+      elem.set("sharedSelection", e.detail.newSelected);
+      console.log(elem.sharedSelection);
+        }
+      this.fire("newPassageSelectedTwo", {"newSelected": e.detail.newSelected});
+      },
     
     _computeStateChanged(params){},
     computeDashBoardElementInitialization(nameOfElement,hasStateChange,screenWidth, screenHeight){
