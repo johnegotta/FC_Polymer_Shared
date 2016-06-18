@@ -66,6 +66,11 @@ Polymer({
 			value: function(){return ""},
 			observer:"observeTabClicked",
 		},
+		profileArrays:{
+			type: Array,
+			value: function(){return[];},
+			notify: true,
+		},
 		
 		elemsArray:{
 			type:Array,
@@ -83,16 +88,35 @@ Polymer({
 	ready: function(){
 	//console.log(this.dataObject, this.divId,"there were lots of empty instances here with no dom show of btns");
 	},
+	getArraysAb(){
+		var papa=document.querySelector("FC-DASHBOARD-DIVISIONS"),
+		key="FC-CALL-CENTER-DIALOG",
+		elem=papa.elemMap.get(key);
+		var inputArrays=elem.inputArraysAb;
+		this.set("profileArrays",inputArrays);
+		if(this.profileArrays && this.profileArrays.length>0){
+			var children=Polymer.dom(this.$.hanger).children;
+			children.forEach(function(val, item, array){
+				val.itemsArraysOne=this.profileArrays;
+			}, this);
+
+		}
+
+
+
+	},
 	computeDataObject(ob, name){
 		console.log(ob, name);
 		var map=new Map();
-		var array=["red","#009","orange","#005c00","purple","white", "aqua", "aliceblue", "yellow"];
+		var array=["#fff","#009","orange","#005c00","purple","white", "aqua", "aliceblue", "yellow"];
 		var fmap=ob.map(function(obb,i,arr){
+
 			var elem = new obb[name].constructor();
+			elem.background=array[i];
 						this.objectsToInstantiate++;
-						if(i!==2){Polymer.dom(elem).classList.add("hidden");}
+						if(i!==0){Polymer.dom(elem).classList.add("hidden");}
 						var key=obb[name].nodeName+"_"+this.objectsToInstantiate.toString();
-						elem.background=array[i];
+						
 						map.set(key, elem);
 						Polymer.dom(this.$.hanger).appendChild(elem);
 						return map.get(key);
@@ -104,6 +128,7 @@ Polymer({
 	observeTabClicked(newval, oldval){
 		console.log(newval,oldval);
 		if(newval){
+			this.getArraysAb();
 
 		var children=Polymer.dom(this.$.hanger).children;
 		children.forEach(function(child, i, arr){
@@ -111,7 +136,7 @@ Polymer({
 			else if(i===newval){Polymer.dom(child).classList.remove("hidden");}
 		},this);
 		}
-
+		else{}
 
 	},
 

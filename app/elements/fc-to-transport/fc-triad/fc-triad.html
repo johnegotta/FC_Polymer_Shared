@@ -88,12 +88,26 @@ on-track="focusedDragMe" -->
 <!--holder for horizontal two panel view begins here-->
 	<div drags on-down="dragsOn" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer">
 	<!--text-holder is here-->
-		<div class="layout vertical flex-4" style="background: #fafafa; padding: 12px 24px;">
-  			<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
-    					<span class="marquee">{{wordEvent}}</span> 
-    					
-  			</template>
-  		</div>
+		<iron-image width="200px" height="120px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image>
+		<div class="vertical layout self-stretch nowrap" > 
+
+      <template is="dom-repeat" id="inputTemplate" items="{{itemsOneObject}}">
+        <section class="horizontal layout container holderClass"> 
+        <span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
+      </section>
+      <div class="horizontal layout flex wrap stretch center center-justified">
+        <section class="container holderClass">
+          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
+          </fc-input-search-select>
+        </section>
+        <section class="container holderClass">
+          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
+          </fc-input-search-select>
+        </section>        
+    </div>
+    
+  </template>
+  </div>      
   	<!--text holder ends-->
   	<!--calendar and green division begin-->
 		<div class$="layout {{visualSwap}} flex-10"><!--visual swap in horizontal layout here-->
@@ -250,11 +264,41 @@ FcTriad=Polymer({
 			value: false,
 			notify: true
 		},
+		itemsArraysOne:{
+			type: Array,
+			value:function(){return [];},
+			notify: true,
+		},
+		itemsOneObject:{
+			type: Array,
+			computed:"_computeItemsOneObject(itemsArraysOne,indexItemsArraysOne)",
+			notify: true
+		},
 		wordEvents:{
 			type:Array,
 			value: function(){
 			readingArr=[];
 			var words="I walked twenty miles a day, when I had just turned twenty years-old...Older dogs not only have a difficult time learning new tricks, but also tend to forget even their most favored of youthful pleasures. Older men would be more faithful. So, I was to marry a Berto twenty years my senior, unlike her Berto who--at twenty days he junior--the whole world believed would have wandered if Mama were not so incessantly desirable. It is twenty minutes past when Berto and I married: Mamma insisted on that precise time. She always said that she and 'her' Berto had such a lovely first night and forty-four years of time after together all beacse they had and she would never pay any mind to others schedules. Mamma called it one of her Benito's many, but oddly enough--to her at least--most reveerred and marvelled at traits. Mamma never seemed to understand that everyone actually did everything at her pace and on her schedule. She was the Mussolini of the whole world's personal train schedule. Everything precisely on time. Her time or someone shot the clock, and everyone who had ever so terribly lie about the time.";
+				var wordArr=words.split(" "),
+				counter=wordArr.length,
+				start=wordArr[0];
+				for(var i=1; i<counter;i++){
+					var zeroed=i%9;
+					start +=" " +wordArr[i];
+					start=start.toString();
+					if(zeroed===0||i+1.1>counter){ 
+						readingArr.push(start);
+						start="";
+					}
+						}
+			return readingArr;},
+			notify: true,
+		},
+		wordEvents2:{
+			type:Array,
+			value: function(){
+			readingArr=[];
+			var words="Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left";
 				var wordArr=words.split(" "),
 				counter=wordArr.length,
 				start=wordArr[0];
@@ -284,10 +328,48 @@ FcTriad=Polymer({
 			notify: true
 
 		},
+		forwardOneArray:{
+			type:Boolean,
+			value: function(){return false;},
+			notify: true,
+		},
+		backOneArray:{
+			type:Boolean,
+			value: function(){return false;},
+			notify: true,
+		},
+		indexItemsArraysOne:{
+			type:Number,
+			value: function(){return 0;},
+			notify:true,
+
+		},
+		user:{
+			type:Object,
+			notify: true, 
+
+		},
+		params:{
+			type: Object,
+			notify: true,
+		},
+
+
+	
 
   },
+
+  computeItemHeaderHidden(header){
+    if(header){return false;}else{return true;}
+  },
+  
 computeEventHeightLightColor:function(){
 	return "aliceblue";
+},
+_computeItemsOneObject(itemsArraysOne,indexItemsArraysOne){
+	if(itemsArraysOne && itemsArraysOne.length>0){
+	return itemsArraysOne[indexItemsArraysOne];
+}
 },
 
 computeDay: function(day){if(day){return "pretty";}

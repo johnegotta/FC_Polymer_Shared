@@ -50,17 +50,17 @@
         margin: 12px;
         --paper-card-header-image-text:{color:#009; position: absolute; right: 6px; top: 25px;}
         --paper-card-header-image: {width: 138px; height: 90px; position: absolute: top: 0px left: 8px; margin: 2px 16px 16px 8px;}
-        --paper-card-header:{height: 95px; border-bottom: double 6px green;}
+        --paper-card-header:{height: 95px; border-bottom: double 6px silver;}
   
     }
     fc-input-search-select.right{
         padding: 4px;
-        margin: 4px 8px;
+        margin: 4px 6px 4px 6px;
         max-width: 660px;
       }
     fc-input-search-select.left{
       padding: 4px;
-        margin: 4px 6px;
+        margin: 4px 6px 4px 6px;
         max-width: 660px;
     }
     paper-button{
@@ -105,9 +105,7 @@
 			padding: 2px;
 		}
 
-    paper-input{
-      margin:12px;
-    }
+    
     gold-input{
      margin:12px; 
     }
@@ -122,7 +120,7 @@
     paper-radio-button{
     		font-size: 16px;
     		font-weight: 600;
-    		size: var(--paper-radio-size, 18px);
+    		size: var(--paper-radio-size, 24px);
     		 /*  --paper-radio-button-label-color: var(--my-blue-009, #000099);*/
     		   --paper-radio-button-checked-color: var(--paper-green-900);
 
@@ -146,11 +144,11 @@
         width: 36px;
         height: 36px;
     }
-    p{
-    	text-indent: 36px;
+    /*p{
+    	text-indent: 24px;
     	font-size: 14px;
     	font-weight: 600;
-    		}
+    		}*/
   .setHeight {
     min-height: 680px;
     max-height: 720px;
@@ -239,10 +237,10 @@
 
 		}
     .holderClass{
-        margin:8px;
-        padding:8px;
+        margin:4px;
+        padding:4px;
     }
-    @media(max-width: 570px){
+    @media(max-width: 620px){
     .container{
         width: 99%;
         @apply(--layout-vertical);
@@ -271,13 +269,13 @@
         <section class="horizontal layout container holderClass"> 
         <span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
       </section>
-      <div class="horizontal layout flex wrap stretch center center-justified">
+      <div class="horizontal layout flex wrap around-justified">
         <section class="container holderClass">
-          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
+          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" on-keyup="_sendInputChanged"iss-name="{{item.nameA}}" name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
           </fc-input-search-select>
         </section>
         <section class="container holderClass">
-          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
+          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" on-keyup="_sendInputChanged"  iss-name="{{item.nameB}}" name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
           </fc-input-search-select>
         </section>        
     </div>
@@ -286,7 +284,7 @@
   </div>      
 </div>
 <section style="height: 74px; min-width:110px;">
-</section>
+</section> <section style="color: brown; padding: 24px 8px; font-size: 32px; float: right; text-align: right;" btn="rightClick">NEXT PAGE &#10148</section>
     <div class="card-actions horizontal layout flex container center-justified" style="min-height: 18%;">
           <paper-button class="flex-1" btn="leftClick">back</paper-button>
            <paper-button class="flex-1" id="one" btn="rightClick">CONTINUE</paper-button>
@@ -311,7 +309,7 @@ FcCallCenterForm=Polymer({
 		},
     pageNumber:{
       type:Number,
-      value: function(){return 2;},
+      value: function(){return 1;},
       notify: true,
     },
 		date:{
@@ -319,7 +317,12 @@ FcCallCenterForm=Polymer({
 				value: function(){var date=new Date().toLocaleDateString();
 					return date;},
 				notify: true,
-		},
+		},searchVals:{
+      type: Object,
+      value: function(){return {};},
+      notify: true
+    },
+
       inputArray:{
         type: Array,
         notify: true,
@@ -332,18 +335,125 @@ FcCallCenterForm=Polymer({
       itemObject:{
         type:Array,
         notify: true,
-        
       },
+    sfna:{
+      type: Array,
+      notify: true,
+      value: function(){return [];},
+      observer:"observeSfna",
+    },
+    slna:{
+      type: Array,
+      notify: true,
+        value: function(){return [];},
+      observer:"observeSlna",
+    },
       currentHeight:{
         type: String,
         notify: true
       },
+      fcStudent: {
+          type: Object,
+          value: {},
+          observer: "fcStudentSelected",
+          notify: true
+        },
     
 	},
 
   computeItemHeaderHidden(header){
     if(header){return false;}else{return true;}
   },
+  _passSearchVals: function(e, detail){
+      console.log(e.detail.value, e.detail.name, "take Note here");
+      var name = e.detail.name;
+      var val = e.detail.value;
+        if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}
+      this.$.callList.updateSearchVals(this.searchVals, name, val);
+
+
+    },
+     observeSfna(nv,ov){
+      if(nv&&nv.length!==0){
+
+        }
+        var elem=Polymer.dom(this.root).querySelectorAll([name='studentFirstName'])
+        if(elem.dropdownItems==undefined||elem.dropdownItems.length==null){elem.dropdownItems=[];}
+        elem.dropdownItems=nv;
+        elem.itemSelectProperty="";
+
+        console.log(nv,ov,"look hr");
+
+     },
+
+     observeSlna(nv,ov){
+      if(nv&&nv.length!==0){
+
+        }
+        var elem=Polymer.dom(this.root).querySelectorAll([name='studentLastName'])
+        if(elem.dropdownItems==undefined||elem.dropdownItems.length==null){elem.dropdownItems=[];}
+        elem.dropdownItems=nv;
+        elem.itemSelectProperty="";
+        console.log(nv,ov,"look hr");
+     },
+
+  fcStudentSelected: function(newVal, oldVal)
+  {
+    console.log(newVal, oldVal);
+    if(newVal!={} && newVal.FcStudent!=null)
+    { //console.log(newVal);
+      var profile=newVal.FcStudent.profile;
+      //console.log(profile);
+      var prokeys =Object.keys(profile);
+      //console.log(prokeys);
+      var counter=prokeys.length;
+      //console.log(counter);
+      var pasta =newVal.FcStudent.pastacademics;
+      //console.log(pasta);
+      var pastakeys=Object.keys(pasta);
+      var len =pastakeys.length;
+      //console.log(pastakeys); 
+      var arr=[];
+      arr = Polymer.dom(this.root).querySelectorAll('fc-input-search-select');
+      console.log(arr);
+      var i=0;
+      //console.log(arr);
+      for(i=0; i<counter; i++)
+      {
+        arr.forEach(function(elem, index, arr){
+      
+          if(elem.name==prokeys[i])
+            {
+              elem.issValue=profile[prokeys[i]];
+              console.log(elem.issValue);
+            }
+          if((len-i)>0 && elem.name==pastakeys[i])
+            {
+              elem.issValue=pasta[pastakeys[i]];
+              elem.selected=pasta[pastakeys[i]];
+              console.log(elem.issValue);
+            }
+          console.log(elem.name, elem.issValue);
+        });
+      }
+    }
+  },
+  _sendInputChanged: function(e, detail){
+    
+    var target=e.target;
+    while(target.nodeName!=="INPUT" && (target.nodeName!=="PAPER-ICON-BUTTON" ||target.nodeName!=="FC-DDR-CARD")){
+      console.log(target.nodeName, e, target.value);
+      target=target.parentNode;
+    }
+    if(target.nodeName==="INPUT"){
+    var name=target.name;
+    this.fire("sendInputVal", {value: target.value, name: name});
+    this.searchVals[name]=target.value;
+  }
+  },
+_computeProfileObj: function(dataSource){
+  console.log(dataSource.itemValue);
+},
   
 
 

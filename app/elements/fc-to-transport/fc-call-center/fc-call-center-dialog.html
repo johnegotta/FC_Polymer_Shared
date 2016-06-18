@@ -271,14 +271,16 @@
             </div>
             <template is="dom-repeat" items="{{inputArraysAb}}">
                 <div>
-                    <fc-call-center-form input-array="{{item}}" current-height="{{siblingHeight}}"item="{{inputArraysAb}}" page-number="{{computePageNumber(selected)}}" item-object="{{item}}">
+                    <fc-call-center-form input-array="{{item}}" current-height="{{siblingHeight}}"item="{{inputArraysAb}}" page-number="{{computePageNumber(selected)}}" item-object="{{item}}" 
+                    fc-student="{{studentSelectable}}" 
+                    search-vals="{{searchVals}}" slna="{{slna}}" sfna="{{sfna}}">
                         <span class="pageTotal">{{_computePageTotal(inputArraysAb, index)}}
                         </span>
                     </fc-call-center-form>
                 </div>
             </template>
             <div>
-        <fc-call-list-view id="callList" style="height: 600px; width:460px;" search-vals="{{searchVals}}"></fc-call-list-view>
+        <fc-call-list-view id="callList" style="min-height: 420px; min-width:315px;" search-vals="{{searchVals}}" student-first-name-A="{{sfna}}" student-last-name-A="{{slna}}"></fc-call-list-view>
         </div>
         <div>
          <fc-tabbed-card id="viewProfile" student="{{studentSelectable}}" on-close="_onClose"></fc-tabbed-card>
@@ -321,6 +323,15 @@ FcCallCenterDialog=Polymer({
             notify: true, 
             reflectToAttribute: true
     },
+    sfna:{
+      type: Array,
+      notify: true,
+      observer:"observeSfna",
+    },
+    slna:{
+      type: Array,
+      notify: true,
+    },
     childHeight:{
         type: String,
         notify: true,
@@ -341,7 +352,7 @@ FcCallCenterDialog=Polymer({
         },
         selected: {
           type: Number,
-          value: function(){return 5;},
+          value: function(){return 0;},
           notify: true
         },
     inputArraysAb:{
@@ -366,9 +377,38 @@ FcCallCenterDialog=Polymer({
 			},
 			notify: true,
 		},
+    studentSelectable:{
+      type:Object,
+      value: {},
+      notify: true,
+    },
+    isFormSubmitted:{
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+    
+     rootPath: {
+          type: String,
+          value: function()
+              { var rootPath= "https://focusedstaging1.firebaseio.com";
+                return  rootPath;
+              },
+          notify: true
+        },
+      callRecordPath:{
+          type: String,
+          value: function(){return "/inquiries"}
+        },
+     
+      searchVals:{
+          type: Object,
+          value: {},
+          notify: true,
+          reflectToAttribute: true
+        },
+  },//end of properties
 		
-
-	},
     doStuffOnLoad(e){
         this.async(function(){window.getComputedStyle(this.$.container1, null).getPropertyValue("height");}, 4400);
         console.log(window.getComputedStyle(this.$.container1, null).getPropertyValue("height"), e);
@@ -377,6 +417,10 @@ FcCallCenterDialog=Polymer({
     console.log(childHeight, childHeight);
     return childHeight;
 
+  },
+  observeSfna(nv,ov){
+    if(nv&&nv.length>0){
+    }
   },
 
   ready(){
@@ -506,17 +550,9 @@ FcCallCenterDialog=Polymer({
             }
         }
     },
-_passSearchVals: function(e, detail){
-      console.log(e.detail.value, e.detail.name, "take Note here");
-      var name = e.detail.name;
-      var val = e.detail.value;
-        if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}
-      this.$.callList.updateSearchVals(this.searchVals, name, val);
 
-
-    },
     _onCallClick: function(e) {
-      this.$.pages.selected = 1;
+      this.$.pages.selected = 7;
       console.log(e.detail.item);
      this.$.viewProfile.setStudent(e.detail.item.fcid); 
      console.log(e.detail.item.fcid);
@@ -557,15 +593,119 @@ _passSearchVals: function(e, detail){
        rightClick: function() {
         this.entryAnimation = 'slide-from-left-animation';
         this.exitAnimation = 'slide-right-animation';
-       this.selected = (this.selected === (this.inputArraysAb.length))? 0 : (this.selected + 1);
+       this.selected = (this.selected === (this.inputArraysAb.length+2))? 0 : (this.selected + 1);
        
       },
       leftClick: function() {
         this.entryAnimation = 'slide-from-right-animation';
         this.exitAnimation = 'slide-left-animation';
-       this.selected = this.selected === 0 ?(this.inputArraysAb.length): (this.selected - 1);
+       this.selected = this.selected === 0 ?(this.inputArraysAb.length+2): (this.selected - 1);
          
       },
+
+
+
+// ready: function(){ 
+//     var d = new Date();
+//     var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+//     this.daysOfWeek = days[d.getDay()].toString();  
+//     var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+//     this.month = months[d.getMonth()].toString().slice(0,3);
+//     console.log(this.month);
+
+//     var day = this.day = d.getDate().toString();
+//     console.log(d);
+//     var year = this.year = d.getFullYear().toString();
+//     this.timeStamp = days[d.getDay()].toString().slice(0,3) +'.' + ' ' + this.month + ' ' + day + ',' + ' ' +year;
+//   },
+
+//   fcStudentSelected: function(newVal, oldVal)
+//   {
+//     console.log(newVal, oldVal);
+//     if(newVal!={} && newVal.FcStudent!=null)
+//     { //console.log(newVal);
+//       var profile=newVal.FcStudent.profile;
+//       //console.log(profile);
+//       var prokeys =Object.keys(profile);
+//       //console.log(prokeys);
+//       var counter=prokeys.length;
+//       //console.log(counter);
+//       var pasta =newVal.FcStudent.pastacademics;
+//       //console.log(pasta);
+//       var pastakeys=Object.keys(pasta);
+//       var len =pastakeys.length;
+//       //console.log(pastakeys); 
+//       var arr=[];
+//       arr = Polymer.dom(this.root).querySelectorAll('fc-input-search-select');
+//       var i=0;
+//       //console.log(arr);
+//       for(i=0; i<counter; i++)
+//       {
+//         arr.forEach(function(elem, index, arr){
+      
+//           if(elem.name==prokeys[i])
+//             {
+//               elem.value=profile[prokeys[i]];
+//               console.log(elem.value);
+//             }
+//           if((len-i)>0 && elem.name==pastakeys[i])
+//             {
+//               elem.value=pasta[pastakeys[i]];
+//               elem.selected=pasta[pastakeys[i]];
+//               console.log(elem.value);
+//             }
+//           console.log(elem.name, elem.value);
+//         });
+//       }
+//     }
+//   },
+//   _sendInputChanged: function(e, detail){
+    
+//     var target=e.target;
+//     while(target.nodeName!=="fc-input-search-select"){
+//       console.log(target.nodeName, e.target.value);
+//       target=target.parentNode;
+//     }
+//     var name=target.name;
+//     this.fire("sendInputVal", {value: e.target.value, name: name});
+//     this.searchVals[name]=e.target.value;
+//   },
+// _computeProfileObj: function(dataSource){
+//   console.log(dataSource.itemValue);
+// },
+
+_passSearchVals: function(e, detail){
+      console.log(e.detail.value, e.detail.name, "take Note here");
+      var name = e.detail.name;
+      var val = e.detail.value;
+        if(name=="parent1FirstName"){this.set("searchVals.parent1FirstName", val);}else if(name=="parent1LastName"){this.set("searchVals.parent1LastName", val);} else if(name=="parent2FirstName"){this.set("searchVals.parent2FirstName", val);}else if(name=="parent2LastName"){this.set("searchVals.parent2LastName", val);}else if(name=="firstName" || name=="studentFirstName"){ this.set("searchVals.studentFirstName", val);}else if(name=="studentLastName" || name=="lastName"){ this.set("searchVals.studentLastName", val);}else if(name=="parent1Email"){this.set("searchVals.parent1Email", val);} else if(name=="studentEmail" || name=="email"){ this.set("searchVals.studentEmail", val);} else if(name=="parent2Email"){ this.set("searchVals.parent2Email", val);}else if(name=="parent1Telephone"){ this.set("searchVals.parent1Telephone", val);}else if(name=="parent2Telephone"){ this.set("searchVals.parent2Telephone", val);} else if(name=="telephone" || name=="studentTelephone"){this.set("searchVals.studentTelephone", val);}else{this.set("searchVals", this.searchVals);}
+      this.$.callList.updateSearchVals(this.searchVals, name, val);
+
+
+    },
+_compute_atFocusedProgramFit: function(ak){
+    var returnVal =("focusedProgramFit"=="Grade 4")?["Young Scholars Reading","Young Scholars Math"]:("focusedProgramFit"=="Grade 5")?["Young Scholars Reading","Young Scholars Math", "Young Scholars:Young Authors"]:("focusedProgramFit"=="Grade 6")?["Young Scholars Reading","Young Scholars Math","Young Scholars:Young Authors","PSAT 8/9"]:("focusedProgramFit"=="Grade 7")?["PSAT 8/9","Young Scholars Reading","Young Scholars Math","Young Scholars:Young Authors","Focused1600Prep"]:("focusedProgramFit"=="Grade 8")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II: True Scholarship"]:("focusedProgramFit"=="Grade 9")?["1600 SAT","PSAT-NMSQT","PSAT 10","PSAT 8/9","Young Scholars II:Deep Learning"]:("focusedProgramFit"=="Grade 10+")?["1600 SAT","PSAT-NMSQT","PSAT 10"]:["1600 SAT"];
+      return returnVal;
+  },
+_computeTimeStampUseful: function(timeStamp, callLogFormOneObject){
+    var d = new Date();
+    var n = -d.getTime();
+    console.log(n);
+    return n;
+
+
+
+},
+
+_onChange: function(e){
+console.log(e.target.value);
+
+},
+updateInput: function(e){
+
+
+
+}
 
 });
 

@@ -20,7 +20,7 @@ span, {
 
 textarea:focus,
 input:focus {
-  outline: 1px green solid;
+  /*outline: 1px green solid;*/
   margin-bottom: 6px;
 }
 
@@ -32,7 +32,7 @@ input.question {
   margin: 0;
   border: none;
   opacity: .5;
-  width: 97%;
+  width: 100%;
   background: rgba(0, 0, 0, 0);
   transition: padding-top 0.4s ease, margin-top 0.4s ease;
   overflow-x: hidden;
@@ -44,7 +44,7 @@ input.question + label{
   white-space: nowrap;
   padding: 0;
   margin: 0;
-width: 80%;
+width: 90%;
   border-top: 1px solid red;
   -webkit-transition: width 0.4s ease;
   transition: width 0.4s ease;
@@ -53,8 +53,8 @@ width: 80%;
 
 input.question:focus + label
 {
-  width: 99%;
-  border-top: 3px solid red;
+  width: 102%;
+  border-top: 3px solid #005c00;
    -webkit-transition: width 0.3s ease, border-top .3s ease;
   transition: width 0.3s ease, border-top .3s ease;
 }
@@ -72,7 +72,7 @@ input.question:valid + label > span {
   z-index:0;
   font-size: 16px;
   font-family: merriweather;
-  color: #050;
+  color: #005c00;
 }
 
 input.question:valid + label{
@@ -180,7 +180,7 @@ top: -53px;
   transition: top 0.6s ease, display 0.6s ease, opacity 0.6s ease;}
 
 </style>
-<array-selector id="selector" items="{{dropdownItems}}" selected="{{selected}}" toggle multi="{{multiSelect}}"></array-selector>
+<array-selector id="selector" items="{{dropdownItems}}" selected="{{selected}}" multi="{{multiSelect}}"></array-selector>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="down" on-keys-pressed="onDownArrow"></iron-a11y-keys>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="up" on-keys-pressed="onUpArrow"></iron-a11y-keys>
 <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="onEnter"></iron-a11y-keys>
@@ -209,7 +209,9 @@ FcInputSearchSelect=Polymer({
 	is:"fc-input-search-select",
 	properties:{
 		issValue:{
+      type: String,
 			notify: true,
+      observer:"observeIssInput",
 		},
     maxHeight: {
       type: String,
@@ -220,6 +222,7 @@ FcInputSearchSelect=Polymer({
 			type:Array,
       value:function(){return[];},
 			notify: true,
+      observe:"observeDropdownItems",
 		},
 		selected:{
 			notify: true,
@@ -299,6 +302,11 @@ FcInputSearchSelect=Polymer({
           type: Number,
           notify: true
         },  
+        hostAttributes:{
+          value:{
+            notify: true
+          },
+        }
 	},//end properties
 	ready(){
     var retVal=(this.multiSelect===true)?[]:"";
@@ -311,6 +319,10 @@ FcInputSearchSelect=Polymer({
   this.set("startScrollTop",this.$.dropdownlist.scrollTop);
   this.set("baseScrollTop",this.$.dropdownlist.scrollTop);
  
+ },
+ observeIssInput(nv, ov){
+  if(nv){this.set("value",this.issValue);}
+
  },
  _computeItemSelectedPropValue(item, index,isp){
        //console.log(index, "in itemSelectPropValue");
@@ -326,6 +338,15 @@ FcInputSearchSelect=Polymer({
 	// 	}
 	 },
   	// doItAgain(){return this.call(this.doItAgainTempVar());}, REVISIT WHEN HOOKING UP SCHOOL CHOICE
+  observeDropdownItems(newVal,oldVal){
+    if(newVal&&newVal.length>0){
+
+
+
+    }
+
+
+  }, 
 	focusInput(){
     this.set("dropdownOpen",true);
     this.async(function(){
