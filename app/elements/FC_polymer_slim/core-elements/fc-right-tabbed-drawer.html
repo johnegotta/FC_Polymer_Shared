@@ -41,6 +41,39 @@
     		box-shadow: 0px  -5px 15px #d9d9d9 inset;
     		align-items: flex-start;
 			}
+.tab-buttons{
+     display: inline-block;
+     border: none;
+     color: #FFF;
+     border-radius: 4px;
+     -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+     font-family: Times New Roman;
+     min-width: 146px;
+     height: 50px;
+     max-width: 225px;
+     font-size:22px;
+     margin: 12px;
+     margin-top: -10px;
+     text-align: center;
+     padding: 20px;
+     padding-bottom: 40px;
+     box-shadow: 0px 1px 1px 0 #90ADD2, inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -moz-box-shadow:  0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     -webkit-box-shadow: 0px 1px 1px 0 #90ADD2,inset 9px 19px 19px 3px #223955,0px 8px 5px 0 #B3B3B3;
+     text-shadow: 0 1px 0 #48576D;
+     background-image: linear-gradient(to top, #4771FC, #79FCF8);
+     background-color: #3F45FC;
+    }
+  .tab-buttons-pressed, .tab-buttons:hover, .tab-buttons:active{
+ border: none;
+ color: #FFF;
+ box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -moz-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ -webkit-box-shadow: inset 0px 1px 0px 0 #90ADD2,0px 2px 0px 0 #223955,0px 4px 3px 0 #6B6B6B;
+ background-color: #395e8d;
+}
+
 .right-header{
 	background: #f7cb4d;			
 	}
@@ -52,7 +85,7 @@ neon-pages{
 		background: linear-gradient(to Top, #1e5799 34%,#1e5799 43%,#2989d8 58%,#207cca 63%,#7db9e8 98%); 
 	}*/
 
-
+.hidden{display: none;}
 .blue-btn-class{
  display: inline-block;
  border:7px solid #2435C9;
@@ -82,18 +115,20 @@ neon-pages{
  -webkit-box-shadow: inset 0 1px 0 0 #FFF6CE,inset 0 -1px 0 0 #E3C852,inset 0 0 0 1px #FCE88D;
  background-color: #5DD7FC;
 }
+.head{margin-top: 12px;}
 	</style>
 	<fc-data-element id="marvin" hidden></fc-data-element>
 	<paper-header-panel 
-		class="vertical layout fullbleed flex stretch" 
+		class="vertical layout fullbleed flex self-stretch" 
 		style="overflow-x: hidden;" 
-		mode="waterfall-tall">
+		mode="seamed">
 		<div 
 			class="paper-header" 
-			style="width: 100%;font-size: 14px; color: #006; margin: auto; ">
+			style="width: 100%;font-size: 14px; color: #006; padding: 24px 18px; margin: auto; ">
 			<paper-icon-button 
+				id="headerPanel"
 				icon="arrow-back" 
-				style="position: absolute; right: 10px; top: 10px; z-index: 4; border-radius: 200px; opacity: 1; background: red;" 
+				style="position: absolute; right:24px; top: 24px; z-index: 4; border-radius: 50%; opacity: 1; background: red;" 
 				on-tap="_onCloseMe">
 			</paper-icon-button>
 		</div>
@@ -103,41 +138,51 @@ neon-pages{
 			class="content vertical layout">
 		<neon-animated-pages
 		 	id="myNext2" class="flex gradBackground" attr-for-selected='data-transition' selected="[[mySelected]]">
-			<fc-main-drawer-page  style="padding-top: 150px;"
-					on-button-click="_onButtonClick"
+			<fc-main-drawer-page  style="padding-top: 75px;"
 					data-transition="default">
-					
 					<template 
 						is='dom-repeat' 
 						class="horizontal layout flex wrap center center-justified" 
 						items="{{iconArray}}">
 						<section 
+							class="buttons"
 							style$="[[computedStyle(determine)]]" 
 							data-transition$="[[item.dDialogTwo]]">
 							<iron-icon 
 								id$="[[item.dDialogTwo]]"
 				        		icon$="[[item.iconUsed]]"  
-				        		class$="[[item.sectionClass]] [[item.splitterClass]]"
+				        		class$="[[item.sectionClass]] buttons [[item.splitterClass]]"
 				        		data-transition$="[[item.dDialogTwo]]"
 				      			>
 							</iron-icon>
 						</section>
 					</template>
 				</fc-main-drawer-page>
-			<template is="dom-repeat" items={{iconArray}}>
+			<template is="dom-repeat" id="repeater" items={{iconArray}}>
         				<fc-animated-drawer-page data-transition$="[[item.dDialogTwo]]" inside-selection="{{secondarySelected}}">
-        					<fc-value-holder div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>
-        						<div class="head" >
-									<fc-input-generator class="head" data-source-button-tabs="[[item.tabDetails2]]">
-									</fc-input-generator>
+        					<fc-value-holder hidden div-id="[[item.divId]]" is-firepad="[[item.isFirepad]]"></fc-value-holder>	
+							<div class="head horizontal layout flex nowrap self-stretch" id="{{item.dDialogTwo}}">
+									<paper-tabs
+            							id="{{item.dDialogTwo}}" 
+            							scrollable
+            							selected="{{name}}"
+            							style="overflow-x: scroll;"
+            							on-tap="_tabClicked"
+            							attr-for-selected="name"
+            							class="buttons horizontal layout flex nowrap">   
+            							<template is="dom-repeat" class="horizontal layout flex nowrap" items="{{item.tabDetails2}}" as="tab">   
+             								<paper-button data-name$="{{tab.tabName}}" data-useful="{{tab.constructorObject.config}}" id$='[[tab.pageLinkId]]_buttonTab' meta="[[tab.meta]]" class$="[[tab.tabButtonClass]] tab-buttons" buttons scrollable>
+             									{{tab.tabName}}
+             								</paper-button> 
+  										</template>
+									</paper-tabs>
         						</div>
-								<div class="main left">
-									<iron-pages attr-for-selected="data-trans" selected="[[secondarySelected]]">
-									<div width="100%">
-										<template id="secondPages" is="dom-repeat" items="[[item.tabDetails2]]" as="second">
-										<div mode="seamed" data-trans$="{{second.tabName}}">
-
-											<div paper-header class="flex self-stretch" style="min-height: 50px; margin-top: 24px; background: magenta; width:50vw-64px;height: 100%; padding: 25px;">{{second.tabName}}</div>
+								<div id="fcTabContentHolder" class="left right mainish">
+									<fc-value-holder-two tab-clicked="{{tabClicked}}" data-object="{{item.tabDetails2}}" obj-property-name="constructorObject">
+									</fc-value-holder-two>
+								</div>
+								
+								<div paper-header class="flex self-stretch" style="min-height: 50px; margin-top: 24px; background: magenta; width:50vw-64px;height: 100%; padding: 25px;">{{second.tabName}}</div>
 											<div id="tabContentContainer" class="tabeContentContainer">
 
 											{{second.name}} select {{second.selected}}
@@ -148,11 +193,7 @@ neon-pages{
 												</content>
 
 											</div>
-										</div>
-										</template>
-									</iron-pages>
-								</div>
-									
+																	
 	        					
 	        			
         				</fc-animated-drawer-page>	
@@ -169,7 +210,11 @@ neon-pages{
 		  is:"fc-right-tabbed-drawer",
 			behaviors: [FCBehaviors.ResizableRootBehavior,
 						 FCBehaviors.FCFirepadBehavior
-						],			
+						],	
+			listeners:{"button-click":"_onButtonClick"
+
+
+			},		
 			properties: {
 				mySelected: {
 					type: String,
@@ -193,6 +238,13 @@ neon-pages{
 					type:Boolean,
 					value: false,
 					reflectToAttribute: true,
+					notify: true
+				},
+				effectiveChildren:{
+					type:Array,
+					value:function(){var children=this.getEffectiveChildren();
+						return children;
+					},
 					notify: true
 				},
 				
@@ -358,110 +410,108 @@ neon-pages{
 	                  value: "admin",
 	                  notify: true
 	             },
+	             tabClicked:{
+	             	type: String,
+	             	value: function(){return "";},
+	             	notify: true,
+	             },
 	        iconArray:{
 				type: Array,
 				value: function(){
 					return [
 
-						{	"sectionClass": " normal buttons blue-btn-class",
-							"dDialogOne": "firePadPrime",
- 							"iconUsed": "icons:spellcheck",
+						{	"sectionClass": "normal buttons blue-btn-class",
+							"dDialogOne": "focusedProfilePrime",
+ 							"iconUsed": "icons:account-circle",
  							"iconClass": "menuItems-dark", 
- 							"dDialogTwo": "firePadPrime",
+ 							"dDialogTwo": "focusedProfilePrime",
  							"dialogClass":"dialogClass",
- 							"indexNum": "005",
+ 							"indexNum": "000",
  							"isFirepad": false,
- 							"tabPageClass":"left main",
- 							"divId":'firepad', 
+ 							"tabPageClass":"right mainish",
  							"tabDetails2": [
-								            { "tabName": "Titling",
+								            { "tabName": "profile",
 											  "pageLinkId": "contentSavingPage",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  // "layoutClass": "buttons layout stretch center",
+											  "layoutClass": "buttons layout stretch center",
+											  "constructorObject":{"constructor": FcEventCalendar,"nodeName":"FC-EVENT-CALENDAR", "config":0,"constructorName":"FcEventCalendar"},
 											},
-											{ "tabName": "Content",
+											{ "tabName": "milestones",
 											  "pageLinkId": "firePadPrime",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "layoutClass": "flex"
+											  "layoutClass": "flex",
+											  "constructorObject":{"constructor": FcEventCalendar,"nodeName":"FC-EVENT-CALENDAR", "config":1,"constructorName":"FcEventCalendar"},
 											},
-											{ "tabName": "Preview",
-											  "pageLinkId": "passagePreview",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "layoutClass": "fourPanel flex"
-											  },
-											{ "tabName": "Data",
+										
+											{ "tabName": "statistics",
 											  "pageLinkId": "dataMapper",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "layoutClass": "twoPanel flex"
+											  "layoutClass": "twoPanel flex",
+											  "constructorObject":{"constructor": FcEventCalendar,"nodeName":"FC-EVENT-CALENDAR", "config":2,"constructorName":"FcEventCalendar"},
 											},
-											 {"tabName": "Revision",
+											 {"tabName": "current focus",
 											  "pageLinkId": "dataSaver",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "layoutClass": "hidden"
+											  "layoutClass": "",
+											  "constructorObject":{"constructor": FcEventCalendar,"nodeName":"FC-EVENT-CALENDAR", "config":3,"constructorName":"FcEventCalendar"},
 											},
-											{"tabName": "Publish",
+											{"tabName": "the future",
 											  "pageLinkId": "dataSaver",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "layoutClass": "twoPanel flex"
+											  "layoutClass": "twoPanel flex",
+											  "constructorObject":{"constructor": FcEventCalendar,"nodeName":"FC-EVENT-CALENDAR", "config":4,"constructorName":"FcEventCalendar"},
 											},
 
 			                            ],
 	                        "tabDataRef": "firePadPrime",
 	                        "secondaryControls": true,
 	                        "titlingInputs": [
-								            { "tabName": "Titling",
+	                        					{ "tabName": "Profile",
 											  "pageLinkId": "contentSavingPage",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "pageClass": "area1",
+											  "layoutClass": "buttons layout stretch center",
 											},
-											{ "tabName": "Content",
+											{ "tabName": "Milestones",
 											  "pageLinkId": "firePadPrime",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "pageClass": "area2"
+											  "layoutClass": "flex"
 											},
-											{ "tabName": "Preview",
-											  "pageLinkId": "passagePreview",
-											  "otherInfo": "OtherInfo",
-											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick",
-											  "pageClass": "area3"
-											  },
-											{ "tabName": "Data",
+											{ "tabName": "Statistics",
 											  "pageLinkId": "dataMapper",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  "pageClass": "area4"
+											  "layoutClass": "twoPanel flex"
 											},
-											 {"tabName": "Revision",
+											{"tabName": "Current Focus",
 											  "pageLinkId": "dataSaver",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
 											  "onTabClick": "onTabClick",
-											  //"pageClass": "area4"
+											  "layoutClass": ""
 											},
-											{"tabName": "Publish",
+											 {"tabName": "The Future",
 											  "pageLinkId": "dataSaver",
 											  "otherInfo": "OtherInfo",
 											  "tabButtonsClass": "tab-buttons",
-											  "onTabClick": "onTabClick"
-											}
+											  "onTabClick": "onTabClick",
+											  "layoutClass": "hidden"
+											},
+								            
 
 			                            ]
 			                        },
@@ -470,13 +520,13 @@ neon-pages{
  						{
 							"sectionClass": " normal buttons blue-btn-class",
 							"dDialogOne": "loginMenu",
- 							"iconUsed": "icons:account-circle",
+ 							"iconUsed": "icons:spellcheck",
  							"iconClass": "menuItems-dark", 
  							"dDialogTwo": "loginMenu",
  							"dialogClass":"dialogClass",
  							"indexNum": "000",
  							"isFirepad": true,
- 							"tabPageClass":"left main",
+ 							"tabPageClass":"left mainish",
  							"divId":""
  						},
  						{
@@ -613,20 +663,29 @@ neon-pages{
 		}, 
 		
 
-			},
+},
 
 				computedStyle: function(determine){
-						return "box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  "
+						return "box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4); border-radius: 23;border: 0 6px 0px 6px; margin:  ";
 
 
-				}, 
-_onButtonClick: function(e) {
-		 // console.log(e);
+				},
+ _tabClicked(e){
+ 	console.log(e,
+ 	e.detail,
+ 	e.target);
+ 	var nname=e.target.dataUseful;
+ 	this.set("tabClicked",nname);
+
+ }, 
+ _onButtonClick: function(e) {
+		  console.log(e);
 		  var button = e.detail;
-		  var selectedPage = button.getAttribute('data-transition');
-		 // console.log("SELECTED PAGE", selectedPage);
+		   var selectedPage = button.getAttribute('data-transition');
+		 console.log("SELECTED PAGE", selectedPage);
 		  this.set('mySelected', selectedPage);
 		},
+
 secondarySelectedChanged: function(e){
 	//console.log(this.secondarySelected);
 },
@@ -637,7 +696,53 @@ _onCloseMe: function(e) {
 ready: function(){
 	 (this.firepadElement)?this.loadFirepad():console.log('I checked if the firePadElementWereTrue in drawer', this.firepadElement);
 	},
+
+	attached(){
+		
+	}
 });
 
 	</script>
 </dom-module>
+<!-- 
+{ "tabName": "Titling",
+											  "pageLinkId": "contentSavingPage",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick",
+											  "pageClass": "area1",
+											},
+											{ "tabName": "Content",
+											  "pageLinkId": "firePadPrime",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick",
+											  "pageClass": "area2"
+											},
+											{ "tabName": "Preview",
+											  "pageLinkId": "passagePreview",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick",
+											  "pageClass": "area3"
+											  },
+											{ "tabName": "Data",
+											  "pageLinkId": "dataMapper",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick",
+											  "pageClass": "area4"
+											},
+											 {"tabName": "Revision",
+											  "pageLinkId": "dataSaver",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick",
+											  //"pageClass": "area4"
+											},
+											{"tabName": "Publish",
+											  "pageLinkId": "dataSaver",
+											  "otherInfo": "OtherInfo",
+											  "tabButtonsClass": "tab-buttons",
+											  "onTabClick": "onTabClick"
+											} -->

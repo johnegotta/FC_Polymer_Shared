@@ -94,13 +94,16 @@
         top: 0px; bottom: 0px;  
       }
   </style>
+ 
 <paper-material class="horizontal layout flex">
 <div class="horizontal layout flex self-stretch" is-resizing dragging draggable id="dashboardLeftDrawer" is-resizing style$="width:{{dashboardLeftDrawerCurrentWidth}}px;">
       <div class="vertical layout flex" style="min-height: 102vh; background: white;"> 
       <div 
-              class="layout vertical block justified" 
+              class="layout vertical block justified"
+              on-tap="openMenu"
               style="max-height: 200px; min-height: 110px; max-height: 160px; min-width: 200px; background: #fff;">
-              <img style="margin: 16px; min-width:200px; max-width: 200px; max-height: 98px;" src="../../../images/FC_frontpage_logo.png">
+              <img style="margin: 16px; min-width:200px; max-width: 200px; max-height: 98px;" src="../../../images/FC_frontpage_logo.png" >
+               <fc-login-dialog id="loginDialog" style="z-index:2000;"></fc-login-dialog>
             
            
       
@@ -108,6 +111,7 @@
       <section horizontal layout style="height: 2px; background: #efefef; width: 100vw;">
       <hr>
       </section>
+      {{containerWidth}}<paper-button on-tap="consoleThis">ConsoleThis</paper-button>
     <section class="layout horizontal wrap center-justified self-shrink leftDrawer" style=" color: black; min-height: 64px;"
     on-track="trackHandler">
       <template 
@@ -155,10 +159,8 @@
       <!--END LEFT COLUMN SPLITTER(row creator)-->
       <!--BEGIN BOTTOM HALF OF LEFT COLUMN-->
       <div id="box4" class='flex dropzone' style="overflow-y:scroll;" parent-cws="in">
-            <fc-relative-fit-wrapper id="wrapperLb" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-            
-                   
-          </fc-relative-fit-wrapper> 
+            <fc-relative-fit-wrapper id="wrapperLb" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>       
+            </fc-relative-fit-wrapper> 
    </div>
   </div>
     <iron-splitter signal="{{resize}}" style="top: 0px; bottom:0px; background: silver; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
@@ -174,25 +176,17 @@
 </iron-splitter>
       <div class="flex layout dropzone" parent-cws="in" style="overflow-y:scroll;">
           <fc-relative-fit-wrapper id="wrapperRb" cws="in" class="item wrapper" current-height="{{currentHeight}}" current-width="{{currentWidth}}" on-track="dragAndDrop" draggable drags>
-         
-
           </fc-relative-fit-wrapper>
       </div>
-  </div>
+    </div>
   </div>
   <!--Start Right Drawer-->
-  <div class="horizontal layout flex end" is-resizing dragging draggable id="dashboardRightDrawer" style$="width:{{dashboardRightDrawerCurrentWidth}}px;" >
+  <div class="horizontal layout flex end" is-resizing dragging draggable id="dashboardRightDrawer" style$="width:{{dashboardRightDrawerCurrentWidth}}px; position: absolute; right:0px; top: 0px; bottom: 0px; min-height: 102vh; background: white;" >
 <section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 1px; width:12px!important; opacity:1; border-left: 2px solid #aecefe; z-index:4; background: #009;">
 </section>
-  <div class="vertical layout flex" style="position:relative; right:0px; top: 0px; bottom: 0px; min-height: 102vh; background: white;">     
-    
-                   <fc-right-tabbed-drawer config-object="" class="fit">
-                    <!--  <fc-value-holder data-object-array="" data-object-array="{{dataObjectArray}}" is-firepad="[[item.isFirepad]]"></fc-value-holder> -->
-                   </fc-right-tabbed-drawer>
-            
 
- 
-  </div>
+                   <fc-right-tabbed-drawer config-object="" class="fit">
+                   </fc-right-tabbed-drawer>
 </div>
   </paper-material>
  <!--  </fc-ddr-card> -->
@@ -202,7 +196,7 @@
 Polymer({
   is:"fc-dashboard-divisions",
     behaviors:[Polymer.IronResizableBehavior],
-    listeners: {'app-drawer-reset-layout': 'resetLayout',  "newPassageSelected": "listenToSelection", "newPassageSelectedTwo":"didItFire"},
+    listeners: {'app-drawer-reset-layout': 'resetLayout',  "newPassageSelected": "listenToSelection"},
     observers: ['resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'],
     properties:{
         hiddenProp:{
@@ -279,10 +273,10 @@ Polymer({
               "constructorName":"FcPickle",
               "constructor":FcPickle,
             },
-            // { "sectionClass": "normal buttons blue-btn-class",
-            //   "iconUsed": "icons:assessment",
-            //   "nodeName": "howWeDoin",
-            //   },
+             { "sectionClass": "normal buttons blue-btn-class",
+               "iconUsed": "icons:assessment",
+               "btn": "analyze",
+               },
 
             // { "sectionClass": " normal buttons blue-btn-class",
             //   "iconUsed": "icons:visibility",
@@ -304,8 +298,9 @@ Polymer({
         currentHeight:{
             notify: true
         },
-        deltaOfTheDrag:{
+       containerWidth:{
             type:Number,
+            computed:"computeContainerWidth(dashboardLeftDrawerCurrentWidth, dashboardRightDrawerCurrentWidth, screenWidth)", 
             notify: true,
         },
         params:{
@@ -391,7 +386,7 @@ Polymer({
             type: Array,
             value: function(){
               var widthArray=[];
-                  var numberWidth=Math.ceil(window.innerWidth*(.94));
+                  var numberWidth=Math.ceil(window.innerWidth*(.97));
                   widthArray.push(numberWidth);
                   var width=numberWidth.toString()+"px";
                   widthArray.push(width);
@@ -403,7 +398,7 @@ Polymer({
             type: Array,
             value: function(){
               var heightArray=[];
-                  var numberHeight=Math.ceil(parseInt((window.innerHeight)*.84));
+                  var numberHeight=Math.ceil(parseInt((window.innerHeight)*.88));
                   heightArray.push(numberHeight);
                   var height=numberHeight.toString()+"px";
                   heightArray.push(height);
@@ -416,6 +411,23 @@ Polymer({
           value:function(){return [];},
           notify: true,
             },
+        thisMap:{
+          type: Map,
+          value: function(){var myMap = new Map();
+            var d=new Date().getTime();
+            d=d/60000;
+            var key="dashboard_"+d.toString();
+            var value=this;
+            myMap.set(key,value);
+            this.set("myMap", myMap);
+            return [key,value];
+          },
+        },
+        myMap:{
+          type: Map,
+          notify:true,
+          reflectToAttribute:true,
+        },
         selectedLT:{
           notify: true,
           observer:"observeSelectedLT",
@@ -440,7 +452,32 @@ Polymer({
         },
       
   },
- 
+ consoleThis(){
+    var myMap = new Map();
+            var d=new Date().getTime();
+            d=d/60000;
+            var key="dashboard_"+d.toString();
+            var value=this;
+            myMap.set(key,value);
+            this.set("myMap", myMap);
+var request = indexedDB.open("dashboardDatabase", 3);
+
+request.onupgradeneeded = (function (event) {
+
+    var db = event.target.result;
+
+    // Create another object store called "names" with the autoIncrement flag set as true.    
+    var objStore = db.createObjectStore("fc-dashboard-divisions", { autoIncrement : true });
+
+    // Because the "names" object store has the key generator, the key for the name value is generated automatically.
+    // The added records would be like:
+    // key : 1 => value : "Bill"
+    // key : 2 => value : "Donna"
+    for (var i in this.myMap) {
+        objStore.add(this.myMap[i][key]);
+    }
+},this);
+},
   created(){
   },
   ready(){
@@ -462,18 +499,27 @@ Polymer({
        
         this.set("elementHolderArray",elementsArray);
         this.implantElements(this.elementHolderArray);
-        this.setcontainerwidth();
+        
     },
-    setcontainerwidth(){var rt=this.dashboardRightDrawerCurrentWidth, lt=
-            this.dashboardLeftDrawerCurrentWidth;
-            var dx=(lt===0&&rt===0)?0:(lt===0||rt===0)?12:24; 
-            var delta=(rt+lt+dx); 
-            console.log(delta);
-            var setVal=(this.screenWidth-delta);
+   
+    openMenu(e){
+      console.log(e, this.$.loginDialog);
+      this.$.loginDialog._openMenu(e);
+      this.$.loginDialog.set("opened",true);
     },
+
     observeResize(newVal, oldVal){
         // console.log(newVal, oldVal);
         this.notifyResize();
+    },
+    computeContainerWidth(left, right, screen){var rt=this.dashboardRightDrawerCurrentWidth, lt=
+            this.dashboardLeftDrawerCurrentWidth;
+            console.log(lt, rt);
+            var dx=(lt===0&&rt===0)?0:(lt===0||rt===0)?24:48; 
+            var delta=(rt+lt+dx); 
+            console.log(delta, this.screenWidth);
+            var setVal=(this.screenWidth[0]-delta);
+            return setVal;
     },
     didItFire(e){console.log(e.detail.newSelected);},
     listenToSelection(e){

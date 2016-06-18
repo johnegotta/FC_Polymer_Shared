@@ -1,0 +1,120 @@
+<dom-module id="fc-value-holder-two">
+<template>
+<style>
+.hidden {
+	display:none!important;
+}
+</style>
+<div id="hanger">
+</div>
+
+<content>
+</content>
+<div id="hangerLow">
+
+</div>
+</template>
+
+<script>
+Polymer({
+	is:"fc-value-holder-two",
+	properties: {
+		isFirepad: {
+				type: Boolean,
+				reflectToAttribute: true,
+				notify: true
+			}, 
+		divId: {
+			type: String,
+			reflectToAttribute: true,
+			notify: true
+		},
+		index:{
+			type:Number,
+			notify: true,
+		},
+		objPropertyName:{
+			type: String,
+			value: function(){return "";},
+			notify: true,
+		},
+		dataContainerObjectArray:{
+			type:Array,
+			value:function(){return [];},
+			notify: true
+		},
+		datumObject:{
+			type: Object,
+			value:function(){return {};},
+			computed: "computeDataObject(dataObject, objPropertyName)",
+			notify:true,
+		},
+		dataObjectArray:{
+			type: Array,
+			value: function(){return[];},
+			notify: true,
+		},
+		dataObject:{
+			type:Object,
+			value:function(){return {};},
+			notify: true,
+			// 
+			//"name": null,"id": null, "class":null, "nodeName":null,"thisConstructor":null, "config":undefined, "handler": undefined,"registrants":undefined};
+		},
+		tabClicked:{
+			type: String,
+			value: function(){return ""},
+			observer:"observeTabClicked",
+		},
+		
+		elemsArray:{
+			type:Array,
+			value:function(){return [];},
+			notify: true
+		},
+		objectsToInstantiate:{
+			type: Number,
+			value:function(){
+				return 0;
+			},
+			notify: true,
+		},
+	},		
+	ready: function(){
+	//console.log(this.dataObject, this.divId,"there were lots of empty instances here with no dom show of btns");
+	},
+	computeDataObject(ob, name){
+		console.log(ob, name);
+		var map=new Map();
+		var array=["red","#009","orange","#005c00","purple","white", "aqua", "aliceblue", "yellow"];
+		var fmap=ob.map(function(obb,i,arr){
+			var elem = new obb[name].constructor();
+						this.objectsToInstantiate++;
+						if(i!==2){Polymer.dom(elem).classList.add("hidden");}
+						var key=obb[name].nodeName+"_"+this.objectsToInstantiate.toString();
+						elem.background=array[i];
+						map.set(key, elem);
+						Polymer.dom(this.$.hanger).appendChild(elem);
+						return map.get(key);
+		}, this);
+			// arr[index]
+			// Polymer.dom(this).classList.add(this.dataObject.class);
+			// var valueElement=new this.dataObject.constructor(this.dataObject.config);
+	},
+	observeTabClicked(newval, oldval){
+		console.log(newval,oldval);
+		if(newval){
+
+		var children=Polymer.dom(this.$.hanger).children;
+		children.forEach(function(child, i, arr){
+			if(i!==newval && Polymer.dom(child).classList.contains("hidden")===false){Polymer.dom(child).classList.add("hidden")}
+			else if(i===newval){Polymer.dom(child).classList.remove("hidden");}
+		},this);
+		}
+
+
+	},
+
+});
+</script>
+</dom-module>
