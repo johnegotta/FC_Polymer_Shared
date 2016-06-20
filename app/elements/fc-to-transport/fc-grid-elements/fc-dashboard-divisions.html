@@ -75,6 +75,27 @@
     #box5, #box11{
           min-height:198vh;
       }
+       #earth {
+  width: 120px;
+  height: 120px;
+  background: url(http://www.noirextreme.com/digital/Earth-Color4096.jpg);
+  border-radius: 50%;
+  background-size: 220px;
+  box-shadow: inset 16px 0 40px 6px rgb(0, 0, 0), inset -3px 0 6px 2px rgba(255, 255, 255, 0.2);
+  animation-name: rotate;
+  animation-duration: 36s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate {
+  from {
+    background-position-x: 0px;
+  }
+  to {
+    background-position-x: 420px;
+  }
+}
 
     fc-relative-fit-wrapper{
           cursor: move;
@@ -94,16 +115,26 @@
         top: 0px; bottom: 0px;  
       }
   </style>
+  <firebase-auth
+        location="[[firebaseURL]]"
+        provider="[[firebaseProvider]]"
+        on-login="onFirebaseLogin"
+        on-logout="onFirebaseLogout">
+    </firebase-auth>
+    <fc-time-keeper-light></fc-time-keeper-light>
+    <paper-toast id="errorToast">
+    </paper-toast>
  
 <paper-material class="horizontal layout flex">
 <div class="horizontal layout flex self-stretch" is-resizing dragging draggable id="dashboardLeftDrawer" is-resizing style$="width:{{dashboardLeftDrawerCurrentWidth}}px;">
-      <div class="vertical layout flex" style="min-height: 102vh; background: white;"> 
+<div id="earth" style="z-index: 99999; position: absolute; top: 5px; left: 445px;"></div>
+      <div class="vertical layout flex" style="min-height: 102vh; background: white;">     
       <div 
               class="layout vertical block justified"
               on-tap="openMenu"
               style="max-height: 200px; min-height: 110px; max-height: 160px; min-width: 200px; background: #fff;">
               <img style="margin: 16px; min-width:200px; max-width: 200px; max-height: 98px;" src="../../../images/FC_frontpage_logo.png" >
-               <fc-login-dialog id="loginDialog" style="z-index:2000;"></fc-login-dialog>
+               <fc-login-dialog id="loginDialog" on-down="loginDrawerWidthAdjustment" style="z-index:2000;"></fc-login-dialog>
             
            
       
@@ -111,7 +142,7 @@
       <section horizontal layout style="height: 2px; background: #efefef; width: 100vw;">
       <hr>
       </section>
-<paper-button on-tap="layoutSwap">layout</paper-button>
+<paper-button on-tap="consoleThis">IndexDB</paper-button>
     <section class="layout horizontal wrap center-justified self-shrink leftDrawer" style=" color: black; min-height: 64px;"
     on-track="trackHandler">
       <template 
@@ -147,7 +178,7 @@
   <!--LEFT COLUMN CONTAINER ON DASHBOARD LAYOUT-->
     <div id="box11">
       <!--Left-TOP BOX FOR ZONE in LEFT COLUMN-->
-      <div class="flex dropzone" style="height: 45vh; overflow-y:scroll;"  parent-cws="in">
+      <div class="flex dropzone" style$="height:{{heightLeftTop}}px; width:{{widthLeftTop}}px; overflow-y:scroll;"  parent-cws="in">
         <fc-relative-fit-wrapper id="wrapperLt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
                
         </fc-relative-fit-wrapper>
@@ -168,7 +199,7 @@
 
   <div id="box5" class="flex">
         <div class="layout flex dropzone" parent-cws="in" style="height: 45vh; overflow-y:scroll;">
-            <fc-relative-fit-wrapper id="wrapperRt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
+            <fc-relative-fit-wrapper id="wrapperRt" style$="height:{{heightRightTop}}px; width:{{widthRightTop}}px;" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
              
             </fc-relative-fit-wrapper>
         </div>
@@ -185,7 +216,8 @@
 <section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 1px; width:12px!important; opacity:1; border-left: 2px solid #aecefe; z-index:4; background: #009;">
 </section>
 
-                   <fc-right-tabbed-drawer config-object="" class="fit">
+                   <fc-right-tabbed-drawer config-object="" style="max-width:98.5vw;"class="vertical layout flex self-stretch">
+                 
                    </fc-right-tabbed-drawer>
 </div>
   </paper-material>
@@ -303,6 +335,29 @@ Polymer({
         currentHeight:{
             notify: true
         },
+        currentWidth:{
+          notify: true,
+        },
+        heightLeftTop:{
+          type: Number,
+          notify:true,
+          observer:"observeHeightTop",
+        },
+      widthLeftTop:{
+        type: Number,
+          notify:true,
+          observer:"observeHeightTop",
+        },
+      firebaseURL: {
+        type: String, 
+        value: "https://focused0ne.firebaseio.com/userInit",
+        notify: true
+        },
+      firebaseProvider: {
+        type: String,
+        value: 'password',
+        notify: true
+        },
        containerWidth:{
             type:Number,
             computed:"computeContainerWidth(dashboardLeftDrawerCurrentWidth, dashboardRightDrawerCurrentWidth, screenWidth)", 
@@ -325,7 +380,7 @@ Polymer({
           },
         dashboardLeftDrawerCurrentWidth:{
             type: Number,
-            value:function(){return 245;},
+            value:function(){return 604;},
             notify: true
         },
         notifyDescendants:{
@@ -335,7 +390,7 @@ Polymer({
         },
         dashboardRightDrawerCurrentWidth:{
             type: Number,
-            value: function(){return 25;},
+            value: function(){return 12;},
             notify: true,
         },
         isWrapper:{
@@ -386,12 +441,17 @@ Polymer({
                 readOnly: true,
                 notify: true
               },
+              firebaseURL: {
+        type: String, 
+        value: "https://focused0ne.firebaseio.com/toDoLists",
+        notify: true
+        },
        
         screenWidth:{
             type: Array,
             value: function(){
               var widthArray=[];
-                  var numberWidth=Math.ceil(window.innerWidth*(.97));
+                  var numberWidth=Math.ceil(window.innerWidth);
                   widthArray.push(numberWidth);
                   var width=numberWidth.toString()+"px";
                   widthArray.push(width);
@@ -403,7 +463,7 @@ Polymer({
             type: Array,
             value: function(){
               var heightArray=[];
-                  var numberHeight=Math.ceil(parseInt((window.innerHeight)*.88));
+                  var numberHeight=Math.ceil(window.innerHeight);
                   heightArray.push(numberHeight);
                   var height=numberHeight.toString()+"px";
                   heightArray.push(height);
@@ -457,10 +517,12 @@ Polymer({
         },
       
   },
-  layoutSwap(){
-    var setVal=(this.layout.charAt(0)==="h")?"vertical":"horizontal";
-    this.set("layout", setVal);
-  },
+  // layoutSwap(){
+  //   var setVal=(this.layout.charAt(0)==="h")?"vertical":"horizontal";
+  //   this.set("layout", setVal);
+  // },
+ loginDrawerWidthAdjustment(e){console.log(e);
+  this.set("dashboardLeftDrawerCurrentWidth", 250);},
  consoleThis(){
     var myMap = new Map();
             var d=new Date().getTime();
@@ -496,6 +558,12 @@ request.onupgradeneeded = (function (event) {
      console.log(this.constructorArray);
         var holderArray=[], length=this.constructorArray;
         console.log(this.constructorArray);
+        this.set("heightLeftTop",980);
+        this.set("currentHeight", 420);
+        var remwidth=this.containerWidth-this.widthLeftTop;
+        this.set("widthRightTop",remwidth);
+        console.log(this.widthRightTop);
+        this.set("currentWidth",remwidth);
         //go with this content tags deprecated
         //its now just an apend child in a slot
         var elemMap=new Map();
@@ -509,6 +577,39 @@ request.onupgradeneeded = (function (event) {
         this.set("elementHolderArray",elementsArray);
         this.implantElements(this.elementHolderArray);
         
+    },
+    onFirebaseLogin: function(event) {
+        this.ref = new Firebase(this.firebaseURL + '/users/' + 
+                                                      event.detail.user.uid);
+        this.ref.on('value', function(snapshot) {
+          this.updateLayout(snapshot);
+        }.bind(this));
+      
+    },
+
+    onFirebaseError: function(event) {
+        this.$.errorToast.text = event.detail.message;
+        this.$.errorToast.show();
+          },
+  
+    onFirebaseLogout: function(event) {
+      this.updateLayout();
+   
+    },
+
+    updateLayout: function(snapshot) {
+        this.toDos = [];
+        snapshot.forEach(function(childSnapshot) {
+          var item = childSnapshot.val();
+          item.uid = childSnapshot.key();
+          this.push('layours', item);
+        }.bind(this));
+    },
+    observeHeightTop(nv, ov){
+
+
+
+
     },
    
     openMenu(e){
@@ -785,58 +886,9 @@ request.onupgradeneeded = (function (event) {
       dragsOn: function(){ if(this.dragState){this.async(this.dragSwitch, 50);}},
       dragSwitch: function(){this.set("drags", true);},
 
-      handleDrop(e){
-        
-                      },
+      handleDrop(e){ },
 
-
-
-  });
-</script>
-</dom-module> 
-<!--
- <div horizontal layout flex nowrap> 
-        <section>
-            <fc-input-search-select name="leftTop" label="Left Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLT}}">
-            </fc-input-search-select>
-        </section>
-        <section>
-            Left Top:<br>
-            {{selectedLT}}
-        </section>
-      </div>
-      <div horizontal layout flex nowrap> 
-        <section>
-            <fc-input-search-select name="leftBottom" label="Left Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLB}}">
-            </fc-input-search-select>
-        </section>
-        <section>
-            Left Bottom:<br>
-            {{selectedLB}}
-        </section>
-      </div>
-      <div horizontal layout flex nowrap> 
-        <section>
-            <fc-input-search-select name="rightTop" label="Right Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRT}}">
-            </fc-input-search-select>
-        </section>
-        <section>
-            Right Top:<br>
-            {{selectedRT}}
-        </section>
-      </div>
-      <div horizontal layout flex nowrap> 
-        <section>
-            <fc-input-search-select name="rightBottom" label="Right Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRB}}">
-            </fc-input-search-select>
-        </section>
-        <section>
-            Right Bottom:<br>
-            {{selectedRB}}
-        </section>
-      </div> 
-
-    observeSelectedLT(newVal, oldval){
+      observeSelectedLT(newVal, oldval){
       console.log(newVal,oldval);
      var insertElement=this.elemMap.get(newVal);
      console.log(insertElement,"here is where the map false should be");
@@ -954,6 +1006,55 @@ request.onupgradeneeded = (function (event) {
         }
 
         },
+
+
+
+  });
+</script>
+</dom-module> 
+<!--
+ <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="leftTop" label="Left Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLT}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Left Top:<br>
+            {{selectedLT}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="leftBottom" label="Left Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLB}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Left Bottom:<br>
+            {{selectedLB}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="rightTop" label="Right Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRT}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Right Top:<br>
+            {{selectedRT}}
+        </section>
+      </div>
+      <div horizontal layout flex nowrap> 
+        <section>
+            <fc-input-search-select name="rightBottom" label="Right Bottom" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedRB}}">
+            </fc-input-search-select>
+        </section>
+        <section>
+            Right Bottom:<br>
+            {{selectedRB}}
+        </section>
+      </div> 
+
+    
 
 
  // widgets:{
@@ -1102,4 +1203,4 @@ handleDrop(e){
     <span class="horizontal layout center justified">{{widget.nodeName}}</span>
   </section>
 </template>
-    -->
+    

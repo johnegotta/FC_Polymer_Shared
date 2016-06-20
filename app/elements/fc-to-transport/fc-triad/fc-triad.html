@@ -85,111 +85,98 @@ min-height: 38px;
 }
 </style><!-- 
 on-track="focusedDragMe" -->
-<!--holder for horizontal two panel view begins here-->
-	<div drags on-down="dragsOn" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer">
-	<!--text-holder is here-->
-		<iron-image width="200px" height="120px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image>
+	<div drags on-down="dragsOff" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer" >
+	<paper-swatch-picker>
+	</paper-swatch-picker>
 		<div class="vertical layout self-stretch nowrap" > 
+		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; margin-bottom: 48px;">
+					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
+						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
+						<section class="layout horizontal headerMonthYear">
+						<!-- <iron-image width="100px" height="60px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image> -->
+							<span on-down="dragsOn" on-track="focusedDragMe" on-up="dragsOff" cursor="crosshairs" style="height: 32px; width: 32px; font-size: 30px; content-align: center; border-radius:50%; background: red; border: orange 6px solid; color: white;">&#9806;</span>
 
-      <template is="dom-repeat" id="inputTemplate" items="{{itemsOneObject}}">
-        <section class="horizontal layout container holderClass"> 
-        <span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
-      </section>
-      <div class="horizontal layout flex wrap stretch center center-justified">
-        <section class="container holderClass">
-          <fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
-          </fc-input-search-select>
-        </section>
-        <section class="container holderClass">
-          <fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
-          </fc-input-search-select>
-        </section>        
-    </div>
-    
-  </template>
-  </div>      
-  	<!--text holder ends-->
-  	<!--calendar and green division begin-->
-		<div class$="layout {{visualSwap}} flex-10"><!--visual swap in horizontal layout here-->
-			<!--greeen side border-->
-			<section style$="width: 25px; background:{{background}};">
-			</section>
-		<!--green side border ends; buttons can be in border-->
-		<!--to panel top and bottom display with calendar begins-->
+						</section>
+						<span btn="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
+					</section> 
+					<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
+				</section>
+				<span on-down="dragsOn" on-track="focusedDragMe" on-up="dragsOff" cursor="crosshairs" style="height: 32px; width: 32px; font-size: 30px; content-align: top; border-radius:50%; background: red; border: orange 6px solid; color: white;">&#9806;</span>
+		</paper-material>
+
+<!--left-panel-header-end-->
+     <template is="dom-repeat" id="inputTemplate" items="{{itemsOneObject}}">
+        <section class="horizontal layout container"> 
+        		<span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
+      	</section>
+      	<div class="horizontal layout flex wrap self-stretch around-justified">
+          		<fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" value="" iss-value="{{someValuePropertyA}}" multi-select="[[item.multiSelectA]]">
+          		</fc-input-search-select>
+          		<fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" value="" iss-value="{{someValuePropertyB}}" multi-select="[[item.multiSelectB]]">
+          		</fc-input-search-select>
+     	</div>
+  	</template>
+  	</div>      
+  <iron-splitter signal="{{resize}}" style$="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
+		<div class="layout vertical flex self-stretch" style="overflow: hidden;">
+		<div class="flex layout vertical self-stretch" style="min-height: 97.5vh; max-height: 97.5vh; overflow: scroll;"><!--visual swap in horizontal layout here-->
 			<div class="vertical layout flex self-stretch">
 				<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
-						<paper-icon-button 
-							on-tap="_backOne" 
-							icon="icons:chevron-left" 
-							hidden={{backHidden}} 
-							class="headerArrowLeft layout horizontal flex-2 self-shrink">
-						</paper-icon-button>
+						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
+	
 						<section class="layout horizontal headerMonthYear">
-							[[computeViewMonth(displayedIndex)]] [[computeYear(displayed)]]
+							[[computeDisplayHeaderOne(displayedIndex)]] [[computeDisplayHeaderTwo(displayed)]]
 						</section>
-						<paper-icon-button 
-							on-tap="_forward" 
+						<span 
+							btn="_forward" 
 							hidden="{{forwardHidden}}" 
-							icon="icons:chevron-right" 
-							class="headerArrowRight layout horizontal flex-2 self-shrink">
-						</paper-icon-button>
+							style="font-size:32px; color:white;"> &#9658; 
+						</span>
 					</section> 
 				</paper-material><!--header ends-->
-				<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
-				</section><!--resizer-->
-				<section class="horizontal layout flex-1">
-						<!-- //DAYS AND DAYS OF WEEK COLUMN REPEATER -->
-					<template is="dom-repeat" class="horizontal layout self-stretch nowrap" items="{{displayedTwo}}">
-						<div class="vertical layout flex" style$="width:calc(.84*{{currentWidth}})px; height:calc(.84*{{currentHeight}})px;" >
-							<paper-material class="horizontal layout center center-justified" style$="font-size: 20px; font-weight:600; background:{{background}}; color: white;text-align: center; padding: 1px;">
-									<a>{{item.0}}</a>
-							</paper-material>
-							<section class="vertical layout flex" style="background: white; box-shadow: 4px 11px 21px 7px #9fafaf; border-bottom: 1px silver solid; border-right: 1px silver solid;">
-								<template is="dom-repeat" items="{{item.1}}" as="day" style$="font-size: 24px; font-weight:600; color: {{background}};">
-									<section style="border:green solid 2px; padding: 8px; background: white;" class="date vertical layout flex center center-justified self-stretch">
-										
-										<a class="date horizontal flex layout center-justified self-stretch" id="button" style$="min-width:25px; cursor: pointer; min-height: 25px; padding: 4px; border-radius: 50%; background: {{computeEventHeightLightColor(day.event.highlightcolor)}}; text-align: center;font-size: 18px; font-weight:600; color: {{background}};">
-											<section class="date horizontal layout center-justified self-stretch" hidden="{{!day.inMonth}}">[[_computePrettyDay(day.date)]]</section>
-										</a>
-										<span>
-										<iron-icon icon="{{day.eventIcon}}" style="color:{{day.eventSecondaryColor}}; background:{{day.eventPrimaryColor}};border-radius:50%;cursor: pointer;">
-										</iron-icon>
-										{{day.eventText}}{{day.eventU}}
-										<iron-icon icon="{{day.eventIcon1}}" style$="color:{{day.eventSecondaryColor1}}; background:{{day.eventPrimaryColor1}}; cursor: pointer;border-radius:50%;">
-										</iron-icon>
-										{{day.eventText}}{{day.eventU}}
-										</span>
-									</section>
-								</template>
-							</section>
-						</div>
-					</template>
+				<!--resizer-->
+				
+				<section class="horizontal layout flex-1 self-stretch" style="overflow: scroll;">
+					<fc-mapped-grid style="overflow:scroll;">
+
+					</fc-mapped-grid>
 				</section>
-				<section class="horizontal layout flex-1">
-					<div class="marquee" style="background: #fafafa; padding: 12px 24px;">
-		  				<template class="marque" is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
-		    					<span class="marquee">{{wordEvent}}</span> 	
-		    					<span class="marquee">{{wordEvent}}</span> 		
+				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 105%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
+			
+ 				<div class="layout vertical flex" style="position:static; max-height: 99vh; min-height:12vh;overflow:scroll;">
+
+ 					<article  class="layout horizontal flex wrap" style="position:static;padding: 34px; height: 450px;max-height:76vh;">
+		  				<template is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
+		    					<p style="margin: 36px;">{{wordEvent}}</p> 	
 		  				</template>
+		  			</article>
 		  			</div>
-				</section>
+				
 			</div>
 		</div>
- <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
- </section>
+<!--  <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
+ </section> -->
  </div>
+ </div>
+
 </template>
 <script>
 FcTriad=Polymer({
 	is: "fc-triad",
-	behaviors:[FCBehaviors.FcCalendarBehaviorPrime],
+	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,Polymer.IronResizableBehavior],
 	observers:[],
 	properties: {
 		day:{
 			type: Object, 
 			value: {},
 			notify: true
+		},
+		rightBottomMarginTop:{
+			type:Number,
+			notify: true,
+			value:function(){return -20;},
+			observer:"observeRightBottomMarginTop",
 		},
 		fcCourse:{
 			type: FcCourse,
@@ -207,7 +194,7 @@ FcTriad=Polymer({
 			notify: true,
 		},
 		
-		days:{
+		columnHeaders:{
 			type: Array,
 			value: function()
 			{
@@ -246,7 +233,7 @@ FcTriad=Polymer({
 		},
 		currentHeight: {
 			type: String,
-			value: function(){return "42vh";},
+			value: function(){return "100%";},
 			notify: true
 		},
 		units: {
@@ -279,41 +266,25 @@ FcTriad=Polymer({
 			value: function(){
 			readingArr=[];
 			var words="I walked twenty miles a day, when I had just turned twenty years-old...Older dogs not only have a difficult time learning new tricks, but also tend to forget even their most favored of youthful pleasures. Older men would be more faithful. So, I was to marry a Berto twenty years my senior, unlike her Berto who--at twenty days he junior--the whole world believed would have wandered if Mama were not so incessantly desirable. It is twenty minutes past when Berto and I married: Mamma insisted on that precise time. She always said that she and 'her' Berto had such a lovely first night and forty-four years of time after together all beacse they had and she would never pay any mind to others schedules. Mamma called it one of her Benito's many, but oddly enough--to her at least--most reveerred and marvelled at traits. Mamma never seemed to understand that everyone actually did everything at her pace and on her schedule. She was the Mussolini of the whole world's personal train schedule. Everything precisely on time. Her time or someone shot the clock, and everyone who had ever so terribly lie about the time.";
-				var wordArr=words.split(" "),
-				counter=wordArr.length,
-				start=wordArr[0];
-				for(var i=1; i<counter;i++){
-					var zeroed=i%9;
-					start +=" " +wordArr[i];
-					start=start.toString();
-					if(zeroed===0||i+1.1>counter){ 
-						readingArr.push(start);
-						start="";
-					}
-						}
-			return readingArr;},
+			// 	var wordArr=words.split(" "),
+			// 	counter=wordArr.length,
+			// 	start=wordArr[0];
+			// 	for(var i=1; i<counter;i++){
+			// 		var zeroed=i%9;
+			// 		start +=" " +wordArr[i];
+			// 		start=start.toString();
+			// 		if(zeroed===0||i+1.1>counter){ 
+			// 			readingArr.push(start);
+			// 			start="";
+			// 		}
+			// 			}
+			// return readingArr;},
+				readingArr=[words, words,words,words, words];
+				return readingArr;
+			},
 			notify: true,
 		},
-		wordEvents2:{
-			type:Array,
-			value: function(){
-			readingArr=[];
-			var words="Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left";
-				var wordArr=words.split(" "),
-				counter=wordArr.length,
-				start=wordArr[0];
-				for(var i=1; i<counter;i++){
-					var zeroed=i%9;
-					start +=" " +wordArr[i];
-					start=start.toString();
-					if(zeroed===0||i+1.1>counter){ 
-						readingArr.push(start);
-						start="";
-					}
-						}
-			return readingArr;},
-			notify: true,
-		},
+		
 		event:{
 			type: Array,
 			value: [],
@@ -344,6 +315,23 @@ FcTriad=Polymer({
 			notify:true,
 
 		},
+		unitIncrement:{
+			value: function(){return "Month";},
+			notify: true,
+		},
+		displayedDateObject:{
+				type:Object,
+			value:function(){
+				return {"year": new Date().getFullYear(),
+				"month": new Date().getMonth(),
+				"day":new Date().getDate()};
+			},
+			notify:true,
+		},
+		change:{
+			notify: true,
+			value:function(){return null;},
+		},
 		user:{
 			type:Object,
 			notify: true, 
@@ -353,14 +341,56 @@ FcTriad=Polymer({
 			type: Object,
 			notify: true,
 		},
-
-
-	
+		firstTimeCounter:{
+			type:Number,
+			value:function(){return 0;},
+			notify: true
+		},
+		theMonths:{
+			type:Array,
+			value:function(){["January","February","March","April","May","June","July","August","September","October","November","December"];},
+			notify: true
+		},
+		isResizing:{
+			type: Boolean,
+			notify: true,
+			value:function(){return true;},
+		}
 
   },
 
+  observeRightBottomMarginTop(newval,oldval){
+  	console.log(newval,oldval);
+
+
+  },
+
+  computeDisplayHeaderOne(displayedIndex){
+
+
+
+  },
+
+
+
+  computeDisplayHeaderTwo(displayed){
+
+
+
+  },
+
+  setYearMonthDay(displayDateObject, dateUnit, updownflat){
+  		displayDateObject[dateUnit]=(updownflat===true)?displayDateObject[dateUnit]+1:(updownflat===false)?displayDateObject[dateUnit]-1:displayDateObject[dateUnit];
+  		var  date=new Date().setFullYear(displayDateObject.year, displayDateObject.month, displayDateObject.day);
+  			this.set("day", date.getDate());
+  			this.set("year", date.getFullYear());
+  			this.set("month", date.getMonth());
+  
+  },
+
   computeItemHeaderHidden(header){
-    if(header){return false;}else{return true;}
+    if(header){return false;}
+    else{return true;}
   },
   
 computeEventHeightLightColor:function(){
@@ -369,7 +399,7 @@ computeEventHeightLightColor:function(){
 _computeItemsOneObject(itemsArraysOne,indexItemsArraysOne){
 	if(itemsArraysOne && itemsArraysOne.length>0){
 	return itemsArraysOne[indexItemsArraysOne];
-}
+	}
 },
 
 computeDay: function(day){if(day){return "pretty";}
@@ -378,7 +408,7 @@ ready: function()
 {	
 		var today = new Date();
 		var index=today.getMonth();
- 		this.set("displayedIndex",index);
+ 		this.set("displayedIndex",1);
 		this.async(this.initialize, 240);
 },
 
@@ -386,95 +416,81 @@ computeCurrentHeight: function(currentHeight){
    	var ht=window.screen.height;
       ht=.90*(ht);
       ht=ht.toString()+"px";
-    	if(this.currentHeight==undefined) {this.set("currentHeight", ht); this.style.height=ht;}
-    	
-    	
+    	if(this.currentHeight==undefined) {this.set("currentHeight", ht); this.style.height=ht;}	
+    },
+computeViewHeaderOne(monthsArray){
+
+
+
+
+
     },
 setArrays:function(){
-	var daysofweek=this.displayed.sort(function(a,b){
-		return (b.date.getDay()-a.date.getDay());});
-
-	//console.log(daysofweek, "yoohoo");
-	var daysOfWeek=daysofweek.reverse();
-	var dow=[["Sun"],["Mon"],["Tues"],["Wed"],["Thur"],["Fri"],["Sat"]];
-	var counter=daysofweek.length;
-	var holder=[],
-	iconsarr=["social:school","icons:dashboard", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
-	holder.push(daysOfWeek[0]);
-	for(let i=1; i<counter; i++)
-	{	var truth=(daysOfWeek[i].date.getDay()==daysOfWeek[i-1].date.getDay());
-		if(daysOfWeek[i].inMonth && i%3==0){
-			daysOfWeek[i].eventIcon=iconsarr[Math.floor(i/3)],
-			daysOfWeek[i].eventIcon1=iconsarr[Math.floor((i/3)+(1/4))],
-			daysOfWeek[i].eventPrimaryColor="aliceblue",
-			daysOfWeek[i].eventSecondaryColor="#009";
-			daysOfWeek[i].eventPrimaryColor1="aliceblue",
-			daysOfWeek[i].eventSecondaryColor1="red";
-		}
-		if(truth)
-		{
-			holder.push(daysOfWeek[i]);
-		}
-		if(i==counter-1 || !truth){
-			var holder2=holder.sort(function(a,b){
-				return a.displayIndex-b.displayIndex;
-			});
-			//console.log(holder2, "h2");
-			var slot=Math.floor(i/7);
-			if(i==counter-1){slot++;}
-			dow[slot].push(holder2);
-			holder=[];
-			holder2=[];
-			holder.push(daysOfWeek[i]);
-			}
-
-	}
-	//console.log(dow, "dow");
-	this.set("displayedTwo", dow);
-
+	var monthsArray=["January","February","March","April","May","June","July","August","September","October","November","December"],
+	setVal=monthsArray.map(function(mon, i, arr){
+		var month = mon.slice(0,3);
+		return [mon, month, i];});
 	},
-initialize:function(days){
-	var startYear =new Date().getFullYear();
-   	var endYear =startYear + 3;
-	var date=new Date(startYear, 0, 1);
-	var dateEnd =new Date(endYear, 11, 31);
-	if(days){
-	this.calendarCreator(date, dateEnd, "months", days);
-	}
-	else{
-		this.calendarCreator(date, dateEnd, "months");
-	}
- var counter=this.monthsArray.length;
- 	this.set("maxIndex", counter-1);
+setCalendarDays(newMonth){
+	if(newMonth){}
 		var self=this;
 		this.calendarDayArray=[];
-		this.calendarMonthsArray=[];
- for(var i=0;i<counter; i++)
-		 { 	
-		 	var array = this.monthsArray[i];
-		 	this.monthsArray.length;
-			self.push("calendarMonthsArray",array);
-		 	array.forEach(function(item, index, arr){
-		   		self.push("calendarDayArray", item);
-		 	});
-		}
-		this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
-		var calendar =[];
-		//console.log(this.displayed);
-		calendar = this.calendarDayArray;
-		this.set("fcCourse.courseCalendarDaysArray", calendar);
-		this.set("fcCourse.calendarDayArray", calendar);
-			this.setArrays();
+ for(var i=0;i<2; i++){ 	
+	// var array = this.monthsArray[i];
+	// this.monthsArray.length;
+	// this.push("calendarMonthsArray",array);
+	// array.forEach(function(item, index, arr){
+	// 	self.push("calendarDayArray", item);});
+	// 	};
+	this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
+	// 	var calendar =[];
+	// 	var calendar = this.calendarDayArray;
+	// 	this.set("fcCourse.courseCalendarDaysArray", calendar);
+	// 	this.set("fcCourse.calendarDayArray", calendar);}
+	this.setArrays();
+	}
+},
+//set data object values
+
+initialize(days,incrementUnits){
+	var bumpBackMonth=11, bumpAheadMonth=0,year=new Date().getFullYear(),day=new Date().getDate(), bumpAheadMonth, month=new Date().getMonth(); 
+	var lessOneYear=year-1;
+	var plusOneYear=year+1;
+	var plusOneMonth=month+1;
+	var lessOneMonth=month-1;
+	var lessOneDay=day-1;
+	var plusOneDay=day+1;
+
+	console.log(year, month);
+	var dateObject =(month===0)?{"startDate":new Date().setFullYear(lessOneYear, 11, 1), "endDate":new Date().setFullYear(year, 1, 1)}:(month===11)?{"startDate":new Date().setFullYear(year, 10, 1),"endDate":new Date().setFullYear(plusOneYear,0,31)}:{"startDate":new Date().setFullYear(year,lessOneMonth,0), "endDate":new Date().setFullYear(plusOneYear,0,31)};
+	if(days){
+	this.calendarCreator(dateObject.startDate, dateObject.endDate, "months", days);
+	}//add ret vals here dont have it set inside// needs to chain
+	else{this.calendarCreator(dateObject.startDate, dateObject.endDate, "months");}
 },
 
-computeDisplayed: function (displayedIndex)
-{
+setDisplayedYearMonthDay(displayDateObject, dateUnit, updownflat){
+		var previousDisplayDateObjectUnitValue=this.displayDateObject[dateUnit];
+  		displayDateObject[dateUnit]=(updownflat===true)?displayDateObject[dateUnit]+1:(updownflat===false)?displayDateObject[dateUnit]-1:displayDateObject[dateUnit];
+  		var keys=Object.keys(displayDateObject);
+  		date=new Date(), date.setFullYear(displayDateObject.year, displayDateObject.month, displayDateObject.day);
+  			this.set("year". date.getFullYear());
+  			this.set("month",date.getMonth());
+  			this.set("day", date.getDate());
+  },
+// get nextIncrementValue(){
+
+// 	year=new Date().getFullYear(), bumpAheadMonth, month=new Date().getMonth();
+
+// },
+
+computeDisplayed(displayedIndex)
+{		
 	return this.calendarMonthsArray[displayedIndex];
 },
 _forward: function(){
-		if(this.displayedIndex ==this.maxIndex)
- 		{
- 			this.set("forwardHidden",true);
+		if(this.displayedIndex ==this.maxIndex){
+ 			this.splice("calendarMonthsArray",this.MaxIndex,1);
  		}
  		else
  		{	this.set("backHidden",false);
@@ -649,3 +665,74 @@ _computePrettyDay: function(d)
 });
 </script>
 </dom-module>
+<!--
+
+	// HERE SHOULD HAVE PLUG IN APIs FOR DIFFERNT TYPES OF COLUMN HEADER CLASSES 
+	//DAYS OF WEEKS 
+	//MONTHS OF YEARS
+	//STUDENTS IN ORDERED CLASS ArRANGEMENT
+	//SCORE RANGES 
+	//THE MORE OF THESE WE USE AND DO THE MORE WE WILL SEE THE COMMONALITIES TO REDUCE AND REFACTOR THEM
+	//DAYS OF WEEK IS BELOW//ABOUT TO DO OR STEAL MONTHS OF YEAR
+
+	//stick in holder 	"January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"
+
+	// var daysofweek=this.displayed.sort(function(a,b){
+	// 	return (b.date.getDay()-a.date.getDay());});
+
+	// //console.log(daysofweek, "yoohoo");
+	// var daysOfWeek=daysofweek.reverse();
+	// var dow=[["Sun"],["Mon"],["Tues"],["Wed"],["Thur"],["Fri"],["Sat"]];
+	// var counter=daysofweek.length;
+	// var holder=[],
+	// iconsarr=["social:school","icons:dashboard", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
+	// holder.push(daysOfWeek[0]);
+	// for(let i=1; i<counter; i++)
+	// {	var truth=(daysOfWeek[i].date.getDay()==daysOfWeek[i-1].date.getDay());
+	// 	if(daysOfWeek[i].inMonth && i%3==0){
+	// 		daysOfWeek[i].eventIcon=iconsarr[Math.floor(i/3)],
+	// 		daysOfWeek[i].eventIcon1=iconsarr[Math.floor((i/3)+(1/4))],
+	// 		daysOfWeek[i].eventPrimaryColor="aliceblue",
+	// 		daysOfWeek[i].eventSecondaryColor="#009";
+	// 		daysOfWeek[i].eventPrimaryColor1="aliceblue",
+	// 		daysOfWeek[i].eventSecondaryColor1="red";
+	// 	}
+	// 	if(truth)
+	// 	{
+	// 		holder.push(daysOfWeek[i]);
+	// 	}
+	// 	if(i==counter-1 || !truth){
+	// 		var holder2=holder.sort(function(a,b){
+	// 			return a.displayIndex-b.displayIndex;
+	// 		});
+	// 		//console.log(holder2, "h2");
+	// 		var slot=Math.floor(i/7);
+	// 		if(i==counter-1){slot++;}
+	// 		dow[slot].push(holder2);
+	// 		holder=[];
+	// 		holder2=[];
+	// 		holder.push(daysOfWeek[i]);
+	// 		}
+
+
+	wordEvents2:{
+			type:Array,
+			value: function(){
+			readingArr=[];
+			var words="Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left";
+				var wordArr=words.split(" "),
+				counter=wordArr.length,
+				start=wordArr[0];
+				for(var i=1; i<counter;i++){
+					var zeroed=i%9;
+					start +=" " +wordArr[i];
+					start=start.toString();
+					if(zeroed===0||i+1.1>counter){ 
+						readingArr.push(start);
+						start="";
+					}
+						}
+			return readingArr;},
+			notify: true,
+		},
+-->

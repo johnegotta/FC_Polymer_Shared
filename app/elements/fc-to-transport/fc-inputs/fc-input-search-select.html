@@ -96,14 +96,19 @@ input.question + label > span{
   -webkit-transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
   transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
 }
-/*input.question + label > span:active {
+input.question + label > span:active {
   top: -53px;
   z-index:1;
   font-size: 16px;
   font-family: merriweather;
   color: #050;
-}*/
+}
+input.question.cell + label{
+  border-top:0px white solid;
+}
 
+.dropbtn.cell{opacity: 0;}
+input.question.cell +label + paper-list-box{display: none;}
 
 input.question:valid  input[type="submit"], textarea.question:valid  input[type="submit"] {
   -webkit-animation: appear 1.2s forwards;
@@ -136,6 +141,9 @@ top: -53px;
 .dropbtn{
  margin-top:-8px;
 }
+paper-icon-button.cell{
+  display:none;
+},
 
  .dropbtn:hover, .dropbtn:focus{
       
@@ -181,17 +189,19 @@ top: -53px;
 
 </style>
 <array-selector id="selector" items="{{dropdownItems}}" selected="{{selected}}" multi="{{multiSelect}}"></array-selector>
-<iron-a11y-keys id="a11y" target="[[target]]" keys="down" on-keys-pressed="onDownArrow"></iron-a11y-keys>
-<iron-a11y-keys id="a11y" target="[[target]]" keys="up" on-keys-pressed="onUpArrow"></iron-a11y-keys>
-<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="onEnter"></iron-a11y-keys>
+<iron-a11y-keys id="a11y1" target="[[target]]" keys="down" on-keys-pressed="onDownArrow"></iron-a11y-keys>
+<iron-a11y-keys id="a11y2" target="[[target]]" keys="up" on-keys-pressed="onUpArrow"></iron-a11y-keys>
+<iron-a11y-keys id="a11y3" target="[[target]]" keys="enter" on-keys-pressed="onEnter"></iron-a11y-keys>
+<iron-a11y-keys id="a11y4" target="[[target]]" keys="esc" on-keys-pressed="onEsc"></iron-a11y-keys>
+
 
 <div class="horizontal layout flex">
-<paper-icon-button class="dropbtn" icon="icons:dashboard" on-tap="inputToggle"> 
+<paper-icon-button class="dropbtn {{issClass}}" style="opacity:0;" icon="icons:dashboard" on-tap="inputToggle"> 
 </paper-icon-button>
 <div class="vertical layout dropdown" on-down="focusInput">
-	<input id="issInput" class="question" required value="{{issValue::input}}" on-change="sortArrayForMultiSelect" name="[[issName]]">
+	<input id="issInput" class$="question {{issClass}}" required value="{{issValue::input}}" is-multi-select="{{isMult}}" on-change="{{sortArrayForMultiSelect(isMulti)}}" name="[[issName]]">
 		<label for="issInput"><span on-tap="focusInput">{{issLabel}}</span></label>
-			<paper-list-box id="dropdownlist" class="block dropdown-content" hidden="{{!dropdownItems}}" style$="min-height:220px; max-height:{{maxHeight}}px; overflow-y: scroll;">
+			<paper-list-box id="dropdownlist" class$="block dropdown-content {{issClass}}" hidden="{{!dropdownItems}}" style$="min-height:220px; max-height:{{maxHeight}}px; overflow-y: scroll;">
 		 		<template is="dom-repeat" id="controllerList" style="height: 2200px;" items="{{dropdownItems}}" observe="selectCheck value name propertyName val" filter="{{createFilter(issValue)}}">
 					<paper-item class="block" style="border: 1px silver solid;margin-top: 3px; color: #006; font-size: 20px; font-weight: 600;font-family:times;text-align: center;" on-up="toggleSelection">
           <span hidden$="{{!item.selectCheck}}" class="check">&#10148;</span>
@@ -213,6 +223,16 @@ FcInputSearchSelect=Polymer({
 			notify: true,
       observer:"observeIssInput",
 		},
+    issClass:{
+       type: String,
+      notify: true,
+      observer:"observeIssClass",
+    },
+    isMulti:{
+      type: Boolean, 
+      function(){return false;},
+      notify: true,
+    },
     maxHeight: {
       type: String,
       value:function(){return "180";},
@@ -321,8 +341,7 @@ FcInputSearchSelect=Polymer({
  
  },
  observeIssInput(nv, ov){
-  if(nv){this.set("value",this.issValue);}
-
+console.log(nv, ov);
  },
  _computeItemSelectedPropValue(item, index,isp){
        //console.log(index, "in itemSelectPropValue");
@@ -347,6 +366,12 @@ FcInputSearchSelect=Polymer({
 
 
   }, 
+
+  observeIssClass(nv,ov){
+    if(nv){console.log(nv, ov)};
+
+
+  },
 	focusInput(){
     this.set("dropdownOpen",true);
     this.async(function(){
@@ -405,9 +430,6 @@ FcInputSearchSelect=Polymer({
     var size=arr.length;
     var diff=size-length;
     console.log(diff,valArr, arr);
-
-
-    
   },
   toggleSelection(e){
     var item = this.$.controllerList.itemForElement(e.target);//console.log(item);
