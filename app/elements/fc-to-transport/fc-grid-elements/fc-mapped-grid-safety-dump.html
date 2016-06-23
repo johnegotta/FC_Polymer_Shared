@@ -1,0 +1,428 @@
+<dom-module id="fc-mapped-grid">
+ <template id="fc-mapped-grid-template">
+ <style>
+ section{
+  background:white;
+ }
+textarea::-moz-selection { /* Code for Firefox */
+    color: red;
+    background: yellow;
+}
+
+textarea::selection {
+    background: yellow;
+}
+:host{
+	background: white;
+	padding: 0px 3px 4px 8px;
+	opacity: 1;
+
+	position: static;
+	@apply(--horizontal-layout);
+	@apply(--layout-flex);
+	}
+  *{@apply(--layout-nowrap);}
+ </style>
+ <array-selector id="columnSelector" items="[[dataArrays]]" selected="{{selected}}?">
+ </array-selector>
+
+ 
+<!-- <a> -->
+<div is-gridbox="true" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:88.99vw; max-width:98.99vw; min-height: 91vh; max-height:96vh;">
+<!--side utility editing menu for the spreadsheet-like versions-->
+<fc-grid-menu_sheets></fc-grid-menu_sheets>
+
+<template is="dom-repeat"  id="mappedGridRepeater" class="horizontal layout flex" id="template" index-as="columnIndex" items="[[dataArrays]]">
+<!-- <a link={{}}> -->
+    <div id$="divCol_[[columnIndex]]" on-click="getChildren" class="vertical layout flex nowrap self-stretch" style="overflow:hidden; background:{{item.background}};">
+          <section class="horizontal layout flex nowrap center center-justified" style$="background:{{item.background}}; border: 2px #005c00 ridge; font-weight:700; color: #009; font-size: 20px; overflow: hidden; text-align: center; width:calc(100vw/18); max-height: 95px; min-height: 38px;">
+              {{item.column}}
+          </section>      
+          <template is="dom-repeat" id$="templateRepeat_{{columnIndex}}" class="vertical flex layout" items="{{item.cell}}" style="padding-top: 30px;" as="cell">
+               <!--  <a link={{}}> -->
+                      <div id="div_{{cell.location}}" location="{{cell.location}}" column="[[item.column]]" style="border:3px solid orange;">
+               <!--          <a link={{}}> -->
+                              <section class="horizontal layout flex self-stretch"  location="{{cell.location}}" counter="0" is-gridbox="true" cell="{{cell}}" key="{{cell.key}}" value="{{cell.value}}" style="min-width:calc(99%/18); min-height:calc(92vh/16); max-width: 220px; max-height:60px; background-color:#ada; border:4px solid #009; font-size:14px;" id$="gridBox{{cell.key}}">
+                 
+                             <fc-input-search-select input-type="text" cell="{{cell}}" style="border-bottom: 3px white solid;min-width: 35px; min-height: 35px; font-family:courier; font-size:24px; font-weight: 700; z-index: 4; resize:none;text-align:center;" id$="input[[cell.key]]" on-keyup="adjustValueArrays" max-char="450" value="{{issValue::value}}" iss-value$="{{cell.value}}" on-track="dragMePlease" key$="{{cell.key}}" drags dragging draggable to-location="{{cell.location}}" class="item target"></fc-input-search-select>
+                            </section>
+                <!--         </a> -->
+                    </div>
+            <!--         </a> -->
+              </template>
+          
+    </div>
+<!--     </a> -->
+</template>
+
+</div>
+<!-- </a> -->
+ </template>
+ <script>
+ FcMappedGrid=Polymer({
+ 	is:"fc-mapped-grid",
+  behaviors:[Polymer.Templatizer],
+ 	properties: {
+    theCoords:{
+      type: Array,
+      value:function(){return[];},
+      notify: true, 
+      observer: "observeTheCoords",
+    },
+    retParent:{
+        type: Object,
+    },
+    dragEl:{
+      type: Object,
+    },
+    dataArrays:{
+      type: Array,
+      value:function(){return[];},
+      notify: true,
+    },
+    trueArrays:{
+      type: Array,
+      value: function(){return[];},
+      notify: true,
+    },
+    selected:{
+      notify: true,
+    },
+    selectedColumn:{
+      notify: true,
+    },
+    stateMap:{
+      type: Map,
+      notify: true,
+    },
+    menuProperty:{
+        type:Object,
+        value:function(){return {"property": null, "propertyValue":null, "propertyType":null};},
+        observer: "observeMenuProperty",
+        notify: true,
+    },
+    
+ 		gridMap:{
+ 			type:Map,
+	 		},
+    stateMap:{
+      type: Map,
+      observer:"observeStateMap",
+      },
+    instanceProps:{
+        myGridMap: true,
+        myStateMap: true,
+      },
+      issClass:{
+        notify: true,
+      },
+      arraySets:{
+        type:Function,
+        value:function(){return [
+                                  ["keyColors", 
+                                          ["yellow","orange","#afafaf", "lightblue","lightgreen","red", "cornflowerblue"]
+                                  ],
+
+                                  ["numberOfHighlightColors",["one", "two", "2 plus one accent", "2 plus 2 accents", "3 plus 2 accents"]
+                                  ],
+                                  ["selectionOfFirstHighlightColor",["rowsOnly", "columnsOnly", "rowsAndColumns", "rowsAndSummations", "All"]
+                                  ],//0th has key then val array
+        ]
+      },
+
+	 	drags:{type: Boolean, value: function(){return true;}, notify: true},
+	 	
+ 		},
+  },
+  observeTheCoords(newval,old){
+
+    console.log(newval, old);
+  },
+showvalues(e){
+  //console.log(e.target, e);
+
+},
+getChildren(e){
+    var parentTemplate=e.target.dataHost.dataHost;
+    var tempInstance=e.target.dataHost;
+    var model=this.$.mappedGridRepeater.modelForElement(e.target);
+    var item = this.$.mappedGridRepeater.itemForElement(e.target);
+    var modelmodel=parentTemplate.modelForElement(e.target);
+    var cell=parentTemplate.itemForElement(e.target);
+    console.log(tempInstance, "instance", model, "model", item, "item", parentTemplate, "TEMPLATE", modelmodel, cell);
+    },
+highlightColumn:function(e){
+        console.log(e, e.target, item);
+
+        var item = this.$.mappedGridRepeater.itemForElement(e.target),
+        model = this.$.mappedGridRepeater.modelForElement(e.target),
+        toTheLeft=model.columnIndex,
+        toTheRight=model.columnIndex+1,
+        baseTest=(this.isToggle===true&&this.toggleClass!==null);
+        console.log(baseTest);
+        var spliceVal=(baseTest&&this.toggleClass==="toggleAddColumn")?this.splice("dataArrays",toTheRight,0,item):(baseTest&& this.toggleClass==="toggleDeleteColumn")?this.splice("dataArrays",toTheRight,0,item):console.log("FAIL");
+        this.splice("dataArrays",toTheRight,0,item);
+
+        if(model.item.background==="orange"){
+          model.set("item.background", "");
+        }
+        else{
+          
+          model.set("item.background", "orange");
+        }
+},
+woops(e){
+console.log(e);
+
+ },
+applycolor(){},
+computeIssValueFunction(theKey, loc, val, cell){
+  // console.log(theKey, loc, val, cell);
+},
+      _computeInputValue(one, two, three, four, five){
+         //console.log("4","4","4","4","4","4");
+         return four;
+      },
+
+      computeElementApiRequestsFromDataStar(needsAvalue){},
+      adjustValueArrays(e){
+        var index1 =e.model.cell.key.charAt(0), 
+         index2=e.model.cell.key.charAt(1),
+         val = e.target.value,
+        valueStart =e.model.cell.value;
+        //console.log(val, valueStart, index1, index2, e.model.cell.location, e.model.cell.key, "look for VALUES HERE", e);
+      },
+
+    ready(){
+      var da=this.setDataArrays();
+      this.set("dataArrays",da);
+      var map=this.setMaps(da);
+      var clone=da.map(function(item, index, array){  return item;});
+      this.set("trueArrays",clone);
+      },
+      // var retsub=item.cell.map(function(it, i){return [it.val, it.value];}); console.log(retsub[index]);
+      attached(){
+      },
+    setDataArrays(){
+        var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+        var columnNames=["Years","January","February","March","April","May","June","July","August","September","October","November","December","Year Total",`&#x0394`, `&#x0394`];
+        var tempArr=[];
+        var retArrays=columnKeys.map(function(val, index,array){
+                    var count=array.length;
+                    var tempArr=[];
+                    var valueArray=[];
+                    for(var i=0;i<count;i++)
+                    {
+                       var retMini= val+array[i];
+                       tempArr.push({"key": retMini, "location": retMini, "value": retMini});
+                       var value= "inputValue__"+index+"_"+i;
+                       valueArray.push(value);
+                    }
+                   retVal={column: columnNames[index], cell: tempArr, values:valueArray};
+                   //console.log()
+                    return retVal;  
+            }, []);
+        //console.log(retArrays);
+        return retArrays;
+        },
+    setMaps(da){
+        var map=new Map(); 
+        this.keys2=[];
+        var stateMap=new Map();
+       var sa= this.dataArrays.reduce(function(pre, val, index, array){
+         return pre.concat(val.cell);
+       },[]).forEach(function(vals, index, array){
+        var key=vals.key;
+        var value=[{"value": vals.value,"timestamp": new Date().getTime(),"userId": "userString", "location": vals.location}];
+        map.set(key,value);
+        var k2=vals.location;
+        stateMap.set(k2,[vals.key, vals.value]);
+       }, this);
+       this.set("stateMap", stateMap);
+       this.set("gridMap", map)
+       //console.log("gridMap: ",map, "stateMap: ", stateMap);
+       var mapPair=[map,stateMap];
+
+       return mapPair;
+        },
+        getRows(){
+          //console.log(this.stateMap);
+        },
+    updateMap(newKey, oldKey){
+      var nkey= this.stateMap.get(newKey);
+      var okey=this.stateMap.get(oldKey);
+      this.stateMap.set(okey,nkey);
+      this.stateMap.set(nkey,okey);
+      this.updateHistory(newKey,oldKey);
+      this.updateHistory(oldKey,newKey);
+      console.log(newKey, oldKey, nkey, okey, this.stateMap, "here is the money");
+    },
+    observeStateMap(newVal, oldVal){
+      //console.log(newVal, oldVal);
+    },  
+    updateHistory(key, value){
+      var ova=this.gridHistoryMap.get(key),
+      nva=[value, new Date().getTime(),"userString"],
+      setval=ova.push(nva);
+      // this.gridHistoryMap.set(key, setval);
+      //console.log(this.gridHistoryMap, this.gridHistoryMap.get(key));
+    },
+    observeMenuProperty(newVal, oldVal){},
+
+dragMePlease(e){
+    e.preventDefault();
+    self=e.target.dataHost;
+    console.log(self);
+            var self=this; 
+   switch(e.detail.state){
+      case 'start':
+            e.preventDefault();
+              var targ=e.target;
+      console.log(targ);
+ 			while(targ.classList.contains("item")!==true && targ.nodeName!="FC-MAPPED-GRID-SAFETY"&& targ.nodeName!=="FC-INPUT-SEARCH-SELECT")
+            {targ=targ.parentElement;}
+ 			if(targ.classList.contains("item")===true){
+        console.log(targ, e.model.cell.key);
+ 				targ.drags=true;
+        targ.draggable=true;
+        console.log(e.model.cell.key);
+        var coords=e.model.cell.key;
+        console.log(coords, targ);
+        this.set("dragEl", targ);
+      var returnParent=  Polymer.dom(this.dragEl).parentElement;
+      this.set("retParent", returnParent)
+       var theCoords=this.getIndex(coords);
+              console.log(theCoords, coords);
+               this.set("theCoords",[theCoords,coords]);
+               console.log(this.theCoords);
+               self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
+                console.log('top distance differenced?' + self._topprime);
+               if(self.counter==0){   self.translate3d(0, 0, 0);}
+                Polymer.dom(self).setAttribute("style.position", "fixed"); 
+               Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
+               Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
+                
+                self.set("refit",true);
+                self.changeX=0;
+                self.changeY=0;
+                Polymer.dom.flush();
+               e.preventDefault();
+             }
+      break;
+       case 'track':
+           e.preventDefault();
+           self.changeX=e.detail.ddx + self.changeX;
+                self.changeY=e.detail.ddy + self.changeY;
+                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+      break;
+      case 'end':
+      console.log(e);
+           // var theId="#"+e.model.dataHost.id;
+             var lt=(e.target===this.dragEl)?e.detail.srcElement:e.target;
+            while(lt.nodeName!=="FC-INPUT-SEARCH-SELECT")
+              {
+                lt=lt.parentElement;
+               
+              }
+              console.log(lt);
+            var key=e.model.cell.key;
+            var val=e.model.cell.key;
+          console.log(key,val);
+            var locator= this.getIndex(key);
+            newLocationArray=[[locator[0],locator[1]],key];
+            var myKey=key;
+            var zero=this.theCoords[0];
+            var first=zero[0].toString();
+            var second=zero[1].toString();
+            console.log(first, second, key, val,this.dataArrays);
+          this.set(['dataArrays',first, "cell",second,"key"],myKey);
+          this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'key'],this.theCoords[1]);
+              //set template instance data    
+               model.set("cell.key",myKey);
+            model.set("cell.key", this.theCoords[1]);
+              //set instance data
+            this.stateMap.set(this.theCoords[1],[myKey,val]);
+            this.stateMap.set(newLocationArray[1],[this.theCoords[1],this.trueArrays[newLocationArray[0][0]].cell[newLocationArray[0][1]].value]);
+            console.log(this.stateMap, this.dataArrays);
+                console.log(cell, "look here for cell", val, this.trueArrays);
+                 self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
+                self._bottom = self.getBoundingClientRect().top;
+                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
+                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
+            
+
+                console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
+              
+                self.style.left=self._x.toString()+'px';
+                self.style.top=self._y.toString()+'px';
+                Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
+          self.translate3d(0, 0, 0);
+
+                console.log('y: ' + e.detail.y);
+                    
+                self.dragging=false;
+            Polymer.dom(lt.parentElement).insertBefore(this.dragEl, lt);
+            Polymer.dom(this.retParent).appendChild(lt);
+            
+        break;
+             Polymer.dom.flush();
+    
+      }
+  },
+
+
+  getIndex(cell){
+    var index=cell.toString().charAt(0);
+    var dex1=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15:parseInt(index); 
+    index=cell.charAt(1);
+    var dex2=(index==="a")?10:(index==="b")?11:(index==="c")?12:(index==="d")?13:(index==="e")?14:(index==="f")?15: parseInt(index);
+    return [dex1, dex2];
+  },
+  getCoordsFromIndex(ind){
+    var index=ind[0];
+    var dex1=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+    index=ind[1];
+    var dex2=(index==10)?"a":(index==11)?"b":(index==12)?"c":(index==13)?"d":(index==14)?"e":(index==15)?"f":parseInt(index);
+    index=ind[1];
+    var retVal=dex1.toString()+dex2.toString();
+    return retVal;
+  }
+	
+
+  });
+    </script>
+   </dom-module>
+   <!--
+  
+           // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+         // e.model.set("cell.location",myLoc);
+         //    while(parent.nodeName!="TEMPLATE" && parent.nodeNam!="DOM-REPEAT" && parent.nodeName!="FC-DASHBOARD-ONE"){  console.log(parent.nodeName);
+         //     if(parent.nodeName=="TEMPLATE"){  console.log(parent.nodeName);            }
+         //       console.log(parent.nodeName);
+         //    //   parent=Polymer.dom(parent).parentNode;
+         //   }
+         // console.log(lt, e.model.dataHost);
+      //       var parent=Polymer.dom(lt).parentNode,
+      // parent2=Polymer.dom(this.dragEl).parentNode,
+      // nes=Polymer.dom(lt).nextSibling,
+      // nes2=Polymer.dom(this.dragEl).nextSibling;
+      //  Polymer.dom(parent2).insertBefore(lt, nes2);
+      //  Polymer.dom(parent).insertBefore(this.dragEl, nes);
+              
+
+
+              // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+        
+       
+            // this.notifyPath(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],this.dragCoords[1]);
+   //  if(this.isWrapper==true){
+        //   var wrap=this.$$("fc-fit-wrapper");
+        //  wrap.set("positionTarget", lt);
+        //    wrap.specialRefit(lt);
+        //  wrap.set("drags",false);
+        //  this.set("isWrapper",false);
+   // this.set(['dataArrays',this.dragCoords[0][0], "cell",this.dragCoords[0][1],"location"], e.model.__data__.cell.location);
+      // this.set(['dataArrays',newLocationArray[0][0], 'cell',newLocationArray[0][1],'location'],loc);
+
+      //this should key map the thing, will location map next
+     // .cell[this.dragCoords[0][1]];

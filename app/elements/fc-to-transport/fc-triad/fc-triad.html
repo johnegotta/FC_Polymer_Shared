@@ -86,8 +86,6 @@ min-height: 38px;
 </style><!-- 
 on-track="focusedDragMe" -->
 	<div drags on-down="dragsOff" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer" >
-	<paper-swatch-picker>
-	</paper-swatch-picker>
 		<div class="vertical layout self-stretch nowrap" > 
 		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; margin-bottom: 48px;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
@@ -110,9 +108,9 @@ on-track="focusedDragMe" -->
         		<span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
       	</section>
       	<div class="horizontal layout flex wrap self-stretch around-justified">
-          		<fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" value="" iss-value="{{someValuePropertyA}}" multi-select="[[item.multiSelectA]]">
+          		<fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
           		</fc-input-search-select>
-          		<fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" value="" iss-value="{{someValuePropertyB}}" multi-select="[[item.multiSelectB]]">
+          		<fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
           		</fc-input-search-select>
      	</div>
   	</template>
@@ -136,15 +134,14 @@ on-track="focusedDragMe" -->
 					</section> 
 				</paper-material><!--header ends-->
 				<!--resizer-->
-				
-				<section class="horizontal layout flex-1 self-stretch" style="overflow: scroll;">
+				<div flex layout vertical style="height: 96vh;">
+				<div class="horizontal layout flex-1" style="height: 50vh; overflow:scroll;">
 					<fc-mapped-grid style="overflow:scroll;">
-
-					</fc-mapped-grid>
-				</section>
+						</fc-mapped-grid>
+				</div>
 				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 105%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
 			
- 				<div class="layout vertical flex" style="position:static; max-height: 99vh; min-height:12vh;overflow:scroll;">
+ 				<div class="layout horizontal flex" style="position:static; height: 100%; padding-bottom: 50%; overflow:scroll;">
 
  					<article  class="layout horizontal flex wrap" style="position:static;padding: 34px; height: 450px;max-height:76vh;">
 		  				<template is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
@@ -152,7 +149,7 @@ on-track="focusedDragMe" -->
 		  				</template>
 		  			</article>
 		  			</div>
-				
+				</div>
 			</div>
 		</div>
 <!--  <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
@@ -167,6 +164,7 @@ FcTriad=Polymer({
 	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,Polymer.IronResizableBehavior],
 	observers:[],
 	properties: {
+		
 		day:{
 			type: Object, 
 			value: {},
@@ -182,6 +180,10 @@ FcTriad=Polymer({
 			type: FcCourse,
 			value: function(){return new FcCourse({});},
 			notify: true
+		},
+		colorToApply:{
+			type:String,
+			notify: true,
 		},
 		background: {
 			type: String,
@@ -358,7 +360,9 @@ FcTriad=Polymer({
 		}
 
   },
+  
 
+ 
   observeRightBottomMarginTop(newval,oldval){
   	console.log(newval,oldval);
 
@@ -539,7 +543,7 @@ computeViewMonth: function(displayedIndex){
 	return monArr[displayedIndex];
 	},
 
-_computePrettyDay: function(d)
+	_computePrettyDay: function(d)
  	{	
  		var day=new Date(d).getDate();//console.log(day);
  		return day;
@@ -647,21 +651,7 @@ _computePrettyDay: function(d)
             }
         }
     },
-       falseClose: function(){
-        this.toggleColor=!this.toggleColor;
-        if(this.toggleColor===false){
-        this.set('currentHeight', this.minHeight);
-        this.style.height= this.minHeight;
-        this.style.width=this.currentWidth +"px";
-        this._onIronResize();
-      }
-        else{
-          this.set('currentHeight',this.heightHolder);
-          this.style.height = this.heightHolder;
-          this._onIronResize();
-            }
 
-       },
 });
 </script>
 </dom-module>

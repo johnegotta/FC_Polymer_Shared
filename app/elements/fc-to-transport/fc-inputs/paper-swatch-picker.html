@@ -119,6 +119,11 @@
           type: Number,
           value: 18
         },
+
+        toColor:{
+          type: String,
+          notify: true,
+        },
         /**
          * The orientation against which to align the menu dropdown
          * horizontally relative to the dropdown trigger.
@@ -178,15 +183,16 @@
       _addOverflowClass: function() {
         this.$.container.toggleClass('opened', true);
       },
-      _removeOverflowClass: function() {
+      _removeOverflowClass:function(){
         this.$.container.toggleClass('opened', false);
       },
-      _onColorTap: function(event) {
+      _onColorTap:function(event){
         var item = event.detail.item;
         // The inner `span` element has the background color;
         var color = item.style.color;
         // If it's in rgb format, convert it first.
         this.color = color.indexOf('rgb') === -1 ? color : this._rgbToHex(color);
+        this.toColor = color.indexOf('rgb') === -1 ? color : this._rgbToHex(color);
         this.fire('color-picker-selected', {color: this.color});
       },
       _colorChanged: function() {

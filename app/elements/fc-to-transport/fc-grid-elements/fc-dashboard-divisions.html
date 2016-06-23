@@ -133,11 +133,8 @@
               class="layout vertical block justified"
               on-tap="openMenu"
               style="max-height: 200px; min-height: 110px; max-height: 160px; min-width: 200px; background: #fff;">
-              <img style="margin: 16px; min-width:200px; max-width: 200px; max-height: 98px;" src="../../../images/FC_frontpage_logo.png" >
+              <img style="margin: 16px; min-width:200px; max-width: 200px; max-height: 98px;" src="../../../images/FC_frontpage_logo.png">
                <fc-login-dialog id="loginDialog" on-down="loginDrawerWidthAdjustment" style="z-index:2000;"></fc-login-dialog>
-            
-           
-      
       </div>
       <section horizontal layout style="height: 2px; background: #efefef; width: 100vw;">
       <hr>
@@ -165,7 +162,9 @@
           </template>
      
     </section>
+          <section class="horizontal layout flex">
             <content select=".leftDrawer"></content>
+      </section>
   </div>
 
     <section on-down="dragsOff" id="dashboardLeftDrawer_resizer" on-track="_resize" on-up="dragsOn" is-resizing dragging draggable style$="position: relative; left:calc({{dashboardLeftDrawerCurrentWidth}}+12)px; bottom:0px; top: 0px; min-width:6px!important; height:103vh; cursor:ew-resize; padding: 1px; width: 12px!important; opacity: 1; background:#009; border-right: 2px solid #aecefe; z-index: 5;">
@@ -306,8 +305,28 @@ Polymer({
               "constructor":FcPickle,
             },
              { "sectionClass": "normal buttons blue-btn-class",
-               "iconUsed": "icons:assessment",
-               "btn": "analyze",
+              "iconUsed": "icons:dashboard",
+              "nodeName": "FC-GRID-TEST",
+              "constructorName":"FcGridTest",
+              "constructor":FcGridTest,
+               },
+               { "sectionClass": "normal buttons blue-btn-class",
+              "iconUsed": "icons:dashboard",
+              "nodeName": "FC-GRID-TEST",
+              "constructorName":"FcGridTest",
+              "constructor":FcGridTest,
+               },
+               { "sectionClass": "normal buttons blue-btn-class",
+              "iconUsed": "icons:dashboard",
+              "nodeName": "FC-GRID-TEST",
+              "constructorName":"FcGridTest",
+              "constructor":FcGridTest,
+               },
+               { "sectionClass": "normal buttons blue-btn-class",
+              "iconUsed": "icons:dashboard",
+              "nodeName": "FC-GRID-TEST",
+              "constructorName":"FcGridTest",
+              "constructor":FcGridTest,
                },
 
             // { "sectionClass": " normal buttons blue-btn-class",
@@ -425,7 +444,7 @@ Polymer({
         },
         constructorArray:{
           type: Array,
-          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar],["FC-PASSAGE-QUESTION-DISPLAY",FcPassageQuestionDisplay],["FC-GRID-CONTAINER",FcGridContainer],["FC-RQTVERSIONC",FcRqtversionc], ["FC-PASSAGE-DB-DISPLAY",FcPassageDbDisplay],["FC-PICKLE", FcPickle]];},
+          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar],["FC-PASSAGE-QUESTION-DISPLAY",FcPassageQuestionDisplay],["FC-GRID-CONTAINER",FcGridContainer],["FC-RQTVERSIONC",FcRqtversionc], ["FC-PASSAGE-DB-DISPLAY",FcPassageDbDisplay],["FC-PICKLE", FcPickle],["FC-GRID-TEST", FcGridTest]] ;},
           notify: true
           },
           responsiveWidth: {
@@ -614,8 +633,13 @@ request.onupgradeneeded = (function (event) {
    
     openMenu(e){
       console.log(e, this.$.loginDialog);
-      this.$.loginDialog._openMenu(e);
-      this.$.loginDialog.set("opened",true);
+      // this.$.loginDialog._openMenu(e);
+      // this.$.loginDialog.set("opened",true);
+      this.loginDrawerWidthAdjustment();
+      var newRtDrawerWidth=this.dashboardRightDrawerCurrentWidth+this.containerWidth;
+      this.set("dashboardRightDrawerCurrentWidth",newRtDrawerWidth);  
+      var tabbedDrawer=this.$$("FC-RIGHT-TABBED-DRAWER");
+      tabbedDrawer.mySelected="focusedProfilePrime";
     },
 
     observeResize(newVal, oldVal){
@@ -734,16 +758,16 @@ request.onupgradeneeded = (function (event) {
               
             switch(e.detail.state){
                     case 'start':
-                        self._leftprime = parseInt(window.getComputedStyle(targ).getPropertyValue("left"))-e.detail.x;
-                        self._topprime = parseInt(window.getComputedStyle(targ).getPropertyValue("top"))-e.detail.y;
-                         self.changeX=0;
-                         self.changeY=0; 
+                        // self._leftprime = parseInt(window.getComputedStyle(targ).getPropertyValue("left"))-e.detail.x;
+                        // self._topprime = parseInt(window.getComputedStyle(targ).getPropertyValue("top"))-e.detail.y;
+                        //  self.changeX=0;
+                        //  self.changeY=0; 
                     break;
                     case 'track':
                           e.preventDefault();
-                         self.changeX=e.detail.ddx + self.changeX; //SELF ISSUE
-                         self.changeY=e.detail.ddy + self.changeY;
-                         this.wrapperDragEl.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
+                         // self.changeX=e.detail.ddx + self.changeX; //SELF ISSUE
+                         // self.changeY=e.detail.ddy + self.changeY;
+                         // this.wrapperDragEl.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
                         break;
                     case 'end':
                         var lt=e.detail.sourceEvent.toElement;

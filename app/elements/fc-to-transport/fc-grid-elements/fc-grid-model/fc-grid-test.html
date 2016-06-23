@@ -1,0 +1,218 @@
+<dom-module id="fc-grid-test">
+<template>
+<style>
+:host {height:5000px;
+		display: absolute;
+
+}
+
+#mappedGridContainer {
+	overflow-y:scroll;
+	max-height:95vh;
+}
+
+paper-material {padding:4px;}
+paper-button {background: #11bb11; border:1px solid black;}
+.woid {
+	border-radius:10%;
+	border: 1px solid black;
+	padding:10px 10px 10px 10px;
+	margin-left: 5px;
+	width:70px;
+}
+
+.highlighted {
+	background:yellow;
+}
+
+</style>
+<div class="layout vertical flex">
+<section class="layout horizontal flex nowrap self-stretch">
+<paper-button on-tap="addCol">Add Column</paper-button>
+<paper-button on-tap="addRow">Add Row</paper-button>
+<paper-button on-tap="monkey">Make (2,2) a Monkey</paper-button>
+</section>
+<br>
+<div id="mappedGridContainer" class="layout horizontal">
+	<template id="mappedGridRepeater" observe="data selected" is="dom-repeat" items="{{columns}}" as="col" index-as="columnIndex" >
+		<div id="{{columnIndex}}" class="layout vertical">
+			<paper-material id="header" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style$="background:[[_computeHighlighted(col.selected, col.data, col.data.0.highlighted, trigger)]]; cursor:pointer;" on-click="highlightCol">{{_computeCol(columnIndex)}}
+			</paper-material>
+			<input type="checkbox" readonly name="hl" value="Bike" checked="{{computeColSelected(col.selected, triggerTheFuckingHighlight)}}">
+			<span>{{col.name}}</span>
+			<template id$="template_{{columnIndex}}" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
+			
+				<paper-material id="{{index}}" data-payload$="{{item.payload}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" class="layout vertical" style$="background:[[_computeHighlighted2(item.highlighted, trigger)]];">
+					<span>([[_computeCol(columnIndex)]],{{index}})</span>						<input data-fcitem$="{{item}}" value="{{item.payload}}" class="woid" on-keyup="changePayload" style$="background:{{item.payload}};">
+				</paper-material>
+			
+			</template>
+		</div>
+	</template>
+</div>
+</div>
+
+</template>
+<script>
+
+FcGridTest = Polymer({
+	is:"fc-grid-test",	
+	properties:{
+		columns:{
+			type: Array,
+			value: function(){return [];},
+			notify:true,
+		},
+		startCell:{
+			type: Object,
+			value:function(){return {};},
+			notify:true
+		},
+		startContainer:{
+			type: Object,
+			value:function(){return {};},
+			notify: true,
+		},
+	
+		startCellModel:{
+			type:Object,
+			value: function(){return {};},
+			notify: true,
+		},
+
+		trigger:{
+			type: Boolean,
+			value: function(){return false;},
+			notify: true
+		},
+
+	},
+
+	
+	ready: function()
+	{
+		this.set("columns", [ {column: 0, selected:false, name:"one", data:[{payload:"yellow", col:0, row:0, highlighted:false}, {payload:"dodgerblue", col:0, row:1, highlighted:false}, {payload:"cyan", col:0, row:2, highlighted:false}]}, {column: 1, selected:false, name:"two", data:[{payload:"lightgrey", col:1, row:0, highlighted:false}, {payload:"green", col:1, row:1, highlighted:false}, {payload:"white", col:1, row:2, highlighted:false}]}, {column: 2,selected:false, name:"three", data:[{payload:"crimson", col:2, row:0, highlighted:false}, {payload:"grey", col:2, row:1, highlighted:false}, {payload:"orange", col:2, row:2, highlighted:false}]}  ]);
+	},
+
+	startDrag: function(e)
+	{	  
+		var parentOneTemplate=e.model.dataHost;
+		var containerModel=this.$.mappedGridRepeater.modelForElement(e.target);
+		var celloneModel = parentOneTemplate.modelForElement(e.target);
+    	var cell=parentOneTemplate.itemForElement(e.target);
+    	var containerOneModel=this.$.mappedGridRepeater.modelForElement(e.target);
+    	var item = this.$.mappedGridRepeater.itemForElement(e.target);
+    	this.set("startContainer",item);
+    	console.log(this.startContainer);
+    	this.set("startCell",cell);
+    	this.set("startCellModel",celloneModel);
+    
+	},
+
+	dragOver: function(e){e.preventDefault();},
+
+	handleDrop: function(e)
+	{	
+		
+		  var parentTemplate=e.model.dataHost;
+    	  var endContainer = this.$.mappedGridRepeater.itemForElement(e.target);
+    	  var endCell= parentTemplate.itemForElement(e.target);
+    	  var cellModel = parentTemplate.modelForElement(e.target);  
+		if(this.startContainer.selected===true){
+			var startCol=this.startContainer.data[0].col;//if change to column here must change assignment in clone
+    	  	var endCol=endContainer.data[1].col;
+    	  	var startContainerClone=Object.assign({},this.startContainer);
+    	  	var endContainerClone=Object.assign({},endContainer);
+    	  	console.log(endContainerClone, startContainerClone);
+    	  for(var i=0; i<endContainer.data.length;i++){
+    	  		startContainerClone.data[i].col=endCol;
+    	  		endContainerClone.data[i].col=startCol;
+    	  	}
+    	  this.async(function(){this.splice("columns",endCol,1,startContainerClone);},50);
+    	  this.async(function(){ this.splice("columns",startCol,1, endContainerClone);},26);
+		}
+		else
+		{
+			var destpayload = endCell.payload;
+			var payload=this.startCell.payload;
+			this.async(function(){cellModel.set("item.payload",payload)},25);
+			this.startCellModel.set("item.payload",destpayload);
+		}
+	},
+
+	monkey: function(e)
+	{
+		var col = "columns[2][2]";
+		this.set(["columns", 2, "data",2, "payload"], "monkey"); //{payload:"Monkey"});
+		console.log(this.columns);
+	},
+
+	changePayload: function(e)
+	{
+		var dat = JSON.parse(e.target.dataset.fcitem);
+		var col = parseInt(dat.col);
+		var row = parseInt(dat.row);
+		console.log(e.target.value, dat, typeof dat, col, row);
+		this.set(["columns", parseInt(dat.col), "data", parseInt(dat.row)], {payload: e.target.value, col: dat.col, row: dat.row, highlighted:dat.highlighted});
+		console.log(this.columns);
+	},
+	_computeCol: function(col){return col;},
+
+	addCol: function(e)
+	{
+		var numCols = this.columns.length;
+		var numRows = this.columns[0].data.length;
+		var newCol = {column: numCols, name: "new", selected:false, data:[]};
+		var i = 0;
+		for(i = 0; i < numRows; i++)
+		{
+			newCol.data.push({payload:"lightgreen", col:numCols, row:i, highlighted:false});
+		}
+		this.push("columns", newCol); //{selected:false, data:newCol});
+		console.log(this.columns.length, this.columns);
+	},
+
+	addRow: function(e)
+	{	
+		var numCols = this.columns.length;
+		var numRows = this.columns[0].data.length;
+		var i = 0;
+		for(i = 0; i < numCols; i++)
+		{
+			this.push(["columns", i, "data"], {payload:"beige", col:i, row:numRows, highlighted:this.columns[i].selected});
+		}
+	},
+
+	highlightCol: function(e)
+	{	  
+
+		  var item= this.$.mappedGridRepeater.itemForElement(e.target);
+    	  var model= this.$.mappedGridRepeater.modelForElement(e.target);
+    	  var setVal=(item.selected===false)?true: false;
+		  var counter=item.data.length;
+		  var resetVal=item, i=0;
+		  	resetVal.selected=setVal;
+		  	model.set("item.selected", setVal);
+		  	for(i=0;i<counter;i++){
+		  		model.set(["item.data",i,"highlighted"], setVal);
+		  		item.data[i].highlighted=setVal;
+		  		}
+		  	console.log(item);
+		  	this.set("trigger",!this.trigger);
+	},
+
+	_computeHighlighted: function(one, two, three)
+	{
+		console.log(one,two, three, "why is this not triggered onb the change of values above");
+		if(typeof three===Object){
+		var result = (one === true && two===true)?"yellow":"#afafaf";
+		}
+		result=(three===true)?"cyan; border: solid 4px #aecdfe":"white; border: solid 0px #aecdfe"+result;
+		return result;
+	},
+	computeColSelected: function(one,two){return one;},
+	_computeHighlighted2(hl, tr){var result = (hl === true)?"yellow":"white";return result;},
+
+});
+</script>
+</dom-module>

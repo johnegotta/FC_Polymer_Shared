@@ -1,0 +1,112 @@
+<dom-module id="fc-grid-menu_sheets">
+<template id="fc-grid-menu_sheets-template">
+<style>
+</style>
+<div class="vertical layout flex" on-tap="listenToTheMusic">
+        <paper-swatch-picker btn="getMenuChildren__setColor__maintainFocusForSelection" id="theColorPicker">
+        </paper-swatch-picker>
+    <template id="gridMenuDomRepeater" is="dom-repeat" items="{{menuButtons}}" as="menuButton">
+      <fc-input-search-select 
+      		id$="[[menuButton.id]]" 
+      		btn="{{menuButton.btn}}" 
+      		menu-property$="{{menuButton.menuProperty}}" 
+      		iss-label$="{{menuButton.issLabel}}" 
+      		dropdown-items$="{{menuButton.dropdownItems}}" 
+      		item-select-property="" 
+      		search-off$="{{menuButton.searchOff}}"
+      		toggle-class$="{{menuButton.toggleClass}}" 
+      		iss-class="{{menuButton.issClass}}" 
+      		show-drop-button$=[[menuButton.showDropButton]] 
+      		iss-icon$="{{menuButton.issIcon}}"
+      		is-toggle$="{{menuButton.isToggle}}">
+      </fc-input-search-select>
+    </template>
+    <section class="vertical layout">
+    <content></content>
+    </section>
+</div>
+</template>
+<script>
+FcGridMenu_sheets=Polymer({
+	is:"fc-grid-menu_sheets",
+	 listeners:{'color-picker-selected':"dosomethingwiththecolor"},
+	properties:{
+
+		textOrBackground:{
+      		type:Array,
+      		value:function(){return;},
+      		notify: true,
+    	},
+    	colorToApply:{
+      		type: String, 
+      		notify: true,
+    	},
+    	menuProperty:{
+    		type:String,
+    		computed:"computeMenuProperty(menuButtons)",
+    		notify: true,
+    	},
+    	gridMenuChildren:{
+    		type:Array,
+    		notify: true,
+    		},
+    	
+    	menuButtons:{
+    		type:Array,
+			notify: true,
+		}
+
+	},
+	created(){
+		var buttonData=[];
+		buttonData=[ 
+					{"id":"colorTypeDropdown", "btn":"", "menuProperty":"","dropdownItems":["color","background"], "itemSelectProperty":'""', "searchOff":"true", "issClass":"menuItem","showDropButton":"true","issIcon":"icons:dashboard", "issLabel":"Apply Color"
+					},
+					{"id":"formatPainter","btn":"",  "issClass":"menuItem", "menuProperty":"", "dropdownItems":["text","cells"], "itemSelectProperty":'""', "searchOff":"true","issLabel":"Format Paint","showDropButton":"true","issIcon":"editor:format-paint"
+					},
+					{"id":"addColumnToggleButton", "btn":"","menuProperty":"addColumns", "issLabel":"Add Cols", "isToggle":"true", "dropdownItems":"","toggleClass":"toggleAddColumn", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"image:exposure-plus-1"
+					},
+					{"id":"deleteColumnToggleButton","btn":"","menuProperty":"deleteColumns","issLabel":"Delete Cols","isToggle":"true", "dropdownItems":"",  "toggleClass":"toggleDeleteColumn", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"image:exposure-neg-1"
+					},
+					{"id":"selectFunctionDropdownButton", "issClass":"menuItem","itemSelectProperty":"''", "btn":"","menuProperty":"selectFunction","issLabel":"Functions", "dropdownItems":["Summation","Delta", "Average"], "searchOff":"true","issIcon":"editor:functions"
+					}
+				];
+		this.async(function(){this.set("menuButtons", buttonData);},750);
+	},
+	dosomethingwiththecolor(e){
+    		this.set("colorToApply", e.target.color);
+      		console.log(e, "third, from top listener: " + e.target.color, this.colorToApply);
+    		// this.$.colorTypeDropdown.set("style.color", this.colorToApply);
+  },
+  computeMenuProperty(menuButtons){},
+  listenToTheMusic(e){
+  		var target=e.target;
+  		console.log(target);
+  		while(target.nodeName!=="FC-INPUT-SEARCH-SELECT" && target.nodeName!=="FC-GRID-MENU_SHEETS"){
+  			target=target.parentElement;
+  			console.log(target.nodeName,target);
+  		}
+  		// if(target.nodeName!=="FC-INPUT-SEARCH-SELECT"){
+ 						console.log(e,target.attributes, target.attributes["dropdown-items"].value); 				
+ 						this.set("dropdownItems",target.attributes["dropdown-items"].value);
+  			// }
+  },
+  attached(){
+
+var children =this.getMenuChildren();
+console.log(children);
+  },
+
+getMenuChildren(e){
+var children=this.$.gridMenuDomRepeater.children;
+console.log(children);
+return children;
+},
+
+  
+ 
+});
+</script>
+</dom-module>
+
+
