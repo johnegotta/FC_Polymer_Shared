@@ -1,54 +1,110 @@
 <dom-module id="fc-mapped-grid">
  <template id="fc-mapped-grid-template">
  <style>
+ :host{@apply(--layout-vertical);
+  @apply(--layout-flex);
+
+  margin: 12px 3px;
+  padding: 4px;
+  overflow:scroll;
+  position: static;
+  background: white;
+  opacity: 1;
+};
+li{
+  height:65px; margin:8px 2px 1px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
+  @apply(--layout-self-shrink);
+}
+ul{border: 0px solid white; outline:0px solid white; margin-top: 44px; display: flex; flex-direction: column-reverse; flex-wrap: true; list-style-type:none;}}
  section{
   background:white;
  }
+.userStyle{font-size:22px; font-weight: 900; font-style: italics; text-decoration: underline;}
 textarea::-moz-selection { /* Code for Firefox */
-    color: red;
-    background: yellow;
+
 }
+.selected{
+  border: dashed 2px #f2f735;
+/*margin-top:-8px;
+margin-right:-5px;*/
+/*z-index:7px;
+box-shadow:4px 8px 13px 4px black;*/
+  /*animation-duration: .3s;
+  animation-name: blink;
+  animation-iteration-count: infinite;*/
+ -webkit-transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;
+  transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;},
+@-webkit-keyframes blink {
+   from {
+    border: dashed 1px
+#f2f735;
+
+  }
+
+  to {
+    border: dashed 3px 
+#f2f735;
+  margin-top:-1px;
+    
+  }
+}
+  
+@keyframes blink {
+  from {
+    border: dashed 1px 
+#f2f735;
+margin-top:0px;
+  }
+
+  to {
+       border: dashed 3px 
+#f2f735;
+  margin-top:-1px;
+  margin-bottom:-1px;
+    
+  }
+}
+
+.cell{
+    word-wrap: break-word;
+    word-break: break-all;
+    cursor:cell;
+    }
 
 textarea::selection {
     background: yellow;
 }
-:host{
-	background: white;
-	padding: 0px 3px 4px 8px;
-	opacity: 1;
 
-	position: static;
-	@apply(--horizontal-layout);
-	@apply(--layout-flex);
-	}
   *{@apply(--layout-nowrap);}
  </style>
- <array-selector id="columnSelector" items="[[dataArrays]]" selected="{{selected}}?">
+ <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
  </array-selector>
 
  
 <!-- <a> -->
-<div is-gridbox="true" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:88.99vw; max-width:98.99vw; min-height: 91vh; max-height:96vh;">
+<div is-gridbox="true" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; max-width:78.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
 <!--side utility editing menu for the spreadsheet-like versions-->
-<fc-grid-menu_sheets>
-  <paper-button on-tap="addCol">Add Column</paper-button>
-<paper-button on-tap="addRow">Add Row</paper-button>
-<paper-button on-tap="monkey">Make (2,2) a Monkey</paper-button>
+<fc-grid-menu_sheets user-selection="{{userSelection}}" menu-properties="{{menuProperties}}" color-to-apply="{{format.color}}" text-or-background="{{format.application}}" format-text="{{format.fontFamily}}" format-fancy="{{format.fontStyle}}" add-column="{{format.addColumns}}" delete-column="{{format.deleteColumn}}" user-drags="{{userDrags}}"add-delete-director="{{format.leftOrRight}}" selected-array="{{selectedArray}}">
+<paper-icon-button icon="icons:dashboard" on-tap="addCol"></paper-icon-button>Add Col
+<paper-icon-button icon="icons:dashboard" on-tap="addRow"></paper-icon-button>Add Row
+<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ArraySwap
 </fc-grid-menu_sheets>
-
-<template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{columns}}" as="col">
+<ul id="hanger3"  hidden="{{!four}}" contenteditable="true" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style="display:flex; flex-direction: column; flex-wrap:wrap; max-height: 4200px;">
+ 
+</ul>
+<template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
 <!-- <a link={{}}> -->
-    <div id$="divCol_[[columnIndex]]" class="vertical layout flex nowrap self-stretch">
-          <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style$="background:[[_computeHighlighted(col.selected, col.data, col.data.0.highlighted, trigger)]]; cursor:pointer; font-weight:700; color: #009; font-size: 20px; overflow: hidden; text-align: center; width:calc(100vw/18); max-height: 95px; min-height: 38px;" on-click="highlightCol">
-          <span>
-              {{col.column}} {{col.name}} <input type="checkbox" readonly name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">{{_computeCol(columnIndex)}}</span>
+    <div id$="divCol_[[columnIndex]]" hidden="{{four}}"style$="{{_computeSelectedHoverStyle(trigger, col.selected)}} position:" class="vertical layout container nowrap self-stretch">
+          <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" 
+          style$="background:[[_computeHighlighted(col.selected, col.data, col.highlighted, trigger)]]; cursor:pointer; font-weight:700; color: #009; font-size: 18px; overflow: hidden; text-align: center; min-width:calc(100vw/28); border-radius: 2px; max-width: 210px; max-height: 58px; min-height: 38px;">
+            {{col.name}} <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
           </section>    
           <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
                <!--          <a link={{}}> -->
-                              <section class="horizontal layout flex self-stretch"  id="{{index}}" data-payload$="{{item.payload}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" class="layout vertical"  style$="background:[[_computeHighlighted2(item.highlighted, trigger)]]; min-width:calc(99%/18); min-height:calc(92vh/16); max-width: 220px; max-height:60px; background-color:#ada; border:4px solid #009; font-size:14px;" id$="gridBox{{item.col}}_{{item.row}}">
-                                <span>([[_computeCol(columnIndex)]],{{index}})</span>
-                             <fc-input-search-select input-type="text" cell="{{item.row}}_{{item.col}}" style="border-bottom: 3px white solid;min-width: 35px; min-height: 35px; font-family:courier; font-size:24px; font-weight: 700; z-index: 4; resize:none;text-align:center;" id$="input[[item.col]]_[[item.row]]" data-fcitem$="{{item}}" on-keyup="changePayload" style$="background:{{item.payload}};" max-char="450" value="{{issValue::value}}" iss-value$="{{item.payload}}"></fc-input-search-select>
-                        </section>
+                            <!--   <section class="horizontal layout flex self-stretch {{_computeSelected(item.selected, item)"  id="{{index}}" data-payload$="{{item.payload}}" class="layout vertical"  style$="background:[[_computeHighlighted2(item.highlighted, item.color, item.background, trigger)]]; min-width:calc(99%/18); min-height:calc(92vh/24); max-width: 210px;width: 155px; max-height:70px; border-top:1px solid #009; 
+                              border-left:1px solid #009;font-size:14px;" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop"  id$="gridBox{{item.col}}_{{item.row}}"> -->
+                             <input input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop"   on-dblclick="selectTog"style="background: #fdfdfd; border-bottom: 2px white solid;min-width: 135px; min-height: 24px; font-family:merriweather; font-size:18px;max-width: 210px; whitespace-wrap: true; font-weight: 900; z-index: 4; line-height:1.15;text-align:center; white-space: wrap; padding-top: 3px;" id$="input[[item.col]]_[[item.row]]" data-payload$="{{item.payload}}" on-keyup="changePayload" texteditable="true"  value="{{item.payload}}" class$="{{_computeSelected(item.selected, item)}} cell" max-char="450">
+                        
             <!--         </a> -->
               </template>
           
@@ -57,6 +113,18 @@ textarea::selection {
 </template>
 
 </div>
+
+<ul id="hanger3" contenteditable="true" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style="display:flex; flex-direction: column; flex-wrap:wrap; max-height: 4200px;">
+ 
+</ul>
+<!-- <template id="stuffToRepeat"> -->
+      
+<!-- <li id="liToIterate" style="height: 80px; width: 320px; margin: 4px 2px; border: 2px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;
+  font-size: 18px; font-weight: 600; color: #009; font-family: merriweather;" >
+<span id="hidden" style="display: none;">stuff</span>
+  </li> -->
+
+
 <!-- </a> -->
  </template>
  <script>
@@ -64,6 +132,33 @@ textarea::selection {
  	is:"fc-mapped-grid",
   behaviors:[Polymer.Templatizer],
  	properties: {
+    format:{
+      type: Object,
+      value:function(){return {};},
+      observer: "observeFormatChanges",
+      notify: true,
+    },
+    selectedArraySet:{
+        type:Array,
+        value:function(){return [];},
+        notify: true
+    },
+    dataArrays:{
+        type:Array,
+        value:function(){return [];},
+        notify: true,
+    },
+    columns2:{
+      type: Array,
+      value: function(){return [];},
+      notify:true,
+    },
+    columns3:{
+      type: Array,
+      value: function(){return [];},
+      notify:true,
+    },
+
     columns:{
       type: Array,
       value: function(){return [];},
@@ -85,18 +180,43 @@ textarea::selection {
       value: function(){return {};},
       notify: true,
     },
-
+    userSelection:{
+      type:Boolean,
+      value: function(){return false;},
+      notify: true,
+      observer: "userSelectionArrayTrigger",
+    },
     trigger:{
       type: Boolean,
       value: function(){return false;},
       notify: true
     },
 
-    menuProperty:{
+    menuProperties:{
         type:Object,
         value:function(){return {"property": null, "propertyValue":null, "propertyType":null};},
         observer: "observeMenuProperty",
         notify: true,
+    },
+    arraysIndex:{
+        type: Number,
+        value: function(){return 0;},
+        notify:true,
+    },
+    selectedArray:{
+      type:Array,
+      value:function(){return [];},
+      notify: true,
+      observer: "observeSelectedArray",
+    },
+    userDrags:{
+      type:Boolean,
+      value: function(){return false;},
+      notify: true,
+    },
+    four:{     type:Boolean,
+     computed:"computefour(arrayIndex)",
+      notify: true,
     },
     
       issClass:{
@@ -120,70 +240,184 @@ textarea::selection {
 	 	
  		},
   },
+
+  arraySwap(e){
+    var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
+    this.set("arrayIndex", arrayNum);
+    this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+      
+  },
+  observeSelectedArray(nv, ov){
+    if(nv && nv.length>0){
+      console.log(nv, ov, nv.length);
+
+    }
+
+
+  },
+computefour(arrayIndex){
+    return(arrayIndex===3);
+
+
+},
+  selectTog(e){
+      console.log(e);
+      // e.model("item.selected",!e.model.item.selected);
+      // console.log(e);
+
+  },
 ready(){
-this.set("columns", [ {column: 0, selected:false, name:"one", data:[{payload:"yellow", col:0, row:0, highlighted:false}, {payload:"dodgerblue", col:0, row:1, highlighted:false}, {payload:"cyan", col:0, row:2, highlighted:false}]}, {column: 1, selected:false, name:"two", data:[{payload:"lightgrey", col:1, row:0, highlighted:false}, {payload:"green", col:1, row:1, highlighted:false}, {payload:"white", col:1, row:2, highlighted:false}]}, {column: 2,selected:false, name:"three", data:[{payload:"crimson", col:2, row:0, highlighted:false}, {payload:"grey", col:2, row:1, highlighted:false}, {payload:"orange", col:2, row:2, highlighted:false}]}  ]);
+    var columns=this.setColumns();
+     var headerArray=columns.map(function(val,index, array){
+             return val.name;
+        });
+     console.log(headerArray, columns);
+    var columnd=this.parser(headerArray,"accounting", columns);
+    this.set("columns", columnd);
+    this.parser2();
+       this.parser3();
+    this.push("dataArrays",this.columns);
+    this.push("dataArrays", this.columns2);
+    this.push("dataArrays",this.columns3);
+        this.push("dataArrays",this.columns4);
+    this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+    },
+observeFormatChanges(newVal, oldVal){
+  if(newVal&&newVal!=null){
+  // console.log(newVal.color, newVal.application, newVal, oldVal);
+  }
+},
+selectCell(e){
+  if(this.userSelection===true){
+   var parentTemplate= e.model.dataHost;
+   var model=parentTemplate.modelForElement(e.target);
+   var item=parentTemplate.itemForElement(e.target);
+   var key=parentTemplate.keyForElement(e.target);
+
+   if(item.selected===false){
+       model.set("item.selected",true);
+       item.selected=true;
+       e.target.selected=true;
+       // e.target.style.margin="-12px -8px 0px 0px";
+       // e.target.style.boxShadow="5px 7px 17px 9px #aeaeae";
+       // e.target.style.background="yellow";
+       // e.target.style.border="5px aliceblue edged"; 
+  }
+  else{
+      model.set("item.selected",false);
+      item.selected=false; 
+      model.set("item.selected",false);
+      item.selected=false;
+      e.target.selected=false;
+  }
+
+     // console.log(e, model, item, key);
+  if(item.selected===true){
+      this.push("selectedArray", e.target);
+      Polymer.dom(e.target).classList.add("selected");
+    } 
+  else{var index=this.selectedArray.indexOf(e.target);
+          this.splice("selectedArray", index, 1);
+  }
+if(this.format.application&&this.selectedArray.length>0)
+      {   this.selectedArray.forEach(function(val,i, arr){
+          var attr="style." + this.format.application;
+          Polymer.dom(val).setAttribute(attr,this.format.color);
+          val.style[this.format.application]=this.format.color;
+          val.setAttribute(attr, this.format.color);}, this);
+     //archive this to undo formatting... a MUST
+      }
+    }
+  },
+  _computeSelected:function(sel, item){
+      if(sel===true){return "selected";}else {return "";}
+
   },
 startDrag: function(e)
   {   
+    if(this.userDrags===true){
     var parentOneTemplate=e.model.dataHost;
     var celloneModel = parentOneTemplate.modelForElement(e.target);
       var cell=parentOneTemplate.itemForElement(e.target); 
       var item = this.$.mappedGridRepeater.itemForElement(e.target);
       this.set("startContainer",item);
-      console.log(this.startContainer);
       this.set("startCell",cell);
       this.set("startCellModel",celloneModel);
-    
+    }
   },
 
-  dragOver: function(e){e.preventDefault();},
+  dragOver: function(e){e.preventDefault();
 
-  handleDrop: function(e)
-  { 
-      var parentTemplate=e.model.dataHost;
+    this.selectCell(e);},
+
+  handleDrop: function(e){   
+    if(this.userDrags===true){
+        var parentTemplate=e.model.dataHost;
         var endContainer = this.$.mappedGridRepeater.itemForElement(e.target);
         var endCell= parentTemplate.itemForElement(e.target);
         var cellModel = parentTemplate.modelForElement(e.target);  
-    if(this.startContainer.selected===true){
-      var startCol=this.startContainer.data[0].col;
-          var endCol=endContainer.data[1].col;
-          var startContainerClone=Object.assign({},this.startContainer);
-          var endContainerClone=Object.assign({},endContainer);
+        if(this.startContainer.selected===true){
+            var startCol=this.startContainer.data[0].col;
+            var endCol=endContainer.data[1].col;
+            var startContainerClone=Object.assign({},this.startContainer);
+            var endContainerClone=Object.assign({},endContainer);
             endContainerClone.column=startCol;
             startContainerClone.column=endCol;
-        for(var i=0; i<endContainer.data.length;i++){
-            startContainerClone.data[i].col=endCol;
-            endContainerClone.data[i].col=startCol;
-          }
-        this.async(function(){this.splice("columns",endCol,1,startContainerClone);},50);
-        this.async(function(){this.splice("columns",startCol,1, endContainerClone);},26);
-    }
-    else
-    {
-      var destpayload = endCell.payload;
-      var payload=this.startCell.payload;
-      this.async(function(){cellModel.set("item.payload",payload)},25);
-      this.startCellModel.set("item.payload",destpayload);
-    }
-  },
+            for(var i=0; i<endContainer.data.length;i++){
+                startContainerClone.data[i].col=endCol;
+                endContainerClone.data[i].col=startCol;
+            }
+            this.async(function(){this.splice("columns",endCol,1,startContainerClone);},50);
+            this.async(function(){this.splice("columns",startCol,1, endContainerClone);},26);
+        }
+        else{
+            var destpayload = endCell.payload;
+            var payload=this.startCell.payload;
+            this.async(function(){cellModel.set("item.payload",payload)},25);
+            this.startCellModel.set("item.payload",destpayload);
+            console.log(this.startCellModel.item.payload);
+        }
+      }
+      else if(this.userSelection===true){
+
+
+
+      }
+    },
 
   monkey: function(e)
   {
     var col = "columns[2][2]";
     this.set(["columns", 2, "data",2, "payload"], "monkey"); //{payload:"Monkey"});
-    console.log(this.columns);
+  //  console.log(this.columns);
+  },
+  userSelectionArrayTrigger(newVal, oldVal){
+    if(newVal!=null&&newVal===false&&this.selectedArray){
+      this.selectedArray.forEach(function(val){ console.log(val);
+        val.selected=false;
+      });
+    }
   },
 
   changePayload: function(e)
   {
-    var dat = JSON.parse(e.target.dataset.fcitem);
-    var col = parseInt(dat.col);
-    var row = parseInt(dat.row);
-    console.log(e.target.value, dat, typeof dat, col, row);
-    this.set(["columns", parseInt(dat.col), "data", parseInt(dat.row)], {payload: e.target.value, col: dat.col, row: dat.row, highlighted:dat.highlighted});
-    console.log(this.columns);
+    console.log(e, "I am in changePayload");
+    // var dat = JSON.parse(e.target.dataset.payload);
+    // var col = parseInt(dat.col);
+    // var row = parseInt(dat.row);
+   // console.log(e.target.value, dat, typeof dat, col, row);
+    // this.set(["columns", parseInt(dat.col), "data", parseInt(dat.row)], {value: e.target.value, col: dat.col, row: dat.row, highlighted:dat.highlighted});
+    // //console.log(this.columns);
   },
   _computeCol: function(col){return col;},
+
+  _computeSelectedHoverStyle(trigger, selected){
+
+    var retVal=(selected===true)?"margin-top:-18px; margin-right: -12px; box-shadow: 7px 13px 28px 12px #afafaf; z-index:222222; border: gold 6px solid":"";
+  //  console.log(selected);
+    return retVal;
+
+  },
 
   addCol: function(e)
   {
@@ -193,11 +427,16 @@ startDrag: function(e)
     var i = 0;
     for(i = 0; i < numRows; i++)
     {
-      newCol.data.push({payload:"lightgreen", col:numCols, row:i, highlighted:false});
+      newCol.data.push({payload:"#fafafa", col:numCols, row:i, highlighted:false});
     }
     this.push("columns", newCol); //{selected:false, data:newCol});
-    console.log(this.columns.length, this.columns);
   },
+  addColRight:function(e){
+
+
+
+  },
+
 
   addRow: function(e)
   { 
@@ -214,57 +453,241 @@ startDrag: function(e)
   {   
       var item= this.$.mappedGridRepeater.itemForElement(e.target);
         var model= this.$.mappedGridRepeater.modelForElement(e.target);
-        var setVal=(item.selected===false)?true: false;
+        var setVal=(item.selected===false)?true: false;//cascade this down
+        console.log(e,model,item);
       var counter=item.data.length;
       var resetVal=item, i=0;
         resetVal.selected=setVal;
         model.set("item.selected", setVal);
         for(i=0;i<counter;i++){
           model.set(["item.data",i,"highlighted"], setVal);
+          model.set(["item.data",i,"selected"], setVal);
           item.data[i].highlighted=setVal;
+         var nodes= Polymer.dom(this.root).querySelectorAll("INPUT");
+          item.data[i].selected=setVal;
           }
-        console.log(item);
+        //console.log(item);
         this.set("trigger",!this.trigger);
+        this.selectCell(e);
   },
 
-  _computeHighlighted: function(one, two, three)
-  {
-    console.log(one,two, three, "why is this not triggered onb the change of values above");
-    if(typeof three===Object){
-    var result = (one === true && two===true)?"yellow":"#afafaf";
-    }
-    result=(three===true)?"cyan; border: solid 4px #aecdfe":"white; border: solid 0px #aecdfe"+result;
+  _computeHighlighted: function(one, two, three){
+    if(typeof three===Object){var result = (one === true && two===true)?"yellow":"#afafaf";}
+    result=(three===true)?"cyan; border: solid 4px #aecdfe":"aliceblue; border: solid 2px #009";
     return result;
-  },
+    },
   computeColSelected: function(one,two){return one;},
-  _computeHighlighted2(hl, tr){var result = (hl === true)?"yellow":"white";return result;},
+  _computeHighlighted2(hl, color,background,tr){var result = (hl === true)?"yellow":"white";return result;},
 
-    setDataArrays(){
-        var columnKeys=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
-        var columnNames=["Years","January","February","March","April","May","June","July","August","September","October","November","December","Year Total",`&#x0394`, `&#x0394`];
+    setColumns(){
+
+          var columnNames=["Years","January","February","March","Qtr1", "April","May","June","Qtr2", "MidYearTot","July","August","September","Qtr3", "Qtr3Tot","October","November","December","Qtr4", "2ndHalf", "Year Total","&#Delta;", '&#Delta'];
         var tempArr=[];
-        var retArrays=columnKeys.map(function(val, index,array){
+        var retArrays=columnNames.map(function(val, index,array){
                     var count=array.length;
                     var tempArr=[];
                     var valueArray=[];
                     for(var i=0;i<count;i++)
                     {
                        var retMini= val+array[i];
-                       tempArr.push({"key": retMini, "location": retMini, "value": retMini});
-                       var value= "inputValue__"+index+"_"+i;
+                       tempArr.push({"col": index, "row": i, "selected":false, "background": "#fafafa", "color": "#009", "highlighted": false, "payload":"",value:" "});
+                       var value={"value":" "};
                        valueArray.push(value);
                     }
-                   retVal={column: columnNames[index], cell: tempArr, values:valueArray};
+                   retVal={column:index, name: columnNames[index], selected: false, data: tempArr, values:valueArray};
                    //console.log()
                     return retVal;  
             }, []);
         //console.log(retArrays);
         return retArrays;
         },
-   
+   parser(colHeaders, type, array){
+    var counter =colHeaders.length;
+    var retVal=[];
+    switch(true){
+      case (type==="accounting"):
+          switch(true){
+            case (colHeaders[0]==="Years"&& colHeaders[4].match("Qtr1")!==undefined):
+                for(var i=0;i<counter;i++){ 
+                var val=2007+i;
+                var cash=1000, ccrd=2300, tot=cash+ccrd;
+                if(i<8){val=val.toString()+ " Total";}
+                else{ 
+                      val=`${val}s: Cash:
+                                         Total CCards:
+                                        Period Total:`;
+
+
+                }
+                array[0].data[i].payload=val;
+              }
+              retVal=array;
+             // console.log(retVal);
+
+
+
+            break;
+            default:
+
+            break;
+          }
+      break;
+      default:
+      break;
+    }
+    return(retVal);
+   },
+   parser3(){
+    var length=this.csv.length;
+    var id; 
+    var array=[];
+    var i=0, j=0;
+    var val=[];
+    var time=new Date().getTime();
+      for(i=0;i<16;i++){
+      var key="_"+i+"_"+j+"_";
+      var elem=document.createElement("LI");
+       var cell={key:elem};
+       var bindValue=(this.csv[0][i])?this.csv[0][i]:"hanger";
+       console.log(bindValue, i , j);
+       elem.contenteditable=true;
+       elem.innerHTML=bindValue;
+       var propName='value';
+       Object.defineProperty(elem,propName,{
+          enumerable: true,
+          configurable: true,
+          get value() {
+            return bindValue;
+          },
+          set [propName](bindValue){
+                [propName] = bindValue;
+                if(propName==="value"){elem.innerHTML=bindValue;}
+                    archive.push({
+                     "element":cell[key],
+                     "propertyName": propName,
+                     "value": bindValue,
+                     "timestamp": time
+                    });
+                     
+              }
+           });
+        array.push({"column": i, "selected": true, "background": "red", "highlighted":true, "color": "#009", "value": this.csv[0][i], "name": this.csv[0][i], "data":[]});
+        console.log(array);
+         if(j===0){Polymer.dom(this.$$("#hanger3")).appendChild(elem);}
+        for(var j=1;j<25;j++){
+            if(this.csv[j][i]){
+                var key="_"+i+"_"+j+"_";
+              var elem=document.createElement("LI");
+              var cell={key:elem};
+              var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
+              console.log(bindValue, "vital locale");
+              elem.contenteditable=true;
+              elem.innerHTML=bindValue;
+              console.log(elem.innerHTML);
+              var propName='value';
+              Object.defineProperty(elem,propName,{
+                          enumerable: true,
+                      configurable: true,
+                      get value() {
+                        return bindValue;
+                      },
+          set [propName](bindValue){
+                [propName] = bindValue;
+                if(propName==="value"){elem.innerHTML=bindValue;}
+                    archive.push({
+                     "element":cell[key],
+                     "propertyName": propName,
+                     "value": bindValue,
+                     "timestamp": time
+                    });
+                  },
+                });
+          array[i].data.push({"row":j, "col":i, "payload":this.csv[j][i], "value":bindValue, "selected": false, "color": "#009", "highlighted": false, "background":"#fafafa","key":key, "elem": elem});
+                Polymer.dom(this.$$("#hanger3")).appendChild(elem);
+                      console.log(array);
+          }
+          else{array[i].data.push({"row":j, "col":i, "payload":"--", "value":"--", "selected": false, "color": "#009", "background":"#fafafa"});
+        Polymer.dom(this.$$("#hanger3")).appendChild(elem);
+                      console.log(array)}
+        }
+      }
+      console.log(array);
+      this.set("columns4", array);
+           this.set("columns3", array);
+    },
+   parser2:function(){
+    var length=this.csv.length;
+    var id; 
+    var array=[];
+    var i=0;
+      for(i=0;i<16;i++){
+        array.push({"column": i, "selected": false, "background": "aliceblue", "highlighted":false, "color": "#009", "name": this.csv[0][i], "data":[]});
+        // console.log(array);
+        for(var j=1;j<25;j++){
+            if(this.csv[j][i]){array[i].data.push({"row":j, "col":i, "payload":this.csv[j][i], "value":this.csv[j][i], "selected": false, "color": "#009", "highlighted": false, "background":"#fafafa"});}
+            else{array[i].data.push({"row":j, "col":i, "payload":"--", "value":"--", "selected": false, "color": "#009", "background":"#fafafa"});}
+        }
+      }
+
+      //console.log(array);
+      this.set("columns2", array);
+   },
+   get csv(){
+
+                var val=[[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%_v_Prev","Yr. Tot. Est 14"],
+            ["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
+            ["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ","40.59%","$192,775.00 "],
+            ["2010 Totals",,,,,,,,,,,,,"$25,997.08 ","61.83%","$311,965.00 "],
+            ["2011 Totals","$31,454.86 ","$17,363.07 ","$36,275.98 ","$18,214.92 ","$9,891.99 ","$52,962.60 ","$70,732.42 ","$70,482.71 ","$30,910.19 ","$45,635.75 ","$10,225.00 ","$29,020.00 ","$35,264.12 ","35.65%","$423,169.49 "],
+            ["2012 Totals","$51,545.00 ","$30,709.50 ","$9,300.00 ","$51,240.00 ","$53,762.50 ","$74,445.00 ","$101,800.00 ","$69,150.00 ","$45,700.00 ","$52,008.00 ","$38,220.00","$25,468.75 ","$50,279.06 ","42.58%","$603,348.75 "],
+            ["2013 Totals","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$68,242.00 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,076.58 ","37.39%","$828,919.00 "],
+            ["2014 Totals","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","35.91%","$1,126,578.34 "],
+            ["Avg. Revenue '11-'14","$58,135.47 ","$38,773.14 ","$47,412.75 ","$66,623.98 ","$52,683.62 ","$70,383.15 ","$106,955.47 ","$69,291.57 ","$42,669.73 ","$53,308.58 ","$33,148.33 ","$40,373.92 ","$60,232.19 ",,"$722,786.31 "],
+            ["% Change 14 v. Avg. '11-'14","35.20%","93.58%","78.59%","65.24%","74.73%","9.93%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","43.29%",,"#REF!"],
+            ["Best Month '11-'13 yr. ","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$70,482.71 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,263.31 ",,"$900,423.02 "],
+            ["% change 14 v. previous best '11-'13","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","24.95%",,"-7.94%"],
+            [ "Avg. Revenue '12-'14","$67,029.00 ","$45,909.83 ","$51,125.00 ","$82,760.33 ","$66,947.50 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$65,006.67 ",,"$780,080.04 "],
+            ["%Change14 v.14 Avg","17.26%","63.49%","65.62%","33.02%","37.50%","1.56%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","32.77%",,"6.26%"],
+            ["Gross delta '13 to '14","$7,658.00 ","$43,096.00 ","$25,275.00 ","$23,141.00 ","$37,030.00 ","$625.00" ,"($148,334.00)","($68,242.00)","($51,399.00)","($62,282.00)","($51,000.00)","($66,633.00)","$27,240.00 ",,"$326,880.00 "],
+            ["% ?  '13 to '14","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","44.76%",,"54.18%"],
+            ["Projections RE: 2014","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%?'14 v 13","Totals"],
+            ["Worst Remaining M. (WRM) '12+","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$74,445.00 ","$101,800.00 ","$68,242.00 ","$45,700.00 ","$52,008.00 ","$38,220.00 ","$25,468.75 ","$70,530.23 ","2.10%","$846,362.75 "],
+            ["Proj.WRMonths_incQ4 +17%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$87,100.65 ","$119,106.00 ","$79,843.14 ","$53,469.00 ","$60,849.36 ","$44,717.40 ","$29,798.44 ","$76,280.25 ","10.43%","$915,362.99 "],
+            ["Proj./w_last +15%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$88,262.50 ","$170,584.10 ","$78,478.30 ","$59,108.85 ","$71,624.30 ","$58,650.00 ","$76,627.95 ","$86,984.58 ","25.92%","$1,043,815.00 "],
+            ["Projected w last+25%","$88,677.50 ","$39,952.50 ","$74,250.00 ","$108,687.50 ","$68,781.25 ","$95,937.50 ","$185,417.50 ","$85,302.50 ","$64,248.75 ","$77,852.50 ","$63,750.00 ","$83,291.25 ","$86,345.73 ","25.00%","$1,036,148.75 "],
+            ["Proj. w/Avg. 12-13","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$75,565.61 ","9.39%","$906,787.38 "],
+            ["2014 Projections" ,"January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%? v. Proj.","2014 Proj."],
+            ["2014 Actual ","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","8.73%","$1,126,578.34"],
+            ["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ","8.73%","$90,429.59"]];
+            return val;
+},
     observeMenuProperty(newVal, oldVal){},
 
   });
     </script>
    </dom-module>
-  
+[[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg",%"_v_Prev","Yr. Tot. Est 14"],
+["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
+["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ",40.59%,"$192,775.00 "],
+["2010 Totals",,,,,,,,,,,,,"$25,997.08 ",61.83%,"$311,965.00 "],
+["2011 Totals","$31,454.86 ","$17,363.07 ","$36,275.98 ","$18,214.92 ","$9,891.99 ","$52,962.60 ","$70,732.42 ","$70,482.71 ","$30,910.19 ","$45,635.75 ","$10,225.00 ","$29,020.00 ","$35,264.12 ",35.65%,"$423,169.49 "],
+["2012 Totals","$51,545.00 ","$30,709.50 ","$9,300.00 ","$51,240.00 ","$53,762.50 ","$74,445.00 ","$101,800.00 ","$69,150.00 ","$45,700.00 ","$52,008.00 ","$38,220.00","$25,468.75 ","$50,279.06 ",42.58%,"$603,348.75 "],
+["2013 Totals","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$68,242.00 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,076.58 ",37.39%,"$828,919.00 "],
+["2014 Totals","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","35.91%","$1,126,578.34 ",]
+["Avg. Revenue '11-'14","$58,135.47 ","$38,773.14 ","$47,412.75 ","$66,623.98 ","$52,683.62 ","$70,383.15 ","$106,955.47 ","$69,291.57 ","$42,669.73 ","$53,308.58 ","$33,148.33 ","$40,373.92 ","$60,232.19 ",,"$722,786.31 "],
+[%" Change 14 v. Avg. '11-'14",35.20%,93.58%,78.59%,65.24%,74.73%,9.93%,-100.00%,-100.00%,-100.00%,-100.00%,-100.00%,-100.00%,43.29%,,#REF!],
+["Best Month '11-'13 yr. ","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$70,482.71 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,263.31 ",,"$900,423.02 "],
+[%" change 14 v. previous best '11-'13","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","24.95%",,"-7.94%"],,,,,,,,
+[ ""Avg. Revenue '12-'14","$67,029.00 ","$45,909.83 ","$51,125.00 ","$82,760.33 ","$66,947.50 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$65,006.67 ",,"$780,080.04 "],
+["%Change'14 v.'12-'14 Avg","17.26%","63.49%","65.62%","33.02%","37.50%","1.56%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","32.77%",,"6.26%"],
+["Gross delta '13 to '14","$7,658.00 ","$43,096.00 ","$25,275.00 ","$23,141.00 ","$37,030.00 ",$625.00 ,"($148,334.00)","($68,242.00)","($51,399.00)","($62,282.00)","($51,000.00)","($66,633.00)","$27,240.00 ",,"$326,880.00 "],
+["% ?  '13 to '14","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","44.76%",,"54.18%"],
+["Projections RE: 2014","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%?'14 v 13","Totals"],
+["Worst Remaining M. (WRM) '12+","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$74,445.00 ","$101,800.00 ","$68,242.00 ","$45,700.00 ","$52,008.00 ","$38,220.00 ","$25,468.75 ","$70,530.23 ","2.10%","$846,362.75 "],
+["Proj.WRMonths_incQ4 +17%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$87,100.65 ","$119,106.00 ","$79,843.14 ","$53,469.00 ","$60,849.36 ","$44,717.40 ","$29,798.44 ","$76,280.25 ","10.43%","$915,362.99 "],
+["Proj./w_last +15%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$88,262.50 ","$170,584.10 ","$78,478.30 ","$59,108.85 ","$71,624.30 ","$58,650.00 ","$76,627.95 ","$86,984.58 ",25.92%,"$1,043,815.00 "],
+["Projected w last+25%","$88,677.50 ","$39,952.50 ","$74,250.00 ","$108,687.50 ","$68,781.25 ","$95,937.50 ","$185,417.50 ","$85,302.50 ","$64,248.75 ","$77,852.50 ","$63,750.00 ","$83,291.25 ","$86,345.73 ",25.00%,"$1,036,148.75 "],
+["Proj. w/Avg. 12-13","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$75,565.61 ",9.39%,"$906,787.38 "],
+["2014 Projections" ,"January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%? v. Proj.","2014 Proj."],
+["2014 Actual ","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ",8.73%,"$1,126,578.34"],,,,,,,,
+["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ",8.73%,"$90,429.59"]];

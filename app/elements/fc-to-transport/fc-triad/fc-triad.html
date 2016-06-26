@@ -9,7 +9,10 @@
 	padding: 0px 0px;
 	margin: 6px 10px;
 	max-height: 92vh;
-	display: flex;	/*width: 420px;*/
+	
+	@apply(--layout-vertical);
+	@appply(--layout-flex);
+	@apply(--layout-self-stretch)
 }
 .calendarheader{
 	border-right: 1px solid white;
@@ -83,23 +86,19 @@ min-height: 38px;
   }
 
 }
-</style><!-- 
-on-track="focusedDragMe" -->
-	<div drags on-down="dragsOff" id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer" >
+</style>
+	<div id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer" >
 		<div class="vertical layout self-stretch nowrap" > 
-		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; margin-bottom: 48px;">
+		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; min-height: 105px; margin-bottom: 48px;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
-						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
+						<span on-tap="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
 						<section class="layout horizontal headerMonthYear">
 						<!-- <iron-image width="100px" height="60px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image> -->
-							<span on-down="dragsOn" on-track="focusedDragMe" on-up="dragsOff" cursor="crosshairs" style="height: 32px; width: 32px; font-size: 30px; content-align: center; border-radius:50%; background: red; border: orange 6px solid; color: white;">&#9806;</span>
-
 						</section>
-						<span btn="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
+						<span on-tap="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
 					</section> 
 					<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
 				</section>
-				<span on-down="dragsOn" on-track="focusedDragMe" on-up="dragsOff" cursor="crosshairs" style="height: 32px; width: 32px; font-size: 30px; content-align: top; border-radius:50%; background: red; border: orange 6px solid; color: white;">&#9806;</span>
 		</paper-material>
 
 <!--left-panel-header-end-->
@@ -107,7 +106,7 @@ on-track="focusedDragMe" -->
         <section class="horizontal layout container"> 
         		<span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
       	</section>
-      	<div class="horizontal layout flex wrap self-stretch around-justified">
+      	<div class="horizontal layout flex wrap self-stretch around-justified" style="padding: 22px;">
           		<fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" multi-select="[[item.multiSelectA]]">
           		</fc-input-search-select>
           		<fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-label="{{item.labelB}}" item-select-property="value" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
@@ -117,9 +116,9 @@ on-track="focusedDragMe" -->
   	</div>      
   <iron-splitter signal="{{resize}}" style$="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
 		<div class="layout vertical flex self-stretch" style="overflow: hidden;">
-		<div class="flex layout vertical self-stretch" style="min-height: 97.5vh; max-height: 97.5vh; overflow: scroll;"><!--visual swap in horizontal layout here-->
+		<div class="flex layout vertical self-stretch" style="min-height: 95.5vh; max-height: 95.5vh; overflow: scroll;"><!--visual swap in horizontal layout here-->
 			<div class="vertical layout flex self-stretch">
-				<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important;">
+				<paper-material class=" layout vertical around-justified calendarborder" style="min-height: 105px; max-height: 125px!important;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
 						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
 	
@@ -135,11 +134,11 @@ on-track="focusedDragMe" -->
 				</paper-material><!--header ends-->
 				<!--resizer-->
 				<div flex layout vertical style="height: 96vh;">
-				<div class="horizontal layout flex-1" style="height: 50vh; overflow:scroll;">
+				<div class="horizontal layout flex-1" style="height: 50vh; overflow:scroll; margin: 12px 5px;">
 					<fc-mapped-grid style="overflow:scroll;">
 						</fc-mapped-grid>
 				</div>
-				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 105%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
+				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 99%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
 			
  				<div class="layout horizontal flex" style="position:static; height: 100%; padding-bottom: 50%; overflow:scroll;">
 
@@ -152,8 +151,6 @@ on-track="focusedDragMe" -->
 				</div>
 			</div>
 		</div>
-<!--  <section  on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}" style="position: absolute; bottom: -4px; cursor:ns-resize; right: 0px; top:{{computeCurrentHeight(currentHeight)}}px; left: 0px; padding:4px; height: 8px; width: 99%; opacity: 0;" on-up="dragsOn">
- </section> -->
  </div>
  </div>
 
@@ -214,8 +211,9 @@ FcTriad=Polymer({
 			value: 0,
 			notify: true
 		},
-		displayedTwo:{
+		displayedLeft:{
 			type: Array,
+			value:function(){return [];},
 			notify: true
 		},
 		displayed:{
@@ -382,16 +380,39 @@ FcTriad=Polymer({
 
 
   },
+ computeDisplayedLeft(displayedIndexLeft)
+{		
+	if(itemsArraysOne && itemsArraysOne.length>0){
+		console.log(itemsArraysOne);
+	return itemsArraysOne[indexItemsArraysOne];
+	}
+},
+_forward: function(){
+		if(this.indexItemsArraysOne===this.itemsArraysOne.length-1)
+			{
+				this.indexItemsArraysOne=0;
+			}
+		else{
+			this.set("indexItemsArraysOne", this.indexItemsArraysOne+1);
+    		this.set("displayedLeft", this.itemsArraysOne[this.indexItemsArraysOne]);
+    		
+    	}
+    },
+ _backOne: function(){	
+ 		if(this.indexItemsArraysOne===0)
+ 		{ 
+			var max=this.itemsArraysOne.length-1;
+ 			console.log(max);
+ 			this.set("indexItemsArraysOne",max);
+ 			this.set("displayedLeft",this.itemsArraysOne[this.indexItemsArraysOne]);
+ 		}
+ 		else
+ 		{	this.set("displayedLeft", this.itemsArraysOne[this.indexItemsArraysOne-1]);
+ 			this.set("indexItemsArraysOne", this.indexItemsArraysOne-1);
+    		
+ 		}
 
-  setYearMonthDay(displayDateObject, dateUnit, updownflat){
-  		displayDateObject[dateUnit]=(updownflat===true)?displayDateObject[dateUnit]+1:(updownflat===false)?displayDateObject[dateUnit]-1:displayDateObject[dateUnit];
-  		var  date=new Date().setFullYear(displayDateObject.year, displayDateObject.month, displayDateObject.day);
-  			this.set("day", date.getDate());
-  			this.set("year", date.getFullYear());
-  			this.set("month", date.getMonth());
-  
-  },
-
+},  
   computeItemHeaderHidden(header){
     if(header){return false;}
     else{return true;}
@@ -402,6 +423,7 @@ computeEventHeightLightColor:function(){
 },
 _computeItemsOneObject(itemsArraysOne,indexItemsArraysOne){
 	if(itemsArraysOne && itemsArraysOne.length>0){
+		console.log(itemsArraysOne);
 	return itemsArraysOne[indexItemsArraysOne];
 	}
 },
@@ -412,8 +434,8 @@ ready: function()
 {	
 		var today = new Date();
 		var index=today.getMonth();
- 		this.set("displayedIndex",1);
-		this.async(this.initialize, 240);
+ 		this.set("indexItemsArraysOne",0);
+
 },
 
 computeCurrentHeight: function(currentHeight){
@@ -492,7 +514,7 @@ computeDisplayed(displayedIndex)
 {		
 	return this.calendarMonthsArray[displayedIndex];
 },
-_forward: function(){
+forward: function(){
 		if(this.displayedIndex ==this.maxIndex){
  			this.splice("calendarMonthsArray",this.MaxIndex,1);
  		}
@@ -505,7 +527,7 @@ _forward: function(){
     		this.setArrays();
     	}
     },
- _backOne: function(){	
+backOne: function(){	
  		if(this.displayedIndex===0)
  		{ 
  			this.set("backHidden",true);
@@ -598,131 +620,6 @@ computeViewMonth: function(displayedIndex){
             }
         },
       
-     dragsOff: function(){this.set("drags", false);},
-    dragsOn: function(){ if(!this.drags){this.async(this.dragSwitch, 500);}},
-    dragSwitch: function(){this.set("drags", true);},
-    focusedDragMe:function(e){
-        if(this.drags==true){
-            var self=this;
-            e.preventDefault();
-            switch(e.detail.state)
-            {
-              case 'start':
-                // console.log('START NoWayAreWe Draggin');
-                self._leftprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("left"))-e.detail.x;
-                self._topprime = parseInt(window.getComputedStyle(self, null).getPropertyValue("top"))-e.detail.y;
-                //console.log('top distance differenced?' + self._topprime);
-               if(self.counter==0){   self.translate3d(0, 0, 0);}
-                Polymer.dom(self).setAttribute("style.position", "fixed"); 
-               Polymer.dom(self).setAttribute("style.left", "0px"); Polymer.dom(self).setAttribute("style.left",self._leftprime+"px");
-               Polymer.dom(self).setAttribute("style.top", "0px"); Polymer.dom(self).setAttribute("style.top",self._topprime+"px");
-                
-                self.set("refit",true);
-                self.changeX=0;
-                self.changeY=0;
-                Polymer.dom.flush();
-                break;
-              case 'track':
-                self.changeX=e.detail.ddx + self.changeX;
-                self.changeY=e.detail.ddy + self.changeY;
-                self.translate3d(self.changeX.toString() + 'px', self.changeY.toString() + 'px', 0);
-                break;
-              case 'end':
-                //console.log(self._topprime);
-                self._right = parseInt(window.getComputedStyle(self, null).getPropertyValue("right"))
-                self._bottom = self.getBoundingClientRect().top;
-                self._x= ((self._leftprime + e.detail.x)>=0)?(self._leftprime + e.detail.x): 0;
-                self._y=((self._topprime + e.detail.y)>=0)?Math.ceil(self._topprime + e.detail.y):0;
-            
-
-                //console.log("ENDING", self._x, e.detail.x, e.detail.y, e.detail.dx);
-              
-                self.style.left=self._x.toString()+'px';
-                self.style.top=self._y.toString()+'px';
-                Polymer.dom(self).setAttribute("style.top", e.detail.y+'px'); Polymer.dom(self).setAttribute("style.left",e.detail.x+'px');
-          self.translate3d(0, 0, 0);
-
-                //console.log('y: ' + e.detail.y);
-                    
-                self.dragging=false;
-                self.set("refit",true);
-                Polymer.dom.flush();
-                break;
-            }
-        }
-    },
-
 });
 </script>
 </dom-module>
-<!--
-
-	// HERE SHOULD HAVE PLUG IN APIs FOR DIFFERNT TYPES OF COLUMN HEADER CLASSES 
-	//DAYS OF WEEKS 
-	//MONTHS OF YEARS
-	//STUDENTS IN ORDERED CLASS ArRANGEMENT
-	//SCORE RANGES 
-	//THE MORE OF THESE WE USE AND DO THE MORE WE WILL SEE THE COMMONALITIES TO REDUCE AND REFACTOR THEM
-	//DAYS OF WEEK IS BELOW//ABOUT TO DO OR STEAL MONTHS OF YEAR
-
-	//stick in holder 	"January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"
-
-	// var daysofweek=this.displayed.sort(function(a,b){
-	// 	return (b.date.getDay()-a.date.getDay());});
-
-	// //console.log(daysofweek, "yoohoo");
-	// var daysOfWeek=daysofweek.reverse();
-	// var dow=[["Sun"],["Mon"],["Tues"],["Wed"],["Thur"],["Fri"],["Sat"]];
-	// var counter=daysofweek.length;
-	// var holder=[],
-	// iconsarr=["social:school","icons:dashboard", "icons:chrome-reader-mode", "maps:local-dining", "image:exposure-neg-1","image:exposure-neg-2","image:exposure-plus-1","image:exposure-plus-2","icons:cloud-download","icons:cloud-download"];
-	// holder.push(daysOfWeek[0]);
-	// for(let i=1; i<counter; i++)
-	// {	var truth=(daysOfWeek[i].date.getDay()==daysOfWeek[i-1].date.getDay());
-	// 	if(daysOfWeek[i].inMonth && i%3==0){
-	// 		daysOfWeek[i].eventIcon=iconsarr[Math.floor(i/3)],
-	// 		daysOfWeek[i].eventIcon1=iconsarr[Math.floor((i/3)+(1/4))],
-	// 		daysOfWeek[i].eventPrimaryColor="aliceblue",
-	// 		daysOfWeek[i].eventSecondaryColor="#009";
-	// 		daysOfWeek[i].eventPrimaryColor1="aliceblue",
-	// 		daysOfWeek[i].eventSecondaryColor1="red";
-	// 	}
-	// 	if(truth)
-	// 	{
-	// 		holder.push(daysOfWeek[i]);
-	// 	}
-	// 	if(i==counter-1 || !truth){
-	// 		var holder2=holder.sort(function(a,b){
-	// 			return a.displayIndex-b.displayIndex;
-	// 		});
-	// 		//console.log(holder2, "h2");
-	// 		var slot=Math.floor(i/7);
-	// 		if(i==counter-1){slot++;}
-	// 		dow[slot].push(holder2);
-	// 		holder=[];
-	// 		holder2=[];
-	// 		holder.push(daysOfWeek[i]);
-	// 		}
-
-
-	wordEvents2:{
-			type:Array,
-			value: function(){
-			readingArr=[];
-			var words="Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left Left";
-				var wordArr=words.split(" "),
-				counter=wordArr.length,
-				start=wordArr[0];
-				for(var i=1; i<counter;i++){
-					var zeroed=i%9;
-					start +=" " +wordArr[i];
-					start=start.toString();
-					if(zeroed===0||i+1.1>counter){ 
-						readingArr.push(start);
-						start="";
-					}
-						}
-			return readingArr;},
-			notify: true,
-		},
--->

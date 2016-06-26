@@ -1,20 +1,26 @@
 <dom-module id="fc-grid-menu_sheets">
 <template id="fc-grid-menu_sheets-template">
-<style>
+<style is="shared-style" id="userSharedStyle">
+.userStyle{font-size:22px; font-weight: 900; font-style: italics; text-decoration: underline;}
+:host{background: aliceblue;}
 </style>
 <div class="vertical layout flex" on-tap="listenToTheMusic">
-        <paper-swatch-picker btn="getMenuChildren__setColor__maintainFocusForSelection" id="theColorPicker">
+        <paper-swatch-picker btn="swatchSet" id="theColorPicker">
         </paper-swatch-picker>
-    <template id="gridMenuDomRepeater" is="dom-repeat" items="{{menuButtons}}" as="menuButton">
-      <fc-input-search-select 
+    <template id="gmd" is="dom-repeat" items="{{menuButtons}}" as="menuButton">
+      <fc-input-search-select
       		id$="[[menuButton.id]]" 
       		btn="{{menuButton.btn}}" 
-      		menu-property$="{{menuButton.menuProperty}}" 
+      		menu-properties$="{{menuButton.menuProperties}}" 
       		iss-label$="{{menuButton.issLabel}}" 
       		dropdown-items$="{{menuButton.dropdownItems}}" 
-      		item-select-property="" 
+      		item-select-property=""
+          multi="{{menuButton.multi}}""
+          key="{{menuButton.key}}"
+          iss-value="{{menuButton.issValue}}"
       		search-off$="{{menuButton.searchOff}}"
-      		toggle-class$="{{menuButton.toggleClass}}" 
+      		toggle-class-on$="{{menuButton.toggleClassOn}}"
+          toggle-class-off$="{{menuButton.toggleClassOff}}"" 
       		iss-class="{{menuButton.issClass}}" 
       		show-drop-button$=[[menuButton.showDropButton]] 
       		iss-icon$="{{menuButton.issIcon}}"
@@ -31,7 +37,15 @@ FcGridMenu_sheets=Polymer({
 	is:"fc-grid-menu_sheets",
 	 listeners:{'color-picker-selected':"dosomethingwiththecolor"},
 	properties:{
-
+    menuMap:{
+      type: Map, 
+      notify: true,
+      },
+    userSelection:{
+      type:Boolean,
+      value:function(){return false;},
+      notify: true,
+    },
 		textOrBackground:{
       		type:Array,
       		value:function(){return;},
@@ -41,70 +55,124 @@ FcGridMenu_sheets=Polymer({
       		type: String, 
       		notify: true,
     	},
-    	menuProperty:{
+    	menuProperties:{
     		type:String,
-    		computed:"computeMenuProperty(menuButtons)",
+    		computed:"computeMenuProperties(menuButtons)",
     		notify: true,
     	},
-    	gridMenuChildren:{
+      selectedArray:{
+        type: Array,
+        value:function(){
+          return [];
+        },
+        notify: true,
+      },
+      userDrags:{
+        type:Boolean,
+        value:function(){return true;},
+        notify: true
+      },
+    	gridMenuButtons:{
     		type:Array,
+        value: function(){return [];},
     		notify: true,
     		},
-    	
     	menuButtons:{
     		type:Array,
-			notify: true,
-		}
+	       value:function(){var buttonData=[ 
+					{"id":"colorTypeDropdown", "btn":"_textOrBackground", "menuProperty":"colorToApply_textOrBackground","dropdownItems":["text-color","background", "none"], "itemSelectProperty":'""', "searchOff":"true", "issClass":"menuItem","showDropButton":"true","issIcon":"icons:dashboard", "issValue": "", "value":"issValue", "issLabel":"Apply Color", "key":"applyColor"
+					},
+					{"id":"formatPainter","btn":"formatPaint",  "issClass":"menuItem", "menuProperty":"", "dropdownItems":["small font", "medium font", "large font", "huge font", "italics", "bold", "underlined", "Finanial Symbols", "Mathematical Symbols"], "itemSelectProperty":'""', "searchOff":"true","issLabel":"Format Paint","showDropButton":"true","issIcon":"editor:format-paint", "key": "formatPaint","selectCheck": "true"
+					},
+					{"id":"layoutGrid", "btn":"changeLayout","menuProperty":"layout", "issLabel":"Layout", "dropdownItems":["Add Column Rt", "Add COlumn Lt", "Add Row Above","Add Row Below","Split Cell(s) ^|v", "Split Cell <-->"], "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"image:view-comfy", "key": "layout"},
 
-	},
-	created(){
-		var buttonData=[];
-		buttonData=[ 
-					{"id":"colorTypeDropdown", "btn":"", "menuProperty":"","dropdownItems":["color","background"], "itemSelectProperty":'""', "searchOff":"true", "issClass":"menuItem","showDropButton":"true","issIcon":"icons:dashboard", "issLabel":"Apply Color"
+					{"id":"selectFunctionDropdownButton", "issClass":"menuItem","itemSelectProperty":"''", "btn":"","menuProperty":"selectFunction","issLabel":"Functions", "dropdownItems":["Summation","Delta", "Average"], "searchOff":"true","issIcon":"editor:functions", "key": "functions",
 					},
-					{"id":"formatPainter","btn":"",  "issClass":"menuItem", "menuProperty":"", "dropdownItems":["text","cells"], "itemSelectProperty":'""', "searchOff":"true","issLabel":"Format Paint","showDropButton":"true","issIcon":"editor:format-paint"
-					},
-					{"id":"addColumnToggleButton", "btn":"","menuProperty":"addColumns", "issLabel":"Add Cols", "isToggle":"true", "dropdownItems":"","toggleClass":"toggleAddColumn", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"image:exposure-plus-1"
-					},
-					{"id":"deleteColumnToggleButton","btn":"","menuProperty":"deleteColumns","issLabel":"Delete Cols","isToggle":"true", "dropdownItems":"",  "toggleClass":"toggleDeleteColumn", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"image:exposure-neg-1"
-					},
-					{"id":"selectFunctionDropdownButton", "issClass":"menuItem","itemSelectProperty":"''", "btn":"","menuProperty":"selectFunction","issLabel":"Functions", "dropdownItems":["Summation","Delta", "Average"], "searchOff":"true","issIcon":"editor:functions"
-					}
+          {"id":"toggleSelectionButton","btn":"userSelectionToggle","menuProperty":"userSelection","issLabel":"Select","isToggle":"true", "dropdownItems":"",  "toggleClassOn":"toggleOn", "toggleClassOff":"toggleOff", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"social:public","key": "userSelection"
+          },
+          {"id":"userDragsToggleButton","btn":"dragToggle","menuProperty":"userDrags","issLabel":"Draggable","isToggle":"true", "dropdownItems":"",  "toggleClassOn":"toggleOn", "toggleClassoff":"toggleOff", "itemSelectProperty":"", "searchOff":"true", "issClass":"menuItem","issIcon":"maps:zoom-out-map","key": "dragToggle"
+          },
+          // draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" 
 				];
-		this.async(function(){this.set("menuButtons", buttonData);},750);
+        return buttonData;
+      }, notify: true,
+    },
 	},
 	dosomethingwiththecolor(e){
     		this.set("colorToApply", e.target.color);
-      		console.log(e, "third, from top listener: " + e.target.color, this.colorToApply);
-    		// this.$.colorTypeDropdown.set("style.color", this.colorToApply);
+        var theId="#colorTypeDropdown";
+        var theElement=this.$$(theId);
+        theElement.style.color= e.target.color;
+        if(theElement.issValue==null&&this.colorToApply!=null){this.set(theElement.issValue,"text-color")
+          }
+         else{ 
+         var setVal = (theElement.issValue==="text-color")?"color":"background";
+          this.set("textOrBackground",setVal);
+        }
   },
-  computeMenuProperty(menuButtons){},
+  computeMenuProperties(menuButtons){},
   listenToTheMusic(e){
-  		var target=e.target;
-  		console.log(target);
-  		while(target.nodeName!=="FC-INPUT-SEARCH-SELECT" && target.nodeName!=="FC-GRID-MENU_SHEETS"){
-  			target=target.parentElement;
-  			console.log(target.nodeName,target);
-  		}
-  		// if(target.nodeName!=="FC-INPUT-SEARCH-SELECT"){
- 						console.log(e,target.attributes, target.attributes["dropdown-items"].value); 				
- 						this.set("dropdownItems",target.attributes["dropdown-items"].value);
-  			// }
+     var target=e.target;
+     while(target.nodeName!="FC-INPUT-SEARCH-SELECT" && target.nodeName!=="FC-GRID-MENU_SHEETS"){
+      target=target.parentElement;
+    //  console.log(target.nodeName);
+     }
+     if(target.nodeName=="FC-INPUT-SEARCH-SELECT"){console.log(target.btn); this[target.btn](e);
+      // console.log(e)
+     }
   },
-  attached(){
-
-var children =this.getMenuChildren();
-console.log(children);
+  dragToggle(e){
+    if(this.userDrags===true){
+  //     this.clearSelectedCuePrompt(); push notify confirm drag always off after drag
+  }
+     this.set("userDrags", !this.userDrags);
+  },
+  _textOrBackground(e){
+     if(e.target.issValue==" "&&this.colorToApply!=null){this.set(theElement.issValue,"text-color");}
+         else{ 
+          console.log(e.target.issValue);
+         var setVal = (e.target.issValue==="text-color")?"color":"background";
+          this.set("textOrBackground",setVal);
+          }
   },
 
-getMenuChildren(e){
-var children=this.$.gridMenuDomRepeater.children;
-console.log(children);
-return children;
-},
+  set menuMap(gridMenuButtons){
+    this.gridMenuButtons.forEach(function(val, i, arr){
+    var key=val.key;
+    var value={"propertyName":val.btn, "function": "__"+val.btn, "currentValue": null};
+    this.menuMap.set(key, value);
+    this.set(val.btn, menuMap.currentValue);
+
+  //  console.log(this.menuMap);//null needs a changeValue function
+    //this effectively should bind the property in the menu to the property in the button map// they are set at the same time;
+    //a getter up in the grid would fully complete the bind, for any buttons we inject.
+    //fast simple stupid effective connection api.
+  },this);
+  },
+
+  changeValue(e){
+      this.set("issValue", e.target.value);
+
+  },
+  formatPaint(e){
+    var choices=[["small font", "medium font", "large font", "huge font"], "italics", "bold", "underlined", ["Finanial Symbols", "Mathematical Symbols"]];
+    var name=".userStyle", rules="font-size:22px; font-weight: 900; font-style: italics; text-decoration: underline;";
+     
+
 
   
- 
+        if(this.selectedArray && this.selectedArray.length>0){this.selectedArray.forEach(function(item, index){item.classList.add("userStyle")});}
+  },
+  
+  userSelectionToggle(e){this.userSelection=!this.userSelection;
+    console.log(e);
+    if(this.userSelection===false){console.log(this.selectedArray); this.selectedArray.forEach(function(val,index, array){
+      val.selected=false;  console.log(val);
+    }, this);
+      this.set("selectedArray",[]);
+  }
+    console.log(this.userSelection, this.selectedArray);
+  },
 });
 </script>
 </dom-module>

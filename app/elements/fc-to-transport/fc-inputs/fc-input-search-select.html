@@ -62,7 +62,7 @@ width: 90%;
 
 input.question:focus + label
 {
-  width: 102%;
+  width: 98%;
   border-top: 3px solid #005c00;
    -webkit-transition: width 0.3s ease, border-top .3s ease;
   transition: width 0.3s ease, border-top .3s ease;
@@ -126,22 +126,12 @@ input.question + label > span{
   -webkit-transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
   transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
 }
-input.question.menuItem + label.menuItem > span{
-    font-size:14px;
-    font-color: brown;
-    font-weight: 700;
-}
+
 
 input.question.menuItem + label.menuItem{
   border-top: 0px white dashed;
 }
-input.question + label > span:active {
-  top: -53px;
-  z-index:1;
-  font-size: 16px;
-  font-family: merriweather;
-  color: #050;
-}
+
 input.question.cell + label{
   border-top:0px white solid;
 }
@@ -180,7 +170,16 @@ top: -53px;
   font-family: merriweather;
   color: #050;
 }
-
+input.menuItem+label>span.menuItem{
+  margin-top:-3px;
+  top:-2px;
+}
+input.question.menuItem+label.menuItem>span.menuItem,input.menuItem:active+label>span.menuItem, input.menuItem:focus+label>span.menuItem, input.menuItem+label>span{
+  margin-top:-3px;
+  margin-left:-2px;
+  font-size:16px;
+  top:-15px;
+}
 @-webkit-keyframes appear {
   100% {
     opacity: 1;
@@ -200,8 +199,8 @@ top: -53px;
   
   }
   .defaultToggleButtonClass{background: gold; border-radius: 50%;}
-  .toggleDeleteColumn{background: red; border-radius: 50%; @apply(--layout-horizontal);} 
-  .toggleAddColumn{background: aqua; border-radius: 50%; @apply(--layout-horizontal); }
+  .toggleOff{color: silver; border-radius: 50%; background: white; @apply(--layout-horizontal);} 
+  .toggleOn{color: #005c00; border-radius: 50%; background: white; @apply(--layout-horizontal); }
  
   .selectColor{
    background: orange;
@@ -260,7 +259,7 @@ top: -53px;
     </paper-icon-button>
 <div class="vertical layout dropdown" on-down="focusInput">
 	<input id="issInput" class$="question {{issClass}}" required value="{{issValue::input}}" is-multi-select="{{isMult}}" on-change="{{sortArrayForMultiSelect(isMulti)}}" name="[[issName]]">
-		<label for="issInput" class$="{{issClass}}"><span class$="{{_computeLabelSpanClass(isToggle,toggleClass,issClass)}}">{{issLabel}}</span></label>
+		<label for="issInput" class$="{{issClass}}"><span on-up="focusInput" class$="{{_computeLabelSpanClass(isToggle,toggleClass,issClass)}}">{{issLabel}}</span></label>
 			<paper-listbox id="dropdownlist" class$="dropdown-content {{issClass}}" hidden="{{!dropdownItems}}" style$="min-height:220px; max-height:{{maxHeight}}px; overflow-y: scroll;">
 		 		<template is="dom-repeat" id="controllerList" style="height: 2200px;" items="{{dropdownItems}}" observe="selectCheck value name propertyName val" filter="{{createFilter(issValue, searchOff)}}">
 					<paper-item class="block" style="border: 1px silver solid;margin-top: 3px; color: #006; font-size: 20px; font-weight:600;font-family:times;text-align: center;" on-up="toggleSelection">
@@ -281,7 +280,12 @@ FcInputSearchSelect=Polymer({
     baseScrollTop:{
           type: Number,
           notify: true
-        },  
+        },
+    selectCheck:{
+      type: Boolean,
+      value:function(){return false;},
+      notify: true
+    },  
 		
 		dropdownItems:{
 			type:Array,
@@ -303,11 +307,7 @@ FcInputSearchSelect=Polymer({
   			},
         notify: true
   		},
-       hostAttributes:{
-          value:{
-            notify: true
-          }
-      },
+    
        issClass:{
           type: String,
           notify: true,
@@ -405,9 +405,21 @@ FcInputSearchSelect=Polymer({
         // observer:"_observeInput", 
         notify: true
       },
-        toggleClass:{
+        toggleClassOn:{
         type: String,
-        value:function(){"";},
+        value:function(){return "";},
+        notify: true,
+      },
+      toggleOn:{
+        type:Boolean,
+        value:function(){return false;}, 
+        notify: true,
+
+      },
+
+        toggleClassOff:{
+        type: String,
+        value:function(){return "";},
         notify: true,
       },
       topHolder:{
@@ -422,6 +434,9 @@ FcInputSearchSelect=Polymer({
       }
       
 	},//end properties
+     hostAttributes:{
+          value: true,
+      },
 	ready(){
     var retVal=(this.multiSelect===true)?[]:"";
     this.set("selected",retVal);
@@ -436,7 +451,9 @@ FcInputSearchSelect=Polymer({
     this.set("showDropButton",true);
   }
   if(this.isToggle===true){
+    this.set("toggleClassOff", "toggleOff");
     this.toggleToggleButton();
+   // this.$.dropdownbutton.toggleClass(this.toggleClassOff,!this.toggleOn);
     this.set("searchOff",true);
     }
  
@@ -446,7 +463,7 @@ FcInputSearchSelect=Polymer({
         return this.issClass;
  },
  observeIssInput(nv, ov){
-//console.log(nv, ov);
+    console.log(nv, ov, "fire here");
  },
  _computeItemSelectedPropValue(item, index,isp){
 	 		var retval=(isp==="")?item:item[isp];
@@ -483,21 +500,21 @@ FcInputSearchSelect=Polymer({
           }
         },
   inputToggle(e){
-    console.log(this.isToggle, this.dropdownOpen, this.showDropButton);
+    //console.log(this.isToggle, this.dropdownOpen, this.showDropButton);
       var retFunc=(this.isToggle===true)?"toggleToggleButton":(this.dropdownOpen===false&&this.showDropButton===true)?"focusInput":"blurInput";
       console.log(retFunc, this.issLabel);
-      this[retFunc](e);
+      this[retFunc](e); 
+      //console.log(this.key, this.value, this.issValue,this.issValueArray, this.selected);
   },
   toggleToggleButton(e){
         var label="";
         var newLabel="";
-        console.log(e);
-        console.log(e);
-      if(this.issLabel!=null){this.actualToggleFunction()}
+      if(this.issLabel!=null){this.actualToggleFunction(e);}
       else{this.async(this.actualToggleFunction,250);}
       },
 
   actualToggleFunction(){
+    if(this.issLabel!=null){
      if(this.issLabel.charAt(this.issLabel.length-3)!=="O")
         {
           newLabel=this.issLabel + " OFF";
@@ -505,15 +522,26 @@ FcInputSearchSelect=Polymer({
         else if(this.issLabel.charAt(this.issLabel.length-2)==="F"){
           label=this.issLabel.slice(0,-4);
           newLabel=label+" ON ";
-          Polymer.dom(this.$.dropdownbutton).classList.add(this.toggleClass);
-        }
+
+             this.$.dropdownbutton.toggleClass(this.toggleClassOff, this.toggleOn);
+             this.$.dropdownbutton.toggleClass(this.toggleClassOn, !this.toggleOn);
+          }
         else{
           label=this.issLabel.slice(0,-4);
           newLabel=label+" OFF"; 
-          Polymer.dom(this.$.dropdownbutton).classList.remove(this.toggleClass);
+          this.$.dropdownbutton.toggleClass(this.toggleClassOff, !this.toggleOn);
+          this.$.dropdownbutton.toggleClass(this.toggleClassOn, this.toggleOn);
+          // Polymer.dom(this.$.dropdownbutton).classList.remove(this.toggleClassOn);
+          // Polymer.dom(this.$.dropdownbutton).classList.add(this.toggleClassOff);
         }  
         this.set("issLabel",newLabel);
-        }, 
+        }
+      else{ 
+        this.set("issLabel", " OFF");
+      }
+
+    },
+
 	createFilter(issValue, searchOff){
     if(searchOff)return function(item){return true;}
     else{
@@ -557,37 +585,37 @@ FcInputSearchSelect=Polymer({
   toggleSelection(e){
     var item = this.$.controllerList.itemForElement(e.target);//console.log(item);
     var model=this.$.controllerList.modelForElement(e.target);
-    //console.log(item,model);
+    console.log(item,model, " I am in the tap");
     var targ=e.target;
-    while(targ.nodeName!=="PAPER-ITEM"){targ=targ.parentElement;}
-    if(targ.nodeName==="PAPER-ITEM"){
-    	if(this.dropdownOpen===true && this.$.controllerList){
+ 
+    	if(this.dropdownOpen===true){//&& this.$.controllerList
+        console.log("i have an open dropdown");
         var setval=(this.itemSelectProperty==="" )?item:model.item[this.itemSelectProperty];
         var children=this.getDropdownChildren();
-          if(this.$.selector.multi===false && this.searchOff===false){
-                
+          if(this.multiSelect===false && this.searchOff===false){
                 this.set("issValue",setval);
+                console.log(this.issValue);
                 Polymer.dom(children[0]).classList.add("selectColor");
+                console.log("search is on and multi is false");
               }
-          else if(this.$.selector.multi===false && this.searchOff===true){
+          else if(this.multiSelect===false && this.searchOff===true){
                 this.removeColorFromChildren(children);
-                Polymer.dom(targ).classList.add("selectColor");
-                this.set("issValue",setval);
-                // if(this.itemSelectProperty==""){
-                //   index=children.indexOf(setval);
-                //   Polymer.dom(children[index]).classList.add("selectColor");
-                // }
+               this.async(function(){
+                  Polymer.dom(targ).classList.add("selectColor");
+                  this.set("issValue",setval);},30);
+               console.log("search off multi off");
           }
           else if(this.$.selector.multi===true&&model.item.selectCheck===true){
     		    this.$.selector.deselect(setval); 
     		    model.set("item.selectCheck",false);
             var index=this.issValue.indexOf(setval);
-            this.set("issValue","");//fix this to choose type for value at attached and get rid oif the double value bullshit
+            this.set("issValue"," ");//fix this to choose type for value at attached and get rid oif the double value bullshit
             index=this.issValueArray.indexOf(setVal);
     		    this.splice("issValueArray",index, 1);
             var showvalue=this.issValueArray.toString();
             this.set("issValue", showvalue);
             Polymer.dom(targ).classList.remove("selectColor");
+            console.log("multi plus select check");
             //console.log(this.issValue, typeof this.issValue, this.issValue.length);
           }    		  
           else if(this.$.selector.multi===true&&model.item.selectCheck===false){
@@ -599,10 +627,11 @@ FcInputSearchSelect=Polymer({
             var showvalue=this.issValueArray.toString();
             this.async(function(){this.set("issValue", showvalue);}, 50);
             // this.valueMap.set(item,this.issValue);
+            console.log("multi no chekc");
           }
         }
+        console.log("leaving dropdown, closing on exit");
 		  this.set("dropdownOpen",false);
-		}
   },
   updateAllyKeyChangedItemInColumnPosition(dy, elem){
         this.trackDelta = dy || this.trackDelta || 0;
@@ -656,15 +685,16 @@ FcInputSearchSelect=Polymer({
  		   this.$.dropdownlist.scrollTop=this.$.dropdownlist.scrollTop-(Math.floor((height+ht)/2)+2);
       },
   onEnter(e){
-      var children=Polymer.dom(this.$.dropdownlist).children;
+      var children=this.getDropdownChildren();
+      if(this.searchOff===true){
+        this.removeColorFromChildren(children);
+      }
       if(this.itemSelectProperty===""){
-        this.set("issValue",children[this.itemKeyStrokeIndex]._templateInstance.item);
-        children=this.getDropdownChildren();
+        this.set("issValue",children[this.itemKeyStrokeIndex]._templateInstance.item);   
         var elem=children[0];
         Polymer.dom(elem).classList.add("selectColor"); 
-
       }
-      else if(this.multiSelect===false){
+      else if(this.multiSelect===false && this.searchOff===true){
         var value=children[this.itemKeyStrokeIndex]._templateInstance.item[this.itemSelectProperty];
         this.set("issValue", value);
         }
@@ -687,6 +717,8 @@ FcInputSearchSelect=Polymer({
             }
       }
       if(this.$.selector.multi===false){this.blurInput();}
+
+      this.blurInput();
     },
 
   
