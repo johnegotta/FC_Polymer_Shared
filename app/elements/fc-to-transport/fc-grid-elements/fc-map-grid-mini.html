@@ -11,27 +11,23 @@
   background: white;
   opacity: 1;
 };
-li{
-  height:65px; margin:8px 2px 1px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
+textarea{
+ margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
+  max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none;
   @apply(--layout-self-shrink);
 }
-ul{border: 0px solid white; outline:0px solid white; margin-top: 44px; display: flex; flex-direction: column-reverse; flex-wrap: true; list-style-type:none;}}
- section{
+section{
   background:white;
  }
 .userStyle{font-size:22px; font-weight: 900; font-style: italics; text-decoration: underline;}
 textarea::-moz-selection { /* Code for Firefox */
 
 }
+paper-item{
+border: 1px solid #afafaf;
+}
 .selected{
   border: dashed 2px #f2f735;
-/*margin-top:-8px;
-margin-right:-5px;*/
-/*z-index:7px;
-box-shadow:4px 8px 13px 4px black;*/
-  /*animation-duration: .3s;
-  animation-name: blink;
-  animation-iteration-count: infinite;*/
  -webkit-transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;
   transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;},
 @-webkit-keyframes blink {
@@ -64,66 +60,83 @@ margin-top:0px;
     
   }
 }
+#myContextMenu{
+  min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;
 
-.cell{
-    word-wrap: break-word;
-    word-break: break-all;
-    cursor:cell;
-    }
-
-textarea::selection {
-    background: yellow;
 }
 
+textarea::selection {
+    border: gold 2px solid;
+}
   *{@apply(--layout-nowrap);}
- </style>
+</style>
+ 
  <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
  </array-selector>
-
- 
 <!-- <a> -->
-<div is-gridbox="true" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; max-width:78.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
+<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; background: aliceblue; max-width:88.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
 <!--side utility editing menu for the spreadsheet-like versions-->
-<fc-grid-menu_sheets user-selection="{{userSelection}}" menu-properties="{{menuProperties}}" color-to-apply="{{format.color}}" text-or-background="{{format.application}}" format-text="{{format.fontFamily}}" format-fancy="{{format.fontStyle}}" add-column="{{format.addColumns}}" delete-column="{{format.deleteColumn}}" user-drags="{{userDrags}}"add-delete-director="{{format.leftOrRight}}" selected-array="{{selectedArray}}">
-<paper-icon-button icon="icons:dashboard" on-tap="addCol"></paper-icon-button>Add Col
-<paper-icon-button icon="icons:dashboard" on-tap="addRow"></paper-icon-button>Add Row
-<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ArraySwap
-</fc-grid-menu_sheets>
-<div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 1800px; width: auto;">
-<div id="hanger3"  contenteditable="true" on-dblclick="addOn" on-tap="selection" data-gh="true" data-payload$="{{col.data}}" on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 1800px; width: auto; overflow: scroll;">
- 
-</div>
+
+Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>Page 
+<div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 85%; width: auto;">
+<div id="hanger3"  on-dblclick="insertRow" contenteditable="true" on-contextmenu="mycontextMenu" data-gh="true" data-payload$="{{col.data}}" on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 1800px; width: auto; overflow: scroll;">
+
 </div>
 
+
+</div>
 <template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
 <!-- <a link={{}}> -->
     <div id$="divCol_[[columnIndex]]" hidden="{{four}}"style$="{{_computeSelectedHoverStyle(trigger, col.selected)}} position:" class="vertical layout container nowrap self-stretch">
-          <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-gh="true" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" 
+          <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" 
           style$="background:[[_computeHighlighted(col.selected, col.data, col.highlighted, trigger)]]; cursor:pointer; font-weight:700; color: #009; font-size: 18px; overflow: hidden; text-align: center; min-width:calc(100vw/28); border-radius: 2px; max-width: 210px; max-height: 58px; min-height: 38px;">
             {{col.name}} <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
           </section>    
           <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
                <!--          <a link={{}}> -->
-                              <section class="horizontal layout flex self-stretch {{_computeSelected(item.selected, item)"  id="{{index}}" data-payload$="{{item.payload}}" class="layout vertical"  style$="background:[[_computeHighlighted2(item.highlighted, item.color, item.background, trigger)]]; min-width:calc(99%/18); min-height:calc(92vh/24); max-width: 210px;width: 155px; max-height:70px; border-top:1px solid #009; 
-                              border-left:1px solid #009;font-size:14px;" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop"  id$="gridBox{{item.col}}_{{item.row}}">                              <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop"   on-dblclick="selectTog" style="background: #fdfdfd; border-bottom: 2px white solid;min-width: 135px; min-height: 24px; font-family:merriweather; color: #009;  font-size:18px;max-width: 210px; whitespace-wrap: true; font-weight: 900; z-index: 4; line-height:1.15;text-align:center; resize: none; white-space: wrap; padding-top: 3px;" id$="input[[item.col]]_[[item.row]]" data-payload$="{{item.payload}}" on-keyup="changePayload" texteditable="true"  value="{{item.payload}}" class$="{{_computeSelected(item.selected, item)}} cell" max-char="450">
+    <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop"  on-dblclick="selectTog" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="{{_computeSelected(item.selected, item)}} cellClass" max-char="450">
                               </textarea>
 
                         
             <!--         </a> -->
               </template>
-          
-    </div>
+               </div>
+               </template>
+       <!--    <fc-fit-wrapper>
+</fc-fit-wrapper>
+    -->
 <!--     </a> -->
-</template>
+
 
 </div>
-
+<paper-listbox id="myContextMenu" hidden>
+      <paper-item>
+        <paper-swatch-picker>
+        </paper-swatch-picker> Color Selector
+    </paper-item>
+    <template is="dom-repeat" items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+        <paper-item value="{{category.title}}">
+            <details>
+                <summary>{{category.title}}</summary>
+                <paper-listbox style="min-width:240px; ">
+                    <template is="dom-repeat" items="{{category.buttons}}" as="item">
+                          <paper-item onclick="{{item.myFunction}}" btn-value="{{item.text.0}}" style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.text.0, format.color, defaultFormat)}}">                {{item.text.0}}
+                              <span  style="font-size: 26px; font-weight: 300; color: #009;">{{item.text.2}}</span>
+                              <span style="font-size: 36px;">{{item.text.1}}</span> 
+                          </paper-item>
+                    </template> 
+                </paper-listbox>
+            </details>
+        </paper-item>
+    </template>
+</paper-listbox>
 <!-- </a> -->
  </template>
  <script>
  FcMappedGrid=Polymer({
  	is:"fc-mapped-grid",
   behaviors:[Polymer.Templatizer],
+  listeners: {"color-picker-selected":"getcolor"},
  	properties: {
     comparisons:{
       type: Map,
@@ -142,8 +155,14 @@ textarea::selection {
     format:{
       type: Object,
       value:function(){return {};},
-      observer: "observeFormatChanges",
       notify: true,
+    },
+    defaultFormat:{
+        type:Object,
+        value:function(){
+            return {"color": "#009", "background": "#fafafa", "header_backgroundColor":"aliceblue", "fontSize": "18px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15", "border": "1px #afafaf solid", "styleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center; font-size: 18px; resize:none;"};
+          },
+        notify: true 
     },
     selectedArraySet:{
         type:Array,
@@ -155,15 +174,42 @@ textarea::selection {
         value:function(){return [];},
         notify: true,
     },
+    spanText:{
+        type: String,
+        value: function(){return "";},
+        notify: true
+    },
+      spanSpanSmallSymbols:{
+        type: String,
+        value: function(){return "";},
+        notify: true
+    },
+      spanLargeSymbols:{
+        type: String,
+        value: function(){return "";},
+        notify: true
+    },
     columns2:{
       type: Array,
       value: function(){return [];},
       notify:true,
     },
+    contextMenuCategories:{
+        type:Array,
+        value:function(){return [];},
+        notify: true
+    },
     columns3:{
       type: Array,
       value: function(){return [];},
       notify:true,
+    },
+    mapArray:{
+        type: Array,
+        value: function(){
+            return[];
+        },
+        notify: true,
     },
 
     columns:{
@@ -171,21 +217,10 @@ textarea::selection {
       value: function(){return [];},
       notify:true,
     },
-    startCell:{
-      type: Object,
-      value:function(){return {};},
-      notify:true
-    },
-    startContainer:{
-      type: Object,
-      value:function(){return {};},
-      notify: true,
-    },
-  
-    startCellModel:{
-      type:Object,
-      value: function(){return {};},
-      notify: true,
+    gridEvent:{
+        type: Object,
+        value: function(){return {};},
+        notify: true, 
     },
     userSelection:{
       type:Boolean,
@@ -193,22 +228,12 @@ textarea::selection {
       notify: true,
       observer: "userSelectionArrayTrigger",
     },
-    trigger:{
-      type: Boolean,
-      value: function(){return false;},
+    
+    
+    btnValue:{
+      type: String,
+      value:function(){return "";},
       notify: true
-    },
-    selected:{
-      type: Object,
-      value:function(){ return {};},
-      notify: true
-    },
-
-    menuProperties:{
-        type:Object,
-        value:function(){return {"property": null, "propertyValue":null, "propertyType":null};},
-        observer: "observeMenuProperty",
-        notify: true,
     },
     arraysIndex:{
         type: Number,
@@ -220,174 +245,346 @@ textarea::selection {
       value:function(){return [];},
       notify: true,
     },
-    userDrags:{
-      type:Boolean,
-      value: function(){return false;},
-      notify: true,
-    },
     four:{     type:Boolean,
      computed:"computefour(arrayIndex)",
       notify: true,
     },
-    
-      issClass:{
-        notify: true,
-      },
-      arraySets:{
-        type:Function,
-        value:function(){return [
-                                  ["keyColors", 
-                                          ["yellow","orange","#afafaf", "lightblue","lightgreen","red", "cornflowerblue"]
-                                  ],
-
-                                  ["numberOfHighlightColors",["one", "two", "2 plus one accent", "2 plus 2 accents", "3 plus 2 accents"]
-                                  ],
-                                  ["selectionOfFirstHighlightColor",["rowsOnly", "columnsOnly", "rowsAndColumns", "rowsAndSummations", "All"]
-                                  ],//0th has key then val array
-        ]
-      },
-
+    columnArchive:{
+      type: Array,
+      value: function(){return [];},
+      notify: true
+    },
+    rowArchive:{
+      type:Array,
+      value:function(){return [];},
+      notify: true
+    },
 	 	drags:{type: Boolean, value: function(){return true;}, notify: true},
 	 	
  		},
+
+  mycontextMenu(e){
+    console.log(e);
+    if(e.target.btnValue){
+    var btnValue=e.target.btnValue;
+      this.set("btnValue", btnValue);
+    } 
+    this.set("gridEvent", e);
+    console.log(this.gridEvent);
+    this.$.myContextMenu.hidden=false;
+    this.$.myContextMenu.style.left=(e.clientX-330)+"px";
+    this.$.myContextMenu.style.top=(e.clientY)+"px";
+    this.$.myContextMenu.style.zIndex=25000;
+    console.log(e.target);
+    var cell=e.target;
+    var cellId=cell.getAttribute("id");
+    var key=cellId.split("_");
+    
+     var allSymbols= `➔ ❶ ✂ ✎ ✒ ✜ ❚ ❶ ➀ ➞ ☚ ☛ ☰ ☱ ☷ ☑ ☐ ☎ ☏ ► ▼ ▲ ◄ ⇒ ▐ █ ▄ ▀`;
+        var addOneColumnRight=["+1 Column Right: ","", " ✜ ▐ ☛"],
+         leftAddOneColumn=["+1 Column Left: ",""," ✜ ▐ ☚"],
+         deleteThisColumn=["Delete Column: ","", " ✂ ▐"],
+         restoreThisColumn=["Restore Column: ", "☤", "☤▐ ☤"],
+         addOneRowBelow=["+1 Row Below:", ," ☰ ▼ "],
+         addOneRowAbove=["+1 Row Above:", ," ☰ ▲ "],
+          deleteThisRow=["Delete Row: "," ", " ✂ ☰"],
+          restoreThisRow=["Restore Row: ","☤", " ☤ ☰ ☤ "],
+         highlightColumn=["Highlight Selection: ",""," ✒ ❚ "],
+         returnToDefaultHighlighting=["Remove Highlighting: ", ," ✂ ✒"],
+         applyThisTextColor=["Apply This Text Color:"," ✎" , "▀"],
+         returnToDefaultTextColor=["Apply Base Text Color:"," ✎ " , "▀"],
+         applyThinTextWeight=["Thin Text Weight:", ,"𝒯𝒽𝒾𝓃"],
+         applyMediumTextWeight=["Medium Text Weight:", ,"Medium"],
+         applyStrongTextWeight=["Strong Text Weight", "STRONG"],
+         applyRobotoFontFamily=["Roboto Font Family", ," ROBOTO"],
+         applyMerriweatherFontFamily=["Merriweather Font Family", ," Merriweather"],
+         applyCourierFixedWidthFontFamily=["Courier Font Family: ", ," Courier"],
+         applyItalics=["Italics:", ,"Italics"], 
+         applyUnderline=["Underline:", ,"Underline"], 
+         applyStrikeThrough=["Strike-Through:", ,"Strike-Through"];
+          var columnMenu=[
+          {   "title": "Add Columns", 
+              "buttons": [
+              {"text":addOneColumnRight,"myFunction": this.addColumn.bind(this)}, 
+              {"text": leftAddOneColumn, "myFunction": this.addColumn.bind(this)}
+            ]
+          }, 
+          {
+              "title":"Delete Column", 
+              "buttons":[
+                  {"text":deleteThisColumn, "myFunction": this.deleteThisColumn.bind(this)}, 
+                  {"text":restoreThisColumn, "myFunction":this.restoreThisColumn.bind(this)}
+                  ]
+          }
+        ];
+        var rowMenu=[
+          {   "title": "Insert Row", 
+              "buttons": [
+              {"text":addOneRowAbove,"myFunction": this.insertRow.bind(this)}, 
+              {"text": addOneRowBelow, "myFunction": this.insertRow.bind(this)}
+            ]
+          }, 
+          {   "title": "Delete Row", 
+              "buttons": [
+              {"text":deleteThisRow,"myFunction": this.deleteRow.bind(this)}, 
+              {"text": restoreThisRow, "myFunction": this.restoreRow.bind(this)}
+            ]
+          }
+          ]; 
+        var basemenu=[{
+              "title":"Highlight Color", 
+              "buttons":[{"text": highlightColumn,"myFunction":this.stylePropertySelection.bind(this)}, {"text":returnToDefaultHighlighting, "myFunction":this.stylePropertySelection.bind(this)}]
+          },
+          {   "title": "Text Color",
+              "buttons": [
+              {"text": applyThisTextColor, "myFunction":this.stylePropertySelection.bind(this)},
+              {"text":returnToDefaultTextColor, "myFunction":this.stylePropertySelection.bind(this)}
+              ] 
+          },
+          {    "title": "Text Weight",
+                "buttons": [
+                    {"text":applyThinTextWeight,"myFunction":this.stylePropertySelection.bind(this)},
+                    {"text":applyMediumTextWeight,"myFunction":this.stylePropertySelection.bind(this)},
+                    {"text": applyStrongTextWeight, "myFunction":this.stylePropertySelection.bind(this)
+              }
+            ] 
+          },
+          {  "title": "Font Family",
+             "buttons": [
+              {"text":applyRobotoFontFamily,"myFunction":this.stylePropertySelection.bind(this)},
+              {"text":applyMerriweatherFontFamily,"myFunction":this.stylePropertySelection.bind(this)},
+              {"text": applyCourierFixedWidthFontFamily, "myFunction":this.stylePropertySelection.bind(this)
+              }
+            ],
+          },
+          {   "title":"Font Styles",
+              "buttons": [
+                  {"text":applyItalics,"myFunction":this.stylePropertySelection.bind(this)},
+                  {"text": applyUnderline,"myFunction":this.stylePropertySelection.bind(this)},
+                  {"text": applyStrikeThrough, "myFunction":this.stylePropertySelection.bind(this)},
+                  {"text": ["Normal: ", , " Normal"], "myFunction":this.stylePropertySelection.bind(this)
+                } 
+            ], 
+          }
+          ];
+    if(key[2]==0){
+      var returnColumnHeader =columnMenu.concat(basemenu);
+    this.setMenuEntries(returnColumnHeader);
+    }
+    else if(key[1]==0&&key[2]!=0){
+        var returnRowMenu=rowMenu.concat(basemenu);
+         this.setMenuEntries(returnRowMenu);
+    }
+    else{ this.setMenuEntries([]);}
   },
 
-  
-  setValuesInMap(e){console.log(e, e.target, e.target.value);},
-  addOn(e){
-    var after=true;
-    console.log("in addOn");
-     var parent=e.target.parentElement;
-    var eid=e.target.getAttribute("id");
+  setMenuEntries(returnValue){
+      this.set("contextMenuCategories", returnValue);
+  },
+  closemenu(e){
+    this.$.myContextMenu.hidden=true;
+  },
+  insertRow(e){
+    var eid=this.gridEvent.target.getAttribute("id");
       var key=eid.split("_");
-      console.log(key[1], key[2]);
+      
       if(key[1]==0 &&key[2]!=0){
-        console.log("calling addrow");
-        this.addRow(e, key, after);
-      }
-      else if(key[2]==0&&key[1]!=0){
-        this.addColumn(e);
-
-      }
-
-  },
-  addRow(e, key, after){
-    console.log("in addRow");
-     var rowNum=key[2];
-     var childColumn= Polymer.dom(this.$.hanger3).children;
-      console.log("what is herer=");
-      console.log(childColumn);
-      var rows=childColumn[0].children.length-1;
+      var rowNum=key[2];
+      var after=(e.target.btnValue.match("Row Below"))?true: false;
+      var childColumn= Polymer.dom(this.$.hanger3).children;
+      var rows=childColumn[0].children.length;
        var count=childColumn.length;
-       console.log(rows);
-       console.log(childColumn);
        for(var k=0;k<count; k++)
        {
           var colNum=childColumn[k].getAttribute("id");
           var colNum=colNum.split("_");
-          console.log(colNum[1]);
         var elem=document.createElement("TEXTAREA");
-         elem.setAttribute("style", "max-height: 55px; min-height: 18px; margin: 1px 0px 1px 0px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
-         var nKey="comparisons_"+colNum[1]+"_"+rowNum+"_";
+        elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
+         var nKey="comparisons_"+colNum[1]+"_"+rows+"_";
          elem.setAttribute("id", nKey);
          elem.value="--";
          this.comparisons.set(nKey,[elem.value, elem]);
-         var theId="#comparisons_"+k+"_"+key[2]+"_";
-         console.log(elem);
+         var theId="#comparisons_"+colNum[1]+"_"+key[2]+"_";
+         // console.log(this.$$(theId));
+         console.log(theId);
         if(after===false)
-        {
+        {   //console.log(this.$$(theId));
           Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
+           var style=Polymer.dom(elem).nextSibling.style.cssText
+          elem.style.cssText=style;
+          this.comparisons.set(nKey, [elem.value,elem]);
          }
         else if(after===true&&key[2]<rows)
             {
               Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
+                var style=Polymer.dom(elem).nextSibling.style.cssText
+                elem.style.cssText=style;
+                this.comparisons.set(nKey, [elem.value,elem]);
+         
             }
         else if(after===true&&key[2]==rows)
             {
               Polymer.dom(childColumn[k]).appendChild(elem);
+                var style=Polymer.dom(elem).previousSibling.style.cssText
+                elem.style.cssText=style;
+                this.comparisons.set(nKey, [elem.value,elem]);
+         
             }
        
        }
+      }
   },
+  deleteRow(e){
+    var children=Polymer.dom(this.$.hanger3).children;
+    var columnNumberArray=[],
+    columnArrayIds=[],
+    rowArray=[];
+    children.forEach(function(col,index, array){
+        var colId=col.getAttribute("id");
+        columnArrayIds.push(colId);
+        var colIdMiniArray=colId.split("_");
+        columnNumberArray.push(colIdMiniArray[1]);
+    });
+    var baseId=this.gridEvent.target.getAttribute("id"),
+    rowIndex=Polymer.dom(children[0]).children.indexOf(this.gridEvent.target),
+    splitBaseId=baseId.split("_");
+    console.log(rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex);
+    rowArray=columnNumberArray.map(function(col, index,array){
+        var theId="#"+splitBaseId[0]+"_"+col+"_"+splitBaseId[2]+"_";
+        var elem=this.$$(theId);
+        var theId2="#" + columnArrayIds[index];
+        var parent=this.$$(theId2);
+        Polymer.dom(parent).removeChild(elem);
+        return elem;
+    }, this);
+    this.push("rowArchive", [rowIndex, rowArray]);
+    
+    },
+  restoreRow(e){
+   
+     var children=Polymer.dom(this.$.hanger3).children;
+     console.log(children,this.rowArchive[0][1],this.rowArchive[0][0], Polymer.dom(children[0]).children);
+     var counter=children.length,
+     i=0,
+    row=this.pop("rowArchive");
+    console.log(row);
+     for(i=0; i<counter; i++){
 
+        var column=Polymer.dom(children[i]).children;
+         var beforeElement=column[row[0]];
+         Polymer.dom(children[i]).insertBefore(row[1][i],beforeElement);
+      }
+  },
   addColumn(e){
-    var parent=e.target.parentElement;
-    var eid=e.target.getAttribute("id");
+    if(e.target.btnValue){
+      this.set("btnValue",e.target.btnValue);
+    }
+    var parent=this.gridEvent.target.parentElement;
+    var pParent=parent.parentElement;
+    var columns=pParent.children;
+    var eid=this.gridEvent.target.getAttribute("id");
       var key=eid.split("_");
     if(key[2]==0){
       var children=Polymer.dom(parent).children;
       var id=parent.getAttribute("id");
-      console.log(id);
-      console.log(parent,children);
-    if(this.format.application){
-           console.log("none", this.format.application); 
       var column =document.createElement("DIV");
         column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-          var colNum=this.columns4.length;//need to push on this length
-          this.push("columns4",["znother", "column"]);
-          var columnId="column_"+colNum;
-          var numCells=children.length;
-          column.setAttribute("id", columnId);
-          var theId="#"+columnId;
-          this.toTheLeft=true;
-        if(this.toTheLeft===true){
+          var colNum=columns.length;//need to push on this length
+         
+          var att=parent.getAttribute("id");
+          var colKey=att.split("_");
+          if(this.btnValue && this.btnValue.match("Left") && this.btnValue.match("Left").length>0){
+           var columnId="column_"+(colNum);
+          column.setAttribute("id", columnId); 
           Polymer.dom(this.$.hanger3).insertBefore(column, parent);
         }
       else{
           var nsib=Polymer.dom(parent).nextSibling;
+
+          var columnId="column_"+(colNum.toString());
+          column.setAttribute("id", columnId);
           Polymer.dom(this.$.hanger3).insertBefore(column,nsib);
+                      console.log(columnId);
       }
+       this.push("columns4",["znother", "column"]);
+          var numCells=children.length;
     for(var j=0; j<numCells;j++)
     {
+      var trueVal=children[j].getAttribute("id");
+      trueVal=trueVal.split("_");
+      var val=trueVal[2];
       elem=document.createElement("TEXTAREA");
-      var key="comparisons_"+colNum+"_"+j+"_";
+      var key="comparisons_"+colNum+"_"+val+"_";
       elem.setAttribute("id",key);
       if(j==0){
-      elem.setAttribute("style", "max-height:65px; min-height: 18px; margin:0px 1px 1px 0px; height: 23px; background: aliceblue; padding-top: 5px; border: 1px solid #afafaf; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
+      elem.setAttribute("style", "max-height:65px; border: solid 1px #009; min-height: 18px; margin:0px; height: 23px!important; font-family: merriweather; background: aliceblue; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
       }
       else{
 
-         elem.setAttribute("style", "max-height: 55px; min-height: 18px; margin: 1px 0px 1px 0px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
-
-       }
+           elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
+         }
        elem.value="--";
-      this.comparisons.set(key,[elem.value, elem]);
-
-
-      Polymer.dom(this.$$(theId)).appendChild(elem);
+        console.log(columnId);
+      Polymer.dom(column).appendChild(elem);
+     this.comparisons.set(key,[elem.value, elem]);
     }
-  }
-  }
-},
-  selection(e){
+  
+      }
+    },
+
+  deleteThisColumn(e){
+    
+      if(e.target.btnValue){
+          this.set("btnValue",e.target.btnValue);
+      }
+      var parent=this.gridEvent.target.parentElement;
+      var key= parent.getAttribute("id");
+      var t=new Date().getTime();
+       var grandParent=parent.parentElement;
+       var nodeArray=Polymer.dom(grandParent).children;
+      var index= nodeArray.indexOf(parent);
+      this.push("columnArchive", [index,parent, t]);
+      Polymer.dom(grandParent).removeChild(parent);
+  },
+  restoreThisColumn(e){
+        var colArchArray=this.pop("columnArchive");
+        var columnChildren=Polymer.dom(this.$.hanger3).children;
+        var beforeElement=columnChildren[colArchArray[0]];
+        Polymer.dom(this.$.hanger3).insertBefore(colArchArray[1],beforeElement);   
+  },
+  stylePropertySelection(e){
     if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
-    var value=this.comparisons.get(e.target.id);
-    var keys=e.target.id.split("_");
-   console.log(keys[1], keys[2], keys, "here are the keys");
+    var value=this.comparisons.get(this.gridEvent.target.id);
+    var keys=this.gridEvent.target.id.split("_");
     var bindValue=value[0];
     value[0]=bindValue;
     value[1].value=bindValue;
-    console.log(value[1].style);
     var property=this.format.application + ": ";
     var color=this.format.color+";";
-    console.log(property, color);
-    for(var i=1;i<30;i++){
+    this.set("btnValue", e.target.btnValue);
+    var text=this.btnValue,
+    defaultformat = this.defaultFormat,
+    formatcolor=this.format.color;  
+    var property=(text.match("Highlight Selection"))?`background: ${formatcolor};`:(text.match("Remove Highlighting"))?`background: ${defaultformat.background};`:(text.match("Apply This Text Color"))?`color: ${formatcolor};`:(text.match("Apply Base Text Color"))?`color: ${defaultformat.color};`:(text.match("Thin Text Weight"))?`font-weight: 300;`: (text.match("Medium Text Weight"))?`font-weight: 600;`: (text.match("Strong Text Weight"))?`font-weight: bold;`: (text.match("Roboto Font Family"))?`font-family: Roboto;`:(text.match("Merriweather Font Family"))?`font-family: merriweather;`: (text.match("Courier Font Family"))?`font-family: courier;`:(text.match("Italics"))?`font-style: italic;`:(text.match("Underline"))?`text-decoration: underline;`:(text.match("Strike-Through"))?`text-decoration: line-through;`: `text-decoration: none; font-style: normal;`;
+    for(var i=1;i<50;i++){
     if(value  && keys[2]==0)
     {
       var newKey="comparisons_"+keys[1]+"_"+i+"_";
       var value=this.comparisons.get(newKey);
       if(value && value[1])
-      {
+      { 
+        console.log(property);
         var style=value[1].style.cssText;
-        var property=this.format.application + ": ";
-        if(style.match(property)&&style.match(property).length>0)
-          {
-            style=style.replace(property, "");
-              style=style+property+color;
+        var propertyName=property.split(":");
+        if(style.match(propertyName[0]))
+          {     
+            var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
+            style=style.replace(replacer, "");
+              style=style+property;
           }
         else
           {
-            style=style+ property+ color;
+            style=style+ property;
           }
       value[1].style=style;
       }
@@ -399,55 +596,38 @@ textarea::selection {
       if(value && value[1])
       { 
         var style=value[1].style.cssText;
-        if(style.match(property)&&style.match(property).length>0)
+        if(style.match(property))
           {
-            style=style.replace(property, "");
-            style=style+property+color;
+            var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
+            style=style.replace(replacer, "");
+              style=style+property;
           
           }
         else
           {
-            style=style+property+color;
+            style=style+property;
           }
         value[1].style=style;
       }
     }
-    else{i=30;}
+    else{i=50;}
     }
-    console.log(e, e.target, e.target.id);
+ 
     }
 
   },
-  _computeNewValue(){
-    if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
-    var value=this.comparisons.get(this.cellKey);
-    var keys=this.cellKey.split("_");
-   console.log( keys[1]);
-
-    var bindValue=this.cellValue;
-    value[0]=bindValue;
-    value[1].value=bindValue;
-    console.log(value[1].style);
-    for(var i=0;i<30;i++){
-
-    var newKey="comparisons_"+keys[1]+"_"+i+"_";
-    var value=this.comparisons.get(newKey);
-    if(value && value[1]){
-    var style=value[1].style.cssText;
-     if(style.match("background: gold;")&&style.match("background: gold;").length>0)
-     {
-      style=style.replace("background: gold;", "");
-      console.log(style);
-    }
-      else{
-        style=style+"background: gold;";
-      }
-    value[1].style=style;
-    }
-    else{i=30;}
-    }
-      }
+  selection(){},
+  getcolor(e){
+    console.log(e.detail.color, e.target.toColor);
+    this.set("format.color", e.detail.color);
   },
+  _computeStyle(text, formatcolor, defaultformat){
+      retVal=(text.match("Highlight Selection"))?`background: ${formatcolor};`:(text.match("Remove Highlighting"))?`background: ${defaultformat.background};`:(text.match("Apply This Text Color"))?`color: ${formatcolor};`:(text.match("Apply Base Text Color"))?`color: ${defaultformat.color};`:(text.match("Thin Text Weight"))?`font-weight: 300;`: (text.match("Medium Text Weight"))?`font-weight: 600;`: (text.match("Strong Text Weight"))?`font-weight: 900;`: (text.match("Roboto Font Family"))?`font-family: Roboto;`:(text.match("Merriweather Font Family"))?`font-family: merriweather;`: (text.match("Courier Font Family"))?`font-family: courier;`:(text.match("Italics"))?`font-style: italic;`:(text.match("Underline"))?`text-decoration: underline;`:(text.match("Strike-Through"))?`text-decoration: line-through;`: `text-decoration: normal;`;
+         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
+         return retVal;
+
+  },
+  
 computefour(arrayIndex){
     return(arrayIndex===3);
 },
@@ -469,6 +649,9 @@ ready(){
     this.push("dataArrays",this.columns3);
         this.push("dataArrays",this.columns4);
     this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+    this.set("format.color","gold");
+    this.set("format.application", "background");
+
     },
   arraySwap(e){
         var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
@@ -524,8 +707,6 @@ if(this.format.application&&this.selectedArray.length>0)
 
   },
 
-
- 
   userSelectionArrayTrigger(newVal, oldVal){
     if(newVal!=null&&newVal===false&&this.selectedArray){
       this.selectedArray.forEach(function(val){ console.log(val);
@@ -537,52 +718,15 @@ if(this.format.application&&this.selectedArray.length>0)
   changePayload: function(e)
   {
     console.log(e, "I am in changePayload");
-    // var dat = JSON.parse(e.target.dataset.payload);
-    // var col = parseInt(dat.col);
-    // var row = parseInt(dat.row);
-   // console.log(e.target.value, dat, typeof dat, col, row);
-    // this.set(["columns", parseInt(dat.col), "data", parseInt(dat.row)], {value: e.target.value, col: dat.col, row: dat.row, highlighted:dat.highlighted});
-    // //console.log(this.columns);
   },
   _computeCol: function(col){return col;},
 
   _computeSelectedHoverStyle(trigger, selected){
-
     var retVal=(selected===true)?"margin-top:-18px; margin-right: -12px; box-shadow: 7px 13px 28px 12px #afafaf; z-index:222222; border: gold 6px solid":"";
   //  console.log(selected);
     return retVal;
 
   },
-
-  // addCol: function(e)
-  // {
-  //   var numCols = this.columns.length;
-  //   var numRows = this.columns[0].data.length;
-  //   var newCol = {column: numCols, name: "new", selected:false, data:[]};
-  //   var i = 0;
-  //   for(i = 0; i < numRows; i++)
-  //   {
-  //     newCol.data.push({payload:"#fafafa", col:numCols, row:i, highlighted:false});
-  //   }
-  //   this.push("columns", newCol); //{selected:false, data:newCol});
-  // },
-/*  addColRight:function(e){
-
-
-
-  },*/
-
-
-  // addRow: function(e)
-  // { 
-  //   var numCols = this.columns.length;
-  //   var numRows = this.columns[0].data.length;
-  //   var i = 0;
-  //   for(i = 0; i < numCols; i++)
-  //   {
-  //     this.push(["columns", i, "data"], {payload:"beige", col:i, row:numRows, highlighted:this.columns[i].selected});
-  //   }
-  // },
 
   highlightCol: function(e)
   {   
@@ -696,7 +840,7 @@ rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
           var columnId="column_"+i;
           column.setAttribute("id",columnId);
           var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", "max-height:65px; min-height: 18px; margin:0px 1px 1px 0px; height: 23px; background: aliceblue; padding-top: 5px; border: 1px solid #afafaf; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
+          elem.setAttribute("style", "max-height:65px; border: solid 1px #009; min-height: 18px; margin:0px; height: 23px!important; font-family: merriweather; background: aliceblue; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
           elem.setAttribute("id", key);
           var hanger="--";
         if(this.comparisons.get(key))
@@ -720,7 +864,7 @@ rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
        var element=this.comparisons.get(key)[1];
        
        
-        array.push({"column": i, "selected": true, "background": "red", "highlighted":true, "color": "#009", "value": this.comparisons.get(key)[0], "name": this.comparisons.get(key)[0], "data":[]});
+        array.push({"column": [i,column], "header": elem, "color": "#009","value": this.comparisons.get(key)[0], "id": key, "key": key, "data":[]});
         console.log(array);
          // if(j===0){
           var theId="#"+columnId;
@@ -732,7 +876,7 @@ rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
 
              var key="comparisons_"+i+"_"+j+"_";
                var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", "max-height: 55px; min-height: 18px; margin: 1px 0px 1px 0px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
+          elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
           elem.setAttribute("id", key);
               var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
             //console.log(bindValue, "vital locale");
@@ -744,12 +888,12 @@ rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
           
                 this.comparisons.set(key,[elem.value,elem]);
         if(this.csv[j][i]){
-          array[i].data.push({"row":j, "col":i, "payload":this.csv[j][i], "value":bindValue, "selected": false, "color": "#009", "highlighted": false, "background":"#fafafa","key":key, "elem": elem});
+          array[i].data.push({"row":j, "col":i, "payload":elem.value, "value":elem.value, "color": "#009","key":key, "cell": elem});
               
                 Polymer.dom(this.$$(theId)).appendChild(elem);
                      // console.log(array);
           }
-          else{array[i].data.push({"row":j, "col":i, "payload":bindValue, "value":bindValue, "selected": false, "color": "#009", "background":"#fafafa"});
+          else{array[i].data.push({"row":j, "col":i, "payload":elem.value, "value":elem.value, "color": "#009","key":key, "cell": elem});
            //comparisons.set(key,elem);
         Polymer.dom(this.$$(theId)).appendChild(elem);
         //              console.log(array)}
@@ -814,6 +958,44 @@ rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
     </script>
    </dom-module>
 <!--
+
+_computeNewValue(){
+    if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
+    var value=this.comparisons.get(this.cellKey);
+    var keys=this.cellKey.split("_");
+   console.log( keys[1]);
+
+    var bindValue=this.cellValue;
+    value[0]=bindValue;
+    value[1].value=bindValue;
+    console.log(value[1].style);
+    for(var i=0;i<30;i++){
+
+    var newKey="comparisons_"+keys[1]+"_"+i+"_";
+    var value=this.comparisons.get(newKey);
+    if(value && value[1]){
+    var style=value[1].style.cssText;
+     if(style.match("background: gold;")&&style.match("background: gold;").length>0)
+     {
+      style=style.replace("background: gold;", "");
+      console.log(style);
+    }
+      else{
+        style=style+"background: gold;";
+      }
+    value[1].style=style;
+    }
+    else{i=30;}
+    }
+      }
+  },
+var counter=rowArray.length,
+    // p=0;
+    // for(p=0;p<counter;p++){
+    //  var theId="#" + columnArrayIds[p];
+    //  var parent=this.$$(theId);
+    //   Polymer.dom(parent).removeChild(rowArray[p]);
+    //   }
  monkey: function(e)
   {
     var col = "columns[2][2]";

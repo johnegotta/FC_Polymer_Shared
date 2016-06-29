@@ -91,9 +91,10 @@ min-height: 38px;
 		<div class="vertical layout self-stretch nowrap" > 
 		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; min-height: 105px; margin-bottom: 48px;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
-						<span on-tap="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
+						<span id="spanLeft" on-tap="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;" inner-html-one="[[_computeSpanOne(arrow)]]"></span>
 						<section class="layout horizontal headerMonthYear">
 						<!-- <iron-image width="100px" height="60px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image> -->
+						<input value="{{arrow::input}}">
 						</section>
 						<span on-tap="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
 					</section> 
@@ -134,8 +135,8 @@ min-height: 38px;
 				</paper-material><!--header ends-->
 				<!--resizer-->
 				<div flex layout vertical style="height: 96vh;">
-				<div class="horizontal layout flex-1" style="height: 50vh; overflow:scroll; margin: 12px 5px;">
-					<fc-mapped-grid style="overflow:scroll;">
+				<div class="horizontal layout flex-1" style="height: 50vh; margin: 12px 5px;">
+					<fc-mapped-grid>
 						</fc-mapped-grid>
 				</div>
 				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 99%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
@@ -161,7 +162,11 @@ FcTriad=Polymer({
 	behaviors:[FCBehaviors.FcCalendarBehaviorPrime,Polymer.IronResizableBehavior],
 	observers:[],
 	properties: {
-		
+		arrow:{
+			type: String,
+			value: function(){return '&#9668';},
+			notify: true
+		},
 		day:{
 			type: Object, 
 			value: {},
@@ -358,7 +363,9 @@ FcTriad=Polymer({
 		}
 
   },
-  
+  _computeSpanOne(arrow){
+  	this.$.spanLeft.innerHTML=arrow;
+  },
 
  
   observeRightBottomMarginTop(newval,oldval){

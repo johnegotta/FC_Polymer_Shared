@@ -1,5 +1,5 @@
-<dom-module id="fc-mapped-grid">
- <template id="fc-mapped-grid-template">
+<dom-module id="fc-mapped-grid-oo">
+ <template id="fc-mapped-grid-oo-template">
  <style>
  section{
   background:white;
@@ -14,19 +14,24 @@
 	@apply(--vertical-layout);
 	@apply(--layout-flex);
 	}
+  fc-fit-wrapper{z-index: 20;}
+  textarea{
+      min-width:calc(100vw/18); min-height:calc(46vh/16); font-family: merriweather; font-size: 18px; text-align: center; color: #009; max-width:240px; max-height:72px; background-color:#fff; border:2px solid #009; resize:none; font-weight: 700;
+
+  }
  </style>
 
 <div on-down="draggy" on-dragover="allowDrop" is-gridbox="true" class="horizontal layout" style="height:100%; min-width:99%!important; max-width:99vw;">
+<fc-fit-wrapper drags="true" is-resizing></fc-fit-wrapper>
 <template is="dom-repeat"  class="horizontal layout" id="template" items="{{dataArrays}}">
 
 <div class="vertical layout flex nowrap">
 <span>{{item.column}}</span>
 <template is="dom-repeat" id="templateTwo" class="vertical layout" items="{{item.row}}" as="val">
 
-<section class="horizontal layout flex self-stretch item" counter="0" drags draggable dragging is-gridbox="true" val="{{val}}"style="min-width:calc(100vw/18);min-height:calc(46vh/16); max-width:240px; max-height:72px; background-color:#fff; border:2px solid #009;"  
- on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe" id$="gridBox{{val}}">
+<textarea class="horizontal layout flex self-stretch item" contenteditable="true" counter="0" drags draggable dragging is-gridbox="true" value="{{val}}" val="{{val}}" style="resize:none;" on-down="draggy" on-dragover="allowDrop" on-track="focusedDragMe" id$="gridBox{{val}}">
 {{val}}
-</section>
+</textarea>
 
 </template>
 </div>
@@ -35,8 +40,8 @@
 </div>
  </template>
  <script>
- FcMappedGrid=Polymer({
- 	is:"fc-mapped-grid",
+ FcMappedGridOo=Polymer({
+ 	is:"fc-mapped-grid-oo",
  	properties: {
     hoverDude:{
       notify: true
