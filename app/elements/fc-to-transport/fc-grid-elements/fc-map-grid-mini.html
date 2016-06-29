@@ -160,7 +160,7 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
     defaultFormat:{
         type:Object,
         value:function(){
-            return {"color": "#009", "background": "#fafafa", "header_backgroundColor":"aliceblue", "fontSize": "18px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15", "border": "1px #afafaf solid", "styleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center; font-size: 18px; resize:none;"};
+            return {"color": "#009", "background": "#fefefe", "header_backgroundColor":"aliceblue", "fontSize": "18px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15", "border": "1px #afafaf solid", "styleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center; font-size: 18px; resize:none;"};
           },
         notify: true 
     },
@@ -375,7 +375,8 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
         var returnRowMenu=rowMenu.concat(basemenu);
          this.setMenuEntries(returnRowMenu);
     }
-    else{ this.setMenuEntries([]);}
+    else if(key[1]&&key[2]){ this.setMenuEntries(basemenu);}
+    else{this.setMenuEntries([]);}
   },
 
   setMenuEntries(returnValue){
@@ -466,10 +467,8 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
      console.log(children,this.rowArchive[0][1],this.rowArchive[0][0], Polymer.dom(children[0]).children);
      var counter=children.length,
      i=0,
-    row=this.pop("rowArchive");
-    console.log(row);
-     for(i=0; i<counter; i++){
-
+      row=this.pop("rowArchive");
+      for(i=0; i<counter; i++){
         var column=Polymer.dom(children[i]).children;
          var beforeElement=column[row[0]];
          Polymer.dom(children[i]).insertBefore(row[1][i],beforeElement);
@@ -556,65 +555,44 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
     if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
     var value=this.comparisons.get(this.gridEvent.target.id);
     var keys=this.gridEvent.target.id.split("_");
-    var bindValue=value[0];
-    value[0]=bindValue;
-    value[1].value=bindValue;
-    var property=this.format.application + ": ";
-    var color=this.format.color+";";
     this.set("btnValue", e.target.btnValue);
     var text=this.btnValue,
     defaultformat = this.defaultFormat,
     formatcolor=this.format.color;  
     var property=(text.match("Highlight Selection"))?`background: ${formatcolor};`:(text.match("Remove Highlighting"))?`background: ${defaultformat.background};`:(text.match("Apply This Text Color"))?`color: ${formatcolor};`:(text.match("Apply Base Text Color"))?`color: ${defaultformat.color};`:(text.match("Thin Text Weight"))?`font-weight: 300;`: (text.match("Medium Text Weight"))?`font-weight: 600;`: (text.match("Strong Text Weight"))?`font-weight: bold;`: (text.match("Roboto Font Family"))?`font-family: Roboto;`:(text.match("Merriweather Font Family"))?`font-family: merriweather;`: (text.match("Courier Font Family"))?`font-family: courier;`:(text.match("Italics"))?`font-style: italic;`:(text.match("Underline"))?`text-decoration: underline;`:(text.match("Strike-Through"))?`text-decoration: line-through;`: `text-decoration: none; font-style: normal;`;
-    for(var i=1;i<50;i++){
-    if(value  && keys[2]==0)
+    for(var i=1;i<50;i++)
     {
-      var newKey="comparisons_"+keys[1]+"_"+i+"_";
-      var value=this.comparisons.get(newKey);
-      if(value && value[1])
-      { 
-        console.log(property);
-        var style=value[1].style.cssText;
-        var propertyName=property.split(":");
-        if(style.match(propertyName[0]))
-          {     
-            var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
-            style=style.replace(replacer, "");
-              style=style+property;
-          }
-        else
+          if(value  && keys[2]==0)
           {
-            style=style+ property;
-          }
-      value[1].style=style;
-      }
-    }
-    else if(value && value[1] && keys[1]==0 && keys[2]!=0)
-    {
-      var newKey="comparisons_"+i+"_"+keys[2]+"_";
-      var value=this.comparisons.get(newKey);
-      if(value && value[1])
-      { 
-        var style=value[1].style.cssText;
-        if(style.match(property))
+            var newKey="comparisons_"+keys[1]+"_"+i+"_";
+             var value=this.comparisons.get(newKey);
+           }
+          else if(value && value[1] && keys[1]==0 && keys[2]!=0)
           {
-            var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
-            style=style.replace(replacer, "");
-              style=style+property;
-          
+            var newKey="comparisons_"+i+"_"+keys[2]+"_";
+             var value=this.comparisons.get(newKey);
           }
-        else
-          {
-            style=style+property;
-          }
-        value[1].style=style;
-      }
-    }
-    else{i=50;}
-    }
- 
-    }
-
+          else{
+            i=52;
+            }
+          if(value && value[1])
+            { 
+              var style=value[1].style.cssText;
+              if(style.match(property))
+                {
+                  var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
+                  style=style.replace(replacer, "");
+                    style=style+property;
+                }
+              else
+                {
+                  style=style+property;
+                }
+              value[1].style=style;
+            }   
+            else{i=52;}
+      }//end for loop 
+    }//end initialization if for values
   },
   selection(){},
   getcolor(e){
@@ -670,10 +648,7 @@ selectCell(e){
        model.set("item.selected",true);
        item.selected=true;
        e.target.selected=true;
-       // e.target.style.margin="-12px -8px 0px 0px";
-       // e.target.style.boxShadow="5px 7px 17px 9px #aeaeae";
-       // e.target.style.background="yellow";
-       // e.target.style.border="5px aliceblue edged"; 
+    
   }
   else{
       model.set("item.selected",false);
