@@ -2,13 +2,16 @@
 <template>
 <style>
 :host{
-	position: static;
+	position: relative;
 	background: white;
 	box-shadow: 4px 11px 21px 7px #9fafaf;
-	max-width: 100%;
+	max-width: 110%;
+	right: 0px;
+	top:-1px;
+	bottom: -1px;
 	padding: 0px 0px;
 	margin: 6px 10px;
-	max-height: 92vh;
+	max-height: 98vh;
 	
 	@apply(--layout-vertical);
 	@appply(--layout-flex);
@@ -87,15 +90,14 @@ min-height: 38px;
 
 }
 </style>
-	<div id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px;" class="horizontal layout flex self-stretch calendarcontainer" >
+	<div id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px; margin: 38px;" class="horizontal layout flex self-shrink justified-around" >
 		<div class="vertical layout self-stretch nowrap" > 
 		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; min-height: 105px; margin-bottom: 48px;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
 						<span id="spanLeft" on-tap="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;" inner-html-one="[[_computeSpanOne(arrow)]]"></span>
 						<section class="layout horizontal headerMonthYear">
-						<!-- <iron-image width="100px" height="60px" sizing="cover" src="../../../images/FC_frontpage_logo.png" style="z-index:33;"></iron-image> -->
-						<input value="{{arrow::input}}">
-						</section>
+						Header Left
+												</section>
 						<span on-tap="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
 					</section> 
 					<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
@@ -115,13 +117,13 @@ min-height: 38px;
      	</div>
   	</template>
   	</div>      
-  <iron-splitter signal="{{resize}}" style$="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
-		<div class="layout vertical flex self-stretch" style="overflow: hidden;">
+  <iron-splitter signal="{{resize}}" style="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
+		<div class="layout vertical flex self-stretch" style="width: 100%; overflow: hidden;">
 		<div class="flex layout vertical self-stretch" style="min-height: 95.5vh; max-height: 95.5vh; overflow: scroll;"><!--visual swap in horizontal layout here-->
-			<div class="vertical layout flex self-stretch">
-				<paper-material class=" layout vertical around-justified calendarborder" style="min-height: 105px; max-height: 125px!important;">
+			<div class="vertical layout flex self-shrink">
+				<paper-material class=" layout vertical around-justified calendarborder" style$="{{_heightOfHeaderArea(calendarData, gridData)}}">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
-						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;">&#9668;</span>
+						<span btn="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;margin-left: 18%;">&#9668;</span>
 	
 						<section class="layout horizontal headerMonthYear">
 							[[computeDisplayHeaderOne(displayedIndex)]] [[computeDisplayHeaderTwo(displayed)]]
@@ -129,14 +131,14 @@ min-height: 38px;
 						<span 
 							btn="_forward" 
 							hidden="{{forwardHidden}}" 
-							style="font-size:32px; color:white;"> &#9658; 
+							style="font-size:32px; margin-right: 18%; color:white;"> &#9658; 
 						</span>
 					</section> 
 				</paper-material><!--header ends-->
 				<!--resizer-->
 				<div flex layout vertical style="height: 96vh;">
 				<div class="horizontal layout flex-1" style="height: 50vh; margin: 12px 5px;">
-					<fc-mapped-grid>
+					<fc-mapped-grid data-set="{{itemsArraysOne}}">
 						</fc-mapped-grid>
 				</div>
 				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 99%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
@@ -167,22 +169,7 @@ FcTriad=Polymer({
 			value: function(){return '&#9668';},
 			notify: true
 		},
-		day:{
-			type: Object, 
-			value: {},
-			notify: true
-		},
-		rightBottomMarginTop:{
-			type:Number,
-			notify: true,
-			value:function(){return -20;},
-			observer:"observeRightBottomMarginTop",
-		},
-		fcCourse:{
-			type: FcCourse,
-			value: function(){return new FcCourse({});},
-			notify: true
-		},
+
 		colorToApply:{
 			type:String,
 			notify: true,
@@ -198,15 +185,6 @@ FcTriad=Polymer({
 			notify: true,
 		},
 		
-		columnHeaders:{
-			type: Array,
-			value: function()
-			{
-					return ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
-			},
-			notify: true
-		},
-	
 		maxIndex:{
 			type: Number,
 			notify: true,
@@ -266,30 +244,21 @@ FcTriad=Polymer({
 			computed:"_computeItemsOneObject(itemsArraysOne,indexItemsArraysOne)",
 			notify: true
 		},
-		wordEvents:{
+	
+		calendarData:{
 			type:Array,
-			value: function(){
-			readingArr=[];
-			var words="I walked twenty miles a day, when I had just turned twenty years-old...Older dogs not only have a difficult time learning new tricks, but also tend to forget even their most favored of youthful pleasures. Older men would be more faithful. So, I was to marry a Berto twenty years my senior, unlike her Berto who--at twenty days he junior--the whole world believed would have wandered if Mama were not so incessantly desirable. It is twenty minutes past when Berto and I married: Mamma insisted on that precise time. She always said that she and 'her' Berto had such a lovely first night and forty-four years of time after together all beacse they had and she would never pay any mind to others schedules. Mamma called it one of her Benito's many, but oddly enough--to her at least--most reveerred and marvelled at traits. Mamma never seemed to understand that everyone actually did everything at her pace and on her schedule. She was the Mussolini of the whole world's personal train schedule. Everything precisely on time. Her time or someone shot the clock, and everyone who had ever so terribly lie about the time.";
-			// 	var wordArr=words.split(" "),
-			// 	counter=wordArr.length,
-			// 	start=wordArr[0];
-			// 	for(var i=1; i<counter;i++){
-			// 		var zeroed=i%9;
-			// 		start +=" " +wordArr[i];
-			// 		start=start.toString();
-			// 		if(zeroed===0||i+1.1>counter){ 
-			// 			readingArr.push(start);
-			// 			start="";
-			// 		}
-			// 			}
-			// return readingArr;},
-				readingArr=[words, words,words,words, words];
-				return readingArr;
+			value:[1,2],
+			notify: true
+
+		}, 
+		gridData:{
+			type:Array,
+			value:function(){
+						return [1,2,3,4];
 			},
 			notify: true,
+
 		},
-		
 		event:{
 			type: Array,
 			value: [],
@@ -346,16 +315,7 @@ FcTriad=Polymer({
 			type: Object,
 			notify: true,
 		},
-		firstTimeCounter:{
-			type:Number,
-			value:function(){return 0;},
-			notify: true
-		},
-		theMonths:{
-			type:Array,
-			value:function(){["January","February","March","April","May","June","July","August","September","October","November","December"];},
-			notify: true
-		},
+	
 		isResizing:{
 			type: Boolean,
 			notify: true,
@@ -367,24 +327,18 @@ FcTriad=Polymer({
   	this.$.spanLeft.innerHTML=arrow;
   },
 
- 
-  observeRightBottomMarginTop(newval,oldval){
-  	console.log(newval,oldval);
-
-
-  },
 
   computeDisplayHeaderOne(displayedIndex){
-
-
-
+  		return "This is the Data Grid";
   },
 
 
-
+_heightOfHeaderArea(calendarData, gridData){
+		var retVal=(calendarData.length>5)?"min-height: 105px; max-height: 135px;":"height:65px!important;";
+		return "min-height: 85px; background: #005c00;";
+},
   computeDisplayHeaderTwo(displayed){
-
-
+return "The Data Grid Rocks!";
 
   },
  computeDisplayedLeft(displayedIndexLeft)

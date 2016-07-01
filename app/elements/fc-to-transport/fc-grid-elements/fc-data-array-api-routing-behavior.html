@@ -1,0 +1,190 @@
+<script>
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcDataArrayApiRoutingBehavior = {
+
+properties:{
+	
+
+
+},
+  setColumns(){
+
+          var columnNames=["Years","January","February","March","Qtr1", "April","May","June","Qtr2", "MidYearTot","July","August","September","Qtr3", "Qtr3Tot","October","November","December","Qtr4", "2ndHalf", "Year Total","Δ","Δ"];
+        var tempArr=[];
+        var retArrays=columnNames.map(function(val, index,array){
+                    var count=array.length;
+                    var tempArr=[];
+                    var valueArray=[];
+                    for(var i=0;i<count;i++)
+                    {
+                       var retMini= val+array[i];
+                       tempArr.push({"col": index, "row": i, "selected":false, "background": "#fafafa", "color": "#009", "highlighted": false, "payload":"",value:" "});
+                       var value={"value":" "};
+                       valueArray.push(value);
+                    }
+                   retVal={column:index, name: columnNames[index], selected: false, data: tempArr, values:valueArray};
+                   //console.log()
+                    return retVal;  
+            }, []);
+        //console.log(retArrays);
+        return retArrays;
+        },
+   parser(colHeaders, type, array){
+	    var counter =colHeaders.length;
+	    var retVal=[];
+	    switch(true){
+	      case (type==="accounting"):
+	          switch(true){
+            case (colHeaders[0]==="Years"&& colHeaders[4].match("Qtr1")!==undefined):
+                for(var i=0;i<counter;i++){ 
+                var val=2007+i;
+                var cash=1000, ccrd=2300, tot=cash+ccrd;
+                if(i<8){val=val.toString()+ " Total";}
+                else{ 
+                      val=`${val}s: Cash:
+                                         Total CCards:
+                                        Period Total:`;
+                }
+                array[0].data[i].payload=val;
+              }
+              retVal=array;
+            break;
+            default:
+            break;
+          }
+      break;
+      default:
+      break;
+    }
+    return(retVal);
+   },
+   parser3(){
+   if(!this.comparisons)
+    {
+    var comparisons=new Map();
+    this.set("comparisons", comparisons);
+    }
+    var array=[];
+    var i=0, j=0;
+    var time=new Date().getTime();
+    for(i=0;i<16;i++)
+     {
+       var key="comparisons_"+i+"_"+0+"_";
+       var column=document.createElement("div");
+       column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
+       var columnId="column_"+i;
+       column.setAttribute("id",columnId);
+       var elem=document.createElement("TEXTAREA");
+          elem.setAttribute("style",  this.defaultHeader.styleText);
+          elem.setAttribute("id", key);
+          var hanger="--";
+        if(this.comparisons.get(key))
+        {   var jason=this.comparisons.get(key);
+            bindValue=jason[0];
+            elem.value=bindValue;
+          }
+        else
+        {
+          var bindValue=(this.csv[0][i])?this.csv[0][i]:hanger;
+          elem.value=bindValue;
+          this.comparisons.set(key,[elem.value, elem]);
+        }
+        var propName='value';
+        var self=this;
+
+        bindValue=this.comparisons.get(key);
+        bindValue=bindValue[0];
+       var value=this.comparisons.get(key)[0];
+       console.log(value);
+       var element=this.comparisons.get(key)[1];
+       
+       
+        array.push({"column": [i,column], "header": elem, "color": "#009","value": this.comparisons.get(key)[0], "id": key, "key": key, "data":[]});
+        console.log(array);
+         // if(j===0){
+          var theId="#"+columnId;
+      
+          Polymer.dom(this.$$("#hanger3")).appendChild(column);
+              Polymer.dom(this.$$(theId)).appendChild(elem);
+        // }
+        for(var j=1;j<25;j++){
+
+             var key="comparisons_"+i+"_"+j+"_";
+               var elem=document.createElement("TEXTAREA");
+          elem.setAttribute("style", this.defaultFormat.styleText);
+          elem.setAttribute("id", key);
+              var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
+              elem.contenteditable=true;
+              elem.value=bindValue
+   
+              var propName='value';
+          
+                this.comparisons.set(key,[elem.value,elem]);
+        if(this.csv[j][i]){
+          array[i].data.push({"row":j, "col":i, "payload":elem.value, "value":elem.value, "color": "#009","key":key, "cell": elem});
+              
+                Polymer.dom(this.$$(theId)).appendChild(elem);
+                     // console.log(array);
+          }
+          else{array[i].data.push({"row":j, "col":i, "payload":elem.value, "value":elem.value, "color": "#009","key":key, "cell": elem});
+           //comparisons.set(key,elem);
+        Polymer.dom(this.$$(theId)).appendChild(elem);
+        //              console.log(array)}
+        }
+       
+      }
+    }
+      //console.log(array);
+      this.set("columns4", array);
+           this.set("columns3", array);
+           //console.log(comparisons);
+           this.set("comparisons", comparisons);
+  },
+   parser2:function(){
+    var length=this.csv.length;
+    var id; 
+    var array=[];
+    var i=0;
+      for(i=0;i<16;i++){
+        array.push({"column": i, "selected": false, "background": "aliceblue", "highlighted":false, "color": "#009", "name": this.csv[0][i], "data":[]});
+        for(var j=1;j<25;j++){
+            if(this.csv[j][i]){array[i].data.push({"row":j, "col":i, "payload":this.csv[j][i], "value":this.csv[j][i], "selected": false, "color": "#009", "highlighted": false, "background":"#fafafa"});}
+            else{array[i].data.push({"row":j, "col":i, "payload":"--", "value":"--", "selected": false, "color": "#009", "background":"#fafafa"});}
+        }
+      }
+
+      //console.log(array);
+      this.set("columns2", array);
+   },
+   get csv(){var val=[
+   			[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%_v_Prev","Yr. Tot. Est 14"],
+            ["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
+            ["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ","40.59%","$192,775.00 "],
+            ["2010 Totals",,,,,,,,,,,,,"$25,997.08 ","61.83%","$311,965.00 "],
+            ["2011 Totals","$31,454.86 ","$17,363.07 ","$36,275.98 ","$18,214.92 ","$9,891.99 ","$52,962.60 ","$70,732.42 ","$70,482.71 ","$30,910.19 ","$45,635.75 ","$10,225.00 ","$29,020.00 ","$35,264.12 ","35.65%","$423,169.49 "],
+            ["2012 Totals","$51,545.00 ","$30,709.50 ","$9,300.00 ","$51,240.00 ","$53,762.50 ","$74,445.00 ","$101,800.00 ","$69,150.00 ","$45,700.00 ","$52,008.00 ","$38,220.00","$25,468.75 ","$50,279.06 ","42.58%","$603,348.75 "],
+            ["2013 Totals","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$68,242.00 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,076.58 ","37.39%","$828,919.00 "],
+            ["2014 Totals","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","35.91%","$1,126,578.34 "],
+            ["Avg. Revenue '11-'14","$58,135.47 ","$38,773.14 ","$47,412.75 ","$66,623.98 ","$52,683.62 ","$70,383.15 ","$106,955.47 ","$69,291.57 ","$42,669.73 ","$53,308.58 ","$33,148.33 ","$40,373.92 ","$60,232.19 ",,"$722,786.31 "],
+            ["% Change 14 v. Avg. '11-'14","35.20%","93.58%","78.59%","65.24%","74.73%","9.93%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","43.29%",,"#REF!"],
+            ["Best Month '11-'13 yr. ","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$70,482.71 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,263.31 ",,"$900,423.02 "],
+            ["% change 14 v. previous best '11-'13","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","24.95%",,"-7.94%"],
+            [ "Avg. Revenue '12-'14","$67,029.00 ","$45,909.83 ","$51,125.00 ","$82,760.33 ","$66,947.50 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$65,006.67 ",,"$780,080.04 "],
+            ["%Change14 v.14 Avg","17.26%","63.49%","65.62%","33.02%","37.50%","1.56%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","32.77%",,"6.26%"],
+            ["Gross delta '13 to '14","$7,658.00 ","$43,096.00 ","$25,275.00 ","$23,141.00 ","$37,030.00 ","$625.00" ,"($148,334.00)","($68,242.00)","($51,399.00)","($62,282.00)","($51,000.00)","($66,633.00)","$27,240.00 ",,"$326,880.00 "],
+            ["% &#916 13 to '14","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","44.76%",,"54.18%"],
+            ["Projections RE: 2014","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%?'14 v 13","Totals"],
+            ["Worst Remaining M. (WRM) '12+","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$74,445.00 ","$101,800.00 ","$68,242.00 ","$45,700.00 ","$52,008.00 ","$38,220.00 ","$25,468.75 ","$70,530.23 ","2.10%","$846,362.75 "],
+            ["Proj.WRMonths_incQ4 +17%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$87,100.65 ","$119,106.00 ","$79,843.14 ","$53,469.00 ","$60,849.36 ","$44,717.40 ","$29,798.44 ","$76,280.25 ","10.43%","$915,362.99 "],
+            ["Proj./w_last +15%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$88,262.50 ","$170,584.10 ","$78,478.30 ","$59,108.85 ","$71,624.30 ","$58,650.00 ","$76,627.95 ","$86,984.58 ","25.92%","$1,043,815.00 "],
+            ["Projected w last+25%","$88,677.50 ","$39,952.50 ","$74,250.00 ","$108,687.50 ","$68,781.25 ","$95,937.50 ","$185,417.50 ","$85,302.50 ","$64,248.75 ","$77,852.50 ","$63,750.00 ","$83,291.25 ","$86,345.73 ","25.00%","$1,036,148.75 "],
+            ["Proj. w/Avg. 12-13","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$75,565.61 ","9.39%","$906,787.38 "],
+            ["2014 Projections" ,"January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%? v. Proj.","2014 Proj."],
+            ["2014 Actual ","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","8.73%","$1,126,578.34"],
+            ["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ","8.73%","$90,429.59"]
+           ];
+         return val;
+		},
+
+	}
+</script>

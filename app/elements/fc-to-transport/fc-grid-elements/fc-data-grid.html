@@ -1,95 +1,55 @@
 <dom-module id="fc-mapped-grid">
  <template id="fc-mapped-grid-template">
  <style>
- :host{@apply(--layout-vertical);
-  @apply(--layout-flex);
-
-  margin: 12px 3px;
-  padding: 4px;
-  overflow:scroll;
-  position: static;
-  background: white;
-  opacity: 1;
-};
-textarea{
- margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
-  max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none;
-  @apply(--layout-self-shrink);
-}
-section{
-  background:white;
- }
-.userStyle{font-size:22px; font-weight: 900; font-style: italics; text-decoration: underline;}
-textarea::-moz-selection { /* Code for Firefox */
-
-}
-paper-item{
-border: 1px solid #afafaf;
-}
-
-#myContextMenu{
-  min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;
-
-}
-
-textarea::selection {
-    border: gold 2px solid;
-}
-  *{@apply(--layout-nowrap);}
+         :host{margin: 12px 3px;padding: 4px;overflow:scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); };
+        textarea{margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
+          max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
+        details{outline: 0px white solid;}
+        summary{outline: 0px white solid;}
+        section{background:white;}
+        paper-item{border: 1px solid #afafaf;}
+        #myContextMenu{min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
 </style>
- 
  <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
  </array-selector>
 <!-- <a> -->
-<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; background: aliceblue; max-width:88.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
+<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; background: aliceblue; max-width:85.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
 <!--side utility editing menu for the spreadsheet-like versions-->
 
 Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>Page 
-<div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 85%; width: auto;">
-<div id="hanger3"  on-dblclick="insertRow" contenteditable="true" on-contextmenu="mycontextMenu" data-gh="true" data-payload$="{{col.data}}" on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 1800px; width: auto; overflow: scroll;">
-
+<div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 97.5%; width: auto;">
+<div id="hanger3"   contenteditable="true" on-contextmenu="mycontextMenu"  on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 95%; width: auto; overflow: scroll;">
 </div>
-
-
 </div>
-<template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
-<!-- <a link={{}}> -->
-    <div id$="divCol_[[columnIndex]]" hidden="{{four}}"style$="{{_computeSelectedHoverStyle(trigger, col.selected)}} position:" class="vertical layout container nowrap self-stretch">
-          <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" 
-          style$="background:[[_computeHighlighted(col.selected, col.data, col.highlighted, trigger)]]; cursor:pointer; font-weight:700; color: #009; font-size: 18px; overflow: hidden; text-align: center; min-width:calc(100vw/28); border-radius: 2px; max-width: 210px; max-height: 58px; min-height: 38px;">
-            {{col.name}} <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
+  <template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
+        <div id$="divCol_[[columnIndex]]" hidden="{{four}}" class="vertical layout container nowrap self-stretch">
+              <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style="cursor:pointer; font-weight:700; color: #009; font-size: 18px; overflow: hidden; text-align: background: aliceblue; center; min-width:calc(100vw/28); border-radius: 2px; max-width: 210px; max-height: 58px; min-height: 38px;">
+            {{col.name}} 
+            <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
           </section>    
           <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
                <!--          <a link={{}}> -->
-    <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="{{_computeSelected(item.selected, item)}} cellClass" max-char="450">
-                              </textarea>
-
-                        
+                <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="cellClass" max-char="450"></textarea>      
             <!--         </a> -->
-              </template>
-               </div>
-               </template>
-       <!--    <fc-fit-wrapper>
-</fc-fit-wrapper>
-    -->
-<!--     </a> -->
-
-
+          </template>
+        </div>
+  </template>
 </div>
-<paper-listbox id="myContextMenu" hidden>
-      <paper-item>
+<paper-listbox id="myContextMenu"  hidden>
+  <paper-item class="around-justified">
         <paper-swatch-picker>
-        </paper-swatch-picker> Color Selector
-    </paper-item>
-    <template is="dom-repeat" items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+        </paper-swatch-picker><span>  &nbsp; Color Selector &nbsp;&nbsp; &nbsp;</span>
+        <input type="color" value="{{color::input}}">
+  </paper-item>
+    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
         <paper-item value="{{category.title}}">
             <details>
                 <summary>{{category.title}}</summary>
-                <paper-listbox style="min-width:240px; ">
+                <paper-listbox style="min-width:320px; max-width: 321px; ">
                     <template is="dom-repeat" items="{{category.buttons}}" as="item">
-                          <paper-item onclick="{{item.myFunction}}" btn-value="{{item.text.0}}" style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.text.0, format.color, defaultFormat)}}">                {{item.text.0}}
-                              <span  style="font-size: 26px; font-weight: 300; color: #009;">{{item.text.2}}</span>
-                              <span style="font-size: 36px;">{{item.text.1}}</span> 
+                          <paper-item onclick="{{item.myFunction}}" btn-value="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.text.0, color)}}" btn-prop="{{item.dataProperty}}">                {{item.text.0}}
+                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.datafunction}}"style$="font-size: 24px; font-weight: 300; color: #009;{{_computeStyle(item.dataProperty,item.text.0, color)}}">{{item.text.2}}</span>
+                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.dataFunction}}" btn-args="{{item.dataArgs}}" style$="{{_computeStyle(item.dataProperty, item.text.0,color)}}; font-size: 28px;">{{item.text.1}}</span> 
                           </paper-item>
                     </template> 
                 </paper-listbox>
@@ -97,27 +57,18 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
         </paper-item>
     </template>
 </paper-listbox>
-<!-- </a> -->
  </template>
  <script>
  FcMappedGrid=Polymer({
  	is:"fc-mapped-grid",
   behaviors:[Polymer.Templatizer, FCBehaviors.FcDataGridBehavior],
   listeners: {"color-picker-selected":"getcolor"},
- 	properties: {
-  
+ 	properties: { 
     format:{
       type: Object,
       value:function(){return {};},
       notify: true,
     },
-   
-    contextMenuCategories:{
-        type:Array,
-        value:function(){return [];},
-        notify: true
-    },
-  
     gridEvent:{
         type: Object,
         value: function(){return {};},
@@ -129,6 +80,11 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
       value:function(){return "";},
       notify: true
     },
+    color:{
+        type: String,
+      value:function(){return "";},
+      notify: true        
+    },
     arraysIndex:{
         type: Number,
         value: function(){return 0;},
@@ -138,26 +94,14 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
      computed:"computefour(arrayIndex)",
       notify: true,
     },
-    columnArchive:{
-      type: Array,
-      value: function(){return [];},
-      notify: true
-    },
-    rowArchive:{
-      type:Array,
-      value:function(){return [];},
-      notify: true
-    },
-	 	drags:{type: Boolean, value: function(){return true;}, notify: true},
-	 	
- 		},
-
+   
+   
+ 	},
 ready(){
     var columns=this.setColumns();
      var headerArray=columns.map(function(val,index, array){
              return val.name;
         });
-     console.log(headerArray, columns);
     var columnd=this.parser(headerArray,"accounting", columns);
     this.set("columns", columnd);
     this.parser2();
@@ -167,13 +111,10 @@ ready(){
     this.push("dataArrays",this.columns3);
         this.push("dataArrays",this.columns4);
     this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
-    this.set("format.color","gold");
-    this.set("format.application", "background");
-
-    },
+  },
 
   mycontextMenu(e){
-    console.log(e);
+    console.log(e, self);
     if(e.target.btnValue){
     var btnValue=e.target.btnValue;
       this.set("btnValue", btnValue);
@@ -185,107 +126,21 @@ ready(){
     this.$.myContextMenu.style.top=(e.clientY)+"px";
     this.$.myContextMenu.style.zIndex=25000;
     console.log(e.target);
-    var cell=e.target;
-    var cellId=cell.getAttribute("id");
-    var key=cellId.split("_");
-    
-     var allSymbols= `➔ ❶ ✂ ✎ ✒ ✜ ❚ ❶ ➀ ➞ ☚ ☛ ☰ ☱ ☷ ☑ ☐ ☎ ☏ ► ▼ ▲ ◄ ⇒ ▐ █ ▄ ▀`;
-        var addOneColumnRight=["+1 Column Right: ","", " ✜ ▐ ☛"],
-         leftAddOneColumn=["+1 Column Left: ",""," ✜ ▐ ☚"],
-         deleteThisColumn=["Delete Column: ","", " ✂ ▐"],
-         restoreThisColumn=["Restore Column: ", "☤", "☤▐ ☤"],
-         addOneRowBelow=["+1 Row Below:", ," ☰ ▼ "],
-         addOneRowAbove=["+1 Row Above:", ," ☰ ▲ "],
-          deleteThisRow=["Delete Row: "," ", " ✂ ☰"],
-          restoreThisRow=["Restore Row: ","☤", " ☤ ☰ ☤ "],
-         highlightColumn=["Highlight Selection: ",""," ✒ ❚ "],
-         returnToDefaultHighlighting=["Remove Highlighting: ", ," ✂ ✒"],
-         applyThisTextColor=["Apply This Text Color:"," ✎" , "▀"],
-         returnToDefaultTextColor=["Apply Base Text Color:"," ✎ " , "▀"],
-         applyThinTextWeight=["Thin Text Weight:", ,"𝒯𝒽𝒾𝓃"],
-         applyMediumTextWeight=["Medium Text Weight:", ,"Medium"],
-         applyStrongTextWeight=["Strong Text Weight", "STRONG"],
-         applyRobotoFontFamily=["Roboto Font Family", ," ROBOTO"],
-         applyMerriweatherFontFamily=["Merriweather Font Family", ," Merriweather"],
-         applyCourierFixedWidthFontFamily=["Courier Font Family: ", ," Courier"],
-         applyItalics=["Italics:", ,"Italics"], 
-         applyUnderline=["Underline:", ,"Underline"], 
-         applyStrikeThrough=["Strike-Through:", ,"Strike-Through"];
-          var columnMenu=[
-          {   "title": "Add Columns", 
-              "buttons": [
-              {"text":addOneColumnRight,"myFunction": this.addColumn.bind(this)}, 
-              {"text": leftAddOneColumn, "myFunction": this.addColumn.bind(this)}
-            ]
-          }, 
-          {
-              "title":"Delete Column", 
-              "buttons":[
-                  {"text":deleteThisColumn, "myFunction": this.deleteThisColumn.bind(this)}, 
-                  {"text":restoreThisColumn, "myFunction":this.restoreThisColumn.bind(this)}
-                  ]
-          }
-        ];
-        var rowMenu=[
-          {   "title": "Insert Row", 
-              "buttons": [
-              {"text":addOneRowAbove,"myFunction": this.insertRow.bind(this)}, 
-              {"text": addOneRowBelow, "myFunction": this.insertRow.bind(this)}
-            ]
-          }, 
-          {   "title": "Delete Row", 
-              "buttons": [
-              {"text":deleteThisRow,"myFunction": this.deleteRow.bind(this)}, 
-              {"text": restoreThisRow, "myFunction": this.restoreRow.bind(this)}
-            ]
-          }
-          ]; 
-        var basemenu=[{
-              "title":"Highlight Color", 
-              "buttons":[{"text": highlightColumn,"myFunction":this.stylePropertySelection.bind(this)}, {"text":returnToDefaultHighlighting, "myFunction":this.stylePropertySelection.bind(this)}]
-          },
-          {   "title": "Text Color",
-              "buttons": [
-              {"text": applyThisTextColor, "myFunction":this.stylePropertySelection.bind(this)},
-              {"text":returnToDefaultTextColor, "myFunction":this.stylePropertySelection.bind(this)}
-              ] 
-          },
-          {    "title": "Text Weight",
-                "buttons": [
-                    {"text":applyThinTextWeight,"myFunction":this.stylePropertySelection.bind(this)},
-                    {"text":applyMediumTextWeight,"myFunction":this.stylePropertySelection.bind(this)},
-                    {"text": applyStrongTextWeight, "myFunction":this.stylePropertySelection.bind(this)
-              }
-            ] 
-          },
-          {  "title": "Font Family",
-             "buttons": [
-              {"text":applyRobotoFontFamily,"myFunction":this.stylePropertySelection.bind(this)},
-              {"text":applyMerriweatherFontFamily,"myFunction":this.stylePropertySelection.bind(this)},
-              {"text": applyCourierFixedWidthFontFamily, "myFunction":this.stylePropertySelection.bind(this)
-              }
-            ],
-          },
-          {   "title":"Font Styles",
-              "buttons": [
-                  {"text":applyItalics,"myFunction":this.stylePropertySelection.bind(this)},
-                  {"text": applyUnderline,"myFunction":this.stylePropertySelection.bind(this)},
-                  {"text": applyStrikeThrough, "myFunction":this.stylePropertySelection.bind(this)},
-                  {"text": ["Normal: ", , " Normal"], "myFunction":this.stylePropertySelection.bind(this)
-                } 
-            ], 
-          }
-          ];
-    if(key[2]==0){
-      var returnColumnHeader =columnMenu.concat(basemenu);
+    this.set("gridEvent",e);
+    var key=e.target.getAttribute("id").split("_");//
+    if(key[2]==0 && key[1]!=0){
+      var returnColumnHeader =this.columnMenu.concat(this.basemenu);
     this.setMenuEntries(returnColumnHeader);
     }
     else if(key[1]==0&&key[2]!=0){
-        var returnRowMenu=rowMenu.concat(basemenu);
+        var returnRowMenu=this.rowMenu.concat(this.basemenu);
          this.setMenuEntries(returnRowMenu);
     }
-    else if(key[1]&&key[2]){ this.setMenuEntries(basemenu);}
+    else if(key[1]&&key[2]){ this.setMenuEntries(this.basemenu);}
     else{this.setMenuEntries([]);}
+  },
+  getcolor(e){
+    this.set("color",e.detail.color);
   },
 
   setMenuEntries(returnValue){
@@ -297,17 +152,19 @@ ready(){
  
   stylePropertySelection(e){
     if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
-    var value=this.comparisons.get(this.gridEvent.target.id);
-    var keys=this.gridEvent.target.id.split("_");
-    this.set("btnValue", e.target.btnValue);
-    var text=this.btnValue,
-    defaultformat = this.defaultFormat,
-    formatcolor=this.format.color;  
-    var property=(text.match("Highlight Selection"))?`background: ${formatcolor};`:(text.match("Remove Highlighting"))?`background: ${defaultformat.background};`:(text.match("Apply This Text Color"))?`color: ${formatcolor};`:(text.match("Apply Base Text Color"))?`color: ${defaultformat.color};`:(text.match("Thin Text Weight"))?`font-weight: 300;`: (text.match("Medium Text Weight"))?`font-weight: 600;`: (text.match("Strong Text Weight"))?`font-weight: bold;`: (text.match("Roboto Font Family"))?`font-family: Roboto;`:(text.match("Merriweather Font Family"))?`font-family: merriweather;`: (text.match("Courier Font Family"))?`font-family: courier;`:(text.match("Italics"))?`font-style: italic;`:(text.match("Underline"))?`text-decoration: underline;`:(text.match("Strike-Through"))?`text-decoration: line-through;`: `text-decoration: none; font-style: normal;`;
+      if(e.target.btnProp){
+        console.log("HERE HERE HERE", e.target.btnProp);
+        this.set("changeProperty", e.target.btnProp);
+        }
+        var value=this.comparisons.get(this.gridEvent.target.id);
+        var keys=this.gridEvent.target.id.split("_");
+        this.set("btnValue", e.target.btnValue);
+        var text=this.btnValue,
+        property=(text.match("Highlight Selection"))?`background: ${this.color};`:(text.match("Apply This Text Color"))?`color: ${this.color}`: e.target.btnProp;
      var propertyName=property.split(":");
     for(var i=1;i<50;i++)
     {
-          if(value  && keys[2]==0)
+          if(value  && keys[2]==0 && keys[1]!=0)
           {
             var newKey="comparisons_"+keys[1]+"_"+i+"_";
              var value=this.comparisons.get(newKey);
@@ -316,6 +173,27 @@ ready(){
           {
             var newKey="comparisons_"+i+"_"+keys[2]+"_";
              var value=this.comparisons.get(newKey);
+          }
+          else if(value && value[1] && keys[1]==0 && keys[2]==0){
+            for(let n of this.comparisons){
+             
+                    var style=n[1][1].style.cssText;
+                  if(style.match(property))
+                {
+                  var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
+                  style=style.replace(replacer, "");
+                  style=style+property;
+                  }
+                 else
+                    {
+                      style=style+property;
+                    }
+                  n[1][1].style=style;
+                  var key=n[1][1].getAttribute("id");//here gets all 
+                  this.comparisons.set(key,[n[1][1].value, n[1][1]]);
+                
+            }
+            break;
           }
           else{
             i=52;
@@ -339,363 +217,27 @@ ready(){
       }//end for loop 
     }//end initialization if for values
   },
-  getcolor(e){
-    console.log(e.detail.color, e.target.toColor);
-    this.set("format.color", e.detail.color);
-  },
-  _computeStyle(text, formatcolor, defaultformat){
-      var retVal=(text.match("Highlight Selection"))?`background: ${formatcolor};`:(text.match("Remove Highlighting"))?`background: ${defaultformat.background};`:(text.match("Apply This Text Color"))?`color: ${formatcolor};`:(text.match("Apply Base Text Color"))?`color: ${defaultformat.color};`:(text.match("Thin Text Weight"))?`font-weight: 300;`: (text.match("Medium Text Weight"))?`font-weight: 600;`: (text.match("Strong Text Weight"))?`font-weight: 900;`: (text.match("Roboto Font Family"))?`font-family: Roboto;`:(text.match("Merriweather Font Family"))?`font-family: merriweather;`: (text.match("Courier Font Family"))?`font-family: courier;`:(text.match("Italics"))?`font-style: italic;`:(text.match("Underline"))?`text-decoration: underline;`:(text.match("Strike-Through"))?`text-decoration: line-through;`: `text-decoration: normal;`;
-         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
-         return retVal;
+  
 
+  _computeStyle(property, text, color){
+    if(text||text.match(" ")){
+ var retVal=(text.match("Highlight Selection"))||text.match("Alternate Row Highlighting")?`background: ${color};`:(text.match("Apply This Text Color"))?`color: ${color}`: property;
+ return retVal;
+}
+else return "background: gold;";
+         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
   },
   
 computefour(arrayIndex){
     return(arrayIndex===3);
 },
-  selectTog(e){
-      console.log(e);
-  },
-
   arraySwap(e){
         var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
         this.set("arrayIndex", arrayNum);
         this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
   },
  
-
-    observeMenuProperty(newVal, oldVal){},
-
   });
     </script>
    </dom-module>
-<!--
 
-.selected{
-  border: dashed 2px #f2f735;
- -webkit-transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;
-  transition: border 0.9 ease, margin-top 0.9s ease, margin-right 0.9s ease;},
-@-webkit-keyframes blink {
-   from {
-    border: dashed 1px
-#f2f735;
-
-  }
-
-  to {
-    border: dashed 3px 
-#f2f735;
-  margin-top:-1px;
-    
-  }
-}
-  
-@keyframes blink {
-  from {
-    border: dashed 1px 
-#f2f735;
-margin-top:0px;
-  }
-
-  to {
-       border: dashed 3px 
-#f2f735;
-  margin-top:-1px;
-  margin-bottom:-1px;
-    
-  }
-}
-selectCell(e){
-  if(this.userSelection===true&&this.four===false){
-   var parentTemplate= e.model.dataHost;
-   var model=parentTemplate.modelForElement(e.target);
-   var item=parentTemplate.itemForElement(e.target);
-   var key=parentTemplate.keyForElement(e.target);
-
-   if(item.selected===false){
-       model.set("item.selected",true);
-       item.selected=true;
-       e.target.selected=true;
-    
-  }
-  else{
-      model.set("item.selected",false);
-      item.selected=false; 
-      model.set("item.selected",false);
-      item.selected=false;
-      e.target.selected=false;
-  }
-
-     // console.log(e, model, item, key);
-  if(item.selected===true){
-      this.push("selectedArray", e.target);
-      Polymer.dom(e.target).classList.add("selected");
-    } 
-  else{var index=this.selectedArray.indexOf(e.target);
-          this.splice("selectedArray", index, 1);
-  }
-if(this.format.application&&this.selectedArray.length>0)
-      {   this.selectedArray.forEach(function(val,i, arr){
-          var attr="style." + this.format.application;
-          Polymer.dom(val).setAttribute(attr,this.format.color);
-          val.style[this.format.application]=this.format.color;
-          val.setAttribute(attr, this.format.color);}, this);
-     //archive this to undo formatting... a MUST
-      }
-    }
-    if(this.four&&e.target.nodeName==="LI" && e.target.select){e.target.select=!e.target.select;}else{e.target.select=true;}
-  },
-  _computeSelected:function(sel, item){
-      if(sel===true){return "selected";}else {return "";}
-
-  },
-
-  userSelectionArrayTrigger(newVal, oldVal){
-    if(newVal!=null&&newVal===false&&this.selectedArray){
-      this.selectedArray.forEach(function(val){ console.log(val);
-        val.selected=false;
-      });
-    }
-  },
-
-  changePayload: function(e)
-  {
-    console.log(e, "I am in changePayload");
-  },
-  _computeCol: function(col){return col;},
-
-  _computeSelectedHoverStyle(trigger, selected){
-    var retVal=(selected===true)?"margin-top:-18px; margin-right: -12px; box-shadow: 7px 13px 28px 12px #afafaf; z-index:222222; border: gold 6px solid":"";
-  //  console.log(selected);
-    return retVal;
-
-  },
-
-  highlightCol: function(e)
-  {   
-      var item= this.$.mappedGridRepeater.itemForElement(e.target);
-        var model= this.$.mappedGridRepeater.modelForElement(e.target);
-        var setVal=(item.selected===false)?true: false;//cascade this down
-        console.log(e,model,item);
-      var counter=item.data.length;
-      var resetVal=item, i=0;
-        resetVal.selected=setVal;
-        model.set("item.selected", setVal);
-        for(i=0;i<counter;i++){
-          model.set(["item.data",i,"highlighted"], setVal);
-          model.set(["item.data",i,"selected"], setVal);
-          item.data[i].highlighted=setVal;
-         var nodes= Polymer.dom(this.root).querySelectorAll("INPUT");
-          item.data[i].selected=setVal;
-          }
-        //console.log(item);
-        this.set("trigger",!this.trigger);
-        this.selectCell(e);
-  },
-
-  _computeHighlighted: function(one, two, three){
-    if(typeof three===Object){var result = (one === true && two===true)?"yellow":"#afafaf";}
-    result=(three===true)?"cyan; border: solid 4px #aecdfe":"aliceblue; border: solid 2px #009";
-    return result;
-    },
-  computeColSelected: function(one,two){return one;},
-  _computeHighlighted2(hl, color,background,tr){var result = (hl === true)?"yellow":"white";return result;},
-setterUsed(e){
-  console.log(e, e.target.value);
- this.set("selected.value", e.target.value);
-},
-
-rowOfSettersUsed(e){this.selectedArray.forEach(function(elem){
-   this.set(elem.value,e.target.value);
-});},
-
-_computeNewValue(){
-    if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
-    var value=this.comparisons.get(this.cellKey);
-    var keys=this.cellKey.split("_");
-   console.log( keys[1]);
-
-    var bindValue=this.cellValue;
-    value[0]=bindValue;
-    value[1].value=bindValue;
-    console.log(value[1].style);
-    for(var i=0;i<30;i++){
-
-    var newKey="comparisons_"+keys[1]+"_"+i+"_";
-    var value=this.comparisons.get(newKey);
-    if(value && value[1]){
-    var style=value[1].style.cssText;
-     if(style.match("background: gold;")&&style.match("background: gold;").length>0)
-     {
-      style=style.replace("background: gold;", "");
-      console.log(style);
-    }
-      else{
-        style=style+"background: gold;";
-      }
-    value[1].style=style;
-    }
-    else{i=30;}
-    }
-      }
-  },
-var counter=rowArray.length,
-    // p=0;
-    // for(p=0;p<counter;p++){
-    //  var theId="#" + columnArrayIds[p];
-    //  var parent=this.$$(theId);
-    //   Polymer.dom(parent).removeChild(rowArray[p]);
-    //   }
- monkey: function(e)
-  {
-    var col = "columns[2][2]";
-    this.set(["columns", 2, "data",2, "payload"], "monkey"); //{payload:"Monkey"});
-  //  console.log(this.columns);
-  },
-
-//     Object.defineProperty(elem,propName,{
-          //                 enumerable: true,
-          //             configurable: true,
-          //             get value() {
-          //               elem.innerHTML=bindValue;
-          //               return bindValue;
-          //             },
-          // set [propName](bindValue){
-          //       [propName] = bindValue;
-          //       if(propName==="value"){
-          //         elem.innerHTML=bindValue;
-          //       }
-          //           archive.push({
-          //            "element":cell[key],
-          //            "propertyName": propName,
-          //            "value": bindValue,
-          //            "timestamp": time
-          //           });
-          //         },
-          //       });
-          //     var keys =Object.keys(elem);
-          //     var p=Object.getOwnPropertyNames(elem);
-              //console.log(p,keys);
-              //if(elem.contenteditable){//console.log(elem.contenteditable);}if(elem.value){//console.log(elem.value);}
-// Object.defineProperty(element,"value",{
-       //    enumerable: true,
-       //    configurable: true,
-       //    writable: true,
-       //    get value() {
-       //      console.log("am in getter");
-       //      return self.comparisons.get(key)[0];
-       //    }
-          // set value(bindValue){
-          //   console.log("am setting value");
-          //        bindValue=this.comparisons.get(key);
-          //        console.log(bindValue);
-          //        bindValue=bindValue[0];
-          //        value=this.comparisons.get(key)[0];
-          //           archive.push({
-          //            "element":elem,
-          //            "propertyName": propName,
-          //            "value": bindValue,
-          //            "timestamp": time
-          //           });
-          //           console.log(bindValue, archive); 
-          //     }
-           // });
-    Object.defineProperty(elem,propName,{
-          enumerable: true,
-          configurable: true,
-          get value() {
-            return background_bindValue;
-          },
-          set [propName](bindValue){;
-                if(propName==="value"){elem.innerHTML=bindValue;}
-                else if(propName==="background"){elem.style.background=background_bindValue;}
-                else{[propName] = [propName]+"_bindValue"}
-                    archive.push({
-                     "element":cell[key],
-                     "propertyName": propName,
-                     "value": bindValue,
-                     "timestamp": time
-                    });
-                    console.log(archive);
-                     
-              }
-           });
-
-
-
-           startDrag: function(e)
-  {   
-    if(this.userDrags===true){
-    var parentOneTemplate=e.model.dataHost;
-    var celloneModel = parentOneTemplate.modelForElement(e.target);
-      var cell=parentOneTemplate.itemForElement(e.target); 
-      var item = this.$.mappedGridRepeater.itemForElement(e.target);
-      this.set("startContainer",item);
-      this.set("startCell",cell);
-      this.set("startCellModel",celloneModel);
-    }
-  },
-
-  dragOver: function(e){e.preventDefault();
-
-    this.selectCell(e);},
-
-  handleDrop: function(e){   
-    if(this.userDrags===true){
-        var parentTemplate=e.model.dataHost;
-        var endContainer = this.$.mappedGridRepeater.itemForElement(e.target);
-        var endCell= parentTemplate.itemForElement(e.target);
-        var cellModel = parentTemplate.modelForElement(e.target);  
-        if(this.startContainer.selected===true){
-            var startCol=this.startContainer.data[0].col;
-            var endCol=endContainer.data[1].col;
-            var startContainerClone=Object.assign({},this.startContainer);
-            var endContainerClone=Object.assign({},endContainer);
-            endContainerClone.column=startCol;
-            startContainerClone.column=endCol;
-            for(var i=0; i<endContainer.data.length;i++){
-                startContainerClone.data[i].col=endCol;
-                endContainerClone.data[i].col=startCol;
-            }
-            this.async(function(){this.splice("columns",endCol,1,startContainerClone);},50);
-            this.async(function(){this.splice("columns",startCol,1, endContainerClone);},26);
-        }
-        else{
-            var destpayload = endCell.payload;
-            var payload=this.startCell.payload;
-            this.async(function(){cellModel.set("item.payload",payload)},25);
-            this.startCellModel.set("item.payload",destpayload);
-            console.log(this.startCellModel.item.payload);
-        }
-      }
-      else if(this.userSelection===true){
-
-
-
-      }
-    },
-[[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg",%"_v_Prev","Yr. Tot. Est 14"],
-["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
-["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ",40.59%,"$192,775.00 "],
-["2010 Totals",,,,,,,,,,,,,"$25,997.08 ",61.83%,"$311,965.00 "],
-["2011 Totals","$31,454.86 ","$17,363.07 ","$36,275.98 ","$18,214.92 ","$9,891.99 ","$52,962.60 ","$70,732.42 ","$70,482.71 ","$30,910.19 ","$45,635.75 ","$10,225.00 ","$29,020.00 ","$35,264.12 ",35.65%,"$423,169.49 "],
-["2012 Totals","$51,545.00 ","$30,709.50 ","$9,300.00 ","$51,240.00 ","$53,762.50 ","$74,445.00 ","$101,800.00 ","$69,150.00 ","$45,700.00 ","$52,008.00 ","$38,220.00","$25,468.75 ","$50,279.06 ",42.58%,"$603,348.75 "],
-["2013 Totals","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$68,242.00 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,076.58 ",37.39%,"$828,919.00 "],
-["2014 Totals","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","35.91%","$1,126,578.34 ",]
-["Avg. Revenue '11-'14","$58,135.47 ","$38,773.14 ","$47,412.75 ","$66,623.98 ","$52,683.62 ","$70,383.15 ","$106,955.47 ","$69,291.57 ","$42,669.73 ","$53,308.58 ","$33,148.33 ","$40,373.92 ","$60,232.19 ",,"$722,786.31 "],
-[%" Change 14 v. Avg. '11-'14",35.20%,93.58%,78.59%,65.24%,74.73%,9.93%,-100.00%,-100.00%,-100.00%,-100.00%,-100.00%,-100.00%,43.29%,,#REF!],
-["Best Month '11-'13 yr. ","$70,942.00 ","$31,962.00 ","$59,400.00 ","$86,950.00 ","$55,025.00 ","$76,750.00 ","$148,334.00 ","$70,482.71 ","$51,399.00 ","$62,282.00 ","$51,000.00 ","$66,633.00 ","$69,263.31 ",,"$900,423.02 "],
-[%" change 14 v. previous best '11-'13","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","24.95%",,"-7.94%"],,,,,,,,
-[ ""Avg. Revenue '12-'14","$67,029.00 ","$45,909.83 ","$51,125.00 ","$82,760.33 ","$66,947.50 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$65,006.67 ",,"$780,080.04 "],
-["%Change'14 v.'12-'14 Avg","17.26%","63.49%","65.62%","33.02%","37.50%","1.56%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","32.77%",,"6.26%"],
-["Gross delta '13 to '14","$7,658.00 ","$43,096.00 ","$25,275.00 ","$23,141.00 ","$37,030.00 ",$625.00 ,"($148,334.00)","($68,242.00)","($51,399.00)","($62,282.00)","($51,000.00)","($66,633.00)","$27,240.00 ",,"$326,880.00 "],
-["% ?  '13 to '14","10.79%","134.84%","42.55%","26.61%","67.30%","0.81%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","-100.00%","44.76%",,"54.18%"],
-["Projections RE: 2014","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%?'14 v 13","Totals"],
-["Worst Remaining M. (WRM) '12+","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$74,445.00 ","$101,800.00 ","$68,242.00 ","$45,700.00 ","$52,008.00 ","$38,220.00 ","$25,468.75 ","$70,530.23 ","2.10%","$846,362.75 "],
-["Proj.WRMonths_incQ4 +17%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$87,100.65 ","$119,106.00 ","$79,843.14 ","$53,469.00 ","$60,849.36 ","$44,717.40 ","$29,798.44 ","$76,280.25 ","10.43%","$915,362.99 "],
-["Proj./w_last +15%","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$88,262.50 ","$170,584.10 ","$78,478.30 ","$59,108.85 ","$71,624.30 ","$58,650.00 ","$76,627.95 ","$86,984.58 ",25.92%,"$1,043,815.00 "],
-["Projected w last+25%","$88,677.50 ","$39,952.50 ","$74,250.00 ","$108,687.50 ","$68,781.25 ","$95,937.50 ","$185,417.50 ","$85,302.50 ","$64,248.75 ","$77,852.50 ","$63,750.00 ","$83,291.25 ","$86,345.73 ",25.00%,"$1,036,148.75 "],
-["Proj. w/Avg. 12-13","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$75,565.61 ",9.39%,"$906,787.38 "],
-["2014 Projections" ,"January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%? v. Proj.","2014 Proj."],
-["2014 Actual ","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ",8.73%,"$1,126,578.34"],,,,,,,,
-["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ",8.73%,"$90,429.59"]];
