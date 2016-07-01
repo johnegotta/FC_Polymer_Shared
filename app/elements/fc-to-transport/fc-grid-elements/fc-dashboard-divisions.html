@@ -3,11 +3,12 @@
 <style>
   :host{
     @apply(--vertical-layout);
-    position: absolute;
+    position: fixed;
     top: 0px;
     bottom: 0px;
     left:0px;
-    right: 0px;
+    right: -10px;
+    background: #aefded;
     overflow: hidden;
   }
   .blue-btn-class{
@@ -75,7 +76,7 @@
     #box5, #box11{
           min-height:198vh;
       }
-       #earth {
+#earth {
   width: 120px;
   height: 120px;
   background: url(http://www.noirextreme.com/digital/Earth-Color4096.jpg);
@@ -179,9 +180,11 @@
   <div class="contentContainer horizontal layout" id="contentContainer" style$="width:100%; position: relative; margin-right:[[dashboardRightDrawerCurrentWidth]]px; margin-left:{{dashboardLeftDrawerCurrentWidth}}px;"> 
   <!--LEFT COLUMN CONTAINER ON DASHBOARD LAYOUT-->
     <div id="box11">
+
       <!--Left-TOP BOX FOR ZONE in LEFT COLUMN-->
       <div class="flex dropzone" style$="height:{{heightLeftTop}}px; width:{{widthLeftTop}}px; overflow-y:scroll;"  parent-cws="in">
         <fc-relative-fit-wrapper id="wrapperLt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
+         <fc-triad></fc-triad>
                
         </fc-relative-fit-wrapper>
       </div>
@@ -218,7 +221,7 @@
 <section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 1px; width:12px!important; opacity:1; border-left: 2px solid #aecefe; z-index:4; background: #009;">
 </section>
 
-                   <fc-right-tabbed-drawer config-object="" style="max-width:98.5vw;"class="vertical layout flex self-stretch">
+                   <fc-right-tabbed-drawer id="drawer" config-object="" style="max-width:99.4vw;position: absolute; right: -2px; top:0px; bottom: 0px;"class="vertical layout flex self-stretch">
                  
                    </fc-right-tabbed-drawer>
 </div>
@@ -852,9 +855,9 @@ request.onupgradeneeded = (function (event) {
       var dx=(lt===0&&rt===0)?0:(lt===0||rt===0)?12:24; 
       var delta=(rt+lt+dx); 
       //console.log(delta);
-      //var centralWidth=this.screenWidth[0]-delta;
+      var centralWidth=this.screenWidth[0]-delta;
              //console.log(dx,this.screenWidth);
-      // this.set("centralWidth", centralWidth);
+      this.set("centralWidth", centralWidth);
       return delta;
     },
     set movingApiElement(argument){},
@@ -866,6 +869,7 @@ request.onupgradeneeded = (function (event) {
           return contentArrayToResizeOrMove;
         }
       },
+      get drawer(){return this.$.drawer;},
     resetLayout: function() {
           this.debounce('_resetLayout', function() {
             if (!this.isAttached)
@@ -890,13 +894,13 @@ request.onupgradeneeded = (function (event) {
 
             //   if (drawer.position == 'right') {
             //     contentContainer.style.marginLeft = '';
-            //     contentContainer.style.marginRight = drawerWidth + 'px';
+            //     contentContainer.style.marginRight = this.dashboardRightDrawerCurrentWidth + 'px';
             //   } else {
-            //     contentContainer.style.marginLeft = drawerWidth + 'px';
+            //     contentContainer.style.marginLeft = this.dashboardRightDrawerCurrentWidth + 'px';
             //     contentContainer.style.marginRight = '';
             //   }
             // }
-                   //this.setcontainerwidth()
+                   // this.setcontainerwidth()
             this.notifyResize();
            });
           

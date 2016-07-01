@@ -1,0 +1,56 @@
+<dom-modulde id="fc-cell">
+<template id="fc-cell-template">
+<style is="custom-style">
+
+<textarea id="cell" value="{{cellValue::textarea}}" contenteditable="{{contenteditable}}"
+
+</style>
+<script>
+FcCell=Polymer({
+    is: 'fc-cell',
+    extends: 'textarea',
+    listeners:{"on-change":"cellValue"}
+    behaviors: [
+     FCBehaviors.FcCellBehavior
+    ],
+    properties: {
+		    cellValue:{
+		        type: String,
+		        observer: '_bindValueChanged',
+		      },
+		     contenteditable:{
+		     	type: Boolean,
+		     	value:function(){return true;},
+		     	notify: true,
+		     	reflectToAttribute: true,
+		     },
+		    
+		     _inputElement:{
+		     	type: Object,
+		     	notify: true,
+		     }
+
+		    },
+		   hostAttributes:{
+		   	value: 
+
+		   },
+
+      
+    ready(){
+    this.set("cellValue", this.$.cell.value);
+
+
+    }
+    get _inputElement(){
+    	return this.$.cell;
+    },
+
+    _cellValueChanged: function(newValue, oldValue) {
+      if (this.$.cell.value !== this.cellValue) {
+        this.$.cell.value = !(this.cellValue || this.cellValue === 0 || this.cellValue === false) ? '' : this.cellValue;
+      }
+      // manually notify because we don't want to notify until after setting value
+      this.fire('cell-value-changed', {value: this.cellValue});
+    },
+

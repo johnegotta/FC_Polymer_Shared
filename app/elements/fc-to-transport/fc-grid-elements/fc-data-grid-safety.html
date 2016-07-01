@@ -1,11 +1,12 @@
-<dom-module id="fc-mapped-grid">
- <template id="fc-mapped-grid-template">
- <style>
-         :host{margin: 12px 3px;padding: 4px;overflow:scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); };
-        textarea{margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
+<dom-module id="fc-data-grid-supra">
+ <template id="fc-data-grid-supra-template">
+ <style>:host{
+      margin: 12px 3px;padding: 4px;overflow:scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); 
+    };
+        textarea{
+          margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
           max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
-        details{outline: 0px white solid;}
-        summary{outline: 0px white solid;}
+        
         section{background:white;}
         paper-item{border: 1px solid #afafaf;}
         #myContextMenu{min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
@@ -35,67 +36,31 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
         </div>
   </template>
 </div>
-<paper-listbox id="myContextMenu"  hidden>
-  <paper-item class="around-justified">
-        <paper-swatch-picker>
-        </paper-swatch-picker><span>  &nbsp; Color Selector &nbsp;&nbsp; &nbsp;</span>
-        <input type="color" value="{{color::input}}">
-  </paper-item>
-    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
-        <paper-item value="{{category.title}}">
-            <details>
-                <summary>{{category.title}}</summary>
-                <paper-listbox style="min-width:360px!important; max-width: 360px!important;">
-                    <template is="dom-repeat" items="{{category.buttons}}" as="item">
-                          <paper-item onclick="{{item.myFunction}}" btn-value="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.text.0, color)}}" btn-prop="{{item.dataProperty}}">                {{item.text.0}}
-                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.datafunction}}"style$="font-size: 24px; font-weight: 300; color: #009;{{_computeStyle(item.dataProperty,item.text.0, color)}}">{{item.text.2}}</span>
-                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.dataFunction}}" btn-args="{{item.dataArgs}}" style$="{{_computeStyle(item.dataProperty, item.text.0,color)}}; font-size: 28px;">{{item.text.1}}</span> 
-                          </paper-item>
-                    </template> 
-                </paper-listbox>
-            </details>
-        </paper-item>
-    </template>
-</paper-listbox>
+            <content>
+<!--context menu goes here-->
+            </content>
  </template>
  <script>
  FcMappedGrid=Polymer({
- 	is:"fc-mapped-grid",
+ 	is:"fc-data-grid-supra",
   behaviors:[Polymer.Templatizer, FCBehaviors.FcDataGridBehavior],
   listeners: {"color-picker-selected":"getcolor"},
  	properties: { 
-    format:{
-      type: Object,
-      value:function(){return {};},
-      notify: true,
-    },
-    gridEvent:{
-        type: Object,
-        value: function(){return {};},
-        notify: true, 
-    },
-   
-    btnValue:{
-      type: String,
-      value:function(){return "";},
-      notify: true
-    },
-    color:{
-        type: String,
-      value:function(){return "";},
-      notify: true        
-    },
-    arraysIndex:{
-        type: Number,
-        value: function(){return 0;},
-        notify:true,
-    },
-    four:{     type:Boolean,
-     computed:"computefour(arrayIndex)",
-      notify: true,
-    },
-   
-   
+    format:{ type: Object,value:function(){return {};}, notify: true,
+          },
+    gridEvent:{type: Object,value: function(){return {};},notify: true, 
+            },
+    btnValue:{type: String,value:function(){return "";},notify: true
+          },
+    color:{type: String,value:function(){return "";},notify: true        
+          },
+    arraysIndex:{type: Number,value: function(){return 0;},notify:true
+          },
+    four:{type:Boolean,computed:"computefour(arrayIndex)",notify: true
+          },
+    
+    colorTwo:{ type: String, value:function(){return "";}, notify: true
+          },
  	},
 ready(){
     var columns=this.setColumns();
@@ -218,19 +183,6 @@ ready(){
     }//end initialization if for values
   },
   
-
-  _computeStyle(property, text, color){
-    if(text||text.match(" ")){
- var retVal=(text.match("Highlight Selection"))||text.match("Alternate Row Highlighting")?`background: ${color};`:(text.match("Apply This Text Color"))?`color: ${color}`: property;
- return retVal;
-}
-else return "background: gold;";
-         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
-  },
-  
-computefour(arrayIndex){
-    return(arrayIndex===3);
-},
   arraySwap(e){
         var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
         this.set("arrayIndex", arrayNum);
@@ -240,4 +192,3 @@ computefour(arrayIndex){
   });
     </script>
    </dom-module>
-

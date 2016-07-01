@@ -1,7 +1,11 @@
 <script>
+(function(){
+"use strict";
+
+})();
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FcDataGridBehavior = {
-	listeners:{},
+	listeners: {"color-picker-selected":"getcolor"},
 	properties: {
 		gridEvent:{
         type: Object,
@@ -27,7 +31,6 @@ FCBehaviors.FcDataGridBehavior = {
         value:function(){return [];},
         notify: true,
     },
-   
     columns2:{
       type: Array,
       value: function(){return [];},
@@ -50,82 +53,336 @@ FCBehaviors.FcDataGridBehavior = {
           },
         notify: true 
     },
-},
- insertRow(e){
-    var eid=this.gridEvent.target.getAttribute("id");
-      var key=eid.split("_");
-      
-      if(key[1]==0 &&key[2]!=0){
-      var rowNum=key[2];
-      var after=(e.target.btnValue.match("Row Below"))?true: false;
-      var childColumn= Polymer.dom(this.$.hanger3).children;
-      var rows=childColumn[0].children.length;
-       var count=childColumn.length;
-       for(var k=0;k<count; k++)
-       {
-          var colNum=childColumn[k].getAttribute("id");
-          var colNum=colNum.split("_");
-        var elem=document.createElement("TEXTAREA");
-        elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
-         var nKey="comparisons_"+colNum[1]+"_"+rows+"_";
-         elem.setAttribute("id", nKey);
-         elem.value="--";
-         this.comparisons.set(nKey,[elem.value, elem]);
-         var theId="#comparisons_"+colNum[1]+"_"+key[2]+"_";
-         // console.log(this.$$(theId));
-         console.log(theId);
-        if(after===false)
-        {   //console.log(this.$$(theId));
-          Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
-           var style=Polymer.dom(elem).nextSibling.style.cssText
-          elem.style.cssText=style;
-          this.comparisons.set(nKey, [elem.value,elem]);
-         }
-        else if(after===true&&key[2]<rows)
-            {
-              Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
-                var style=Polymer.dom(elem).nextSibling.style.cssText
-                elem.style.cssText=style;
-                this.comparisons.set(nKey, [elem.value,elem]);
-         
-            }
-        else if(after===true&&key[2]==rows)
-            {
-              Polymer.dom(childColumn[k]).appendChild(elem);
-                var style=Polymer.dom(elem).previousSibling.style.cssText
-                elem.style.cssText=style;
-                this.comparisons.set(nKey, [elem.value,elem]);
-         
-            }
+    defaultHeader:{
+    	type:Object,
+    	value:function(){
+    		return {"max-height": "65px;","border": "solid 1px #009;", "min-height": "18px;", "margin": "0px;", "height":"23px!important;", "font-family":"merriweather;", "background": "aliceblue;", "color": " #009;", "text-align": "center;", "font-size": "18px;","font-weight":"700;", "resize":"none;", "styleText":"max-height: 65px; border: solid 1px #009; min-height: 18px;  margin: 0px;  height:23px!important;  font-family:merriweather;  background: aliceblue;  color:  #009;  text-align: center;  font-size: 18px; font-weight:700; resize:none;"};
+    	},
+    	notify: true,
+    },
+    allSymbols:{
+    	type:String,
+    	value:function(){return  `➔ ❶ ✂ ✎ ✒ ✜ ❚ ❶ ➀ ➞ ☚ ☛ ☰ ☱ ☷ ☑ ☐ ☎ ☏ ► ▼ ▲ ◄ ⇒ Δ ▐ █ ▄ ▀`;},
+    	notify: true,
+    },
+    color:{
+        type: String,
+        value:function(){return "gold";},
+        notify: true
+        },
+     columnArchive:{
+      type: Array,
+      value: function(){return [];},
+      notify: true
+    },
+    rowArchive:{
+      type:Array,
+      value:function(){return [];},
+      notify: true
+    },
+    undoArchive:{
+    	type:Array,
+    	value:function(){return [];},
+    	notify: true
+    	}
+	},
+	detached(){this.columnIndices},
+
+	getcolor(e){
+    		this.set("color", e.detail.color);
+    		},
+    get columnMenu(){return [
+          { "title": "Adding & Deleting Columns", 
+              "buttons":[
+              {"text": ["+1 Column Right: ","", " ✜ ▐ ☛"],"myFunction": this.addColumn.bind(this)}, 
+              {"text":["+1 Column Left: ",""," ✜ ▐ ☚"], "myFunction": this.addColumn.bind(this)},
+       	      {"text":["Delete Column: ","", " ✂ ▐"], "myFunction": this.deleteThisColumn.bind(this)}, 
+             {"text": ["Restore Column: ", , "☤ ▐ ☤"], "myFunction":this.restoreThisColumn.bind(this)}
+            ]
+          }, 
        
-       }
-      }
+         {   "title":"Column Highlighting Patterns",
+              "buttons": [
+                  {"text":["Odd Numbered Column Highlighter", "",""],
+                  		"dataProperty": "background", 
+                  		"myFunction":this.columnHighlighter.bind(this)
+                  },
+                  {"text":["Remove Odd Numbered Columns' Highlight", "",""],
+                  		"dataProperty":"background", 
+                  		"myFunction": this.columnHighlighter.bind(this)
+                  	},
+                  {	"text":["Shift Column Highlight Right One Column", "",""],
+                  		"dataProperty": "background", 
+                  		"myFunction":this.columnHighlighter.bind(this)
+                  	},
+                  {	"text":["Shift Column Highlight Left One Column", "",""],
+                  		"dataProperty": this.columnHighlighter, 
+                  		"myFunction":this.columnHighlighter.bind(this)
+                  	},
+                  {	"text":["Begin and End Column Highlight On Tap", "",""],
+                  		"dataProperty":"background",
+                  		"dataFunction": this.columnHighlighter,
+                  		"myFunction":this.columnHighlighter.bind(this)
+                  	},
+                  ]
+          		},  
+   		     ];
+    	},
+   	get rowMenu(){return [
+   		{   "title": "Inserting & Excising Rows", 
+              "buttons": [
+              		{"text": ["+1 Row Above:", ," ☰ ▲ "] ,"myFunction": this.insertRow.bind(this)}, 
+              		{"text":["+1 Row Below:", ," ☰ ▼ "], "myFunction": this.insertRow.bind(this)},
+        			{"text": ["Delete Row: "," ", " ✂ ☰"],"myFunction": this.deleteRow.bind(this)}, 
+        			{"text":["Restore Row: ","☤", " ☤ ☰ ☤ "], "myFunction": this.restoreRow.bind(this)}
+            		]
+          		},
+
+        { "title":"Row Highlighting Patterns",
+      		 "buttons":
+      		[	{	"text": 
+      					["Add Alternate Row Highlighting", " ", " "], 
+					"dataProperty":"background", 
+					"dataFunction": "alternateRowsHighlightSequence",
+					"myFunction":this.rowsHighlighter.bind(this), 
+					"dataArgs":
+					[	{"setter":true, 
+  						"colRowStartIndices":[1,0], 
+  						"modulus":[2,1], 
+  						"modulusBase": 2, 
+  						"deepProperty":"style.background", 
+  						"setValue":this.color, 
+  						"mapForKey_set_get":this.comparisons, 
+  						"typeArchive":this.rowArchive, 
+  						"undoArchive":this.undoArchive
+  					},
+  						
+  				], 
+  					
+  				},
+                {	"text": 
+                		["Remove Alternate Row Highlighting"],
+                		"dataProperty":"background",
+                		"dataFunction": "alternateRowsHighlightSequence", 
+                		"myFunction":this.rowsHighlighter.bind(this),
+                	"dataArgs":
+					[	
+						{"setter":true,
+  						"colRowStartIndices":[1,1],
+  						"modulus":[2,1],
+  						"modulusBase": 2,
+  						"deepProperty":"style.background",
+  						"setValue":this.defaultFormat.background,
+  						"mapForKeyset_get":this.comparisons,
+  						"typeArchive":this.rowArchive,
+  						"untyped_Archive":this.undoArchive
+  					},
+  				]
+  				},
+                   {"text":["Begin and End Row Highlight On Tap", "",""],"myFunction":this.rowsHighlighter.bind(this)},  
+            ], //End Six Button Page
+      }];
+      	},
+	get basemenu(){ return [
+		{
+              "title":"Highlight Color", 
+              "buttons":[
+              {"text":["Highlight Selection: ",""," ✒ ❚ "],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "background: "+this.color+";"}, 
+              {"text":["Remove Highlighting: ", ," ✂ ✒"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "background: "+this.defaultFormat.background+";"}]
+          },
+          {   "title": "Text Color",
+              "buttons": [
+              {"text":["Apply This Text Color:"," ✎" , "▀"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty":"color: " + this.color + ";"},
+              {"text":["Apply Base Text Color:"," ✎ " , "▀"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty": "color:"+this.defaultFormat.color+";"}
+              ] 
+          },
+          {    "title": "Text Weight",
+                "buttons": [
+                    {"text":["Thin Text Weight:", ,"𝒯𝒽𝒾𝓃"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "font-weight: 300;"},
+                    {"text":["Medium Text Weight:", ,"Medium"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-weight: 600;"},
+                    {"text":["Strong Text Weight", "STRONG"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-weight: 900;"
+              }
+            ] 
+          },
+          {  "title": "Font Family",
+             "buttons": [
+              {"text": ["Roboto Font Family", ," ROBOTO"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family: Roboto;"},
+              {"text":["Merriweather Font Family", ," Merriweather"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family: merriweather;"},
+              {"text":["Courier Font Family: ", ," Courier"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family: courier;"
+              }
+            ],
+          },
+          {   "title":"Font Styles",
+              "buttons": [
+                  {"text": [`Italics: Italics`],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-style: italic;"},
+                  {"text":["Underline:", ,"Underline"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration: underline;"},
+                  {"text": ["Strike-Through:", ,"Strike-Through"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration: line-through;"},
+                  {"text": ["Normal: ", , " Normal"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration: none; font-style: normal;"
+                } 
+            ], 
+          },
+          {   "title":"Font Size",
+              "buttons": [
+              		{"text":[`10px Smallest Large Screen Font`],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:10px;"},
+                  {"text":["12px", "","Smaller Than Shown"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:12px;"},
+                   {"text": ["14px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:14px;"},
+                  {"text": ["16px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:16px;"},
+                  {"text": ["18px","", "Focused Standard"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:18px;"},
+                   {"text": ["20px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:20px;"},
+                  {"text": ["22px","","Section Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:22px;"},
+                  {"text": ["24px","","Section Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:24px;"},
+                  {"text": ["26px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size: 26px;"},
+                  {"text": ["28px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size: 28px;"}, 
+                  {"text": ["30px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size: 30px;"},
+                  {"text": ["32px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size: 32px;"},
+                  {"text": ["34px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size: 34px;"},
+                  {"text": ["36px Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size: 36px;"}
+            ], 
+          },
+       
+      	];
+    }, 
+    detached(){console.log(this.columnIndices);},
+
+ 
+rowsHighlighter(e){
+  console.log(e);
+    var columns= Polymer.dom(this.$.hanger3).children,
+    i=0,j=0,btn=e.target,arr=[];
+    counter=columns.length;
+    for(i=1;i<counter;i++)
+    {
+      var columnChildren=Polymer.dom(columns[i]).children,
+      halfRows=Math.floor(columnChildren.length/2);
+      for(j=0;j<halfRows;j++)
+      {   var p=2*j+1;
+          if(columnChildren[p]!=undefined){
+          	console.log(columnChildren[p]);
+          var key =columnChildren[p].getAttribute("id");
+          console.log(key);
+          elem=this.comparisons.get(key);
+          elem[1].style.background=this.color;
+          var partialKey=i.toString()+"_"+j.toString(),
+          reverseKey={partialKey, key};
+          this.comparisons.set(key,[elem[1].value,elem[1]]);
+      		}
+          	var time=new Date().getTime();
+          	this.comparisons.set(key,[elem[1].value,elem[1]]);
+        	var archiveObject={	"key":key, 
+          						"id":key,
+          						"value":elem[1].value,
+          						"element": elem[1],
+          						"timestamp":time,
+          						"change":btn.deepProperty,
+          						"deepPropertyValue":"style.background",
+          						"argsAtSet":e.target.btnArgs,
+          						"boundFunction":e.btnFunction 				};
+          this.push("rowArchive", archiveObject);
+          this.push("undoArchive", archiveObject);
+      	}
+    }
+  
   },
-  deleteRow(e){
-    var children=Polymer.dom(this.$.hanger3).children;
-    var columnNumberArray=[],
-    columnArrayIds=[],
-    rowArray=[];
-    children.forEach(function(col,index, array){
-        var colId=col.getAttribute("id");
-        columnArrayIds.push(colId);
-        var colIdMiniArray=colId.split("_");
-        columnNumberArray.push(colIdMiniArray[1]);
-    });
-    var baseId=this.gridEvent.target.getAttribute("id"),
-    rowIndex=Polymer.dom(children[0]).children.indexOf(this.gridEvent.target),
-    splitBaseId=baseId.split("_");
-    console.log(rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex,rowIndex);
-    rowArray=columnNumberArray.map(function(col, index,array){
+   columnHighlighter(e){
+   	//from here to the next break is code chunk A for grids
+   	var columns= Polymer.dom(this.$.hanger3).children,
+    i=0,
+    j=0,
+    arr=[];
+    counter=columns.length;
+    for(i=1;i<counter;i++)//NOTE: I ALWAYS SKIP THE LABEL COLUMN/ROW
+    {
+      //end of code chunk A
+      var columnChildren=Polymer.dom(columns[i]).children;
+     //end of code chunk A Noted it twice cause small change
+      arr=columnChildren.map(function(val, j, colarray){
+      	//virtually Identical could have used the other loop
+      	//the returned array copy, however is nice cause it wont trigger Polymer,
+      	// well it still sorta does i already tried that.. but I will stick with the 
+      	//spec
+      	  var key =val.getAttribute("id"),
+          elem=this.comparisons.get(key);
+          if(i%2!==0&&j!==0){elem[1].style.background=this.color;}
+          //only real change is the condition, but that is similar...
+          //here I am thinking if we run through this code, we can assemble efficient little code chunks... like little "clauses" to assemble function sentences
+          this.comparisons.set(key, [elem[1].value,elem[1]]);
+          var partialKey=i.toString()+"_"+j.toString(),
+          reverseKey={partialKey, key};
+          return elem;
+      }, this);
+      console.log(arr);
+     }
+   },
+ 	insertRow(e){
+   		var eid=this.gridEvent.target.getAttribute("id");
+   		var key=eid.split("_");
+      		if(key[1]==0 &&key[2]!=0)
+      		{
+			      var rowNum=key[2];
+			      var after=(e.target.btnValue.match("Row Below"))?true: false;
+			      var childColumn= Polymer.dom(this.$.hanger3).children;
+			      var rows=childColumn[0].children.length;
+			      var count=childColumn.length;
+			    for(var k=0;k<count; k++)
+			    {
+			        var colNum=childColumn[k].getAttribute("id");
+			        var colNum=colNum.split("_");
+			        var elem=document.createElement("TEXTAREA");
+			        elem.setAttribute("style", this.defaultFormat.styleText);
+			        var nKey="comparisons_"+colNum[1]+"_"+rows+"_";
+			        elem.setAttribute("id", nKey);
+			        elem.value="--";
+			        this.comparisons.set(nKey,[elem.value, elem]);
+			        var theId="#comparisons_"+colNum[1]+"_"+key[2]+"_";
+        			
+        			if(after===false)
+        			{   
+        				Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
+           				var style=Polymer.dom(elem).nextSibling.style.cssText
+          				elem.style.cssText=style;
+          				this.comparisons.set(nKey, [elem.value,elem]);
+         			}
+        			else if(after===true&&key[2]<rows)
+            		{
+              			Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
+                		var style=Polymer.dom(elem).nextSibling.style.cssText
+                		elem.style.cssText=style;
+                		this.comparisons.set(nKey, [elem.value,elem]);
+            		}
+        			else if(after===true&&key[2]==rows)
+            		{
+              			Polymer.dom(childColumn[k]).appendChild(elem);
+                		var style=Polymer.dom(elem).previousSibling.style.cssText
+                		elem.style.cssText=style;
+                		this.comparisons.set(nKey, [elem.value,elem]);
+            		}
+       			}//end for look from way up above
+      		}//end of be a row header etc
+  		},
+  	deleteRow(e){
+    	var children=Polymer.dom(this.$.hanger3).children;
+    	var columnNumberArray=[],
+    	columnArrayIds=[],
+    	rowArray=[];
+    	children.forEach(function(col,index, array){
+        		var colId=col.getAttribute("id");
+        		columnArrayIds.push(colId);
+        		var colIdMiniArray=colId.split("_");
+        		columnNumberArray.push(colIdMiniArray[1]);
+    	});
+    	var baseId=this.gridEvent.target.getAttribute("id"),
+    	rowIndex=Polymer.dom(children[0]).children.indexOf(this.gridEvent.target),
+    	splitBaseId=baseId.split("_");
+     	rowArray=columnNumberArray.map(function(col, index,array)
+     	{
         var theId="#"+splitBaseId[0]+"_"+col+"_"+splitBaseId[2]+"_";
         var elem=this.$$(theId);
         var theId2="#" + columnArrayIds[index];
         var parent=this.$$(theId2);
         Polymer.dom(parent).removeChild(elem);
         return elem;
-    }, this);
-    this.push("rowArchive", [rowIndex, rowArray]);
-    
+    	}, this);
+    	this.push("rowArchive", [rowIndex, rowArray]);
     },
   restoreRow(e){
    
@@ -141,9 +398,7 @@ FCBehaviors.FcDataGridBehavior = {
       }
   },
   addColumn(e){
-    if(e.target.btnValue){
-      this.set("btnValue",e.target.btnValue);
-    }
+    if(e.target.btnValue){this.set("btnValue",e.target.btnValue);}
     var parent=this.gridEvent.target.parentElement;
     var pParent=parent.parentElement;
     var columns=pParent.children;
@@ -174,31 +429,22 @@ FCBehaviors.FcDataGridBehavior = {
        this.push("columns4",["znother", "column"]);
           var numCells=children.length;
     for(var j=0; j<numCells;j++)
-    {
-      var trueVal=children[j].getAttribute("id");
+    { var trueVal=children[j].getAttribute("id");
       trueVal=trueVal.split("_");
       var val=trueVal[2];
       elem=document.createElement("TEXTAREA");
       var key="comparisons_"+colNum+"_"+val+"_";
       elem.setAttribute("id",key);
-      if(j==0){
-      elem.setAttribute("style", "max-height:65px; border: solid 1px #009; min-height: 18px; margin:0px; height: 23px!important; font-family: merriweather; background: aliceblue; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
-      }
-      else{
-
-           elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
-         }
-       elem.value="--";
-        console.log(columnId);
-      Polymer.dom(column).appendChild(elem);
-     this.comparisons.set(key,[elem.value, elem]);
+      if(j==0){elem.setAttribute("style", this.defaultHeader.styleText);}
+      else{elem.setAttribute("style", this.defaultFormat.styleText);}
+       		elem.value="--";
+      		Polymer.dom(column).appendChild(elem);
+     		this.comparisons.set(key,[elem.value, elem]);
+    	}
     }
-  
-      }
-    },
+},
 
   deleteThisColumn(e){
-    
       if(e.target.btnValue){
           this.set("btnValue",e.target.btnValue);
       }
@@ -240,12 +486,34 @@ FCBehaviors.FcDataGridBehavior = {
         //console.log(retArrays);
         return retArrays;
         },
+       get columnIndices(){
+		var columnDivs=Polymer.dom(this.$.hanger3).children;
+		var arrayOne=[];
+		var arrayTw0=[];
+		for(var i=0; i<columnDivs.length;i++){
+				var header=Polymer.dom(columnDivs[i]).firstElementChild;
+				var keys=header.getAttribute("id").split("_");
+				var colNum=keys[1],rowNum=keys[2], value=header.value;
+				value+=colNum+"_"+rowNum;
+				arrayTwo.push(value);
+
+				var rowCells=Polymer.dom(columnDivs[i]).children;
+				rowCells.forEach(function(elem){
+					var keys=elem.getAttribute("id").split("_");
+					elem.value+=elem.value+keys[1]+"_"+keys[2]; 
+					arrayOne.push([elem.value,elem]);
+					console.log(elem.value,elem)
+				},this)
+
+		}
+		return [arrayTwo,arrayOne];
+    },
    parser(colHeaders, type, array){
-    var counter =colHeaders.length;
-    var retVal=[];
-    switch(true){
-      case (type==="accounting"):
-          switch(true){
+	    var counter =colHeaders.length;
+	    var retVal=[];
+	    switch(true){
+	      case (type==="accounting"):
+	          switch(true){
             case (colHeaders[0]==="Years"&& colHeaders[4].match("Qtr1")!==undefined):
                 for(var i=0;i<counter;i++){ 
                 var val=2007+i;
@@ -255,19 +523,12 @@ FCBehaviors.FcDataGridBehavior = {
                       val=`${val}s: Cash:
                                          Total CCards:
                                         Period Total:`;
-
-
                 }
                 array[0].data[i].payload=val;
               }
               retVal=array;
-             // console.log(retVal);
-
-
-
             break;
             default:
-
             break;
           }
       break;
@@ -285,15 +546,15 @@ FCBehaviors.FcDataGridBehavior = {
     var array=[];
     var i=0, j=0;
     var time=new Date().getTime();
-      for(i=0;i<16;i++)
-      {
-          var key="comparisons_"+i+"_"+0+"_";
-          var column=document.createElement("div");
-          column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-          var columnId="column_"+i;
-          column.setAttribute("id",columnId);
-          var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", "max-height:65px; border: solid 1px #009; min-height: 18px; margin:0px; height: 23px!important; font-family: merriweather; background: aliceblue; color: #009; text-align: center; font-size: 18px; font-weight: 700; resize:none;");
+    for(i=0;i<16;i++)
+     {
+       var key="comparisons_"+i+"_"+0+"_";
+       var column=document.createElement("div");
+       column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
+       var columnId="column_"+i;
+       column.setAttribute("id",columnId);
+       var elem=document.createElement("TEXTAREA");
+          elem.setAttribute("style",  this.defaultHeader.styleText);
           elem.setAttribute("id", key);
           var hanger="--";
         if(this.comparisons.get(key))
@@ -329,14 +590,12 @@ FCBehaviors.FcDataGridBehavior = {
 
              var key="comparisons_"+i+"_"+j+"_";
                var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", "max-height: 55px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; height: 33px!important; font-family: merriweather; color: #009; text-align: center; font-size: 18px; font-weight: 600; resize:none;");
+          elem.setAttribute("style", this.defaultFormat.styleText);
           elem.setAttribute("id", key);
               var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
-            //console.log(bindValue, "vital locale");
               elem.contenteditable=true;
-              //elem.innerHTML=bindValue;
               elem.value=bindValue
-              //console.log(elem.innerHTML);
+   
               var propName='value';
           
                 this.comparisons.set(key,[elem.value,elem]);
@@ -376,9 +635,8 @@ FCBehaviors.FcDataGridBehavior = {
       //console.log(array);
       this.set("columns2", array);
    },
-   get csv(){
-
-                var val=[[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%_v_Prev","Yr. Tot. Est 14"],
+   get csv(){var val=[
+   			[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%_v_Prev","Yr. Tot. Est 14"],
             ["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
             ["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ","40.59%","$192,775.00 "],
             ["2010 Totals",,,,,,,,,,,,,"$25,997.08 ","61.83%","$311,965.00 "],
@@ -402,9 +660,179 @@ FCBehaviors.FcDataGridBehavior = {
             ["Proj. w/Avg. 12-13","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$76,190.00 ","$125,067.00 ","$68,696.00 ","$48,549.50 ","$57,145.00 ","$44,610.00 ","$46,050.88 ","$75,565.61 ","9.39%","$906,787.38 "],
             ["2014 Projections" ,"January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%? v. Proj.","2014 Proj."],
             ["2014 Actual ","$78,600.00 ","$75,058.00 ","$84,675.00 ","$110,091.00 ","$92,055.00 ","$77,375.00 ",,,,,,,"$86,309.00 ","8.73%","$1,126,578.34"],
-            ["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ","8.73%","$90,429.59"]];
-            return val;
-},
+            ["? '14 v. + 25%","($10,077.50)","$35,105.50 ","$10,425.00 ","$1,403.50 ","$23,273.75 ","($18,562.50)",,,,,,,"$6,927.96 ","8.73%","$90,429.59"]
+           ];
+         return val;
+		},
 
 	}
 </script>
+<!--     
+
+  rowsHighlighter(e){
+   	var btn=e.target.btnArgs[0];
+   	if(btn.setter===true){
+   		var columns=Polymer.dom(this.$.hanger3).children; 
+   		var	i=parseInt(btn.colRowStartIndices[0]), j=parseInt(btn.colRowStartIndices[1]);
+    	for(i;i<columns.length;i++)
+    		{	var setValue=btn.setValue;
+    			console.log(setValue,"nothing VALUES?", btn.setValue);
+      			var columnChildren=Polymer.dom(columns[i]).children,
+      			halfRows=Math.floor(columnChildren.length/(parseInt(btn.modulusBase)));
+      		}
+      	for(j;j<halfRows;j++)
+      	{   
+         if(columnChildren[p]!=undefined)
+         {console.log(columnChildren[p], "childewn");
+          var key =columnChildren[p].getAttribute("id");
+          var elem=this.comparisons.get(key);
+          var style=elem[1].style.cssText
+          style.matchcolumnChildren[p].style.cssText;
+          var fullprop=btn.deepProperty.split(".");
+          var property=fullprop[1] +": "+ this.color +";";
+          console.log(property, fullprop[1]);
+              if(style.match(fullprop[1]))
+                {
+                  var replacer=fullprop[1]+/\[[a-z]+\]:[a-z]+;/;
+                  style=style.replace(replacer, "");
+                  style=style+property;
+                }
+              else
+                {
+                  style=style+property;
+                }
+
+          console.log(style, elem, elem.style.background,"look here");
+          elem[1].style.cssText=style;
+          var partialKey=i.toString()+"_"+j.toString();
+   
+          var checkKey={partialKey, key};
+          var time=new Date().getTime();
+          this.comparisons.set(key,[elem[1].value,elem[1]]);
+         var archiveObject=	{		"key":key, 
+          							"id":key,
+          							"checkKey":checkKey,
+          							"value":elem[1].value,
+          							"element": elem[1],
+          							"timestamp":time,
+          							"change":btn.deepProperty,
+          							"deepPropertyValue":"style.background",
+          							"argsAtSet":btn,
+          							"boundFunction":e.btnFunction
+          						};
+          this.push("rowArchive", archiveObject);
+          this.push("undoArchive", archiveObject);
+          console.log(this.color, btn.setValue);
+      		}
+      	}
+    }
+  },
+         // highlightColumn:{
+         // 	type:Array,
+         // 	value:function(){return ["Highlight Selection: ",""," ✒ ❚ "];},
+         // 	notify: true,
+         // },
+         // returnToDefaultHighlighting:{
+         // 	type:Array,
+         // 	value:function(){return ["Remove Highlighting: ", ," ✂ ✒"];},
+         // 	notify: true,
+         // },
+  // applyThisTextColor:{
+         // 	type:Array,
+         // 	value:function(){return ["Apply This Text Color:"," ✎" , "▀"];},
+         // 	notify: true,
+         // },
+         // returnToDefaultTextColor:{
+         // 	type:Array,
+         // 	value:function(){return ["Apply Base Text Color:"," ✎ " , "▀"];},
+         // 	notify: true,
+         // },
+         // applyThinTextWeight:{
+         // 	type:Array,
+         // 	value:function(){return ["Thin Text Weight:", ,"𝒯𝒽𝒾𝓃"];},
+         // 	notify: true,
+         // },
+         // applyMediumTextWeight:{
+         // 	type:Array,
+         // 	value:function(){return ["Medium Text Weight:", ,"Medium"];},
+         // 	notify: true,
+         // },
+         // applyStrongTextWeight:{
+         // 	type:Array,
+         // 	value:function(){return ["Strong Text Weight", "STRONG"];},
+         // 	notify: true,
+         // },
+         // applyRobotoFontFamily:{
+         // 	type:Array,
+         // 	value:function(){return ["Roboto Font Family", ," ROBOTO"];},
+         // 	notify: true,
+         // },
+         // applyMerriweatherFontFamily:{
+         // 	type:Array,
+         // 	value:function(){return ["Merriweather Font Family", ," Merriweather"];},
+         // 	notify: true,
+         // },
+         // applyCourierFixedWidthFontFamily:{
+         // 	type:Array,
+         // 	value:function(){return ["Courier Font Family: ", ," Courier"];},
+         // 	notify: true,
+         // },
+         // applyItalics:{
+         // 	type:Array,
+         // 	value:function(){return ["Italics:", ,"Italics"];},
+         // 	notify: true,
+         // 	}, 
+         // applyUnderline:{
+         // 	type:Array,
+         // 	value:function(){return ["Underline:", ,"Underline"];},
+         // 	notify: true,
+         // 	}, 
+         // applyStrikeThrough:{
+         // 	type:Array,
+         // 	value:function(){return ["Strike-Through:", ,"Strike-Through"];},
+         // 	notify: true,
+         // }
+
+
+
+
+   //  addOneColumnRight:{
+        // 	type:Array,
+        // 	value:function(){return ["+1 Column Right: ","", " ✜ ▐ ☛"];},
+        // 	notify: true,
+        // },
+         // leftAddOneColumn:{
+         // 	type:Array,
+         // 	value:function(){return ["+1 Column Left: ",""," ✜ ▐ ☚"];},
+         // 	notify: true,
+         // },
+         // deleteThisColumnProp:{
+         // 	type:Array,
+         // 	value:function(){return ["Delete Column: ","", " ✂ ▐"];},
+         // 	notify: true,
+         // },
+         // restoreThisColumnProp:{
+         // 	type:Array,
+         // 	value:function(){return ["Restore Column: ", , "☤ ▐ ☤"];},
+         // 	notify: true,
+         // },
+         // addOneRowBelow:{
+         // 	type:Array,
+         // 	value:function(){return ["+1 Row Below:", ," ☰ ▼ "];},
+         // 	notify: true,
+         // },
+         // addOneRowAbove:{
+         // 	type:Array,
+         // 	value:function(){return ["+1 Row Above:", ," ☰ ▲ "];},
+         // 	notify: true,
+         // },
+          // deleteThisRow:{
+          // 	type:Array,
+          // 	value:function(){return ["Delete Row: "," ", " ✂ ☰"];},
+          // 	notify: true,
+          // },
+          // restoreThisRow:{
+          // 	type:Array,
+          // 	value:function(){return ["Restore Row: ","☤", " ☤ ☰ ☤ "];},
+          // 	notify: true,
+          // },

@@ -1,0 +1,116 @@
+<dom-module id="fc-context-menu">
+<template id="fc-context-menu-template">
+<style>
+		:host{positionAbsolute}
+		details{outline: 0px white solid;}
+		summary{outline: 0px white solid;}
+		paper-item{padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;border: 1px solid #afafaf;}
+        #myContextMenu{min-width: 360px; max-width: 360px;max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
+</style>
+		span{font-size: 24px; font-weight: 300; color: #009;}
+		paper-listbox{min-width:360px!important; max-width: 360px!important;}
+</style>
+<div>
+<paper-material class="around-justified">
+<section class="layout horizontal "></section>
+        <paper-swatch-picker>
+     </paper-swatch-picker><span>  &nbsp;&nbsp; Color Selector &nbsp;&nbsp; &nbsp;</span>
+        <input type="color" value="{{color::input}}"><span>{{color}}</span>
+ 
+    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+        <paper-item value="{{category.title}}">
+            
+            <summary>{{category.title}}</summary>
+                <paper-listbox style="min-width:360px!important; max-width: 360px!important;">
+                    <template 
+                    		is="dom-repeat" 
+                    		items="{{category.buttons}}" 
+                    		as="item">
+                        	<paper-item 
+                     		 		onclick="{{item.myFunction}}" 
+                     		 		btn-value="{{item.text.0}}" 
+                     		 		btn-args="{{item.dataArgs}}"
+                     		 		btn-prop="{{item.dataProperty}}"
+                     		 		style$="{{_computeStyle(item.dataProperty, item.text.0, color)}}" 
+                     		 		btn-prop="{{item.dataProperty}}"> 
+                     		 	{{item.text.0}}
+                              		<span 
+                              		btn-prop="{{item.dataProperty}}" 
+                              		btn-function="{{item.datafunction}}"
+                              		style$="{{_computeStyle(item.dataProperty,item.text.0, color)}}">
+                              	{{item.text.2}}
+                              	</span>
+                              	<span 
+                              		btn-prop="{{item.dataProperty}}" 
+                              		btn-function="{{item.dataFunction}}" 
+                              		btn-args="{{item.dataArgs}}" 
+                              		style$="{{_computeStyle(item.dataProperty, item.text.0,color)}};">
+                              	{{item.text.1}}
+                              </span> 
+                        </paper-item>
+                    </template> 
+        </paper-listbox>
+     </template>
+     </paper-item>
+</div>
+</template>
+<script>
+FcContextMenu=Polymer({
+	is:"fc-styles-menu",
+	behaviors:[FCBehaviors.FcDataGridBehavior],
+	properties:{
+	contextMenuCategories:{
+		type:Array,
+		value:function(){return [];},
+      notify: true,
+
+
+	},
+	format:{
+      type: Object,
+      value:function(){return {};},
+      notify: true,
+    },
+    gridEvent:{
+        type: Object,
+        value: function(){return {};},
+        notify: true, 
+    },
+   
+    btnValue:{
+      type: String,
+      value:function(){return "";},
+      notify: true
+    },
+    color:{
+        type: String,
+      value:function(){return "";},
+      notify: true        
+    },
+    // arraysIndex:{
+    //     type: Number,
+    //     value: function(){return 0;},
+    //     notify:true,
+    // },
+    eight:{
+     	computed:"computeEight(arrayIndex)",
+      	notify: true,
+    },
+   
+   
+ 	},
+
+
+
+  _computeStyle(property, text, color){
+    if(text||text.match(" ")){
+ var retVal=(text.match("Highlight Selection"))||text.match("Alternate Row Highlighting")?`background: ${color};`:(text.match("Apply This Text Color"))?`color: ${color}`: property;
+ return retVal;
+}
+else return "background: gold;";
+         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
+  },
+  
+computefour(arrayIndex){
+    return(arrayIndex===3);
+},
