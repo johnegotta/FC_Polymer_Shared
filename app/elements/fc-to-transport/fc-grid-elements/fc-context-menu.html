@@ -1,116 +1,253 @@
 <dom-module id="fc-context-menu">
 <template id="fc-context-menu-template">
-<style>
-		:host{positionAbsolute}
-		details{outline: 0px white solid;}
-		summary{outline: 0px white solid;}
-		paper-item{padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;border: 1px solid #afafaf;}
-        #myContextMenu{min-width: 360px; max-width: 360px;max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
-</style>
-		span{font-size: 24px; font-weight: 300; color: #009;}
-		paper-listbox{min-width:360px!important; max-width: 360px!important;}
-</style>
-<div>
-<paper-material class="around-justified">
-<section class="layout horizontal "></section>
-        <paper-swatch-picker>
-     </paper-swatch-picker><span>  &nbsp;&nbsp; Color Selector &nbsp;&nbsp; &nbsp;</span>
-        <input type="color" value="{{color::input}}"><span>{{color}}</span>
- 
-    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
-        <paper-item value="{{category.title}}">
-            
-            <summary>{{category.title}}</summary>
-                <paper-listbox style="min-width:360px!important; max-width: 360px!important;">
-                    <template 
-                    		is="dom-repeat" 
-                    		items="{{category.buttons}}" 
-                    		as="item">
-                        	<paper-item 
-                     		 		onclick="{{item.myFunction}}" 
-                     		 		btn-value="{{item.text.0}}" 
-                     		 		btn-args="{{item.dataArgs}}"
-                     		 		btn-prop="{{item.dataProperty}}"
-                     		 		style$="{{_computeStyle(item.dataProperty, item.text.0, color)}}" 
-                     		 		btn-prop="{{item.dataProperty}}"> 
-                     		 	{{item.text.0}}
-                              		<span 
-                              		btn-prop="{{item.dataProperty}}" 
-                              		btn-function="{{item.datafunction}}"
-                              		style$="{{_computeStyle(item.dataProperty,item.text.0, color)}}">
-                              	{{item.text.2}}
-                              	</span>
-                              	<span 
-                              		btn-prop="{{item.dataProperty}}" 
-                              		btn-function="{{item.dataFunction}}" 
-                              		btn-args="{{item.dataArgs}}" 
-                              		style$="{{_computeStyle(item.dataProperty, item.text.0,color)}};">
-                              	{{item.text.1}}
-                              </span> 
-                        </paper-item>
-                    </template> 
-        </paper-listbox>
-     </template>
-     </paper-item>
-</div>
-</template>
+<style is="custom-style">
+		:host{ min-width: 360px; max-width: 420px;max-height: 480px; overflow: hidden; position: fixed; border:4px ridge gold;box-shadow: 5px 7px 11px 3px #afafaf; min-height: 360px;
+      background: white;}
+
+    .topHeaderContainer{
+      background: #fff;
+      border-bottom: double 4px #009; 
+      padding: 2px 4px; 
+      min-height: 48px;
+      height: 72px; 
+      max-height: 89px; 
+      box-shadow: 4px 7px 13px 3px #6f6f6f; 
+      margin-bottom: 9px;
+      @apply(--vertical-layout);
+      @apply(--layout-flex-3);
+    }
+    .headingLayer{
+        font-size: 20px;
+        color: #009;
+        font-weight: 600;
+        font-color: #fff;
+        @apply(--horizontal-layout); 
+        @apply(--layout-flex);
+        @apply(--flex-nowrap);
+        @apply(--layout-around-justified);
+
+    }
+    summary{outline: 0px;}
+    details{outline: 0px;}
+		paper-item{
+      padding: 4px 6px; 
+      margin: 0px; 
+      font-size: 18px; 
+      font-weight: 700; 
+      font-family: merriweather; 
+      color: #009;
+      border: 1px solid #afafaf; 
+      min-height:60px;
+      min-width: 330px;
+       --paper-item-focused: {
+      background: var(--paper-amber-500);
+      font-weight: bold;
+    };
+    --paper-item-focused-before: {
+      opacity: 0;
+    };
+  }
+      }
+		span{font-size: 16px; font-weight: 300; color: #009;}
+    paper-material{min-height: 65px; background: aliceblue; }
+
+  paper-item.fancy {
+    --paper-item-focused: {
+      background: var(--paper-amber-500);
+      font-weight: bold;
+    };
+    --paper-item-focused-before: {
+      opacity: 0;
+    };
+  }
+  </style>
+<section>
+<div class="vertical layout nowrap" 
+  id="myContainer"
+  style="border: double 6px #009; outline: silver; overflow: hidden; max-height: 440px;">
+    <section class="topHeaderContainer flex-4" style="padding:0px;">
+          <section class="headingLayer" style="position: relative; white-space: nowrap; font-size: 16px;">
+          <section class="horizontal layout flex nowrap justified">
+          <content select=".header"></content>
+
+                </section>
+          </section>
+    </section>
+  
+        <section class="vertical layout flex-9" style="overflow-y: scroll;">
+<content></content>
+        
+                </section>
+
+                         </div>
+            </section>
+
+          </template>
 <script>
 FcContextMenu=Polymer({
-	is:"fc-styles-menu",
-	behaviors:[FCBehaviors.FcDataGridBehavior],
+	is:"fc-context-menu",
+	behaviors:[FCBehaviors.FcDataGridStylingBehavior],
 	properties:{
-	contextMenuCategories:{
+	
+  contextMenuCategories:{
 		type:Array,
 		value:function(){return [];},
       notify: true,
+	   },
+    theGrid:{
+        type: Object,
+        notify: true,
 
+    },
 
-	},
-	format:{
-      type: Object,
-      value:function(){return {};},
+    selectedItem:{
+        notify: true,
+    },
+    topLevelItems:{
+      type: Array,
       notify: true,
     },
     gridEvent:{
         type: Object,
         value: function(){return {};},
-        notify: true, 
+        observer:"_observeKingsWill",
+        notify: true 
     },
-   
-    btnValue:{
+    myItem:{
+      value: function(){return -1;},
+      notify: true
+    },
+    selected:{
+      type: Number,
+      value: function(){return -1;},
+      notify: true,
+      observer: "observeSelected",
+    },
+    multi:{
+        type: Boolean, 
+        value: function(){return true;},
+        notify: true
+    },
+    isHidden:{
+      type: Boolean,
+      value: function(){return false;},
+      notify: true
+    },
+    hiddenStyle:{
       type: String,
       value:function(){return "";},
       notify: true
     },
-    color:{
-        type: String,
-      value:function(){return "";},
-      notify: true        
-    },
-    // arraysIndex:{
-    //     type: Number,
-    //     value: function(){return 0;},
-    //     notify:true,
-    // },
-    eight:{
-     	computed:"computeEight(arrayIndex)",
-      	notify: true,
-    },
-   
-   
+    innerRepeat:{
+      type: Array,
+      value: function(){return [];},
+      notify: true
+
+    }
  	},
+_observeKingsWill(nv,ov){
+    if(nv){console.log(nv[1], nv[0], "value observer on saved event" );}
+},
+_computeStyle(property, setValue,text, event, color){
+    console.log(property, setValue,text, event, color);
+      this.set("btnValue",setValue);
+      this.set("btnProperty", property);
+        return property + setValue;
+        
+  },
+  launchButtons(e){
+    // console.log(e.target.value, e);
+    // this.set('isHidden', !this.isHidden);
+    //   this.set("innerRepeat", e.target.value);
+    // var stylez=`z-index: 43; min-height: 330px; max-height: 1200px; position: fixed; top: ${e.detail.y}px; left: ${e.detail.x}px;`
+    //  this.set("hiddenStyle",stylez);
+  },
 
-
-
-  _computeStyle(property, text, color){
-    if(text||text.match(" ")){
- var retVal=(text.match("Highlight Selection"))||text.match("Alternate Row Highlighting")?`background: ${color};`:(text.match("Apply This Text Color"))?`color: ${color}`: property;
- return retVal;
-}
-else return "background: gold;";
-         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
+  observeSelected(newa, olda){
+    console.log(newa,olda, "selected selected selected ");
   },
   
-computefour(arrayIndex){
-    return(arrayIndex===3);
-},
+      
+});
+</script>
+</dom-module>
+<!-- 
+
+  <paper-listbox items="{{topLevelItems}}" selected="{{selected}}" selected-item="{{myItem}}" style="overflow-y: scroll; max-height: 380px; border: 4px solid orange;">
+    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+        <paper-item  value="{{category.buttons}}">
+         <details>
+          <summary>&nbsp;{{category.title}}</summary>
+             
+                     
+               <paper-listbox hidden$="{{!isHidden}}" selected="{{subSelected}}" style$="[[hiddenStyle]]" activate-event="{{item.myFunction}}"> 
+                    <template 
+                        is="dom-repeat" 
+                        items="{{category.buttons}}" 
+                        as="item"
+                        >
+                          <paper-item
+                            on-tap$="{{item.myFunction}}"
+                            btn-set-value$="{{item.dataSetValue}}" 
+                            btn-args$="{{item.dataArgs}}"
+                            btn-property$="{{item.dataProperty}}"
+                            btn-function$="{{item.datafunction}}"
+                            style$="{{_computeStyle(item.dataProperty, item.dataSetValue, item.text.0, color, gridEvent)}}" >
+                         <div
+                            btn-set-value$="{{item.dataSetValue}}" 
+                            btn-args$="{{item.dataArgs}}"
+                            btn-property$="{{item.dataProperty}}"
+                            btn-function$="{{item.datafunction}}"
+                            style$="{{_computeStyle(item.dataProperty, item.dataSetValue, item.text.0, color, gridEvent)}}" 
+
+
+                         >
+                           
+
+                          {{item.text.0}}&nbsp;{{item.text.1}} &nbsp;{{item.text.2}}</div>
+                        </paper-item>
+                        </template>
+                       </details>
+                         </paper-item>
+                    </template>
+              </paper-listbox>
+
+
+<paper-listbox style="[[hiddenStyle]]">
+                  {{_computeInnerRepeat(selected, categoryIndex, category)}} 
+                    <template 
+                        is="dom-repeat" 
+                        items="{{_computeInnerRepeat(selected, categoryIndex, category)}}" 
+                        as="item"
+                        >
+                          <paper-item
+                          class="fancy"
+                            id$=""; 
+                            on-tap$="{{item.myFunction}}"
+                            btn-set-value$="{{item.dataSetValue}}" 
+                            btn-args$="{{item.dataArgs}}"
+                            btn-property$="{{item.dataProperty}}"
+                            btn-function$="{{item.datafunction}}"
+                            style$="{{_computeStyle(item.dataProperty, item.dataSetValue, item.text.0, color, gridEvent)}}" >
+                           
+                          {{item.text.0}}
+                            <div
+                              btn-args$="{{item.dataArgs}}"
+                              btn-property$="{{item.dataProperty}}" 
+                              btn-function$="{{item.datafunction}}"
+                                btn-set-value$="{{item.dataSetValue}}"
+                                  style$="{{_computeStyle(item.dataProperty,item.dataArgs.setValue, item.text.0, color)}}">
+                                {{item.text.2}}
+                                </div>
+                                <div
+                                 btn-set-value$="{{item.dataSetValue}}"
+                                 btn-args$="{{item.dataArgs}}"
+                                 btn-property$="{{item.dataProperty}}" 
+                                 btn-function$="{{item.dataFunction}}"
+                                 style$="{{_computeStyle(item.dataProperty, item.dataArgs.setValue, item.text.0,color)}};">
+                                {{item.text.1}}
+                              </div> 
+                        </paper-item>
+                        </template>
+                        </paper-listbox>
+          -->

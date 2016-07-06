@@ -5,7 +5,7 @@
     };
         textarea{
           margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
-          max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
+          max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
         
         section{background:white;}
         paper-item{border: 1px solid #afafaf;}
@@ -29,9 +29,7 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
             <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
           </section>    
           <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
-               <!--          <a link={{}}> -->
-                <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="cellClass" max-char="450"></textarea>      
-            <!--         </a> -->
+              <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="cellClass" max-char="450"></textarea>      
           </template>
         </div>
   </template>
@@ -41,27 +39,22 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
             </content>
  </template>
  <script>
- FcMappedGrid=Polymer({
- 	is:"fc-data-grid-supra",
-  behaviors:[Polymer.Templatizer, FCBehaviors.FcDataGridBehavior],
-  listeners: {"color-picker-selected":"getcolor"},
- 	properties: { 
-    format:{ type: Object,value:function(){return {};}, notify: true,
-          },
-    gridEvent:{type: Object,value: function(){return {};},notify: true, 
-            },
-    btnValue:{type: String,value:function(){return "";},notify: true
-          },
-    color:{type: String,value:function(){return "";},notify: true        
-          },
-    arraysIndex:{type: Number,value: function(){return 0;},notify:true
-          },
-    four:{type:Boolean,computed:"computefour(arrayIndex)",notify: true
-          },
-    
-    colorTwo:{ type: String, value:function(){return "";}, notify: true
-          },
- 	},
+ FcDataGridSupra]]=Polymer({
+  is:"fc-data-grid-supra",
+    behaviors:[Polymer.Templatizer,Polymer.IronResiz FCBehaviors.FcDataGridBehavior],
+    listeners: {"color-picker-selected":"getcolor"},
+ 	  properties: { 
+        format:{ type: Object,value:function(){return {};}, notify: true},
+        gridEvent:{type: Object,value: function(){return {};},notify: true},
+        btnValue:{type: String,value:function(){return "";},notify: true},
+        color:{type: String,value:function(){return "";},notify: true},
+        arraysIndex:{type: Number,value: function(){return 0;},notify:true},
+        four:{type:Boolean,computed:"computefour(arrayIndex)",notify: true},        },
+        
+        colorTwo:{ type: String, value:function(){return "";}, notify: true},
+        gridItem:{type: Object, value: function(){return {};}, notify: true}
+              },
+     	},
 ready(){
     var columns=this.setColumns();
      var headerArray=columns.map(function(val,index, array){
@@ -84,14 +77,15 @@ ready(){
     var btnValue=e.target.btnValue;
       this.set("btnValue", btnValue);
     } 
-    this.set("gridEvent", e);
+    var model=modelForElement(e.target),
+    item=itemForElement(e.target);
+    var item=e.target
+    this.set("gridEvent", [e,item, model]);
     console.log(this.gridEvent);
     this.$.myContextMenu.hidden=false;
     this.$.myContextMenu.style.left=(e.clientX-330)+"px";
     this.$.myContextMenu.style.top=(e.clientY)+"px";
     this.$.myContextMenu.style.zIndex=25000;
-    console.log(e.target);
-    this.set("gridEvent",e);
     var key=e.target.getAttribute("id").split("_");//
     if(key[2]==0 && key[1]!=0){
       var returnColumnHeader =this.columnMenu.concat(this.basemenu);
@@ -118,7 +112,7 @@ ready(){
   stylePropertySelection(e){
     if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
       if(e.target.btnProp){
-        console.log("HERE HERE HERE", e.target.btnProp);
+        console.log("HERE HERE HERE", e.target.btnProp, "IS THIS CALLED STILL; I REALLY NEED TO GET ON TOP OF WHERE THINGS ARE ACTUALLY HAPPENING");
         this.set("changeProperty", e.target.btnProp);
         }
         var value=this.comparisons.get(this.gridEvent.target.id);

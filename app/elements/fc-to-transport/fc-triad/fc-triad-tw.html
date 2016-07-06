@@ -60,6 +60,9 @@ background: white;
 min-height: 38px;
 
 }
+fc-relative-fit-wrapper{
+	border: dashed 8px orange;
+};
 .headerArrowRight{
 	 color: white; 
 	 position:absolute; 
@@ -92,15 +95,16 @@ min-height: 38px;
 </style>
 	<div id="myPanel" style$="width:{{currentWidth}}; height:{{currentHeight}}px; margin: 38px;" class="horizontal layout flex self-shrink justified-around" >
 		<div class="vertical layout self-stretch nowrap" > 
-		 <fc-relative-fit-wrapper id="wrapperLb" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>       
-            </fc-relative-fit-wrapper> 
-		<paper-material class=" layout vertical around-justified calendarborder" style="max-height: 125px!important; min-height: 105px; margin-bottom: 48px;">
+	<!-- 	 <fc-relative-fit-wrapper id="wrapperLb" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>       
+            </fc-relative-fit-wrapper>  -->
+		<paper-material class=" layout vertical around-justified calendarborder" style$="max-height: 78px!important; min-height: 105px; margin:12px 12px 24px: 12px; padding 8px 4px 4px 4px;">
 					<section class="horizontal layout center-justify headerTop" style="align-items: center;">
 						<span id="spanLeft" on-tap="_backOne" hidden={{backHidden}} style="font-size:32px; color:white;" inner-html-one="[[_computeSpanOne(arrow)]]"></span>
 						<section class="layout horizontal headerMonthYear">
 						Header Left
-												</section>
-						<span on-tap="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> &#9658;</span>
+						</section>
+						<span on-tap="_forward" hidden="{{forwardHidden}}" style="font-size:32px; color:white;"> 
+						&#9658;</span>
 					</section> 
 					<section on-down="dragsOff" on-track="_resize" hidden="{{!isResizing}}"  on-up="dragsOn" style="position: absolute; right: -4px; top: 0px; bottom:0px; cursor:ew-resize; padding: 4px; width: 8px!important;opacity: 0;">
 				</section>
@@ -123,7 +127,7 @@ min-height: 38px;
      	</div>
   	</template>
   	</div>      
-  <iron-splitter signal="{{resize}}" style="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
+  <iron-splitter signal="{{resize}}" style$="top: 0px; bottom:0px; background:{{background}}; width: 12px;  border: 2px solid #efefef;" direction="left"></iron-splitter>
 		<div class="layout vertical flex self-stretch" style="width: 100%; overflow: hidden;">
 		<div class="flex layout vertical self-stretch" style="min-height: 95.5vh; max-height: 95.5vh; overflow: scroll;"><!--visual swap in horizontal layout here-->
 			<div class="vertical layout flex self-shrink">
@@ -144,15 +148,12 @@ min-height: 38px;
 				<!--resizer-->
 				<div flex layout vertical style="height: 96vh;">
 				<div class="horizontal layout flex-1" style="height: 50vh; margin: 12px 5px;">
-					<fc-mapped-grid data-set="{{itemsArraysOne}}" context-menu-categories="{{contextMenuCategories}}" properties="{{format}}" grid-event="{{gridEvent}}" btn-value={{btnValue}} color="{{color}}" color-two="{{format.colorTwo}}">
-						<fc-context-menu context-menu-categories="{{contextMenuCategories}}" properties="{{format}}" grid-event="{{gridEvent}}" btn-value={{btnValue}} color="{{color}}" color-two="{{format.colorTwo}}">
-						</fc-context-menu>
-					</fc-mapped-grid>
+					<fc-data-grid-supra data-set="{{itemsArraysOne}}" context-menu-categories="{{contextMenuCategories}}" properties="{{format}}" grid-event="{{gridEvent}}" btn-value={{btnValue}} color="{{color}}" color-two="{{format.colorTwo}}">
+					</fc-data-grid-supra>
 				</div>
 				 <iron-splitter signal="{{resize}}" style="background:orange; height: 22px; width: 99%; border: 2px solid #efefef;" direction="up"></iron-splitter><!--here is where you have to change your the height to the difference betweeb screen height and height, and use a margin property or overflow to fix it-->
 			
- 				<div class="layout horizontal flex" style="position:static; height: 100%; padding-bottom: 50%; overflow:scroll;">
-
+ 				<div class="layout horizontal flex" style="position:static; height: 100%; padding-bottom: 50%; overflow:scro
  									<article  class="layout horizontal flex wrap" style="position:static;padding: 34px; height: 450px;max-height:76vh;">
 		  				<template is="dom-repeat" items="{{wordEvents}}" as="wordEvent">
 		    					<p style="margin: 36px;">{{wordEvent}}</p> 	
@@ -233,7 +234,6 @@ FcTriad=Polymer({
 		},
 		displayedCalendarMonth:{
 			type: String,
-			computed: "computeViewMonth(displayedIndex)",
 			notify: true
 		},
 		currentWidth: {
@@ -361,8 +361,8 @@ FcTriad=Polymer({
   },
 
 
-_heightOfHeaderArea(calendarData, gridData){
-		var retVal=(calendarData.length>5)?"min-height: 105px; max-height: 135px;":"height:65px!important;";
+_heightOfHeaderArea(gridData){
+		var retVal=(gridData.length>5)?"min-height: 105px; max-height: 135px;":"height:65px!important;";
 		return "min-height: 85px; background: #005c00;";
 },
   computeDisplayHeaderTwo(displayed){
@@ -420,8 +420,7 @@ _computeItemsOneObject(itemsArraysOne,indexItemsArraysOne){
 	}
 },
 
-computeDay: function(day){if(day){return "pretty";}
-},
+
 ready: function()
 {	
 		var today = new Date();
@@ -436,76 +435,8 @@ computeCurrentHeight: function(currentHeight){
       ht=ht.toString()+"px";
     	if(this.currentHeight==undefined) {this.set("currentHeight", ht); this.style.height=ht;}	
     },
-computeViewHeaderOne(monthsArray){
+computeViewHeaderOne(monthsArray){},
 
-
-
-
-
-    },
-setArrays:function(){
-	var monthsArray=["January","February","March","April","May","June","July","August","September","October","November","December"],
-	setVal=monthsArray.map(function(mon, i, arr){
-		var month = mon.slice(0,3);
-		return [mon, month, i];});
-	},
-setCalendarDays(newMonth){
-	if(newMonth){}
-		var self=this;
-		this.calendarDayArray=[];
- for(var i=0;i<2; i++){ 	
-	// var array = this.monthsArray[i];
-	// this.monthsArray.length;
-	// this.push("calendarMonthsArray",array);
-	// array.forEach(function(item, index, arr){
-	// 	self.push("calendarDayArray", item);});
-	// 	};
-	this.set("displayed", this.calendarMonthsArray[this.displayedIndex]);
-	// 	var calendar =[];
-	// 	var calendar = this.calendarDayArray;
-	// 	this.set("fcCourse.courseCalendarDaysArray", calendar);
-	// 	this.set("fcCourse.calendarDayArray", calendar);}
-	this.setArrays();
-	}
-},
-//set data object values
-
-initialize(days,incrementUnits){
-	var bumpBackMonth=11, bumpAheadMonth=0,year=new Date().getFullYear(),day=new Date().getDate(), bumpAheadMonth, month=new Date().getMonth(); 
-	var lessOneYear=year-1;
-	var plusOneYear=year+1;
-	var plusOneMonth=month+1;
-	var lessOneMonth=month-1;
-	var lessOneDay=day-1;
-	var plusOneDay=day+1;
-
-	console.log(year, month);
-	var dateObject =(month===0)?{"startDate":new Date().setFullYear(lessOneYear, 11, 1), "endDate":new Date().setFullYear(year, 1, 1)}:(month===11)?{"startDate":new Date().setFullYear(year, 10, 1),"endDate":new Date().setFullYear(plusOneYear,0,31)}:{"startDate":new Date().setFullYear(year,lessOneMonth,0), "endDate":new Date().setFullYear(plusOneYear,0,31)};
-	if(days){
-	this.calendarCreator(dateObject.startDate, dateObject.endDate, "months", days);
-	}//add ret vals here dont have it set inside// needs to chain
-	else{this.calendarCreator(dateObject.startDate, dateObject.endDate, "months");}
-},
-
-setDisplayedYearMonthDay(displayDateObject, dateUnit, updownflat){
-		var previousDisplayDateObjectUnitValue=this.displayDateObject[dateUnit];
-  		displayDateObject[dateUnit]=(updownflat===true)?displayDateObject[dateUnit]+1:(updownflat===false)?displayDateObject[dateUnit]-1:displayDateObject[dateUnit];
-  		var keys=Object.keys(displayDateObject);
-  		date=new Date(), date.setFullYear(displayDateObject.year, displayDateObject.month, displayDateObject.day);
-  			this.set("year". date.getFullYear());
-  			this.set("month",date.getMonth());
-  			this.set("day", date.getDate());
-  },
-// get nextIncrementValue(){
-
-// 	year=new Date().getFullYear(), bumpAheadMonth, month=new Date().getMonth();
-
-// },
-
-computeDisplayed(displayedIndex)
-{		
-	return this.calendarMonthsArray[displayedIndex];
-},
 forward: function(){
 		if(this.displayedIndex ==this.maxIndex){
  			this.splice("calendarMonthsArray",this.MaxIndex,1);
@@ -544,25 +475,6 @@ backOne: function(){
 		return retVal;
 		},
 
-computeNotInMonths: function(item, displayedIndex){
-	var x=new Date(item).getFullMonth();
-	var y=this.displayedCalendarMonth;
-	var retVal = (x===y);
-	var len = this.displayed.length;
-	return retVal;
-},
-computeViewMonth: function(displayedIndex){
- var monArr =[];	
- monArr=["January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December"];
-	return monArr[displayedIndex];
-	},
-
-	_computePrettyDay: function(d)
- 	{	
- 		var day=new Date(d).getDate();//console.log(day);
- 		return day;
-
- 	},
 
  	 _resize: function(e){
           var self=this;

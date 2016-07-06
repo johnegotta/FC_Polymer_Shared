@@ -1,0 +1,630 @@
+<script>
+(function(){
+"use strict";
+
+})();
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcDataGridStylingBehavior = {
+	listeners: {"color-picker-selected":"getcolor"},
+	properties: {
+		gridEvent:{
+        type: Object,
+        value: function(){return {};},
+        notify: true
+      },
+    btnText:{
+      type: String,
+      value:function(){return "";},
+      notify: true
+    },
+    comparisons:{
+      type: Map,
+      notify: true,
+    },
+     defaultFormat:{
+        type:Object,
+        value:function(){
+            return {"color": "#009", "background": "#fefefe", "header_backgroundColor":"aliceblue", "fontSize": "18px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15", "border": "1px #afafaf solid", "styleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center; font-size: 18px; resize:none;"};
+          },
+        notify: true 
+    },
+    defaultHeader:{
+    	type:Object,
+    	value:function(){
+    		return {"max-height": "65px;","border": "solid 1px #009;", "min-height": "18px;", "margin": "0px;", "height":"23px!important;", "font-family":"merriweather;", "background": "aliceblue;", "color": " #009;", "text-align": "center;", "font-size": "18px;","font-weight":"700;", "resize":"none;", "styleText":"max-height: 65px; border: solid 1px #009; min-height: 18px;  margin: 0px;  height:23px!important;  font-family:merriweather;  background: aliceblue;  color:  #009;  text-align: center;  font-size: 18px; font-weight:700; resize:none;"};
+    	},
+    	notify: true,
+    },
+    allSymbols:{
+    	type:String,
+    	value:function(){return  `➔ ❶ ✂ ✎ ✒ ✜ ❚ ❶ ➀ ➞ ☚ ☛ ☰ ☱ ☷ ☑ ☐ ☎ ☏ ► ▼ ▲ ◄ ⇒ Δ ▐ █ ▄ ▀`;},
+    	notify: true,
+    },
+    selectedMap:{
+        type:Map,
+        notify: true
+    },
+    sourceCell:{
+      type: Object, 
+      notify: true,
+    },
+    color:{
+        type: String,
+        value:function(){return "#009";},
+        notify: true
+        },
+    background:{
+        type: String,
+        value:function(){return "#F0F8FF";},
+        notify: true
+    
+    },
+     columnArchive:{
+      type: Array,
+      value: function(){return [];},
+      notify: true
+    },
+    rowArchive:{
+      type:Array,
+      value:function(){return [];},
+      notify: true
+    },
+    archivist:{
+    	type:Object,
+    	value:function(){return [];},
+    	notify: true
+    	},
+	},
+	detached(){},
+
+	getcolor(e){
+    		this.set("color", e.detail.color);
+    		},
+    get columnMenu(){
+      var menuArray= [
+          { "title": "Adding & Deleting Columns", 
+              "buttons":[
+              {"text": ["+1 Column Right: ","", " ✜ ▐ ☛"],"myFunction": this.addColumn.bind(this)}, 
+              {"text":["+1 Column Left: ",""," ✜ ▐ ☚"], "myFunction": this.addColumn.bind(this)},
+       	      {"text":["Delete Column: ","", " ✂ ▐"], "myFunction": this.deleteThisColumn.bind(this)}, 
+             {"text": ["Restore Column: ", , "☤ ▐ ☤"], "myFunction":this.restoreThisColumn.bind(this)}
+            ]
+          }, 
+       
+         {   "title":"Column Highlighting Patterns",
+            "boundFunctionString":this.alternatingHighlighter.toString(),
+            "function":this.alternatingHighlighter.bind(this), 
+              "buttons": [
+                  {"text":["Odd Numbered Column Highlighter", "",""],
+                  		"dataProperty": "background:",
+                      "dataSetValue":`${this.color};`,
+                  		"myFunction":this.alternatingHighlighter.bind(this), 
+            
+                  },
+                  {   "text":["Remove Odd Numbered Columns' Highlight", "",""],
+                  		"dataProperty":"background:",
+                      "dataSetValue":`${this.defaultFormat.background};`,
+                  		"myFunction": this.alternatingHighlighter.bind(this)
+                  	},
+                  {	"text":["Shift Column Highlight Right One Column", "",""],
+                  		"dataProperty": "background:",
+                      "dataSetValue	":`${this.color};`,
+                  		"myFunction":this.alternatingHighlighter.bind(this)
+                  	},
+                  {	"text":["Shift Column Highlight Left One Column", "",""],
+                  		"dataProperty": "background:",
+                      "dataSetValue	": `${this.color};`,
+                  		"myFunction":this.alternatingHighlighter.bind(this)
+                  	},
+                  {	"text":["Begin and End Column Highlight On Tap", "",""],
+                  		"dataProperty":"background:",
+                      "dataSetValue	": `${this.color};`,
+                  		"myFunction":this.alternatingHighlighter.bind(this),
+                     // "additionalRequirements": get dragWrapperSelectionHandler(),
+                  	},
+                  ]
+          		},  
+   		     ];
+
+         var returnArray=this.setDataArgs(menuArray);
+         return returnArray;
+      
+    	},
+   	get rowMenu(){var menuArray= [
+   		{   "title": "Inserting & Excising Rows", 
+              "buttons": [
+              		{"text": ["+1 Row Above:", ," ☰ ▲ "] ,"myFunction": this.insertRow.bind(this)}, 
+              		{"text":["+1 Row Below:", ," ☰ ▼ "], "myFunction": this.insertRow.bind(this)},
+        			    {"text": ["Delete Row: "," ", " ✂ ☰"],"myFunction": this.deleteRow.bind(this)}, 
+        			    {"text":["Restore Row: ","☤", " ☤ ☰ ☤ "], "myFunction": this.restoreRow.bind(this)}
+            		]
+          		},
+
+        { "title":"Row Highlighting Patterns",
+      		 "buttons":
+      		[	{	"text": ["Add Alternate Row Highlighting", " ", " "], 
+					   "dataProperty":"background:",
+             "dataSetValue	":this.background, 
+					   "myFunction":this.alternatingHighlighter.bind(this), 
+					   "dataArgs":[]
+            },
+			
+        {	"text":["Remove Alternate Row Highlighting"],
+              "dataProperty":"background:",
+              "dataSetValue": this.defaultFormat.background,
+              "dataFunction": "alternatingHighlighter", 
+              "myFunction":this.alternatingHighlighter.bind(this),
+                	"dataArgs":
+					[	
+						{
+  						"key":"key",
+
+  						"modulus":[2,1],
+  						"modulusBase": 2,
+  						"dataProperty":"background",
+  						"setValue":this.defaultFormat.background,
+  						"mapForKeysetget":this.comparisons,
+  						"typeArchive":this.rowArchive,
+  						"untyped_Archive":this.undoArchive
+  					},
+  				]
+  				},
+                   {"text":["Begin and End Row Highlight On Tap", "",""],"myFunction":this.alternatingHighlighter.bind(this)},  
+            ], //End Six Button Page
+
+      }];
+       var returnArray=this.setDataArgs(menuArray);
+         return returnArray;
+      
+      	},
+	get basemenu(){ var menuArray =[
+		{
+              "title":"Highlight Color", 
+              "buttons":[
+              {"text":["Highlight Selection: ",""," ✒ ❚ "],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "background:", "dataSetValue	": `${this.color};`}, 
+              {"text":["Remove Highlighting: ", ," ✂ ✒"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "background: ",
+                "dataSetValue	": `${this.defaultFormat.background};`}]
+          },
+          {   "title": "Text Color",
+              "buttons": [
+              {"text":["Apply This Text Color:"," ✎" , "▀"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty":"color:", 
+              "dataSetValue": ` ${this.color };`
+                },
+              {"text":["Apply Base Text Color:"," ✎ " , "▀"], 
+              "myFunction":this.stylePropertySelection.bind(this),
+              "dataProperty": "color:",
+              "dataSetValue": ` ${this.defaultFormat.color};`}
+              ] 
+          },
+          {    "title": "Text Weight",
+                "buttons": [
+                    {"text":["Thin Text Weight:", ,"𝒯𝒽𝒾𝓃"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "font-weight:","dataSetValue": " 300;"},
+                    {"text":["Medium Text Weight:", ,"Medium"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-weight:","dataSetValue": " 600;"},
+                    {"text":["Strong Text Weight", "STRONG"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-weight:", "dataSetValue": " 900;"
+              }
+            ] 
+          },
+          {  "title": "Font Family",
+             "buttons": [
+              {"text": ["Roboto Font Family", ," ROBOTO"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family:", "dataSetValue": "roboto;"},
+              {"text":["Merriweather Font Family", ," Merriweather"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family:", "dataSetValue": "merriweather;"},
+              {"text":["Courier Font Family: ", ," Courier"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-family:", "dataSetValue":  "courier;"
+              }
+            ],
+          },
+          {   "title":"Font Styles",
+              "buttons": [
+                  {"text": [`Italics: Italics`],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-style:", "dataSetValue": " italic;"},
+                  {"text":["Underline:", ,"Underline"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration:", "dataSetValue":" underline;"},
+                  {"text": ["Strike-Through:", ,"Strike-Through"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration:",  "dataSetValue":" line-through;"},
+                  {"text": ["Normal: ", , " Normal"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration:", "dataSetValue": " none;"},
+                  {"text": ["Clear Italics:", , "Normal"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty": "font-style:","dataSetValue": " normal;"
+                } 
+            ], 
+          },
+          {   "title":"Font Size",
+              "buttons": [
+              		{"text":[`10px Smallest Large Screen Font`],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:10px;"},
+                  {"text":["12px", "","Smaller Than Shown"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 12px;"},
+                   {"text": ["14px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 14px;"},
+                  {"text": ["16px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 16px;"},
+                  {"text": ["18px","", "Focused Standard"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 18px;"},
+                   {"text": ["20px", "", "Slightly Smaller"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 20px;"},
+                  {"text": ["22px","","Section Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 22px;"},
+                  {"text": ["24px","","Section Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 24px;"},
+                  {"text": ["26px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 26px;"},
+                  {"text": ["28px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 28px;"}, 
+                  {"text": ["30px","","Header Font"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 30px;"},
+                  {"text": ["32px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size:",  "dataSetValue": " 32px;"},
+                  {"text": ["34px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size:",  "dataSetValue": " 34px;"},
+                  {"text": ["36px","", "Banner Font"],"myFunction":this.stylePropertySelection.bind(this), " dataProperty": "font-size:",  "dataSetValue": " 36px;"}
+            ], 
+          },
+       
+      	];
+
+         var returnArray=this.setDataArgs(menuArray);
+         return returnArray;
+    }, 
+
+    setDataArgs(menuArray){
+      var newMenuArray=menuArray.map(function(val, index, array){
+             var newButtons=val.buttons.map(function(button,i, ar){
+                    button.dataArgs={"setValue": button.dataSetValue, "property": button.dataProperty, "propertyAndValue": button.dataProperty+" " +button.dataSetValue};
+                  return button;});
+              //console.log(val.buttons);
+             val.buttons=newButtons;
+             ////console.log(newButtons,val.buttons);
+             return val;
+           });
+             return newMenuArray;
+    }, 
+
+
+
+    observeGridItemData(nval, oval){
+        if(nval){
+      //console.log(nval, this.gridEvent[1].dataSetValue	);
+    }
+
+
+    },
+ stylePropertySelection(e){
+    if(this.comparisons&&this.comparisons.get("comparisons_0_15_"))
+    {
+      var value=this.comparisons.get(this.gridEvent.target.id);
+      var keys=this.gridEvent.target.id.split("_");
+      var fullVal=e.target.btnProperty + e.target.btnSetValue;
+      var property=e.target.btnProperty.replace(":","");
+      var setValue =(property.match("color"))?this.color:(property.match("background"))?this.background: e.target.btnSetValue; 
+      setValue=setValue.replace(";", "");
+      for(var i=1;i<50;i++)
+      {
+          if(value  && keys[2]==0 && keys[1]!=0)
+          {
+            var newKey="comparisons_"+keys[1]+"_"+i+"_";
+             var value=this.comparisons.get(newKey);
+           }
+          else if(value && value[1] && keys[1]==0 && keys[2]!=0)
+          {
+            var newKey="comparisons_"+i+"_"+keys[2]+"_";
+             var value=this.comparisons.get(newKey);
+          }
+          else if(value && value[1] && keys[1]==0 && keys[2]==0){
+            for(let n of this.comparisons){
+                  n[1][1].style[property]=setValue;
+                  var key=n[1][1].getAttribute("id");//here gets all 
+                  this.comparisons.set(key,[n[1][1].value, n[1][1]]);
+            }
+            break;
+          }
+          else{
+           i=52;
+            }
+          if(value && value[1])
+            { 
+             value[1].style[property]=setValue;
+             this.comparisons.set(key,[value[1].value, value[1]]);
+            }   
+            else{break;}
+      }//end for loop; headers below:e.target.parentElement._templateInstance for model col for item
+    }//end initialization if for values//HERE DOWN IS FOR POLYMER STILL HAVE HEADER ISSUE
+    if(!this.gridEvent.target.id.match("comparisons")){
+      var key =this.gridEvent.target.id;
+      var keys=this.gridEvent.target.id.split("_");
+      var mapName=keys[0];
+      var property=e.target.btnProperty;
+      var setValue =(property.match("color"))?this.color+";":(property.match("background"))?this.background+";": e.target.btnSetValue;
+        var fullVal=property+setValue;
+       
+      for(var i=1;i<50;i++)
+        {
+          if(keys[2]==0 && keys[1]!=0)
+          {
+            var newKey=mapName+"_"+keys[1]+"_"+i+"_";
+              
+           }
+          else if(keys[1]==0 && keys[2]!=0)
+          {
+              var newKey=mapName+"_"+i+"_"+keys[2]+"_";
+          }
+          else if(keys[1]==0 && keys[2]==0)
+          {
+            for(let n of this[mapName])
+            {
+              var newKey=n[1][1].id;
+              var keycells=newKey.split("_");
+              if(keycells[1]!=0&&keycells[2]!=0)
+                {
+                  var theId="#"+newKey;
+                  var cell=this.$$(theId);
+                  var model=cell._templateInstance;
+                  var cellStyle=model.item.style;
+                  if(cellStyle.match(property))
+                    {
+                      var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                      cellStyle=cellStyle.replace(replacer, "");
+                     } 
+                  cellStyle=cellStyle+fullVal;
+                  model.set("item.style",cellStyle);
+                  n[1][1].style=cellStyle;
+                  this[mapName].set(newKey,[n[1][1].value, n[1][1]]);
+                }
+            }
+            break;
+          }
+          else{
+            var newKey=key;
+           i=52;
+            }
+          if(newKey){
+              var payload=this[mapName].get(newKey);
+              if(payload){
+              var theId="#"+newKey;
+              var cell=this.$$(theId);
+              var model=cell._templateInstance;
+              var cellStyle=model.item.style;
+          if(cellStyle.match(property))
+          {
+                  var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                  cellStyle=cellStyle.replace(replacer, "");
+          }
+              cellStyle=cellStyle+fullVal;
+              model.set("item.style",cellStyle);
+          payload[1].style=cellStyle;
+          console.log(payload);
+          this[mapName].set(key,payload);
+            }
+        }
+      }//end for
+    }//end if
+  },
+  
+  
+ 
+alternatingHighlighter(e){
+    var keys=this.gridEvent.target.id.split("_"),
+    mapName=keys[0],
+    parent=(keys[0]=="comparisons")?this.$.hanger3:this.$.polymerGrid;
+    console.log(mapName, this[mapName]);
+    var columns= Polymer.dom(parent).children;
+    var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
+    var property=btn.btnProperty,
+    setValue =(property.match("color"))?this.color:(property.match("background"))?this.background: e.target.btnSetValue;
+    var fullVal=property+" "+setValue;
+    var colCount=(keys[1]==0&&keys[2]!=0)?1:2;
+    var rowCount=(keys[1]==0&&keys[2]!=0)?2:1;
+    for(i=1;i<counter;i+=colCount)
+    {
+      var columnChildren=Polymer.dom(columns[i]).children,
+      counter2=columnChildren.length;
+      for(j=1;j<counter2;j+=rowCount)
+      {   
+          if(columnChildren[j]!=undefined){
+            var key =columnChildren[j].getAttribute("id");
+            if(parent==this.$.polymerGrid){
+                var theId="#"+key, 
+                cell=this.$$(theId);
+                var payload=this[mapName].get(key);//keys[0] is mapname//
+                  console.log(payload);
+                var keyParts=key.split('_');
+                if(keyParts[2]!=0&&cell.nodeName=="TEXTAREA"){
+                var model=cell._templateInstance;
+                 var cellStyle=model.item.style;
+                 console.log(cellStyle, property);
+                    if(cellStyle.match(property))
+                      {
+                        console.log(cellStyle, property);
+                          var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                          cellStyle=cellStyle.replace(replacer, "");
+                      }
+                    cellStyle=cellStyle + fullVal+";"+" ";
+                    model.set("item.style",cellStyle);
+                    payload[1].style=cellStyle;
+                    this[mapName].set(key,payload);
+                  }
+                }
+            
+            else{
+                property=property.replace(":","");
+                setValue = setValue.replace(";","");
+                var elem=this.comparisons.get(key);
+                elem[1].style[property]=setValue;
+                this.comparisons.set(key,[elem[1].value,elem[1]]);
+      		  }
+          }
+       
+      	}
+      }
+  },
+  
+ 	insertRow(e){
+   		var eid=this.gridEvent.target.getAttribute("id");
+   		var key=eid.split("_");
+      		if(key[1]==0 &&key[2]!=0)
+      		{
+			      var rowNum=key[2];
+			      var after=(e.target.btnText.match("Row Below"))?true: false;
+			      var childColumn= Polymer.dom(this.$.hanger3).children;
+			      var rows=childColumn[0].children.length;
+			      var count=childColumn.length;
+			    for(var k=0;k<count; k++)
+			    {
+			        var colNum=childColumn[k].getAttribute("id");
+			        var colNum=colNum.split("_");
+			        var elem=document.createElement("TEXTAREA");
+			        elem.setAttribute("style", this.defaultFormat.styleText);
+			        var nKey=key[0]+"_"+colNum[1]+"_"+rows+"_";
+			        elem.setAttribute("id", nKey);
+			        elem.value="--";
+			        this[key[0]].set(nKey,[elem.value, elem]);
+			        var theId="#"+ key[0] + "_" + colNum[1] + "_" + key[2] + "_";
+        			
+        			if(after===false)
+        			{   
+        				Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
+           				var style=Polymer.dom(elem).nextSibling.style.cssText
+          				elem.style.cssText=style;
+          				this[key[0]].set(nKey, [elem.value,elem]);
+         			}
+        			else if(after===true&&key[2]<rows)
+            		{
+              			Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
+                		var style=Polymer.dom(elem).nextSibling.style.cssText
+                		elem.style.cssText=style;
+                		this[key[0]].set(nKey, [elem.value,elem]);
+            		}
+        			else if(after===true&&key[2]==rows)
+            		{
+              			Polymer.dom(childColumn[k]).appendChild(elem);
+                		var style=Polymer.dom(elem).previousSibling.style.cssText
+                		elem.style.cssText=style;
+                		this[key[0]].set(nKey, [elem.value,elem]);
+            		}
+       			}//end for look from way up above
+      		}//end of be a row header etc
+          
+  		},
+  	deleteRow(e){
+    	var children=Polymer.dom(this.$.hanger3).children;
+    	var columnNumberArray=[],
+    	columnArrayIds=[],
+    	rowArray=[];
+    	children.forEach(function(col,index, array){
+        		var colId=col.getAttribute("id");
+        		columnArrayIds.push(colId);
+        		var colIdMiniArray=colId.split("_");
+        		columnNumberArray.push(colIdMiniArray[1]);
+    	});
+    	var baseId=this.gridEvent.target.getAttribute("id"),
+    	rowIndex=Polymer.dom(children[0]).children.indexOf(this.gridEvent.target),
+    	splitBaseId=baseId.split("_");
+     	rowArray=columnNumberArray.map(function(col, index,array)
+     	{
+        var theId="#"+splitBaseId[0]+"_"+col+"_"+splitBaseId[2]+"_";
+        var elem=this.$$(theId);
+        var theId2="#" + columnArrayIds[index];
+        var parent=this.$$(theId2);
+        Polymer.dom(parent).removeChild(elem);
+        return elem;
+    	}, this);
+    	this.push("rowArchive", [rowIndex, rowArray]);
+      this._synchMapIndices();
+    },
+  restoreRow(e){
+   
+     var children=Polymer.dom(this.$.hanger3).children;
+     var counter=children.length,
+     i=0,
+      row=this.pop("rowArchive");
+      for(i=0; i<counter; i++){
+        var column=Polymer.dom(children[i]).children;
+         var beforeElement=column[row[0]];
+         Polymer.dom(children[i]).insertBefore(row[1][i],beforeElement);
+      }
+  },
+  addColumn(e){
+    if(e.target.btnText){this.set("btnText",e.target.btnText);}
+    var parent=this.gridEvent.target.parentElement;
+    var pParent=parent.parentElement;
+    var columns=pParent.children;
+    var eid=this.gridEvent.target.getAttribute("id");
+      var key=eid.split("_");
+    if(key[2]==0){
+      var children=Polymer.dom(parent).children;
+      var id=parent.getAttribute("id");
+      var column =document.createElement("DIV");
+        column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
+          var colNum=columns.length;//need to push on this length
+         
+          var att=parent.getAttribute("id");
+          var colKey=att.split("_");
+          if(this.btnText && this.btnText.match("Left") && this.btnText.match("Left").length>0){
+           var columnId="column_"+(colNum);
+          column.setAttribute("id", columnId); 
+          Polymer.dom(this.$.hanger3).insertBefore(column, parent);
+        }
+      else{
+          var nsib=Polymer.dom(parent).nextSibling;
+          var columnId="column_"+(colNum.toString());
+          column.setAttribute("id", columnId);
+          Polymer.dom(this.$.hanger3).insertBefore(column,nsib);
+                      console.log(columnId);
+      }
+       this.push("columns4",["znother", "column"]);
+          var numCells=children.length;
+    for(var j=0; j<numCells;j++)
+    { var trueVal=children[j].getAttribute("id");
+      trueVal=trueVal.split("_");
+      var val=trueVal[2];
+      elem=document.createElement("TEXTAREA");
+      var key="comparisons_"+colNum+"_"+val+"_";
+      elem.setAttribute("id",key);
+      if(j==0){elem.setAttribute("style", this.defaultHeader.styleText);}
+      else{elem.setAttribute("style", this.defaultFormat.styleText);}
+       		elem.value="--";
+      		Polymer.dom(column).appendChild(elem);
+     		this.comparisons.set(key,[elem.value, elem]);
+    	}
+    }
+    
+},
+
+  deleteThisColumn(e){
+      if(e.target.btnText){
+          this.set("btnText",e.target.btnText);
+      }
+      var parent=this.gridEvent.target.parentElement;
+      var key= parent.getAttribute("id");
+      var t=new Date().getTime();
+       var grandParent=parent.parentElement;
+       var nodeArray=Polymer.dom(grandParent).children;
+      var index= nodeArray.indexOf(parent);
+      this.push("columnArchive", [index,parent, t]);
+      Polymer.dom(grandParent).removeChild(parent);
+  },
+  restoreThisColumn(e){
+        var colArchArray=this.pop("columnArchive");
+        var columnChildren=Polymer.dom(this.$.hanger3).children;
+        var beforeElement=columnChildren[colArchArray[0]];
+        Polymer.dom(this.$.hanger3).insertBefore(colArchArray[1],beforeElement);
+  },
+
+
+	}
+</script>
+
+<!-- var property=e.target.btnProperty;
+      var setValue =(property.match("color"))?this.color+";":(property.match("background"))?this.background+";": e.target.btnSetValue;
+        var item = this.parentTarget.itemForElement(cell);
+        var model =this.parentTarget.modelForElement(cell);
+          console.log(cell, model, item);
+        console.log(cellStyle);
+        var fullVal=property+setValue;
+          for(i=0;i<50;i++){}
+          if(cell  && keys[2]==0 && keys[1]!=0)
+          {
+            var newKey="mapName"+keys[1]+"_"+i+"_";
+             payload=this[mapName]get(newKey);
+             theId=payload[1].id;
+             cell= this.$$(theId);
+             cellStyle=cell.style;
+                  if(cellStyle.match(property))
+                {
+                  var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                  cellStyle=cellStyle.replace(replacer, "");
+                  cellStyle=cellStyle+fullVal;
+
+                  this.gridEvent.target._templateInstance.set("__data__.item.style",cellStyle);
+                  }
+                 else
+                    {
+                      cellStyle=cellStyle+fullVal;
+                       this.gridEvent.target._templateInstance.set("__data__.item.style",cellStyle);
+                    }
+      property=property.replace(":","");
+      setValue=setValue.replace(";", ""); 
+          cell.style[property]=setValue;
+          payload[1].style=cellStyle;
+          console.log(payload);
+          this[mapName].set(key,payload);

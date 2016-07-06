@@ -1,0 +1,182 @@
+<dom-module id="fc-data-grid-supra">
+ <template id="fc-data-grid-supra-template">
+ <style>
+ :host{
+          margin: 12px 3px;
+          padding: 4px;
+          overflow:scroll;position: static;background: white; opacity: 1; 
+          @apply(--layout-vertical);
+          @apply(--layout-flex); 
+    };
+        textarea{   
+              margin:0px; 
+              border: 1px #dfdfdf solid; 
+              box-shadow: 1px 3px 4px 2px #fafafa;
+              cursor: cell; font-size: 18px; 
+              font-weight: 600; color: #009; 
+              font-family: merriweather; 
+              text-align: center; white-space: wrap;
+              max-height: 45px; 
+              min-height: 45px; border: 1px solid #afafaf;
+              padding-top: 4px; 
+              color: #009; 
+              text-align: center; 
+              resize:none; 
+              @apply(--layout-self-shrink);}
+        
+        section{        background:white;
+            }
+        paper-item{       border: 1px solid #afafaf;
+                          background: white;
+                          padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;
+            }
+        #myContextMenu{   min-width: 280px; 
+                          max-height: 420px; 
+                          position: fixed; 
+                          border:4px 
+                          ridge gold;  
+                          box-shadow: 5px 7px 11px 3px #afafaf;
+                          }
+        span{font-size: 18px; font-weight: 300; color: #009;}
+        details{outline: 0px; background: white; overflow: scroll;}
+        summary{outline: 0px;}
+      *{@apply(--layout-nowrap);
+    }
+</style>
+ <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
+ </array-selector>
+<!-- <a> -->
+<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; background: aliceblue; max-width:85.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
+<!--side utility editing menu for the spreadsheet-like versions-->
+
+Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>Page 
+<div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 97.5%; width: auto;">
+<div id="hanger3"   contenteditable="true" on-dblclick="mycontextMenu"  on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 95%; width: auto; overflow: scroll;">
+</div>
+</div>
+  
+</div>
+<fc-context-menu id="contextMenu" hidden>
+<section class="header layout horizontal flex">
+        <paper-swatch-picker>
+        </paper-swatch-picker><span>  &nbsp; Text &nbsp; </span>
+        <input type="color" value="{{background::input}}">&nbsp; Background
+  </section>
+<paper-listbox >
+  
+    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+        <paper-item value="{{category.title}}" category="{{category}}">
+            <details open="{{category.isOpen}}">
+                <summary>{{category.title}}</summary>
+                <paper-listbox style="min-width:260px!important; overflow-y: scroll; max-height: 200px; max-width: 360px!important;">
+                    <template is="dom-repeat" items="{{category.buttons}}" as="item">
+                          <paper-item onclick="{{item.myFunction}}" btn-set-value="{{item.dataSetValue}}" btn-text="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}" btn-property="{{item.dataProperty}}">                {{item.text.0}}
+                              <span btn-property="{{item.dataProperty}}" btn-text="{{item.text.0}}" btn-set-value="{{item.dataSetValue}}" btn-function="{{item.datafunction}}"style$="{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}">{{item.text.2}}</span>
+                              <span btn-property="{{item.dataProperty}}" btn-text="{{item.text.0}}" btn-set-value="{{item.dataSetValue}}" btn-function="{{item.dataFunction}}" btn-args="{{item.dataArgs}}" style$="{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}};">{{item.text.1}}</span> 
+                          </paper-item>
+                    </template> 
+                </paper-listbox>
+            </details>
+        </paper-item>
+    </template>
+</paper-listbox>
+</fc-context-menu>
+
+ </template>
+ <script>
+ FcDataGridSupra=Polymer({
+  is:"fc-data-grid-supra",
+    behaviors:[Polymer.Templatizer,Polymer.IronResizableBehavior,FCBehaviors.FcDataGridDataLoadingBehavior, FCBehaviors.FcDataGridStylingBehavior],
+    listeners:{"color-picker-selected":"getcolor"},
+ 	  properties:{ 
+        format:{ type: Object,value:function(){return {};}, notify: true
+          },
+        arraysIndex:{type: Number,value: function(){return 0;}, notify:true
+          },
+        four:{type:Boolean,computed:"computefour(arrayIndex)", notify: true
+          },    
+        contextMenu:{type:Object, value: function(){return {};}, notify: true
+          },
+        contextMenuCategories:{ type:Array,value:function(){return [];},notify: true  
+          },
+        theGrid:{type: Object, notify: true, observer:"gridObserve", 
+        }, 
+    },
+
+ready(){
+    var columns=this.setColumns();
+     var headerArray=columns.map(function(val,index, array){
+             return val.name;
+        });
+    var columnd=this.parser(headerArray,"accounting", columns);
+    this.set("columns", columnd);
+    this.parser2();
+       this.parser3();
+    this.push("dataArrays",this.columns);
+    this.push("dataArrays", this.columns2);
+    this.push("dataArrays",this.columns3);
+    this.push("dataArrays",this.columns4);
+    this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+  },
+gridObserve(newl, oldl){console.log(newl, oldl);},
+  mycontextMenu(e){
+    var menu=this.$.contextMenu;
+    this.set("contextMenu", menu);
+    this.set("gridEvent", e);
+    this.set("sourceCell", e.target);
+    this.set("theGrid", this);
+    var props=[["hidden",false], ["style.position", "fixed"], ["style.left",(e.clientX+20)+"px"],["style.top",(e.clientY +10)+"px"],["style.zIndex", 7], ["style.height", "320px"], ["style.width", "240px"],["style.border", "ridge gold 4px"],["overflow", "hidden"],["overflow", "scroll"], ["background", "#fdfdfd"]];
+    var counter=props.length, i=0;
+  for(i=0;i<counter;i++)
+  {
+    property=props[i][0];
+    this.set(["contextMenu",property],props[i][1]);
+    menu[props[i][0]]=props[i][1];
+  }
+    key=e.target.getAttribute("id").split("_");
+    if(key[2]==0 && key[1]!=0)
+    {
+        var returnColumnHeader =this.columnMenu.concat(this.basemenu);
+        this.setMenuEntries(returnColumnHeader);
+    }
+    else if(key[1]==0&&key[2]!=0){
+        var returnRowMenu=this.rowMenu.concat(this.basemenu);
+        this.setMenuEntries(returnRowMenu);
+    }
+    else if(key[1]&&key[2])
+    { 
+      this.setMenuEntries(this.basemenu);
+    }
+    else{
+      this.setMenuEntries([]);
+    }
+  },
+  getcolor(e){
+      this.set("color",e.detail.color);
+  },
+
+  setMenuEntries(returnValue){
+      this.set("contextMenuCategories", returnValue);
+  },
+  closemenu(e){
+      this.$.contextMenu.hidden=true;
+  },
+ 
+  arraySwap(e){
+        var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
+        this.set("arrayIndex", arrayNum);
+        this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+  },
+
+  _computeStyle(property, val, color, background, text ){
+    if(text||text.match(" ")){
+        var retVal=(text.match("Remove"))?`background: ${this.defaultFormat.background};`:(text.match("Base"))?`color: ${this.defaultFormat.color};`:(property==="background:")?`background: ${this.background};`:(property==="color:")?`color: ${this.color}`: property + val;
+    return retVal;
+    }
+    else return "background: gold;";
+         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
+  },
+ 
+  });
+    </script>
+   </dom-module>

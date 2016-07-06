@@ -1,7 +1,7 @@
 <dom-module id="fc-mapped-grid">
  <template id="fc-mapped-grid-template">
  <style>
-         :host{margin: 12px 3px;padding: 4px;overflow:scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); };
+         :host{margin: 12px; padding: 4px;overflow: scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); };
         textarea{margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
           max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
         details{outline: 0px white solid;}
@@ -9,37 +9,49 @@
         section{background:white;}
         paper-item{border: 1px solid #afafaf;}
         #myContextMenu{min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
+        #mappedGridContainer{min-width:50.99vw; background: aliceblue; max-width:92.99vw; width: 75%; min-height: 81vh; max-height:96vh; padding-top: 19px; margin: 16px;}
+        input{padding: 6px; min-height: 12px; align-items: center;}
+        paper-button{
+          min-width: 110px; height: 65px; border: #afafaf solid 2px; box-shadow: 4px 7px 15px 9px slategrey;
+        }
 </style>
+
  <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
  </array-selector>
 <!-- <a> -->
-<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse" style="min-width:66.99vw; background: aliceblue; max-width:85.99vw; min-height: 91vh; max-height:96vh; padding-top: 9px;">
+<div on-contextmenu="mycontextMenu">
+<div is-gridbox="true" on-mousedown="closemenu" id="mappedGridContainer" class="horizontal layout flex self-stretch reverse">
 <!--side utility editing menu for the spreadsheet-like versions-->
-
-Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>Page 
+<section class="layout flex-1" style="width: 120px;padding: 8px 28px; height: 100%; border: #005c00;">
+FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ONE 
+{{arrayIndex}}
+<paper-button on-tap="initializeIndexDB">Init DB</paper-button>
+</section>
 <div hidden="{{!four}}" id="hanger1" contenteditable="true" style="display:flex; flex-direction: column; flex-wrap:nowrap; max-width: 97.5%; width: auto;">
 <div id="hanger3"   contenteditable="true" on-contextmenu="mycontextMenu"  on-focus="setValuesInMap" style="display:flex; flex-direction: row; flex-wrap:nowrap; max-width: 95%; width: auto; overflow: scroll;">
 </div>
 </div>
+<div id="polymerGrid" class="horizontal layout flex-9 self-stretch reverse">
   <template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
-        <div id$="divCol_[[columnIndex]]" hidden="{{four}}" class="vertical layout container nowrap self-stretch">
-              <section id$="header_[[columnIndex]]" class="horizontal layout flex nowrap center center-justified self-shrink" data-payload$="{{col.data}}" draggable="true" on-dragstart="startDrag" on-dragover="dragOver" on-drop="handleDrop" style="cursor:pointer; font-weight:700; color: #009; font-size: 18px; overflow: hidden; text-align: background: aliceblue; center; min-width:calc(100vw/28); border-radius: 2px; max-width: 210px; max-height: 58px; min-height: 38px;">
-            {{col.name}} 
-            <input on-click="highlightCol" type="checkbox" name="hl" value="Bike" checked="{{computeColSelected(col.selected, trigger)}}">
-          </section>    
-          <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.data}}">
+        <div id$="divCol_[[columnIndex]]" hidden="{{four}}" class="vertical layout container nowrap self-stretch column">
+        <input on-click="lockColumn" type="checkbox" name="hl" value="[[columnIndex]]" checked="[[computeLockedColumn(col.id)]]">
+              <textarea id$="{{col.id}}" class="horizontal layout flex nowrap center center-justified self-shrink" draggable="true" on-dragstart="startDrag" value="{{col.name::textarea}}" on-dragover="dragOver" on-drop="handleDrop" style$="{{col.style}}">{{col.name}} 
+          </textarea>    
+          <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col.columnCells}}">
                <!--          <a link={{}}> -->
-                <textarea input-type="text" cell="{{item.row}}_{{item.col}}" draggable="true" style="" id$="gridBox[[item.col]][[item.row]]" data-payload$="{{item.payload}}" contenteditable="true"  value="{{item.value}}" class$="cellClass" max-char="450"></textarea>      
+                <textarea input-type="text" draggable="true" id$="{{item.id}}" value="{{item.value::textarea}}" contenteditable="true" style$="{{item.style}}" class$="{{cellClass}}" max-char="450"></textarea>      
             <!--         </a> -->
           </template>
         </div>
   </template>
+  </div>
+</div>
 </div>
 <paper-listbox id="myContextMenu"  hidden>
   <paper-item class="around-justified">
         <paper-swatch-picker>
-        </paper-swatch-picker><span>  &nbsp; Color Selector &nbsp;&nbsp; &nbsp;</span>
-        <input type="color" value="{{color::input}}">
+        </paper-swatch-picker><span>  &nbsp; Text Color &nbsp;&nbsp; &nbsp;</span>
+        <input type="color" value="{{background::input}}"> Background Color
   </paper-item>
     <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
         <paper-item value="{{category.title}}">
@@ -47,9 +59,9 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
                 <summary>{{category.title}}</summary>
                 <paper-listbox style="min-width:360px!important; max-width: 360px!important;">
                     <template is="dom-repeat" items="{{category.buttons}}" as="item">
-                          <paper-item onclick="{{item.myFunction}}" btn-value="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.text.0, color)}}" btn-prop="{{item.dataProperty}}">                {{item.text.0}}
-                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.datafunction}}"style$="font-size: 24px; font-weight: 300; color: #009;{{_computeStyle(item.dataProperty,item.text.0, color)}}">{{item.text.2}}</span>
-                              <span btn-prop="{{item.dataProperty}}" btn-function="{{item.dataFunction}}" btn-args="{{item.dataArgs}}" style$="{{_computeStyle(item.dataProperty, item.text.0,color)}}; font-size: 28px;">{{item.text.1}}</span> 
+                          <paper-item onclick="{{item.myFunction}}" btn-set-value="{{item.dataSetValue}}" btn-text="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}" btn-property="{{item.dataProperty}}">                {{item.text.0}}
+                              <span btn-property="{{item.dataProperty}}" btn-text="{{item.text.0}}" btn-set-value="{{item.dataSetValue}}" btn-function="{{item.datafunction}}"style$="font-size: 24px; font-weight: 300; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}">{{item.text.2}}</span>
+                              <span btn-property="{{item.dataProperty}}" btn-text="{{item.text.0}}" btn-set-value="{{item.dataSetValue}}" btn-function="{{item.dataFunction}}" btn-args="{{item.dataArgs}}" style$="{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}; font-size: 28px;">{{item.text.1}}</span> 
                           </paper-item>
                     </template> 
                 </paper-listbox>
@@ -61,7 +73,7 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
  <script>
  FcMappedGrid=Polymer({
  	is:"fc-mapped-grid",
-  behaviors:[Polymer.Templatizer, FCBehaviors.FcDataGridBehavior],
+  behaviors:[Polymer.Templatizer, FCBehaviors.FcDataGridDataLoadingBehavior, FCBehaviors.FcDataGridStylingBehavior],
   listeners: {"color-picker-selected":"getcolor"},
  	properties: { 
     format:{
@@ -69,35 +81,32 @@ Turn<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-bu
       value:function(){return {};},
       notify: true,
     },
-    gridEvent:{
-        type: Object,
-        value: function(){return {};},
-        notify: true, 
-    },
-   
-    btnValue:{
-      type: String,
-      value:function(){return "";},
-      notify: true
-    },
-    color:{
-        type: String,
-      value:function(){return "";},
-      notify: true        
-    },
     arraysIndex:{
         type: Number,
         value: function(){return 0;},
+        observer:"observeIndex",
         notify:true,
     },
     four:{     type:Boolean,
      computed:"computefour(arrayIndex)",
       notify: true,
     },
+    parentTarget:{
+        type: Object,
+        notify: true,
+    
+    },data:{
+      type: Array,
+      value: function(){return [];},
+      notify: true
+    }
+
+
    
    
  	},
 ready(){
+    this.parser3();
     var columns=this.setColumns();
      var headerArray=columns.map(function(val,index, array){
              return val.name;
@@ -105,31 +114,33 @@ ready(){
     var columnd=this.parser(headerArray,"accounting", columns);
     this.set("columns", columnd);
     this.parser2();
-       this.parser3();
+     
     this.push("dataArrays",this.columns);
     this.push("dataArrays", this.columns2);
     this.push("dataArrays",this.columns3);
         this.push("dataArrays",this.columns4);
     this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+    this.set("parentTarget", this.$.mappedGridRepeater);
+     for(let n of this.comparisons){
+      var style=n[1][1].style.cssText;
+            var cell={"mapName": "comparisons", "key": n[0], "value": n[1][0],"style":style};
+            this.push("data",cell);
+            }
+      console.log(this.data);
   },
+
 
   mycontextMenu(e){
     console.log(e, self);
-    if(e.target.btnValue){
-    var btnValue=e.target.btnValue;
-      this.set("btnValue", btnValue);
-    } 
     this.set("gridEvent", e);
-    console.log(this.gridEvent);
+    this.set("sourceCell", e.target);
     this.$.myContextMenu.hidden=false;
     this.$.myContextMenu.style.left=(e.clientX-330)+"px";
-    this.$.myContextMenu.style.top=(e.clientY)+"px";
+    this.$.myContextMenu.style.top=(e.clientY-80)+"px";
     this.$.myContextMenu.style.zIndex=25000;
-    console.log(e.target);
-    this.set("gridEvent",e);
     var key=e.target.getAttribute("id").split("_");//
     if(key[2]==0 && key[1]!=0){
-      var returnColumnHeader =this.columnMenu.concat(this.basemenu);
+      var returnColumnHeader=this.columnMenu.concat(this.basemenu);
     this.setMenuEntries(returnColumnHeader);
     }
     else if(key[1]==0&&key[2]!=0){
@@ -139,6 +150,8 @@ ready(){
     else if(key[1]&&key[2]){ this.setMenuEntries(this.basemenu);}
     else{this.setMenuEntries([]);}
   },
+
+computeColSelected(one, trigger){},
   getcolor(e){
     this.set("color",e.detail.color);
   },
@@ -149,93 +162,34 @@ ready(){
   closemenu(e){
     this.$.myContextMenu.hidden=true;
   },
- 
-  stylePropertySelection(e){
-    if(this.comparisons&&this.comparisons.get("comparisons_0_15_")){
-      if(e.target.btnProp){
-        console.log("HERE HERE HERE", e.target.btnProp);
-        this.set("changeProperty", e.target.btnProp);
-        }
-        var value=this.comparisons.get(this.gridEvent.target.id);
-        var keys=this.gridEvent.target.id.split("_");
-        this.set("btnValue", e.target.btnValue);
-        var text=this.btnValue,
-        property=(text.match("Highlight Selection"))?`background: ${this.color};`:(text.match("Apply This Text Color"))?`color: ${this.color}`: e.target.btnProp;
-     var propertyName=property.split(":");
-    for(var i=1;i<50;i++)
-    {
-          if(value  && keys[2]==0 && keys[1]!=0)
-          {
-            var newKey="comparisons_"+keys[1]+"_"+i+"_";
-             var value=this.comparisons.get(newKey);
-           }
-          else if(value && value[1] && keys[1]==0 && keys[2]!=0)
-          {
-            var newKey="comparisons_"+i+"_"+keys[2]+"_";
-             var value=this.comparisons.get(newKey);
-          }
-          else if(value && value[1] && keys[1]==0 && keys[2]==0){
-            for(let n of this.comparisons){
-             
-                    var style=n[1][1].style.cssText;
-                  if(style.match(property))
-                {
-                  var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
-                  style=style.replace(replacer, "");
-                  style=style+property;
-                  }
-                 else
-                    {
-                      style=style+property;
-                    }
-                  n[1][1].style=style;
-                  var key=n[1][1].getAttribute("id");//here gets all 
-                  this.comparisons.set(key,[n[1][1].value, n[1][1]]);
-                
-            }
-            break;
-          }
-          else{
-            i=52;
-            }
-          if(value && value[1])
-            { 
-              var style=value[1].style.cssText;
-              if(style.match(property))
-                {
-                  var replacer=propertyName[0]+/\[[a-z]+\]:[a-z]+;/;
-                  style=style.replace(replacer, "");
-                    style=style+property;
-                }
-              else
-                {
-                  style=style+property;
-                }
-              value[1].style=style;
-            }   
-            else{i=52;}
-      }//end for loop 
-    }//end initialization if for values
-  },
-  
+    observeGridEvents(a,b){if(a){console.log(a);if(a && b){console.log(a,b);}}},
 
-  _computeStyle(property, text, color){
+
+  _computeStyle(property, val, color, background, text ){
     if(text||text.match(" ")){
- var retVal=(text.match("Highlight Selection"))||text.match("Alternate Row Highlighting")?`background: ${color};`:(text.match("Apply This Text Color"))?`color: ${color}`: property;
+ var retVal=(text.match("Remove"))?`background: ${this.defaultFormat.background};`:(text.match("Base"))?`color: ${this.defaultFormat.color};`:(property==="background:")?`background: ${this.background};`:(property==="color:")?`color: ${this.color}`: property + val;
  return retVal;
 }
 else return "background: gold;";
          //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
   },
-  
-computefour(arrayIndex){
-    return(arrayIndex===3);
-},
-  arraySwap(e){
-        var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:0;
+ arraySwap(e){
+        var arrayNum=(this.arrayIndex===0)?1:(this.arrayIndex===1)?2:(this.arrayIndex===2)?3:(this.arrayIndex===3)?4:(this.arrayIndex===4)?5:(this.arrayIndex===5)?6:(this.arrayIndex===6)?7:(this.arrayIndex===7)?8:(this.arrayIndex===8)?9:0;
         this.set("arrayIndex", arrayNum);
         this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
   },
+computefour(arrayIndex){
+    return(arrayIndex===3);
+},
+observeIndex(newVal, oldVal){
+  console.log(newVal, oldVal, "index for names");
+},
+lockColumn(e){},
+startDrag(e){},
+dragOver(e){},
+handleDrop(e){},
+computeLockedColumn(col){},
+
  
   });
     </script>
