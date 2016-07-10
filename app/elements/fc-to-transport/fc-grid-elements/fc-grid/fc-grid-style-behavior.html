@@ -17,10 +17,6 @@ FCBehaviors.FcGridStyleBehavior = {
       value:function(){return "";},
       notify: true
     },
-    comparisons:{
-      type: Map,
-      notify: true,
-    },
      defaultFormat:{
         type:Object,
         value:function(){
@@ -39,14 +35,6 @@ FCBehaviors.FcGridStyleBehavior = {
     	type:String,
     	value:function(){return  `➔ ❶ ✂ ✎ ✒ ✜ ❚ ❶ ➀ ➞ ☚ ☛ ☰ ☱ ☷ ☑ ☐ ☎ ☏ ► ▼ ▲ ◄ ⇒ Δ ▐ █ ▄ ▀`;},
     	notify: true,
-    },
-    selectedMap:{
-        type:Map,
-        notify: true
-    },
-    sourceCell:{
-      type: Object, 
-      notify: true,
     },
     color:{
         type: String,
@@ -81,7 +69,6 @@ FCBehaviors.FcGridStyleBehavior = {
     		this.set("color", e.detail.color);
     },
  stylePropertySelection(e){
-  if(!this.gridEvent.target.id.match("comparisons")){
       var key =this.gridEvent.target.id;
       var keys=this.gridEvent.target.id.split("_");
       var mapName="m"+keys[0];
@@ -90,16 +77,19 @@ FCBehaviors.FcGridStyleBehavior = {
       var property=e.target.btnProperty;
       var setValue =(property.match("color"))?this.color+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
         var fullVal=property+setValue;
+        var rowscols=50;
        //below fix the i for the size of the rows columns etc
-      for(var i=1;i<50;i++)
+      for(var i=1;i<rowscols;i++)
         {
           if(keys[2]==0 && keys[1]!=0)
           {
+            rowscols=this[arrayName][0].length-1;
             var newKey=keys[0]+"_"+keys[1]+"_"+i+"_";
               
            }
           else if(keys[1]==0 && keys[2]!=0)
           {
+              rowscols=this[arrayName].length-1;
               var newKey=keys[0]+"_"+i+"_"+keys[2]+"_";
           }
           else if(keys[1]==0 && keys[2]==0)
@@ -132,10 +122,11 @@ FCBehaviors.FcGridStyleBehavior = {
           else{
             var newKey=key;
            i=52;
+           rowscols=2;
             }
           if(newKey){
             var payload=this[mapName].get(newKey);
-            if(payload){
+            if(payload&&payload[1]){
               var theId="#"+newKey;
               var cell=this.$$(theId);
               console.log(cell, payload);
@@ -154,7 +145,6 @@ FCBehaviors.FcGridStyleBehavior = {
             }
         }
       }//end for
-    }//end if
   },
 
   alternatingHighlighter(e){
@@ -202,8 +192,6 @@ FCBehaviors.FcGridStyleBehavior = {
   
  	insertRow(e){
       console.log(e, this.gridEvent);
-
-
    		var eid=this.gridEvent.target.getAttribute("id");
    		var key=eid.split("_");
       var mapName="m"+key[0];

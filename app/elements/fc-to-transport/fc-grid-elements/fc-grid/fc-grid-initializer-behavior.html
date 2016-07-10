@@ -1,6 +1,6 @@
 <script>
 (function(){
-// "use strict";
+// // "use strict";
 window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
  
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
@@ -76,7 +76,7 @@ detached(){},
 initializeIndexDB(){
   var dataPrime=this.selectedArraySet;
  var data =dataPrime.map(function(colHolder){
-    return colHolder.column;
+    return colHolder;
   }).reduce(function(pre, val){
     return pre.concat(val);
   },[]);
@@ -118,13 +118,12 @@ this.persistCells(data);
     console.log("db updated");
   };
   
-    
-  
 },
  
- addCellsToView(key) {
+ addCellsToView(gridName, version) {
   var cell1;
   var request = indexedDB.open("jasonGrid", 1);//"gridMap"
+  var query;
   
   request.onsuccess = function(event) {
  
@@ -133,7 +132,8 @@ this.persistCells(data);
       var transaction = db.transaction("cell", "readonly");
       var objectStore = transaction.objectStore("cell");
       
-      var query = objectStore.getAll();
+      query = objectStore.getAll();
+      console.log(query);
       
       query.onerror = function(queryEvent) {
           console.log("Unable to retrieve data from database!");
@@ -143,8 +143,38 @@ this.persistCells(data);
           
           console.log(queryEvent.target.result);
            cell1 = queryEvent.target.result;
-           this.set("holderArray",cell1);
- 		console.log(this.holderArray, cell1);
+           var topArray=[];
+           var lastVal=cell1.length-1;
+          var columnArray =cell1.reduce(function(pre, val, i, arr){
+            console.log(pre,val);
+              if(pre.length==0){pre.push(val); return pre;}
+              else {  
+                      var last=pre.length-1;
+                      var keys=pre[last].id.split("_");
+                      var valKeys=val.id.split("_");
+                      if(keys[1]==valKeys[1]&&i!==(lastVal)){pre.push(val); return pre;}
+                      else if(keys[1]!=valKeys[1]){
+                        topArray.push(pre); 
+                        var newArr=[];
+                        newArr.push(val);
+                        return newArr;
+                      }
+                      else if(i==(lastVal)&&keys[1]==valKeys[1]){
+                        pre.push(val);
+                        topArray.push(pre);
+                        return topArray;
+                      }
+                      else if(i==(lastVal)&&keys[1]!=valKeys[1]){
+                        topArray.push(pre); 
+                        var newArr=[];
+                        newArr.push(val);
+                        topArray.push(newArr);
+                        return topArray;
+                      }
+                    }
+           }, []);
+          this.set("holderArray", columnArray);
+ 		console.log("successfully regrouped into", topArray.length,"number of columns, the following arrays of objects: ", this.holderArray);
    		
       // do stuff with the product
       // provide a callback parameter to execute here
@@ -212,8 +242,9 @@ deletedb(){
 	     
 			var value=(valuesArray===true&&this.csv && this.csv[j] && this.csv[j][i])?this.csv[j][i]:"--";
 			  	
-			
-			id=sheetName+"_"+i+"_"+j+"_", keys=id.split("_");
+			var co=(cols>10&&cols<100&&i<10)?"0"+i:(cols>99&&cols<1000&&i<10)?"00"+i:(cols>99&&cols<1000&&i>9&&i<100)?"0"+i:i;
+      var ro=(rows>10&&rows<100&&j<10)?"0"+j:(rows>99&&rows<1000&&j<10)?"00"+j:(rows>99&&rows<1000&&j>9&&j<100)?"0"+j:j;
+			id=sheetName+"_"+co+"_"+ro+"_", keys=id.split("_");
 			var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.styleText:(keys[2]==0)?this.defaultHeader.styleText:"fitter";
        		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "class": appliedClass, "archive":[]};
        				var width=this.textMeasurements(cell);
