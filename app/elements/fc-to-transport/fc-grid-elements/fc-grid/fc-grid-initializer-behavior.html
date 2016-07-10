@@ -12,9 +12,9 @@ if (!window.indexedDB) {
    window.alert("Your browser doesn't support a stable version of IndexedDB.")
 }
  
-const dbName = "gridMap";
+const dbName = "jasonGrid";
  
-var request = indexedDB.open(dbName, 5);
+var request = indexedDB.open(dbName, 1);
  
 request.onerror = function(event) {
     console.log("db error");
@@ -22,104 +22,21 @@ request.onerror = function(event) {
  
 request.onupgradeneeded = function(event) {
     var db = event.target.result;
-    console.log(db);
-    // self.FCBehaviors.FcDataGridDataLoadingBehavior.set("dataBaseProxy", db);
+    // self.FCBehaviors.FcGridInitializerBehavior.set("dataBaseProxy", db);
  
     var mapsObjectStore = db.createObjectStore("cell", { keyPath: "key" });
     
     mapsObjectStore.createIndex("key", "key", { unique: true });
     
-    self.FCBehaviors.FcDataGridDataLoadingBehavior.persistCells(this.data);
-    
-    console.log("db created");
-    
+    self.FCBehaviors.FcGridInitializerBehavior.persistCells(this.data);
+    console.log("db created"); 
   };
- 
-
-
 })();
 window.FCBehaviors = window.FCBehaviors || {};
-FCBehaviors.FcDataGridDataLoadingBehavior = {
+FCBehaviors.FcGridInitializerBehavior = {
 	properties: {
-	comparisons:{
-      type: Map,
-      notify: true,
-    },
-    comparisons2:{
-      type: Map,
-      notify: true,
-    },
-    counter:{
-     	type: Number,
-     	value: 0,
-     	notify: true,
-    },
-     defaultFormat:{
-        type:Object,
-        value:function(){
-            return {"color": "#009", "background": "#fefefe", "header_backgroundColor":"aliceblue", "fontSize": "18px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15", "border": "1px #afafaf solid", "styleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center; font-size: 18px; resize:none;"};
-          },
-        notify: true 
-    },
-    defaultHeader:{
-    	type:Object,
-    	value:function(){
-    		return {"max-height": "65px;","border": "solid 1px #009;", "min-height": "18px;", "margin": "0px;", "height":"23px!important;", "font-family":"merriweather;", "background": "aliceblue;", "color": " #009;", "text-align": "center;", "font-size": "18px;","font-weight":"700;", "resize":"none;", "styleText":"max-height: 65px; border: solid 1px #009; min-height: 18px;  margin: 0px;  height:23px!important;  font-family:merriweather;  background: aliceblue;  color:  #009;  text-align: center;  font-size: 18px; font-weight:700; resize:none;"};
-    	},
-    	notify: true,
-    },
-    color:{
-        type: String,
-        value:function(){return "#009";},
-        notify: true
-        },
-    background:{
-        type: String,
-        value:function(){return "#F0F8FF";},
-        notify: true
     
-    },
-
-    sheetName0:{
-      type: Map,
-      notify: true,
-    },
-    sheetName1:{
-      type: Map,
-      notify: true,
-    },
-    sheetName2:{
-      type: Map,
-      notify: true,
-    },
-    sheetName3:{
-      type: Map,
-      notify: true,
-    },
-    sheetName4:{
-      type: Map,
-      notify: true,
-    },
-    sheetName5:{
-      type: Map,
-      notify: true,
-    },
-    sheetName6:{
-      type: Map,
-      notify: true,
-    },
-    sheetName7:{
-      type: Map,
-      notify: true,
-    },
-    sheetName8:{
-      type: Map,
-      notify: true,
-    },
-    sheetName9:{
-      type: Map,
-      notify: true,
-    },
+    
      selectedArraySet:{
         type:Array,
         value:function(){return [];},
@@ -129,21 +46,6 @@ FCBehaviors.FcDataGridDataLoadingBehavior = {
         type:Array,
         value:function(){return [];},
         notify: true,
-    },
-    columns2:{
-      type: Array,
-      value: function(){return [];},
-      notify:true,
-    },
-     columns3:{
-      type: Array,
-      value: function(){return [];},
-      notify:true,
-    },
-     columns:{
-      type: Array,
-      value: function(){return [];},
-      notify:true,
     },
     fromDb:{
     	type: Boolean, 
@@ -157,46 +59,35 @@ FCBehaviors.FcDataGridDataLoadingBehavior = {
     	type: Array,
       value: function(){return [];},
       notify:true,
-
+    },
+    counter:{
+     	type: Number,
+     	value: 0,
+     	notify: true,
     },
 
 },
-ready(){
-
-
-},
-
-attached(){
-
-
-
-
-
-},
-detached(){
-	
-
-},
+created(){},
+ready(){},
+attached(){},
+detached(){},
 
 
 initializeIndexDB(){
-this._synchMapIndices();
-	for(let n of this.comparisons){
-      var style=n[1][1].style.cssText;
-            var cell={"mapName": "comparisons", "id":n[0], "key": n[0], "value": n[1][0],"style":style, "archive":[],"relatedCells":[]};
-            this.push("data",cell);
-            }
-     // console.log(this.data);
-  
-console.log("in init", this.data);
-this.persistCells(this.data);
+  var dataPrime=this.selectedArraySet;
+ var data =dataPrime.map(function(colHolder){
+    return colHolder.column;
+  }).reduce(function(pre, val){
+    return pre.concat(val);
+  },[]);
+this.persistCells(data);
 },
  
 
   persistCells(data){
   	var jason=this;
   	console.log(data);//got hear stopped
-  	var request = indexedDB.open("gridMap", 5);
+  	var request = indexedDB.open("jasonGrid", 1);
   request.onupgradeneeded = function(event) {
     var db = event.target.result;
     console.log(db, "did i make it in here, HERE HERE HERE");
@@ -205,7 +96,7 @@ this.persistCells(this.data);
     mapsObjectStore.createIndex("key", "key", { unique: true });
 	};
   var jason=this;
-  var request = indexedDB.open("gridMap", 5);//"gridMaps"
+  var request = indexedDB.open("jasonGrid", 1);//"gridMaps"
   request.onsuccess = function(event) {
       
     var db = event.target.result;
@@ -233,7 +124,7 @@ this.persistCells(this.data);
  
  addCellsToView(key) {
   var cell1;
-  var request = indexedDB.open("gridMap", 5);//"gridMap"
+  var request = indexedDB.open("jasonGrid", 1);//"gridMap"
   
   request.onsuccess = function(event) {
  
@@ -263,16 +154,16 @@ this.persistCells(this.data);
  
 },
  
-  addCellByKey(key) {
+  updateOnValueChange(key) {
   
-  var request = indexedDB.open("gridMap", 5);
+  var request = indexedDB.open("jasonGrid", 1);
   
   request.onsuccess = function(event) {
  
       var db = event.target.result;
       
  
-      var transaction = db.transaction("cell", "readonly");
+      var transaction = db.transaction("cell", "readwrite");
       var objectStore = transaction.objectStore("cell");
     var index = objectStore.index('key');
       
@@ -295,202 +186,96 @@ this.persistCells(this.data);
 },
  
 deletedb(){
- 
-  var req = indexedDB.deleteDatabase("gridMap", 5);
+  var req = indexedDB.deleteDatabase("jasonGrid", 1);
   console.log("db deleted");
   
 },
 
- 
-_synchMapIndices(){
-		var columnDivs=Polymer.dom(this.$.hanger3).children;
-    var cell=Polymer.dom(columnDivs[0]).firstElementChild;
-    var keys=cell.getAttribute("id").split("_");
-    var holderMap=new Map();
-    var mapName=keys[0];
-    holderMap=this[mapName];
-    var virtualMap=new Map();
-    console.log(holderMap);
-		var arrayOne=[],arrayTwo=[], i=0, j=0,colNum=i,
-        rowNum=j,numCols=columnDivs.length;
-		for(i=0; i<numCols;i++){
-				var rowCells=Polymer.dom(columnDivs[i]).children,
-        numRows=rowCells.length;
-        for(j=0;j<numRows;j++){
-            if(j==0){
-                var elem=Polymer.dom(columnDivs[i]).firstElementChild; 
-                }
-            else{
-                elem=Polymer.dom(elem).nextSibling;
-                }
-            var key=elem.id;
-            var newKey=mapName+"_"+i+"_"+j+"_";                
-            var payload=holderMap.get(key);
-            virtualMap.set(newKey,payload);
-            this[mapName].set(newKey,payload);
-           // console.log(this[mapName]);
-          }	
-				}
-		  },
 
-  parser3(){
-  	if(this.fromDb===true){
-  		 this.recallSpreadSheet(); //mapnameShould be the argument
-  	}
-  	else{
-    var comparisons=new Map();
-    this.set("comparisons", comparisons);
+  gridConstructor(col,row,gridname,headers,sheets, toolset, baseValuesArrays, userStyle, userClass){
+  	console.log(col, gridname);
+    var grid=[], i=0, j=0, cell={},colArray=[]; 
+    var cols=(col)?col:26; var rows=(row)?row:26; 
+    var appliedClass=(userClass)?userClass:"fitter"; 
+	var valuesArray=(baseValuesArrays)?baseValuesArrays:(baseValuesArrays===true)?this.csv:"--";
+	var sheetName=(gridname)?gridname: "newSheet"+this.counter;
+	var time=new Date().getTime();
+	var input={},
+	mapName="m"+sheetName;
+	map=new Map(); 
+	this[mapName]=map;
+    for(i=0;i<cols;i++){
     
-    var array=[];
-    var i=0, j=0;
-    var time=new Date().getTime();
-    for(i=0;i<16;i++)
-     {
-       var key="comparisons_"+i+"_"+"0"+"_";//(i<10)?"comparisons_0"+i+"_"+"0_":
-       var column=document.createElement("div");
-       column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-       column.setAttribute("class","column");
-       var columnId="column_"+i;//(i<10)?"column_0"+i:
-       column.setAttribute("id",columnId);
-       var elem=document.createElement("TEXTAREA");
-       elem.contenteditable=true;
-          elem.setAttribute("style",  this.defaultHeader.styleText);
-          elem.setAttribute("id", key);
-          var hanger="--";
-          elem.value=(this.csv[0][i])?this.csv[0][i]:hanger;
-          this.comparisons.set(key,[elem.value, elem]);
-        array.push({"style": this.defaultHeader.styleText, "value": this.comparisons.get(key)[0],"archive":[], "relatedCells":[], "id": key,"cell": elem, "dataRows":[]});
-          var theId="#"+columnId;
-          Polymer.dom(this.$$("#hanger3")).appendChild(column);
-              Polymer.dom(this.$$(theId)).appendChild(elem);
-        // }
-        for(var j=1;j<25;j++){
-             var key="comparisons_"+i+"_"+j+"_";
-               var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", this.defaultFormat.styleText);
-          elem.setAttribute("id", key);
-              var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
-              elem.contenteditable=true;
-              elem.value=bindValue;
-              var propName='value';
-              this.comparisons.set(key,[elem.value,elem]);
-        if(this.csv[j][i]){
-          array[i].dataRows.push({"style": this.defaultFormat.styleText, "value":elem.value, "archive":[], "relatedCells":[], "id": key,"cell": elem}); 
-                Polymer.dom(this.$$(theId)).appendChild(elem);
+    var	minWidth=0; var altitude=0;
+     	for(var j=0;j<rows;j++)
+     	{
+	     
+			var value=(valuesArray===true&&this.csv && this.csv[j] && this.csv[j][i])?this.csv[j][i]:"--";
+			  	
+			
+			id=sheetName+"_"+i+"_"+j+"_", keys=id.split("_");
+			var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.styleText:(keys[2]==0)?this.defaultHeader.styleText:"fitter";
+       		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "class": appliedClass, "archive":[]};
+       				var width=this.textMeasurements(cell);
+       				width=parseInt(width);
+       				minWidth=(minWidth>=width)?minWidth:width;
+       				
+          		colArray.push(cell); 
           }
-          else{array[i].dataRows.push({"style": this.defaultFormat.styleText, "value":elem.value, "archive":[], "relatedCells":[], "id": key,"cell": elem});
-        Polymer.dom(this.$$(theId)).appendChild(elem);
-        	}
-       
-      	}
-    	}
-	
-      	   // this.set("columns4", array);
-          //  this.set("columns3", array);
-        this.set("comparisons", comparisons);
+        
+          colArray.forEach(function(cell, ind){
+          	var numb=Math.ceil(parseInt(minWidth)+63);//do the cleaner removal
+          	cell.style+="width: " +numb+"px; ";
+          	this[mapName].set(cell.key, [cell.value, cell]);
+          }, this);
 
-          this.set("columns4", array);
-           this.set("columns3", array);
-      
-           return this.comparisons;
-           }
+          // var colObjLayer={"id": "column_"+i+"_0_", "value":colArray[0].value, "column":colArray, "otherJunk":"JasonWasHere"};
+          // this[mapName].set(colObjLayer.id,[colObjLayer.value,colObjLayer]);
+
+         grid.push(colArray);
+         colArray=[];
+    }
+    this.set("counter",this.counter++);
+    this.set([sheetName],grid);//
+    this.set([mapName], this[mapName]);
+    this.push("dataArrays", this[sheetName]);
+    console.log(this[sheetName],  this[mapName]);
+  },
+   textMeasurements(cell, units){
+    var c=document.createElement("CANVAS");
+    var ctx=c.getContext("2d");;
+    var theId="#"+cell.id
+    var elem=this.$$(theId);
+    if(cell){
+    var ft1=cell.style.match("font-size:"),
+    cssArr=cell.style.split("font-size:");
+    var inde=cssArr[cssArr.length-1].indexOf(";")
+    var fs=parseInt(cssArr[cssArr.length-1].substr(inde-4,4));
+    fs=parseInt(fs);
+  cell.style.split("font-size:")
+    var ft2= cell.style.split("font-family");
+    var index=ft2[ft2.length-1].indexOf(";"); var family=ft2[ft2.length-1].slice(0, index);};
+    ctx.font =fs+"px"+ " "+family;
+    var txt=cell.value;
+    var width=ctx.measureText(txt).width;
+    return width;
   },
 
-   parser2:function(){
-    var length=this.csv.length;
-    var id; 
-    
-    var i=0;
-    var k=2;
-    var sheetName="sheetName";
-    for(k=2;k<10;k++)
-    {	var array=[];
-    	console.log(k);
-    	var mapName=sheetName + k; //link this to name in TODO BELOW?? Give em ten then instantiate a new folder? 
-	    console.log(mapName);
-	    var map=new Map();
-	    this.set(mapName, map);
-	  
-	      for(i=0;i<16;i++)
-	      {//TODO CHANGE HEADERS TO BUTTONS AND MOVE TEXT AREA TO COLUMN
-	      	var headerCellData={"id":mapName + "_" + i + "_0_", "style":this.defaultHeader.styleText, "name": this.csv[0][i], "relatedCells":[], "archive":[], "value":this.csv[0][i], "columnCells":[]}
-	      	if(i===0){headerCellData.name=mapName;}//TODO WRITE AUTO NAMING COUNTER
-	        array.push(headerCellData);
-	        this[mapName].set(headerCellData.id, [headerCellData.value,headerCellData]);
-	        for(var j=1;j<25;j++)
-	        {
-	        	var cellData={"id":mapName + "_" + i + "_"+j+"_", "value":"--", "style": this.defaultFormat.styleText, "relatedCells":[], "archive":[]};
-	            if(this.csv[j][i]){cellData.value=this.csv[j][i];}
-	            array[i].columnCells.push(cellData);
-	            this[mapName].set(cellData.id, [cellData.value, cellData]);
-	        }
-	      }
-	
-	      this.push("dataArrays", array);
-	      this.set(mapName, this[mapName])
-	  }
-   },
+		get defaultFormat(){
+		        return {"color": "#009", "background": "#fefefe", "header_backgroundColor":"aliceblue", "fontSize": "14px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15","line-height":"1.3em", "border": "1px #afafaf solid", 
+		        	"stryleText": "margin:0px; box-shadow: 1px 3px 4px 2px #fafafa; cursor: cell;font-size: 14px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap; max-height: 65px; min-height: 18px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; text-align: center;resize:none; line-height:1.3em;"};
+			},
+		get defaultHeader(){
+				return {"max-height": "65px;","border": "solid 1px #009;", "min-height": "18px;","line-height":"1.3em", "margin": "0px;", "height":"20px!important;", "font-family":"merriweather;", "background": "aliceblue;", "color": " #009;", "text-align": "center;", "font-size": "18px;","font-weight":"700;", "resize":"none;", 
+				"styleText":"max-height: 65px; border: solid 1px #009; min-height: 18px;  margin: 0px;  height:23px!important;  font-family:merriweather;  background: aliceblue;  color:  #009;  text-align: center; line-height:1.3em; font-size: 18px; font-weight:700; resize:none;"};
+			},
+		get defaultColor(){return "#009";},
+		    
+		get defaultHeaderbackground(){return "#F0F8FF";},
+		    
+		get defaultBackground(){},
 
-   recallSpreadSheet(){
-   	this.addCellsToView();
-   	this.comparisons=new Map();
-   	var comparisons=new Map();
-   	var j=0;
-   	var colIdArray=[];
-    this.async(function(){
-    var colNumber =[];
-	var rowNumber =[];
-
-    this.holderArray.forEach(function(item, i, array){
-    	var pre=(i==0)?0:array[i-1].key.split("_");
-    	 	var elem=document.createElement("TEXTAREA");
-    	 	var keys=Object.keys(item);
-    	 	console.log(keys)
-    	 	var counter=keys.length;
-    	 	for(j=0;j<counter;j++){
-    	 	elem[keys[j]]=item[keys[j]];
-    	 	elem.id=item.key;
-    	 	elem.value=item.value;
-    	 	elem.contenteditable=true;
-    	 	console.log(elem, elem.id);
-    	 comparisons.set(item.key,[item.value,elem]);
-    	 console.log(this.comparisons, comparisons);
-    	 var keys2=item.key.split("_"),
-    	 kc=parseInt(keys2[1]),kr=parseInt(keys2[2]),pc=parseInt(pre[1]), pr=parseInt(pre[2]);
-    	 var colTot=kc>pc?kc:pc;
-    	 var rowTot=kr>pr?kr:pr;
-    	 colNumber.push(colTot);
-    	 rowNumber.push(rowTot)
-    	}}, this);//was 0
-    this.set("comparisons", comparisons);
-    console.log(this.comparisons,"LOOOOK HERE");
-    var colNum=colNumber.reduce(function(pc, kc){var colTot=kc>pc?kc:pc; return colTot;},0);
-     var rowNum=rowNumber.reduce(function(pr, kr){var rowTot=kr>pr?kr:pr; return rowTot;},0);
-	var j=0
-    var i=0;
-    console.log(colNum, rowNum)
-    for(i=0;i<colNum+1; i++){
-	var column=document.createElement("div");
-       	column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-       	column.setAttribute("class","column");
-       	var columnId="column_"+i;
-       	column.setAttribute("id",columnId);
-        var theId="#"+columnId;
-        colIdArray.push(theId);
-        Polymer.dom(this.$$("#hanger3")).appendChild(column);
-        for(j=0;j<rowNum+1;j++)
-        {
-        	var key="comparisons_"+i+"_"+j+"_";
-        	var packet=comparisons.get(key)
-        	Polymer.dom(column).appendChild(packet[1]);
-        }
-    }
-    },2200);
-},
-
-
-
-  get csv(){var val=[
+		get csv(){var val=[
    			[  "Monthly Comparisons","January" ,"February" ,"March" ,"April" ,"May" ,"June" ,"July" ,"August" ,"September" ,"October","November" ,"December","Monthly Avg","%_v_Prev","Yr. Tot. Est 14"],
             ["2008 Totals",,,,,,,,,,,,,"$11,426.42 ",,"$137,117.00 "],
             ["2009 Totals","39.79%",,,,,,,,,,,,"$16,064.58 ","40.59%","$192,775.00 "],
@@ -553,8 +338,104 @@ var request = indexedDB.open("gridMap", 4);//"gridMaps"
 },
 
 
+this._synchMapIndices();
+	for(let n of this.comparisons){
+      var style=n[1][1].style.cssText;
+            var cell={"mapName": "comparisons", "id":n[0], "key": n[0], "value": n[1][0],"style":style, "archive":[],"relatedCells":[]};
+            this.push("data",cell);
+            }
+     // console.log(this.data);
+  
+console.log("in init", this.data);
+this.persistCells(this.data);
+   recallSpreadSheet(){
+   	this.addCellsToView();
+   	this.comparisons=new Map();
+   	var comparisons=new Map();
+   	var j=0;
+   	var colIdArray=[];
+    this.async(function(){
+    var colNumber =[];
+	var rowNumber =[];
+
+    this.holderArray.forEach(function(item, i, array){
+    	var pre=(i==0)?0:array[i-1].key.split("_");
+    	 	var elem=document.createElement("TEXTAREA");
+    	 	var keys=Object.keys(item);
+    	 	console.log(keys)
+    	 	var counter=keys.length;
+    	 	for(j=0;j<counter;j++){
+    	 	elem[keys[j]]=item[keys[j]];
+    	 	elem.id=item.key;
+    	 	elem.value=item.value;
+    	 	elem.contenteditable=true;
+    	 	console.log(elem, elem.id);
+    	 comparisons.set(item.key,[item.value,elem]);
+    	 console.log(this.comparisons, comparisons);
+    	 var keys2=item.key.split("_"),
+    	 kc=parseInt(keys2[1]),kr=parseInt(keys2[2]),pc=parseInt(pre[1]), pr=parseInt(pre[2]);
+    	 var colTot=kc>pc?kc:pc;
+    	 var rowTot=kr>pr?kr:pr;
+    	 colNumber.push(colTot);
+    	 rowNumber.push(rowTot)
+    	}}, this);//was 0
+    this.set("comparisons", comparisons);
+    console.log(this.comparisons,"LOOOOK HERE");
+    var colNum=colNumber.reduce(function(pc, kc){var colTot=kc>pc?kc:pc; return colTot;},0);
+     var rowNum=rowNumber.reduce(function(pr, kr){var rowTot=kr>pr?kr:pr; return rowTot;},0);
+	var j=0
+    var i=0;
+    console.log(colNum, rowNum)
+    for(i=0;i<colNum+1; i++){
+	var column=document.createElement("div");
+       	column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
+       	column.setAttribute("class","column");
+       	var columnId="column_"+i;
+       	column.setAttribute("id",columnId);
+        var theId="#"+columnId;
+        colIdArray.push(theId);
+        Polymer.dom(this.$$("#hanger3")).appendChild(column);
+        for(j=0;j<rowNum+1;j++)
+        {
+        	var key="comparisons_"+i+"_"+j+"_";
+        	var packet=comparisons.get(key)
+        	Polymer.dom(column).appendChild(packet[1]);
+        }
+    }
+    },2200);
 
 
+ 
+_synchMapIndices(){
+		var columnDivs=Polymer.dom(this.$.hanger3).children;
+    var cell=Polymer.dom(columnDivs[0]).firstElementChild;
+    var keys=cell.getAttribute("id").split("_");
+    var holderMap=new Map();
+    var mapName=keys[0];
+    holderMap=this[mapName];
+    var virtualMap=new Map();
+    console.log(holderMap);
+		var arrayOne=[],arrayTwo=[], i=0, j=0,colNum=i,
+        rowNum=j,numCols=columnDivs.length;
+		for(i=0; i<numCols;i++){
+				var rowCells=Polymer.dom(columnDivs[i]).children,
+        numRows=rowCells.length;
+        for(j=0;j<numRows;j++){
+            if(j==0){
+                var elem=Polymer.dom(columnDivs[i]).firstElementChild; 
+                }
+            else{
+                elem=Polymer.dom(elem).nextSibling;
+                }
+            var key=elem.id;
+            var newKey=mapName+"_"+i+"_"+j+"_";                
+            var payload=holderMap.get(key);
+            virtualMap.set(newKey,payload);
+            this[mapName].set(newKey,payload);
+           // console.log(this[mapName]);
+          }	
+				}
+		  },
 
 
      setColumns(){

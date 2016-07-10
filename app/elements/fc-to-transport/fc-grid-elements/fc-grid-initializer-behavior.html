@@ -22,8 +22,7 @@ request.onerror = function(event) {
  
 request.onupgradeneeded = function(event) {
     var db = event.target.result;
-    console.log(db);
-    // self.FCBehaviors.FcDataGridDataLoadingBehavior.set("dataBaseProxy", db);
+    self.FCBehaviors.FcDataGridDataLoadingBehavior.set("dataBaseProxy", db);
  
     var mapsObjectStore = db.createObjectStore("cell", { keyPath: "key" });
     
@@ -158,6 +157,11 @@ FCBehaviors.FcDataGridDataLoadingBehavior = {
       value: function(){return [];},
       notify:true,
 
+    },
+    counter:{
+    	type: Number,
+    	value: 0, 
+    	notify: true
     },
 
 },
@@ -333,103 +337,35 @@ _synchMapIndices(){
 				}
 		  },
 
-  parser3(){
-  	if(this.fromDb===true){
-  		 this.recallSpreadSheet(); //mapnameShould be the argument
-  	}
-  	else{
-    var comparisons=new Map();
-    this.set("comparisons", comparisons);
-    
-    var array=[];
-    var i=0, j=0;
+  gridConstructor(col,row,gridname,headers,sheets, toolset, baseValuesArrays, userStyle, userClass){
+    var colArray=[],
+    grid=[];
+    var i=0, j=0, cell={};
+    var cols=(col)?col:26;
+  	var rows=(row)?row:26,
+  	id=sheetname+"_"+i+"_"+j+"_",
+  	keys=id.split("_");
+  	var appliedClass=(userClass)?userClass:"fitter"; 
+  	var valuesArray=(baseValuesArrays)?baseValuesArrays:(baseValuesArrays===true)?this.csv:"--",
+  	value=(valuesArray===true&&this.csv[j][i])?this.csv[j][i]:"--";
+  	var sheetName=(gridname)?gridname: "newSheet"+this.counter;
+  	var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.cssText:(keys[2]==0)?this.defaultHeader.cssStyle:"fitter";
     var time=new Date().getTime();
-    for(i=0;i<16;i++)
-     {
-       var key="comparisons_"+i+"_"+"0"+"_";//(i<10)?"comparisons_0"+i+"_"+"0_":
-       var column=document.createElement("div");
-       column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-       column.setAttribute("class","column");
-       var columnId="column_"+i;//(i<10)?"column_0"+i:
-       column.setAttribute("id",columnId);
-       var elem=document.createElement("TEXTAREA");
-       elem.contenteditable=true;
-          elem.setAttribute("style",  this.defaultHeader.styleText);
-          elem.setAttribute("id", key);
-          var hanger="--";
-          elem.value=(this.csv[0][i])?this.csv[0][i]:hanger;
-          this.comparisons.set(key,[elem.value, elem]);
-        array.push({"style": this.defaultHeader.styleText, "value": this.comparisons.get(key)[0],"archive":[], "relatedCells":[], "id": key,"cell": elem, "dataRows":[]});
-          var theId="#"+columnId;
-          Polymer.dom(this.$$("#hanger3")).appendChild(column);
-              Polymer.dom(this.$$(theId)).appendChild(elem);
-        // }
-        for(var j=1;j<25;j++){
-             var key="comparisons_"+i+"_"+j+"_";
-               var elem=document.createElement("TEXTAREA");
-          elem.setAttribute("style", this.defaultFormat.styleText);
-          elem.setAttribute("id", key);
-              var bindValue=(this.csv[j][i])?this.csv[j][i]:"--";
-              elem.contenteditable=true;
-              elem.value=bindValue;
-              var propName='value';
-              this.comparisons.set(key,[elem.value,elem]);
-        if(this.csv[j][i]){
-          array[i].dataRows.push({"style": this.defaultFormat.styleText, "value":elem.value, "archive":[], "relatedCells":[], "id": key,"cell": elem}); 
-                Polymer.dom(this.$$(theId)).appendChild(elem);
+    var input={};
+    for(i=0;i<cols;i++)
+    {
+     	for(var j=0;j<rows;j++){
+       cell={"key":id, "value":value, "contenteditable": true, "id": id, "style": style, "class": appliedClass, "archive":[], "relatedCells":[]};
+          colArray[i].push(cell); 
           }
-          else{array[i].dataRows.push({"style": this.defaultFormat.styleText, "value":elem.value, "archive":[], "relatedCells":[], "id": key,"cell": elem});
-        Polymer.dom(this.$$(theId)).appendChild(elem);
-        	}
-       
-      	}
-    	}
-	
-      	   // this.set("columns4", array);
-          //  this.set("columns3", array);
-        this.set("comparisons", comparisons);
-
-          this.set("columns4", array);
-           this.set("columns3", array);
-      
-           return this.comparisons;
-           }
+          var colName="colArray"+"_"+i;
+          var colObjLayer={colName:colArray, "otherJunk":"JasonWasHere"};
+         grid.push(colObjLayer);
+    }
+    this.set([sheetName],grid);//
+    this.push(dataArrays, this[sheetName]);
   },
 
-   parser2:function(){
-    var length=this.csv.length;
-    var id; 
-    
-    var i=0;
-    var k=2;
-    var sheetName="sheetName";
-    for(k=2;k<10;k++)
-    {	var array=[];
-    	console.log(k);
-    	var mapName=sheetName + k; //link this to name in TODO BELOW?? Give em ten then instantiate a new folder? 
-	    console.log(mapName);
-	    var map=new Map();
-	    this.set(mapName, map);
-	  
-	      for(i=0;i<16;i++)
-	      {//TODO CHANGE HEADERS TO BUTTONS AND MOVE TEXT AREA TO COLUMN
-	      	var headerCellData={"id":mapName + "_" + i + "_0_", "style":this.defaultHeader.styleText, "name": this.csv[0][i], "relatedCells":[], "archive":[], "value":this.csv[0][i], "columnCells":[]}
-	      	if(i===0){headerCellData.name=mapName;}//TODO WRITE AUTO NAMING COUNTER
-	        array.push(headerCellData);
-	        this[mapName].set(headerCellData.id, [headerCellData.value,headerCellData]);
-	        for(var j=1;j<25;j++)
-	        {
-	        	var cellData={"id":mapName + "_" + i + "_"+j+"_", "value":"--", "style": this.defaultFormat.styleText, "relatedCells":[], "archive":[]};
-	            if(this.csv[j][i]){cellData.value=this.csv[j][i];}
-	            array[i].columnCells.push(cellData);
-	            this[mapName].set(cellData.id, [cellData.value, cellData]);
-	        }
-	      }
-	
-	      this.push("dataArrays", array);
-	      this.set(mapName, this[mapName])
-	  }
-   },
 
    recallSpreadSheet(){
    	this.addCellsToView();

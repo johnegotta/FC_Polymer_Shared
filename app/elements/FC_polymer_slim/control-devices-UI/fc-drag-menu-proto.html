@@ -3,6 +3,9 @@
 <style>
 :host {
   position:fixed;
+  overflow: hidden;
+  overflow-x: scroll;
+  background: #009;
 }
 .menubuttons{
   display: inline-block; 
@@ -13,7 +16,7 @@
   box-shadow: 0px  -5px 15px #d9d9d9 inset;
   align-items: flex-start;
     text-align: center;
-    cursor: default;
+    cursor: pointer;
     color: buttontext;
     border-image-source: initial;
     border-image-slice: initial;
@@ -40,65 +43,31 @@
 
 
 </style>
-<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; min-height: 24px; min-width: 320px!important; background: #000066; border: 3px ridge silver;'>
+<div id="protoMenu"  class="horizontal layout flex" style='max-height: 96px; width:{{currentWidth}}px; min-height: 24px; min-width: 220px!important; background: #009; border: 3px ridge silver;'>
   <span draggable$="[[_computestaticmenu(dragmenu)]]" hidden="[[_computestaticmenu(dragmenu)]]">
-<!-- 
-   on-track="dragmeplease" -->
-      <iron-icon 
-        name="fcdragtag"
-        
-        draggable$="[[_computestaticmenu(dragmenu)]]" 
-        icon="icons:label-outline"  
-        description="the dragable edge of the card"
-        class="menuItems-light"
-      >
+      <iron-icon name="fcdragtag" draggable$="[[_computestaticmenu(dragmenu)]]" icon="icons:label-outline" description="the dragable edge of the card" class="menuItems-light">
       </iron-icon>     
   </span>
   <section class="menubuttons longer" style="min-width: 63px; height: 48px; width: 63px !important; max-width: 64px; font-size: 24px" on-tap="_toggleLeftDrawer" >
       <b>L</b>
-      <iron-icon
-        icon="icons:swap-horiz"  
-        class="menuItems-dark"      
-      >
+      <iron-icon icon="icons:swap-horiz" class="menuItems-dark">
       </iron-icon>
   </section>
-  <section on-down="dragsOff" on-up="dragsOn">
+  <section on-down="dragsOff">
     <content>
     </content>
  </section>
-  <section 
-    class="menubuttons longer layout horizontal"
-    style="min-width: 63px; height: 48px; width: 63px !important; max-width: 64px; font-size: 24px" 
-    on-tap="_toggleRightDrawer"
-    >
-      <iron-icon 
-        icon="icons:swap-horiz"  
-        class="menuItems-dark"
-      >
-      </iron-icon>
-      <b>R</b>
-  </section>
-  <section 
-    class="menubuttons mini" 
-    on-tap="swapMenu">
-      MENU
-    <iron-icon 
-      icon="icons:autorenew"  
-      class="menuItems-dark micro"    
-      >
-    </iron-icon>
-    SWAP
-</section>  
-<section on-down="dragsOff" on-up="dragsOn">
-  <iron-icon
-    draggable="[[_computestaticmenu(dragmenu)]]"
-    track
-    icon="icons:input"
 
-    on-track="_resetWidth"
-    class="center center-justified menuItems-light"
-    style="background: #000066; border: 2px ridge biege;"
-    >
+  <section class="menubuttons mini"  on-tap="swapMenu" style="z-index: 7; position: absolute; right: 99px;">MENU
+      <iron-icon icon="icons:autorenew" class="menuItems-dark micro">
+      </iron-icon>SWAP
+  </section> 
+  <section class="menubuttons longer layout horizontal" style="min-width: 63px; height: 48px; width: 63px !important; max-width: 64px; font-size: 24px; position: absolute; right: 34px;" on-tap="_toggleRightDrawer">
+      <iron-icon icon="icons:swap-horiz"  class="menuItems-dark"></iron-icon>
+      <b>R</b>
+  </section> 
+<section on-down="dragsOff" on-up="dragsOn" style="background: #009; height: 92%; position: absolute; right: 2px; top: 1px; bottom: 1px; min-width:32px;">
+  <iron-icon draggable="[[_computestaticmenu(dragmenu)]]" track icon="icons:input" style="background: #000066; position: absolute; right: 1px; min-width:30px;" on-track="_resetWidth" class="center center-justified menuItems-light">
   </iron-icon>
 </section>        
 </div>
@@ -109,11 +78,8 @@ FcDragMenuProto = Polymer({
 	behaviors: [
     FCBehaviors.DraggableBehavior,
 		Polymer.IronResizableBehavior,
-		Polymer.NeonAnimationBehavior,
 		Polymer.IronSelectableBehavior,
-		Polymer.NeonAnimationRunnerBehavior,
-		Polymer.IronMenubarBehavior,
-		Polymer.IronRangeBehavior],
+		Polymer.IronMenubarBehavior],
 	properties: {
           	class: {
                 type: String,
@@ -121,7 +87,7 @@ FcDragMenuProto = Polymer({
                     return 'horizontal layout';
                 }, 
                 notify: true,
-                reflectToAttribute: true
+            
                },
             notRouter:{
               type: Boolean,
@@ -133,7 +99,6 @@ FcDragMenuProto = Polymer({
             dragmenu:{
                 type: Boolean,
                 value: false,
-                reflectToAttruibute: true,
                 notify: true
                },
             staticmenu:{
@@ -144,18 +109,10 @@ FcDragMenuProto = Polymer({
             currentWidth:{
                   type: String, 
                   value: function(){
-                            return '280';
+                            return "250";
                       },
                   notify: true, 
-                  reflectToAttribute: true
               },
-
-                slide:{
-                        type: Boolean,
-                        value: false,
-                        notify: true
-                },
-
                 _leftHidden: {
                   type: Boolean,
                   value: false
@@ -164,23 +121,22 @@ FcDragMenuProto = Polymer({
                   type: Boolean,
                   value: false
                 },
-                _previousButton: {
-                  type: Object
-              },
-              hostAttributes: {
-                role: 'tabList'
-              },
+             
               listeners: {
                 'iron-resize': '_onResize',
               },
-              hostAttributes: {
-                'role': 'menubar'
-              },
+             
               keyBindings: {
                 'left': '_onLeftKey',
                 'right': '_onRightKey'
               } 
           },
+           hostAttributes: {
+                "role": 'tabList'
+              },
+            hostAttributes: {
+                'role': 'menubar'
+              },
     
     created: function() {
       this._holdJob = null;
@@ -191,6 +147,9 @@ FcDragMenuProto = Polymer({
     attached: function(){
     
     },
+    swapMenu: function(){
+          this.notRouter = !this.notRouter;
+          },
     _computestaticmenu: function(dragmenu){
         return dragmenu;
     },
@@ -202,32 +161,29 @@ FcDragMenuProto = Polymer({
     },
    
     	_toggleRightDrawer: function(){
-			var drawer = document.querySelector('#drawer-2');	
-			if(drawer.forceNarrow!==true)
-			{drawer.forceNarrow = true;}
-			else{drawer.forceNarrow = false;
-			}
+			// var drawer = document.querySelector('#drawer-2');	
+			// if(drawer.forceNarrow!==true)
+			// {drawer.forceNarrow = true;}
+			// else{drawer.forceNarrow = false;
+			// }
 	},
 	_toggleLeftDrawer: function(){
-		var drawer = document.querySelector('#drawerPrimed');
-          var dashboard = document.querySelector("#dashboardPrime");	
-		if(drawer.forceNarrow!==true)
-          {
-               drawer.forceNarrow = true;
-               drawer.responsiveWidth='90000px';
-               dashboard.leftHidden=true;
-          }
-          else
-          {
-               drawer.forceNarrow = false;
-               drawer.responsiveWidth ='1080px';
-               dashboard.leftHidden=false;
+		// var drawer = document.querySelector('#drawerPrimed');
+  //         var dashboard = document.querySelector("#dashboardPrime");	
+		// if(drawer.forceNarrow!==true)
+  //         {
+  //              drawer.forceNarrow = true;
+  //              drawer.responsiveWidth='90000px';
+  //              dashboard.leftHidden=true;
+  //         }
+  //         else
+  //         {
+  //              drawer.forceNarrow = false;
+  //              drawer.responsiveWidth ='1080px';
+  //              dashboard.leftHidden=false;
 
-          }
+  //         }
      },
-     swapMenu: function(){
-      this.notRouter = !this.notRouter;
-    },
 
 
      _resetWidth: function(e){
@@ -238,13 +194,13 @@ FcDragMenuProto = Polymer({
                   console.log(e.detail);
                   break;
                 case 'track':
-                  var nwidth = parseInt(self.currentWidth) + e.detail.ddx;
-                  var trueWidth = nwidth.toString()+'px';
-                  self.currentWidth=trueWidth;
+                  var nwidth = parseInt(this.currentWidth) + e.detail.ddx;
+                  var trueWidth = (nwidth<250)?"250px":nwidth.toString()+'px';
+                  this.currentWidth=trueWidth;
                   this.$.protoMenu.style.width= trueWidth;
-                  var insertionPoint = Polymer.dom(this.root).querySelector('content');
-                  var distributed = Polymer.dom(insertionPoint).getDistributedNodes()[1];
-                  distributed.style.width= trueWidth;
+                  var insertionPoint = Polymer.dom(this.root).querySelector('CONTENT');
+                  var distributed = Polymer.dom(insertionPoint).getDistributedNodes();
+                  distributed[1].style.width= (nwidth<250)?"0px":(nwidth-250).toString()+'px';
                 
                   break;
                 case 'end':
@@ -252,14 +208,7 @@ FcDragMenuProto = Polymer({
                   break;
           }
         },
-         swapMenu: function(){
-          this.notRouter = !this.notRouter;
-          },
-          _computeWidth: function(currentWidth){
-                   return currentWidth;
-    }
-
-
+         
 });
   </script>
 </dom-module>

@@ -339,7 +339,7 @@ FCBehaviors.FcDataGridStylingBehavior = {
                   var theId="#"+newKey;
                   var cell=this.$$(theId);
                   var model=cell._templateInstance;
-                  var cellStyle=model.item.style;
+                  var cellStyle=model.item.style.cssText;
                   if(cellStyle.match(property))
                     {
                       var replacer=property+/\[[a-z]+\]:[a-z]+;/;
@@ -386,7 +386,7 @@ alternatingHighlighter(e){
     var keys=this.gridEvent.target.id.split("_"),
     mapName=keys[0],
     parent=(keys[0]=="comparisons")?this.$.hanger3:this.$.polymerGrid;
-    console.log(mapName, this[mapName]);
+ 
     var columns= Polymer.dom(parent).children;
     var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
     var property=btn.btnProperty,
@@ -410,7 +410,7 @@ alternatingHighlighter(e){
                 var keyParts=key.split('_');
                 if(keyParts[2]!=0&&cell.nodeName=="TEXTAREA"){
                 var model=cell._templateInstance;
-                 var cellStyle=model.item.style;
+                 var cellStyle=model.item.style.cssText;
                  console.log(cellStyle, property);
                     if(cellStyle.match(property))
                       {
@@ -439,6 +439,9 @@ alternatingHighlighter(e){
   },
   
  	insertRow(e){
+      console.log(e, this.gridEvent);
+
+
    		var eid=this.gridEvent.target.getAttribute("id");
    		var key=eid.split("_");
       		if(key[1]==0 &&key[2]!=0)
@@ -447,6 +450,7 @@ alternatingHighlighter(e){
 			      var after=(e.target.btnText.match("Row Below"))?true: false;
 			      var childColumn= Polymer.dom(this.$.hanger3).children;
 			      var rows=childColumn[0].children.length;
+            var lastKeys=childColumn[0].children[rows-1].id.split("_");
 			      var count=childColumn.length;
 			    for(var k=0;k<count; k++)
 			    {
@@ -463,26 +467,26 @@ alternatingHighlighter(e){
         			if(after===false)
         			{   
         				Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
-           				var style=Polymer.dom(elem).nextSibling.style.cssText
-          				elem.style.cssText=style;
+           				var style=Polymer.dom(elem).nextSibling.style.cssText;
+          				elem.style=style;
           				this[key[0]].set(nKey, [elem.value,elem]);
          			}
-        			else if(after===true&&key[2]<rows)
+        			else if(after===true&&key[2]!=lastKeys[2])
             		{
               			Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
                 		var style=Polymer.dom(elem).nextSibling.style.cssText
                 		elem.style.cssText=style;
                 		this[key[0]].set(nKey, [elem.value,elem]);
             		}
-        			else if(after===true&&key[2]==rows)
+        			else if(after===true && key[2]==lastKeys[2])
             		{
               			Polymer.dom(childColumn[k]).appendChild(elem);
                 		var style=Polymer.dom(elem).previousSibling.style.cssText
-                		elem.style.cssText=style;
+                		elem.style=style;
                 		this[key[0]].set(nKey, [elem.value,elem]);
             		}
-       			}//end for look from way up above
-      		}//end of be a row header etc
+       			}//end for loop from way up above
+      		}//end of be a row and column corner header conditional
           
   		},
   	deleteRow(e){

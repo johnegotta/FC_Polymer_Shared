@@ -1,0 +1,127 @@
+	window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+ 
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange
+ 
+if (!window.indexedDB) {
+   window.alert("Your browser doesn't support a stable version of IndexedDB.")
+}
+ 
+const dbName = "gridMaps";
+ 
+var request = indexedDB.open(dbName, 3);
+ 
+request.onerror = function(event) {
+    console.log("db error");
+};
+ 
+request.onupgradeneeded = function(event) {
+    var db = event.target.result;
+ 
+    var mapsObjectStore = db.createObjectStore("cells", {keyPath: "key" });
+    
+    mapsObjectStore.createIndex("key", "key", { unique: true });
+    
+    
+    console.log("db created");
+    
+  };
+ 
+
+	persistCells(){
+  var  data=[];
+  console.log(this.comparisons);
+    for(let n of this.comparisons){
+            var cell={"mapName": "comparisons", "key": n[0], "value": n[1][0],"payload": n[1][1]};
+            data.push(cell);
+            }
+  var request = indexedDB.open("gridMaps", 3);//"gridMaps"
+  request.onsuccess = function(event) {
+      
+    var db = event.target.result;
+ 
+    var transaction = db.transaction("cells", "readwrite");
+    
+    var objectStore = transaction.objectStore("cells");
+    
+   
+
+        data.forEach(function(c,i,a){
+        	objectStore.put(c);
+        }, this);
+    console.log(data);
+
+    
+    transaction.oncomplete = function() {
+      console.log("cells saved", objectStore);
+    };
+    
+  };
+},
+ 
+ addCellsToView(key) {
+  
+  var request = indexedDB.open("gridMaps", 3);//"gridMaps"
+  
+  request.onsuccess = function(event) {
+ 
+      var db = event.target.result;
+ 
+      var transaction = db.transaction("cells", "readonly");
+      var objectStore = transaction.objectStore("cells");
+      
+      var query = objectStore.get(key);
+      
+      query.onerror = function(queryEvent) {
+          console.log("Unable to retrieve data from database!");
+        };
+        
+        query.onsuccess = function(queryEvent) {
+          
+          console.log(queryEvent.target.result);
+          var cell1 = queryEvent.target.result;
+ 
+ 			console.log(cell1);
+      // do stuff with the product
+      // provide a callback parameter to execute here
+          
+        };
+  };
+},
+ 
+	addCellByKey(key) {
+  
+  var request = indexedDB.open("gridMaps", 3);
+  
+  request.onsuccess = function(event) {
+ 
+      var db = event.target.result;
+ 
+      var transaction = db.transaction("cells", "readonly");
+      var objectStore = transaction.objectStore("cells");
+    var index = objectStore.index('key');
+      
+      var query = index.get(key);
+      
+      query.onerror = function(queryEvent) {
+          console.log("Unable to retrieve data from database!");
+        };
+        
+        query.onsuccess = function(queryEvent) {
+          
+          console.log(queryEvent.target.result);
+          var cell1 = queryEvent.target.result;
+ 
+      // do stuff with the product
+      // provide a callback parameter to execute here
+          
+        };
+  };
+},
+ 
+deletedb(){
+ 
+  var req = indexedDB.deleteDatabase("gridMaps", 3);
+  console.log("db deleted");
+  
+},

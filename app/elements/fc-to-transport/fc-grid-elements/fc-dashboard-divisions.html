@@ -292,12 +292,12 @@ Polymer({
               "constructor":FcGridContainer,
               },
         
-            // { "sectionClass": " normal buttons blue-btn-class",
-            //   "iconUsed": "icons:today",
-            //   "nodeName": "FC-RQTVERSIONC",
-            //     "constructorName":"FcRqtversionc",
-            //   "constructor":FcRqtversionc,
-            //   },
+            { "sectionClass": " normal buttons blue-btn-class",
+              "iconUsed": "icons:today",
+              "nodeName": "FC-GRID",
+                "constructorName":"FcGrid",
+              "constructor":FcGrid,
+              },
             // { "sectionClass": "normal buttons blue-btn-class",
             //   "iconUsed": "icons:chrome-reader-mode",
             //   "nodeName": "FC-PASSAGE-DB-DISPLAY",
@@ -385,7 +385,8 @@ Polymer({
         },
        containerWidth:{
             type:Number,
-            computed:"computeContainerWidth(dashboardLeftDrawerCurrentWidth, dashboardRightDrawerCurrentWidth, screenWidth)", 
+            computed:"computeContainerWidth(dashboardLeftDrawerCurrentWidth, dashboardRightDrawerCurrentWidth, screenWidth)",
+            observer:"_observeContainerWidth", 
             notify: true,
         },
         params:{
@@ -450,7 +451,7 @@ Polymer({
         },
         constructorArray:{
           type: Array,
-          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar], ["FC-MAPPED-GRID-OO",FcMappedGridOo]];},
+          value:function(){return [["FC-CALENDAR-DIALOG",FcCalendarDialog], ["FC-MAPPED-GRID",FcMappedGrid],["FC-CALL-CENTER-DIALOG",FcCallCenterDialog],["FC-DOUBLE-TAB-SET",FcDoubleTabSet],["FC-EVENT-CALENDAR",FcEventCalendar], ["FC-MAPPED-GRID-OO",FcMappedGridOo],["FC-GRID",FcGrid]];},
           notify: true
           },
           responsiveWidth: {
@@ -603,6 +604,12 @@ request.onupgradeneeded = (function (event) {
         this.set("elementHolderArray",elementsArray);
         this.implantElements(this.elementHolderArray);
         
+    },
+    _observeContainerWidth(newVal, oldVal){
+        console.log(newVal, oldVal);
+
+
+
     },
     onFirebaseLogin: function(event) {
         this.ref = new Firebase(this.firebaseURL + '/users/' + 
