@@ -229,7 +229,6 @@ deletedb(){
     var appliedClass=(userClass)?userClass:"fitter"; 
 	var valuesArray=(baseValuesArrays)?baseValuesArrays:(baseValuesArrays===true)?this.csv:"--";
 	var sheetName=(gridname)?gridname: "newSheet"+this.counter;
-	var time=new Date().getTime();
 	var input={},
 	mapName="m"+sheetName;
 	map=new Map(); 
@@ -245,8 +244,10 @@ deletedb(){
 			var co=(cols>10&&cols<100&&i<10)?"0"+i:(cols>99&&cols<1000&&i<10)?"00"+i:(cols>99&&cols<1000&&i>9&&i<100)?"0"+i:i;
       var ro=(rows>10&&rows<100&&j<10)?"0"+j:(rows>99&&rows<1000&&j<10)?"00"+j:(rows>99&&rows<1000&&j>9&&j<100)?"0"+j:j;
 			id=sheetName+"_"+co+"_"+ro+"_", keys=id.split("_");
+      var name=(valuesArray===true&&this.csv && this.csv[0][i] && this.csv[j])?this.csv[0][i]+"__"+this.csv[j][0]:(this[sheetName]&&this[sheetName].length>0&&this.sheetName[i])?this[sheetName][i][0]+"__"+this[sheetName][0][j]:"add names";
 			var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.styleText:(keys[2]==0)?this.defaultHeader.styleText:"fitter";
-       		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "class": appliedClass, "archive":[]};
+      var time=new Date().getTime();
+       		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "name": name,"class": appliedClass, "time": time, "archive":[]};
        				var width=this.textMeasurements(cell);
        				width=parseInt(width);
        				minWidth=(minWidth>=width)?minWidth:width;
@@ -290,6 +291,16 @@ deletedb(){
     var txt=cell.value;
     var width=ctx.measureText(txt).width;
     return width;
+  },
+  indexedDbRequest(e){
+      console.log(e, "request");
+
+
+  },
+  indexedDbPutter(e){
+      console.log(e, "putter");
+
+
   },
 
 		get defaultFormat(){
