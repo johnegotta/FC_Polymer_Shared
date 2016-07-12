@@ -1,0 +1,288 @@
+ <script>
+(function(){
+// // "use strict";
+window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+ 
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+// From here on, it's like using IndexedDB from content
+
+if (!window.indexedDB) {
+   window.alert("Your browser doesn't support a stable version of IndexedDB.")
+}
+})();
+window.FCBehaviors = window.FCBehaviors || {};
+FCBehaviors.FcIndexedDbBehavior = {     
+  properties:{
+      indexedDataBases:{
+        type: Array,
+        value:function(){return [];},
+        notify: true,
+      },
+      dataArrays:{
+          types: Array,
+          value:function(){return [];},
+          notify: true,
+          observer: "observeDataArrays",//may want a higher level observer to hit some subproperties
+      },
+      mapsArray:{
+        type: Array,
+        value: function(){return [];},
+        notify: true,
+      },
+
+    },
+
+    created(){},
+    ready(){ this.getIndexedDb();},
+    attached(){
+        console.log(this.indexedDB);
+      },
+    observeDataArrays(news,olds){
+      if(news){
+        console.log(news, olds, "observing the arrays");
+            }
+        },
+    detached(){},
+    getIndexedDb(){
+          var moreDb=true;
+          var nameArray=[];
+          var i=0;
+          var gridName ="indexOfDatabases", version=1;
+          console.log(gridName);
+          var request = indexedDB.open(gridName, version);//"gridMap"
+          request.onerror = function(e)
+                {
+                  console.log("Unable to retrieve data from database!");
+                };
+          request.onsuccess = function(event){
+              var db = event.target.result;
+              console.log(db);
+              var transaction = db.transaction("cell", "readonly");
+              var objectStore = transaction.objectStore("cell");
+              query = objectStore.getAll();
+              query.onerror = function(queryEvent)
+              {
+                  console.log("Unable to retrieve data from database!");
+                };
+              query.onsuccess = function(queryEvent) 
+              {
+                          console.log(gridName, queryEvent,queryEvent.target.result );
+                          var indexdbsheet=[];
+                          var flag;
+              if(gridName=="indexOfDatabases"){
+                var qu=queryEvent.target.result;
+                  qu.forEach(function(val, i){
+                    flag=(i%13===0)?true:false;
+                    nameArray.push([val.key,1]);
+                    indexdbsheet.push({
+                    "name": val.name,
+                    "version": val.version, 
+                    "columns": val.columns,
+                    "rows": val.rows,
+                    "size": val.size,
+                    "value": val.value,
+                    "closed": val.closed,
+                    "key": val.key,
+                    "time": 0,
+                    "location":"#s_#n",
+                    "changeFlag":flag
+                  });
+                    console.log(val.key, val);
+                  });
+                  this.set("indexedDataBases",indexdbsheet);
+               
+                  console.log(this.indexedDataBases);
+            for(i=0;i<nameArray.length;i++){
+            if(nameArray.length==0){console.log("start the other stuff here");}
+               
+                console.log("round two", i, nameArray);
+                 var cell1;
+                 gridName=nameArray[i][0];
+                 var arrayName=gridName;
+                 var mapName="m"+gridName
+                 this[mapName]=new Map();
+                 var map=new Map();
+                 version=nameArray[i][1];
+                  var request = indexedDB.open(gridName, version);//"gridMap"
+                    var query;
+              
+              request.onerror = function(e){
+                      console.log("Unable to retrieve data from database!");
+                    };
+              request.onsuccess = function(event){
+                  var db = event.target.result;
+              var transaction = db.transaction("cell", "readonly");
+                  var objectStore = transaction.objectStore("cell");
+                  query = objectStore.getAll();
+              query.onsuccess = function(queryEvent){
+                       cell1 = queryEvent.target.result;
+                       console.log("got in onsuccess");
+                       var topArray=[];
+                       var lastVal=cell1.length-1;
+                       var columnArray =cell1.reduce((pre, val, i, arr)=>{
+                          if(pre.length==0)
+                            {
+                              pre.push(val); 
+                              var valKeys=val.id.split("_"); 
+                              var mapName="m"+valKeys[0]; 
+                              var map=new Map();
+                              this.set([mapName], map); 
+                              return pre;
+                              }
+                          else {  
+                                  var last=pre.length-1;
+                                  var keys=pre[last].id.split("_");
+                                  var valKeys=val.id.split("_");
+                                  }
+                                  if(keys[1]==valKeys[1]&&i!==(lastVal))
+                                  { 
+                                    mapName="m"+valKeys[0];
+                                     this[mapName].set(val.key, [val.value, val]);
+                                         pre.push(val); return pre;
+                                  }
+                                  else if(keys[1]!=valKeys[1]){
+                                    topArray.push(pre); 
+                                    var newArr=[];
+                                    newArr.push(val);
+                                   
+                                    mapName="m"+valKeys[0];
+                                    this[mapName].set(val.key, [val.value, val]);
+                                    return newArr;
+                                  }
+                                  else if(i==(lastVal)&&keys[1]==valKeys[1]){
+                                    pre.push(val);
+                                    topArray.push(pre);
+                                     mapName="m"+valKeys[0];
+                                    this[mapName].set(val.key, [val.value, val]);
+                                    return topArray;
+                                  }
+                                  else if(i==(lastVal)&&keys[1]!=valKeys[1]){
+                                    topArray.push(pre); 
+                                    var newArr=[];
+                                    newArr.push(val);
+                                    mapName="m"+valKeys[0];
+                                    this[mapName].set(val.key, [val.value, val]);
+                                    newArr.push(val);
+                                    topArray.push(newArr);
+                                    return topArray;
+                                  }
+                                
+                       }, []);
+                       var ksey=columnArray[0][0].id.split("_");
+                       var arrayName=ksey[0];
+                        this.set([arrayName],columnArray);
+                      this.push("dataArrays", this[arrayName]);
+                      // this.set([mapName],map);
+                      mapName="m" + arrayName;
+                      this.push("mapsArray", this[mapName]);
+                console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
+                  console.log(columnArray, this[mapName], "jason was here");
+                         }.bind(this);
+                      }.bind(this);
+                    }//for loop
+                  }//useless if   
+              }.bind(this);//first querry on success;
+             
+            }.bind(this); //first response on success
+            console.log("ON WAY OUT");
+            console.log(nameArray, this.mapsArray);
+          },
+    initAllDatabases(dataArrays){
+              window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+              window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+              window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+              // From here on, it's like using IndexedDB from content
+                var cell;
+              if (!window.indexedDB) {
+                window.alert("Load Chrome; Your browser doesn't support our database.")
+              }
+              var counter=dataArrays.length;
+
+              for(var j=0; j<counter;j++)
+              {   var dataArray=dataArrays[j];
+                  var columns=dataArray.length;
+                  var rows=dataArray[0].length;
+                  var data =dataArray.map(function(colHolder, col){
+                      return colHolder;
+                      }).reduce(function(pre, val){
+                          return pre.concat(val);
+                      },[]);
+                      console.log(data);
+                  var gridKey=dataArray[0][0].key.split("_");
+                  var gridName=gridKey[0];
+                  var version=1;
+                  var dbName = gridName; 
+                  var numObj=data.length;
+                  cell={
+                      "name": gridName,
+                      "version": version, 
+                      "columns": columns,
+                      "rows": rows,
+                      "size": numObj,
+                      "value": "cell",
+                      "closed": false,
+                      "key": gridName,
+                      "time": 0 
+                                 };
+                  this.push("indexedDataBases", cell); 
+                   
+                  
+                var request = indexedDB.open(gridName, version);
+
+              request.onerror = function(event) {
+                          console.log("db error");
+                    };
+
+              request.onupgradeneeded = function(event) {
+                  var db = event.target.result;
+                  var gridObjectStore = db.createObjectStore("cell", { keyPath: "key" });
+           
+                  gridObjectStore.createIndex("key", "key", { unique: true });
+                  gridObjectStore.createIndex("value", "value", { unique: false });
+                  gridObjectStore.createIndex("name", "name", { unique: false });
+                  gridObjectStore.createIndex("closed", "closed", {unique: false});
+                  gridObjectStore.createIndex("time", "time", {unique: false});
+          
+                  };
+                    this.setDataBase(gridName,version,data);
+                 //data is from 68 above
+             
+                    data=[];
+                }// for loop ends here
+                var cells=this.indexedDataBases;
+                this.persistCells("indexOfDatabases", 1,cells);
+  
+  },
+    persistCells(gridName, version, data){
+            var request = indexedDB.open(gridName, version);
+                request.onerror = function(event) {
+                    console.log(gridName, version, data, "db error");
+                  };
+                request.onupgradeneeded = function(event) {
+                    var db = event.target.result;
+                    var objectStore = db.createObjectStore("cell", { keyPath: "key" });
+    
+                    objectStore.createIndex("key", "key", {unique: true });
+                      };
+                request.onsuccess = function(event) {
+      
+                    var db = event.target.result;
+                    var transaction = db.transaction("cell", "readwrite");
+                    var objectStore = transaction.objectStore("cell");
+                        data.forEach(function(ca,i,a){
+                              objectStore.put(ca);
+                 });
+    
+                    transaction.oncomplete = function() {
+                      console.log("cells saved", objectStore);
+                      console.log("db updated");
+                    };
+                      console.log("db updated");
+                    };
+            },
+
+    };
+</script>

@@ -5,17 +5,38 @@ paper-item{
   margin: 1px;
   font-size: 14px; 
   font-family: merriweather;
+  text-align: left;
+  @apply(--layout-vertical);
+  @apply(--layout-flex);
+  @apply(--layout-start-justified);
 }
 paper-listbox{
   overflow-y: scroll;
-  border: gold 4px ridge;
+  border: gold 4px ridge; min-width: 265px; margin: 32px 32px 32px 12px;
 }
+div{
+  text-align: left;
+  @apply(--layout-flex);
+   @apply(--layout-start-justified);
+}
+.primary{color: #009; font-size: 18px; font-weight: 600;@apply(--layout-flex);
+   @apply(--layout-start-justified); }
+.secondary{color: brown; font-size: 14px; font-weight: 300;}
+  .tertiary{color: brown; font-size: 14px; font-weight: 300;}
 </style>
 <template id="fc-indexed-database-template">
 <paper-listbox>
 <template is="dom-repeat" items="{{indexedDataBases}}">
 <paper-item>
-Name: {{item.name}}, Version: {{item.version}}, Columns: {{item.columns}}, Rows: {{item.rows}}, Size: {{item.size}}
+<div class="primary">
+DB: {{item.name}} V. {{item.version}}
+</div>
+<div class="secondary">
+Cols: {{item.columns}} x Rows: {{item.rows}}, {{item.size}}cells,
+ </div>
+<div class="tertiary">
+ Time: {{item.time}} Coords: {{item.location}} <span style="{{isChangeSynced(item.changeFlag)}}"> &#9651;: {{item.changeFlag}}</span>
+ </div>
 </paper-item>
 </template>   
 </paper-listbox>
@@ -23,12 +44,8 @@ Name: {{item.name}}, Version: {{item.version}}, Columns: {{item.columns}}, Rows:
 <script>
 FcIndexedDatabase=Polymer({
   is: "fc-indexed-database",
+  behaviors:[FCBehaviors.FcIndexedDbBehavior],
   properties: {
-    indexedDataBases:{
-        type: Array,
-        value:function(){return [];},
-        notify: true,
-      },
       userParams:{
           type:Object,
           value:function(){return {};},
@@ -37,14 +54,7 @@ FcIndexedDatabase=Polymer({
               //from where firebase? uggh... should hold params in local storage 
               //with some funcadelic, woodblock, turing machine, encryption
       },
-      dataArrays:{
-          types: Array,
-          value:function(){return [];},
-          notify: true,
-          observer: "observeDataArrays",//may want a higher level observer to hit some subproperties
-      },
-
-      sessionHistory:{
+       sessionHistory:{
           type: Array, 
           value: function(){return [];},
           notify: true,
@@ -60,14 +70,193 @@ FcIndexedDatabase=Polymer({
     },
 
   created(){},
-  ready(){},
+  ready(){ },
   attached(){
-      if(this.dataArrays.length>0){
-          this.initAllDatabases(this.dataArrays);
-      }
-      else{this.async(this.initAllDatabases(this.dataArrays), 230);}
+    console.log(this.indexedDB);
+   
   },
   detached(){},
+  
+  observeActiveCell(ncv, ocv){
+      if(ncv!=null){console.log(ncv, ocv);}
+  },
+  isChangeSynced(flag){
+      var retVal=(flag===true)?"color: red; background: yellow;": "color:green; background: white;";
+  },
+  observeDataArrays(ndav, odav){
+      if(ndav!=null){console.log(ndav, odav);}
+  },
+  setDataBase(gridName, version, data){
+
+          var request = indexedDB.open(gridName, version);
+          request.onsuccess = function(event){   
+                var db = event.target.result;
+                console.log(gridName);
+                var transaction = db.transaction("cell", "readwrite");
+                var objectStore = transaction.objectStore("cell");
+                    data.forEach(function(ca,i,a){
+                          objectStore.put(ca);
+                    });
+                           console.log("db created"); 
+              };
+
+
+  },
+ logByTime(){
+            var now=new Date().getTime();
+            var lastUpdate=now-172800000;
+   request.onsuccess=function(event){
+              var db= event.target.result;
+              var transaction =db.transaction("cell", "readonly");
+              var objectStore = transaction.objectStore('cell');
+              var myIndex = objectStore.index('time'); 
+              var boundKeyRange=IDBKeyRange.bound(lastUpdate, now, false, false);
+              myIndex.openCursor(boundKeyRange).onsuccess = function(event) {
+                var cursor = event.target.result;
+                   if(cursor){ console.log(cursor.value.name, cursor.value.value, cursor.value.style);
+                  cursor.continue();}
+        else{console.log('Entries all displayed.');    
+         }
+       };
+     };
+ },
+
+ 
+ 
+});
+</script>
+
+
+
+
+
+<!-- 
+getIndexedDb(){
+      var moreDb=true;
+      var nameArray=[];
+      var i=0;
+      var gridName ="indexOfDatabases", version=1;
+      console.log(gridName);
+      var request = indexedDB.open(gridName, version);//"gridMap"
+      request.onerror = function(e)
+            {
+              console.log("Unable to retrieve data from database!");
+            };
+      request.onsuccess = function(event){
+          var db = event.target.result;
+          console.log(db);
+          var transaction = db.transaction("cell", "readonly");
+          var objectStore = transaction.objectStore("cell");
+          query = objectStore.getAll();
+          query.onerror = function(queryEvent)
+          {
+              console.log("Unable to retrieve data from database!");
+            };
+          query.onsuccess = function(queryEvent) 
+          {
+                      console.log(gridName, queryEvent,queryEvent.target.result );
+                      var indexdbsheet=[];
+                      var flag;
+          if(gridName=="indexOfDatabases"){
+            var qu=queryEvent.target.result;
+              qu.forEach(function(val, i){
+                flag=(i%13===0)?true:false;
+                nameArray.push([val.key,1]);
+                indexdbsheet.push({
+                "name": val.name,
+                "version": val.version, 
+                "columns": val.columns,
+                "rows": val.rows,
+                "size": val.size,
+                "value": val.value,
+                "closed": val.closed,
+                "key": val.key,
+                "time": 0,
+                "location":"#s_#n",
+                "changeFlag":flag
+              });
+                console.log(val.key, val);
+              });
+              this.set("indexedDataBases",indexdbsheet);
+           
+              console.log(this.indexedDataBases);
+        for(i=0;i<nameArray.length;i++){
+        if(nameArray.length==0){console.log("start the other stuff here");}
+           
+            console.log("round two", i, nameArray);
+             var cell1;
+             gridName=nameArray[i][0];
+             var arrayName=gridName;
+             var mapName="m"+gridName
+             this[mapName]=new Map();
+             var map=new Map();
+             version=nameArray[i][1];
+              var request = indexedDB.open(gridName, version);//"gridMap"
+                var query;
+      
+      request.onerror = function(e){
+              console.log("Unable to retrieve data from database!");
+            };
+      request.onsuccess = function(event){
+          var db = event.target.result;
+      var transaction = db.transaction("cell", "readonly");
+          var objectStore = transaction.objectStore("cell");
+          query = objectStore.getAll();
+      query.onsuccess = function(queryEvent){
+               cell1 = queryEvent.target.result;
+               console.log("got in onsuccess");
+               var topArray=[];
+               var lastVal=cell1.length-1;
+                var columnArray =cell1.reduce(function(pre, val, i, arr)
+                  {
+                    map.set(val.key, val);
+                  if(pre.length==0){pre.push(val); return pre;}
+                  else {  
+                          var last=pre.length-1;
+                          var keys=pre[last].id.split("_");
+                          var valKeys=val.id.split("_");
+                          if(keys[1]==valKeys[1]&&i!==(lastVal))
+                          {
+                            pre.push(val); return pre;
+                            this[gridName].set(val.key, [val.value, val]);
+                          }
+                          else if(keys[1]!=valKeys[1]){
+                            topArray.push(pre); 
+                            var newArr=[];
+                            newArr.push(val);
+                            return newArr;
+                          }
+                          else if(i==(lastVal)&&keys[1]==valKeys[1]){
+                            pre.push(val);
+                            topArray.push(pre);
+                            return topArray;
+                          }
+                          else if(i==(lastVal)&&keys[1]!=valKeys[1]){
+                            topArray.push(pre); 
+                            var newArr=[];
+                            newArr.push(val);
+                            topArray.push(newArr);
+                            return topArray;
+                          }
+                        }
+               }, []);
+                this.set([arrayName],columnArray);
+              this.push("dataArrays", this[arrayName]);
+              this.set([mapName],map);
+              this.push("mapsArray", this[mapName]);
+        console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
+          console.log(columnArray, this[mapName], "jason was here");
+                 }.bind(this);
+              }.bind(this);
+            }//for loop
+          }//useless if   
+      }.bind(this);//first querry on success;
+     
+    }.bind(this); //first response on success
+    console.log("ON WAY OUT");
+    console.log(nameArray);
+  },
+
 
   initAllDatabases(dataArrays){
         window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -75,7 +264,7 @@ FcIndexedDatabase=Polymer({
         window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
         // From here on, it's like using IndexedDB from content
-
+          var cell;
         if (!window.indexedDB) {
           window.alert("Load Chrome; Your browser doesn't support our database.")
         }
@@ -96,139 +285,57 @@ FcIndexedDatabase=Polymer({
             var version=1;
             var dbName = gridName; 
             var numObj=data.length;
-            var indexedDataBaseObject={
+            cell={
                 "name": gridName,
                 "version": version, 
                 "columns": columns,
                 "rows": rows,
                 "size": numObj,
-                "objects": data,
-            };
-            this.push("indexedDataBases", indexedDataBaseObject); 
-        
-  //           var request = indexedDB.open(gridName, version);
-  //           request.onsuccess=function(event){
-  //               var db= event.target.result;
-  //               var transaction =db.transaction("cell", "readonly");
-  //                var objectStore = transaction.objectStore('contactsList');
+                "value": "cell",
+                "closed": false,
+                "key": gridName,
+                "time": 0 
+                           };
+            this.push("indexedDataBases", cell); 
+             
+            
+          var request = indexedDB.open(gridName, version);
 
-  //                 var myIndex = objectStore.index('time'); 
-  //                  myIndex.openCursor().onsuccess = function(event) {
-  //   var cursor = event.target.result;
-  //   if(cursor){ console.log(cursor.value.name, cursor.value.value, cursor.value.style);}
-  //   cursor.continue();
-  //   else{ console.log('Entries all displayed.');    
-  //   }
-  // };
-  //               console.log(event, db);
-  //   };
-   this.setDataBase(gridName,version,data);
         request.onerror = function(event) {
                     console.log("db error");
               };
 
         request.onupgradeneeded = function(event) {
             var db = event.target.result;
-            console.log(db);
             var gridObjectStore = db.createObjectStore("cell", { keyPath: "key" });
      
             gridObjectStore.createIndex("key", "key", { unique: true });
             gridObjectStore.createIndex("value", "value", { unique: false });
             gridObjectStore.createIndex("name", "name", { unique: false });
-            gridObjectStore.createIndex("open", "open", {unique: false});
-            gridObjectStore.createIndex("time", "time", {unique: false})
+            gridObjectStore.createIndex("closed", "closed", {unique: false});
+            gridObjectStore.createIndex("time", "time", {unique: false});
     
             };
-            
+              this.setDataBase(gridName,version,data);
            //data is from 68 above
-     
+       
               data=[];
           }// for loop ends here
+          var cells=this.indexedDataBases;
+          this.persistCells("indexOfDatabases", 1,cells);
         },
 
-  observeActiveCell(ncv, ocv){
-
-      if(ncv!=null){console.log(ncv, ocv);}
-
-  },
-  observeDataArrays(ndav, odav){
-      if(ndav!=null){console.log(ndav, odav);}
 
 
-  },
-  setDataBase(gridName, version, data){
-
-          var request = indexedDB.open(gridName, version);
-          request.onsuccess = function(event) {   
-                var db = event.target.result;
-                var transaction = db.transaction("cell", "readwrite");
-                console.log(db, "did i make it in here", gridName, j);
-                var objectStore = transaction.objectStore("cell");
-                    data.forEach(function(ca,i,a){
-                          objectStore.put(ca);
-                          console.log(ca, "in for each");
-                    });
-                           console.log("db created"); 
-              };
 
 
-  },
 
-initializeDataArray(dataArray){
-     
-      var data =dataArray.map(function(colHolder){
-            return colHolder;
-        }).reduce(function(pre, val){
-        return pre.concat(val);
-        },[]);
-      var gridKey=dataArray[0][0].key.split("_");
-      var gridName=gridKey[0];
-      var version=1;
-    this.persistCells(gridName, version, data);
-    },
- 
 
-  persistCells(gridName, version, data){
-  	var jason=this;
-  	console.log(data);//got hear stopped
-  	var request = indexedDB.open(gridName, version);
-  request.onupgradeneeded = function(event) {
-    var db = event.target.result;
-    console.log(db, "did i make it in here, HERE HERE HERE");
-    var mapsObjectStore = db.createObjectStore("cell", { keyPath: "key" });
-    
-    mapsObjectStore.createIndex("key", "key", { unique: true });
-	};
-  var jason=this;
-  var request = indexedDB.open(gridName, version);//"gridMaps"
-  request.onsuccess = function(event) {
-      
-    var db = event.target.result;
-    var transaction = db.transaction("cell", "readwrite");
-     console.log(db, "did i make it in here");
-    var objectStore = transaction.objectStore("cell");
-    
-        data.forEach(function(ca,i,a){
-          objectStore.put(ca);
-          console.log(ca, "in for each");
-         });
-    
 
-    
-    transaction.oncomplete = function() {
-      console.log("cells saved", objectStore);
-      console.log("db updated");
-    };
-    console.log("db updated");
-  };
-  
-    
-  
-},
- 
- addCellsToView(gridName, version){
+
+addCellsToView(gridName, version){
   var cell1;
-  var request = indexedDB.open("jasonGrid", 1);//"gridMap"
+  var request = indexedDB.open(gridName, version);//"gridMap"
   var query;
   
   request.onsuccess = function(event) {
@@ -280,8 +387,8 @@ initializeDataArray(dataArray){
                     }
            }, []);
           this.set("holderArray", columnArray);
- 		console.log("successfully regrouped into", topArray.length,"number of columns, the following arrays of objects: ", this.holderArray);
-   		
+    console.log("successfully regrouped into", topArray.length,"number of columns, the following arrays of objects: ", this.holderArray);
+      
       // do stuff with the product
       // provide a callback parameter to execute here
           
@@ -289,13 +396,6 @@ initializeDataArray(dataArray){
   }.bind(this);
  
 }
-});
-</script>
-
-
-
-
-
 <!--(function(){
 // // "use strict";
 // window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;

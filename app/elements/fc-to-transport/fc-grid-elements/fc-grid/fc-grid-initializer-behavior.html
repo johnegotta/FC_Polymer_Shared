@@ -11,26 +11,6 @@ window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.ms
 if (!window.indexedDB) {
    window.alert("Your browser doesn't support a stable version of IndexedDB.")
 }
- 
-const dbName = "jasonGrid";
- 
-var request = indexedDB.open(dbName, 1);
- 
-request.onerror = function(event) {
-    console.log("db error");
-};
- 
-request.onupgradeneeded = function(event) {
-    var db = event.target.result;
-    // self.FCBehaviors.FcGridInitializerBehavior.set("dataBaseProxy", db);
- 
-    var mapsObjectStore = db.createObjectStore("cell", { keyPath: "key" });
-    
-    mapsObjectStore.createIndex("key", "key", { unique: true });
-    
-    self.FCBehaviors.FcGridInitializerBehavior.persistCells(this.data);
-    console.log("db created"); 
-  };
 })();
 window.FCBehaviors = window.FCBehaviors || {};
 FCBehaviors.FcGridInitializerBehavior = {
@@ -84,145 +64,7 @@ this.persistCells(data);
 },
  
 
-  persistCells(data){
-  	var jason=this;
-  	console.log(data);//got hear stopped
-  	var request = indexedDB.open("jasonGrid", 1);
-  request.onupgradeneeded = function(event) {
-    var db = event.target.result;
-    console.log(db, "did i make it in here, HERE HERE HERE");
-    var mapsObjectStore = db.createObjectStore("cell", { keyPath: "key" });
-    
-    mapsObjectStore.createIndex("key", "key", { unique: true });
-	};
-  var jason=this;
-  var request = indexedDB.open("jasonGrid", 1);//"gridMaps"
-  request.onsuccess = function(event) {
-      
-    var db = event.target.result;
-    var transaction = db.transaction("cell", "readwrite");
-     console.log(db, "did i make it in here");
-    var objectStore = transaction.objectStore("cell");
-    
-        data.forEach(function(ca,i,a){
-          objectStore.put(ca);
-          console.log(ca, "in for each");
-         });
-    
-
-    
-    transaction.oncomplete = function() {
-      console.log("cells saved", objectStore);
-      console.log("db updated");
-    };
-    console.log("db updated");
-  };
-  
-},
- 
- addCellsToView(gridName, version) {
-  var cell1;
-  var request = indexedDB.open("jasonGrid", 1);//"gridMap"
-  var query;
-  
-  request.onsuccess = function(event) {
- 
-      var db = event.target.result;
- 
-      var transaction = db.transaction("cell", "readonly");
-      var objectStore = transaction.objectStore("cell");
-      
-      query = objectStore.getAll();
-      console.log(query);
-      
-      query.onerror = function(queryEvent) {
-          console.log("Unable to retrieve data from database!");
-        };
-        
-        query.onsuccess = function(queryEvent) {
-          
-          console.log(queryEvent.target.result);
-           cell1 = queryEvent.target.result;
-           var topArray=[];
-           var lastVal=cell1.length-1;
-          var columnArray =cell1.reduce(function(pre, val, i, arr){
-            console.log(pre,val);
-              if(pre.length==0){pre.push(val); return pre;}
-              else {  
-                      var last=pre.length-1;
-                      var keys=pre[last].id.split("_");
-                      var valKeys=val.id.split("_");
-                      if(keys[1]==valKeys[1]&&i!==(lastVal)){pre.push(val); return pre;}
-                      else if(keys[1]!=valKeys[1]){
-                        topArray.push(pre); 
-                        var newArr=[];
-                        newArr.push(val);
-                        return newArr;
-                      }
-                      else if(i==(lastVal)&&keys[1]==valKeys[1]){
-                        pre.push(val);
-                        topArray.push(pre);
-                        return topArray;
-                      }
-                      else if(i==(lastVal)&&keys[1]!=valKeys[1]){
-                        topArray.push(pre); 
-                        var newArr=[];
-                        newArr.push(val);
-                        topArray.push(newArr);
-                        return topArray;
-                      }
-                    }
-           }, []);
-          this.set("holderArray", columnArray);
- 		console.log("successfully regrouped into", topArray.length,"number of columns, the following arrays of objects: ", this.holderArray);
-   		
-      // do stuff with the product
-      // provide a callback parameter to execute here
-          
-        }.bind(this);
-  }.bind(this);
- 
-},
- 
-  updateOnValueChange(key) {
-  
-  var request = indexedDB.open("jasonGrid", 1);
-  
-  request.onsuccess = function(event) {
- 
-      var db = event.target.result;
-      
- 
-      var transaction = db.transaction("cell", "readwrite");
-      var objectStore = transaction.objectStore("cell");
-    var index = objectStore.index('key');
-      
-      var query = index.get(key);
-      
-      query.onerror = function(queryEvent) {
-          console.log("Unable to retrieve data from database!");
-        };
-        
-        query.onsuccess = function(queryEvent) {
-          
-          console.log(queryEvent.target.result);
-          var cell1 = queryEvent.target.result;
- 
-      // do stuff with the product
-      // provide a callback parameter to execute here
-          
-        };
-  };
-},
- 
-deletedb(){
-  var req = indexedDB.deleteDatabase("jasonGrid", 1);
-  console.log("db deleted");
-  
-},
-
-
-  gridConstructor(col,row,gridname,headers,sheets, toolset, baseValuesArrays, userStyle, userClass){
+  gridConstructor([col,row,gridname,headers,sheets, toolset, baseValuesArrays, userStyle, userClass]){
   	console.log(col, gridname);
     var grid=[], i=0, j=0, cell={},colArray=[]; 
     var cols=(col)?col:26; var rows=(row)?row:26; 
@@ -240,14 +82,14 @@ deletedb(){
      	{
 	     
 			var value=(valuesArray===true&&this.csv && this.csv[j] && this.csv[j][i])?this.csv[j][i]:"--";
-			  	
-			var co=(cols>10&&cols<100&&i<10)?"0"+i:(cols>99&&cols<1000&&i<10)?"00"+i:(cols>99&&cols<1000&&i>9&&i<100)?"0"+i:i;
-      var ro=(rows>10&&rows<100&&j<10)?"0"+j:(rows>99&&rows<1000&&j<10)?"00"+j:(rows>99&&rows<1000&&j>9&&j<100)?"0"+j:j;
+			var str="00000";
+		  var co=(str+i).slice(-5);
+      var ro=(str+j).slice(-5);
 			id=sheetName+"_"+co+"_"+ro+"_", keys=id.split("_");
       var name=(valuesArray===true&&this.csv && this.csv[0][i] && this.csv[j])?this.csv[0][i]+"__"+this.csv[j][0]:(this[sheetName]&&this[sheetName].length>0&&this.sheetName[i])?this[sheetName][i][0]+"__"+this[sheetName][0][j]:"add names";
 			var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.styleText:(keys[2]==0)?this.defaultHeader.styleText:"fitter";
-      var time=new Date().getTime();
-       		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "name": name,"class": appliedClass, "time": time, "archive":[]};
+      var time=0;
+       		var cell={"key":id, "value":value, "contenteditable": true, "id": id, "style":  style, "name": name,"class": appliedClass, "time": time, "archive":[], "closed": false};
        				var width=this.textMeasurements(cell);
        				width=parseInt(width);
        				minWidth=(minWidth>=width)?minWidth:width;
@@ -260,9 +102,6 @@ deletedb(){
           	cell.style+="width: " +numb+"px; ";
           	this[mapName].set(cell.key, [cell.value, cell]);
           }, this);
-
-          // var colObjLayer={"id": "column_"+i+"_0_", "value":colArray[0].value, "column":colArray, "otherJunk":"JasonWasHere"};
-          // this[mapName].set(colObjLayer.id,[colObjLayer.value,colObjLayer]);
 
          grid.push(colArray);
          colArray=[];

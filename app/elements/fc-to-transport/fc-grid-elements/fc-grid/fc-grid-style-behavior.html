@@ -4,7 +4,7 @@
 
 })();
 window.FCBehaviors = window.FCBehaviors || {};
-FCBehaviors.FcGridStyleBehavior = {
+FCBehaviors.FcGridStyleBehaviorImpl = {
 	listeners: {"color-picker-selected":"getcolor"},
 	properties: {
 		gridEvent:{
@@ -62,289 +62,29 @@ FCBehaviors.FcGridStyleBehavior = {
     	value:function(){return [];},
     	notify: true
     	},
-	},
-	detached(){},
-
-	getcolor(e){
-    		this.set("color", e.detail.color);
-    },
- stylePropertySelection(e){
-      var key =this.gridEvent.target.id;
-      var keys=this.gridEvent.target.id.split("_");
-      var mapName="m"+keys[0];
-      var arrayName=keys[0];
-      console.log(this[arrayName]);
-      var property=e.target.btnProperty;
-      var setValue =(property.match("color"))?this.color+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
-        var fullVal=property+setValue;
-        var rowscols=50;
-       //below fix the i for the size of the rows columns etc
-      for(var i=1;i<rowscols;i++)
-        {
-          if(keys[2]==0 && keys[1]!=0)
-          {
-            rowscols=this[arrayName][0].length-1;
-            var newKey=(i<10&&this[arrayName][0].length>9)?keys[0]+"_"+keys[1]+"_"+"0"+i+"_":keys[0]+"_"+keys[1]+"_"+i+"_";
-              
-           }
-          else if(keys[1]==0 && keys[2]!=0)
-          {
-              rowscols=this[arrayName].length-1;
-              var newKey=(i<10&&this[arrayName].length>9)?keys[0]+"_"+"0"+i+"_"+keys[2]+"_":keys[0]+"_"+i+"_"+keys[2]+"_";
-          }
-          else if(keys[1]==0 && keys[2]==0)
-          {
-              var newArray=this[arrayName].map(function(value, index, array){
-               if(index!=0){
-                return value.map(function(cell, i){
-                  if(i!=0){
-                  if(cell.style.match(property))
-                    {
-                      var replacer=property+/\[[a-z]+\]:[a-z]+;/;
-                      cell.style=cell.style.replace(replacer, "");
-                     } 
-                  cell.style=cell.style+fullVal  + " ";
-                  let newKey= cell.id;
-                  this[mapName].set(newKey,[cell.value, cell]);
-                  return cell;
-                }
-                return cell;
-                },this);
-              }
-              return value;
-              },this);
-            this.set(arrayName, newArray);
-            console.log(this, this.arraySwap, this.arraySwapBack);
-            this.arraySwap();
-            this.async(this.arraySwapBack,2);
-            break;
-          }
-          else{
-            var newKey=key;
-           i=52;
-           rowscols=2;
-            }
-          if(newKey){
-            var payload=this[mapName].get(newKey);
-            if(payload&&payload[1]){
-              var theId="#"+newKey;
-              var cell=this.$$(theId);
-              console.log(cell, payload);
-              var model=cell._templateInstance;
-              var cellStyle=model.item.style;
-                if(cellStyle.match(property))
-                  {
-                  var replacer=property+/\[[a-z]+\]:[a-z]+;/;
-                  cellStyle=cellStyle.replace(replacer, "");
-                  }
-              cellStyle=cellStyle+fullVal + " ";
-              model.set("item.style",cellStyle);
-              payload[1].style=cellStyle;
-              console.log(payload);
-              this[mapName].set(key,payload);
-            }
-        }
-      }//end for
-  },
-
-  alternatingHighlighter(e){
-    var keys=this.gridEvent.target.id.split("_"),
-    mapName="m"+keys[0],
-    parent=this.$.polymerGrid;
-    var columns= Polymer.dom(parent).children;
-    var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
-    var property=btn.btnProperty,
-    setValue =(property.match("color"))?this.color + " ":(property.match("background"))?this.background + " ": e.target.btnSetValue + " ";
-    var fullVal=property+" "+setValue;
-    var colCount=(keys[1]==0&&keys[2]!=0)?1:2;
-    var rowCount=(keys[1]==0&&keys[2]!=0)?2:1;
-    for(i=1;i<counter;i+=colCount)
-      {
-        var columnChildren=Polymer.dom(columns[i]).children,
-        counter2=columnChildren.length;
-        for(j=1;j<counter2;j+=rowCount)
-        {   
-          if(columnChildren[j]!=undefined)
-          {
-            var key =columnChildren[j].getAttribute("id");
-            var theId="#"+key, 
-            cell=this.$$(theId);
-            var payload=this[mapName].get(key);//keys[0] is mapname//
-              var keyParts=key.split('_');
-            if(keyParts[2]!=0&&cell.nodeName=="TEXTAREA")
-            {
-                var model=cell._templateInstance;
-                 var cellStyle=model.item.style;
-                    if(cellStyle.match(property))
-                      {
-                          var replacer=property+/\[[a-z]+\]:[a-z]+;/;
-                          cellStyle=cellStyle.replace(replacer, "");
-                      }
-                    cellStyle=cellStyle + fullVal+";"+" ";
-                    model.set("item.style",cellStyle);
-                    payload[1].style=cellStyle;
-                    this[mapName].set(key,payload);
-            }
-          }
-        }   
-      }
-    },
-  
- 	insertRow(e){
-      console.log(e, this.gridEvent);
-   		var eid=this.gridEvent.target.getAttribute("id");
-   		var key=eid.split("_");
-      var mapName="m"+key[0];
-      		if(key[1]==0 &&key[2]!=0)
-      		{
-			      var rowNum=key[2];
-			      var after=(e.target.btnText.match("Row Below"))?true: false;
-			      var childColumn= Polymer.dom(this.$.hanger3).children;
-			      var rows=childColumn[0].children.length;
-            var lastKeys=childColumn[0].children[rows-1].id.split("_");
-			      var count=childColumn.length;
-			    for(var k=0;k<count; k++)
-			    {
-			        var colNum=childColumn[k].getAttribute("id");
-			        var colNum=colNum.split("_");
-			        var elem=document.createElement("TEXTAREA");
-			        elem.setAttribute("style", this.defaultFormat.styleText);
-			        var nKey=key[0]+"_"+colNum[1]+"_"+rows+"_";
-			        elem.setAttribute("id", nKey);
-			        elem.value="--";
-			        this[mapName].set(nKey,[elem.value, elem]);
-			        var theId="#"+ key[0] + "_" + colNum[1] + "_" + key[2] + "_";
-        			
-        			if(after===false)
-        			{   
-        				Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId));
-           				var style=Polymer.dom(elem).nextSibling.style.cssText;
-          				elem.style=style;
-          				this[key[0]].set(nKey, [elem.value,elem]);
-         			}
-        			else if(after===true&&key[2]!=lastKeys[2])
-            		{
-              			Polymer.dom(childColumn[k]).insertBefore(elem, this.$$(theId).nextSibling);
-                		var style=Polymer.dom(elem).nextSibling.style.cssText
-                		elem.style.cssText=style;
-                		this[key[0]].set(nKey, [elem.value,elem]);
-            		}
-        			else if(after===true && key[2]==lastKeys[2])
-            		{
-              			Polymer.dom(childColumn[k]).appendChild(elem);
-                		var style=Polymer.dom(elem).previousSibling.style.cssText
-                		elem.style=style;
-                		this[key[0]].set(nKey, [elem.value,elem]);
-            		}
-       			}//end for loop from way up above
-      		}//end of be a row and column corner header conditional
-          
-  		},
-  	deleteRow(e){
-    	var children=Polymer.dom(this.$.hanger3).children;
-    	var columnNumberArray=[],
-    	columnArrayIds=[],
-    	rowArray=[];
-    	children.forEach(function(col,index, array){
-        		var colId=col.getAttribute("id");
-        		columnArrayIds.push(colId);
-        		var colIdMiniArray=colId.split("_");
-        		columnNumberArray.push(colIdMiniArray[1]);
-    	});
-    	var baseId=this.gridEvent.target.getAttribute("id"),
-    	rowIndex=Polymer.dom(children[0]).children.indexOf(this.gridEvent.target),
-    	splitBaseId=baseId.split("_");
-     	rowArray=columnNumberArray.map(function(col, index,array)
-     	{
-        var theId="#"+splitBaseId[0]+"_"+col+"_"+splitBaseId[2]+"_";
-        var elem=this.$$(theId);
-        var theId2="#" + columnArrayIds[index];
-        var parent=this.$$(theId2);
-        Polymer.dom(parent).removeChild(elem);
-        return elem;
-    	}, this);
-    	this.push("rowArchive", [rowIndex, rowArray]);
-      this._synchMapIndices();
-    },
-  restoreRow(e){
-   
-     var children=Polymer.dom(this.$.hanger3).children;
-     var counter=children.length,
-     i=0,
-      row=this.pop("rowArchive");
-      for(i=0; i<counter; i++){
-        var column=Polymer.dom(children[i]).children;
-         var beforeElement=column[row[0]];
-         Polymer.dom(children[i]).insertBefore(row[1][i],beforeElement);
-      }
-  },
-  addColumn(e){
-    if(e.target.btnText){this.set("btnText",e.target.btnText);}
-    var parent=this.gridEvent.target.parentElement;
-    var pParent=parent.parentElement;
-    var columns=pParent.children;
-    var eid=this.gridEvent.target.getAttribute("id");
-      var key=eid.split("_");
-    if(key[2]==0){
-      var children=Polymer.dom(parent).children;
-      var id=parent.getAttribute("id");
-      var column =document.createElement("DIV");
-        column.setAttribute("style","display:flex; flex-direction: column; margin: 0px; flex-wrap:nowrap; max-height: 1820px;");
-          var colNum=columns.length;//need to push on this length
-         
-          var att=parent.getAttribute("id");
-          var colKey=att.split("_");
-          if(this.btnText && this.btnText.match("Left") && this.btnText.match("Left").length>0){
-           var columnId="column_"+(colNum);
-          column.setAttribute("id", columnId); 
-          Polymer.dom(this.$.hanger3).insertBefore(column, parent);
-        }
-      else{
-          var nsib=Polymer.dom(parent).nextSibling;
-          var columnId="column_"+(colNum.toString());
-          column.setAttribute("id", columnId);
-          Polymer.dom(this.$.hanger3).insertBefore(column,nsib);
-                      console.log(columnId);
-      }
-       this.push("columns4",["znother", "column"]);
-          var numCells=children.length;
-    for(var j=0; j<numCells;j++)
-    { var trueVal=children[j].getAttribute("id");
-      trueVal=trueVal.split("_");
-      var val=trueVal[2];
-      elem=document.createElement("TEXTAREA");
-      var key="comparisons_"+colNum+"_"+val+"_";
-      elem.setAttribute("id",key);
-      if(j==0){elem.setAttribute("style", this.defaultHeader.styleText);}
-      else{elem.setAttribute("style", this.defaultFormat.styleText);}
-       		elem.value="--";
-      		Polymer.dom(column).appendChild(elem);
-     		this.comparisons.set(key,[elem.value, elem]);
-    	}
-    }
     
-},
+	},
+	  ready(){
+    console.log(this.mapsArray);
 
-  deleteThisColumn(e){
-      if(e.target.btnText){
-          this.set("btnText",e.target.btnText);
-      }
-      var parent=this.gridEvent.target.parentElement;
-      var key= parent.getAttribute("id");
-      var t=new Date().getTime();
-       var grandParent=parent.parentElement;
-       var nodeArray=Polymer.dom(grandParent).children;
-      var index= nodeArray.indexOf(parent);
-      this.push("columnArchive", [index,parent, t]);
-      Polymer.dom(grandParent).removeChild(parent);
-  },
-  restoreThisColumn(e){
-        var colArchArray=this.pop("columnArchive");
-        var columnChildren=Polymer.dom(this.$.hanger3).children;
-        var beforeElement=columnChildren[colArchArray[0]];
-        Polymer.dom(this.$.hanger3).insertBefore(colArchArray[1],beforeElement);
-  },
-    get columnMenu(){
+    },
+
+
+    detached(){},
+    setDataArgs(menuArray){
+      var newMenuArray=menuArray.map(function(val, index, array){
+             var newButtons=val.buttons.map(function(button,i, ar){
+                    button.dataArgs={"setValue": button.dataSetValue, "property": button.dataProperty, "propertyAndValue": button.dataProperty+" " +button.dataSetValue};
+                  return button;});
+              //console.log(val.buttons);
+             val.buttons=newButtons;
+             ////console.log(newButtons,val.buttons);
+             return val;
+           });
+             return newMenuArray;
+    }, 
+
+      get columnMenu(){
       var menuArray= [
           { "title": "Adding & Deleting Columns", 
               "buttons":[
@@ -511,21 +251,152 @@ FCBehaviors.FcGridStyleBehavior = {
          return returnArray;
     }, 
 
-    setDataArgs(menuArray){
-      var newMenuArray=menuArray.map(function(val, index, array){
-             var newButtons=val.buttons.map(function(button,i, ar){
-                    button.dataArgs={"setValue": button.dataSetValue, "property": button.dataProperty, "propertyAndValue": button.dataProperty+" " +button.dataSetValue};
-                  return button;});
-              //console.log(val.buttons);
-             val.buttons=newButtons;
-             ////console.log(newButtons,val.buttons);
-             return val;
-           });
-             return newMenuArray;
-    }, 
+	getcolor(e){
+    		this.set("color", e.detail.color);
+    },
+ stylePropertySelection(e){
+      var key =this.gridEvent.target.id;
+      var keys=this.gridEvent.target.id.split("_");
+      var mapName="m"+keys[0];
+      var arrayName=keys[0];
+      console.log(this[arrayName], arrayName);
+      var property=e.target.btnProperty;
+      var setValue =(property.match("color"))?this.color+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
+        var fullVal=property+setValue;
+        var rowscols=50;
+       //below fix the i for the size of the rows columns etc
+      for(var i=1;i<rowscols;i++)
+        { 
+           var str="00000";
+
+          var co=(str+i).slice(-5);
+          if(keys[2]==0 && keys[1]!=0)
+          {
+           
+            rowscols=this[arrayName][0].length-1;
+            var newKey=keys[0]+"_"+keys[1]+"_"+co+"_";
+              
+           }
+          else if(parseInt(keys[1])==0 && parseInt(keys[2])!=0)
+          {
+              rowscols=this[arrayName].length-1;
+              var newKey=keys[0]+"_"+co+"_"+keys[2]+"_";
+          }
+          else if(keys[1]=="00000" && keys[2]=="00000")
+          {
+              var newArray=this[arrayName].map(function(value, index, array){
+               if(index!=0){
+                return value.map(function(cell, i){
+                  if(i!=0){
+                  if(cell.style.match(property))
+                    {
+                      var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                      cell.style=cell.style.replace(replacer, "");
+                     } 
+                  cell.style=cell.style+fullVal  + " ";
+                  let newKey= cell.id;
+                  this[mapName].set(newKey,[cell.value, cell]);
+                  return cell;
+                }
+                return cell;
+                },this);
+              }
+              return value;
+              },this);
+            this.set(arrayName, newArray);
+            console.log(this, this.arraySwap, this.arraySwapBack);
+            this.arraySwap();
+            this.async(this.arraySwapBack,2);
+            break;
+          }
+          else{
+            var newKey=key;
+           i=52;
+           rowscols=2;
+            }
+          if(newKey){
+            console.log(mapName, "no map", newKey, this[mapName]);
+            var payload=this[mapName].get(newKey);
+            if(payload&&payload[1]){
+              var theId="#"+newKey;
+              var cell=this.$$(theId);
+              console.log(cell, payload);
+              var model=cell._templateInstance;
+              var cellStyle=model.item.style;
+                if(cellStyle.match(property))
+                  {
+                  var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                  cellStyle=cellStyle.replace(replacer, "");
+                  }
+              cellStyle=cellStyle+fullVal + " ";
+              model.set("item.style",cellStyle);
+              payload[1].style=cellStyle;
+              console.log(payload);
+              this[mapName].set(key,payload);
+            }
+        }
+      }//end for
+  },
+  insertRow(){},
+  deleteRow(){},
+  insertColumn(){},
+  deleteColumn(){},
+  restoreRow(){},
+  restoreColumn(){},
 
 
+  alternatingHighlighter(e){
+    var keys=this.gridEvent.target.id.split("_"),
+    mapName="m"+keys[0],
+    arrayName=keys[0],
+    parent=this.$.polymerGrid;
+    console.log(this[mapName], this.mapArray)
+    var columns= Polymer.dom(parent).children;
+    var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
+    var property=btn.btnProperty,
+    setValue =(property.match("color"))?this.color + " ":(property.match("background"))?this.background + " ": e.target.btnSetValue + " ";
+    var fullVal=property+" "+setValue;
+    var colCount=(keys[1]==0&&keys[2]!=0)?1:2;
+    var rowCount=(keys[1]==0&&keys[2]!=0)?2:1;
+    for(i=1;i<counter;i+=colCount)
+      {
+        var columnChildren=Polymer.dom(columns[i]).children,
+        counter2=columnChildren.length;
+        for(j=1;j<counter2;j+=rowCount)
+        {   
+          if(columnChildren[j]!=undefined)
+          {
+            var key =columnChildren[j].getAttribute("id");
+            var theId="#"+key, 
+            cell=this.$$(theId);
+            var payload=this[mapName].get(key);//keys[0] is mapname//
+              var keyParts=key.split('_');
+            if(keyParts[2]!=0&&cell.nodeName=="TEXTAREA")
+            {
+                var model=cell._templateInstance;
+                 var cellStyle=model.item.style;
+                    if(cellStyle.match(property))
+                      {
+                          var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                          cellStyle=cellStyle.replace(replacer, "");
+                      }
+                    cellStyle=cellStyle + fullVal+";"+" ";
+                    model.set("item.style",cellStyle);
+                    payload[1].style=cellStyle;
+                    this[mapName].set(key,payload);
+                    var gridName=arrayName, version =1, argToChange="style", setValue=cellStyle;
+                    this.updateOnValueChange(gridName, version, key, argToChange, setValue);
+            }
+          }
+        }   
+      }
+    },
+    updateOnValueChange(gridName, version, key, argToChange, setValue){
+            //here we should use the pouch and the other data synching they offer
 
+
+    },
 
 	}
+ FCBehaviors.FcGridStyleBehavior=[ FCBehaviors.FcGridInitializerBehavior,FCBehaviors.FcIndexedDbBehavior, FCBehaviors.FcGridStyleBehaviorImpl];
 </script>
