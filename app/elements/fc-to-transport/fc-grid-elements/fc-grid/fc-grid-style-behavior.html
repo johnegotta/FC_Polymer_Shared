@@ -10,6 +10,7 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
 		gridEvent:{
         type: Object,
         value: function(){return {};},
+        observer: "observeGridEvent",
         notify: true
       },
     btnText:{
@@ -52,7 +53,7 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
       value: function(){return [];},
       notify: true
     },
-    rowArchive:{
+    gridEventArchive:{
       type:Array,
       value:function(){return [];},
       notify: true
@@ -65,11 +66,9 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
     
 	},
 	  ready(){
-    console.log(this.mapsArray);
+    //console.log(this.mapsArray);
 
     },
-
-
     detached(){},
     setDataArgs(menuArray){
       var newMenuArray=menuArray.map(function(val, index, array){
@@ -82,9 +81,8 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
              return val;
            });
              return newMenuArray;
-    }, 
-
-      get columnMenu(){
+      }, 
+    get columnMenu(){
       var menuArray= [
           { "title": "Adding & Deleting Columns", 
               "buttons":[
@@ -148,7 +146,7 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
            "buttons":
           [ { "text": ["Add Alternate Row Highlighting", " ", " "], 
              "dataProperty":"background:",
-             "dataSetValue  ":this.background, 
+             "dataSetValue":this.background, 
              "myFunction":this.alternatingHighlighter.bind(this), 
              "dataArgs":[]
             },
@@ -181,23 +179,22 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
          return returnArray;
       
         },
-  get basemenu(){ var menuArray =[
-    {
-              "title":"Highlight Color", 
+    get basemenu(){ var menuArray =[
+          {"title":"Highlight Color", 
               "buttons":[
-              {"text":["Highlight Selection: ",""," ✒ ❚ "],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "background:", "dataSetValue ": `${this.color};`}, 
+              {"text":["Highlight Selection: ",""," ✒ ❚ "],"myFunction":this.stylePropertySelection.bind(this),"dataProperty": "background: ", "dataSetValue ": this.background}, 
               {"text":["Remove Highlighting: ", ," ✂ ✒"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty": "background: ",
                 "dataSetValue ": `${this.defaultFormat.background};`}]
           },
           {   "title": "Text Color",
               "buttons": [
               {"text":["Apply This Text Color:"," ✎" , "▀"], "myFunction":this.stylePropertySelection.bind(this), "dataProperty":"color:", 
-              "dataSetValue": ` ${this.color };`
+              "dataSetValue": this.color,
                 },
               {"text":["Apply Base Text Color:"," ✎ " , "▀"], 
               "myFunction":this.stylePropertySelection.bind(this),
-              "dataProperty": "color:",
-              "dataSetValue": ` ${this.defaultFormat.color};`}
+              "dataProperty": "color: ",
+              "dataSetValue":  this.defaultFormat.color}
               ] 
           },
           {    "title": "Text Weight",
@@ -224,9 +221,9 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
                   {"text": ["Normal: ", , " Normal"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty":"text-decoration:", "dataSetValue": " none;"},
                   {"text": ["Clear Italics:", , "Normal"], "myFunction":this.stylePropertySelection.bind(this),"dataProperty": "font-style:","dataSetValue": " normal;"
                 } 
-            ], 
-          },
-          {   "title":"Font Size",
+              ], 
+            },
+            {   "title":"Font Size",
               "buttons": [
                   {"text":[`10px Smallest Large Screen Font`],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:10px;"},
                   {"text":["12px", "","Smaller Than Shown"],"myFunction":this.stylePropertySelection.bind(this),"dataProperty":"font-size:",  "dataSetValue": " 12px;"},
@@ -242,29 +239,85 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
                   {"text": ["32px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size:",  "dataSetValue": " 32px;"},
                   {"text": ["34px", "","Banner Font"],"myFunction":this.stylePropertySelection.bind(this), "dataProperty": "font-size:",  "dataSetValue": " 34px;"},
                   {"text": ["36px","", "Banner Font"],"myFunction":this.stylePropertySelection.bind(this), " dataProperty": "font-size:",  "dataSetValue": " 36px;"}
-            ], 
-          },
+              ], 
+            },
        
-        ];
+          ];
 
-         var returnArray=this.setDataArgs(menuArray);
-         return returnArray;
-    }, 
+            var returnArray=this.setDataArgs(menuArray);
+           return returnArray;
+    },
+    
+    observeGridEvent(newEvent, oldEvent){
+      if(newEvent&&newEvent!=oldEvent){
+        console.log(newEvent, oldEvent);
+      }
+
+      },
+    
+    onGridEventChanged(){
+
+    },
 
 	getcolor(e){
     		this.set("color", e.detail.color);
     },
- stylePropertySelection(e){
+  chunked(arr, chunkSize) {
+            var groups = [], i;
+            for (i = 0; i < arr.length; i += chunkSize) {
+            groups.push(arr.slice(i, i + chunkSize));
+            }
+        return groups;
+      },
+  chunkMutationForMultiDimensionalArrays(array,property, fullvalue, context){
+          var keys=array[0][0].id.split("_");
+          var cellClass="." + keys[0];
+     
+          var nodeList=document.querySelectorAll(cellClass);
+          console.log(cellClass);
+               console.log(nodeList);
+          var counter=nodeList.length;
+          var p=0;
+          var mapName="m"+keys[0];
+          var arrayName=keys[0];
+          for(p=0;p<counter; p++)
+          {
+            var cell=nodeList[p];
+            model=cell._templateInstance;
+            if(model.item.style.match(property))
+            {
+                var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
+                model.item.style=model.item.style.replace(replacer, "");
+            }
+            var cellStyle=model.item.style+fullvalue  + " ";
+            model.item.style =cellStyle;
+            model.set("item.style",cellStyle);
+            var key=cell.id;
+            var col=keys[1];
+            var row=keys[2];
+            context.set([arrayName, col, row,".style"],cellStyle);
+            context[mapName].set(key,[cell.value, cell]);
+            context.updateObjectStores(arrayName, 1, key, "style", cellStyle); 
+          }
+          context.splice("dataArrays", context.arrayIndex,1,context[arrayName]);
+          return context[arrayName];
+      },
+
+  stylePropertySelection(e){
+      var cell;
       var key =this.gridEvent.target.id;
       var keys=this.gridEvent.target.id.split("_");
       var mapName="m"+keys[0];
       var arrayName=keys[0];
-      console.log(this[arrayName], arrayName);
+      //console.log(this[arrayName], arrayName);
       var property=e.target.btnProperty;
-      var setValue =(property.match("color"))?this.color+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
+      var text=e.target.btnText;
+      //console.log(property, text, "ALERT ALERT ALERT");
+      var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background")&&(text.match("Add")||text.match("Selection")))?this.background+";" + " ": e.target.btnSetValue + " ";
+      console.log(setValue);
         var fullVal=property+setValue;
         var rowscols=50;
-       //below fix the i for the size of the rows columns etc
+       //below should be a case switch map/reduce function that returns the map/store/array names/relatedKeys/properties and the new setValues.  The selection should occur in this early phase, as broken down here, but should be more flexible.  Here we have base cases for all row, all column, all grid and individual cells;  TODO: add column headers, row titles, and assorted selection: the map/reduce will tghen give us something other than a loop; we will target the precise cells to change, and eventually the precise values and linked cells/  this should increase performance a lot;
       for(var i=1;i<rowscols;i++)
         { 
            var str="00000";
@@ -273,40 +326,24 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
           if(keys[2]==0 && keys[1]!=0)
           {
            
-            rowscols=this[arrayName][0].length-1;
+            rowscols=this[arrayName][0].length;
+            //rows cols should only be rows cols actually affected new filtered smaller array for sure!!!
             var newKey=keys[0]+"_"+keys[1]+"_"+co+"_";
               
            }
           else if(parseInt(keys[1])==0 && parseInt(keys[2])!=0)
           {
-              rowscols=this[arrayName].length-1;
+              rowscols=this[arrayName].length;
               var newKey=keys[0]+"_"+co+"_"+keys[2]+"_";
           }
-          else if(keys[1]=="00000" && keys[2]=="00000")
-          {
-              var newArray=this[arrayName].map(function(value, index, array){
-               if(index!=0){
-                return value.map(function(cell, i){
-                  if(i!=0){
-                  if(cell.style.match(property))
-                    {
-                      var replacer=property+/\[[a-z]+\]:[a-z]+;/;
-                      cell.style=cell.style.replace(replacer, "");
-                     } 
-                  cell.style=cell.style+fullVal  + " ";
-                  let newKey= cell.id;
-                  this[mapName].set(newKey,[cell.value, cell]);
-                  return cell;
-                }
-                return cell;
-                },this);
-              }
-              return value;
-              },this);
-            this.set(arrayName, newArray);
-            console.log(this, this.arraySwap, this.arraySwapBack);
-            this.arraySwap();
-            this.async(this.arraySwapBack,2);
+          else if(parseInt(keys[1])==0 && parseInt(keys[2])==0)
+          {   
+            var changeArray= this.chunkMutationForMultiDimensionalArrays(this[arrayName],property, fullVal, this);
+            // this.set([arrayName], changeArray);
+             this.getUpdatedObjectStores([[arrayName,1]], this, false, this.arrayIndex, changeArray);
+            //this.splice("dataArrays",this.arrayIndex,1,this[arrayName]);
+              this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "updateFunction": this.getUpdatedObjectStores});
+     
             break;
           }
           else{
@@ -315,34 +352,41 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
            rowscols=2;
             }
           if(newKey){
-            console.log(mapName, "no map", newKey, this[mapName]);
+            //console.log(mapName, "no map", newKey, this[mapName]);
             var payload=this[mapName].get(newKey);
             if(payload&&payload[1]){
               var theId="#"+newKey;
               var cell=this.$$(theId);
-              console.log(cell, payload);
+              console.log(cell, payload, theId);
               var model=cell._templateInstance;
               var cellStyle=model.item.style;
                 if(cellStyle.match(property))
                   {
-                  var replacer=property+/\[[a-z]+\]:[a-z]+;/;
+                 var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
                   cellStyle=cellStyle.replace(replacer, "");
+                 
                   }
               cellStyle=cellStyle+fullVal + " ";
+              console.log(cellStyle,"look here to see if regEx Worked");
               model.set("item.style",cellStyle);
               payload[1].style=cellStyle;
-              console.log(payload);
+              //console.log(payload);
+              this.updateObjectStores(arrayName, 1, newKey, "style", cellStyle);
+              //console.log(arrayName, 1, newKey, "style", cellStyle);
               this[mapName].set(key,payload);
+
             }
         }
       }//end for
+       this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "updateFunction": this.getUpdatedObjectStores});
+            console.log("?I huihhuheuh");
   },
   insertRow(){},
   deleteRow(){},
-  insertColumn(){},
-  deleteColumn(){},
+  addColumn(){},
+  deleteThisColumn(){},
   restoreRow(){},
-  restoreColumn(){},
+  restoreThisColumn(){},
 
 
   alternatingHighlighter(e){
@@ -350,12 +394,15 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
     mapName="m"+keys[0],
     arrayName=keys[0],
     parent=this.$.polymerGrid;
-    console.log(this[mapName], this.mapArray)
+    //console.log(this[mapName], this.mapArray);
     var columns= Polymer.dom(parent).children;
     var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
-    var property=btn.btnProperty,
-    setValue =(property.match("color"))?this.color + " ":(property.match("background"))?this.background + " ": e.target.btnSetValue + " ";
+    var text=btn.btnText;
+    var property=btn.btnProperty;
+    var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
+    //console.log(setValue, property);
     var fullVal=property+" "+setValue;
+  //console.log(fullVal);
     var colCount=(keys[1]==0&&keys[2]!=0)?1:2;
     var rowCount=(keys[1]==0&&keys[2]!=0)?2:1;
     for(i=1;i<counter;i+=colCount)
@@ -367,25 +414,26 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
           if(columnChildren[j]!=undefined)
           {
             var key =columnChildren[j].getAttribute("id");
+            //console.log(key);
             var theId="#"+key, 
             cell=this.$$(theId);
-            var payload=this[mapName].get(key);//keys[0] is mapname//
+            //console.log(cell);
+            var payload=this[mapName].get(key);//keys[0] is no longer mapname//
               var keyParts=key.split('_');
-            if(keyParts[2]!=0&&cell.nodeName=="TEXTAREA")
+            if(keyParts[2]!=0 &keyParts[1]!=0&& cell.nodeName=="TEXTAREA")
             {
                 var model=cell._templateInstance;
                  var cellStyle=model.item.style;
                     if(cellStyle.match(property))
                       {
-                          var replacer=property+/\[[a-z]+\]:[a-z]+;/;
-                          cellStyle=cellStyle.replace(replacer, "");
+                       var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
                       }
                     cellStyle=cellStyle + fullVal+";"+" ";
                     model.set("item.style",cellStyle);
                     payload[1].style=cellStyle;
                     this[mapName].set(key,payload);
                     var gridName=arrayName, version =1, argToChange="style", setValue=cellStyle;
-                    this.updateOnValueChange(gridName, version, key, argToChange, setValue);
+                    this.updateObjectStores(arrayName, 1, key, "style", cellStyle);
             }
           }
         }   

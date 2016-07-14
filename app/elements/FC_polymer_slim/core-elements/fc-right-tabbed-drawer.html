@@ -182,7 +182,7 @@ neon-pages{
 									</paper-tabs>
         						</div>
 								<div id="fcTabContentHolder" class="mainish">
-									<fc-value-holder-two tab-clicked="{{tabClicked}}" data-object="{{item.tabDetails2}}" obj-property-name="constructorObject">
+									<fc-value-holder-two tab-clicked="{{tabClicked}}" data-object="{{item.tabDetails2}}" return-data-object="{{returnDataObject}}" obj-property-name="constructorObject">
 									</fc-value-holder-two>
 								</div>
 								
@@ -226,6 +226,13 @@ neon-pages{
 					notify: true,
 				
 				},
+				returnDataObject:{
+					type:Object,
+					value:function(){return {};},
+					notify: true
+
+				},
+				
 				secondarySelected: {
 					type: String,
 					value: 'Titling',
@@ -685,6 +692,12 @@ neon-pages{
 			value: {},
 			notify: true
 		}, 
+		dataEventArchive:{
+			type:Array,
+			notify: true,
+
+
+		},
 		
 
 },
@@ -703,6 +716,12 @@ neon-pages{
  	this.set("tabClicked",lame);
 
  }, 
+ observeReturnData:function(newVal, oldVal){
+ 		if(newVal){
+ 			console.log(newVal, oldVal);
+ 			this.push("dataEventArchive",newVal);
+ 		}
+ },
  _onButtonClick: function(e) {
 		  console.log(e);
 		  var button = e.detail;

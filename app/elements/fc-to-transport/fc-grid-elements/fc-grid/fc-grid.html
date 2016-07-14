@@ -48,8 +48,7 @@ BCK<paper-icon-button icon="icons:dashboard" on-tap="arraySwapBack"></paper-icon
           <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col}}">
                <!--          <a link={{}}>  on-change="{{item.indexedDbFunction}}"
                     on-focus="{{item.indexedDbRequest}}"  hidden="{{__computeCellHidden(item.id, item.key)}}" -->
-                <textarea
-                   
+                <textarea        
                     input-type="text" 
                     draggable="true" 
                     id$="{{item.id}}" 
@@ -58,7 +57,7 @@ BCK<paper-icon-button icon="icons:dashboard" on-tap="arraySwapBack"></paper-icon
                     on-change="indexedDbPutter"  
                     contenteditable="true" 
                     style$="{{item.style}}"
-                    class$="{{item.class}}"
+                    class$="{{_computeClass(item.id)}}"
                     key="{{item.key}}"
                     related-cells="{{item.relatedCells}}"
                     name="{{item.name}}"
@@ -73,7 +72,7 @@ BCK<paper-icon-button icon="icons:dashboard" on-tap="arraySwapBack"></paper-icon
 </div>
 <section class="layout flex-1 center-justified" style="z-index: 7; position: relative; right:-2px;bottom: -2px; top: 1px; min-width: 297px;padding: 8px 8px 8px 20px; margin:0px; border-left: 1px silver solid;">
 FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ONE 
-<fc-indexed-database maps-array="{{mapsArray}}" data-arrays="{{dataArrays}}">
+<fc-indexed-database maps-array="{{mapsArray}}" database-changed="{{databaseChanged}}" data-arrays="{{dataArrays}}">
 </fc-indexed-database>
 </section>
 </div>
@@ -90,8 +89,8 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
                 <paper-listbox id="innerListBox" style="min-width:360px!important; max-width: 360px!important;">
                     <template is="dom-repeat" items="{{category.buttons}}" as="item">
                           <paper-item onclick="{{item.myFunction}}" btn-set-value="{{item.dataSetValue}}" btn-text="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}" btn-property="{{item.dataProperty}}">                {{item.text.0}}
-                            {{item.text.2}}  
-                             {{item.text.1}}
+                         <!--    {{item.text.2}}  
+                             {{item.text.1}} -->
                           </paper-item>
                     </template> 
                 </paper-listbox>
@@ -103,7 +102,7 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
  <script>
  FcGrid=Polymer({
  	is:"fc-grid",
-  behaviors:[Polymer.Templatizer, FCBehaviors.FcGridInitializerBehavior, FCBehaviors.FcGridStyleBehavior],
+  behaviors:[FCBehaviors.FcGridInitializerBehavior, FCBehaviors.FcGridStyleBehavior],
   listeners: {"color-picker-selected":"getcolor"},
  	properties: { 
     format:{
@@ -111,18 +110,13 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
       value:function(){return {};},
       notify: true,
     },
-    arrayIndex:{
-        type: Number,
-        value: function(){return 0;},
-        observer:"observeIndex",
-        notify:true,
-    },
-   
-    parentTarget:{
+    databaseChanged:{
         type: Object,
         notify: true,
+
+    },
     
-    },data:{
+     data:{
       type: Array,
       value: function(){return [];},
       notify: true
@@ -144,7 +138,7 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
 
  get gridPresets(){
     return [ [50,50, "JasonTest", "allRed", 1, null, false, undefined, undefined],
-      [40,40, "A Calendar", "calendar", 1, null, false, undefined, undefined],
+      [40,40, "ACalendar", "calendar", 1, null, false, undefined, undefined],
       [30,30, "ACalendar2", "daysofweek", 1, null, true, undefined, undefined],
       [26,26,"jasonGrid2","monthsFinancial",1, null, true, undefined, undefined],
       [16,25,"jasonGrid","allBlue",1, null, true, undefined, undefined],
@@ -159,15 +153,30 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
   ready(){
     
       // this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
-    this.set("parentTarget", this.$.mappedGridRepeater);
+    // this.set("parentTarget", this.$.mappedGridRepeater);
   },
 
   attached(){
-     this.async(this.arraySwap, 2);
-     this.async(this.arraySwapBack,20);
      if(this.dataArrays.length>0&&this.arrayIndex){
-      this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+      this.set("selectedArraySet", this.dataArrays[2]);
+      this.async(this.arraySwap, 2000);
+     this.async(this.arraySwapBack,2000);
       }
+  },
+
+  _computeClass(key){
+    var keys=key.split("_");
+    if(keys[1]!=0&&keys[2]!=0)
+    {
+    return keys[0];
+    }
+    else if(keys[2]==0)
+      {
+        return keys[0]+"headers";
+      }
+    else{
+      return keys[0]+"rowlabels";
+    }
   },
   detailOpenListener(e){
     console.log(e, "here is the focus lost");
@@ -230,7 +239,6 @@ else return "background: gold;";
   },
  arraySwap(e){
        var maxNum=this.dataArrays.length;
-       console.log(this.dataArrays);
         maxNum=maxNum-1;
         var newIndex=(this.arrayIndex!=maxNum)?parseInt(this.arrayIndex)+1:0;
         this.set("arrayIndex", newIndex);
@@ -244,14 +252,6 @@ else return "background: gold;";
         this.set("selectedArraySet", this.dataArrays[this.arrayIndex])
 
   },
-observeIndex(newVal, oldVal){
-  console.log(newVal, oldVal, "index for names");
-},
-changeSource(e){
-    console.log(this.dataArrays.length);
-  this.push("dataArrays",this.holderArray);
-    console.log(this.dataArrays.length);
-},
 loadPresets(e){
   this.gridPresets.forEach(function(gridParams, index, arrayOfGrids){
       this.gridConstructor(gridParams);

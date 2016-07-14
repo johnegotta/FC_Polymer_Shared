@@ -45,12 +45,21 @@ FCBehaviors.FcGridInitializerBehavior = {
      	value: 0,
      	notify: true,
     },
+    arrayIndex:{
+        type: Number,
+        value: function(){return 0;},
+        observer:"observeIndex",
+        notify:true,
+    },
 
 },
 created(){},
-ready(){},
+ready(){console.log("I still Exist INIT INIT");},
 attached(){},
 detached(){},
+observeIndex(newVal, oldVal){
+  console.log(newVal, oldVal, "index for names");
+},
 
 
 initializeIndexDB(){
@@ -85,7 +94,7 @@ this.persistCells(data);
 			var str="00000";
 		  var co=(str+i).slice(-5);
       var ro=(str+j).slice(-5);
-			id=sheetName+"_"+co+"_"+ro+"_", keys=id.split("_");
+			var id=sheetName+"_"+co+"_"+ro+"_", keys=id.split("_");
       var name=(valuesArray===true&&this.csv && this.csv[0][i] && this.csv[j])?this.csv[0][i]+"__"+this.csv[j][0]:(this[sheetName]&&this[sheetName].length>0&&this.sheetName[i])?this[sheetName][i][0]+"__"+this[sheetName][0][j]:"add names";
 			var style=(userStyle)?userStyle:(this.defaultFormat&&keys[2]!=0)?this.defaultFormat.styleText:(keys[2]==0)?this.defaultHeader.styleText:"fitter";
       var time=0;
@@ -141,6 +150,8 @@ this.persistCells(data);
 
 
   },
+
+  //this.updateOnValueChange(gridName, version, key, argToChange, setValue){},
 
 		get defaultFormat(){
 		        return {"color": "#009", "background": "#fefefe", "header_backgroundColor":"aliceblue", "fontSize": "14px", "fontWeight": "600", "fontFamily": "merriweather", "lineHeight": "1.15","line-height":"1.3em", "border": "1px #afafaf solid", 

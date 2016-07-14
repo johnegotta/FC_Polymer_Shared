@@ -35,7 +35,7 @@ FCBehaviors.FcIndexedDbBehavior = {
     },
 
     created(){},
-    ready(){ this.getAllObjectStoresAtInit();},
+    ready(){ this.getIndexedDb();},
     attached(){
         //console.log(this.indexedDB);
       },
@@ -45,8 +45,7 @@ FCBehaviors.FcIndexedDbBehavior = {
             }
         },
     detached(){},
-
-    getUpdatedObjectStores(nameArray, context, isInit, index, changeArray){
+    getUpdatedObjectStores(nameArray, context){
         for(i=0;i<nameArray.length;i++){
             if(nameArray.length==0)
             {
@@ -55,8 +54,8 @@ FCBehaviors.FcIndexedDbBehavior = {
             var gridName=nameArray[i][0];
             var cell1;
             var arrayName=gridName;
-            var mapName="m"+gridName;
-            if(isInit===false){context[mapName]=new Map();}
+            var mapName="m"+gridName
+            context[mapName]=new Map();
             var map=new Map();
             version=nameArray[i][1];
             var request = indexedDB.open(gridName, version);//"gridMap"
@@ -72,7 +71,7 @@ FCBehaviors.FcIndexedDbBehavior = {
                       query = objectStore.getAll();
                   query.onsuccess = function(queryEvent){
                      cell1 = queryEvent.target.result;
-                    // console.log("got in onsuccess");
+                     console.log("got in onsuccess");
                      var topArray=[];
                      var lastVal=cell1.length-1;
                      var columnArray =cell1.reduce((pre, val, i, arr)=>{
@@ -126,35 +125,22 @@ FCBehaviors.FcIndexedDbBehavior = {
                      var ksey=columnArray[0][0].id.split("_");
                      var arrayName=ksey[0];
                     context.set([arrayName],columnArray);
-                    if(isInit===true){
                     context.push("dataArrays", context[arrayName]);
                     mapName="m" + arrayName;
                     context.push("mapsArray", context[mapName]);
-                    }
-                    if(isInit===false){
-                      console.log(changeArray, columnArray);
-                        context.splice("dataArrays", index,1,columnArray);
-                          }
-
-
-               
-                   
-
-                    
-              //console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
-              //console.log(columnArray, context[mapName], "jason was here");
+              console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
+              console.log(columnArray, context[mapName], "jason was here");
                     }.bind(context);
                 }.bind(context);
             }//for loop
           },
-
-    getAllObjectStoresAtInit(){
+    getIndexedDb(){
           var context=this;
           var moreDb=true;
           var nameArray=[];
           var i=0;
           var gridName ="indexOfDatabases", version=1;
-          //console.log(gridName);
+          console.log(gridName);
           var request = indexedDB.open("indexOfDatabases", version);//"gridMap"
           request.onerror = function(e)
                 {
@@ -198,7 +184,93 @@ FCBehaviors.FcIndexedDbBehavior = {
                   });
                   this.set("indexedDataBases",indexdbsheet);
                
-                this.getUpdatedObjectStores(nameArray, this, true);
+                this.getUpdatedObjectStores(nameArray, this);
+            // for(i=0;i<nameArray.length;i++){
+            // if(nameArray.length==0){console.log("start the other stuff here");}
+            //      var cell1;
+            //      gridName=nameArray[i][0];
+            //      var arrayName=gridName;
+            //      var mapName="m"+gridName
+            //      this[mapName]=new Map();
+            //      var map=new Map();
+            //      version=nameArray[i][1];
+            //       var request = indexedDB.open(gridName, version);//"gridMap"
+            //         var query;
+              
+            //   request.onerror = function(e){
+            //           console.log("Unable to retrieve data from database!");
+            //         };
+            //   request.onsuccess = function(event){
+            //       var db = event.target.result;
+            //   var transaction = db.transaction("cell", "readonly");
+            //       var objectStore = transaction.objectStore("cell");
+            //       query = objectStore.getAll();
+            //   query.onsuccess = function(queryEvent){
+            //            cell1 = queryEvent.target.result;
+            //            //console.log("got in onsuccess");
+            //            var topArray=[];
+            //            var lastVal=cell1.length-1;
+            //            var columnArray =cell1.reduce((pre, val, i, arr)=>{
+            //               if(pre.length==0)
+            //                 {
+            //                   pre.push(val); 
+            //                   var valKeys=val.id.split("_"); 
+            //                   var mapName="m"+valKeys[0]; 
+            //                   var map=new Map();
+            //                   this.set([mapName], map); 
+            //                   return pre;
+            //                   }
+            //               else {  
+            //                       var last=pre.length-1;
+            //                       var keys=pre[last].id.split("_");
+            //                       var valKeys=val.id.split("_");
+            //                       }
+            //                       if(keys[1]==valKeys[1]&&i!==(lastVal))
+            //                       { 
+            //                         mapName="m"+valKeys[0];
+            //                          this[mapName].set(val.key, [val.value, val]);
+            //                              pre.push(val); return pre;
+            //                       }
+            //                       else if(keys[1]!=valKeys[1]){
+            //                         topArray.push(pre); 
+            //                         var newArr=[];
+            //                         newArr.push(val);
+                                   
+            //                         mapName="m"+valKeys[0];
+            //                         this[mapName].set(val.key, [val.value, val]);
+            //                         return newArr;
+            //                       }
+            //                       else if(i==(lastVal)&&keys[1]==valKeys[1]){
+            //                         pre.push(val);
+            //                         topArray.push(pre);
+            //                          mapName="m"+valKeys[0];
+            //                         this[mapName].set(val.key, [val.value, val]);
+            //                         return topArray;
+            //                       }
+            //                       else if(i==(lastVal)&&keys[1]!=valKeys[1]){
+            //                         topArray.push(pre); 
+            //                         var newArr=[];
+            //                         newArr.push(val);
+            //                         mapName="m"+valKeys[0];
+            //                         this[mapName].set(val.key, [val.value, val]);
+            //                         newArr.push(val);
+            //                         topArray.push(newArr);
+            //                         return topArray;
+            //                       }
+                                
+            //            }, []);
+            //            var ksey=columnArray[0][0].id.split("_");
+            //            var arrayName=ksey[0];
+            //             this.set([arrayName],columnArray);
+            //           this.push("dataArrays", this[arrayName]);
+            //           // this.set([mapName],map);
+            //           mapName="m" + arrayName;
+            //           this.push("mapsArray", this[mapName]);
+            //     //console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
+            //       //console.log(columnArray, this[mapName], "jason was here");
+            //              }.bind(this);
+            //           }.bind(this);
+            //         }//for loop
                   }//useless if   
               }.bind(this);//first querry on success;
              
@@ -206,8 +278,7 @@ FCBehaviors.FcIndexedDbBehavior = {
             //console.log("ON WAY OUT");
             //console.log(nameArray, this.mapsArray);
           },
-   
-    initObjectStoresFromPresets(dataArrays){
+    initAllDatabases(dataArrays){
               window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
               window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
               window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
@@ -272,9 +343,9 @@ FCBehaviors.FcIndexedDbBehavior = {
                 }// for loop ends here
                 var cells=this.indexedDataBases;
                 this.persistCells("indexOfDatabases", 1,cells);
-            },
-    updateObjectStores(gridName, version, key,propertyPath, setValue,subStore, updateSource){
-      //last two properties were to be for an updating-synching model, but realized I would be doing the updating piecemeal, way easier all at once, at least at some breakpoint single updates using this for up to data limit x// mass store for data above x
+  
+        },
+    updateObjectStores(gridName, version, key,propertyPath, setValue){
       var request = indexedDB.open(gridName, version);
       request.onsuccess = function(event) 
       {      
@@ -299,18 +370,18 @@ FCBehaviors.FcIndexedDbBehavior = {
               var updateData = cursor.value;
               //console.log(updateData, "am in the updateData, this is base data struct");
               updateData[propertyPath] = setValue;
-              // console.log("here I am setting the path to property to set value, prop path, assigned value, value to assign", propertyPath, setValue);
+              //console.log("here I am setting the path to property to set value, prop path, assigned value, value to assign", propertyPath, updateData[propertyPath], setValue);
               var request = cursor.update(updateData);
               //console.log("final request for callback to confirm update", request);
               request.onsuccess = function() {
-                 
-                      //this.fire("updatedGrids", {"gridName": gridName, "version": version, "key": key, "propertyPath": propertyPath, "setValue": setValue,"subStore": subStore, "updateSource", updateSource, "asArray": [gridName, version, key, propertyPath, setValue, subStore], "functionToApply":})
-              }.bind(this);  
+                        //console.log('yeaah', updateData);
+              };
             }
           }
-        }.bind(this);
-      }.bind(this);
+        };
+      };
     },
+
     persistCells(gridName, version, data){
             var request = indexedDB.open(gridName, version);
                 request.onerror = function(event){

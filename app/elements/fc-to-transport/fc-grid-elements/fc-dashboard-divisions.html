@@ -233,7 +233,7 @@
 Polymer({
   is:"fc-dashboard-divisions",
     behaviors:[Polymer.IronResizableBehavior],
-    listeners: {'app-drawer-reset-layout': 'resetLayout',  "newPassageSelected": "listenToSelection"},
+    listeners: {'app-drawer-reset-layout': 'resetLayout',  "newPassageSelected": "listenToSelection", "objectStoresUpdated": "notifyGrids"},
     observers: ['resetLayout(dashboardLeftDrawerCurrentWidth,dashboardRightDrawerCurrentWidth)'],
     properties:{
         hiddenProp:{
@@ -298,51 +298,7 @@ Polymer({
                 "constructorName":"FcGrid",
               "constructor":FcGrid,
               },
-            // { "sectionClass": "normal buttons blue-btn-class",
-            //   "iconUsed": "icons:chrome-reader-mode",
-            //   "nodeName": "FC-PASSAGE-DB-DISPLAY",
-            //   "constructorName":"FcPassageDbDisplay",
-            //   "constructor":FcPassageDbDisplay,
-            // },
-            // { "sectionClass": "normal buttons blue-btn-class",
-            //   "iconUsed": "icons:chrome-reader-mode",
-            //   "nodeName": "FC-PICKLE",
-            //   "constructorName":"FcPickle",
-            //   "constructor":FcPickle,
-            // },
-             // { "sectionClass": "normal buttons blue-btn-class",
-             //  "iconUsed": "icons:dashboard",
-             //  "nodeName": "FC-PASSAGE-DISPLAY",
-             //  "constructorName":"FcPassageDisplay",
-             //  "constructor":FcPassageDisplay,
-             //   },
-             //   { "sectionClass": "normal buttons blue-btn-class",
-             //  "iconUsed": "icons:dashboard",
-             //  "nodeName": "FC-GRID-TEST",
-             //  "constructorName":"FcGridTest",
-             //  "constructor":FcGridTest,
-             //   },
-             //   { "sectionClass": "normal buttons blue-btn-class",
-             //  "iconUsed": "icons:dashboard",
-             //  "nodeName": "FC-GRID-TEST",
-             //  "constructorName":"FcGridTest",
-             //  "constructor":FcGridTest,
-             //   },
-             //   { "sectionClass": "normal buttons blue-btn-class",
-             //  "iconUsed": "icons:dashboard",
-             //  "nodeName": "FC-GRID-TEST",
-             //  "constructorName":"FcGridTest",
-             //  "constructor":FcGridTest,
-               // },
-
-            // { "sectionClass": " normal buttons blue-btn-class",
-            //   "iconUsed": "icons:visibility",
-            //   "nodeName": "whatToSee",
-            //   },
-            // { "sectionClass": "normal buttons blue-btn-class",
-            //   "iconUsed": "icons:stars",
-            //   "nodeName": "starRated",
-            //   }
+            
         ];
             },
           notify: true
@@ -434,6 +390,7 @@ Polymer({
         },
         dataObject:{
             type:Object,
+            notify: true,
         },
         iconArray2:{
               type: Array,
@@ -541,12 +498,63 @@ Polymer({
             notify: true,
             observer: "observeResize",
         },
+  dataEventArchive:{
+      type:Array,
+      notify: true,
+      value: [],
+      returnDataObject:{
+          type:Object,
+          value:function(){return{};},
+          notify: true,
+          observer: "observeReturnData",
+        },
+
+    },
       
   },
   // layoutSwap(){
   //   var setVal=(this.layout.charAt(0)==="h")?"vertical":"horizontal";
   //   this.set("layout", setVal);
   // },
+
+    notifyGrids(e){
+      console.log(e, e.detail.changeContext, e.target);
+     var gridNodes= document.querySelectorAll("FC-GRID");
+      console.log(gridNodes);
+      var myHelperArray=[];
+      var extraElement=this.elemMap.get("FC-Grid");
+      var counter=gridNodes.length;
+      for(var i=0; i<counter;i++){
+          if(gridNodes[i]&&gridNodes[i].getUpdatedObjectStores&&gridNodes[i]!=e.target){
+            myHelperArray.push(gridNodes[i]);
+            var keys= e.target.__data__.selectedArraySet[0][0].id.split("_");
+            var changeArray=e.detail[keys[0][0]];
+            gridNodes[i].getUpdatedObjectStores(e.detail.namesArray,gridNodes[i],e.detail.isInit,e.detail.arrayIndex,changeArray);
+           console.log(gridNodes[i].dataArrays, changeArray,"look here");
+          }
+          else{
+             // extraElement.getUpdatedObjectStores(e.detail.namesArray,extraElement,e.detail.isInit,e.detail.arrayIndex,e.detail.changeContext);
+             console.log(extraElement.dataArrays)
+
+
+
+            myHelperArray.push(extraElement);}
+
+            //this.getUpdatedObjectStores()
+          }
+          console.log(myHelperArray);
+      // var indy=grids.indexOf(e.detail.changeContext);
+      // console.log(indy);
+    },
+
+  observeReturnData:function(newVal, oldVal){
+    if(newVal){
+      this.notifyGrids(newVal);
+      console.log(newVal, oldVal, "this is my observer");
+      this.push("dataEventArchive",newVal);
+    }
+ },
+
  loginDrawerWidthAdjustment(e){
   ////console.log(e);
   this.set("dashboardLeftDrawerCurrentWidth", 250);},
@@ -558,7 +566,7 @@ Polymer({
             var value=this;
             myMap.set(key,value);
             this.set("myMap", myMap);
-var request = indexedDB.open("dashboardDatabase", 3);
+var request = indexedDB.open("dashboardDatabase", 4);
 
 request.onupgradeneeded = (function (event) {
 
@@ -572,9 +580,9 @@ request.onupgradeneeded = (function (event) {
     // key : 1 => value : "Bill"
     // key : 2 => value : "Donna"
     for (var i in this.myMap) {
-        objStore.add(this.myMap[i][key]);
+        objStore.put(this.myMap[i][key]);
     }
-},this);
+}).bind(this);
 },
   created(){
   },
@@ -1017,9 +1025,9 @@ request.onupgradeneeded = (function (event) {
         }
   },
   observeSelectedRB(newVal, oldval){
-       //console.log(newVal,oldval);
+       console.log(newVal,oldval);
      var insertElement=this.elemMap.get(newVal);
-     //console.log(insertElement,"here is where the map false should be");
+     console.log(insertElement,"here is where the map false should be");
      if(oldval!==undefined && newVal===oldval){
       //console.log("we do nothing here");
      }
@@ -1053,6 +1061,51 @@ request.onupgradeneeded = (function (event) {
 </script>
 </dom-module> 
 <!--
+// { "sectionClass": "normal buttons blue-btn-class",
+            //   "iconUsed": "icons:chrome-reader-mode",
+            //   "nodeName": "FC-PASSAGE-DB-DISPLAY",
+            //   "constructorName":"FcPassageDbDisplay",
+            //   "constructor":FcPassageDbDisplay,
+            // },
+            // { "sectionClass": "normal buttons blue-btn-class",
+            //   "iconUsed": "icons:chrome-reader-mode",
+            //   "nodeName": "FC-PICKLE",
+            //   "constructorName":"FcPickle",
+            //   "constructor":FcPickle,
+            // },
+             // { "sectionClass": "normal buttons blue-btn-class",
+             //  "iconUsed": "icons:dashboard",
+             //  "nodeName": "FC-PASSAGE-DISPLAY",
+             //  "constructorName":"FcPassageDisplay",
+             //  "constructor":FcPassageDisplay,
+             //   },
+             //   { "sectionClass": "normal buttons blue-btn-class",
+             //  "iconUsed": "icons:dashboard",
+             //  "nodeName": "FC-GRID-TEST",
+             //  "constructorName":"FcGridTest",
+             //  "constructor":FcGridTest,
+             //   },
+             //   { "sectionClass": "normal buttons blue-btn-class",
+             //  "iconUsed": "icons:dashboard",
+             //  "nodeName": "FC-GRID-TEST",
+             //  "constructorName":"FcGridTest",
+             //  "constructor":FcGridTest,
+             //   },
+             //   { "sectionClass": "normal buttons blue-btn-class",
+             //  "iconUsed": "icons:dashboard",
+             //  "nodeName": "FC-GRID-TEST",
+             //  "constructorName":"FcGridTest",
+             //  "constructor":FcGridTest,
+               // },
+
+            // { "sectionClass": " normal buttons blue-btn-class",
+            //   "iconUsed": "icons:visibility",
+            //   "nodeName": "whatToSee",
+            //   },
+            // { "sectionClass": "normal buttons blue-btn-class",
+            //   "iconUsed": "icons:stars",
+            //   "nodeName": "starRated",
+            //   }
  <div horizontal layout flex nowrap> 
         <section>
             <fc-input-search-select name="leftTop" label="Left Top" dropdown-items="{{constructorArray}}" item-select-property="0" iss-value="{{selectedLT}}">
