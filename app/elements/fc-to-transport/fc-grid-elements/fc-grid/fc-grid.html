@@ -72,7 +72,7 @@ BCK<paper-icon-button icon="icons:dashboard" on-tap="arraySwapBack"></paper-icon
 </div>
 <section class="layout flex-1 center-justified" style="z-index: 7; position: relative; right:-2px;bottom: -2px; top: 1px; min-width: 297px;padding: 8px 8px 8px 20px; margin:0px; border-left: 1px silver solid;">
 FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ONE 
-<fc-indexed-database maps-array="{{mapsArray}}" database-changed="{{databaseChanged}}" data-arrays="{{dataArrays}}">
+<fc-indexed-database maps-array="{{mapsArray}}" indexed-data-bases="{{indexedDataBases}}" database-changed="{{databaseChanged}}" data-arrays="{{dataArrays}}">
 </fc-indexed-database>
 </section>
 </div>
@@ -102,7 +102,7 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
  <script>
  FcGrid=Polymer({
  	is:"fc-grid",
-  behaviors:[FCBehaviors.FcGridInitializerBehavior, FCBehaviors.FcGridStyleBehavior],
+  behaviors:[FCBehaviors.FcGridStyleBehavior],
   listeners: {"color-picker-selected":"getcolor"},
  	properties: { 
     format:{
@@ -115,7 +115,6 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
         notify: true,
 
     },
-    
      data:{
       type: Array,
       value: function(){return [];},
@@ -151,31 +150,33 @@ FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-but
     },
 
   ready(){
-    
+
+      
       // this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
     // this.set("parentTarget", this.$.mappedGridRepeater);
   },
 
   attached(){
-     if(this.dataArrays.length>0&&this.arrayIndex){
-      this.set("selectedArraySet", this.dataArrays[2]);
-      this.async(this.arraySwap, 2000);
-     this.async(this.arraySwapBack,2000);
-      }
+    this.getAllObjectStoresAtInit();
   },
 
   _computeClass(key){
     var keys=key.split("_");
+    var oddEvenRow=(parseInt(keys[2])%2!==0)?"oddRow":"evenRow";
+      var oddEvenColumn=(parseInt(keys[1])%2!==0)?"oddColumn":"evenColumn";
     if(keys[1]!=0&&keys[2]!=0)
-    {
-    return keys[0];
+    { 
+    var str= keys[0] + " " +"row"+parseInt(keys[2])+" "+" column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+    return str;
     }
     else if(keys[2]==0)
       {
-        return keys[0]+"headers";
+        var str = keys[0]+" "+ "headers" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+    return str;
       }
     else{
-      return keys[0]+"rowlabels";
+      var str=keys[0]+" "+"rowlabels" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+      return str;
     }
   },
   detailOpenListener(e){

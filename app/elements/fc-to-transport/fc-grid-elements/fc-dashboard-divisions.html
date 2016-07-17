@@ -184,7 +184,6 @@
       <!--Left-TOP BOX FOR ZONE in LEFT COLUMN-->
       <div class="flex dropzone" style$="height:{{heightLeftTop}}px; width:{{widthLeftTop}}px; overflow-y:scroll;"  parent-cws="in">
         <fc-relative-fit-wrapper id="wrapperLt" cws="in" class="item wrapper" on-track="dragAndDrop" draggable drags>
-         <fc-triad></fc-triad>
                
         </fc-relative-fit-wrapper>
       </div>
@@ -519,32 +518,23 @@ Polymer({
 
     notifyGrids(e){
       console.log(e, e.detail.changeContext, e.target);
-     var gridNodes= document.querySelectorAll("FC-GRID");
+      var gridNodes= Polymer.dom(this.root).querySelectorAll("FC-GRID");
       console.log(gridNodes);
       var myHelperArray=[];
+       var changeArr=e.detail.context.dataArrays[e.detail.context.arrayIndex];
       var extraElement=this.elemMap.get("FC-Grid");
+      //this.splice([extraElement,"dataArrays"],changeArr);
       var counter=gridNodes.length;
       for(var i=0; i<counter;i++){
-          if(gridNodes[i]&&gridNodes[i].getUpdatedObjectStores&&gridNodes[i]!=e.target){
+          if(gridNodes[i]&&gridNodes[i]!=e.target){
             myHelperArray.push(gridNodes[i]);
-            var keys= e.target.__data__.selectedArraySet[0][0].id.split("_");
-            var changeArray=e.detail[keys[0][0]];
-            gridNodes[i].getUpdatedObjectStores(e.detail.namesArray,gridNodes[i],e.detail.isInit,e.detail.arrayIndex,changeArray);
-           console.log(gridNodes[i].dataArrays, changeArray,"look here");
+         console.log("I GOT PAST THE IFs");
+            console.log(changeArr, changeArr[1][2], gridNodes[i]);
+            gridNodes[i].getUpdatedObjectStores(e.detail.namesArray,gridNodes[i],e.detail.isInit,e.detail.arrayIndex,changeArr);
+           console.log(gridNodes[i].dataArrays, changeArr,"look here");
           }
-          else{
-             // extraElement.getUpdatedObjectStores(e.detail.namesArray,extraElement,e.detail.isInit,e.detail.arrayIndex,e.detail.changeContext);
-             console.log(extraElement.dataArrays)
-
-
-
-            myHelperArray.push(extraElement);}
-
-            //this.getUpdatedObjectStores()
-          }
-          console.log(myHelperArray);
-      // var indy=grids.indexOf(e.detail.changeContext);
-      // console.log(indy);
+         
+        }
     },
 
   observeReturnData:function(newVal, oldVal){
@@ -557,7 +547,7 @@ Polymer({
 
  loginDrawerWidthAdjustment(e){
   ////console.log(e);
-  this.set("dashboardLeftDrawerCurrentWidth", 250);},
+  this.set("dashboardLeftDrawerCurrentWidth", 220);},
  consoleThis(){
     var myMap = new Map();
             var d=new Date().getTime();
@@ -615,9 +605,6 @@ request.onupgradeneeded = (function (event) {
     },
     _observeContainerWidth(newVal, oldVal){
         console.log(newVal, oldVal);
-
-
-
     },
     onFirebaseLogin: function(event) {
         this.ref = new Firebase(this.firebaseURL + '/users/' + 
@@ -939,6 +926,7 @@ request.onupgradeneeded = (function (event) {
       observeSelectedLT(newVal, oldval){
       //console.log(newVal,oldval);
      var insertElement=this.elemMap.get(newVal);
+     console.log(insertElement, insertElement, insertElement, insertElement, newVal, newVal, newVal);
      //console.log(insertElement,"here is where the map false should be");
      if(oldval!==undefined && newVal===oldval){
       //console.log("we do nothing here");

@@ -97,9 +97,9 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
             "boundFunctionString":this.alternatingHighlighter.toString(),
             "function":this.alternatingHighlighter.bind(this), 
               "buttons": [
-                  {"text":["Odd Numbered Column Highlighter", "",""],
+                  {"text":["Add Odd Numbered Column Highlighter", "",""],
                       "dataProperty": "background:",
-                      "dataSetValue":`${this.color};`,
+                      "dataSetValue":this.background,
                       "myFunction":this.alternatingHighlighter.bind(this), 
             
                   },
@@ -108,19 +108,29 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
                       "dataSetValue":`${this.defaultFormat.background};`,
                       "myFunction": this.alternatingHighlighter.bind(this)
                     },
-                  { "text":["Shift Column Highlight Right One Column", "",""],
+                  { "text":["Add Even Numbered Column Highlighting", "",""],
                       "dataProperty": "background:",
-                      "dataSetValue ":`${this.color};`,
+                      "dataSetValue ": this.background+"; ",
                       "myFunction":this.alternatingHighlighter.bind(this)
+                    },
+                    {   "text":["Remove Even Numbered Columns' Highlight", "",""],
+                      "dataProperty":"background:",
+                      "dataSetValue":`${this.defaultFormat.background};`,
+                      "myFunction": this.alternatingHighlighter.bind(this)
                     },
                   { "text":["Shift Column Highlight Left One Column", "",""],
                       "dataProperty": "background:",
-                      "dataSetValue ": `${this.color};`,
+                      "dataSetValue ": this.background+"; ",
+                      "myFunction":this.alternatingHighlighter.bind(this)
+                    },
+                     { "text":["Shift Column Highlight Right One Column", "",""],
+                      "dataProperty": "background:",
+                      "dataSetValue ": this.background +";",
                       "myFunction":this.alternatingHighlighter.bind(this)
                     },
                   { "text":["Begin and End Column Highlight On Tap", "",""],
                       "dataProperty":"background:",
-                      "dataSetValue ": `${this.color};`,
+                      "dataSetValue ": this.background + ";",
                       "myFunction":this.alternatingHighlighter.bind(this),
                      // "additionalRequirements": get dragWrapperSelectionHandler(),
                     },
@@ -144,32 +154,32 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
 
         { "title":"Row Highlighting Patterns",
            "buttons":
-          [ { "text": ["Add Alternate Row Highlighting", " ", " "], 
+          [ { "text": ["Add Odd Numbered Row Highlighting", " ", " "], 
              "dataProperty":"background:",
              "dataSetValue":this.background, 
              "myFunction":this.alternatingHighlighter.bind(this), 
              "dataArgs":[]
             },
-      
-        { "text":["Remove Alternate Row Highlighting"],
+
+          { "text": ["Add Even Numbered Row Highlighting", " ", " "], 
+             "dataProperty":"background:",
+             "dataSetValue":this.background, 
+             "myFunction":this.alternatingHighlighter.bind(this), 
+             "dataArgs":[]
+            },
+        { "text":["Remove Odd Numbered Row Highlighting"],
               "dataProperty":"background:",
               "dataSetValue": this.defaultFormat.background,
               "dataFunction": "alternatingHighlighter", 
               "myFunction":this.alternatingHighlighter.bind(this),
-                  "dataArgs":
-          [ 
-            {
-              "key":"key",
-
-              "modulus":[2,1],
-              "modulusBase": 2,
-              "dataProperty":"background",
-              "setValue":this.defaultFormat.background,
-              "mapForKeysetget":this.comparisons,
-              "typeArchive":this.rowArchive,
-              "untyped_Archive":this.undoArchive
-            },
-          ]
+                  "dataArgs":[ ]
+          },
+            { "text":["Remove Even Numbered Row Highlighting"],
+              "dataProperty":"background:",
+              "dataSetValue": this.defaultFormat.background,
+              "dataFunction": "alternatingHighlighter", 
+              "myFunction":this.alternatingHighlighter.bind(this),
+                  "dataArgs":[ ]
           },
                    {"text":["Begin and End Row Highlight On Tap", "",""],"myFunction":this.alternatingHighlighter.bind(this)},  
             ], //End Six Button Page
@@ -273,7 +283,7 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
           var keys=array[0][0].id.split("_");
           var cellClass="." + keys[0];
      
-          var nodeList=document.querySelectorAll(cellClass);
+          var nodeList=Polymer.dom(this.root).querySelectorAll(cellClass);
           console.log(cellClass);
                console.log(nodeList);
           var counter=nodeList.length;
@@ -314,20 +324,16 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
       var text=e.target.btnText;
       //console.log(property, text, "ALERT ALERT ALERT");
       var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background")&&(text.match("Add")||text.match("Selection")))?this.background+";" + " ": e.target.btnSetValue + " ";
-      console.log(setValue);
         var fullVal=property+setValue;
         var rowscols=50;
-       //below should be a case switch map/reduce function that returns the map/store/array names/relatedKeys/properties and the new setValues.  The selection should occur in this early phase, as broken down here, but should be more flexible.  Here we have base cases for all row, all column, all grid and individual cells;  TODO: add column headers, row titles, and assorted selection: the map/reduce will tghen give us something other than a loop; we will target the precise cells to change, and eventually the precise values and linked cells/  this should increase performance a lot;
       for(var i=1;i<rowscols;i++)
         { 
            var str="00000";
 
           var co=(str+i).slice(-5);
           if(keys[2]==0 && keys[1]!=0)
-          {
-           
+          {   
             rowscols=this[arrayName][0].length;
-            //rows cols should only be rows cols actually affected new filtered smaller array for sure!!!
             var newKey=keys[0]+"_"+keys[1]+"_"+co+"_";
               
            }
@@ -339,10 +345,8 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
           else if(parseInt(keys[1])==0 && parseInt(keys[2])==0)
           {   
             var changeArray= this.chunkMutationForMultiDimensionalArrays(this[arrayName],property, fullVal, this);
-            // this.set([arrayName], changeArray);
              this.getUpdatedObjectStores([[arrayName,1]], this, false, this.arrayIndex, changeArray);
-            //this.splice("dataArrays",this.arrayIndex,1,this[arrayName]);
-              this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "updateFunction": this.getUpdatedObjectStores});
+               this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "updateFunction": this.getUpdatedObjectStores});
      
             break;
           }
@@ -364,21 +368,17 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
                   {
                  var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
                   cellStyle=cellStyle.replace(replacer, "");
-                 
                   }
               cellStyle=cellStyle+fullVal + " ";
               console.log(cellStyle,"look here to see if regEx Worked");
               model.set("item.style",cellStyle);
               payload[1].style=cellStyle;
-              //console.log(payload);
               this.updateObjectStores(arrayName, 1, newKey, "style", cellStyle);
-              //console.log(arrayName, 1, newKey, "style", cellStyle);
               this[mapName].set(key,payload);
-
             }
         }
       }//end for
-       this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "updateFunction": this.getUpdatedObjectStores});
+        this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "updateFunction": this.getUpdatedObjectStores});
             console.log("?I huihhuheuh");
   },
   insertRow(){},
@@ -390,55 +390,66 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
 
 
   alternatingHighlighter(e){
-    var keys=this.gridEvent.target.id.split("_"),
-    mapName="m"+keys[0],
-    arrayName=keys[0],
-    parent=this.$.polymerGrid;
-    //console.log(this[mapName], this.mapArray);
-    var columns= Polymer.dom(parent).children;
-    var i=0,j=0,btn=e.target,arr=[], counter=columns.length;
+    var keys=this.gridEvent.target.id.split("_");
+    var mapName="m"+keys[0],arrayName=keys[0];
+    var p=0, btn=e.target,arr=[];
     var text=btn.btnText;
     var property=btn.btnProperty;
     var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
-    //console.log(setValue, property);
-    var fullVal=property+" "+setValue;
-  //console.log(fullVal);
-    var colCount=(keys[1]==0&&keys[2]!=0)?1:2;
-    var rowCount=(keys[1]==0&&keys[2]!=0)?2:1;
-    for(i=1;i<counter;i+=colCount)
-      {
-        var columnChildren=Polymer.dom(columns[i]).children,
-        counter2=columnChildren.length;
-        for(j=1;j<counter2;j+=rowCount)
-        {   
-          if(columnChildren[j]!=undefined)
+    //388-394 is initialization can repeated multiple times
+    var kp=(text.match("Column"))?1:text.match("Row")?2:-1;
+    var modEven=(text.match("Odd"))?false: true;
+      var cellClass="." + keys[0];
+      var nodelist;
+      console.log(kp, modEven, cellClass);
+      //here down is effectively just conditional implimentation--this is the whole of deteriminism in the code and it also //by using the whole document--i thought--would get me ALL INSTANCES on the single dom... no luck charley
+      console.log(this.root, this);
+        if(kp===1 && modEven===false){
+          var twoClass=cellClass  + ".oddColumn";
+           nodelist=Polymer.dom(this.root).querySelectorAll(twoClass);
+           console.log(nodelist);
+           }
+        else if(kp===1&&modEven===true){
+            var twoClass=cellClass  + ".evenColumn";
+            nodelist=Polymer.dom(this.root).querySelectorAll(twoClass);
+        }
+        else if(kp===2&&modEven===true){
+              var twoClass=cellClass  + ".evenRow";
+            nodelist=Polymer.dom(this.root).querySelectorAll(twoClass);
+        }
+        else{
+            var twoClass=cellClass  + ".oddRow";
+            nodelist=Polymer.dom(this.root).querySelectorAll(twoClass);
+        }
+        var fullVal=property+setValue;
+        var counter=nodelist.length;
+        console.log(counter, fullVal, nodelist, property, setValue);
+        for(p=0;p<counter; p++)
           {
-            var key =columnChildren[j].getAttribute("id");
-            //console.log(key);
-            var theId="#"+key, 
-            cell=this.$$(theId);
-            //console.log(cell);
-            var payload=this[mapName].get(key);//keys[0] is no longer mapname//
-              var keyParts=key.split('_');
-            if(keyParts[2]!=0 &keyParts[1]!=0&& cell.nodeName=="TEXTAREA")
+            var cell=nodelist[p];
+            var model=cell._templateInstance;
+            if(model.item.style.match(property))
             {
-                var model=cell._templateInstance;
-                 var cellStyle=model.item.style;
-                    if(cellStyle.match(property))
-                      {
-                       var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
-                      }
-                    cellStyle=cellStyle + fullVal+";"+" ";
-                    model.set("item.style",cellStyle);
-                    payload[1].style=cellStyle;
-                    this[mapName].set(key,payload);
-                    var gridName=arrayName, version =1, argToChange="style", setValue=cellStyle;
-                    this.updateObjectStores(arrayName, 1, key, "style", cellStyle);
+                var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
+                model.item.style=model.item.style.replace(replacer, "");
             }
+            var cellStyle=model.item.style+fullVal + " ";
+            model.item.style =cellStyle;
+            model.set("item.style",cellStyle);
+            var key=cell.id;
+            keys=key.split("_");
+            var col=keys[1];
+            var row=keys[2];
+            this.set([arrayName, col, row,".style"],cellStyle);
+            this[mapName].set(key,[cell.value, cell]);
+            this.updateObjectStores(arrayName, 1, key, "style", cellStyle);
           }
-        }   
-      }
-    },
+          //would like to pass keyS not key to the setter in the object store...
+          this.splice("dataArrays", this.arrayIndex,1,this[arrayName]);
+           this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "updateFunction": this.getUpdatedObjectStores});
+          return this[arrayName];
+      }, 
+     
     updateOnValueChange(gridName, version, key, argToChange, setValue){
             //here we should use the pouch and the other data synching they offer
 

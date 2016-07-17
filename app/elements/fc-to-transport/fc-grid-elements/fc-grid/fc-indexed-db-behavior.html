@@ -35,7 +35,7 @@ FCBehaviors.FcIndexedDbBehavior = {
     },
 
     created(){},
-    ready(){ this.getAllObjectStoresAtInit();},
+    ready(){},
     attached(){
         //console.log(this.indexedDB);
       },
@@ -72,7 +72,9 @@ FCBehaviors.FcIndexedDbBehavior = {
                       query = objectStore.getAll();
                   query.onsuccess = function(queryEvent){
                      cell1 = queryEvent.target.result;
+                    // console.log(cell1);
                     // console.log("got in onsuccess");
+              
                      var topArray=[];
                      var lastVal=cell1.length-1;
                      var columnArray =cell1.reduce((pre, val, i, arr)=>{
@@ -131,16 +133,12 @@ FCBehaviors.FcIndexedDbBehavior = {
                     mapName="m" + arrayName;
                     context.push("mapsArray", context[mapName]);
                     }
+                    
                     if(isInit===false){
-                      console.log(changeArray, columnArray);
+                     // context.set([arrayName],columnArray);
+                    //  console.log(changeArray, columnArray);
                         context.splice("dataArrays", index,1,columnArray);
                           }
-
-
-               
-                   
-
-                    
               //console.log("successfully reordered data from indexed DB into", columnArray.length,"columns, suitable for grid: The following arrays of objects will be represented in your grid: ", columnArray);
               //console.log(columnArray, context[mapName], "jason was here");
                     }.bind(context);
@@ -197,7 +195,7 @@ FCBehaviors.FcIndexedDbBehavior = {
                     //console.log(val.key, val);
                   });
                   this.set("indexedDataBases",indexdbsheet);
-               
+               console.log(nameArray, "here is the double load I think");
                 this.getUpdatedObjectStores(nameArray, this, true);
                   }//useless if   
               }.bind(this);//first querry on success;
@@ -271,7 +269,7 @@ FCBehaviors.FcIndexedDbBehavior = {
                     data=[];
                 }// for loop ends here
                 var cells=this.indexedDataBases;
-                this.persistCells("indexOfDatabases", 1,cells);
+               // this.persistCells("indexOfDatabases", 1,cells);
             },
     updateObjectStores(gridName, version, key,propertyPath, setValue,subStore, updateSource){
       //last two properties were to be for an updating-synching model, but realized I would be doing the updating piecemeal, way easier all at once, at least at some breakpoint single updates using this for up to data limit x// mass store for data above x
@@ -290,11 +288,11 @@ FCBehaviors.FcIndexedDbBehavior = {
           if(cursor) 
           {
             //console.log("this is the key followed by the cursorKey in the object store", key, cursor.value.key);
-            if(cursor.value.key !== key)
+            if(cursor.value.key < key)
             {
                 cursor.continue(key);
             }
-            if(cursor.value.key===key)
+           if(cursor.value.key===key)
             {
               var updateData = cursor.value;
               //console.log(updateData, "am in the updateData, this is base data struct");
