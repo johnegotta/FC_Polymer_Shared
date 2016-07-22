@@ -71,8 +71,6 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
     
 	},
 	  ready(){
-
-
     //console.log(this.mapsArray);
 
     },
@@ -266,8 +264,11 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
     },
     
     observeGridEvent(newEvent, oldEvent){
-      if(newEvent&&newEvent!=oldEvent){ console.log(newEvent, oldEvent);}
-    },
+      if(newEvent&&newEvent!=oldEvent){
+        console.log(newEvent, oldEvent);
+      }
+
+      },
     
     onGridEventChanged(){
 
@@ -276,26 +277,37 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
 	getcolor(e){
     		this.set("color", e.detail.color);
     },
-  
+  // chunked(arr, chunkSize) {
+  //           var groups = [], i;
+  //           for (i = 0; i < arr.length; i += chunkSize) {
+  //           groups.push(arr.slice(i, i + chunkSize));
+  //           }
+  //       return groups;
+  //     },
   chunkMutationForMultiDimensionalArrays(array,property, fullvalue, context,index, notify, unitArray){
-        var keys=array[0][0].id.split("_");
-        var cellClass="." + keys[0];
-        var mapName="m"+keys[0];
-        var arrayName=keys[0];
-        var p=0;
+          var keys=array[0][0].id.split("_");
+          var cellClass="." + keys[0];
+          var mapName="m"+keys[0];
+          var arrayName=keys[0];
+          var p=0;
         if(!unitArray || (unitArray&&index==context.arrayIndex)){
           var nodeList=Polymer.dom(this.root).querySelectorAll(cellClass);
          
           var counter=nodeList.length;
+          
           }
         else{
           var counter=unitArray.length;
         }
-        for(p=0;p<counter; p++){
-            if(!unitArray && notify===true){
+          for(p=0;p<counter; p++)
+          {
+            
+            if(!unitArray && notify===true)
+            {
               var cell=nodeList[p];
               var model=cell._templateInstance;
-              if(model.item.style.match(property)){
+              if(model.item.style.match(property))
+              {
                 var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
                 model.item.style=model.item.style.replace(replacer, "");
               }
@@ -305,7 +317,8 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
                var key=cell.id;
                keys=key.split("_");
             }
-            else if(index==context.arrayIndex){
+            else if(index==context.arrayIndex)
+            {
                 var cell=nodeList[p];
                 var model=cell._templateInstance;
                 var cellStyle=unitArray[p].style;
@@ -324,21 +337,19 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
             var col=parseInt(keys[1]);
             var row=parseInt(keys[2]);
             if(unitArray&&index!=context.arrayIndex){
-                context.splice(["dataArrays",indi, col], row,1,unitArray[p]);
-                context[mapName].set(key,[unitArray[p].value, unitArray[p]]);
-                console.log(context.dataArrays[indi][col][row], "what is this value");
+            context.splice(["dataArrays",indi, col], row,1,unitArray[p]);
+            context[mapName].set(key,[unitArray[p].value, unitArray[p]]);
+            console.log(context.dataArrays[indi][col][row], "what is this value");
             }
             else{
-              context[mapName].set(key,[cell.value, cell]);
+            context[mapName].set(key,[cell.value, cell]);
             }
             if(notify===true){
-              if(arrayName=="class20" || arrayName=="class22"){var version=3;}
-                    else{var version=2}
-              context.updateObjectStores(arrayName, version, key, "style", cellStyle); 
+            context.updateObjectStores(arrayName, 1, key, "style", cellStyle); 
             }
-        }
-        return context[arrayName];
-  },
+          }
+          return context[arrayName];
+      },
 
   stylePropertySelection(e){
       var cell;
@@ -346,10 +357,12 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
       var keys=this.gridEvent.target.id.split("_");
       var mapName="m"+keys[0];
       var arrayName=keys[0];
+      //console.log(this[arrayName], arrayName);
       var property=e.target.btnProperty;
       var text=e.target.btnText;
+      //console.log(property, text, "ALERT ALERT ALERT");
       var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background")&&(text.match("Add")||text.match("Selection")))?this.background+";" + " ": e.target.btnSetValue + " ";
-        var fullVal=(property!="value")?property+setValue: setValue;
+        var fullVal=property+setValue;
         var rowscols=50;
       for(var i=1;i<rowscols;i++)
         { 
@@ -370,9 +383,25 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
           else if(parseInt(keys[1])==0 && parseInt(keys[2])==0)
           {   
             var changeArray= this.chunkMutationForMultiDimensionalArrays(this[arrayName],property, fullVal, this, this.arrayIndex, true);
+             // this.getUpdatedObjectStores([[arrayName,1]], this, false, this.arrayIndex, changeArray);
+        //        this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": changeArray, "property": property, "fullvalue": fullVal});
+        // if(!this.parentElement){
+        //       this.set("returnDataObject", {"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": changeArray, "property": property, "fullvalue": fullVal});
+        //     }
+
                    var e={};
-                      e.detail={"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "property": property, "fullvalue": fullVal};
-              this.notifygrids(e);
+                      e.detail={
+                        "namesArray":[[arrayName,1]],
+                        "context":this,
+                        "isInit":false,
+                        "arrayIndex": this.arrayIndex, 
+                        "spliceArray": this[arrayName], 
+                        "property": property, 
+                        "fullvalue": fullVal
+                        };
+                        this.notifygrids(e);
+
+     
             break;
           }
           else{
@@ -381,35 +410,38 @@ FCBehaviors.FcGridStyleBehaviorImpl = {
            rowscols=2;
             }
           if(newKey){
-            // var payload=this[mapName].get(newKey);
+            //console.log(mapName, "no map", newKey, this[mapName]);
+            var payload=this[mapName].get(newKey);
+            if(payload&&payload[1]){
               var theId="#"+newKey;
               var cell=this.$$(theId);
+              console.log(cell, payload, theId);
               var model=cell._templateInstance;
               var cellStyle=model.item.style;
-              if(property!="value"){
                 if(cellStyle.match(property))
                   {
                  var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
                   cellStyle=cellStyle.replace(replacer, "");
                   }
               cellStyle=cellStyle+fullVal + " ";
+              console.log(cellStyle,"look here to see if regEx Worked");
               model.set("item.style",cellStyle);
-             // payload[1].style=cellStyle;
+              payload[1].style=cellStyle;
               this.updateObjectStores(arrayName, 1, newKey, "style", cellStyle);
-          //    this[mapName].set(key,payload);
-            }
-            else if(property=="value"){
-               model.set("item.value",setValue);
-               payload[1].value=setValue;
-               console.log(payload[0]);
-               this.updateObjectStores(arrayName, undefined, newKey, "value", setValue);
               this[mapName].set(key,payload);
-               //payload[0]=setValue;
             }
         }
       }//end for
       var e={};
-      e.detail={"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "property": property,"fullvalue": fullVal};
+      e.detail={
+        "namesArray":[[arrayName,1]],
+        "context":this,
+        "isInit":false,
+        "arrayIndex": this.arrayIndex, 
+        "spliceArray": this[arrayName], 
+        "property": property, 
+        "fullvalue": fullVal
+        };
         this.notifygrids(e);
   },
 
@@ -418,9 +450,14 @@ notifygrids(e){
       console.log(gridNodes, "see who the nodes are");
       var myHelperArray=[];
        var changeArr=e.detail.context.dataArrays[e.detail.context.arrayIndex];
+     // var extraElement=this.elemMap.get("FC-Grid");
+      //this.splice([extraElement,"dataArrays"],changeArr);
       var counter=gridNodes.length;
       for(var i=0; i<counter;i++){
           if(gridNodes[i]&&gridNodes[i]!==e.target){
+            myHelperArray.push(gridNodes[i]);
+         console.log("I GOT PAST THE IFs");
+            console.log(gridNodes[i]);
             var index=e.detail.arrayIndex;
             var unitArray=e.detail.spliceArray.reduce(function(pre, val, ind, arr){
               pre=pre.concat(val);
@@ -433,6 +470,15 @@ notifygrids(e){
         }
       },
 
+
+  insertRow(){},
+  deleteRow(){},
+  addColumn(){},
+  deleteThisColumn(){},
+  restoreRow(){},
+  restoreThisColumn(){},
+
+
   alternatingHighlighter(e){
     var keys=this.gridEvent.target.id.split("_");
     var mapName="m"+keys[0],arrayName=keys[0];
@@ -440,10 +486,13 @@ notifygrids(e){
     var text=btn.btnText;
     var property=btn.btnProperty;
     var setValue =(property.match("color")&&text.match("This"))?this.color+";" + " ":(property.match("color")&&text.match("Base"))?this.defaultFormat.color+";" + " ":(property.match("background")&&text.match("Remove"))?this.defaultFormat.background+";" + " ":(property.match("background"))?this.background+";" + " ": e.target.btnSetValue + " ";
+    //388-394 is initialization can repeated multiple times
     var kp=(text.match("Column"))?1:text.match("Row")?2:-1;
     var modEven=(text.match("Odd"))?false: true;
       var cellClass="." + keys[0];
       var nodelist;
+      console.log(kp, modEven, cellClass);
+      console.log(this.root, this);
         if(kp===1 && modEven===false){
           var twoClass=cellClass  + ".oddColumn";
            nodelist=Polymer.dom(this.root).querySelectorAll(twoClass);
@@ -481,142 +530,25 @@ notifygrids(e){
             var col=keys[1];
             var row=keys[2];
             this.set([arrayName, col, row,".style"],cellStyle);
-          
-            this.updateObjectStores(arrayName, undefined , key, "style", cellStyle);
+            this[mapName].set(key,[cell.value, cell]);
+            this.updateObjectStores(arrayName, 1, key, "style", cellStyle);
           }
-          var e={};
-            e.detail={"namesArray":[[arrayName,1]],"context":this,"isInit":false,
-              "arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "property": property, "fullvalue": fullVal};
-          this.notifygrids(e);
-          return this[arrayName];
-      },
-      insertRow(e){
-        console.log(e, "this is my event", this.gridEvent);
-        var model=this.gridEvent.target._templateInstance;
-        var cell=model.item;
-        var key=cell.key;
-        var keys=key.split("_");
-      
-        console.log(key, keys, cell, model, "total columns number of any row",
-        this.indexedDataBases[this.arrayIndex].columns, "total columns number of any row");
+          //would like to pass keyS not key to the setter in the object store...
+          // this.fire("objectStoresUpdated",{"namesArray":[[arrayName,1]],"context":this,"isInit":false,"arrayIndex": this.arrayIndex, "spliceArray": this[arrayName], "property": property, "fullvalue": fullVal});
 
-        var keys1=parseInt(keys[1]);
-        var keys2=parseInt(keys[2]);
-        var id=keys[0];
-        var time=new Date().getTime();
-        // var newCell={"key":key, "value":"--", "contenteditable": true, "id": id, "style":  cell.style, "name": "","class": "", "time": time, "archive":[], "closed": false};
-        var counter=this.selectedArraySet.length;
-        console.log(counter);
-        for(var i=0;i<counter;i++){
-          var nextCell=this.selectedArraySet[i][keys2];
-          console.log(nextCell.style);
-          var newCell={"key":"", "value":"--", "contenteditable": true, "id": "", "style":  nextCell.style, "name": "","class": "", "time": time, "archive":[], "closed": false};
-        this.splice(["selectedArraySet",i],keys2, 0,newCell);
-        }
-        this.reorderKeys(this.selectedArraySet);
-      },
-
-      reorderKeys(array){
-        var columns=array.length;
-        var rows=array[0].length;
-        var key=array[0][0].id;
-        var keys=key.split("_");
-        var name=keys[0];
-        for(var i=0;i<columns;i++){
-          columnArray=[];
-          for(var j=0; j<rows;j++){
-            var str="00000";
-            var col=(str+i).slice(-5);
-            var row=(str+j).slice(-5);
-            var nkey=name+"_"+col+"_"+row+"_";
-            this.set(["selectedArraySet", i, j, "id"],nkey);
-            this.set(["selectedArraySet", i, j, "key"],nkey);
-          }
-        }
-       var version=undefined; 
-       //this.indexedDataBases[this.arrayIndex].version;
-       console.log(this.selectedArraySet, this.indexedDataBases);
-        var newVersion=version+1;
-        var columns=this.selectedArraySet.length;
-        var rows=this.selectedArraySet[0].length;
-        var product=rows*columns;
-        this.notifyVersionChangeToIndex(name, newVersion, rows, columns, product);
-        this.initializeIndexDB(name, version,this.selectedArraySet)
-      },
-
-      initializeIndexDB(name, lastversion, newArray){
-        var data =newArray.map(function(colHolder){
-                return colHolder;
-                }).reduce(function(pre, val){
-              return pre.concat(val);
-          },[]);
-          var newVersion=lastversion;
-          console.log(newVersion);
-          this.setDataBase(name, newVersion, data);
-      },
-      notifyVersionChangeToIndex(name,version, rows, columns, product){
-        var indexArray=[];
-        var singletonArray=this.indexedDataBases.filter(function(val, index){
-         if (val.name==name){
-            indexArray.push(index); return true;
-                };
-            });
-          var count=indexArray.length;
-          singletonArray[0].version=version;
-          singletonArray[0].rows=rows;
-          singletonArray[0].columns=columns;
-          singletonArray[0].size=product;
-          this.splice("indexedDataBases",indexArray[0],1,singletonArray[0]);
-        if(count>1){
-          console.log(indexArray);
-          for(var i=1; i<indexArray.length; i++){
-            this.splice("indexedDataBases", indexArray[i],1);
-          }
-        }
-           var request = indexedDB.open("indexOfDatabases", 1);//"gridMap"
-          request.onerror = function(e)
-                {
-                  console.log("Unable to retrieve data from database! and stopped it!");
-                  e.stopPropogation();
-                };
-          request.onsuccess = function(event){
-              var db = event.target.result;
-              //console.log(db);
-              var transaction = db.transaction("cell", "readwrite");
-              var objectStore = transaction.objectStore("cell");
-              query = objectStore.get(name);
-              query.onerror = function(queryEvent)
-              {
-                  console.log("Unable to retrieve data from database!");
-                };
-              query.onsuccess = function(queryEvent) 
-              {
-                 var ref = queryEvent.target.result;
-                 
-                console.log(ref);
-                 ref.version=version;
-                 ref.rows=rows;
-                 ref.columns=columns;
-                 ref.size=product;
-                 var update = objectStore.put(ref);
-
-              update.onsuccess = function() {
-                 console.log(ref);
-                 console.log("we have updated the index ref0ref");
+           var e={};
+            e.detail={
+              "namesArray":[[arrayName,1]],
+              "context":this,
+              "isInit":false,
+              "arrayIndex": this.arrayIndex, 
+              "spliceArray": this[arrayName], 
+              "property": property, 
+              "fullvalue": fullVal
               };
-        };
-
-      };
-
-      },
-
-      deleteRow(e){console.log(e);},
-      addColumn(e){console.log(e);},
-      deleteThisColumn(){},
-      restoreRow(){},
-      restoreThisColumn(){},
-
- 
+        this.notifygrids(e);
+          return this[arrayName];
+      }, 
      
     updateOnValueChange(gridName, version, key, argToChange, setValue){
             //here we should use the pouch and the other data synching they offer

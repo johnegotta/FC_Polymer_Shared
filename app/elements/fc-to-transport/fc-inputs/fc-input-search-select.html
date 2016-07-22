@@ -258,7 +258,7 @@ input.question.menuItem+label.menuItem>span.menuItem,input.menuItem:active+label
     <paper-icon-button id="dropdownbutton" class$="dropbtn dropdown-trigger {{issClass}}" hidden="{{!showDropButton}}" icon="{{issIcon}}" on-tap="inputToggle"> 
     </paper-icon-button>
 <div class="vertical layout dropdown" on-down="focusInput">
-	<input id="issInput" class$="question {{issClass}}" required value="{{issValue::input}}" is-multi-select="{{isMult}}" on-change="{{sortArrayForMultiSelect(isMulti)}}" name="[[issName]]">
+	<input id="issInput" class$="question {{issClass}}" required value="{{issValue::input}}" is-multi-select="{{isMult}}" on-change="setValueItem" name="[[issName]]">
 		<label for="issInput" class$="{{issClass}}"><span on-up="focusInput" class$="{{_computeLabelSpanClass(isToggle,toggleClass,issClass)}}">{{issLabel}}</span></label>
 			<paper-listbox id="dropdownlist" class$="dropdown-content {{issClass}}" hidden="{{!dropdownItems}}" style$="min-height:220px; max-height:{{maxHeight}}px; overflow-y: scroll;">
 		 		<template is="dom-repeat" id="controllerList" style="height: 2200px;" items="{{dropdownItems}}" observe="selectCheck value name propertyName val" filter="{{createFilter(issValue, searchOff)}}">
@@ -459,11 +459,20 @@ FcInputSearchSelect=Polymer({
  
  },
 
+ setValueItem(e){
+    var input=this.$.issInput;
+  this.set([input,"value"], e.target.value);
+  if(e.model||e._templateInstance){
+    var model=e._templateInstance;
+    model.set("item.value", e.target.value);
+    }
+  },
+
  _computeLabelSpanClass(isToggle,toggleClass,issClass){
         return this.issClass;
  },
  observeIssInput(nv, ov){
-    console.log(nv, ov, "fire here");
+  //  console.log(nv, ov, "fire here");
  },
  _computeItemSelectedPropValue(item, index,isp){
 	 		var retval=(isp==="")?item:item[isp];

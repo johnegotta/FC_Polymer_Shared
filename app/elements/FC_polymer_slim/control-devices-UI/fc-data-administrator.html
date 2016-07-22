@@ -102,10 +102,11 @@
 <paper-dialog 
 	id="dragAdmin" 
 	class="layout vertical flex container" 
-	style="display: block; overflow: auto; resize: both; position:fixed;"  
-	draggable="true" 
+	style="display: block; overflow: auto; width:12vw; resize: both; position:fixed; height: 30vh; z-index: 22000;"  
+	draggable
+	drags 
 	no-cancel-on-outside-click="true"
-	track
+	on-track
 	>
 
 
@@ -113,7 +114,7 @@
 			track style="padding-bottom: 4px;">
 			<button><iron-icon
 				icon="hardware:dock"  
-				on-mousedown="_startDrag"
+				on-track="_startDrag"
 				track
 				class="dragbox"
 
@@ -282,7 +283,8 @@
 <script>  
 	Polymer({
 		is: 'fc-data-administrator',
-		
+
+	behaviors: [ FCBehaviors.DraggableBehavior],
 	properties: {
       layoutClasses:{},
       fileData: {
@@ -737,7 +739,12 @@
 			notify: true,
 			reflectToAttributes: true
 
-		}, 
+		},
+		screenWidth:{
+			type: Number,
+			observer: "observeScreenWidth",
+			notify: true,
+		},
 
 
 		yourName: {
@@ -883,9 +890,14 @@
 		},
 	attached: function() { 
 		this.loadFirepad();
+		this.interrogateScreen();
+	},
+	interrogateScreen(){
+		var screenWidth=window.screen.width;
+		var width=Math.floor(.2*(screenWidth));
+		this.set("screenWidth",width);
 
 	},
-	
 
 	saveTestTwo: function(){
       var self=this;
@@ -900,6 +912,7 @@
 	_openAdmin: function() {
   			console.log(this.passageDestinations + "sandles");
 			this.$.dragAdmin.open();
+			this.interrogateScreen();
 				
 	},
 

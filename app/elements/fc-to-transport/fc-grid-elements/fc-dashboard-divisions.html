@@ -220,7 +220,8 @@
 <section id="dashboardRightDrawer_resizer" on-down="dragsOff" on-track="_resize" on-up="dragsOn" is-resizing style$="position:relative; right:{{dashboardRightDrawerCurrentWidth}}px; left: 0px; bottom:0px; top: 0px; min-width: 12px; height: 103vh; cursor:ew-resize; padding: 1px; width:12px!important; opacity:1; border-left: 2px solid #aecefe; z-index:4; background: #009;">
 </section>
 
-                   <fc-right-tabbed-drawer id="drawer" config-object="" style="max-width:99.4vw;position: absolute; right: -2px; top:0px; bottom: 0px;"class="vertical layout flex self-stretch">
+                   <fc-right-tabbed-drawer id="drawer" config-object="" messages-in="{{messagesOutRightDrawer}}"style="max-width:99.4vw;position: absolute; right: -2px; top:0px; bottom: 0px;"class="vertical layout flex self-stretch">
+
                  
                    </fc-right-tabbed-drawer>
 </div>
@@ -501,12 +502,21 @@ Polymer({
       type:Array,
       notify: true,
       value: [],
-      returnDataObject:{
+  returnDataObject:{
           type:Object,
           value:function(){return{};},
           notify: true,
           observer: "observeReturnData",
         },
+
+    },
+    messagesOutRightDrawer:{
+      type: Object, 
+      value: function(){
+
+      },
+
+
 
     },
       
@@ -517,29 +527,40 @@ Polymer({
   // },
 
     notifyGrids(e){
-      console.log(e, e.detail.changeContext, e.target);
-      var gridNodes= Polymer.dom(this.root).querySelectorAll("FC-GRID");
-      console.log(gridNodes);
-      var myHelperArray=[];
-       var changeArr=e.detail.context.dataArrays[e.detail.context.arrayIndex];
-      var extraElement=this.elemMap.get("FC-Grid");
-      //this.splice([extraElement,"dataArrays"],changeArr);
-      var counter=gridNodes.length;
-      for(var i=0; i<counter;i++){
-          if(gridNodes[i]&&gridNodes[i]!=e.target){
-            myHelperArray.push(gridNodes[i]);
-         console.log("I GOT PAST THE IFs");
-            console.log(changeArr, changeArr[1][2], gridNodes[i]);
-            gridNodes[i].getUpdatedObjectStores(e.detail.namesArray,gridNodes[i],e.detail.isInit,e.detail.arrayIndex,changeArr);
-           console.log(gridNodes[i].dataArrays, changeArr,"look here");
-          }
+     //console.log(e, e.detail.changeContext, e.target);
+      // var gridNodes= document.querySelectorAll("FC-GRID");
+      // console.log(gridNodes, "see who the nodes are");
+      // var myHelperArray=[];
+      //  var changeArr=e.detail.context.dataArrays[e.detail.context.arrayIndex];
+      // var extraElement=this.elemMap.get("FC-Grid");
+      // //this.splice([extraElement,"dataArrays"],changeArr);
+      // var counter=gridNodes.length;
+      // for(var i=0; i<counter;i++){
+      //     if(gridNodes[i]&&gridNodes[i]!==e.target){
+      //       myHelperArray.push(gridNodes[i]);
+      //    console.log("I GOT PAST THE IFs");
+      //       console.log(gridNodes[i]);
+      //       var index=e.detail.arrayIndex;
+      //       var unitArray=e.detail.spliceArray.reduce(function(pre, val, ind, arr){
+      //         pre=pre.concat(val);
+      //         return pre;
+      //       }, []);
+      //       console.log(unitArray);
+      //       gridNodes[i].chunkMutationForMultiDimensionalArrays(gridNodes[i].dataArrays[index],e.detail.property, e.detail.fullvalue, gridNodes[i],index, false,unitArray);
+
+
+           // getUpdatedObjectStores(e.detail.namesArray,gridNodes[i],e.detail.isInit,e.detail.arrayIndex,changeArr);
+           //console.log(gridNodes[i].dataArrays, changeArr,"look here");
+        //   }
          
-        }
+        // }
     },
 
   observeReturnData:function(newVal, oldVal){
     if(newVal){
-      this.notifyGrids(newVal);
+      var e={};
+      e.detail=newVal;
+      this.notifyGrids(e);
       console.log(newVal, oldVal, "this is my observer");
       this.push("dataEventArchive",newVal);
     }

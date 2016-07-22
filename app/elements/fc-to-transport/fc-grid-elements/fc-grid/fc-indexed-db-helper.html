@@ -1,8 +1,393 @@
-<dom-module id="fc-indexed-database">
-<template id="fc-indexed-database-template">
+<dom-module id="fc-indexed-db-helper">
+<template id="fc-indexed-db-helper">
+<style>
+:host{
+	position: fixed;
+	z-index:2200;
+	
+};
+paper-dialog{
+	position: fixed;
+	min-width: 20vw;
+	max-height: 60vh;
+	width: 460px;
 
+}
+paper-dialog-scrollable{
+	min-width: 18vw;
+	max-height: 45vh;
+	overflow-y: scroll;
+	border: solid 1px silver;
+
+}
+fc-input-search-select{
+	margin:26px 12px;
+
+}
+</style>
+
+<paper-dialog id="idbHelper"  draggable drags no-cancel-on-outside-click always-on-top >
+<section class="horizontal flex layout around-justified">
+       <span on-tap="_backOne">Back</span> <h2>{{itemsArrayTitle}}</h2><span on-tap="_forward">Forward</span></section>
+        <paper-dialog-scrollable>
+          <p>
+
+
+          </p>
+          <p>
+          <template is="dom-repeat" id="inputTemplate" items="{{itemsArray}}">
+        	<section class="horizontal layout container"> 
+        		<span hidden$="{{computeItemHeaderHidden(item.headerA)}}" class="questionHeader">{{item.headerA}}.</span>  <span hidden$="{{computeItemHeaderHidden(item.headerB)}}" class="questionHeader">{{item.headerB}}.</span>
+      		</section>
+
+      		<div class="horizontal layout flex wrap self-stretch around-justified">
+          		<fc-input-search-select class="left" id$="{{item.nameA}}_{{counter}}" iss-name="{{item.nameA}}" iss-label="{{item.labelA}}" iss-value="{{item.valueA}}" item-select-property="value" dropdown-items="{{item.dropdownItemsA}}" on-change="enterDataFromInterface" multi-select="[[item.multiSelectA]]">
+          		</fc-input-search-select>
+          		<fc-input-search-select id$="{{item.nameB}}_{{counter}}" iss-name="{{item.nameB}}" iss-value="{{item.valueB}}" iss-label="{{item.labelB}}" item-select-property="value" on-change="enterDataFromInterface" class="right" dropdown-items="{{item.dropdownItemsB}}" multi-select="[[item.multiSelectB]]">
+          		</fc-input-search-select>
+     		</div>
+  		</template>
+  		
+  		<paper-button on-tap="deleteObjectStorePass">Delete This Store</paper-button>
+        </p>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button dialog-dismiss>Cancel</paper-button>
+          <paper-button dialog-confirm autofocus>OK</paper-button>
+        </div>
+      </paper-dialog>
 
 </template>
 <script>
+FcIndexedDbHelper=Polymer({
+	is:"fc-indexed-db-helper",
+	behaviors:[FCBehaviors.FcIndexedDbBehavior, FCBehaviors.DraggableBehavior],
+	listeners: {},
+	observers:[],
+	properties:{
+		apiLinked:{
+			type: Object,
+			notify: true,
+		},
+		apiDataSource:{
+			type: Array,
+			notify: true,
+		},
+		inputFields:{
+			type: Object,
+			notify: true,
+		},
+		itemsArray:{
+			type:Array,
+			value:function(){return [];},
+			notify: true,
+		},
+		itemsArrays:{
+			type:Array,
+			value:function(){return [];},
+			notify: true,
+		},
+		itemsArraysIndex:{
+			type: Number,
+			value: 0,
+			notify: true,
+
+		},
+		callCenterArrays:{
+			type:Array,
+			value:function(){return [];},
+			notify: true,
+		},
+		currentArraySet:{
+				type:Array,
+			value:function(){return [];},
+			notify: true,
+		},
+		indexOfDatabasesProxy:{
+			type:Array,
+			computed:"_computeIndexOfDatabasesProxy(indexeddbIndexArray)",
+			observer:"observeTheProxy",
+			notify: true,
+		},
+		apiArraysObject:{
+			type:Object,
+			notify: true,
+
+			},
+		indexeddbIndexArray:{
+			type:Array,
+			value:function(){return [];},
+			observer:"observeTheIndex",
+			notify: true,
+		},
+		counter:{
+			type: Number,
+			value: function(){return 0;},
+			notify: true
+
+		},
+
+	},
+
+
+	register(){
+
+		
+
+	},
+	ready(){
+		
+	},
+
+	attached:function(){
+		var data=this.viewIndexOfIndexedDatabases();
+		// console.log(this.indexOfDatabases);
+		var cucumber=this.makeInputPage(data);
+		 console.log(cucumber);
+		 this.set('indexeddbIndexArray', cucumber);
+
+		 this.set("itemsArray",cucumber[this.itemsArraysIndex]);
+		 this.set("currentArraySet", cucumber);
+		var arrays=this.getArraysAb();
+		this.set("itemsArrays", arrays);
+		this.set("itemsArray", this.itemsArrays[0]);
+		console.log(this.itemsArray);
+		 this.set('indexeddbIndexArray', cucumber);
+		 this.set("itemsArray",cucumber[this.itemsArraysIndex]);
+		 this.set("currentArraySet", cucumber);
+
+		
+	},
+	
+	openit(){
+		this.$.idbHelper.opened=!this.$.idbHelper.opened;
+		 
+	},
+
+	enterDataFromInterface(e){
+		console.log(e, e.model.item);
+		var inputSet=e.model.item;
+		var arrayForInputPage=this.indexeddbIndexArray[this.itemsArraysIndex];
+		arrayForInputPage.forEach(function(obj, i, array){
+			var values=Object.values(obj);
+				var index=values.indexOf(e.target.value);
+				if(index>-1){
+					var keys=Object.keys(obj);
+					var key=keys[index];					
+					this.set(["indexeddbIndexArray", this.itemsArraysIndex, key],e.target.value);
+					obj[keys[index]]=e.target.value;
+				}
+		}, this);
+	},
+	observeTheProxy(newVal, oldVal){
+		if(newVal){console.log("this is the proxy", newVal,oldVal);}
+	},
+	observeTheIndex(newVal, oldVal){
+		if(newVal){console.log("this is the index", newVal,oldVal);}
+	},
+
+	deleteObjectStorePass(e){
+		console.log(e, e.target.previousElementSibling.__data__.items);
+	},
+
+ _computeIndexOfDatabasesProxy(indexeddbIndexArray){
+ 	var objectA={};
+ 	var arrayForIdb=indexeddbIndexArray.reduce(function(previous,fourItemArrayContainingTwoObjectsInSubItemsA_and_B,index){
+ 			if(index%2==0){objectA={};}	
+ 			pairedObjectArray=fourItemArrayContainingTwoObjectsInSubItemsA_and_B.reduce(function(pre,val, i, arr){	
+ 						console.log(val, arr);	
+ 						var propertyA=val.nameA;
+ 						var propertyB=val.nameB;
+ 						var setValueA=(val.dropdownItemsA===false)?val.valueA:val.dropDownItemsA;
+ 						var setValueB=(val.dropdownItemsB===false)?val.valueB:val.dropDownItemsB;
+ 						console.log(setValueA,setValueB);
+ 						pre[propertyA]=setValueA;
+ 						pre[propertyB]=setValueB;
+ 						return pre;
+ 				}, objectA);
+ 			console.log(previous, pairedObjectArray);
+ 			previous =previous.concat(pairedObjectArray);
+ 			console.log(previous, pairedObjectArray);
+ 			return previous;
+ 			},[]);
+ 	console.log(arrayForIdb);
+ 	//this.updateObjectStoreByPuttingNewObjects("indexOfDatabases", 1,arrayForIdb);
+ 	//return arrayForIdb;
+ },
+
+ makeInputPage(objArr){
+	var kvals=objArr.map(function(val,index,array){
+		var keys=Object.keys(val);
+		var numbKeys=keys.length;
+		//console.log(keys);
+		return keys.reduce(function(pre,key, i,arr){
+			pre.push([key,val[key]]);
+			//console.log(pre, key, val[key]);
+			return pre;	
+			},[]);
+		});
+	//console.log(kvals);
+	var bigArray=[];
+	var numPairs=kvals.length;
+	var arrayPair=[];
+	var pageArray=[];
+	for(var i=0;i<numPairs;i++){
+		var last=kvals[i].length-1;
+		for(var j=0;j<kvals[i].length;j++)
+		{	
+			arrayPair.push(kvals[i][j]);
+			if(j>0&&j%2===0){
+			var obj=this.makeInputPairObject(arrayPair);
+			pageArray.push(obj);
+			arrayPair=[];
+			}
+			if(j===last){
+				bigArray.push(pageArray);
+				pageArray=[];
+			}
+			else if (j===last&&pageArray.length!==0){
+					bigArray.push(pageArray);
+
+			}
+			else if(j===last&&pageArray.length===0&&arrayPair.length!==0){
+				bigArray.push(obj);
+			}
+			
+		}
+	}
+	//console.log(bigArray);
+	return bigArray;
+
+	},
+
+makeInputPairObject(pairArray){
+
+		var keyA=pairArray[0][0];
+		var	valA=pairArray[0][1];
+		var keyB="addProperty";
+		var valB="Add Value"
+		if(pairArray[1]){
+		keyB=pairArray[1][0];
+		valB=pairArray[1][1];
+		//console.log(valB, keyB, pairArray);
+		}
+		if(keyB==="name"){
+			var holderK=keyA;
+			var holderV=valA;
+			keyA=keyB;
+			keyB=holderK;
+			valA=valB;
+			valB=holderV;
+		}
+
+		var object={};
+			object.dropdownItemsA=(Array.isArray(valA))?valA:false;
+ 			object.dropdownItemsB=(Array.isArray(valB))?valB:false;
+ 			//console.log(keyA);
+ 			object.labelA=keyA.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }); 
+ 			//console.log(object.labelA);
+ 			object.labelB=keyB.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+ 			object.nameA=keyA; 			
+ 			object.nameB=keyB; 			
+ 			object.valueA=(!Array.isArray(valA))?valA:false; 		
+ 			object.valueB=(!Array.isArray(valB))?valB:false;
+ 		return object;		
+		},
+
+	getArraysAb(){
+		var papa=document.querySelector("FC-DASHBOARD-DIVISIONS"),
+		key="FC-CALL-CENTER-DIALOG",
+		elem=papa.elemMap.get(key);
+		var inputArrays=elem.inputArraysAb;
+		this.set("callCenterArrays",inputArrays);
+		return this.callCenterArrays;	
+	},
+
+
+_forward(){
+		if(this.itemsArraysIndex===this.currentArraySet.length-1)
+			{
+				this.itemsArraysIndex=0;
+			}
+		else{
+			this.set("itemsArraysIndex", this.itemsArraysIndex+1);
+    		this.set("itemsArray", this.currentArraySet[this.itemsArraysIndex]);
+    		
+    	}
+    },
+ _backOne(){	
+ 		if(this.itemsArraysIndex===0)
+ 		{ 
+			var max=this.currentArraySet.length-1;
+ 			console.log(max);
+ 			this.set("itemsArraysIndex",max);
+ 			this.set("itemsArray",this.currentArraySet[this.itemsArraysIndex]);
+ 		}
+ 		else
+ 		{	this.set("itemsArray", this.currentArraySet[this.itemsArraysIndex-1]);
+ 			this.set("itemsArraysIndex", this.itemsArraysIndex-1);
+    		
+ 		}
+
+},  
+
+computeItemHeaderHidden(header){
+    if(header){return false;}
+    else{return true;}
+  },
+
+ dataArrayToObjectArraysForInputDisplay(data){
+ 	console.log(data,data,data);
+ 	
+
+
+
+
+
+
+
+
+ },
+
+
+});
 </script>
 </dom-module>
+<!--
+Object
+dropdownItemsA
+:
+false
+dropdownItemsB
+:
+false
+labelA
+:
+"Student First Name"
+labelB
+:
+"Student Last Name"
+nameA
+:
+"studentFirstName"
+nameB
+:
+"studentLastName"
+propertyNameA
+:
+"studentFirstName"
+propertyNameB
+:
+"studentLastName"
+
+		var keys=Object.keys(argObject);
+		var numbKeys=keys.length;
+		if(numbKeys===2)
+			this.dropdownItemsA=(Array.isArray(argObject[keys[0]]))?argObject[keys[0]]:false;
+ 			this.dropdownItemsB=(Array.isArray(argObject[keys[1]]))?argObject[keys[1]]:false;
+ 			this.labelA= keys[0].replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }); console.log(this.labelA);
+ 			this.labelB=keys[1].replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+ 			this.nameA=keys[0]; 			
+ 			this.nameB=keys[1]; 			
+ 			this.valueA=(!Array.isArray(argObject[keys[0]]))?argObject[keys[0]]:false; 		
+ 			this.valueB=(!Array.isArray(argObject[keys[0]]))?argObject[keys[1]]:false;				};

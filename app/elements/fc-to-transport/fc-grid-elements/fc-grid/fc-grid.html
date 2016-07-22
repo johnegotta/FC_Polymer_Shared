@@ -1,274 +1,504 @@
 <dom-module id="fc-grid">
- <template id="fc-grid-template">
- <style>
-         :host{margin: 12px; padding: 4px;overflow: scroll;position: static;background: white; opacity: 1; @apply(--layout-vertical);@apply(--layout-flex); };
-        textarea{margin:0px; border: 1px #dfdfdf solid; box-shadow: 1px 3px 4px 2px #fafafa;cursor: cell; font-size: 18px; font-weight: 600; color: #009; font-family: merriweather; text-align: center; white-space: wrap;
-          max-height: 45px; min-height: 45px; border: 1px solid #afafaf; padding-top: 4px; font-family: merriweather; color: #009; text-align: center; resize:none; @apply(--layout-self-shrink);}
+  <template id="fc-grid-template">
+    <style>
+      :host{
+        margin: 12px; 
+        padding: 4px;
+        overflow: scroll;
+        position: static;
+        background: white; 
+        opacity: 1; 
+        @apply(--layout-vertical);
+        @apply(--layout-flex); 
+      };
         details{outline: 0px white solid;}
         summary{outline: 0px white solid;}
         section{background:white;}
         paper-item{border: 1px solid #afafaf;}
-        #myContextMenu{min-width: 280px; max-height: 420px; position: fixed; border:4px ridge gold; overflow-y: scroll; box-shadow: 5px 7px 11px 3px #afafaf;}*{@apply(--layout-nowrap);}
-        #mappedGridContainer{min-width:50.99vw; background: aliceblue; max-width:92.99vw; width: 90%; min-height: 50vh; max-height:96vh; height: 100%; padding: 19px; margin: 16px;}
-        input{padding: 6px; min-height: 12px; align-items: center;}
+      #myContextMenu{
+          min-width: 280px; 
+          max-height: 420px; 
+          position: fixed; 
+          border:4px ridge gold; 
+          overflow-y: scroll; 
+          box-shadow: 5px 7px 11px 3px #afafaf;
+          }
+        #mappedGridContainer{
+          min-width:50.99vw; 
+          background: aliceblue; 
+          max-width:92.99vw; 
+          width: 90%; 
+          min-height: 50vh; 
+          max-height:96vh; 
+          height: 100%; 
+          padding: 19px; 
+          margin: 16px;
+        }
+        input{
+          padding: 6px; 
+          min-height: 12px; 
+          align-items: center;
+        }
         paper-button{
-          min-width: 110px; height: 65px; text-align: center; margin: 12px; border: #afafaf solid 2px; box-shadow: 4px 7px 15px 9px slategrey;
-        }
+          min-width: 110px;
+          max-width: 110px; 
+          height: 65px; 
+          text-align: 
+          center; 
+          margin: 12px; 
+          border: #afafaf solid 2px; 
+          box-shadow: 4px 7px 15px 9px slategrey;
+            }
         .columnHeader{
-          background: yellow; border: 1px silver solid; text-align: center; font-weight: 600; color: #009;
+              background: yellow; 
+              border: 1px silver solid; 
+              text-align: center; 
+              font-weight: 300; 
+              color: #009;
+            }
+        #polymerGrid{
+          position: absolute; 
+          padding: 6px; 
+          background: aliceblue;
         }
-        #polymerGrid{position: absolute; padding: 6px; background: aliceblue;}
-</style>
+        .columnCheckboxHeaders{
+            display: flex; 
+            flex-direction: row;
+            flex: nowrap; 
+            white-space: nowrap; 
+            overflow-x: scroll; 
+            margin: auto; 
+            background: yellow; 
+            position: absolute: 
+            top: 0px; right: 0px; left: 0px;
+        }
+        @media (min-width: 1900px){
+          .leftpanel{
+            @apply(--layout-flex-1);
+            z-index: 7; 
+            position: relative; 
+            left:22px;
+            bottom: -2px; 
+            top: 1px; 
+            width: 137px;
+            padding: 8px 36px 8px 20px;
+            @apply(--layout-center-justified);
 
- <array-selector id="columnSelector" items="{{dataArrays}}" multi toggle selected="{{selectedArraySet}}">
- </array-selector>
-<!-- <a> -->
-<div on-mousedown="closemenu" class="layout horizontal" style="position: relative; width: 100%;">
-<section class="layout flex-1 center-justified" style="z-index: 7; position: relative; left:22px;bottom: -2px; top: 1px; width: 137px;padding: 8px 36px 8px 20px;">
-BCK<paper-icon-button icon="icons:dashboard" on-tap="arraySwapBack"></paper-icon-button>ONE 
-
-<paper-button on-tap="loadPresets">Load Presets</paper-button>
-<!-- <paper-button on-tap="deletedb">delete all</paper-button>
-<paper-button on-tap="changeSource">Data Add</paper-button>
-<paper-button on-tap="recallSpreadSheet">Access DB</paper-button> -->
-              {{arrayIndex}}                      
-</section>
-<div is-gridbox="true"  id="mappedGridContainer" class="horizontal layout reverse flex-8" style="position: relative; overflow: scroll;">
-<!--side utility editing menu for the spreadsheet-like versions-->
-
-
-<div id="polymerGrid" on-contextmenu="mycontextMenu" class="horizontal layout flex-9 self-stretch reverse">
-  <template is="dom-repeat"  id="mappedGridRepeater" observe="data selected" class="horizontal layout flex" id="template" index-as="columnIndex" items="{{selectedArraySet}}" as="col">
-        <div id$="divCol_[[columnIndex]]" class="vertical layout container nowrap self-stretch columnHeader" style="position: relative;">
-      <section style="display: flex; flex-direction: row;flex: nowrap; white-space: nowrap; overflow-x: scroll; margin: auto; background: yellow; position: absolute: top: 0px; right: 0px; left: 0px;">  [[columnIndex]]
-        <input on-click="lockColumn" style="background:yellow;" type="checkbox" name="hl" value="[[columnIndex]]" id="column_{{columnIndex}}_0_inputA" checked="[[computeLockedColumn(columnIndex)]]">
-        <input on-click="lockColumn" type="checkbox" style="background:yellow;" name="hl" value="[[columnIndex]]" id="column_{{columnIndex}}_0_inputB" checked="[[computeLockedColumn(columnIndex)]]">
+          }
+        }
+        @media (max-width: 1899px){
+          .leftpanel{
+            display: none;
+          }
+        }
+        @media (min-width: 747px)
+        {
+          .rightpanel{
+            @apply(--layout-flex-1);
+            z-index: 7; 
+            position: relative; 
+            right:-2px;
+            bottom: -2px; 
+            top: 1px; 
+            min-width: 297px;
+            padding: 8px 8px 8px 20px; 
+            margin:0px; 
+            border-left: 1px silver solid;
+            @apply(--layout-center-justified);
+          }
+        }
+        @media(max-width: 746px){
+          .rightpanel{
+            width: 1px;
+            height: 1px;
+            position: fixed;
+            top: -100px;
+            left: -100px;
+          }
+        }
+        .interface{
+          position: fixed;
+          bottom: 50px;
+          right: 70px;
+          background: white;
+          color: #005c00;
+        }
+    </style>
+    <array-selector 
+        id="columnSelector" 
+        items="{{dataArrays}}" 
+        multi toggle 
+        selected="{{selectedArraySet}}">
+    </array-selector>
+    <!--begin grid-->
+    <div on-mousedown="closemenu" class="layout horizontal" style="position: relative; width: 100%;">
+        <!--begin left control panel-->
+        <section 
+            class="leftpanel">
+            BCK
+            <paper-icon-button
+                icon="icons:dashboard" 
+                on-tap="arraySwapBack">  
+            </paper-icon-button>
+            ONE 
+           
+              {{arrayIndex}} 
         </section>
-        
-          <template is="dom-repeat" id$="template_{{columnIndex}}" class="vertical flex layout" observe="highlight col row" is="dom-repeat" items="{{col}}">
-               <!--          <a link={{}}>  on-change="{{item.indexedDbFunction}}"
-                    on-focus="{{item.indexedDbRequest}}"  hidden="{{__computeCellHidden(item.id, item.key)}}" -->
-                <textarea        
-                    input-type="text" 
-                    draggable="true" 
-                    id$="{{item.id}}" 
-                    value="{{item.value::textarea}}"
-                    on-focus="indexedDbRequest"
-                    on-change="indexedDbPutter"  
-                    contenteditable="true" 
-                    style$="{{item.style}}"
-                    class$="{{_computeClass(item.id)}}"
-                    key="{{item.key}}"
-                    related-cells="{{item.relatedCells}}"
-                    name="{{item.name}}"
-                    archive="{{item.archive}}" 
-                    max-char="450">  
-                </textarea>      
-            <!--         </a> -->
-          </template>
-        </div>
-  </template>
-  </div>
-</div>
-<section class="layout flex-1 center-justified" style="z-index: 7; position: relative; right:-2px;bottom: -2px; top: 1px; min-width: 297px;padding: 8px 8px 8px 20px; margin:0px; border-left: 1px silver solid;">
-FWD<paper-icon-button icon="icons:dashboard" on-tap="arraySwap"></paper-icon-button>ONE 
-<fc-indexed-database maps-array="{{mapsArray}}" indexed-data-bases="{{indexedDataBases}}" database-changed="{{databaseChanged}}" data-arrays="{{dataArrays}}">
-</fc-indexed-database>
-</section>
-</div>
-<paper-listbox id="myContextMenu"  hidden>
-  <paper-item class="around-justified">
-        <paper-swatch-picker>
-        </paper-swatch-picker><span>  &nbsp; Text Color &nbsp;&nbsp; &nbsp;</span>
-        <input type="color" value="{{background::input}}"> Background Color
-  </paper-item>
-    <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
-        <paper-item on-blur="detailOpenListener" value="{{category.title}}">
-            <details on-blur="detailOpenListener" open="{{detailOpen}}">
-                <summary>{{category.title}}</summary>
-                <paper-listbox id="innerListBox" style="min-width:360px!important; max-width: 360px!important;">
-                    <template is="dom-repeat" items="{{category.buttons}}" as="item">
-                          <paper-item onclick="{{item.myFunction}}" btn-set-value="{{item.dataSetValue}}" btn-text="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}" btn-property="{{item.dataProperty}}">                {{item.text.0}}
-                         <!--    {{item.text.2}}  
-                             {{item.text.1}} -->
-                          </paper-item>
-                    </template> 
-                </paper-listbox>
-            </details>
+        <!--end left controll panel-->
+        <!--begin center grid scroll container-->
+        <div 
+            is-gridbox="true"  
+            id="mappedGridContainer" 
+            class="horizontal layout reverse flex-8" 
+            style="position: relative; overflow: scroll;">
+            <!--interior of scroll div for grid-->
+            <!--begin grid div below-->
+            <div 
+                id="polymerGrid" 
+                on-contextmenu="mycontextMenu" 
+                class="horizontal layout flex-9 self-stretch reverse">
+                <template 
+                    is="dom-repeat"  
+                    id="mappedGridRepeater" 
+                    observe="data selected" 
+                    class="horizontal layout flex" 
+                    id="template" 
+                    index-as="columnIndex" 
+                    items="{{selectedArraySet}}" 
+                    as="col"><!--begin columns-->
+                    <div 
+                        id$="divCol_[[columnIndex]]" 
+                        class="vertical layout container nowrap columnHeader" 
+                        style="position: relative; font-size: 6px; overflow:hidden;">
+                        {{col.0.key}}
+                        <section 
+                            class="columnCheckboxHeaders">
+                            <input 
+                                on-click="lockColumn" 
+                                style="background:yellow;" 
+                                type="checkbox" 
+                                name="hl" 
+                                value="[[columnIndex]]" 
+                                id="column_{{columnIndex}}_0_inputA" 
+                                checked="[[computeLockedColumn(columnIndex)]]">
+                            <input 
+                                on-click="lockColumn" 
+                                    type="checkbox" 
+                                    style="background:yellow;" 
+                                    name="hl" 
+                                    value="[[columnIndex]]" 
+                                    id="column_{{columnIndex}}_0_inputB" 
+                                    checked="[[computeLockedColumn(columnIndex)]]">
+                        </section><!--end column checkboxheader-->
+                        <!--begin column-->
+                        <template 
+                            is="dom-repeat" 
+                            id$="template_{{columnIndex}}" 
+                            filter="{{_myStupidFilter(item)}}"
+                            class="vertical flex layout"
+                            items="{{col}}">
+                           <!--begin cell repeats--> 
+                            <textarea        
+                                input-type="text" 
+                                 
+                                id$="{{item.id}}" 
+                                value="{{item.value::input}}"
+                                on-keydown="valueChangeRecord"
+                                on-change="_valueFunction"
+                                contenteditable="true" 
+                                style$="{{item.style}} {{_computeStyleTwo(item.style)}}"
+                                class$="{{_computeClass(item.id,item)}}"
+                                key="{{item.key}}"
+                                related-cells="{{item.relatedCells}}"
+                                name="{{item.name}}"
+                                archive="{{item.archive}}" 
+                                max-char="450">
+                                <!--draggable="true"-->
+                            </textarea>      
+                        </template><!--end cell repeats-->
+                    </div><!--end column div-->
+                </template><!--end column repeater-->
+            </div><!-- end grid div-->
+             <fc-indexed-db-helper id="interface"></fc-indexed-db-helper>
+        </div><!--end center grid scroll container-->
+        <!--begin Right control panel-->
+       
+        <section 
+            class="rightpanel">
+            FWD
+            <paper-icon-button 
+                icon="icons:dashboard" 
+                on-tap="arraySwap">
+            </paper-icon-button>
+            ONE 
+
+            <fc-indexed-database 
+                maps-array="{{mapsArray}}" 
+                indexed-databases="{{indexedDatabases}}" 
+                database-changed="{{databaseChanged}}" 
+                data-arrays="{{dataArrays}}"
+                selected-array-set="{{selectedArraySet}}"
+                array-index="{{arrayIndex}}">
+            </fc-indexed-database>
+        </section>
+        <!--end Right Panel-->
+    </div>
+    <!--end grid-->
+    <paper-listbox id="myContextMenu"  hidden>
+        <paper-item class="around-justified">
+            <paper-swatch-picker>
+            </paper-swatch-picker><span>  &nbsp; Text Color &nbsp;&nbsp; &nbsp;</span>
+            <input type="color" value="{{background::input}}"> Background Color
         </paper-item>
-    </template>
-</paper-listbox>
- </template>
- <script>
- FcGrid=Polymer({
- 	is:"fc-grid",
-  behaviors:[FCBehaviors.FcGridStyleBehavior],
-  listeners: {"color-picker-selected":"getcolor"},
- 	properties: { 
-    format:{
-      type: Object,
-      value:function(){return {};},
-      notify: true,
-    },
-    databaseChanged:{
-        type: Object,
-        notify: true,
+        <template is="dom-repeat"  items="{{contextMenuCategories}}" as="category" index-as="categoryIndex">
+            <paper-item on-blur="detailOpenListener" value="{{category.title}}">
+                <details on-blur="detailOpenListener" open="{{detailOpen}}">
+                    <summary>{{category.title}}</summary>
+                    <paper-listbox id="innerListBox" style="min-width:360px!important; max-width: 360px!important;">
+                        <template is="dom-repeat" items="{{category.buttons}}" as="item">
+                            <paper-item onclick="{{item.myFunction}}" btn-set-value="{{item.dataSetValue}}" btn-text="{{item.text.0}}" btn-args="{{item.dataArgs}}"style$="padding: 0px; margin: 0px; font-size: 18px; font-weight: 700; font-family: merriweather; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}" btn-property="{{item.dataProperty}}">                {{item.text.0}}
+                            </paper-item>
+                        </template> 
+                    </paper-listbox>
+                </details>
+            </paper-item>
+        </template>
+    </paper-listbox>
+     <paper-button on-tap="openit" class="interface">interface</paper-button>
+  </template>
+  <script>
+  FcGrid=Polymer({
+	      is:"fc-grid",
+      behaviors:[FCBehaviors.FcGridStyleBehavior],
+      listeners: {"color-picker-selected":"getcolor"},
+     	properties: { 
+        format:{
+          type: Object,
+          value:function(){return {};},
+          notify: true,
+        },
+        databaseChanged:{
+            type: Object,
+            notify: true,
+        },
+        data:{
+          type: Array,
+          value: function(){return [];},
+          notify: true
+        },
+          detailOpen:{
+            type: Boolean,
+            value: function(){return false;},
+            notify: true,
+          },
+          mapsArray:{
+            type:Array,
+            value: function(){return [];},
+            notify: true,
+          },
+       
+     	},
 
-    },
-     data:{
-      type: Array,
-      value: function(){return [];},
-      notify: true
-    },
-      detailOpen:{
-        type: Boolean,
-        value: function(){return false;},
-        notify: true,
+     get gridPresets(){
+        return [ [50,50, "JasonTest", "allRed", 1, null, false, undefined, undefined],
+          [40,40, "ACalendar", "calendar", 1, null, false, undefined, undefined],
+          [30,30, "ACalendar2", "daysofweek", 1, null, true, undefined, undefined],
+          [26,26,"jasonGrid2","monthsFinancial",1, null, true, undefined, undefined],
+          [16,25,"jasonGrid","allBlue",1, null, true, undefined, undefined],
+          [12,12,"months","allBlue",1, null, false, undefined, undefined],
+          [38,43,"class","allBlue",1, null, false, undefined, undefined],
+          [4,10,"class21","allBlue",1, null, false, undefined, undefined],
+          [6,12,"class20","allBlue",1, null, false, undefined, undefined],
+          [5,10,"class22","allBlue",1, null, false, undefined, undefined]
+          ];
+        },
+    
+      registered(){
+//        this.getAllObjectStoresAtInit();
       },
-      mapsArray:{
-        type:Array,
-        value: function(){return [];},
-        notify: true,
-
+      ready(){
+                 this.getAllObjectStoresAtInit();
 
       },
-   
- 	},
+      attached(){
 
- get gridPresets(){
-    return [ [50,50, "JasonTest", "allRed", 1, null, false, undefined, undefined],
-      [40,40, "ACalendar", "calendar", 1, null, false, undefined, undefined],
-      [30,30, "ACalendar2", "daysofweek", 1, null, true, undefined, undefined],
-      [26,26,"jasonGrid2","monthsFinancial",1, null, true, undefined, undefined],
-      [16,25,"jasonGrid","allBlue",1, null, true, undefined, undefined],
-      [12,12,"months","allBlue",1, null, false, undefined, undefined],
-      [38,43,"class","allBlue",1, null, false, undefined, undefined],
-      [4,10,"class21","allBlue",1, null, false, undefined, undefined],
-      [6,12,"class20","allBlue",1, null, false, undefined, undefined],
-      [5,10,"class22","allBlue",1, null, false, undefined, undefined]
-      ];
-    },
+      },
 
-  ready(){
+      display(){
+        var pickle=new DataGrids();
+        console.log(pickle, pickle.dataArrays);
+      },
+
+      _computeStyleTwo(style){
+     
+      },     
+      openit(){
+        this.$.interface.openit();
+      },
+
+      valueChangeRecord(e){},
+      _valueFunction(e){
+
+       var model=e.model;
+        var value=e.target.value;
+        console.log(model, value, model.item);
+        model.set("item.value",value);
+        var setValue=model.item.value;
+        console.log(model.item.value);
+        var key=e.model.item.id;
+        var keys=key.split("_");
+        var keys1=parseInt(keys[1]);
+        this.updateObjectStores(keys[0], 1, key,"value", setValue);
+        var width= this.textMeasurements(model.item);
+        var cellStyle=model.item.style;
+        var property="width";
+        var minWidth=0;
+        minWidth=(minWidth>=width)?minWidth:(width>180)?180:width;
+        width=minWidth+63;
+        var fullVal=property+":"+" "+width+"px;" 
+        var noodles=this.selectedArraySet[keys1];
+        var smallestWidth=noodles.reduce((pre,val)=>{
+              let width=this.textMeasurements(val);
+              // console.log(width);
+              width=width+63;
+              // console.log(width);
+              var retval=(width>pre)?width: pre;
+              return retval;
+              }, 0);
+        if(width>=smallestWidth){
+              noodles.forEach(function(cell, ind){
+                 var cstyle=cell.style;
+                  if(cstyle.match(property))
+                  {
+                    var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
+                    cstyle=cstyle.replace(replacer, "");
+                    }
+                  cstyle=cstyle+fullVal;
+                  this.set(["selectedArraySet",keys1,ind,"style"], cstyle);
+                  let key =cell.id;
+                  let keys=cell.id.split("_");
+                  this.updateObjectStores(keys[0], 1, key ,"style", cstyle);
+              }, this);
+          }
+         
+        },
+
+     
+      _computeClass(key, item){
+        var keys=key.split("_");
+        var oddEvenRow=(parseInt(keys[2])%2!==0)?"oddRow":"evenRow";
+          var oddEvenColumn=(parseInt(keys[1])%2!==0)?"oddColumn":"evenColumn";
+        if(keys[1]!=0&&keys[2]!=0)
+        { 
+        var str= keys[0] + " " +"row"+parseInt(keys[2])+" "+" column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+        item.class=str;
+        this.set("item.class",str);
+        return str;
+        }
+        else if(keys[2]==0)
+          {
+            var str = keys[0]+" "+ "headers" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+            this.set("item.class",str);
+            item.class=str;
+        return str;
+          }
+        else{
+          var str=keys[0]+" "+"rowlabels" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
+          this.set("item.class",str);
+          item.class=str;
+          return str;
+        }
+      },
 
       
-      // this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
-    // this.set("parentTarget", this.$.mappedGridRepeater);
-  },
+      detailOpenListener(e){
+        console.log(e, "here is the focus lost");
+        if(e.target.nodeName==="DETAILS"){
+        e.target.open=false;
+        }
+        else if(e.target.nodeName==="PAPER-ITEM")
+        { 
+          var children= Polymer.dom(e.target).children; 
+          var details=children.filter(function(elem){return (elem.nodeName==="DETAILS");});
+          console.log(details);
+          details.forEach(function(item){item.attributes.open=false;},this);
+        }
+      },
+      __computeCellHidden(id, key){
+        var keys=key.split("_");
+        return(keys[2]==0);
+      }, 
 
-  attached(){
-    this.getAllObjectStoresAtInit();
-  },
+      mycontextMenu(e){
+        this.set("gridEvent", e);
+        this.$.myContextMenu.hidden=false;
+        this.$.myContextMenu.style.left=(e.clientX-330)+"px";
+        this.$.myContextMenu.style.top=(e.clientY-80)+"px";
+        this.$.myContextMenu.style.zIndex=25000;
+        var key=e.target.getAttribute("id").split("_");//
+        if(key[2]==0 && key[1]!=0){
+          var returnColumnHeader=this.columnMenu.concat(this.basemenu);
+        this.setMenuEntries(returnColumnHeader);
+        }
+        else if(key[1]==0&&key[2]!=0){
+            var returnRowMenu=this.rowMenu.concat(this.basemenu);
+             this.setMenuEntries(returnRowMenu);
+        }
+        else if(key[1]&&key[2]){ this.setMenuEntries(this.basemenu);}
+        else{this.setMenuEntries([]);}
+      },
 
-  _computeClass(key){
-    var keys=key.split("_");
-    var oddEvenRow=(parseInt(keys[2])%2!==0)?"oddRow":"evenRow";
-      var oddEvenColumn=(parseInt(keys[1])%2!==0)?"oddColumn":"evenColumn";
-    if(keys[1]!=0&&keys[2]!=0)
-    { 
-    var str= keys[0] + " " +"row"+parseInt(keys[2])+" "+" column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
-    return str;
-    }
-    else if(keys[2]==0)
-      {
-        var str = keys[0]+" "+ "headers" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
-    return str;
-      }
-    else{
-      var str=keys[0]+" "+"rowlabels" + " " +"row"+parseInt(keys[2])+" "+"column"+parseInt(keys[1])+" "+oddEvenRow +" "+ oddEvenColumn;
-      return str;
-    }
-  },
-  detailOpenListener(e){
-    console.log(e, "here is the focus lost");
-    if(e.target.nodeName==="DETAILS"){
-    e.target.open=false;
-    }
-    else if(e.target.nodeName==="PAPER-ITEM")
-    { 
-      var children= Polymer.dom(e.target).children; 
-      var details=children.filter(function(elem){return (elem.nodeName==="DETAILS");});
-      console.log(details);
-      details.forEach(function(item){item.attributes.open=false;},this);
-    
+      getcolor(e){
+        this.set("color",e.detail.color);
+      },
 
-    }
-  },
-  __computeCellHidden(id, key){
-    var keys=key.split("_");
-    return(keys[2]==0);
-  },
-  
-
-  mycontextMenu(e){
-    this.set("gridEvent", e);
-    this.$.myContextMenu.hidden=false;
-    this.$.myContextMenu.style.left=(e.clientX-330)+"px";
-    this.$.myContextMenu.style.top=(e.clientY-80)+"px";
-    this.$.myContextMenu.style.zIndex=25000;
-    var key=e.target.getAttribute("id").split("_");//
-    if(key[2]==0 && key[1]!=0){
-      var returnColumnHeader=this.columnMenu.concat(this.basemenu);
-    this.setMenuEntries(returnColumnHeader);
-    }
-    else if(key[1]==0&&key[2]!=0){
-        var returnRowMenu=this.rowMenu.concat(this.basemenu);
-         this.setMenuEntries(returnRowMenu);
-    }
-    else if(key[1]&&key[2]){ this.setMenuEntries(this.basemenu);}
-    else{this.setMenuEntries([]);}
-  },
-
-computeColSelected(one, trigger){},
-  getcolor(e){
-    this.set("color",e.detail.color);
-  },
-
-  setMenuEntries(returnValue){
-      this.set("contextMenuCategories", returnValue);
-  },
-  closemenu(e){
-    this.$.myContextMenu.hidden=true;
-  },
-  _computeStyle(property, val, color, background, text ){
-    if(text||text.match(" ")){
- var retVal=(text.match("Remove"))?`background: ${this.defaultFormat.background};`:(text.match("Base"))?`color: ${this.defaultFormat.color};`:(property==="background:")?`background: ${this.background};`:(property==="color:")?`color: ${this.color}`: property + val;
- return retVal;
-}
-else return "background: gold;";
-         //NOTE TODO: MUST SAVE THE SET OF PROPERTIES WILL OVERWRITE EACH TIME!!!
-  },
- arraySwap(e){
-       var maxNum=this.dataArrays.length;
+      setMenuEntries(returnValue){
+          this.set("contextMenuCategories", returnValue);
+      },
+      closemenu(e){
+        this.$.myContextMenu.hidden=true;
+      },
+      _computeStyle(property, val, color, background, text ){
+        if(text||text.match(" ")){
+          var retVal=(text.match("Remove"))?`background: ${this.defaultFormat.background};`:(text.match("Base"))?`color: ${this.defaultFormat.color};`:(property==="background:")?`background: ${this.background};`:(property==="color:")?`color: ${this.color}`: property + val;
+          return retVal;
+        }
+        else{ return "background: gold";}
+      },
+      arraySwap(e){
+           var maxNum=this.dataArrays.length;
+            maxNum=maxNum-1;
+            var newIndex=(this.arrayIndex!=maxNum)?parseInt(this.arrayIndex)+1:0;
+            this.set("arrayIndex", newIndex);
+            this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+      },
+      arraySwapBack(e){
+        var maxNum=this.dataArrays.length;
         maxNum=maxNum-1;
-        var newIndex=(this.arrayIndex!=maxNum)?parseInt(this.arrayIndex)+1:0;
-        this.set("arrayIndex", newIndex);
-        this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
-  },
-  arraySwapBack(e){
-    var maxNum=this.dataArrays.length;
-    maxNum=maxNum-1;
-    var newIndex=(this.arrayIndex!=0)?parseInt(this.arrayIndex)-1:maxNum;
-        this.set("arrayIndex", newIndex);
-        this.set("selectedArraySet", this.dataArrays[this.arrayIndex])
+        var newIndex=(this.arrayIndex!=0)?parseInt(this.arrayIndex)-1:maxNum;
+            this.set("arrayIndex", newIndex);
+            this.set("selectedArraySet", this.dataArrays[this.arrayIndex]);
+      },
+    loadPresets(e){
+      this.gridPresets.forEach(function(gridParams, index, arrayOfGrids){
+          this.gridConstructor(gridParams);
+          }, this);
 
-  },
-loadPresets(e){
-  this.gridPresets.forEach(function(gridParams, index, arrayOfGrids){
-      this.gridConstructor(gridParams);
-      }, this);
+    },
+    _myStupidFilter(item){
+      return function(){
 
-},
-lockColumn(e){},
-startDrag(e){},
-dragOver(e){},
-handleDrop(e){},
-computeLockedColumn(col){},
- 
- 
+        return true;
+      };
+    },
+    lockColumn(e){},
+    startDrag(e){},
+    dragOver(e){},
+    handleDrop(e){},
+    computeLockedColumn(col){},
   });
-    </script>
-   </dom-module>
+  </script>
+</dom-module>
 
 <!--<span btn-property="{{item.dataProperty}}" btn-text="{{item.text.0}}" btn-set-value="{{item.dataSetValue}}" btn-function="{{item.datafunction}}"style$="font-size: 24px; font-weight: 300; color: #009;{{_computeStyle(item.dataProperty, item.dataSetValue, color, background, item.text.0)}}"></span>
 
@@ -283,4 +513,89 @@ computeLockedColumn(col){},
         <input on-click="lockColumn" type="checkbox" style="background:yellow;" name="hl" value="[[columnIndex]]" id="column_{{columnIndex}}_0_" checked="[[computeLockedColumn(col.id)]]">
         <input on-click="lockColumn" type="checkbox" style="background:yellow;" name="hl" value="[[columnIndex]]" id="column_{{columnIndex}}_0_" checked="[[computeLockedColumn(col.id)]]">
              </section>
-             </section> -->
+             </section> 
+
+    var model=e.model;
+    var value=e.target.value;
+    model.set("item.value",value);
+    var setValue=model.item.value;
+    var key=e.model.item.id;
+    var keys=key.split("_");
+    var keys1=parseInt(keys[1]);
+    var width= this.textMeasurements(model.item);
+    var cellStyle=model.item.style;
+    var property="width";
+    var minWidth=0;
+    minWidth=(minWidth>=width)?minWidth:(width>180)?180:width;
+    width=minWidth+63;
+    var fullVal=property+":"+" "+width+"px;" 
+    var noodles=this.selectedArraySet[keys1];
+    var smallestWidth=noodles.reduce((pre,val)=>{
+          let width=this.textMeasurements(val);
+          console.log(width);
+          width=width+63;
+          console.log(width);
+          var retval=(width>pre)?width: pre;
+          return retval;
+          }, 0);
+    if(width>=smallestWidth){
+          noodles.forEach(function(cell, ind){
+             var cstyle=cell.style;
+              if(cstyle.match(property))
+              {
+                var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
+                cstyle=cstyle.replace(replacer, "");
+                }
+              cstyle=cstyle+fullVal;
+              this.set(["selectedArraySet",colKey,ind,"style"], cstyle);
+              let key =cell.id;
+              let keys=cell.id.split("_");
+              this.updateObjectStores(keys[0], 1, key ,"style", cstyle);
+            }
+          }, this);
+      }
+      this.updateObjectStores(keys[0], 1, key,"value", setValue);
+
+       valueChangeRecord(e){
+       var model=e.model;
+        var value=e.target.value;
+        model.set("item.value",value);
+        var setValue=model.item.value;
+        var key=e.model.item.id;
+        var keys=key.split("_");
+        var keys1=parseInt(keys[1]);
+        var width= this.textMeasurements(model.item);
+        var cellStyle=model.item.style;
+        var property="width";
+        var minWidth=0;
+        minWidth=(minWidth>=width)?minWidth:(width>180)?180:width;
+        width=minWidth+63;
+        var fullVal=property+":"+" "+width+"px;" 
+        var noodles=this.selectedArraySet[keys1];
+        var smallestWidth=noodles.reduce((pre,val)=>{
+              let width=this.textMeasurements(val);
+              console.log(width);
+              width=width+63;
+              console.log(width);
+              var retval=(width>pre)?width: pre;
+              return retval;
+              }, 0);
+        if(width>=smallestWidth){
+              noodles.forEach(function(cell, ind){
+                 var cstyle=cell.style;
+                  if(cstyle.match(property))
+                  {
+                    var replacer= new RegExp('(('+property+')+(\\w*|\\s*|:)+(\\w|\\s|\\-|\\#)+(;|(\\w|\\s|\\b)+;|\\b))+','g');
+                    cstyle=cstyle.replace(replacer, "");
+                    }
+                  cstyle=cstyle+fullVal;
+                  this.set(["selectedArraySet",keys1,ind,"style"], cstyle);
+                  let key =cell.id;
+                  let keys=cell.id.split("_");
+                  this.updateObjectStores(keys[0], 1, key ,"style", cstyle);
+              }, this);
+          }
+          this.updateObjectStores(keys[0], 1, key,"value", setValue);
+        },
+
+-->

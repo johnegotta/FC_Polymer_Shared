@@ -20,16 +20,16 @@ div{
    @apply(--layout-start-justified);
 }
 .primary{color: #009; font-size: 18px; font-weight: 600;@apply(--layout-flex);
-   @apply(--layout-start-justified); }
+   @apply(--layout-start); }
 .secondary{color: brown; font-size: 14px; font-weight: 300;}
   .tertiary{color: brown; font-size: 14px; font-weight: 300;}
 </style>
 <template id="fc-indexed-database-template">
 <paper-listbox>
-<template is="dom-repeat" items="{{indexedDataBases}}">
+<template is="dom-repeat" items="{{indexedDatabases}}">
 <paper-item on-tap="checkDataBase">
 <div class="primary">
-DB: {{item.name}} V. {{item.version}}
+DB: {{item.name}} V. {{item.version}} index: {{index}}
 </div>
 <div class="secondary">
 Cols: {{item.columns}} x Rows: {{item.rows}}, {{item.size}}cells,
@@ -61,6 +61,7 @@ FcIndexedDatabase=Polymer({
           notify: true,
       },
 
+
       activeCell:{
           type: Object, 
           value: function(){return{};},
@@ -74,18 +75,19 @@ FcIndexedDatabase=Polymer({
   ready(){ },
   attached(){
     console.log(this.indexedDB);
+    var data=this.viewIndexOfIndexedDatabases();
+    this.set("indexedDatabases", data);
    
   },
   detached(){},
 
   observeArrayIndex(arrayIndex){
-      console.log(arrayIndex, this.arrayIndex);
+      //console.log(arrayIndex, this.arrayIndex);
 
   },
   checkDataBase(e){
-
-
-
+    console.log(e);
+    this.updateDataArraysFromIndexedDatabase(e.model.item.name, e.model.item.version, e.model.index, this);
   },
 
   
@@ -98,7 +100,7 @@ FcIndexedDatabase=Polymer({
 
   },
   observeDataArrays(ndav, odav){
-      if(ndav!=null){console.log(ndav, odav);}
+      // if(ndav!=null){console.log(ndav, odav);}
   },
   setDataBase(gridName, version, data){
 
