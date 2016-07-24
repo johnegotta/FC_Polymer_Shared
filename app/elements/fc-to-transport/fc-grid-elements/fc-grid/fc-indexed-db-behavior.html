@@ -1,4 +1,7 @@
- <script>
+
+<script>
+
+
 (function(){
 // // "use strict";
 window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -12,6 +15,7 @@ if (!window.indexedDB) {
    window.alert("Your browser doesn't support a stable version of IndexedDB.")
 }
 })();
+
 class DataGrids{
   constructor(){
     this.dataArrays=[];
@@ -151,7 +155,6 @@ class DataGrids{
                     "value": val.value,
                     "key": val.key,
                     "time": 0,
-                    "location":"#s_#n",
                     "changeFlag":flag
                   };
                   return databases;
@@ -256,7 +259,14 @@ FCBehaviors.FcIndexedDbBehavior = {
     created(){},
     ready(){},
     attached(){
-        //console.log(this.indexedDB);
+       var myWorker = new Worker("fc-idb-firebase-webworker.js");
+  myWorker.onmessage = function(argResults){
+   console.log("got Worker results:", argResults);
+   
+   };
+  myWorker.postMessage({data:"buttmonkey", requestType:"ping"});
+  myWorker.postMessage({data:"buttmonkey", requestType:"zing"});
+  myWorker.postMessage({data:"gimmeEvents", requestType:"getAllEvents"});
       },
     observeDataArrays(news,olds){
       if(news){
@@ -658,12 +668,11 @@ FCBehaviors.FcIndexedDbBehavior = {
   },
 
   viewIndexOfIndexedDatabases(){
-                this.set("indexDatabases", drays.indexOfDatabases);
-                this.set("indexedDataBases",  drays.indexOfDatabases);
+                 this.set("indexedDatabases", drays.indexOfDatabases);
                 console.log(this.indexOfDatabases);
-              this.set("indexOfDataBases", drays.indexOfdata)
                   return drays.indexOfDatabases;
   },
 
       }
 </script>
+
